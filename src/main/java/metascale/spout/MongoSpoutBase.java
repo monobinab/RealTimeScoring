@@ -24,6 +24,7 @@ public abstract class MongoSpoutBase extends BaseRichSpout {
     wholeDocumentMapper = new MongoObjectGrabber() {
       @Override
       public List<Object> map(DBObject object) {
+        if (object != null) System.out.println(" in Mapper: " + object);
         List<Object> tuple = new ArrayList<Object>();
         tuple.add(object);
         return tuple;

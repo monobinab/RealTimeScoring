@@ -33,6 +33,7 @@ public class MongoCappedCollectionSpout extends MongoSpoutBase implements Serial
   @Override
   protected void processNextTuple() {
     DBObject object = this.queue.poll();
+    if (object != null) {System.out.println(" in the spout: " + object);}
     // If we have an object, let's process it, map and emit it
     if (object != null) {
       // Map the object to a tuple

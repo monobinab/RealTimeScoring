@@ -1,20 +1,17 @@
 package metascale;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.mongodb.DBObject;
-
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
 import backtype.storm.generated.AlreadyAliveException;
 import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.topology.TopologyBuilder;
-import metascale.bolt.RedisBolt;
-import metascale.spout.MeetupRsvpsSpout;
+import com.mongodb.DBObject;
+import metascale.bolt.ScoringBolt;
 import metascale.spout.MongoCappedCollectionSpout;
-import metascale.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -31,24 +28,22 @@ public class RealTimeScoringTopology {
         MongoObjectGrabber mongoMapper = new MongoObjectGrabber() {
             @Override
             public List<Object> map(DBObject object) {
-              List<Object> tuple = new ArrayList<Object>();
-              // Add the a variable
-              tuple.add(object.get("a"));
-              // Return the mapped object
-              return tuple;
+                if (object != null) System.out.println(" in Mapper: " + object);
+                List<Object> tuple = new ArrayList<Object>();
+                tuple.add(object);
+                return tuple;
             }
 
             @Override
             public String[] fields() {
-              return new String[]{"a"};
+                return new String[]{"document"};
             }
+        };
 
-          };
-
-          topologyBuilder.setSpout("mongodb", new MongoCappedCollectionSpout("mongodb://127.0.0.1:27017/storm_mongospout_test", "aggregation", mongoMapper), 1);
+          topologyBuilder.setSpout("mongodb", new MongoCappedCollectionSpout("mongodb://151.149.191.228:27017/test", "BrightTagFeed", mongoMapper), 1);
 
         // create definition of main spout for queue 1
-        topologyBuilder.setBolt("redis_bolt", new RedisBolt()).shuffleGrouping("meetup_rsvp_spout");
+        topologyBuilder.setBolt("scoring_bolt", new ScoringBolt()).shuffleGrouping("mongodb");
         Config conf = new Config();
         conf.setDebug(false);
 

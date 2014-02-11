@@ -8,10 +8,9 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
-import org.json.simple.JSONObject;
+import com.mongodb.DBObject;
 import redis.clients.jedis.Jedis;
 
-import java.util.Collection;
 import java.util.Map;
 
 public class RedisBolt extends BaseRichBolt {
@@ -42,17 +41,12 @@ public class RedisBolt extends BaseRichBolt {
 	 */
 	@Override
 	public void execute(Tuple input) {
-        JSONObject rsvp = (JSONObject) input.getValueByField("rsvp");
-        Object country = ((Map) rsvp.get("group")).get("group_country");
-        System.out.println("country : " + rsvp);
+
+        DBObject document = (DBObject) input.getValueByField("document");
+
+        System.out.println(document);
         //jedis.hincrBy("meetup_country", country.toString(), 1);
-        Collection topics = ((Collection)((Map) rsvp.get("group")).get("group_topics"));
-        for(Object topics_map:topics)
-        {
-            System.out.println(((Map)topics_map).get("url_key"));
-            //jedis.hincrBy("topics", ((Map)topics_map).get("urlkey").toString(), 1);
-            //jedis.publish("meetup_topics", ((Map)topics_map).get("topic_name").toString());
-        }
+
 
 	}
 

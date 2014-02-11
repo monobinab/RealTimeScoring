@@ -80,7 +80,9 @@ class MongoSpoutTask implements Callable<Boolean>, Runnable, Serializable {
         if (this.cursor.hasNext()) {
           if (LOG.isInfoEnabled()) LOG.info("Fetching a new item from MongoDB cursor");
           // Fetch the next object and push it on the queue
-          this.queue.put(this.cursor.next());
+            DBObject next = this.cursor.next();
+            System.out.println(" in the task: " + next);
+            this.queue.put(next);
         } else {
           // Sleep for 50 ms and then wake up
           Thread.sleep(50);
