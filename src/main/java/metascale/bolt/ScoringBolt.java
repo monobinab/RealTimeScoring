@@ -69,9 +69,6 @@ public class ScoringBolt extends BaseRichBolt {
         }.getType();
         Map gson =    new Gson().fromJson(document.toString(), type);
 
-        DBObject dbObj = (DBObject) com.mongodb.util.JSON.parse("{}");
-
-
         BasicDBObject query = new BasicDBObject( "LYL_ID_NO", Long.valueOf(gson.get("lyl_id_no").toString()));
 
         DBObject member = coll.findOne(query);

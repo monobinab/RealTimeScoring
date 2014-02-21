@@ -7,8 +7,8 @@ import backtype.storm.generated.AlreadyAliveException;
 import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.topology.TopologyBuilder;
 import com.mongodb.DBObject;
-import metascale.bolt.ScoringBolt;
-import metascale.spout.MongoCappedCollectionSpout;
+import metascale.bolt.RedisBolt;
+import metascale.spout.WebsphereMQSpout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,10 +40,11 @@ public class RealTimeScoringTopology {
             }
         };
 
-          topologyBuilder.setSpout("mongodb", new MongoCappedCollectionSpout("mongodb://151.149.191.228:27017/test", "BrightTagFeed", mongoMapper), 1);
+          topologyBuilder.setSpout("npos1", new WebsphereMQSpout("iasapp304p.prod.ch3.s.com", 1414, "SQLP0393", "MARKETAN.SVRCONN", "STORM.NPOS.MASCORED.QC01"), 1);
+        topologyBuilder.setSpout("npos2", new WebsphereMQSpout("iasapp305p.prod.ch3.s.com", 1414, "SQLP0394", "MARKETAN.SVRCONN", "STORM.NPOS.MASCORED.QC01"), 1);
 
         // create definition of main spout for queue 1
-        topologyBuilder.setBolt("scoring_bolt", new ScoringBolt()).shuffleGrouping("mongodb");
+        topologyBuilder.setBolt("scoring_bolt", new RedisBolt()).shuffleGrouping("npos1").shuffleGrouping("npos2");
         Config conf = new Config();
         conf.setDebug(false);
 

@@ -8,9 +8,15 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
-import com.mongodb.DBObject;
+import com.ibm.jms.JMSMessage;
+import metascale.util.StoreZipMap;
 import redis.clients.jedis.Jedis;
+import shc.npos.segments.Segment;
+import shc.npos.util.SegmentUtils;
 
+import javax.jms.JMSException;
+import javax.jms.TextMessage;
+import java.util.Collection;
 import java.util.Map;
 
 public class RedisBolt extends BaseRichBolt {
@@ -30,7 +36,7 @@ public class RedisBolt extends BaseRichBolt {
 	 */
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
-        //jedis = new Jedis("localhost");
+        jedis = new Jedis("151.149.116.48");
         this.outputCollector = collector;
     }
 
@@ -42,9 +48,38 @@ public class RedisBolt extends BaseRichBolt {
 	@Override
 	public void execute(Tuple input) {
 
-        DBObject document = (DBObject) input.getValueByField("document");
+        JMSMessage document = (JMSMessage) input.getValueByField("npos");
 
-        System.out.println(document);
+        try {
+            String nposTransaction = ((TextMessage) document).getText();
+            //System.out.println(nposTransaction);
+            Collection<Segment> saleSegments = SegmentUtils.findAllSegments(nposTransaction, "B1");
+            Integer zip = 0;
+            char sywrCardUsed = 'N';
+            String amount = "0";
+            for (Segment segment : saleSegments) {
+                String transactionType = segment.getSegmentBody().get("Transaction Type Code");
+                if ("1".equals(transactionType)) {
+                    String store = segment.getSegmentBody().get("Store Number");
+                    zip = StoreZipMap.getInstance().getZip(store);
+                }
+                amount = segment.getSegmentBody().get("Transaction Total");
+            }
+
+            Collection<Segment> b2Segments = SegmentUtils.findAllSegments(nposTransaction, "B2");
+            for (Segment segment : b2Segments) {
+                if (segment != null && segment.getSegmentDescription() != null && segment.getSegmentDescription().contains("Type 8")) {
+                    sywrCardUsed = 'Y';
+                }
+            }
+
+            StringBuffer saleInfo = new StringBuffer().append(zip).append(':').append(sywrCardUsed).append(':').append(amount);
+
+            if (zip != null && zip != 0)
+                jedis.publish("sale_info", saleInfo.toString());
+        } catch (JMSException e) {
+            e.printStackTrace();
+        }
         //jedis.hincrBy("meetup_country", country.toString(), 1);
 
 
