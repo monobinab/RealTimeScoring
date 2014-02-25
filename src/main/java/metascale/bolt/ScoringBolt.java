@@ -192,7 +192,7 @@ public class ScoringBolt extends BaseRichBolt {
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 	}
 
-    private static double calcMbrVar( String modelId, DBCollection modelCollection, long LID, DBCollection memberCollection)
+    private static double calcMbrVar( Map changes, String modelId, DBCollection modelCollection, long LID, DBCollection memberCollection)
     {
 	    
         BasicDBObject queryModel = new BasicDBObject("modelId", modelId);
