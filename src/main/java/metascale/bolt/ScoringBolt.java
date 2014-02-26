@@ -39,7 +39,27 @@ public class ScoringBolt extends BaseRichBolt {
 	 */
 	private static final long serialVersionUID = 1L;
     private OutputCollector outputCollector;
-    DB db;
+    public void setOutputCollector(OutputCollector outputCollector) {
+		this.outputCollector = outputCollector;
+	}
+
+	public void setDb(DB db) {
+		this.db = db;
+	}
+
+	public void setMongoClient(MongoClient mongoClient) {
+		this.mongoClient = mongoClient;
+	}
+
+	public void setModelCollection(DBCollection modelCollection) {
+		this.modelCollection = modelCollection;
+	}
+
+	public void setMemberCollection(DBCollection memberCollection) {
+		this.memberCollection = memberCollection;
+	}
+
+	DB db;
     MongoClient mongoClient;
     DBCollection modelCollection;
     DBCollection memberCollection;
@@ -179,7 +199,7 @@ public class ScoringBolt extends BaseRichBolt {
 		
 	}
 
-    private double calcMbrVar( Map changes, int modelId, long LID)
+    double calcMbrVar( Map changes, int modelId, long LID)
     {
 	    
         BasicDBObject queryModel = new BasicDBObject("modelId", modelId);
