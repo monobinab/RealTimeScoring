@@ -89,6 +89,7 @@ public class ScoringBolt extends BaseRichBolt {
 
         db = mongoClient.getDB("RealTimeScoring");
         //db.authenticate(configuration.getString("mongo.db.user"), configuration.getString("mongo.db.password").toCharArray());
+	db.authenticate("rtsw", "$core123".toCharArray());
         memberCollection = db.getCollection("memberVariables");
         modelCollection = db.getCollection("modelVariables");
     }
@@ -209,7 +210,9 @@ public class ScoringBolt extends BaseRichBolt {
         BasicDBObject queryMbr = new BasicDBObject("l_id", LID);
         System.out.println(memberCollection.findOne(queryMbr));
         DBObject member = memberCollection.findOne(queryMbr);
-        
+        if (member == null) {
+		return 0; // TODO:this needs more thought
+	} 
 	    DBObject model = null;
 	    
 	    while( cursor.hasNext() )
@@ -285,8 +288,8 @@ public class ScoringBolt extends BaseRichBolt {
 			else {
 				changedVar=Double.parseDouble(changedVar.toString());
 			}
-		}
 		System.out.println("changed variable value: " + changedVar.toString());
+		}
 		return changedVar;
 	}
 
