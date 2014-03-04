@@ -8,29 +8,21 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
-import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
 import com.ibm.jms.JMSMessage;
 import com.mongodb.*;
+import metascale.util.Variable;
+import org.apache.commons.lang3.ArrayUtils;
+import redis.clients.jedis.Jedis;
+import shc.npos.segments.Segment;
+import shc.npos.util.SegmentUtils;
 
-import java.lang.reflect.Type;
+import javax.jms.JMSException;
+import javax.jms.TextMessage;
 import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
-import javax.jms.JMSException;
-import javax.jms.TextMessage;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-
-import metascale.util.StoreZipMap;
-import shc.npos.segments.Segment;
-import shc.npos.util.SegmentUtils;
-
-import metascale.util.*;
 
 public class ScoringBolt extends BaseRichBolt {
 
@@ -39,37 +31,47 @@ public class ScoringBolt extends BaseRichBolt {
 	 */
 	private static final long serialVersionUID = 1L;
     private OutputCollector outputCollector;
-    public void setOutputCollector(OutputCollector outputCollector) {
-		this.outputCollector = outputCollector;
-	}
 
-	public void setDb(DB db) {
-		this.db = db;
-	}
-
-	public void setMongoClient(MongoClient mongoClient) {
-		this.mongoClient = mongoClient;
-	}
-
-	public void setModelCollection(DBCollection modelCollection) {
-		this.modelCollection = modelCollection;
-	}
-
-	public void setMemberCollection(DBCollection memberCollection) {
-		this.memberCollection = memberCollection;
-	}
-
-	DB db;
+    DB db;
     MongoClient mongoClient;
     DBCollection modelCollection;
     DBCollection memberCollection;
+    DBCollection memberScoreCollection;
+    private Jedis jedis;
+
+
+
+
+    public void setOutputCollector(OutputCollector outputCollector) {
+        this.outputCollector = outputCollector;
+    }
+
+    public void setDb(DB db) {
+        this.db = db;
+    }
+
+    public void setMongoClient(MongoClient mongoClient) {
+        this.mongoClient = mongoClient;
+    }
+
+    public void setModelCollection(DBCollection modelCollection) {
+        this.modelCollection = modelCollection;
+    }
+
+    public void setMemberCollection(DBCollection memberCollection) {
+        this.memberCollection = memberCollection;
+    }
+
+    public void setMemberScoreCollection(DBCollection memberScoreCollection) {
+        this.memberScoreCollection = memberScoreCollection;
+    }
 
     /*
-	 * (non-Javadoc)
-	 * 
-	 * @see backtype.storm.task.IBolt#prepare(java.util.Map,
-	 * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
-	 */
+         * (non-Javadoc)
+         *
+         * @see backtype.storm.task.IBolt#prepare(java.util.Map,
+         * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
+         */
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         this.outputCollector = collector;
@@ -89,9 +91,12 @@ public class ScoringBolt extends BaseRichBolt {
 
         db = mongoClient.getDB("RealTimeScoring");
         //db.authenticate(configuration.getString("mongo.db.user"), configuration.getString("mongo.db.password").toCharArray());
-	db.authenticate("rtsw", "$core123".toCharArray());
+	    db.authenticate("rtsw", "$core123".toCharArray());
         memberCollection = db.getCollection("memberVariables");
         modelCollection = db.getCollection("modelVariables");
+        memberScoreCollection = db.getCollection("memberScore");
+        jedis = new Jedis("151.149.116.48");
+
     }
 
 	/*
@@ -166,9 +171,23 @@ public class ScoringBolt extends BaseRichBolt {
 		            
 					// 4 if any divisions that affects the HA model - then re-score
 		            if(!changes.isEmpty()){
+                        //System.out.println("transaction : " + nposTransaction);
+                        System.out.println(" Changes: " + changes );
 		            	//double mbrVar = calcMbrVar(changes, 1, Long.parseLong(l_id));
 		            	double newScore = 1/(1+ Math.exp(-1*(calcMbrVar(changes, 1, Long.parseLong(l_id))))) * 1000;
 		            	System.out.println(l_id + ": " + Double.toString(newScore));
+
+                        BasicDBObject queryMbr = new BasicDBObject("l_id", Long.valueOf(l_id));
+                        DBObject oldScore = memberScoreCollection.findOne(queryMbr);
+//                        if (oldScore == null)
+//                        {
+//                            memberScoreCollection.insert(new BasicDBObjectBuilder().append("l_id", l_id).append("1", String.valueOf(newScore)).get());
+//                        }
+//                        else
+//                        {
+//                            memberScoreCollection.update(oldScore, new BasicDBObjectBuilder().append("l_id", l_id).append("1", String.valueOf(newScore)).get());
+//                        }
+                        jedis.publish("score_changes", new StringBuffer().append(l_id).append("-").append(changes).append("-").append(oldScore == null ? "0" : oldScore.get("1")).append("-").append(newScore).toString());
 		            }
 		            else {
 		            	return;
@@ -204,11 +223,11 @@ public class ScoringBolt extends BaseRichBolt {
     {
 	    
         BasicDBObject queryModel = new BasicDBObject("modelId", modelId);
-        System.out.println(modelCollection.findOne(queryModel));
+        //System.out.println(modelCollection.findOne(queryModel));
 	    DBCursor cursor = modelCollection.find( queryModel );
 	     
         BasicDBObject queryMbr = new BasicDBObject("l_id", LID);
-        System.out.println(memberCollection.findOne(queryMbr));
+        //System.out.println(memberCollection.findOne(queryMbr));
         DBObject member = memberCollection.findOne(queryMbr);
         if (member == null) {
 		return 0; // TODO:this needs more thought
@@ -219,7 +238,7 @@ public class ScoringBolt extends BaseRichBolt {
 	    	model = ( BasicDBObject ) cursor.next();
 	    
 	    
-	    System.out.println( model.get( "modelId" ) + ": " + model.get( "constant" ).toString());
+	    //System.out.println( model.get( "modelId" ) + ": " + model.get( "constant" ).toString());
 	    
 	    double val = (Double) model.get( "constant" );
 	    
@@ -232,13 +251,13 @@ public class ScoringBolt extends BaseRichBolt {
 		    
 		    var.makePojoFromBson( dbo );
 		     
-		    System.out.println( var.getName() + ", "
-		    + var.getVid() + ", "
-		    + var.getRealTimeFlag()   + ", "
-		    + var.getType()  + ", "
-		    + var.getStrategy()   + ", " 
-		    + var.getCoefficeint() );
-		    
+//		    System.out.println( var.getName() + ", "
+//		    + var.getVid() + ", "
+//		    + var.getRealTimeFlag()   + ", "
+//		    + var.getType()  + ", "
+//		    + var.getStrategy()   + ", "
+//		    + var.getCoefficeint() );
+//
 		    if(  var.getType().equals("Integer")) val = val + ((Integer)calculateVariableValue(member, var, changes, var.getType()) * var.getCoefficeint());
 		    else if( var.getType().equals("Double")) val = val + ((Double)calculateVariableValue(member, var, changes, var.getType()) * var.getCoefficeint());
 		    else {
