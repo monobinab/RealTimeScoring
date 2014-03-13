@@ -18,7 +18,10 @@ import shc.npos.util.SegmentUtils;
 
 import javax.jms.JMSException;
 import javax.jms.TextMessage;
+import java.math.BigInteger;
 import java.net.UnknownHostException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -91,7 +94,7 @@ public class ScoringBolt extends BaseRichBolt {
 
         db = mongoClient.getDB("RealTimeScoring");
         //db.authenticate(configuration.getString("mongo.db.user"), configuration.getString("mongo.db.password").toCharArray());
-	    db.authenticate("rtsw", "$core123".toCharArray());
+	    db.authenticate("rtsw", "5core123".toCharArray());
         memberCollection = db.getCollection("memberVariables");
         modelCollection = db.getCollection("modelVariables");
         memberScoreCollection = db.getCollection("memberScore");
@@ -177,7 +180,14 @@ public class ScoringBolt extends BaseRichBolt {
 		            	double newScore = 1/(1+ Math.exp(-1*(calcMbrVar(changes, 1, Long.parseLong(l_id))))) * 1000;
 		            	System.out.println(l_id + ": " + Double.toString(newScore));
 
-                        BasicDBObject queryMbr = new BasicDBObject("l_id", Long.valueOf(l_id));
+                        MessageDigest digest = null;
+                        try {
+                            digest = MessageDigest.getInstance("MD5");
+                        } catch (NoSuchAlgorithmException e) {
+                            e.printStackTrace();
+                        }
+                        digest.update(l_id.toString().getBytes());
+                        BasicDBObject queryMbr = new BasicDBObject("l_id", new BigInteger(1, digest.digest()).toString(16));
                         DBObject oldScore = memberScoreCollection.findOne(queryMbr);
 //                        if (oldScore == null)
 //                        {
@@ -187,7 +197,9 @@ public class ScoringBolt extends BaseRichBolt {
 //                        {
 //                            memberScoreCollection.update(oldScore, new BasicDBObjectBuilder().append("l_id", l_id).append("1", String.valueOf(newScore)).get());
 //                        }
-                        jedis.publish("score_changes", new StringBuffer().append(l_id).append("-").append(changes).append("-").append(oldScore == null ? "0" : oldScore.get("1")).append("-").append(newScore).toString());
+                        String message = new StringBuffer().append(l_id).append("-").append(changes).append("-").append(oldScore == null ? "0" : oldScore.get("1")).append("-").append(newScore).toString();
+                        System.out.println(message);
+                        jedis.publish("score_changes", message);
 		            }
 		            else {
 		            	return;
@@ -225,14 +237,23 @@ public class ScoringBolt extends BaseRichBolt {
         BasicDBObject queryModel = new BasicDBObject("modelId", modelId);
         //System.out.println(modelCollection.findOne(queryModel));
 	    DBCursor cursor = modelCollection.find( queryModel );
-	     
-        BasicDBObject queryMbr = new BasicDBObject("l_id", LID);
+
+        MessageDigest digest = null;
+        try {
+            digest = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        digest.update(String.valueOf(LID).getBytes());
+        BasicDBObject queryMbr = new BasicDBObject("l_id", new BigInteger(1, digest.digest()).toString(16));
+        //BasicDBObject queryMbr = new BasicDBObject("l_id", LID);
         //System.out.println(memberCollection.findOne(queryMbr));
         DBObject member = memberCollection.findOne(queryMbr);
         if (member == null) {
 		return 0; // TODO:this needs more thought
 	} 
-	    DBObject model = null;
+	    System.out.println("member :" + member);
+        DBObject model = null;
 	    
 	    while( cursor.hasNext() )
 	    	model = ( BasicDBObject ) cursor.next();
