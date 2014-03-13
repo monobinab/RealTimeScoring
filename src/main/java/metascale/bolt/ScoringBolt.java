@@ -10,6 +10,7 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
 import com.ibm.jms.JMSMessage;
 import com.mongodb.*;
+
 import metascale.util.Variable;
 import org.apache.commons.lang3.ArrayUtils;
 import redis.clients.jedis.Jedis;
@@ -40,6 +41,7 @@ public class ScoringBolt extends BaseRichBolt {
     DBCollection modelCollection;
     DBCollection memberCollection;
     DBCollection memberScoreCollection;
+    DBCollection variablesCollection;
     private Jedis jedis;
 
 
@@ -67,6 +69,10 @@ public class ScoringBolt extends BaseRichBolt {
 
     public void setMemberScoreCollection(DBCollection memberScoreCollection) {
         this.memberScoreCollection = memberScoreCollection;
+    }
+
+    public void setVariablesCollection(DBCollection variablesCollection) {
+        this.variablesCollection = variablesCollection;
     }
 
     /*
@@ -98,6 +104,7 @@ public class ScoringBolt extends BaseRichBolt {
         memberCollection = db.getCollection("memberVariables");
         modelCollection = db.getCollection("modelVariables");
         memberScoreCollection = db.getCollection("memberScore");
+        variablesCollection = db.getCollection("Variables");
         jedis = new Jedis("151.149.116.48");
 
     }
@@ -269,6 +276,10 @@ public class ScoringBolt extends BaseRichBolt {
 	    for( Iterator< Object > it = variable.iterator(); it.hasNext(); )
 	    {
 	    	BasicDBObject dbo     = ( BasicDBObject ) it.next();
+	    	BasicDBObject queryVariableId = new BasicDBObject("name", dbo.get("name").toString().toUpperCase());
+		    
+	    	DBCursor varIndexCursor = this.variablesCollection.find(queryVariableId);
+	    	var.setVid(varIndexCursor.next().get("VID").toString());
 		    
 		    var.makePojoFromBson( dbo );
 		     
