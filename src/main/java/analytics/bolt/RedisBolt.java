@@ -1,7 +1,7 @@
 /**
  * 
  */
-package metascale.bolt;
+package analytics.bolt;
 
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -9,7 +9,7 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
 import com.ibm.jms.JMSMessage;
-import metascale.util.StoreZipMap;
+import analytics.util.StoreZipMap;
 import redis.clients.jedis.Jedis;
 import shc.npos.segments.Segment;
 import shc.npos.util.SegmentUtils;

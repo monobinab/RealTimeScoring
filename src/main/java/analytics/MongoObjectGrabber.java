@@ -1,4 +1,4 @@
-package metascale;
+package analytics;
 
 import com.mongodb.DBObject;
 

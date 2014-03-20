@@ -1,9 +1,9 @@
-package metascale.spout;
+package analytics.spout;
 
 import com.mongodb.DBObject;
 import org.apache.log4j.Logger;
 import org.bson.BSONObject;
-import metascale.*;
+import analytics.*;
 
 import java.io.Serializable;
 import java.util.List;

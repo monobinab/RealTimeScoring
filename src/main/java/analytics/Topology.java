@@ -1,4 +1,4 @@
-package metascale;
+package analytics;
 
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
@@ -6,8 +6,8 @@ import backtype.storm.StormSubmitter;
 import backtype.storm.generated.AlreadyAliveException;
 import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.topology.TopologyBuilder;
-import metascale.bolt.RedisBolt;
-import metascale.spout.OfflineMeetupRsvpsSpout;
+import analytics.bolt.RedisBolt;
+import analytics.spout.MeetupRsvpsSpout;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,13 +16,13 @@ import metascale.spout.OfflineMeetupRsvpsSpout;
  * Time: 10:14 AM
  * To change this template use File | Settings | File Templates.
  */
-public class OfflineTopology {
+public class Topology {
     public static void main(String[] args) {
 
         TopologyBuilder topologyBuilder = new TopologyBuilder();
 
         // create definition of main spout for queue 1
-        topologyBuilder.setSpout("meetup_rsvp_spout", new OfflineMeetupRsvpsSpout());
+        topologyBuilder.setSpout("meetup_rsvp_spout", new MeetupRsvpsSpout());
         topologyBuilder.setBolt("redis_bolt", new RedisBolt()).shuffleGrouping("meetup_rsvp_spout");
         Config conf = new Config();
         conf.setDebug(false);

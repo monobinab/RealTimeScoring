@@ -1,4 +1,4 @@
-package metascale;
+package analytics;
 
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
@@ -7,8 +7,8 @@ import backtype.storm.generated.AlreadyAliveException;
 import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.topology.TopologyBuilder;
 import com.mongodb.DBObject;
-import metascale.bolt.*;
-import metascale.spout.WebsphereMQSpout;
+import analytics.bolt.*;
+import analytics.spout.WebsphereMQSpout;
 
 import java.util.ArrayList;
 import java.util.List;

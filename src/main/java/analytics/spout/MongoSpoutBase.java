@@ -1,4 +1,4 @@
-package metascale.spout;
+package analytics.spout;
 
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -7,7 +7,7 @@ import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import com.mongodb.DBObject;
 import org.apache.log4j.Logger;
-import metascale.*;
+import analytics.*;
 
 import java.util.ArrayList;
 import java.util.List;

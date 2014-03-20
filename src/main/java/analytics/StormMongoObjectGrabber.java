@@ -1,4 +1,4 @@
-package metascale;
+package analytics;
 
 import backtype.storm.tuple.Tuple;
 import com.mongodb.DBObject;

@@ -1,14 +1,11 @@
-package metascale.bolt;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-
-import metascale.bolt.ScoringBolt;
-
-import org.junit.Test;
+package analytics.bolt;
 
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 
 

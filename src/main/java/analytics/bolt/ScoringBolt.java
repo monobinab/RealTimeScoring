@@ -1,7 +1,7 @@
 /**
  * 
  */
-package metascale.bolt;
+package analytics.bolt;
 
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -11,7 +11,7 @@ import backtype.storm.tuple.Tuple;
 import com.ibm.jms.JMSMessage;
 import com.mongodb.*;
 
-import metascale.util.Variable;
+import analytics.util.Variable;
 import org.apache.commons.lang3.ArrayUtils;
 import redis.clients.jedis.Jedis;
 import shc.npos.segments.Segment;
@@ -105,7 +105,7 @@ public class ScoringBolt extends BaseRichBolt {
         modelCollection = db.getCollection("modelVariables");
         memberScoreCollection = db.getCollection("memberScore");
         variablesCollection = db.getCollection("Variables");
-        jedis = new Jedis("151.149.116.48");
+        //jedis = new Jedis("151.149.116.48");
 
     }
 
@@ -206,7 +206,7 @@ public class ScoringBolt extends BaseRichBolt {
 //                        }
                         String message = new StringBuffer().append(l_id).append("-").append(changes).append("-").append(oldScore == null ? "0" : oldScore.get("1")).append("-").append(newScore).toString();
                         System.out.println(message);
-                        jedis.publish("score_changes", message);
+                        //jedis.publish("score_changes", message);
 		            }
 		            else {
 		            	return;
