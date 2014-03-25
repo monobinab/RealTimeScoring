@@ -167,13 +167,13 @@ public class ScoringBolt extends BaseRichBolt {
 		            for (Segment segment : c1Segments) {
 		            	String div = segment.getSegmentBody().get("Division Number");
 		            	if(ArrayUtils.contains(new String[]{"033","041","043","045"}, div)) {
-		            		changes.put("srs_mapp_days_since_last", 0);
+		            		changes.put("srs_mapp_days_since_last".toUpperCase(), 1);
 		            	}
 		            	if(ArrayUtils.contains(new String[]{"020","022","026","032","042","046"}, div)) {
-		            		changes.put("srs_appliance_days_since_last", 0);
+		            		changes.put("srs_appliance_days_since_last".toUpperCase(), 1);
 		            	}
 		            	if(ArrayUtils.contains(new String[]{"046"}, div)) {
-		            		changes.put("ha_refrig_0_30_purch_flg", 1);
+		            		changes.put("ha_refrig_0_30_purch_flg".toUpperCase(), 1);
 		            	}
 		            	
 		            	
@@ -206,7 +206,7 @@ public class ScoringBolt extends BaseRichBolt {
 //                        }
                         String message = new StringBuffer().append(l_id).append("-").append(changes).append("-").append(oldScore == null ? "0" : oldScore.get("1")).append("-").append(newScore).toString();
                         System.out.println(message);
-                        jedis.publish("score_changes", message);
+//                        jedis.publish("score_changes", message);
 		            }
 		            else {
 		            	return;
@@ -279,17 +279,20 @@ public class ScoringBolt extends BaseRichBolt {
 	    	BasicDBObject queryVariableId = new BasicDBObject("name", dbo.get("name").toString().toUpperCase());
 		    
 	    	DBCursor varIndexCursor = this.variablesCollection.find(queryVariableId);
-	    	var.setVid(varIndexCursor.next().get("VID").toString());
-		    
+	    	DBObject next = varIndexCursor.next();
+	    	System.out.println(next);
+	    	
 		    var.makePojoFromBson( dbo );
 		     
-//		    System.out.println( var.getName() + ", "
-//		    + var.getVid() + ", "
-//		    + var.getRealTimeFlag()   + ", "
-//		    + var.getType()  + ", "
-//		    + var.getStrategy()   + ", "
-//		    + var.getCoefficeint() );
-//
+			var.setVid(next.get("VID").toString());
+		    
+		    System.out.println( var.getName() + ", "
+		    + var.getVid() + ", "
+		    + var.getRealTimeFlag()   + ", "
+		    + var.getType()  + ", "
+		    + var.getStrategy()   + ", "
+		    + var.getCoefficeint() );
+
 		    if(  var.getType().equals("Integer")) val = val + ((Integer)calculateVariableValue(member, var, changes, var.getType()) * var.getCoefficeint());
 		    else if( var.getType().equals("Double")) val = val + ((Double)calculateVariableValue(member, var, changes, var.getType()) * var.getCoefficeint());
 		    else {
