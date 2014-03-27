@@ -1,4 +1,4 @@
-package metascale.spout;
+package analytics.spout;
 
 import com.mongodb.*;
 import org.apache.log4j.Logger;

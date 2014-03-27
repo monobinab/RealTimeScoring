@@ -3,7 +3,7 @@
  * copied from https://github.com/kstyrc/trident-redis
  *
  */
-package metascale.trident;
+package analytics.trident;
 
 import backtype.storm.task.IMetricsContext;
 import backtype.storm.tuple.Values;

@@ -1,4 +1,4 @@
-package metascale;
+package analytics;
 
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
@@ -7,8 +7,8 @@ import backtype.storm.generated.AlreadyAliveException;
 import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
-import metascale.spout.MeetupRsvpsBatchSpout;
-import metascale.trident.RedisState;
+import analytics.spout.MeetupRsvpsBatchSpout;
+import analytics.trident.RedisState;
 import org.json.simple.JSONObject;
 import storm.trident.operation.BaseFunction;
 import storm.trident.operation.TridentCollector;

@@ -1,4 +1,4 @@
-package metascale.util;
+package analytics.util;
 
 import java.io.Serializable;
 

@@ -1,4 +1,4 @@
-package metascale.spout;
+package analytics.spout;
 
 
 import backtype.storm.task.TopologyContext;

@@ -233,7 +233,7 @@
 					<archive>
 						<manifest>
 							<!--<mainClass></mainClass>-->
-                            <mainClass>metascale.Topology</mainClass>
+                            <mainClass>analytics.RealTimeScoringTopology</mainClass>
 
 						</manifest>
 					</archive>
@@ -267,7 +267,7 @@
             <!-- automatically creates the classpath using all project dependencies,
                  also adding the project build directory -->
             <classpath/>
-            <argument>metascale.RealTimeScoringTopology</argument>
+            <argument>analytics.RealTimeScoringTopology</argument>
           </arguments>
         </configuration>
 		
