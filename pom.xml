@@ -215,9 +215,10 @@
 	<build>
 		<resources>
 			<resource>
-				<directory>src/main/resources</directory>
+				<directory>${basedir}/src/main/</directory>
 			</resource>
 		</resources>
+
 		<plugins>
 		    <!-- 
 		    bind the maven-assembly-plugin to the package phase
@@ -249,7 +250,7 @@
 				</executions>
 
 			</plugin>
-<plugin>
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.1</version>
@@ -261,17 +262,17 @@
                     </execution>
                 </executions>
                 <configuration>
-                <executable>java</executable>
-          <arguments>
-            <argument>-classpath</argument>
-            <!-- automatically creates the classpath using all project dependencies,
-                 also adding the project build directory -->
-            <classpath/>
-            <argument>analytics.RealTimeScoringTopology</argument>
-          </arguments>
-        </configuration>
-		
-        </plugin>
+                    <executable>java</executable>
+                    <arguments>
+                        <argument>-classpath</argument>
+                        <!-- automatically creates the classpath using all project dependencies,
+                             also adding the project build directory -->
+                        <classpath/>
+                        <argument>analytics.RealtyTracTopology</argument>
+                    </arguments>
+                </configuration>
+
+            </plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
