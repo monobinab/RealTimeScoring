@@ -3,6 +3,7 @@
  */
 package analytics.bolt;
 
+import analytics.util.Variable;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -10,9 +11,6 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
 import com.ibm.jms.JMSMessage;
 import com.mongodb.*;
-
-import analytics.util.Variable;
-import org.apache.commons.lang3.ArrayUtils;
 import redis.clients.jedis.Jedis;
 import shc.npos.segments.Segment;
 import shc.npos.util.SegmentUtils;
@@ -23,10 +21,7 @@ import java.math.BigInteger;
 import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 public class ScoringBolt extends BaseRichBolt {
 
@@ -42,6 +37,11 @@ public class ScoringBolt extends BaseRichBolt {
     DBCollection memberCollection;
     DBCollection memberScoreCollection;
     DBCollection variablesCollection;
+    DBCollection divLnItmCollection;
+    DBCollection divLnVariableCollection;
+
+    private Map<String,Collection<Integer>> variableModelsMap;
+
     private Jedis jedis;
 
 
@@ -105,15 +105,51 @@ public class ScoringBolt extends BaseRichBolt {
         modelCollection = db.getCollection("modelVariables");
         memberScoreCollection = db.getCollection("memberScore");
         variablesCollection = db.getCollection("Variables");
+        divLnItmCollection = db.getCollection("DivLnItm");
+        divLnVariableCollection = db.getCollection("DivLnVariable");
+
+
+        // populate the variableModelsMap
+        variableModelsMap = new HashMap<String, Collection<Integer>>();
+        DBCursor models = modelCollection.find();
+        for(DBObject model:models){
+             BasicDBList modelVariables = (BasicDBList) model.get("variable");
+             for(Object modelVariable:modelVariables)
+             {
+                 String variableName = ((DBObject) modelVariable).get("name").toString().toUpperCase();
+                 if (variableModelsMap.get(variableName) == null)
+                 {
+                     Collection<Integer> modelIds = new ArrayList<Integer>();
+                     addModel(model, variableName, modelIds);
+                 }
+                 else
+                 {
+                     Collection<Integer> modelIds = variableModelsMap.get(variableName);
+                     addModel(model, variableName, modelIds);
+                 }
+
+             }
+        }
+
+        System.out.println(" variablesModelMap: " + variableModelsMap);
+
+
+
+
         //jedis = new Jedis("151.149.116.48");
 
     }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see backtype.storm.task.IBolt#execute(backtype.storm.tuple.Tuple)
-	 */
+    private void addModel(DBObject model, String variableName, Collection<Integer> modelIds) {
+        modelIds.add(Integer.valueOf(model.get("modelId").toString()));
+        variableModelsMap.put(variableName, modelIds);
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see backtype.storm.task.IBolt#execute(backtype.storm.tuple.Tuple)
+     */
 	@Override
 	public void execute(Tuple input) {
 
@@ -160,22 +196,57 @@ public class ScoringBolt extends BaseRichBolt {
 	            if(l_id!=null) {
 	            	
 	            
-		            Map changes = new HashMap();
+		            Map<String,Object> changes = new HashMap<String,Object>();
 		            Collection<Segment> c1Segments = SegmentUtils.findAllSegments(nposTransaction, "C1");
 		            
 					// 3 for each item in the basket find the division OK
 		            for (Segment segment : c1Segments) {
 		            	String div = segment.getSegmentBody().get("Division Number");
-		            	if(ArrayUtils.contains(new String[]{"033","041","043","045"}, div)) {
-		            		changes.put("srs_mapp_days_since_last".toUpperCase(), 1);
-		            	}
-		            	if(ArrayUtils.contains(new String[]{"020","022","026","032","042","046"}, div)) {
-		            		changes.put("srs_appliance_days_since_last".toUpperCase(), 1);
-		            	}
-		            	if(ArrayUtils.contains(new String[]{"046"}, div)) {
-		            		changes.put("ha_refrig_0_30_purch_flg".toUpperCase(), 1);
-		            	}
-		            	
+                        System.out.println(" division :" + div );
+
+                        String item = segment.getSegmentBody().get("Item Number");
+                        System.out.println(" item :" + item );
+
+
+                        DBObject line = divLnItmCollection.findOne(new BasicDBObjectBuilder().append("d", div).append("i", item).get());
+
+                        DBCursor variables = divLnVariableCollection.find(new BasicDBObject("d",div));
+
+                        if (variables != null)
+                        {
+                            System.out.println(" variables :" + variables.length() );
+
+                        }
+
+                        for(DBObject variable:variables)
+                        {
+                            String variableUppercase = variable.get("v").toString().toUpperCase();
+                            System.out.println(" div :" + div + ":" + variableUppercase);
+
+                            changes.put(variableUppercase, 1/*this needs to be a strategy*/);
+                        }
+
+                        variables = divLnVariableCollection.find(new BasicDBObject("d",div+line));
+
+                        for(DBObject variable:variables)
+                        {
+                            String variableUppercase = variable.get("v").toString().toUpperCase();
+                            System.out.println("divline:" + div+line+ ":" + variableUppercase);
+                            changes.put(variableUppercase, 1/*this needs to be a strategy*/) ;
+                        }
+
+
+
+//                        if(ArrayUtils.contains(new String[]{"033","041","043","045"}, div)) {
+//		            		changes.put("srs_mapp_days_since_last".toUpperCase(), 1);
+//		            	}
+//		            	if(ArrayUtils.contains(new String[]{"020","022","026","032","042","046"}, div)) {
+//		            		changes.put("srs_appliance_days_since_last".toUpperCase(), 1);
+//		            	}
+//		            	if(ArrayUtils.contains(new String[]{"046"}, div)) {
+//		            		changes.put("ha_refrig_0_30_purch_flg".toUpperCase(), 1);
+//		            	}
+//
 		            	
 		            }
 		            
@@ -184,30 +255,47 @@ public class ScoringBolt extends BaseRichBolt {
                         //System.out.println("transaction : " + nposTransaction);
                         System.out.println(" Changes: " + changes );
 		            	//double mbrVar = calcMbrVar(changes, 1, Long.parseLong(l_id));
-		            	double newScore = 1/(1+ Math.exp(-1*(calcMbrVar(changes, 1, Long.parseLong(l_id))))) * 1000;
-		            	System.out.println(l_id + ": " + Double.toString(newScore));
 
-                        MessageDigest digest = null;
-                        try {
-                            digest = MessageDigest.getInstance("MD5");
-                        } catch (NoSuchAlgorithmException e) {
-                            e.printStackTrace();
+                        // find all the models that are affected by these changes
+                        Set<Integer> modelsSet = new HashSet<Integer>();
+                        for(String changedVariable:changes.keySet())
+                        {
+                            Collection<Integer> models = variableModelsMap.get(changedVariable);
+                            for (Integer modelId: models){
+                                modelsSet.add(modelId);
+                            }
                         }
-                        digest.update(l_id.toString().getBytes());
-                        BasicDBObject queryMbr = new BasicDBObject("l_id", new BigInteger(1, digest.digest()).toString(16));
-                        DBObject oldScore = memberScoreCollection.findOne(queryMbr);
-//                        if (oldScore == null)
-//                        {
-//                            memberScoreCollection.insert(new BasicDBObjectBuilder().append("l_id", l_id).append("1", String.valueOf(newScore)).get());
-//                        }
-//                        else
-//                        {
-//                            memberScoreCollection.update(oldScore, new BasicDBObjectBuilder().append("l_id", l_id).append("1", String.valueOf(newScore)).get());
-//                        }
-                        String message = new StringBuffer().append(l_id).append("-").append(changes).append("-").append(oldScore == null ? "0" : oldScore.get("1")).append("-").append(newScore).toString();
-                        System.out.println(message);
-                        //jedis.publish("score_changes", message);
-		            }
+
+
+                        // Score each model in a loop
+
+                        for (Integer modelId:modelsSet)
+                        {
+                            double newScore = 1/(1+ Math.exp(-1*(calcMbrVar(changes, modelId, Long.parseLong(l_id))))) * 1000;
+                            System.out.println(l_id + ": " + Double.toString(newScore));
+
+                            MessageDigest digest = null;
+                            try {
+                                digest = MessageDigest.getInstance("MD5");
+                            } catch (NoSuchAlgorithmException e) {
+                                e.printStackTrace();
+                            }
+                            digest.update(l_id.toString().getBytes());
+                            BasicDBObject queryMbr = new BasicDBObject("l_id", new BigInteger(1, digest.digest()).toString(16));
+                            DBObject oldScore = memberScoreCollection.findOne(queryMbr);
+    //                        if (oldScore == null)
+    //                        {
+    //                            memberScoreCollection.insert(new BasicDBObjectBuilder().append("l_id", l_id).append("1", String.valueOf(newScore)).get());
+    //                        }
+    //                        else
+    //                        {
+    //                            memberScoreCollection.update(oldScore, new BasicDBObjectBuilder().append("l_id", l_id).append("1", String.valueOf(newScore)).get());
+    //                        }
+                            String message = new StringBuffer().append(l_id).append("-").append(modelId).append("-").append(changes).append("-").append(oldScore == null ? "0" : oldScore.get("1")).append("-").append(newScore).toString();
+                            System.out.println(message);
+                            //jedis.publish("score_changes", message);
+                        }
+                    }
 		            else {
 		            	return;
 		            }
@@ -238,7 +326,7 @@ public class ScoringBolt extends BaseRichBolt {
 		
 	}
 
-    double calcMbrVar( Map changes, int modelId, long LID)
+    double calcMbrVar( Map<String,Object> changes, int modelId, long LID)
     {
 	    
         BasicDBObject queryModel = new BasicDBObject("modelId", modelId);
@@ -257,8 +345,8 @@ public class ScoringBolt extends BaseRichBolt {
         //System.out.println(memberCollection.findOne(queryMbr));
         DBObject member = memberCollection.findOne(queryMbr);
         if (member == null) {
-		return 0; // TODO:this needs more thought
-	} 
+		    return 0; // TODO:this needs more thought
+	    }
 	    System.out.println("member :" + member);
         DBObject model = null;
 	    
@@ -278,20 +366,19 @@ public class ScoringBolt extends BaseRichBolt {
 	    	BasicDBObject dbo     = ( BasicDBObject ) it.next();
 	    	BasicDBObject queryVariableId = new BasicDBObject("name", dbo.get("name").toString().toUpperCase());
 		    
-	    	DBCursor varIndexCursor = this.variablesCollection.find(queryVariableId);
-	    	DBObject next = varIndexCursor.next();
-	    	System.out.println(next);
-	    	
-		    var.makePojoFromBson( dbo );
-		     
-			var.setVid(next.get("VID").toString());
-		    
+	    	DBObject variableFromVariablesCollection = this.variablesCollection.findOne(queryVariableId);
+	    	System.out.println(variableFromVariablesCollection);
+
+            var.setVid(variableFromVariablesCollection.get("VID").toString());
+            var.makePojoFromBson( dbo );
+
+
 		    System.out.println( var.getName() + ", "
-		    + var.getVid() + ", "
 		    + var.getRealTimeFlag()   + ", "
 		    + var.getType()  + ", "
 		    + var.getStrategy()   + ", "
-		    + var.getCoefficeint() );
+		    + var.getCoefficeint() +", "
+            + var.getVid());
 
 		    if(  var.getType().equals("Integer")) val = val + ((Integer)calculateVariableValue(member, var, changes, var.getType()) * var.getCoefficeint());
 		    else if( var.getType().equals("Double")) val = val + ((Double)calculateVariableValue(member, var, changes, var.getType()) * var.getCoefficeint());

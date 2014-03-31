@@ -1,11 +1,10 @@
 package analytics.util;
 
-import java.io.Serializable;
-
-import org.bson.types.ObjectId;
-
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import org.bson.types.ObjectId;
+
+import java.io.Serializable;
 
 public class Variable implements Serializable
 {
@@ -36,7 +35,7 @@ public class Variable implements Serializable
 	 
 	public String getName() { return this.name; }
 	public void setName( String name ) { this.name = name; }
-	
+
 	public String getVid() { return this.VID; }
 	public void setVid( String VID ) { this.VID = VID; }
 	
@@ -58,7 +57,6 @@ public class Variable implements Serializable
 		 
 		document.put( "_id",    this._id );
 		document.put( "name",   this.name );
-		document.put( "VID",   this.VID );
 		document.put( "realTimeFlag", this.realTimeFlag );
 		document.put( "type",   this.type );
 		document.put( "strategy",  this.strategy );
@@ -73,7 +71,6 @@ public class Variable implements Serializable
 		 
 		this._id    	= ( ObjectId ) b.get( "_id" );
 		this.name   	= ( String )   b.get( "name" );
-		this.VID 		= ( String ) b.get( "VID" );
 		this.realTimeFlag = ( Integer )   b.get( "realTimeFlag" );
 		this.type   	= ( String )   b.get( "type" );
 		this.strategy  	= ( String )   b.get( "strategy" );
