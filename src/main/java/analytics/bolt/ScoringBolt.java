@@ -3,7 +3,10 @@
  */
 package analytics.bolt;
 
+import analytics.util.RealTimeScoringContext;
+import analytics.util.TransactionLineItem;
 import analytics.util.Variable;
+import analytics.util.strategies.Strategy;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -207,47 +210,33 @@ public class ScoringBolt extends BaseRichBolt {
                         String item = segment.getSegmentBody().get("Item Number");
                         System.out.println(" item :" + item );
 
+                        RealTimeScoringContext context = createRealTimeScoringContext(segment);
 
-                        DBObject line = divLnItmCollection.findOne(new BasicDBObjectBuilder().append("d", div).append("i", item).get());
+                        Collection<String> variableNamesList = getVariableNamesFromDivAndDivLine(div, item);
 
-                        DBCursor variables = divLnVariableCollection.find(new BasicDBObject("d",div));
 
-                        if (variables != null)
+                        for(String variableName:variableNamesList)
                         {
-                            System.out.println(" variables :" + variables.length() );
+                            System.out.println(" div :" + div + ":" + variableName);
+                            DBObject variableFromVariablesCollection = variablesCollection.findOne(new BasicDBObject("name", variableName));
+                            if (variableFromVariablesCollection != null )System.out.println(" found variable :" + variableName);
 
-                        }
+                            try {
+                                Strategy strategy = (Strategy) Class.forName("analytics.util.strategies."+ variableFromVariablesCollection.get("strategy")).newInstance();
+                                changes.put(variableName, strategy.execute(context)/*this needs to be a strategy*/);
 
-                        for(DBObject variable:variables)
-                        {
-                            String variableUppercase = variable.get("v").toString().toUpperCase();
-                            System.out.println(" div :" + div + ":" + variableUppercase);
+                            } catch (ClassNotFoundException e) {
+                                e.printStackTrace();
+                            } catch (InstantiationException e) {
+                                e.printStackTrace();
+                            } catch (IllegalAccessException e) {
+                                e.printStackTrace();
+                            }
 
-                            changes.put(variableUppercase, 1/*this needs to be a strategy*/);
-                        }
-
-                        variables = divLnVariableCollection.find(new BasicDBObject("d",div+line));
-
-                        for(DBObject variable:variables)
-                        {
-                            String variableUppercase = variable.get("v").toString().toUpperCase();
-                            System.out.println("divline:" + div+line+ ":" + variableUppercase);
-                            changes.put(variableUppercase, 1/*this needs to be a strategy*/) ;
                         }
 
 
 
-//                        if(ArrayUtils.contains(new String[]{"033","041","043","045"}, div)) {
-//		            		changes.put("srs_mapp_days_since_last".toUpperCase(), 1);
-//		            	}
-//		            	if(ArrayUtils.contains(new String[]{"020","022","026","032","042","046"}, div)) {
-//		            		changes.put("srs_appliance_days_since_last".toUpperCase(), 1);
-//		            	}
-//		            	if(ArrayUtils.contains(new String[]{"046"}, div)) {
-//		            		changes.put("ha_refrig_0_30_purch_flg".toUpperCase(), 1);
-//		            	}
-//
-		            	
 		            }
 		            
 					// 4 if any divisions that affects the HA model - then re-score
@@ -255,6 +244,9 @@ public class ScoringBolt extends BaseRichBolt {
                         //System.out.println("transaction : " + nposTransaction);
                         System.out.println(" Changes: " + changes );
 		            	//double mbrVar = calcMbrVar(changes, 1, Long.parseLong(l_id));
+
+
+		            	/*
 
                         // find all the models that are affected by these changes
                         Set<Integer> modelsSet = new HashSet<Integer>();
@@ -294,7 +286,7 @@ public class ScoringBolt extends BaseRichBolt {
                             String message = new StringBuffer().append(l_id).append("-").append(modelId).append("-").append(changes).append("-").append(oldScore == null ? "0" : oldScore.get("1")).append("-").append(newScore).toString();
                             System.out.println(message);
                             //jedis.publish("score_changes", message);
-                        }
+                        }                                                     */
                     }
 		            else {
 		            	return;
@@ -313,6 +305,50 @@ public class ScoringBolt extends BaseRichBolt {
 			
 
         }
+
+    private Collection<String> getVariableNamesFromDivAndDivLine(String div, String item) {
+        DBObject line = divLnItmCollection.findOne(new BasicDBObjectBuilder().append("d", div).append("i", item).get());
+
+        DBCursor variables = divLnVariableCollection.find(new BasicDBObject("d",div));
+
+        if (variables != null)
+        {
+            System.out.println(" variables :" + variables.length() );
+
+        }
+
+
+        Collection<String> variableNamesList = new ArrayList<String>();
+
+        for(DBObject variable:variables)
+        {
+            variableNamesList.add(variable.get("v").toString().trim().toUpperCase());
+        }
+
+        DBCursor variablesAtDivLine = divLnVariableCollection.find(new BasicDBObject("d",div+line));
+
+        for(DBObject variable:variablesAtDivLine)
+        {
+            variableNamesList.add(variable.get("v").toString().trim().toUpperCase());
+        }
+        return variableNamesList;
+    }
+
+    private RealTimeScoringContext createRealTimeScoringContext(Segment segment) {
+        String sellingAmountString = segment.getSegmentBody().get("Selling Amount").trim();
+        Double sellingAmount = 0d;
+        if (!sellingAmountString.contains("-"))
+        {
+           sellingAmount = Double.valueOf(sellingAmountString)/100;
+        }
+
+        TransactionLineItem transactionLineItem = new TransactionLineItem();
+        transactionLineItem.setAmount(sellingAmount);
+        RealTimeScoringContext context = new RealTimeScoringContext();
+        context.setTransactionLineItem(transactionLineItem);
+        context.setPreviousValue(0d); //TODO: this has to come from the member variable
+        return context;
+    }
 
     /*
       * (non-Javadoc)
@@ -390,30 +426,6 @@ public class ScoringBolt extends BaseRichBolt {
 	    }
 	    
         return val;
-
-        /*
-	    double val = (-3.4817414262759
-        	    + (Integer)member.get("redeemer_seg") * 0.2960757192325
-        	    + (Integer)member.get("srs_mapp_days_since_last") * 0.0004399620490
-        	    + (Integer)member.get("srs_appliance_days_since_last") * -0.0006412329322
-        	    + (Integer)member.get("earned_points_24m_cd") * 0.1230495072226
-        	    + (Integer)member.get("web_flag_refrig_0_7") * 1.5046153477196
-        	    + (Integer)member.get("hdln_fl") * 0.3758939603009
-        	    + (Double)member.get("srs_str_appliance_sales3m") * 0.0004695336403
-        	    + (Integer)member.get("cnt_emal_camp_12m_ind") * 0.2768082292745
-        	    + (Integer)member.get("srs_sears_card_amt_ind") * 0.2948286393805
-        	    + (Integer)member.get("HS_ANY_dsl") * -0.0000314858291
-        	    + (Integer)member.get("num_yr_rsd") * 0.0170213240149
-        	    + (Integer)member.get("HA_ANY_5y") * 0.2690159365066
-        	    + (Integer)member.get("sr_any_record_flg") * 1.2280939436473
-        	    + (Integer)member.get("ha_refrig_0_30_purch_flg") * 0.9681973501297
-        	    + (Integer)member.get("cnt_dm_camp_12_mth_ind") * 0.1019036215871
-        	    + (Integer)member.get("net_sales_24m_ind") * -0.0475925281865
-        	    + (Double)member.get("srs_str_mapp_sales3m") * 0.0034857097067
-        	    + (Double)member.get("BlackFriday_Sales_Index_Srs") * -0.0021117730335
-        	    + (Integer)member.get("gift_giver_srs") * -3.2426464544210
-        	    + (Integer)member.get("HA_ANY_indi") * 0.1390558536262);
-    */
 
     }
 

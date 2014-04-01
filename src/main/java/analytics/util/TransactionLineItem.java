@@ -1,4 +1,4 @@
-package util;
+package analytics.util;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
@@ -9,7 +9,7 @@ public class TransactionLineItem {
 	public String item;
 	public String line;
 	public boolean searsCardUsed;
-	public float amount;
+	public double amount;
 	
 	public TransactionLineItem() {
 		
@@ -29,7 +29,7 @@ public class TransactionLineItem {
 		this.item=i;
 	}
 	
-	public void setAmount(float a) {
+	public void setAmount(double a) {
 		this.amount=a;
 	}
 	
@@ -56,7 +56,7 @@ public class TransactionLineItem {
 		return this.item;
 	}
 	
-	public float getAmount() {
+	public double getAmount() {
 		return this.amount;
 	}
 	
