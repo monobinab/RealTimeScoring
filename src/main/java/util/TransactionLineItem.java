@@ -8,6 +8,7 @@ public class TransactionLineItem {
 	public String div;
 	public String item;
 	public String line;
+	public boolean searsCardUsed;
 	public float amount;
 	
 	public TransactionLineItem() {
