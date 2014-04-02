@@ -1,12 +1,23 @@
 package analytics.util.strategies;
 
+import java.util.Date;
+
+import org.joda.time.LocalDate;
+
+import analytics.util.Change;
 import analytics.util.RealTimeScoringContext;
 
 public class strategySumSales implements Strategy {
 
+	private int daysToExpiration = 2;
+	
 
     @Override
-    public Object execute(RealTimeScoringContext context) {
-        return context.getPreviousValue()+context.getTransactionLineItem().getAmount();
+    public Change execute(RealTimeScoringContext context) {
+		return new Change(context.getPreviousValue() + context.getTransactionLineItem().getAmount(), calculateExpirationDate());
     }
+	
+    private Date calculateExpirationDate() {
+		return new LocalDate(new Date()).plusDays(this.daysToExpiration).toDateMidnight().toDate();
+	}
 }

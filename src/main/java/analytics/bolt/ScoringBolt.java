@@ -3,6 +3,7 @@
  */
 package analytics.bolt;
 
+import analytics.util.Change;
 import analytics.util.RealTimeScoringContext;
 import analytics.util.TransactionLineItem;
 import analytics.util.Variable;
@@ -25,6 +26,7 @@ import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.Map.Entry;
 
 public class ScoringBolt extends BaseRichBolt {
 
@@ -42,7 +44,10 @@ public class ScoringBolt extends BaseRichBolt {
     DBCollection variablesCollection;
     DBCollection divLnItmCollection;
     DBCollection divLnVariableCollection;
-
+    DBCollection changesCollection;
+    
+    private String encryptionMethod = "MD5";
+    
     private Map<String,Collection<Integer>> variableModelsMap;
 
     private Jedis jedis;
@@ -110,6 +115,7 @@ public class ScoringBolt extends BaseRichBolt {
         variablesCollection = db.getCollection("Variables");
         divLnItmCollection = db.getCollection("DivLnItm");
         divLnVariableCollection = db.getCollection("DivLnVariable");
+        changesCollection = db.getCollection("changedMemberVariables");
 
 
         // populate the variableModelsMap
@@ -164,8 +170,9 @@ public class ScoringBolt extends BaseRichBolt {
 			// 2 if SYWR ID retrieve all items in the basket OK
 			// 3 for each item in the basket find the division OK
 			// 4 if any divisions that affects the HA model - then re-score OK
-			// 5 store new score in mongodb  PENDING
-			// 6 store the score in redis    PENDING
+			// 5 store changes in mongodb 	PENDING
+			// 6 store new score in mongodb  PENDING
+			// 7 store the score in redis    PENDING
 
 	        try {
 	        	
@@ -199,7 +206,7 @@ public class ScoringBolt extends BaseRichBolt {
 	            if(l_id!=null) {
 	            	
 	            
-		            Map<String,Object> changes = new HashMap<String,Object>();
+		            Map<String,Change> newChanges = new HashMap<String,Change>();
 		            Collection<Segment> c1Segments = SegmentUtils.findAllSegments(nposTransaction, "C1");
 		            
 					// 3 for each item in the basket find the division OK
@@ -223,8 +230,9 @@ public class ScoringBolt extends BaseRichBolt {
 
                             try {
                                 Strategy strategy = (Strategy) Class.forName("analytics.util.strategies."+ variableFromVariablesCollection.get("strategy")).newInstance();
-                                changes.put(variableName, strategy.execute(context)/*this needs to be a strategy*/);
-
+                                newChanges.put(variableName, strategy.execute(context)/*this needs to be a strategy*/);
+                                //TODO: arbitrate between memberVariables and changedMemberVariables to send as previous value
+                                //TODO: fix date format for the expiration date
                             } catch (ClassNotFoundException e) {
                                 e.printStackTrace();
                             } catch (InstantiationException e) {
@@ -240,17 +248,57 @@ public class ScoringBolt extends BaseRichBolt {
 		            }
 		            
 					// 4 if any divisions that affects the HA model - then re-score
-		            if(!changes.isEmpty()){
+		            if(!newChanges.isEmpty()){
                         //System.out.println("transaction : " + nposTransaction);
-                        System.out.println(" Changes: " + changes );
+                        System.out.println(" Changes: " + newChanges );
 		            	//double mbrVar = calcMbrVar(changes, 1, Long.parseLong(l_id));
+                        
+                        String hashed = new String();
+						try {
+
+							MessageDigest digest;
+							digest = MessageDigest.getInstance(this.encryptionMethod);
+							digest.update(l_id.getBytes());
+							hashed = new BigInteger(1, digest.digest()).toString(16);
+						} catch (NoSuchAlgorithmException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+	
+						DBObject collectionChanges = changesCollection.findOne(new BasicDBObject("l_id",hashed));
+
+						Map<String,Object> allChanges = new HashMap<String,Object>(); //TODO: move allChanges to be created before strategies are called
+						if(collectionChanges!=null && collectionChanges.keySet()!=null) {
+							Iterator<String> collectionChangesIter = collectionChanges.keySet().iterator();
+						    
+							while (collectionChangesIter.hasNext()){
+						    	String key = collectionChangesIter.next();
+						    	allChanges.put(key, ((DBObject) collectionChanges.get(key)).get("v")); //TODO: skip l_id and _id
+						    }
+					    	
+						}
+						Iterator<Entry<String, Change>> newChangesIter = newChanges.entrySet().iterator();
+						BasicDBObject newDocument = new BasicDBObject();
+					    while (newChangesIter.hasNext()) {
+					        Map.Entry<String, Change> pairsVarValue = (Map.Entry)newChangesIter.next();
+					    	String varNm = pairsVarValue.getKey().toString().toUpperCase();
+							Object val = pairsVarValue.getValue().value;
+							newDocument.append("$set", new BasicDBObject().append(varNm, new BasicDBObject().append("v", val).append("e", pairsVarValue.getValue().expirationDate)));
+					    	
+					    	allChanges.put(varNm, val);
+					    }
 
 
-		            	/*
+					    BasicDBObject searchQuery = new BasicDBObject().append("l_id", hashed);
+					     
+					    changesCollection.update(searchQuery, newDocument, true, false);
+
+//							String formatJSON = "{\"l_id\":\"" + hashed + "\"}";
+
 
                         // find all the models that are affected by these changes
                         Set<Integer> modelsSet = new HashSet<Integer>();
-                        for(String changedVariable:changes.keySet())
+                        for(String changedVariable:newChanges.keySet())
                         {
                             Collection<Integer> models = variableModelsMap.get(changedVariable);
                             for (Integer modelId: models){
@@ -263,17 +311,10 @@ public class ScoringBolt extends BaseRichBolt {
 
                         for (Integer modelId:modelsSet)
                         {
-                            double newScore = 1/(1+ Math.exp(-1*(calcMbrVar(changes, modelId, Long.parseLong(l_id))))) * 1000;
+                            double newScore = 1/(1+ Math.exp(-1*(calcMbrVar(allChanges, modelId, Long.parseLong(l_id))))) * 1000;
                             System.out.println(l_id + ": " + Double.toString(newScore));
 
-                            MessageDigest digest = null;
-                            try {
-                                digest = MessageDigest.getInstance("MD5");
-                            } catch (NoSuchAlgorithmException e) {
-                                e.printStackTrace();
-                            }
-                            digest.update(l_id.toString().getBytes());
-                            BasicDBObject queryMbr = new BasicDBObject("l_id", new BigInteger(1, digest.digest()).toString(16));
+                            BasicDBObject queryMbr = new BasicDBObject("l_id", hashed);
                             DBObject oldScore = memberScoreCollection.findOne(queryMbr);
     //                        if (oldScore == null)
     //                        {
@@ -283,10 +324,10 @@ public class ScoringBolt extends BaseRichBolt {
     //                        {
     //                            memberScoreCollection.update(oldScore, new BasicDBObjectBuilder().append("l_id", l_id).append("1", String.valueOf(newScore)).get());
     //                        }
-                            String message = new StringBuffer().append(l_id).append("-").append(modelId).append("-").append(changes).append("-").append(oldScore == null ? "0" : oldScore.get("1")).append("-").append(newScore).toString();
+                            String message = new StringBuffer().append(l_id).append("-").append(modelId).append("-").append(newChanges).append("-").append(oldScore == null ? "0" : oldScore.get("1")).append("-").append(newScore).toString();
                             System.out.println(message);
                             //jedis.publish("score_changes", message);
-                        }                                                     */
+                        }                                                     
                     }
 		            else {
 		            	return;
