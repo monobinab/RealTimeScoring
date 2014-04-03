@@ -248,7 +248,7 @@ public class ScoringBolt extends BaseRichBolt {
 						    	//skip expired changes
 						    	Days dif = Days.daysBetween(new LocalDate(new Date()), new LocalDate((Date)((DBObject) collectionChanges.get(key)).get("e")));
 						    	if(dif.getDays() >= 0) {
-						    		allChanges.put(key, ((DBObject) collectionChanges.get(key)).get("v").toString().toUpperCase()); 
+						    		allChanges.put(key.toUpperCase(), ((DBObject) collectionChanges.get(key)).get("v").toString()); 
 						    	}
 						    }
 						}
@@ -340,7 +340,7 @@ public class ScoringBolt extends BaseRichBolt {
 	
 	                        for (Integer modelId:modelsSet)
 	                        {
-	                            double newScore = 1/(1+ Math.exp(-1*(calcMbrVar(allChanges, modelId, hashed)))) * 1000;
+	                            double newScore = 1/(1+ Math.exp(-1*(calcMbrVar(memberVariablesMap, allChanges, modelId)))) * 1000;
 	                            System.out.println(l_id + ": " + Double.toString(newScore));
 	
 	                            BasicDBObject queryMbr = new BasicDBObject("l_id", hashed);
@@ -450,26 +450,17 @@ public class ScoringBolt extends BaseRichBolt {
 		
 	}
 
-    double calcMbrVar( Map<String,Object> changes, int modelId, String hashed)
+    double calcMbrVar( Map<String,Object> mbrVarMap, Map<String,Object> changes, int modelId)
     {
 	    
         BasicDBObject queryModel = new BasicDBObject("modelId", modelId);
         //System.out.println(modelCollection.findOne(queryModel));
-	    DBCursor cursor = modelCollection.find( queryModel );
+	    DBCursor modelCollectionCursor = modelCollection.find( queryModel );
 
-        BasicDBObject queryMbr = new BasicDBObject("l_id", hashed);
-        //BasicDBObject queryMbr = new BasicDBObject("l_id", LID);
-        //System.out.println(memberCollection.findOne(queryMbr));
-        DBObject member = memberCollection.findOne(queryMbr);
-        if (member == null) {
-		    return 0; // TODO:this needs more thought
-	    }
-	    System.out.println("member :" + member);
         DBObject model = null;
-	    
-	    while( cursor.hasNext() )
-	    	model = ( BasicDBObject ) cursor.next();
-	    
+	    while( modelCollectionCursor.hasNext() ) {
+	    	model = ( BasicDBObject ) modelCollectionCursor.next();
+	    }
 	    
 	    //System.out.println( model.get( "modelId" ) + ": " + model.get( "constant" ).toString());
 	    
@@ -497,8 +488,8 @@ public class ScoringBolt extends BaseRichBolt {
 		    + var.getCoefficeint() +", "
             + var.getVid());
 
-		    if(  var.getType().equals("Integer")) val = val + ((Integer)calculateVariableValue(member, var, changes, var.getType()) * var.getCoefficeint());
-		    else if( var.getType().equals("Double")) val = val + ((Double)calculateVariableValue(member, var, changes, var.getType()) * var.getCoefficeint());
+		    if(  var.getType().equals("Integer")) val = val + ((Integer)calculateVariableValue(mbrVarMap, var, changes, var.getType()) * var.getCoefficeint());
+		    else if( var.getType().equals("Double")) val = val + ((Double)calculateVariableValue(mbrVarMap, var, changes, var.getType()) * var.getCoefficeint());
 		    else {
 		    	val = 0;
 		    	break;
@@ -509,10 +500,10 @@ public class ScoringBolt extends BaseRichBolt {
 
     }
 
-	private Object calculateVariableValue(DBObject member, Variable var, Map changes, String dataType) {
-		Object changedVar = changes.get(var.getName());
+	private Object calculateVariableValue(Map<String,Object> mbrVarMap, Variable var, Map<String,Object> changes, String dataType) {
+		Object changedVar = changes.get(var.getName().toUpperCase());
 		if(changedVar == null) {
-			changedVar=member.get(var.getVid());
+			changedVar=mbrVarMap.get(var.getName().toUpperCase());
 		}
 		else{
 			if(dataType.equals("Integer")) {
