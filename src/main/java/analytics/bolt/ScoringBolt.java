@@ -21,6 +21,10 @@ import shc.npos.util.SegmentUtils;
 
 import javax.jms.JMSException;
 import javax.jms.TextMessage;
+
+import org.joda.time.Days;
+import org.joda.time.LocalDate;
+
 import java.math.BigInteger;
 import java.net.UnknownHostException;
 import java.security.MessageDigest;
@@ -49,6 +53,7 @@ public class ScoringBolt extends BaseRichBolt {
     private String encryptionMethod = "MD5";
     
     private Map<String,Collection<Integer>> variableModelsMap;
+    private Map<String, String> variableVidToNameMap;
 
     private Jedis jedis;
 
@@ -129,20 +134,31 @@ public class ScoringBolt extends BaseRichBolt {
                  if (variableModelsMap.get(variableName) == null)
                  {
                      Collection<Integer> modelIds = new ArrayList<Integer>();
-                     addModel(model, variableName, modelIds);
+                     addModel(model, variableName.toUpperCase(), modelIds);
                  }
                  else
                  {
-                     Collection<Integer> modelIds = variableModelsMap.get(variableName);
-                     addModel(model, variableName, modelIds);
+                     Collection<Integer> modelIds = variableModelsMap.get(variableName.toUpperCase());
+                     addModel(model, variableName.toUpperCase(), modelIds);
                  }
-
              }
         }
 
         System.out.println(" variablesModelMap: " + variableModelsMap);
 
+        // populate the variableVidToNameMap
+        variableVidToNameMap = new HashMap<String, String>();
+        DBCursor vCursor = variablesCollection.find();
+        for(DBObject variable:vCursor){
+             String variableName = ((DBObject) variable).get("name").toString().toUpperCase();
+             String vid = ((DBObject) variable).get("VID").toString();
+             if (variableName != null && vid != null)
+             {
+                 variableVidToNameMap.put(vid, variableName.toUpperCase());
+             }
+        }
 
+        System.out.println(" variableVidToNameMap: " + variableVidToNameMap);
 
 
         //jedis = new Jedis("151.149.116.48");
@@ -204,140 +220,157 @@ public class ScoringBolt extends BaseRichBolt {
 	            
 				// 2 if SYWR ID retrieve all items in the basket OK
 	            if(l_id!=null) {
+                    
+	            	// hash l_id with the algorithm specified in the class variables
+	            	String hashed = hashLoyaltyId(l_id);
 	            	
-	            
-		            Map<String,Change> newChanges = new HashMap<String,Change>();
-		            Collection<Segment> c1Segments = SegmentUtils.findAllSegments(nposTransaction, "C1");
-		            
-					// 3 for each item in the basket find the division OK
-		            for (Segment segment : c1Segments) {
-		            	String div = segment.getSegmentBody().get("Division Number");
-                        System.out.println(" division :" + div );
-
-                        String item = segment.getSegmentBody().get("Item Number");
-                        System.out.println(" item :" + item );
-
-                        RealTimeScoringContext context = createRealTimeScoringContext(segment);
-
-                        Collection<String> variableNamesList = getVariableNamesFromDivAndDivLine(div, item);
-
-
-                        for(String variableName:variableNamesList)
-                        {
-                            System.out.println(" div :" + div + ":" + variableName);
-                            DBObject variableFromVariablesCollection = variablesCollection.findOne(new BasicDBObject("name", variableName));
-                            if (variableFromVariablesCollection != null )System.out.println(" found variable :" + variableName);
-
-                            try {
-                                Strategy strategy = (Strategy) Class.forName("analytics.util.strategies."+ variableFromVariablesCollection.get("strategy")).newInstance();
-                                newChanges.put(variableName, strategy.execute(context)/*this needs to be a strategy*/);
-                                //TODO: arbitrate between memberVariables and changedMemberVariables to send as previous value
-                                //TODO: fix date format for the expiration date
-                            } catch (ClassNotFoundException e) {
-                                e.printStackTrace();
-                            } catch (InstantiationException e) {
-                                e.printStackTrace();
-                            } catch (IllegalAccessException e) {
-                                e.printStackTrace();
-                            }
-
-                        }
-
-
-
-		            }
-		            
-					// 4 if any divisions that affects the HA model - then re-score
-		            if(!newChanges.isEmpty()){
-                        //System.out.println("transaction : " + nposTransaction);
-                        System.out.println(" Changes: " + newChanges );
-		            	//double mbrVar = calcMbrVar(changes, 1, Long.parseLong(l_id));
-                        
-                        String hashed = new String();
-						try {
-
-							MessageDigest digest;
-							digest = MessageDigest.getInstance(this.encryptionMethod);
-							digest.update(l_id.getBytes());
-							hashed = new BigInteger(1, digest.digest()).toString(16);
-						} catch (NoSuchAlgorithmException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+	            	//get member variables values from memberVariables collection
+					DBObject mbrVariables = memberCollection.findOne(new BasicDBObject("l_id",hashed));
+					if(mbrVariables != null) {
+						Map<String,Object> memberVariablesMap = new HashMap<String,Object>();
+						Iterator<String> mbrVariablesIter = mbrVariables.keySet().iterator();
+						while(mbrVariablesIter.hasNext()) {
+							String key = mbrVariablesIter.next();
+							memberVariablesMap.put(variableVidToNameMap.get(key), mbrVariables.get(key));
 						}
-	
+						System.out.println(" *** Member Variables Map: " + memberVariablesMap);
+						
+						//get changed variable values from the changedMemberVariables collection
 						DBObject collectionChanges = changesCollection.findOne(new BasicDBObject("l_id",hashed));
-
-						Map<String,Object> allChanges = new HashMap<String,Object>(); //TODO: move allChanges to be created before strategies are called
+	
+						Map<String,Object> allChanges = new HashMap<String,Object>();
 						if(collectionChanges!=null && collectionChanges.keySet()!=null) {
 							Iterator<String> collectionChangesIter = collectionChanges.keySet().iterator();
 						    
 							while (collectionChangesIter.hasNext()){
 						    	String key = collectionChangesIter.next();
-						    	allChanges.put(key, ((DBObject) collectionChanges.get(key)).get("v")); //TODO: skip l_id and _id
+						    	//TODO: skip l_id and _id
+						    	//skip expired changes
+						    	Days dif = Days.daysBetween(new LocalDate(new Date()), new LocalDate((Date)((DBObject) collectionChanges.get(key)).get("e")));
+						    	if(dif.getDays() >= 0) {
+						    		allChanges.put(key, ((DBObject) collectionChanges.get(key)).get("v").toString().toUpperCase()); 
+						    	}
 						    }
-					    	
 						}
-						Iterator<Entry<String, Change>> newChangesIter = newChanges.entrySet().iterator();
-						BasicDBObject newDocument = new BasicDBObject();
-					    while (newChangesIter.hasNext()) {
-					        Map.Entry<String, Change> pairsVarValue = (Map.Entry)newChangesIter.next();
-					    	String varNm = pairsVarValue.getKey().toString().toUpperCase();
-							Object val = pairsVarValue.getValue().value;
-							newDocument.append("$set", new BasicDBObject().append(varNm, new BasicDBObject().append("v", val).append("e", pairsVarValue.getValue().expirationDate)));
-					    	
-					    	allChanges.put(varNm, val);
-					    }
-
-
-					    BasicDBObject searchQuery = new BasicDBObject().append("l_id", hashed);
-					     
-					    changesCollection.update(searchQuery, newDocument, true, false);
-
-//							String formatJSON = "{\"l_id\":\"" + hashed + "\"}";
-
-
-                        // find all the models that are affected by these changes
-                        Set<Integer> modelsSet = new HashSet<Integer>();
-                        for(String changedVariable:newChanges.keySet())
-                        {
-                            Collection<Integer> models = variableModelsMap.get(changedVariable);
-                            for (Integer modelId: models){
-                                modelsSet.add(modelId);
-                            }
-                        }
-
-
-                        // Score each model in a loop
-
-                        for (Integer modelId:modelsSet)
-                        {
-                            double newScore = 1/(1+ Math.exp(-1*(calcMbrVar(allChanges, modelId, Long.parseLong(l_id))))) * 1000;
-                            System.out.println(l_id + ": " + Double.toString(newScore));
-
-                            BasicDBObject queryMbr = new BasicDBObject("l_id", hashed);
-                            DBObject oldScore = memberScoreCollection.findOne(queryMbr);
-    //                        if (oldScore == null)
-    //                        {
-    //                            memberScoreCollection.insert(new BasicDBObjectBuilder().append("l_id", l_id).append("1", String.valueOf(newScore)).get());
-    //                        }
-    //                        else
-    //                        {
-    //                            memberScoreCollection.update(oldScore, new BasicDBObjectBuilder().append("l_id", l_id).append("1", String.valueOf(newScore)).get());
-    //                        }
-                            String message = new StringBuffer().append(l_id).append("-").append(modelId).append("-").append(newChanges).append("-").append(oldScore == null ? "0" : oldScore.get("1")).append("-").append(newScore).toString();
-                            System.out.println(message);
-                            //jedis.publish("score_changes", message);
-                        }                                                     
+		            	
+		            
+			            Map<String,Change> newChanges = new HashMap<String,Change>();
+			            Collection<Segment> c1Segments = SegmentUtils.findAllSegments(nposTransaction, "C1");
+			            
+						// 3 for each item in the basket find the division OK
+			            Collection<String> variableNamesList; 
+			            for (Segment segment : c1Segments) {
+			            	String div = segment.getSegmentBody().get("Division Number");
+	                        System.out.println(" division :" + div );
+	
+	                        String item = segment.getSegmentBody().get("Item Number");
+	                        System.out.println(" item :" + item );
+	
+	                        RealTimeScoringContext context = createRealTimeScoringContext(segment);
+	
+	                        variableNamesList = getVariableNamesFromDivAndDivLine(div, item);
+	
+	
+	                        for(String variableName:variableNamesList)
+	                        {
+	                            System.out.println(" div :" + div + ":" + variableName);
+	                            DBObject variableFromVariablesCollection = variablesCollection.findOne(new BasicDBObject("name", variableName));
+	                            if (variableFromVariablesCollection != null )System.out.println(" found variable :" + variableName.toUpperCase());
+	
+	                            try {
+	                                //arbitrate between memberVariables and changedMemberVariables to send as previous value
+	                                Strategy strategy = (Strategy) Class.forName("analytics.util.strategies."+ variableFromVariablesCollection.get("strategy")).newInstance();
+	                                if(allChanges.containsKey(variableName)) {
+	                                	context.setPreviousValue(allChanges.get(variableName.toUpperCase()));
+	                                }
+	                                else {
+	                                	context.setPreviousValue(memberVariablesMap.get(variableName.toUpperCase()));
+	                                }
+	                                
+	                                newChanges.put(variableName, strategy.execute(context)/*this needs to be a strategy*/);
+	                                //TODO: fix date format for the expiration date
+	                            } catch (ClassNotFoundException e) {
+	                                e.printStackTrace();
+	                            } catch (InstantiationException e) {
+	                                e.printStackTrace();
+	                            } catch (IllegalAccessException e) {
+	                                e.printStackTrace();
+	                            }
+	
+	                        }
+			            }
+			            
+						// 4 if any divisions that affects the HA model - then re-score
+			            if(!newChanges.isEmpty()){
+	                        //System.out.println("transaction : " + nposTransaction);
+	                        System.out.println(" Changes: " + newChanges );
+			            	//double mbrVar = calcMbrVar(changes, 1, Long.parseLong(l_id));
+	                        
+							Iterator<Entry<String, Change>> newChangesIter = newChanges.entrySet().iterator();
+							BasicDBObject newDocument = new BasicDBObject();
+						    while (newChangesIter.hasNext()) {
+						        Map.Entry<String, Change> pairsVarValue = (Map.Entry)newChangesIter.next();
+						    	String varNm = pairsVarValue.getKey().toString().toUpperCase();
+								Object val = pairsVarValue.getValue().value;
+								newDocument.append("$set", new BasicDBObject().append(varNm, new BasicDBObject().append("v", val).append("e", pairsVarValue.getValue().expirationDate)));
+						    	
+						    	allChanges.put(varNm, val);
+						    }
+	
+	
+						    BasicDBObject searchQuery = new BasicDBObject().append("l_id", hashed);
+						     
+						    changesCollection.update(searchQuery, newDocument, true, false);
+	
+	//							String formatJSON = "{\"l_id\":\"" + hashed + "\"}";
+	
+	
+	                        // find all the models that are affected by these changes
+	                        Set<Integer> modelsSet = new HashSet<Integer>();
+	                        for(String changedVariable:newChanges.keySet())
+	                        {
+	                            Collection<Integer> models = variableModelsMap.get(changedVariable);
+	                            for (Integer modelId: models){
+	                                modelsSet.add(modelId);
+	                            }
+	                        }
+	
+	
+	                        // Score each model in a loop
+	
+	                        for (Integer modelId:modelsSet)
+	                        {
+	                            double newScore = 1/(1+ Math.exp(-1*(calcMbrVar(allChanges, modelId, hashed)))) * 1000;
+	                            System.out.println(l_id + ": " + Double.toString(newScore));
+	
+	                            BasicDBObject queryMbr = new BasicDBObject("l_id", hashed);
+	                            DBObject oldScore = memberScoreCollection.findOne(queryMbr);
+	    //                        if (oldScore == null)
+	    //                        {
+	    //                            memberScoreCollection.insert(new BasicDBObjectBuilder().append("l_id", l_id).append("1", String.valueOf(newScore)).get());
+	    //                        }
+	    //                        else
+	    //                        {
+	    //                            memberScoreCollection.update(oldScore, new BasicDBObjectBuilder().append("l_id", l_id).append("1", String.valueOf(newScore)).get());
+	    //                        }
+	                            String message = new StringBuffer().append(l_id).append("-").append(modelId).append("-").append(newChanges).append("-").append(oldScore == null ? "0" : oldScore.get("1")).append("-").append(newScore).toString();
+	                            System.out.println(message);
+	                            //jedis.publish("score_changes", message);
+	                        }
+			            }
                     }
 		            else {
 		            	return;
 		            }
+	            }
+	            else {
+	            	return;
+	            }
 		            
 		            //StringBuffer saleInfo = new StringBuffer().append(zip).append(':').append(sywrCardUsed).append(':').append(amount);
 	
 		            //if (zip != null && zip != 0)
 		                //jedis.publish("sale_info", saleInfo.toString());
-	            }
 
 	        } catch (JMSException e) {
 	            e.printStackTrace();
@@ -346,6 +379,20 @@ public class ScoringBolt extends BaseRichBolt {
 			
 
         }
+
+	private String hashLoyaltyId(String l_id) {
+		String hashed = new String();
+		try {
+			MessageDigest digest;
+			digest = MessageDigest.getInstance(this.encryptionMethod);
+			digest.update(l_id.getBytes());
+			hashed = new BigInteger(1, digest.digest()).toString(16);
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return hashed;
+	}
 
     private Collection<String> getVariableNamesFromDivAndDivLine(String div, String item) {
         DBObject line = divLnItmCollection.findOne(new BasicDBObjectBuilder().append("d", div).append("i", item).get());
@@ -387,7 +434,7 @@ public class ScoringBolt extends BaseRichBolt {
         transactionLineItem.setAmount(sellingAmount);
         RealTimeScoringContext context = new RealTimeScoringContext();
         context.setTransactionLineItem(transactionLineItem);
-        context.setPreviousValue(0d); //TODO: this has to come from the member variable
+        context.setPreviousValue(0);
         return context;
     }
 
@@ -403,21 +450,14 @@ public class ScoringBolt extends BaseRichBolt {
 		
 	}
 
-    double calcMbrVar( Map<String,Object> changes, int modelId, long LID)
+    double calcMbrVar( Map<String,Object> changes, int modelId, String hashed)
     {
 	    
         BasicDBObject queryModel = new BasicDBObject("modelId", modelId);
         //System.out.println(modelCollection.findOne(queryModel));
 	    DBCursor cursor = modelCollection.find( queryModel );
 
-        MessageDigest digest = null;
-        try {
-            digest = MessageDigest.getInstance("MD5");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        digest.update(String.valueOf(LID).getBytes());
-        BasicDBObject queryMbr = new BasicDBObject("l_id", new BigInteger(1, digest.digest()).toString(16));
+        BasicDBObject queryMbr = new BasicDBObject("l_id", hashed);
         //BasicDBObject queryMbr = new BasicDBObject("l_id", LID);
         //System.out.println(memberCollection.findOne(queryMbr));
         DBObject member = memberCollection.findOne(queryMbr);
@@ -463,7 +503,6 @@ public class ScoringBolt extends BaseRichBolt {
 		    	val = 0;
 		    	break;
 		    }
-		    
 	    }
 	    
         return val;
