@@ -375,7 +375,7 @@ public class ScoringBolt extends BaseRichBolt {
 	                            }
 	                            
 	                            //APPEND CHANGED SCORE AND MIN/MAX EXPIRATION DATES TO DOCUMENT FOR UPDATE
-	                            updateRec.append(modelId.toString(), newScore).append("minEx", simpleDateFormat.format(minDate)).append("maxEx", simpleDateFormat.format(maxDate));
+	                            updateRec.append(modelId.toString(), new BasicDBObject().append("s", newScore).append("minEx", simpleDateFormat.format(minDate)).append("maxEx", simpleDateFormat.format(maxDate)));
 	                            
 	                            	                            
 	                            DBObject oldScore = changedMemberScoresCollection.findOne(new BasicDBObject("l_id", hashed));
