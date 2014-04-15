@@ -22,18 +22,23 @@ import shc.npos.util.SegmentUtils;
 import javax.jms.JMSException;
 import javax.jms.TextMessage;
 
-import org.apache.commons.codec.binary.Base64;
 import org.joda.time.Days;
 import org.joda.time.LocalDate;
 
 import java.math.BigInteger;
 import java.net.UnknownHostException;
+import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Map.Entry;
+
+import java.security.SignatureException;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import org.apache.commons.codec.binary.Base64;
 
 public class ScoringBolt extends BaseRichBolt {
 
@@ -172,7 +177,7 @@ public class ScoringBolt extends BaseRichBolt {
 
     private void addModel(DBObject model, String variableName, Collection<Integer> modelIds) {
         modelIds.add(Integer.valueOf(model.get("modelId").toString()));
-        variableModelsMap.put(variableName, modelIds);
+        variableModelsMap.put(variableName.toUpperCase(), modelIds);
     }
 
     /*
@@ -191,8 +196,8 @@ public class ScoringBolt extends BaseRichBolt {
 			// 2 if SYWR ID retrieve all items in the basket OK
 			// 3 for each item in the basket find the division OK
 			// 4 if any divisions that affects the HA model - then re-score OK
-			// 5 store changes in mongodb 	PENDING
-			// 6 store new score in mongodb  PENDING
+			// 5 store changes in mongodb 	OK
+			// 6 store new score in mongodb  OK
 			// 7 store the score in redis    PENDING
 
 	        try {
@@ -228,6 +233,7 @@ public class ScoringBolt extends BaseRichBolt {
                     
 	            	// hash l_id with the algorithm specified in the class variables
 	            	String hashed = hashLoyaltyId(l_id);
+	            	System.out.println(l_id + " : " + hashed);
 	            	
 	            	//get member variables values from memberVariables collection
 					DBObject mbrVariables = memberCollection.findOne(new BasicDBObject("l_id",hashed));
@@ -236,9 +242,11 @@ public class ScoringBolt extends BaseRichBolt {
 						Iterator<String> mbrVariablesIter = mbrVariables.keySet().iterator();
 						while(mbrVariablesIter.hasNext()) {
 							String key = mbrVariablesIter.next();
-							memberVariablesMap.put(variableVidToNameMap.get(key), mbrVariables.get(key));
+							if(!key.equals("l_id") && !key.equals("_id")) {
+								memberVariablesMap.put(variableVidToNameMap.get(key).toUpperCase(), mbrVariables.get(key));
+							}
 						}
-						//System.out.println(" *** Member Variables Map: " + memberVariablesMap);
+//						System.out.println(" *** Member Variables Map: " + memberVariablesMap);
 						
 						//get changed variable values from the changedMemberVariables collection
 						DBObject collectionChanges = changesCollection.findOne(new BasicDBObject("l_id",hashed));
@@ -280,7 +288,7 @@ public class ScoringBolt extends BaseRichBolt {
 	
 	                        for(String variableName:variableNamesList)
 	                        {
-	                            System.out.println(" div :" + div + ":" + variableName);
+	                            System.out.println(" div: " + div + " : " + variableName);
 	                            DBObject variableFromVariablesCollection = variablesCollection.findOne(new BasicDBObject("name", variableName));
 	                            if (variableFromVariablesCollection != null )System.out.println(" found variable :" + variableName.toUpperCase());
 	
@@ -308,9 +316,8 @@ public class ScoringBolt extends BaseRichBolt {
 			            
 						// 4 if any divisions that affects the HA model - then re-score
 			            if(!newChanges.isEmpty()){
-	                        //System.out.println("transaction : " + nposTransaction);
-	                        System.out.println(" CHANGES: " + newChanges );
-			            	//double mbrVar = calcMbrVar(changes, 1, Long.parseLong(l_id));
+//	                        System.out.println("transaction : " + nposTransaction);
+//	                        System.out.println(" CHANGES: " + newChanges );
 	                        
 							Iterator<Entry<String, Change>> newChangesIter = newChanges.entrySet().iterator();
 							BasicDBObject newDocument = new BasicDBObject();
@@ -331,8 +338,6 @@ public class ScoringBolt extends BaseRichBolt {
 						    System.out.println("END DOCUMENT");
 						    changesCollection.update(searchQuery, new BasicDBObject("$set", newDocument), true, false);
 	
-	//							String formatJSON = "{\"l_id\":\"" + hashed + "\"}";
-	
 	
 	                        // find all the models that are affected by these changes
 	                        Set<Integer> modelsSet = new HashSet<Integer>();
@@ -351,6 +356,8 @@ public class ScoringBolt extends BaseRichBolt {
 	                        {
 	                        	
 	                        	// recalculate score for model
+	                        	
+//	                            System.out.println("SCORE INPUTS: " + memberVariablesMap + " : " + allChanges + " : " + modelId);
 	                            double newScore = 1/(1+ Math.exp(-1*(calcMbrVar(memberVariablesMap, allChanges, modelId)))) * 1000;
 	                            System.out.println(l_id + ": " + Double.toString(newScore));
 	                            
@@ -377,7 +384,6 @@ public class ScoringBolt extends BaseRichBolt {
 	                            //APPEND CHANGED SCORE AND MIN/MAX EXPIRATION DATES TO DOCUMENT FOR UPDATE
 	                            updateRec.append(modelId.toString(), new BasicDBObject().append("s", newScore).append("minEx", simpleDateFormat.format(minDate)).append("maxEx", simpleDateFormat.format(maxDate)));
 	                            
-	                            	                            
 	                            DBObject oldScore = changedMemberScoresCollection.findOne(new BasicDBObject("l_id", hashed));
 	                            String message = new StringBuffer().append(l_id).append("-").append(modelId).append("-").append(newChanges).append("-").append(oldScore == null ? "0" : oldScore.get("1")).append("-").append(newScore).toString();
 	                            System.out.println(message);
@@ -409,13 +415,19 @@ public class ScoringBolt extends BaseRichBolt {
 			}
         }
 
-	private String hashLoyaltyId(String l_id) {
+	public String hashLoyaltyId(String l_id) {
 		String hashed = new String();
 		try {
-			MessageDigest digest;
-			digest = MessageDigest.getInstance(encryptionMethod);
-			digest.update((l_id + salt).getBytes());
-			hashed = new String(Base64.encodeBase64(digest.digest()));
+			SecretKeySpec signingKey = new SecretKeySpec("mykey".getBytes(), "HmacSHA1");
+			Mac mac = Mac.getInstance("HmacSHA1");
+			try {
+				mac.init(signingKey);
+			} catch (InvalidKeyException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			byte[] rawHmac = mac.doFinal(l_id.getBytes());
+			hashed = new String(Base64.encodeBase64(rawHmac));
 		} catch (NoSuchAlgorithmException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -483,7 +495,6 @@ public class ScoringBolt extends BaseRichBolt {
     {
 	    
         BasicDBObject queryModel = new BasicDBObject("modelId", modelId);
-        //System.out.println(modelCollection.findOne(queryModel));
 	    DBCursor modelCollectionCursor = modelCollection.find( queryModel );
 
         DBObject model = null;
@@ -508,7 +519,7 @@ public class ScoringBolt extends BaseRichBolt {
             var.makePojoFromBson( dbo );
 
 //		    System.out.println( var.getName() + ", " + var.getRealTimeFlag() + ", " + var.getType()  + ", " + var.getStrategy() + ", " + var.getCoefficeint() +", " + var.getVid());
-
+//		    System.out.println("PASS: " + mbrVarMap + " varNm: " + var.getName() + " varType: " + var.getType() + " cng: " + changes + var.getCoefficeint());
 		    if(  var.getType().equals("Integer")) val = val + ((Integer)calculateVariableValue(mbrVarMap, var, changes, var.getType()) * var.getCoefficeint());
 		    else if( var.getType().equals("Double")) val = val + ((Double)calculateVariableValue(mbrVarMap, var, changes, var.getType()) * var.getCoefficeint());
 		    else {
@@ -522,20 +533,28 @@ public class ScoringBolt extends BaseRichBolt {
     }
 
 	private Object calculateVariableValue(Map<String,Object> mbrVarMap, Variable var, Map<String,Change> changes, String dataType) {
-		Object changedVar = changes.get(var.getName().toUpperCase()).getValue();
-		if(changedVar == null) {
-			changedVar=mbrVarMap.get(var.getName().toUpperCase());
-		}
-		else{
-			if(dataType.equals("Integer")) {
-				changedVar=Integer.parseInt(changedVar.toString());
+		Object changedValue = null;
+		if(var != null) {
+			if(changes.containsKey(var.getName().toUpperCase())) {
+				changedValue = changes.get(var.getName().toUpperCase()).getValue();
 			}
-			else {
-				changedVar=Double.parseDouble(changedVar.toString());
+			if(changedValue == null) {
+				changedValue=mbrVarMap.get(var.getName().toUpperCase());
 			}
-		System.out.println("changed variable: " + var.getName() + "  value: "+ changedVar.toString());
+			else{
+				if(dataType.equals("Integer")) {
+					changedValue=Integer.parseInt(changedValue.toString());
+				}
+				else {
+					changedValue=Double.parseDouble(changedValue.toString());
+				}
+			}
+			System.out.println("changed variable: " + var.getName().toUpperCase() + "  value: " + changedValue);
 		}
-		return changedVar;
+		else {
+			return 0;
+		}
+		return changedValue;
 	}
 	
 }
