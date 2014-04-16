@@ -5,7 +5,7 @@ package analytics.util;
  */
 public class RealTimeScoringContext {
 
-    private double previousValue;
+    private Object previousValue;
 
     /* need no-argument constructor */
     public RealTimeScoringContext() {
@@ -21,12 +21,12 @@ public class RealTimeScoringContext {
         this.transactionLineItem = transactionLineItem;
     }
 
-    public double getPreviousValue() {
+    public Object getPreviousValue() {
         return previousValue;
     }
 
-    public void setPreviousValue(double previousValue) {
-        this.previousValue = previousValue;
+    public void setPreviousValue(Object object) {
+        this.previousValue = object;
     }
 
 }
