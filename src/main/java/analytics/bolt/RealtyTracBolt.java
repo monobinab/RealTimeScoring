@@ -11,6 +11,8 @@ import backtype.storm.tuple.Tuple;
 import com.mongodb.*;
 
 import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +27,7 @@ public class RealtyTracBolt extends BaseRichBolt {
     DB db;
     MongoClient mongoClient;
     DBCollection homesListedCollection;
-
+    private Collection<String> columns;
 
 
 
@@ -71,6 +73,8 @@ public class RealtyTracBolt extends BaseRichBolt {
         //modelCollection = db.getCollection("modelVariables");
         //jedis = new Jedis("151.149.116.48");
 
+        columns = Arrays.asList(new String[]{"street", "city", "county", "state", "zip","saleStatus", "date", "bed", "bath", "area", "lotSize", "price"});
+
     }
 
 	/*
@@ -91,28 +95,31 @@ public class RealtyTracBolt extends BaseRichBolt {
         6 "bed",
         7 "bath",
         8 "area",
-        9 "price"
+        9 "lotSize"
+        10 "price"
          */
         List values = input.getValues();
-        System.out.println (values.get(0));
+        //System.out.println (values.get(0));
         BasicDBObjectBuilder builder = new BasicDBObjectBuilder();
         int count = 0;
-        for (Object value:values)
+
+        for(String column:columns)
         {
-           builder.append(String.valueOf(count++), value);
+           builder.append(column,input.getStringByField(column));
         }
 
-        BasicDBObject queryMbr = new BasicDBObject("0", values.get(0));
-        queryMbr.append("1", values.get(1));
-        queryMbr.append("3", values.get(3));
+
+        BasicDBObject queryMbr = new BasicDBObject("street", input.getStringByField("street"));
+        queryMbr.append("city", input.getStringByField("city"));
+        queryMbr.append("state", input.getStringByField("state"));
 
         DBObject old = homesListedCollection.findOne(queryMbr);
         if(old != null)
         {
             //flip the flag if necessary
-            if (!values.get(4).toString().equals(old.get("4"))){
-                builder.append("4",values.get(4).toString());
-                homesListedCollection.update(old, builder.get());
+            if (!input.getStringByField("saleStatus").equals(old.get("saleStatus"))){
+                builder.append("saleStatus",input.getStringByField("saleStatus"));
+                homesListedCollection.update(queryMbr, builder.get());
             }
         }
         else

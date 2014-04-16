@@ -27,16 +27,26 @@ public class RedisBolt extends BaseRichBolt {
 	private static final long serialVersionUID = 1L;
     private Jedis jedis;
     private OutputCollector outputCollector;
+    final String host;
+    final int port;
+    final String pattern;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see backtype.storm.task.IBolt#prepare(java.util.Map,
-	 * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
-	 */
+
+    public RedisBolt(String host, int port, String pattern) {
+        this.host = host;
+        this.port = port;
+        this.pattern = pattern;
+    }
+
+    /*
+         * (non-Javadoc)
+         *
+         * @see backtype.storm.task.IBolt#prepare(java.util.Map,
+         * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
+         */
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
-        jedis = new Jedis("151.149.116.48");
+        jedis = new Jedis(host, port);
         this.outputCollector = collector;
     }
 
@@ -76,7 +86,7 @@ public class RedisBolt extends BaseRichBolt {
             StringBuffer saleInfo = new StringBuffer().append(zip).append(':').append(sywrCardUsed).append(':').append(amount);
 
             if (zip != null && zip != 0)
-                jedis.publish("sale_info", saleInfo.toString());
+                jedis.publish(pattern, saleInfo.toString());
         } catch (JMSException e) {
             e.printStackTrace();
         }

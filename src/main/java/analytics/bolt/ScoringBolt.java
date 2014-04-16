@@ -429,10 +429,10 @@ public class ScoringBolt extends BaseRichBolt {
 
     }
 
-	private Object calculateVariableValue(DBObject member, Variable var, Map changes, String dataType) {
+	private Object calculateVariableValue(DBObject memberVariable, Variable var, Map changes, String dataType) {
 		Object changedVar = changes.get(var.getName());
 		if(changedVar == null) {
-			changedVar=member.get(var.getVid());
+			changedVar=memberVariable.get(var.getVid());
 		}
 		else{
 			if(dataType.equals("Integer")) {

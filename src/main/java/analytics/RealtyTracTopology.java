@@ -11,7 +11,6 @@ import backtype.storm.topology.IRichSpout;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
-import analytics.bolt.PrinterBolt;
 
 import java.util.Map;
 
@@ -38,15 +37,15 @@ public class RealtyTracTopology {
 
   public static class JavaRealtyTracSpout extends ShellSpout implements IRichSpout {
 
-      public JavaRealtyTracSpout()
+      public JavaRealtyTracSpout(String scriptName)
       {
-          super("python", "RealtyTracSpout.py");
+          super("python", scriptName);
       }
 
       @Override
       public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-          outputFieldsDeclarer.declare(new Fields("street", "city", "county", "state", "saleStatus", "date", "bed", "bath", "area", "price"));
-          //7414 S Harvard Ave,Chicago,cook-county,IL,1,3/24/2014,5,2,3318,39000
+          outputFieldsDeclarer.declare(new Fields("street", "city", "county", "state", "zip","saleStatus", "date", "bed", "bath", "area", "lotSize", "price"));
+          //"515 Sandstone Trce","Prattville","autauga-county","AL","36066","1","3\/27\/2013","4","3","2980","0.440","249000"
       }
 
       @Override
@@ -60,21 +59,25 @@ public class RealtyTracTopology {
 
     TopologyBuilder builder = new TopologyBuilder();
 
-    builder.setSpout("spout", new JavaRealtyTracSpout(), 1);
-
-    builder.setBolt("print", new PrinterBolt(), 1).shuffleGrouping("spout");
-    builder.setBolt("mongo", new RealtyTracBolt(), 1).shuffleGrouping("spout");
+    builder.setSpout("spout", new JavaRealtyTracSpout("RealtyTracSpoutForSold.py"), 1);
+    builder.setSpout("spout2", new JavaRealtyTracSpout("RealtyTracSpoutForListed.py"), 1);
 
 
-      Config conf = new Config();
-    conf.setDebug(true);
+    //builder.setBolt("print", new PrinterBolt(), 1).shuffleGrouping("spout").shuffleGrouping("spout2");
+    builder.setBolt("mongo", new RealtyTracBolt(), 2).shuffleGrouping("spout").shuffleGrouping("spout2");
+
+
+    Config conf = new Config();
+
 
 
     if (args != null && args.length > 0) {
       conf.setNumWorkers(3);
+
       StormSubmitter.submitTopology(args[0], conf, builder.createTopology());
     }
     else {
+        conf.setDebug(true);
       conf.setMaxTaskParallelism(3);
       LocalCluster cluster = new LocalCluster();
       cluster.submitTopology("realty-trac", conf, builder.createTopology());

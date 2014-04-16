@@ -14,14 +14,14 @@ log = logging.getLogger('RealtyTracSpout')
 log.debug('RealtyTracSpout loading')
 
 
-class RealtyTracSpout(storm.Spout):
+class RealtyTracSpoutBase(storm.Spout):
 
     county_state=[];
     index = 0;
 
     def initialize(self, conf, context):
 
-        with open('member_county.csv', 'r') as csvfile:
+        with open('county_code.csv', 'r') as csvfile:
             csvFile = csv.reader(csvfile, delimiter=',');
             for row in csvFile:
                 if len(self.county_state)==0:
@@ -38,6 +38,13 @@ class RealtyTracSpout(storm.Spout):
     def fail(self, id):
         pass
 
+    def get_saleStatus(self):
+        pass
+
+    def get_sleepTime(self):
+        pass
+
+
     def nextTuple(self):
         #cs = self.county_state[self.index];
         county_name=self.county_state[self.index][0];
@@ -46,7 +53,8 @@ class RealtyTracSpout(storm.Spout):
         self.index=self.index+1;
         if self.index==len(self.county_state):
             self.index=0;
-        self.get_county(county_name,state_code,1);
+
+        self.get_county(county_name, state_code, self.get_saleStatus());
         # for adr in adrs:
         #storm.emit([county_name]);
 
@@ -140,11 +148,10 @@ class RealtyTracSpout(storm.Spout):
             elif nAddresses > 0 and a0[i]=="itemprop='addressRegion'" : # State
                 i=i+1;
                 address.append(str(a0[i]));
-                address.append(str(saleStatus)); # Append the sales status after the state name.
-            # Zip code not saved in the database
-            #		elif nAddresses > 0 and a0[i]=="itemprop='postalCode'" : # Zip Code
-            #			i=i+1;
-            #			address.append(str(a0[i]));
+            elif nAddresses > 0 and a0[i]=="itemprop='postalCode'" : # Zip Code
+                i=i+1;
+                address.append(str(a0[i]));
+                address.append(str(saleStatus)); # Append the sales status after the ZIP code.
             elif nAddresses > 0 and a0[i]=='itemprop="datePublished"' :
                 i=i+1;
                 address.append(str(a0[i]));
@@ -163,11 +170,23 @@ class RealtyTracSpout(storm.Spout):
                 if s=='NA' :
                     s='0';
                 address.append(s);
+                # Lot Size, 1 acre = 43560 sq/ft
+                s=a0[i+17].replace(',','');
+                if " SQ/FT LOT" in s:
+                    s=s.replace(" SQ/FT LOT",".0");
+                    lotSize=float(s)/43560.0; # in acres
+                    s="%.3f"%(lotSize);
+                elif "NA LOT" in s :
+                    s="0.0";
+                elif " ACRE LOT" in s :
+                    s=s.replace(" ACRE LOT","");
+                address.append(s);
+                i=i+17;
             elif nAddresses > 0 and a0[i]=='class="spanPrice"' :
                 i=i+2;
                 s=a0[i].replace(',','');
                 s=s.replace('$','');
-                if s=='NA' :
+                if s=='NA' or s=='N/A' :
                     s='0';
                 address.append(s);
                 if len(addresses)==0 :
@@ -175,9 +194,8 @@ class RealtyTracSpout(storm.Spout):
                 else:
                     addresses.append(address);
 
-                if len(address) == 10:
-                    storm.emit([address[0],address[1],address[2],address[3],address[4],address[5],address[6],address[7],address[8],address[9]]);
-
+                if len(address) > 11:
+                    storm.emit([address[0],address[1],address[2],address[3],address[4],address[5],address[6],address[7],address[8],address[9], address[10], address[11]]);
             elif 'maxPage="' in a0[i] :
                 s=a0[i].replace('maxPage="','');
                 s=s.replace('"','');
@@ -207,9 +225,23 @@ class RealtyTracSpout(storm.Spout):
                     adrs.append(x);
             #print county_name+','+state_code+': '+str(iPage)+'/'+str(maxPage)
             iPage=iPage+1;
-            sleep(random.uniform(0.5,7.5)); # Sleep sometime before hitting the web site again.
+            sleep(self.get_sleepTime()); # Sleep sometime before hitting the web site again.
         return(adrs);
     # End of get_county
 
 
-RealtyTracSpout().run()
+
+class RealtyTracSpoutForSold(RealtyTracSpoutBase):
+    def get_saleStatus(self):
+        return 2
+
+    def get_sleepTime(self):
+        return random.uniform(1,3);
+
+
+class RealtyTracSpoutForListed(RealtyTracSpoutBase):
+    def get_saleStatus(self):
+        return 1
+
+    def get_sleepTime(self):
+        return random.uniform(2,6);

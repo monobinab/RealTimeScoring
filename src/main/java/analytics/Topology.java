@@ -23,7 +23,7 @@ public class Topology {
 
         // create definition of main spout for queue 1
         topologyBuilder.setSpout("meetup_rsvp_spout", new MeetupRsvpsSpout());
-        topologyBuilder.setBolt("redis_bolt", new RedisBolt()).shuffleGrouping("meetup_rsvp_spout");
+        topologyBuilder.setBolt("redis_bolt", new RedisBolt("localhost",3567,"topic")).shuffleGrouping("meetup_rsvp_spout");
         Config conf = new Config();
         conf.setDebug(false);
 

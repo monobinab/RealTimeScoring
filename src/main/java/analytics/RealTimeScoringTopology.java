@@ -45,7 +45,7 @@ public class RealTimeScoringTopology {
 
         // create definition of main spout for queue 1
         topologyBuilder.setBolt("scoring_bolt", new ScoringBolt()).shuffleGrouping("npos1").shuffleGrouping("npos2");
-        //topologyBuilder.setBolt("map_bolt", new RedisBolt()).shuffleGrouping("npos1").shuffleGrouping("npos2");
+        topologyBuilder.setBolt("map_bolt", new RedisBolt("rtsapp302p.qa.ch3.s.com", 6379,"sale_info")).shuffleGrouping("npos1").shuffleGrouping("npos2");
 
         Config conf = new Config();
         conf.setDebug(false);
