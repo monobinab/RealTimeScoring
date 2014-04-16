@@ -294,15 +294,17 @@ public class ScoringBolt extends BaseRichBolt {
 	
 	                            try {
 	                                //arbitrate between memberVariables and changedMemberVariables to send as previous value
-	                                Strategy strategy = (Strategy) Class.forName("analytics.util.strategies."+ variableFromVariablesCollection.get("strategy")).newInstance();
-	                                if(allChanges.containsKey(variableName)) {
-	                                	context.setPreviousValue(allChanges.get(variableName.toUpperCase()).getValue());
-	                                }
-	                                else {
-	                                	context.setPreviousValue(memberVariablesMap.get(variableName.toUpperCase()));
-	                                }
-	                                
-	                                newChanges.put(variableName, strategy.execute(context)/*this needs to be a strategy*/);
+	                            	if(variableModelsMap.containsKey(variableName)) {
+	                            		Strategy strategy = (Strategy) Class.forName("analytics.util.strategies."+ variableFromVariablesCollection.get("strategy")).newInstance();
+		                                if(allChanges.containsKey(variableName)) {
+		                                	context.setPreviousValue(allChanges.get(variableName.toUpperCase()).getValue());
+		                                }
+		                                else {
+		                                	context.setPreviousValue(memberVariablesMap.get(variableName.toUpperCase()));
+		                                }
+		                                
+		                                newChanges.put(variableName, strategy.execute(context));
+	                            	}
 	                            } catch (ClassNotFoundException e) {
 	                                e.printStackTrace();
 	                            } catch (InstantiationException e) {
@@ -317,7 +319,7 @@ public class ScoringBolt extends BaseRichBolt {
 						// 4 if any divisions that affects the HA model - then re-score
 			            if(!newChanges.isEmpty()){
 //	                        System.out.println("transaction : " + nposTransaction);
-//	                        System.out.println(" CHANGES: " + newChanges );
+	                        System.out.println(" CHANGES: " + newChanges );
 	                        
 							Iterator<Entry<String, Change>> newChangesIter = newChanges.entrySet().iterator();
 							BasicDBObject newDocument = new BasicDBObject();
@@ -343,7 +345,8 @@ public class ScoringBolt extends BaseRichBolt {
 	                        Set<Integer> modelsSet = new HashSet<Integer>();
 	                        for(String changedVariable:newChanges.keySet())
 	                        {
-	                            Collection<Integer> models = variableModelsMap.get(changedVariable);
+	                            //TODO: do not put variables that are not associated with a model in the changes map
+	                        	Collection<Integer> models = variableModelsMap.get(changedVariable);
 	                            for (Integer modelId: models){
 	                                modelsSet.add(modelId);
 	                            }
@@ -537,6 +540,7 @@ public class ScoringBolt extends BaseRichBolt {
 		if(var != null) {
 			if(changes.containsKey(var.getName().toUpperCase())) {
 				changedValue = changes.get(var.getName().toUpperCase()).getValue();
+				System.out.println("changed variable: " + var.getName().toUpperCase() + "  value: " + changedValue);
 			}
 			if(changedValue == null) {
 				changedValue=mbrVarMap.get(var.getName().toUpperCase());
@@ -549,7 +553,6 @@ public class ScoringBolt extends BaseRichBolt {
 					changedValue=Double.parseDouble(changedValue.toString());
 				}
 			}
-			System.out.println("changed variable: " + var.getName().toUpperCase() + "  value: " + changedValue);
 		}
 		else {
 			return 0;
