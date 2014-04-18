@@ -17,7 +17,7 @@ public class BrightTagsTopology {
 
     TopologyBuilder builder = new TopologyBuilder();
 
-    builder.setSpout("spout", new RedisPubSubSpout("rtsapp302p.qa.ch3.s.com", 6379, "bright_tags"), 1);
+    builder.setSpout("spout", new RedisPubSubSpout("rtsapp302p.qa.ch3.s.com", 6379, "Products"), 1);
 
     builder.setBolt("print", new PrinterBolt(), 1).shuffleGrouping("spout");
     //builder.setBolt("print", new RealtyTracBolt(), 2).shuffleGrouping("spout").shuffleGrouping("spout2");

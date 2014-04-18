@@ -1,24 +1,38 @@
 package analytics.util;
 
+import java.io.Serializable;
+import java.util.List;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
 
-public class TransactionLineItem {
+public class TransactionLineItem implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	public String hashed;
 	public String div;
 	public String item;
 	public String line;
 	public boolean searsCardUsed;
 	public double amount;
+	public List<String> variableList;
 	
 	public TransactionLineItem() {
 		
 	}
 	
-	public TransactionLineItem(String d, String i, float a) {
+	public TransactionLineItem(String hashed, String d, String i) {
+		this.hashed=hashed;
 		this.div=d;
 		this.item=i;
-		this.amount=a;
+	}
+	
+	public TransactionLineItem(String d, String i) {
+		this.div=d;
+		this.item=i;
 	}
 	
 	public void setDiv(String d) {
@@ -33,14 +47,26 @@ public class TransactionLineItem {
 		this.amount=a;
 	}
 	
-	public void setLine(DBCollection divLnItmCollection) {
+	public void setLine(String l) {
+		this.line=l;
+	}
+	
+	public boolean setLineFromCollection(DBCollection divLnItmCollection) {
 		BasicDBObject queryLine = new BasicDBObject();
 		queryLine.put("d", this.div);
 		queryLine.put("i", this.item);
 		
-		DBCursor divLnItm = divLnItmCollection.find(queryLine);
-		this.line = divLnItm.next().get("l").toString();
+		DBObject divLnItm = divLnItmCollection.findOne(queryLine);
 		
+		if(divLnItm.keySet().isEmpty()) {
+			return false;
+		}
+		this.line = divLnItm.get("l").toString();
+		return true;
+	}
+	
+	public void setVariableList(List<String> v) {
+		this.variableList = v;
 	}
 	
 	
@@ -58,6 +84,14 @@ public class TransactionLineItem {
 	
 	public double getAmount() {
 		return this.amount;
+	}
+
+	public String getHashed() {
+		return this.hashed;
+	}
+
+	public List<String> getVariableList() {
+		return this.variableList;
 	}
 	
 	

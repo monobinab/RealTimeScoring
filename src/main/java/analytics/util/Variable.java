@@ -8,6 +8,10 @@ import java.io.Serializable;
 
 public class Variable implements Serializable
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private ObjectId _id;
 	private String name;
 	private String VID;

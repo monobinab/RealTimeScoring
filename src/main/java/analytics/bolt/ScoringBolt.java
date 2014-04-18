@@ -12,6 +12,7 @@ import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import com.ibm.jms.JMSMessage;
 import com.mongodb.*;
@@ -107,7 +108,7 @@ public class ScoringBolt extends BaseRichBolt {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         this.outputCollector = collector;
-
+//        this.outputCollector.emit(tuple);
 	/*
 	 * (non-Javadoc)
 	 *
@@ -229,7 +230,7 @@ public class ScoringBolt extends BaseRichBolt {
 	            }
 	            
 				// 2 if SYWR ID retrieve all items in the basket OK
-	            if(l_id!=null) {
+	            if(l_id != null) {
                     
 	            	// hash l_id with the algorithm specified in the class variables
 	            	String hashed = hashLoyaltyId(l_id);
@@ -491,6 +492,7 @@ public class ScoringBolt extends BaseRichBolt {
       */
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
+		declarer.declare(new Fields("lineItems"));
 		
 	}
 
