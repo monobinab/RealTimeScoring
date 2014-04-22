@@ -143,6 +143,8 @@ public class ParsingBoltPOS extends BaseRichBolt {
 		// 8) EMIT LINE ITEMS
 
         	
+		System.out.println("PARSING NPOS DOCUMENT");
+		
 		// 1) FETCH SEGMENT "B1"
     	
         String nposTransaction = null;
