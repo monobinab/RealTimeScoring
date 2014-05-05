@@ -268,7 +268,7 @@
                         <!-- automatically creates the classpath using all project dependencies,
                              also adding the project build directory -->
                         <classpath/>
-                        <argument>analytics.RealtyTracTopology</argument>
+                        <argument>analytics.RealTimeScoringTopology</argument>
                     </arguments>
                 </configuration>
 

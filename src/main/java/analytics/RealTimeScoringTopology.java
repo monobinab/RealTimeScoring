@@ -44,8 +44,8 @@ public class RealTimeScoringTopology {
         topologyBuilder.setSpout("npos2", new WebsphereMQSpout("iasapp305p.prod.ch3.s.com", 1414, "SQLP0394", "MARKETAN.SVRCONN", "STORM.NPOS.MASCORED.QC01"), 1);
 
         // create definition of main spout for queue 1
-        topologyBuilder.setBolt("scoring_bolt", new ScoringBolt()).shuffleGrouping("npos1").shuffleGrouping("npos2");
-        topologyBuilder.setBolt("map_bolt", new RedisBolt("rtsapp302p.qa.ch3.s.com", 6379,"sale_info")).shuffleGrouping("npos1").shuffleGrouping("npos2");
+        //topologyBuilder.setBolt("scoring_bolt", new ScoringBolt()).shuffleGrouping("npos1").shuffleGrouping("npos2");
+        topologyBuilder.setBolt("map_bolt", new RedisBolt("rtsapp401p.prod.ch4.s.com", 6379,"sale_info"),5).shuffleGrouping("npos1").shuffleGrouping("npos2");
 
         Config conf = new Config();
         conf.setDebug(false);

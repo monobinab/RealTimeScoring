@@ -13,7 +13,6 @@ import com.mongodb.*;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 public class RealtyTracBolt extends BaseRichBolt {
@@ -69,11 +68,11 @@ public class RealtyTracBolt extends BaseRichBolt {
         db = mongoClient.getDB("RealTimeScoring");
         //db.authenticate(configuration.getString("mongo.db.user"), configuration.getString("mongo.db.password").toCharArray());
 	    db.authenticate("rtsw", "5core123".toCharArray());
-        homesListedCollection = db.getCollection("homesListed");
+        homesListedCollection = db.getCollection("homes");
         //modelCollection = db.getCollection("modelVariables");
         //jedis = new Jedis("151.149.116.48");
 
-        columns = Arrays.asList(new String[]{"street", "city", "county", "state", "zip","saleStatus", "date", "bed", "bath", "area", "lotSize", "price"});
+        columns = Arrays.asList(new String[]{"street", "city", "county", "state", "zip","saleStatus", "date", "bed", "bath", "area", "price"});
 
     }
 
@@ -98,7 +97,7 @@ public class RealtyTracBolt extends BaseRichBolt {
         9 "lotSize"
         10 "price"
          */
-        List values = input.getValues();
+        //List values = input.getValues();
         //System.out.println (values.get(0));
         BasicDBObjectBuilder builder = new BasicDBObjectBuilder();
         int count = 0;
