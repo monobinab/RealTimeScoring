@@ -4,6 +4,7 @@
 package analytics.bolt;
 
 import analytics.util.Change;
+import analytics.util.TransactionLineItem;
 import analytics.util.Variable;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -11,11 +12,15 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
 import com.ibm.jms.JMSMessage;
 import com.mongodb.*;
 
 import redis.clients.jedis.Jedis;
 
+import java.lang.reflect.Type;
 import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -27,6 +32,7 @@ import java.util.Map.Entry;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
 
 public class ScoringBolt extends BaseRichBolt {
 
@@ -172,10 +178,11 @@ public class ScoringBolt extends BaseRichBolt {
 
 		// SCORING BOLTS READS A LIST OF OBJECTS WITH THE FIRST ELEMENT BEING THE HASHED LOYALTY ID
 		// AND n MODEL IDs AFTER
-		List<Object> modelIdList = (List<Object>) input.getValueByField("modelIdList");
+		List<Object> modelIdList = restoreModelListFromJson(input.getString(0));
 		//List<TransactionLineItem> lineItemList = new ArrayList<TransactionLineItem>();
 
-		System.out.println("APPLYING STRATEGIES");
+		System.out.println("RE-SCORING MODELS");
+		System.out.println(" *** model ID list: " + modelIdList);
 		
 		// 1) PULL OUT HASHED LOYALTY ID FROM THE FIRST RECORD IN lineItemList
 		String hashed = modelIdList.get(0).toString();
@@ -225,13 +232,16 @@ public class ScoringBolt extends BaseRichBolt {
 	
         // Score each model in a loop
 		BasicDBObject updateRec = new BasicDBObject();
-        for ( Object modelId:modelIdList)
+		int listPosition = 0;
+        for (Object modelId:modelIdList)
         {
-        	
         	// recalculate score for model
         	
-//	                            System.out.println("SCORE INPUTS: " + memberVariablesMap + " : " + allChanges + " : " + modelId);
-            double newScore = 1/(1+ Math.exp(-1*(calcMbrVar(memberVariablesMap, allChanges, (Integer)modelId)))) * 1000;
+        	// skip first item in list because it is the l_id
+        	if(++listPosition==1) continue;
+        	
+        	System.out.println("SCORE INPUTS: modelID " + modelId);
+            double newScore = 1/(1+ Math.exp(-1*(calcMbrVar(memberVariablesMap, allChanges,  (Integer) modelId)))) * 1000;
             System.out.println(hashed + ": " + Double.toString(newScore));
             
             // FIND THE MIN AND MAX EXPIRATION DATE OF ALL VARIABLE CHANGES FOR CHANGED MODEL SCORE TO WRITE TO SCORE CHANGES COLLECTION
@@ -300,6 +310,25 @@ public class ScoringBolt extends BaseRichBolt {
 		declarer.declare(new Fields("newScore"));
 		
 	}
+
+	public static List<Object> restoreModelListFromJson(String json)
+    {
+        System.out.println(" model list string: " + json);
+		//modelList = new ArrayList<Object>();
+        
+        String strings[]=StringUtils.split(json);
+        List<Object> modelList = new ArrayList<Object>();
+        for(Object s: strings) {
+        	modelList.add(s);
+        }
+        
+        /*
+        Type lineItemListType = new TypeToken<List<Object>>() {}.getType();
+        List<Object> modelList = new Gson().fromJson(json, lineItemListType);
+        */
+        return modelList;
+    }
+	
 
     double calcMbrVar( Map<String,Object> mbrVarMap, Map<String,Change> changes, int modelId)
     {

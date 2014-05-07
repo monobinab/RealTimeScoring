@@ -3,20 +3,16 @@ package analytics.util;
 import java.io.Serializable;
 import java.util.List;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
-
 public class TransactionLineItem implements Serializable {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	public String hashed;
+	public String l_id;
 	public String div;
 	public String item;
 	public String line;
-	public boolean searsCardUsed;
+//	public boolean searsCardUsed;
 	public double amount;
 	public List<String> variableList;
 	
@@ -24,8 +20,20 @@ public class TransactionLineItem implements Serializable {
 		
 	}
 	
-	public TransactionLineItem(String hashed, String d, String i) {
-		this.hashed=hashed;
+	public TransactionLineItem(String id) {
+		this.l_id=id;
+	}
+
+	public TransactionLineItem(String id, String d, String i, String l, double a) {
+		this.l_id=id;
+		this.div=d;
+		this.item=i;
+		this.line=l;
+		this.amount=a;
+	}
+	
+	public TransactionLineItem(String id, String d, String i) {
+		this.l_id=id;
 		this.div=d;
 		this.item=i;
 	}
@@ -51,20 +59,6 @@ public class TransactionLineItem implements Serializable {
 		this.line=l;
 	}
 	
-	public boolean setLineFromCollection(DBCollection divLnItmCollection) {
-		BasicDBObject queryLine = new BasicDBObject();
-		queryLine.put("d", this.div);
-		queryLine.put("i", this.item);
-		
-		DBObject divLnItm = divLnItmCollection.findOne(queryLine);
-		
-		if(divLnItm.keySet().isEmpty()) {
-			return false;
-		}
-		this.line = divLnItm.get("l").toString();
-		return true;
-	}
-	
 	public void setVariableList(List<String> v) {
 		this.variableList = v;
 	}
@@ -86,8 +80,8 @@ public class TransactionLineItem implements Serializable {
 		return this.amount;
 	}
 
-	public String getHashed() {
-		return this.hashed;
+	public String getL_id() {
+		return this.l_id;
 	}
 
 	public List<String> getVariableList() {

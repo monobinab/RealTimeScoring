@@ -11,11 +11,15 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
 import com.mongodb.*;
 
 import redis.clients.jedis.Jedis;
 import shc.npos.segments.Segment;
 
+import java.lang.reflect.Type;
 import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
@@ -29,6 +33,7 @@ import java.security.SignatureException;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
 
 
 public class StrategyBolt extends BaseRichBolt {
@@ -103,7 +108,7 @@ public class StrategyBolt extends BaseRichBolt {
         modelCollection = db.getCollection("modelVariables");
         memberVariablesCollection = db.getCollection("memberVariables");
         variablesCollection = db.getCollection("Variables");
-        divLnVariableCollection = db.getCollection("DivLnVariable");
+        divLnVariableCollection = db.getCollection("divLnVariable");
         changedVariablesCollection = db.getCollection("changedMemberVariables");
         changedMemberScoresCollection = db.getCollection("changedMemberScores");
 
@@ -167,18 +172,23 @@ public class StrategyBolt extends BaseRichBolt {
 		// 10) EMIT LIST OF MODEL IDs
 		
 		
+		List<TransactionLineItem> lineItemList = restoreLineItemListFromJson(input.getString(0));
 		
-		
-		List<TransactionLineItem> lineItemList = (List<TransactionLineItem>) input.getValueByField("lineItemList");
+		//List<TransactionLineItem> lineItemList = (List<TransactionLineItem>) input.getValueByField("lineItemList");
 		//List<TransactionLineItem> lineItemList = new ArrayList<TransactionLineItem>();
 
 		System.out.println("APPLYING STRATEGIES");
+		System.out.println(" *** input tuple: " + input);
+		System.out.println(" *** line items: " + lineItemList.size());
+		for(TransactionLineItem i: lineItemList) {
+			System.out.println(" variables: " + i.getVariableList().toString());
+		}
 		
 		// 1) PULL OUT HASHED LOYALTY ID FROM THE FIRST RECORD IN lineItemList
-		String hashed = lineItemList.get(0).getHashed();
+		String l_id = lineItemList.get(0).getL_id();
 		
 		// 2) FETCH MEMBER VARIABLES FROM memberVariables COLLECTION
-		DBObject mbrVariables = memberVariablesCollection.findOne(new BasicDBObject("l_id",hashed));
+		DBObject mbrVariables = memberVariablesCollection.findOne(new BasicDBObject("l_id",l_id));
 		if(mbrVariables == null) {
 			return;
 		}
@@ -194,7 +204,7 @@ public class StrategyBolt extends BaseRichBolt {
 		}
 		
 		// 4) FETCH CHANGED VARIABLES FROM changedMemberVariables COLLECTION
-		DBObject changedMbrVariables = changedVariablesCollection.findOne(new BasicDBObject("l_id",hashed));
+		DBObject changedMbrVariables = changedVariablesCollection.findOne(new BasicDBObject("l_id",l_id));
 
 		// 5) CREATE MAP FROM CHANGED VARIABLES TO VALUE AND EXPIRATION DATE (CHANGE CLASS)
 		Map<String,Change> allChanges = new HashMap<String,Change>();
@@ -269,7 +279,7 @@ public class StrategyBolt extends BaseRichBolt {
 		    	allChanges.put(varNm, new Change(varNm, val, pairsVarValue.getValue().expirationDate));
 		    }
 
-		    BasicDBObject searchQuery = new BasicDBObject().append("l_id", hashed);
+		    BasicDBObject searchQuery = new BasicDBObject().append("l_id", l_id);
 		    
 		    System.out.println("DOCUMENT TO INSERT:");
 		    System.out.println(newDocument.toString());
@@ -281,7 +291,7 @@ public class StrategyBolt extends BaseRichBolt {
 
 			// 9) FIND ALL MODELS THAT ARE AFFECTED BY CHANGES
             List<Object> modelIdList = new ArrayList<Object>();
-            modelIdList.add(hashed);
+            modelIdList.add(l_id);
             for(String changedVariable:newChanges.keySet())
             {
                 //TODO: do not put variables that are not associated with a model in the changes map
@@ -295,7 +305,10 @@ public class StrategyBolt extends BaseRichBolt {
     		
             // 10) EMIT LIST OF MODEL IDs
             if(modelIdList.size()>1) {
-            	this.outputCollector.emit(modelIdList);
+            	List<Object> stringModelList = new ArrayList<Object>();
+            	stringModelList.add(createStringFromModelList(modelIdList));
+            	System.out.println(" *** strategy bolt emitting: " + stringModelList);
+            	this.outputCollector.emit(stringModelList);
             }
         }
 	}
@@ -313,5 +326,29 @@ public class StrategyBolt extends BaseRichBolt {
 		declarer.declare(new Fields("modelIdList"));
 		
 	}
+    
+	public static List<TransactionLineItem> restoreLineItemListFromJson(String json)
+    {
+        //System.out.println(" JSON string: " + json);
+		List<TransactionLineItem> lineItemList = new ArrayList<TransactionLineItem>();
+        Type lineItemListType = new TypeToken<List<TransactionLineItem>>() {}.getType();
+
+        lineItemList = new Gson().fromJson(json, lineItemListType);
+        return lineItemList;
+    }
 	
+    private Object createStringFromModelList(List<Object> modelList) {
+		// Create string in JSON format to emit
+   	
+    	String transLineItemListString=StringUtils.join(modelList.toArray());
+    	
+    	/*
+    	Gson gson = new Gson();
+    	Type transLineItemType = new TypeToken<List<Object>>() {}.getType();
+    	String transLineItemListString = gson.toJson(modelList, transLineItemType);
+    	*/
+		return transLineItemListString;
+	}
+
+
 }
