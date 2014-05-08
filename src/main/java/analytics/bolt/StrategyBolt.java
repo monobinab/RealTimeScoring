@@ -96,6 +96,8 @@ public class StrategyBolt extends BaseRichBolt {
 	 * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
 	 */
 
+        System.out.println("PREPARING STRATEGY BOLT");
+        
         try {
             mongoClient = new MongoClient("shrdmdb301p.stag.ch3.s.com", 20000);
         } catch (UnknownHostException e) {
@@ -340,7 +342,7 @@ public class StrategyBolt extends BaseRichBolt {
     private Object createStringFromModelList(List<Object> modelList) {
 		// Create string in JSON format to emit
    	
-    	String transLineItemListString=StringUtils.join(modelList.toArray());
+    	String transLineItemListString=StringUtils.join(modelList.toArray(),",");
     	
     	/*
     	Gson gson = new Gson();

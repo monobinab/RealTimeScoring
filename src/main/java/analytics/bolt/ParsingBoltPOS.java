@@ -94,6 +94,7 @@ public class ParsingBoltPOS extends BaseRichBolt {
 	 * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
 	 */
 
+        System.out.println("PREPARING PARSING POS BOLT");
         try {
             mongoClient = new MongoClient("shrdmdb301p.stag.ch3.s.com", 20000);
         } catch (UnknownHostException e) {
