@@ -33,7 +33,7 @@ public class StoreZipMap {
             try {
                 BufferedReader br = new BufferedReader(new InputStreamReader(StoreZipMap
                         .class.getClassLoader()
-                        .getResourceAsStream("storeZips.csv")));
+                        .getResourceAsStream("mainstoreZips.csv")));
                 String record = br.readLine();
                 while (record != null) {
                     String[] storeZip = record.split(",");

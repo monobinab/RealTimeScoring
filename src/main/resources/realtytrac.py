@@ -132,70 +132,86 @@ class RealtyTracSpoutBase(storm.Spout):
         # Init
         nAddresses=0; i=0; j=0; maxPage=0; addresses=[]; address=[''];
         na0=len(a0);
+
         # Process the data.
         while i < na0 :
             if a0[i]=='class="propertyLink"' : # beginning of new address
+                if nAddresses>=1 :
+                    storm.emit([address[0],address[1],address[2],address[3],address[4],address[5],address[6],address[7],address[8],address[9], address[10]]);
                 nAddresses=nAddresses+1;
+                address=["NA","NA","NA","NA","NA",str(saleStatus),"NA","0","0","0","0"];
             elif nAddresses > 0 and a0[i]=="itemprop='streetAddress'" :
                 i=i+1;
                 s=str(a0[i]);
                 s=s.replace(',','');
-                address=[s];
+                address[0]=s;
             elif nAddresses > 0 and a0[i]=="itemprop='addressLocality'" : # City
                 i=i+1;
-                address.append(str(a0[i]));
-                address.append(county_name); # Append the county name after the city name.
+                address[1]=str(a0[i]);
+                address[2]=county_name; # Append the county name after the city name.
+            #	address.append(str(a0[i]));
+            #	address.append(county_name); # Append the county name after the city name.
             elif nAddresses > 0 and a0[i]=="itemprop='addressRegion'" : # State
                 i=i+1;
-                address.append(str(a0[i]));
+                address[3]=str(a0[i]);
+            #	address.append(str(a0[i]));
             elif nAddresses > 0 and a0[i]=="itemprop='postalCode'" : # Zip Code
                 i=i+1;
-                address.append(str(a0[i]));
-                address.append(str(saleStatus)); # Append the sales status after the ZIP code.
-            elif nAddresses > 0 and a0[i]=='itemprop="datePublished"' :
-                i=i+1;
-                address.append(str(a0[i]));
-            elif nAddresses > 0 and a0[i]=='Bed' :
+                address[4]=str(a0[i]);
+                address[5]=str(saleStatus); # Append the sales status after the ZIP code.
+            #	address.append(str(a0[i]));
+            #	address.append(str(saleStatus)); # Append the sales status after the ZIP code.
+            elif nAddresses > 0 and ((saleStatus==1 and a0[i].strip()=='Listed:') or (saleStatus==2 and a0[i].strip()=='Sold:')) :
+                i=i+5;
+                address[6]=str(a0[i]);
+            #	address.append(str(a0[i]));
+            elif nAddresses > 0 and (a0[i].strip()=='Beds' or a0[i].strip()=='Bed') :
+                #	print "Beds"
                 s=a0[i-4];
                 if s=='NA' :
                     s='0';
-                address.append(s);
-            elif nAddresses > 0 and a0[i]=='Bath' :
+                address[7]=s;
+            #	address.append("Beds="+s);
+            elif nAddresses > 0 and (a0[i].strip()=='Baths' or a0[i].strip()=='Bath') :
+                #	print "Bath"
                 s=a0[i-4];
                 if s=='NA' :
                     s='0';
-                address.append(s);
-            elif nAddresses > 0 and a0[i]=='Sq/Ft' :
+                address[8]=s;
+            #	address.append("Bath="+s);
+            elif nAddresses > 0 and a0[i].strip()=='sqft' :
+                #	print "Sq/Ft"
                 s=a0[i-4].replace(',','');
-                if s=='NA' :
+                if s=='NA' or s=='N/A' :
                     s='0';
-                address.append(s);
+                address[9]=s;
+                #	address.append("Sq/Ft="+s);
+                # No more lot size in the page of listing/sold pages.
                 # Lot Size, 1 acre = 43560 sq/ft
-                s=a0[i+17].replace(',','');
-                if " SQ/FT LOT" in s:
-                    s=s.replace(" SQ/FT LOT",".0");
-                    lotSize=float(s)/43560.0; # in acres
-                    s="%.3f"%(lotSize);
-                elif "NA LOT" in s :
-                    s="0.0";
-                elif " ACRE LOT" in s :
-                    s=s.replace(" ACRE LOT","");
-                address.append(s);
+                #	s=a0[i+17].replace(',','');
+                #	if " SQ/FT LOT" in s:
+                #		s=s.replace(" SQ/FT LOT",".0");
+                #		lotSize=float(s)/43560.0; # in acres
+                #		s="%.3f"%(lotSize);
+                #	elif "NA LOT" in s :
+                #		s="0.0";
+                #	elif " ACRE LOT" in s :
+                #		s=s.replace(" ACRE LOT","");
+                #	address.append("Lot="+s);
                 i=i+17;
-            elif nAddresses > 0 and a0[i]=='class="spanPrice"' :
+            #	elif nAddresses > 0 and a0[i]=='class="spanPrice"' :
+            elif nAddresses > 0 and a0[i]=='itemprop="price"' :
                 i=i+2;
                 s=a0[i].replace(',','');
                 s=s.replace('$','');
                 if s=='NA' or s=='N/A' :
                     s='0';
-                address.append(s);
-                if len(addresses)==0 :
-                    addresses=[address];
-                else:
-                    addresses.append(address);
-
-                if len(address) > 11:
-                    storm.emit([address[0],address[1],address[2],address[3],address[4],address[5],address[6],address[7],address[8],address[9], address[10], address[11]]);
+                address[10]=s;
+            #	address.append(s);
+            #	if len(addresses)==0 :
+            #		addresses=[address];
+            #	else:
+            #		addresses.append(address);
             elif 'maxPage="' in a0[i] :
                 s=a0[i].replace('maxPage="','');
                 s=s.replace('"','');
@@ -205,14 +221,16 @@ class RealtyTracSpoutBase(storm.Spout):
                 else:
                     maxPage=0;
             i=i+1;
+
         return([maxPage, addresses]);
     # End of get_addresses
 
     def get_county(self,county_name,state_code,saleStatus):
+
         iPage=1; maxPage=6;
         while iPage <= maxPage :
             if saleStatus==1 : # Listing
-                urlAddress='http://www.realtytrac.com/mapsearch/real-estate/'+state_code+'/'+county_name+'/p-'+str(iPage)+'?sortbyfield=featured,desc&itemsper=50'
+                urlAddress='http://www.realtytrac.com/mapsearch/real-estate/'+state_code+'/'+county_name+'/p-'+str(iPage)+'?sortbyfield=featured,desc&itemsper=50';
             else: # Sold
                 urlAddress='http://www.realtytrac.com/mapsearch/sold/'+state_code+'/'+county_name+'/p-'+str(iPage)+'?sortbyfield=featured,desc&itemsper=50'
             #		urlAddress='http://www.realtytrac.com/mapsearch/real-estate/il/cook-county/glenview/p-'+str(iPage)+'?sortbyfield=featured,desc';
@@ -233,7 +251,7 @@ class RealtyTracSpoutBase(storm.Spout):
 
 class RealtyTracSpoutForSold(RealtyTracSpoutBase):
     def get_saleStatus(self):
-        return 2
+        return 2;
 
     def get_sleepTime(self):
         return random.uniform(1,3);
@@ -241,7 +259,7 @@ class RealtyTracSpoutForSold(RealtyTracSpoutBase):
 
 class RealtyTracSpoutForListed(RealtyTracSpoutBase):
     def get_saleStatus(self):
-        return 1
+        return 1;
 
     def get_sleepTime(self):
         return random.uniform(2,6);
