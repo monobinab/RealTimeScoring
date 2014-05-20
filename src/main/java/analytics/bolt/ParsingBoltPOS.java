@@ -1,10 +1,6 @@
 package analytics.bolt;
 
-import analytics.util.Change;
-import analytics.util.RealTimeScoringContext;
 import analytics.util.TransactionLineItem;
-import analytics.util.Variable;
-import analytics.util.strategies.Strategy;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -17,7 +13,6 @@ import com.google.gson.Gson;
 import com.ibm.jms.JMSMessage;
 import com.mongodb.*;
 
-import redis.clients.jedis.Jedis;
 import shc.npos.segments.Segment;
 import shc.npos.util.SegmentUtils;
 
@@ -27,19 +22,11 @@ import javax.jms.TextMessage;
 import java.lang.reflect.Type;
 import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.Map.Entry;
-import java.util.concurrent.TimeUnit;
-
-import java.security.SignatureException;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import org.apache.commons.codec.binary.Base64;
-import org.json.simple.JSONObject;
 
 
 public class ParsingBoltPOS extends BaseRichBolt {
@@ -250,6 +237,7 @@ public class ParsingBoltPOS extends BaseRichBolt {
         System.out.println("list size: " + lineItemList.size());
         if(lineItemList.size()>0){
 	        List<Object> lineItemAsJsonString = new ArrayList<Object>();
+	        lineItemAsJsonString.add(l_id);
 	        lineItemAsJsonString.add(createJsonFromLineItemList(lineItemList));
 
 	        System.out.println(" *** parsing bolt emitting: " + lineItemAsJsonString.toString());
@@ -263,37 +251,35 @@ public class ParsingBoltPOS extends BaseRichBolt {
 
     private Object createJsonFromLineItemList(Collection<TransactionLineItem> lineItemCollection) {
 		// Create string in JSON format to emit
-    	/*
-    	String transLineItemListString = new String();
-    	
-    	for(TransactionLineItem itm: lineItemCollection) {
-			transLineItemListString = transLineItemListString 
-					+ "{\"hashed\":\"" + itm.getHashed() + "\""
-					+ ",\"div\":\"" + itm.getDiv() + "\""
-					+ ",\"ln\":\"" + itm.getLine() + "\""
-					+ ",\"itm\":\"" + itm.getItem() + "\""
-					+ ",\"amt\":" + itm.getAmount();
-			
-			int variableCount = 0;
-			for(String var: itm.getVariableList()) {
-				if(++variableCount==1) {
-					transLineItemListString = transLineItemListString 
-							+ "[{\"var\":\"" + var + "\"}";
-				}
-				else {
-					transLineItemListString = transLineItemListString 
-							+ ",{\"var\":\"" + var + "\"}";
-				}
-			}
-    	}
-		transLineItemListString = transLineItemListString + "}]}";
-    	System.out.println("concatenation:  " + transLineItemListString);
-    	
-    	*/
+
     	Gson gson = new Gson();
-    	Type transLineItemType = new TypeToken<Collection<TransactionLineItem>>() {}.getType();
-    	String transLineItemListString = gson.toJson(lineItemCollection, transLineItemType);
+    	Map<String, String> varAmountMap = new HashMap<String, String>();
+    	Type transLineItemType = new TypeToken<Map<String, String>>() {
+			private static final long serialVersionUID = 1L;}.getType();
     	
+    	if(lineItemCollection == null || lineItemCollection.isEmpty()) {
+    		return null;
+    	}
+    	
+    	for(TransactionLineItem lnItm : lineItemCollection) {
+    		List<String> varList = lnItm.getVariableList();
+    		if(varList == null || varList.isEmpty()) {
+    			continue;
+    		}
+    		for(String v : varList) {
+    			if(!varAmountMap.containsKey(v.toUpperCase())) {
+	    			varAmountMap.put(v.toUpperCase(), String.valueOf(lnItm.getAmount()));
+    			}
+    			else {
+    				Double a1 = Double.valueOf(varAmountMap.get(v));
+    				a1 = a1 + lnItm.getAmount();
+    				varAmountMap.remove(v.toUpperCase());
+	    			varAmountMap.put(v.toUpperCase(), String.valueOf(a1));
+    			}
+    		}
+		}
+    	
+    	String transLineItemListString = gson.toJson(varAmountMap, transLineItemType);
 		return transLineItemListString;
 	}
 
@@ -306,7 +292,7 @@ public class ParsingBoltPOS extends BaseRichBolt {
      */
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("lineItemAsJsonString"));
+		declarer.declare(new Fields("l_id","lineItemAsJsonString"));
 	}
 
 

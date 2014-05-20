@@ -174,20 +174,17 @@ public class StrategyBolt extends BaseRichBolt {
 		// 10) EMIT LIST OF MODEL IDs
 		
 		
-		List<TransactionLineItem> lineItemList = restoreLineItemListFromJson(input.getString(0));
+		String l_id = input.getString(0);
+		Map<String, String> varAmountMap = restoreVariableListFromJson(input.getString(1));
 		
 		//List<TransactionLineItem> lineItemList = (List<TransactionLineItem>) input.getValueByField("lineItemList");
 		//List<TransactionLineItem> lineItemList = new ArrayList<TransactionLineItem>();
 
 		System.out.println("APPLYING STRATEGIES");
-		System.out.println(" *** input tuple: " + input);
-		System.out.println(" *** line items: " + lineItemList.size());
-		for(TransactionLineItem i: lineItemList) {
-			System.out.println(" variables: " + i.getVariableList().toString());
-		}
+//		System.out.println(" *** input tuple: " + input);
+//		System.out.println(" *** line items: " + lineItemList.size());
 		
 		// 1) PULL OUT HASHED LOYALTY ID FROM THE FIRST RECORD IN lineItemList
-		String l_id = lineItemList.get(0).getL_id();
 		
 		// 2) FETCH MEMBER VARIABLES FROM memberVariables COLLECTION
 		DBObject mbrVariables = memberVariablesCollection.findOne(new BasicDBObject("l_id",l_id));
@@ -231,40 +228,47 @@ public class StrategyBolt extends BaseRichBolt {
 		    }
 		}
         	
-        
+		Set<String> varAmoutMapKeySet = varAmountMap.keySet();
+		for(String v: varAmoutMapKeySet) {
+			System.out.println(" variable: " + v + "  amount: " + varAmountMap.get(v));
+		}
+		        
 		// 6) CREATE MAP FROM NEW CHANGES TO CHANGE CLASS
         Map<String,Change> newChanges = new HashMap<String,Change>();
-		for(TransactionLineItem lineItem: lineItemList) {
+        for(String variableName: varAmoutMapKeySet) {
+            DBObject variableFromVariablesCollection = variablesCollection.findOne(new BasicDBObject("name", variableName.toUpperCase()));
+            if (variableFromVariablesCollection == null ) {
+            	System.out.println(" DID NOT FIND VARIBALE: " + variableName);
+            	continue;
+            }
+        	System.out.println(" found variable :" + variableName);
+            
 	        RealTimeScoringContext context = new RealTimeScoringContext();
-	        context.setTransactionLineItem(lineItem);
+            context.setAmount(Double.valueOf(varAmountMap.get(variableName)));
 	        context.setPreviousValue(0);
-	        for(String variableName: lineItem.getVariableList()) {
-                DBObject variableFromVariablesCollection = variablesCollection.findOne(new BasicDBObject("name", variableName));
-                if (variableFromVariablesCollection != null )System.out.println(" found variable :" + variableName.toUpperCase());
 
-        		// 7) FOR EACH CHANGE EXECUTE STRATEGY
-                try {
-                    //arbitrate between memberVariables and changedMemberVariables to send as previous value
-                	if(variableModelsMap.containsKey(variableName)) {
-                		Strategy strategy = (Strategy) Class.forName("analytics.util.strategies."+ variableFromVariablesCollection.get("strategy")).newInstance();
-                        if(allChanges.containsKey(variableName)) {
-                        	context.setPreviousValue(allChanges.get(variableName.toUpperCase()).getValue());
-                        }
-                        else {
-                        	context.setPreviousValue(memberVariablesMap.get(variableName.toUpperCase()));
-                        }
-                        
-                        newChanges.put(variableName, strategy.execute(context));
-                	}
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                } catch (InstantiationException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-	        }
-		}
+    		// 7) FOR EACH CHANGE EXECUTE STRATEGY
+            try {
+                //arbitrate between memberVariables and changedMemberVariables to send as previous value
+            	if(variableModelsMap.containsKey(variableName)) {
+            		Strategy strategy = (Strategy) Class.forName("analytics.util.strategies."+ variableFromVariablesCollection.get("strategy")).newInstance();
+                    if(allChanges.containsKey(variableName)) {
+                    	context.setPreviousValue(allChanges.get(variableName.toUpperCase()).getValue());
+                    }
+                    else {
+                    	context.setPreviousValue(memberVariablesMap.get(variableName.toUpperCase()));
+                    }
+                    
+                    newChanges.put(variableName, strategy.execute(context));
+            	}
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
 	            	
 		// 8) FORMAT DOCUMENT FOR MONGODB UPSERT
         if(!newChanges.isEmpty()){
@@ -329,14 +333,15 @@ public class StrategyBolt extends BaseRichBolt {
 		
 	}
     
-	public static List<TransactionLineItem> restoreLineItemListFromJson(String json)
+	public static Map<String, String> restoreVariableListFromJson(String json)
     {
         //System.out.println(" JSON string: " + json);
-		List<TransactionLineItem> lineItemList = new ArrayList<TransactionLineItem>();
-        Type lineItemListType = new TypeToken<List<TransactionLineItem>>() {}.getType();
+		Map<String, String> varList = new HashMap<String, String>();
+        Type varListType = new TypeToken<Map<String, String>>() {
+			private static final long serialVersionUID = 1L;}.getType();
 
-        lineItemList = new Gson().fromJson(json, lineItemListType);
-        return lineItemList;
+        varList = new Gson().fromJson(json, varListType);
+        return varList;
     }
 	
     private Object createStringFromModelList(List<Object> modelList) {

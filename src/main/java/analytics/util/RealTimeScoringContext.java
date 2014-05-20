@@ -1,5 +1,7 @@
 package analytics.util;
 
+import java.util.Map;
+
 /**
  * Created by syermalk on 4/1/14.
  */
@@ -11,14 +13,14 @@ public class RealTimeScoringContext {
     public RealTimeScoringContext() {
     }
 
-    private TransactionLineItem transactionLineItem;
+    private Double amount; // Map should contain variable as key and amount as value
 
-    public TransactionLineItem getTransactionLineItem() {
-        return transactionLineItem;
+    public Double getAmount() {
+        return amount;
     }
 
-    public void setTransactionLineItem(TransactionLineItem transactionLineItem) {
-        this.transactionLineItem = transactionLineItem;
+    public void setAmount(Double a) {
+        this.amount = a;
     }
 
     public Object getPreviousValue() {

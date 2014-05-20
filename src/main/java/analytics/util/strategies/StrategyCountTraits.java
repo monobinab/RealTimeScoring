@@ -7,9 +7,9 @@ import org.joda.time.LocalDate;
 import analytics.util.Change;
 import analytics.util.RealTimeScoringContext;
 
-public class strategySumSales implements Strategy {
 
-	private int daysToExpiration = 2;
+public class StrategyCountTraits implements Strategy {
+	private int daysToExpiration = 1;
 	
 
     @Override
@@ -20,4 +20,5 @@ public class strategySumSales implements Strategy {
     private Date calculateExpirationDate() {
 		return new LocalDate(new Date()).plusDays(this.daysToExpiration).toDateMidnight().toDate();
 	}
+
 }

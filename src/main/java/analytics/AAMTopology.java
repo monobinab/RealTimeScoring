@@ -1,6 +1,9 @@
 package analytics;
 
+import analytics.bolt.ParsingBoltWebTraits;
 import analytics.bolt.RedisCounterBolt;
+import analytics.bolt.ScoringBolt;
+import analytics.bolt.StrategyBolt;
 import analytics.spout.RedisPubSubSpout;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
@@ -18,17 +21,18 @@ public class AAMTopology {
 
     TopologyBuilder builder = new TopologyBuilder();
 
-    String[] topics = new String[]{"AAM_CDF_SID",
-            "AAM_CDF_APP_Performance",
-            "AAM_CDF_PSID",
-            "AAM_CDF_Products",
-            "AAM_CDF_PaidSearch",
-            "AAM_CDF_NaturalSearch",
-            "AAM_CDF_InternalSearch",
-            "AAM_CDF_CheckoutProducts",
-            "AAM_CDF_ATCProducts",
-            "AAM_CDF_AbanCart",
-            "AAM_CDF_AbanBrow",
+    String[] topics = new String[]{
+//    		"AAM_CDF_SID",
+//            "AAM_CDF_APP_Performance",
+//            "AAM_CDF_PSID",
+//            "AAM_CDF_Products",
+//            "AAM_CDF_PaidSearch",
+//            "AAM_CDF_NaturalSearch",
+//            "AAM_CDF_InternalSearch",
+//            "AAM_CDF_CheckoutProducts",
+//            "AAM_CDF_ATCProducts",
+//            "AAM_CDF_AbanCart",
+//            "AAM_CDF_AbanBrow",
             "AAM_CDF_Traits"};
 
     String[] servers = new String[]{"rtsapp301p.qa.ch3.s.com","rtsapp302p.qa.ch3.s.com","rtsapp303p.qa.ch3.s.com"};
@@ -46,7 +50,10 @@ public class AAMTopology {
 //    builder.setSpout("spout", new RedisPubSubSpout("rtsapp303p.qa.ch3.s.com", 6379, "Products"), 1);
 
 
-      BoltDeclarer boltDeclarer = builder.setBolt("count", new RedisCounterBolt("rtsapp401p.prod.ch4.s.com", 6379), 10);
+//      BoltDeclarer boltDeclarer = builder.setBolt("count", new RedisCounterBolt("rtsapp401p.prod.ch4.s.com", 6379), 10);
+      BoltDeclarer boltDeclarer = builder.setBolt("ParsingBoltWebTraits", new ParsingBoltWebTraits("rtsapp401p.prod.ch4.s.com", 6379), 10);
+      builder.setBolt("strategy_bolt", new StrategyBolt()).shuffleGrouping("ParsingBoltWebTraits");
+      builder.setBolt("scoring_bolt", new ScoringBolt()).shuffleGrouping("strategy_bolt");
 
       for(String topic:topics){
           for(String server:servers)

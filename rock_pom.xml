@@ -233,7 +233,8 @@
 					<archive>
 						<manifest>
 							<!--<mainClass></mainClass>-->
-                            <mainClass>analytics.RealTimeScoringTopology</mainClass>
+                            <mainClass>analytics.AAMTopology</mainClass>
+                            <!--mainClass>analytics.RealTimeScoringTopology</mainClass-->
 
 						</manifest>
 					</archive>
