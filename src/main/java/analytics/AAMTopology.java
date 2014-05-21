@@ -51,7 +51,7 @@ public class AAMTopology {
 
 
 //      BoltDeclarer boltDeclarer = builder.setBolt("count", new RedisCounterBolt("rtsapp401p.prod.ch4.s.com", 6379), 10);
-      BoltDeclarer boltDeclarer = builder.setBolt("ParsingBoltWebTraits", new ParsingBoltWebTraits("rtsapp401p.prod.ch4.s.com", 6379), 10);
+      BoltDeclarer boltDeclarer = builder.setBolt("ParsingBoltWebTraits", new ParsingBoltWebTraits("rtsapp401p.prod.ch4.s.com", 6379), 1);
       builder.setBolt("strategy_bolt", new StrategyBolt()).shuffleGrouping("ParsingBoltWebTraits");
       builder.setBolt("scoring_bolt", new ScoringBolt()).shuffleGrouping("strategy_bolt");
 
@@ -74,7 +74,7 @@ public class AAMTopology {
       StormSubmitter.submitTopology(args[0], conf, builder.createTopology());
     }
     else {
-        conf.setDebug(true);
+        conf.setDebug(false);
       conf.setMaxTaskParallelism(3);
       LocalCluster cluster = new LocalCluster();
       cluster.submitTopology("aam", conf, builder.createTopology());

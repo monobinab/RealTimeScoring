@@ -169,7 +169,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 		
 		
 		
-		System.out.println("PARSING DOCUMENT -- WEB TRAIT RECORD");
+		//System.out.println("PARSING DOCUMENT -- WEB TRAIT RECORD");
 		
 		// 1) SPLIT INPUT STRING
         String webTraitInteractionRec = input.getString(0);
@@ -180,7 +180,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
         	if(i==0) splitRec = webTraitsSplitRec[i];
         	else splitRec = splitRec + "  " + webTraitsSplitRec[i];
         }
-        System.out.println("     split string: " + splitRec);
+        System.out.println("  split string: " + splitRec);
 		
         
         //2014-03-08 10:56:17,00000388763646853831116694914086674166,743651,US,Sears
@@ -191,7 +191,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
         
         if(this.currentUUID !=null && this.currentUUID.equalsIgnoreCase(webTraitsSplitRec[1])) {
         	if(this.current_l_id == null) {
-        		System.out.println(" *** NULL l_id -- return");
+        		//System.out.println(" NULL l_id -- return");
         		return;
         	}
         	l_idToTraitCollectionMap.get(current_l_id).add(webTraitsSplitRec[2]);
@@ -201,6 +201,11 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
         
         if(l_idToTraitCollectionMap != null && !l_idToTraitCollectionMap.isEmpty()) {
         	Map<String,String> variableValueMap = processTraitsList();
+        	if(variableValueMap==null || variableValueMap.isEmpty()) {
+        		System.out.println(" *** NO VARIBALES FOUND - NOTHING TO EMIT");
+            	l_idToTraitCollectionMap.remove(current_l_id);
+        		return;
+        	}
         	Object variableValueJSON = createJsonFromVariableValueMap(variableValueMap);
         	List<Object> listToEmit = new ArrayList<Object>();
         	listToEmit.add(current_l_id);
@@ -253,7 +258,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 	}
 
     private String[] splitRec(String webRec) {
-        System.out.println(" *** WEB RECORD: " + webRec);
+        System.out.println("WEB RECORD: " + webRec);
         String split[]=StringUtils.split(webRec,",");
         
         if(split !=null && split.length>0) {
