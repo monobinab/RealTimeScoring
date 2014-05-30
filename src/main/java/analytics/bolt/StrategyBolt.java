@@ -254,6 +254,10 @@ public class StrategyBolt extends BaseRichBolt {
             try {
                 //arbitrate between memberVariables and changedMemberVariables to send as previous value
             	if(variableModelsMap.containsKey(variableName)) {
+            		if(variableFromVariablesCollection.get("strategy") == "NONE") {
+            			continue;
+            		}
+            		
             		Strategy strategy = (Strategy) Class.forName("analytics.util.strategies."+ variableFromVariablesCollection.get("strategy")).newInstance();
                     if(allChanges.containsKey(variableName)) {
                     	context.setPreviousValue(allChanges.get(variableName.toUpperCase()).getValue());
