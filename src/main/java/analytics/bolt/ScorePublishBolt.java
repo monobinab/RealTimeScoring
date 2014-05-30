@@ -83,8 +83,12 @@ public class ScorePublishBolt extends BaseRichBolt {
         DBObject row = memberZipCollection.findOne(new BasicDBObject("l_id", l_id));
             if (row != null && StringUtils.isNotEmpty(row.get("zip").toString()))
             {
-                jedis.publish(pattern, new StringBuffer(l_id).append(",").append(input.getStringByField("old_score")).append(",").append(input.getStringByField("new_score"))
-                        .append(",").append(input.getStringByField("model")).append(",").append(input.getStringByField("reason")).append(",").append(input.getStringByField("zip")).toString());
+                jedis.publish(pattern, new StringBuffer(l_id).append(",")
+                        .append(input.getStringByField("oldScore")).append(",")
+                        .append(input.getStringByField("newScore")).append(",")
+                        .append(input.getStringByField("model")).append(",")
+                        .append(input.getStringByField("source")).append(",")
+                        .append(input.getStringByField("zip")).toString());
             }
 	}
 
