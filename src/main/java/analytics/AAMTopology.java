@@ -2,6 +2,7 @@ package analytics;
 
 import analytics.bolt.ParsingBoltWebTraits;
 import analytics.bolt.RedisCounterBolt;
+import analytics.bolt.ScorePublishBolt;
 import analytics.bolt.ScoringBolt;
 import analytics.bolt.StrategyBolt;
 import analytics.spout.RedisPubSubSpout;
@@ -54,7 +55,9 @@ public class AAMTopology {
       BoltDeclarer boltDeclarer = builder.setBolt("ParsingBoltWebTraits", new ParsingBoltWebTraits("rtsapp401p.prod.ch4.s.com", 6379), 1);
       builder.setBolt("strategy_bolt", new StrategyBolt()).shuffleGrouping("ParsingBoltWebTraits");
       builder.setBolt("scoring_bolt", new ScoringBolt()).shuffleGrouping("strategy_bolt");
-
+      builder.setBolt("ScorePublishBolt", new ScorePublishBolt("rtsapp401p.prod.ch4.s.com", 6379,"score")).shuffleGrouping("scoring_bolt");
+      
+      
       for(String topic:topics){
           for(String server:servers)
           {

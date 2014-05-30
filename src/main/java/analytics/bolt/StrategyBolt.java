@@ -279,7 +279,7 @@ public class StrategyBolt extends BaseRichBolt {
 	            	
 		// 8) FORMAT DOCUMENT FOR MONGODB UPSERT
         if(!newChanges.isEmpty()){
-            System.out.println(" ~~~ CHANGES: " + newChanges );
+//            System.out.println(" ~~~ CHANGES: " + newChanges );
             
 			Iterator<Entry<String, Change>> newChangesIter = newChanges.entrySet().iterator();
 			BasicDBObject newDocument = new BasicDBObject();
@@ -316,7 +316,7 @@ public class StrategyBolt extends BaseRichBolt {
             }
     		
             // 10) EMIT LIST OF MODEL IDs
-            if(modelIdList.size()>1) {
+            if(modelIdList.size()>0) {
             	List<Object> listToEmit = new ArrayList<Object>();
             	listToEmit.add(l_id);
             	listToEmit.add(createStringFromModelList(modelIdList));

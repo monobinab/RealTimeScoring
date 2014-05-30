@@ -88,7 +88,7 @@ public class ScorePublishBolt extends BaseRichBolt {
                         .append(input.getStringByField("newScore")).append(",")
                         .append(input.getStringByField("model")).append(",")
                         .append(input.getStringByField("source")).append(",")
-                        .append(input.getStringByField("zip")).toString());
+                        .append(row.get("zip").toString()).toString());
             }
 	}
 

@@ -216,7 +216,7 @@ public class ScoringBolt extends BaseRichBolt {
 		Map<String,Change> allChanges = new HashMap<String,Change>();
     	SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		
-    	System.out.println(" *** CHANGED MEMBER VARIABLES: " + changedMbrVariables);
+    	System.out.println(" ### CHANGED MEMBER VARIABLES: " + changedMbrVariables);
     	if(changedMbrVariables!=null && changedMbrVariables.keySet()!=null) {
 			Iterator<String> collectionChangesIter = changedMbrVariables.keySet().iterator();
 		    
@@ -226,11 +226,11 @@ public class ScoringBolt extends BaseRichBolt {
 		    	if("_id".equals(key) || "l_id".equals(key)) {
 		    		continue;
 		    	}
-//		    	System.out.println("   *** VARIABLE: " + key);
-//		    	System.out.println("   *** GET VARIABLE: " + changedMbrVariables.get(key));
-//		    	System.out.println("   *** EXPIRATION: " + ((DBObject) changedMbrVariables.get(key)).get("e"));
+//		    	System.out.println("   ### VARIABLE: " + key);
+//		    	System.out.println("   ### GET VARIABLE: " + changedMbrVariables.get(key));
+//		    	System.out.println("   ### EXPIRATION: " + ((DBObject) changedMbrVariables.get(key)).get("e"));
 		    	try {
-//			    	System.out.println("   *** THE WHOLE THING: " + simpleDateFormat.parse(((DBObject) changedMbrVariables.get(key)).get("e").toString()));
+//			    	System.out.println("   ### THE WHOLE THING: " + simpleDateFormat.parse(((DBObject) changedMbrVariables.get(key)).get("e").toString()));
 					if(simpleDateFormat.parse(((DBObject) changedMbrVariables.get(key)).get("e").toString()).after(Calendar.getInstance().getTime())) {
 						allChanges.put(key.toUpperCase()
 								, new Change(key.toUpperCase()
@@ -251,7 +251,7 @@ public class ScoringBolt extends BaseRichBolt {
         {
         	// recalculate score for model
         	
-        	System.out.println(" ### SCORE INPUTS: modelID " + modelId);
+        	System.out.println(" ### SCORING MODEL ID: " + modelId);
             double newScore = 1/(1+ Math.exp(-1*(calcMbrVar(memberVariablesMap, allChanges,  Integer.valueOf(modelId))))) * 1000;
             System.out.println(l_id + ": " + Double.toString(newScore));
             
@@ -346,7 +346,7 @@ public class ScoringBolt extends BaseRichBolt {
         for(String s: strings) {
         	modelList.add(s);
         }
-        
+        System.out.println(" ### MODEL LIST PARSED: " + json);
         /*
         Type lineItemListType = new TypeToken<List<Object>>() {}.getType();
         List<Object> modelList = new Gson().fromJson(json, lineItemListType);
