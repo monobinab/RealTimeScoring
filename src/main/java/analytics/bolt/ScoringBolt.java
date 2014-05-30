@@ -192,6 +192,7 @@ public class ScoringBolt extends BaseRichBolt {
 		// 2) FETCH MEMBER VARIABLES FROM memberVariables COLLECTION
 		DBObject mbrVariables = memberVariablesCollection.findOne(new BasicDBObject("l_id",l_id));
 		if(mbrVariables == null) {
+			System.out.println(" $$$ SCORING BOLT COULD NOT FIND MEMBER VARIABLES");
 			return;
 		}
 		
@@ -394,7 +395,8 @@ public class ScoringBolt extends BaseRichBolt {
 			}
 			else{
 				if(dataType.equals("Integer")) {
-					changedValue=Integer.parseInt(changedValue.toString());
+					//changedValue=Integer.parseInt(changedValue.toString());
+					changedValue=(int) Math.round(Double.valueOf(changedValue.toString()));
 				}
 				else {
 					changedValue=Double.parseDouble(changedValue.toString());

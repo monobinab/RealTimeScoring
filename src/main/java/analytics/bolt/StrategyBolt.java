@@ -173,14 +173,16 @@ public class StrategyBolt extends BaseRichBolt {
 		// 9) FIND ALL MODELS THAT ARE AFFECTED BY CHANGES
 		// 10) EMIT LIST OF MODEL IDs
 		
+		System.out.println("APPLYING STRATEGIES");
 		
 		String l_id = input.getString(0);
+//		System.out.println(" ~~~ STRATEGY BOLT PARSED l_id AS: " + l_id);
 		Map<String, String> varAmountMap = restoreVariableListFromJson(input.getString(1));
+//		System.out.println(" ~~~ STRATEGY BOLT PARSED VARIABLE MAP AS: " + varAmountMap);
 		
 		//List<TransactionLineItem> lineItemList = (List<TransactionLineItem>) input.getValueByField("lineItemList");
 		//List<TransactionLineItem> lineItemList = new ArrayList<TransactionLineItem>();
 
-		System.out.println("APPLYING STRATEGIES");
 //		System.out.println(" *** input tuple: " + input);
 //		System.out.println(" *** line items: " + lineItemList.size());
 		
@@ -189,6 +191,7 @@ public class StrategyBolt extends BaseRichBolt {
 		// 2) FETCH MEMBER VARIABLES FROM memberVariables COLLECTION
 		DBObject mbrVariables = memberVariablesCollection.findOne(new BasicDBObject("l_id",l_id));
 		if(mbrVariables == null) {
+			System.out.println(" ~~~ STRATEGY BOLD COULD NOT FIND MEMBER VARIABLES");
 			return;
 		}
 		
@@ -241,7 +244,7 @@ public class StrategyBolt extends BaseRichBolt {
             	System.out.println(" DID NOT FIND VARIBALE: " + variableName);
             	continue;
             }
-        	System.out.println(" found variable :" + variableName);
+        	System.out.println(" ~~~ FOUND VARIABLE - name: " + variableName + " amount: "  + Double.valueOf(varAmountMap.get(variableName)));
             
 	        RealTimeScoringContext context = new RealTimeScoringContext();
             context.setAmount(Double.valueOf(varAmountMap.get(variableName)));
@@ -256,9 +259,11 @@ public class StrategyBolt extends BaseRichBolt {
                     	context.setPreviousValue(allChanges.get(variableName.toUpperCase()).getValue());
                     }
                     else {
-                    	context.setPreviousValue(memberVariablesMap.get(variableName.toUpperCase()));
+                    	if(memberVariablesMap.get(variableName.toUpperCase()) != null) {
+                    		context.setPreviousValue(memberVariablesMap.get(variableName.toUpperCase()));
+                    	}
                     }
-                    
+//                    System.out.println(" ~~~ STRATEGY BOLT CHANGES - variable: " + variableName + " context: " + context);
                     newChanges.put(variableName, strategy.execute(context));
             	}
             } catch (ClassNotFoundException e) {
@@ -335,12 +340,13 @@ public class StrategyBolt extends BaseRichBolt {
     
 	public static Map<String, String> restoreVariableListFromJson(String json)
     {
-        //System.out.println(" JSON string: " + json);
 		Map<String, String> varList = new HashMap<String, String>();
         Type varListType = new TypeToken<Map<String, String>>() {
 			private static final long serialVersionUID = 1L;}.getType();
 
         varList = new Gson().fromJson(json, varListType);
+//        System.out.println(" JSON string: " + json);
+//        System.out.println(" Map: " + varList);
         return varList;
     }
 	

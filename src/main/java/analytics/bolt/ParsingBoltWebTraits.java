@@ -120,7 +120,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
         traitVariablesMap = new HashMap<String, String>();
 		DBCursor traitVarCursor = traitVariablesCollection.find();
 		for(DBObject traitDBObject: traitVarCursor) {
-		    if (traitVariablesMap.get(traitDBObject.get("v")) == null)
+		    if (traitDBObject.get("v") == null || traitDBObject.get("t") == null)
 			{
 		    	continue;			
 			}
@@ -130,6 +130,9 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 		    }
 		}
         
+//		System.out.println("*** TRAIT TO VARIABLES MAP >>>");
+//		System.out.println(traitVariablesMap);
+		
         // populate divLnVariablesMap
         // TODO: NOT SURE IF THIS IS NEEDED        
 //        divLnVariablesMap = new HashMap<String, Collection<String>>();
