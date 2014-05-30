@@ -213,6 +213,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
         	List<Object> listToEmit = new ArrayList<Object>();
         	listToEmit.add(current_l_id);
         	listToEmit.add(variableValueJSON);
+        	listToEmit.add("WebTraits");
         	l_idToTraitCollectionMap.remove(current_l_id);
             this.currentUUID=null;
             this.current_l_id=null;
@@ -311,7 +312,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
      */
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("l_id","lineItemAsJsonString"));
+		declarer.declare(new Fields("l_id","lineItemAsJsonString","source"));
 	}
 
 

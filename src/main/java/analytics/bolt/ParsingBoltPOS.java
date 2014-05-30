@@ -239,6 +239,7 @@ public class ParsingBoltPOS extends BaseRichBolt {
 	        List<Object> lineItemAsJsonString = new ArrayList<Object>();
 	        lineItemAsJsonString.add(l_id);
 	        lineItemAsJsonString.add(createJsonFromLineItemList(lineItemList));
+	        lineItemAsJsonString.add("NPOS");
 
 	        System.out.println(" *** parsing bolt emitting: " + lineItemAsJsonString.toString());
 	        
@@ -292,7 +293,7 @@ public class ParsingBoltPOS extends BaseRichBolt {
      */
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("l_id","lineItemAsJsonString"));
+		declarer.declare(new Fields("l_id","lineItemAsJsonString","source"));
 	}
 
 

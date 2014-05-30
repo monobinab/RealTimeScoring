@@ -176,15 +176,13 @@ public class StrategyBolt extends BaseRichBolt {
 		System.out.println("APPLYING STRATEGIES");
 		
 		String l_id = input.getString(0);
+		String source = input.getString(2);
 //		System.out.println(" ~~~ STRATEGY BOLT PARSED l_id AS: " + l_id);
 		Map<String, String> varAmountMap = restoreVariableListFromJson(input.getString(1));
 //		System.out.println(" ~~~ STRATEGY BOLT PARSED VARIABLE MAP AS: " + varAmountMap);
 		
-		//List<TransactionLineItem> lineItemList = (List<TransactionLineItem>) input.getValueByField("lineItemList");
-		//List<TransactionLineItem> lineItemList = new ArrayList<TransactionLineItem>();
-
-//		System.out.println(" *** input tuple: " + input);
-//		System.out.println(" *** line items: " + lineItemList.size());
+//		System.out.println(" ~~~ input tuple: " + input);
+//		System.out.println(" ~~~ line items: " + lineItemList.size());
 		
 		// 1) PULL OUT HASHED LOYALTY ID FROM THE FIRST RECORD IN lineItemList
 		
@@ -241,7 +239,7 @@ public class StrategyBolt extends BaseRichBolt {
         for(String variableName: varAmoutMapKeySet) {
             DBObject variableFromVariablesCollection = variablesCollection.findOne(new BasicDBObject("name", variableName.toUpperCase()));
             if (variableFromVariablesCollection == null ) {
-            	System.out.println(" DID NOT FIND VARIBALE: " + variableName);
+            	System.out.println(" ~~~ DID NOT FIND VARIBALE: " + variableName);
             	continue;
             }
         	System.out.println(" ~~~ FOUND VARIABLE - name: " + variableName + " amount: "  + Double.valueOf(varAmountMap.get(variableName)));
@@ -281,7 +279,7 @@ public class StrategyBolt extends BaseRichBolt {
 	            	
 		// 8) FORMAT DOCUMENT FOR MONGODB UPSERT
         if(!newChanges.isEmpty()){
-            System.out.println(" CHANGES: " + newChanges );
+            System.out.println(" ~~~ CHANGES: " + newChanges );
             
 			Iterator<Entry<String, Change>> newChangesIter = newChanges.entrySet().iterator();
 			BasicDBObject newDocument = new BasicDBObject();
@@ -296,9 +294,9 @@ public class StrategyBolt extends BaseRichBolt {
 
 		    BasicDBObject searchQuery = new BasicDBObject().append("l_id", l_id);
 		    
-		    System.out.println("DOCUMENT TO INSERT:");
+		    System.out.println(" ~~~ DOCUMENT TO INSERT:");
 		    System.out.println(newDocument.toString());
-		    System.out.println("END DOCUMENT");
+		    System.out.println(" ~~~ END DOCUMENT");
 		    
 		    //upsert document
 		    changedVariablesCollection.update(searchQuery, new BasicDBObject("$set", newDocument), true, false);
@@ -306,7 +304,6 @@ public class StrategyBolt extends BaseRichBolt {
 
 			// 9) FIND ALL MODELS THAT ARE AFFECTED BY CHANGES
             List<Object> modelIdList = new ArrayList<Object>();
-            modelIdList.add(l_id);
             for(String changedVariable:newChanges.keySet())
             {
                 //TODO: do not put variables that are not associated with a model in the changes map
@@ -320,10 +317,12 @@ public class StrategyBolt extends BaseRichBolt {
     		
             // 10) EMIT LIST OF MODEL IDs
             if(modelIdList.size()>1) {
-            	List<Object> stringModelList = new ArrayList<Object>();
-            	stringModelList.add(createStringFromModelList(modelIdList));
-            	System.out.println(" *** strategy bolt emitting: " + stringModelList);
-            	this.outputCollector.emit(stringModelList);
+            	List<Object> listToEmit = new ArrayList<Object>();
+            	listToEmit.add(l_id);
+            	listToEmit.add(createStringFromModelList(modelIdList));
+            	listToEmit.add(source);
+            	System.out.println(" ~~~ strategy bolt emitting: " + listToEmit);
+            	this.outputCollector.emit(listToEmit);
             }
         }
 	}
@@ -338,7 +337,7 @@ public class StrategyBolt extends BaseRichBolt {
       */
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("modelIdList"));
+		declarer.declare(new Fields("l_id","modelIdList","source"));
 		
 	}
     

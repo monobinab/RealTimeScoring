@@ -177,17 +177,20 @@ public class ScoringBolt extends BaseRichBolt {
      */
 	@Override
 	public void execute(Tuple input) {
-
+		
+		String l_id = input.getString(0);
+		String source = input.getString(2);
+		
+		
 		// SCORING BOLTS READS A LIST OF OBJECTS WITH THE FIRST ELEMENT BEING THE HASHED LOYALTY ID
 		// AND n MODEL IDs AFTER
-		List<String> modelIdList = restoreModelListFromJson(input.getString(0));
+		List<String> modelIdList = restoreModelListFromJson(input.getString(1));
 		//List<TransactionLineItem> lineItemList = new ArrayList<TransactionLineItem>();
 
 		System.out.println("RE-SCORING MODELS");
 		System.out.println(" *** model ID list: " + modelIdList);
 		
 		// 1) PULL OUT HASHED LOYALTY ID FROM THE FIRST RECORD IN lineItemList
-		String l_id = modelIdList.get(0).toString();
 		
 		// 2) FETCH MEMBER VARIABLES FROM memberVariables COLLECTION
 		DBObject mbrVariables = memberVariablesCollection.findOne(new BasicDBObject("l_id",l_id));
@@ -244,15 +247,11 @@ public class ScoringBolt extends BaseRichBolt {
 	
         // Score each model in a loop
 		BasicDBObject updateRec = new BasicDBObject();
-		int listPosition = 0;
         for (String modelId:modelIdList)
         {
         	// recalculate score for model
         	
-        	// skip first item in list because it is the l_id
-        	if(++listPosition==1) continue;
-        	
-        	System.out.println("SCORE INPUTS: modelID " + modelId);
+        	System.out.println(" ### SCORE INPUTS: modelID " + modelId);
             double newScore = 1/(1+ Math.exp(-1*(calcMbrVar(memberVariablesMap, allChanges,  Integer.valueOf(modelId))))) * 1000;
             System.out.println(l_id + ": " + Double.toString(newScore));
             
@@ -281,12 +280,25 @@ public class ScoringBolt extends BaseRichBolt {
             
             DBObject oldScore = changedMemberScoresCollection.findOne(new BasicDBObject("l_id", l_id));
             String message = new StringBuffer().append(l_id).append("-").append(modelId).append("-").append(oldScore == null ? "0" : oldScore.get("1")).append("-").append(newScore).toString();
+            
+            // EMIT CHANGES
+        	List<Object> listToEmit = new ArrayList<Object>();
+        	listToEmit.add(l_id);
+        	listToEmit.add(oldScore == null ? "0" : oldScore.get("1"));
+        	listToEmit.add(newScore);
+        	listToEmit.add(modelId.toString());
+        	listToEmit.add(source);
+        	System.out.println(" ### scoring bolt emitting: " + listToEmit);
+        	this.outputCollector.emit(listToEmit);
+
+            
             System.out.println(message);
             //jedis.publish("score_changes", message);
         }
-    	System.out.println(" *** UPDATE RECORD CHANGED SCORE: " + updateRec);
+    	System.out.println(" ### UPDATE RECORD CHANGED SCORE: " + updateRec);
         if(updateRec != null) {
         	changedMemberScoresCollection.update(new BasicDBObject("l_id", l_id), new BasicDBObject("$set", updateRec), true, false);
+
         }
     }
 
@@ -320,13 +332,13 @@ public class ScoringBolt extends BaseRichBolt {
       */
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("newScore"));
+		declarer.declare(new Fields("l_id","oldScore","newScore","model","source"));
 		
 	}
 
 	public static List<String> restoreModelListFromJson(String json)
     {
-        System.out.println(" model list string: " + json);
+        System.out.println(" ### MODEL LIST STRING: " + json);
 		//modelList = new ArrayList<Object>();
         
         String strings[]=StringUtils.split(json,",");
