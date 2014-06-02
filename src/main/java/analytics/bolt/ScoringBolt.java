@@ -4,7 +4,6 @@
 package analytics.bolt;
 
 import analytics.util.Change;
-import analytics.util.TransactionLineItem;
 import analytics.util.Variable;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -12,27 +11,19 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-
-import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
-import com.ibm.jms.JMSMessage;
 import com.mongodb.*;
-
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
 import redis.clients.jedis.Jedis;
 
-import java.lang.reflect.Type;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.Map.Entry;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringUtils;
 
 public class ScoringBolt extends BaseRichBolt {
 
@@ -286,7 +277,7 @@ public class ScoringBolt extends BaseRichBolt {
         	listToEmit.add(l_id);
         	listToEmit.add(oldScore == null ? "0" : oldScore.get("1"));
         	listToEmit.add(newScore);
-        	listToEmit.add(modelId.toString());
+        	listToEmit.add(modelId);
         	listToEmit.add(source);
         	System.out.println(" ### scoring bolt emitting: " + listToEmit);
         	this.outputCollector.emit(listToEmit);

@@ -9,6 +9,7 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
 import com.mongodb.*;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import redis.clients.jedis.Jedis;
 
@@ -78,17 +79,23 @@ public class ScorePublishBolt extends BaseRichBolt {
 	@Override
 	public void execute(Tuple input) {
 
-
+        System.out.println(" *** scorepublishbolt :" + input);
         String l_id = input.getStringByField("l_id");
         DBObject row = memberZipCollection.findOne(new BasicDBObject("l_id", l_id));
-            if (row != null && StringUtils.isNotEmpty(row.get("zip").toString()))
+        Object zip = row==null?"00000":row.get("z");
+        System.out.println(" *** zip zip :" + ObjectUtils.toString(zip));
+
+        if (row != null && StringUtils.isNotEmpty(ObjectUtils.toString(zip)))
             {
-                jedis.publish(pattern, new StringBuffer(l_id).append(",")
+                String message = new StringBuffer(l_id).append(",")
                         .append(input.getStringByField("oldScore")).append(",")
-                        .append(input.getStringByField("newScore")).append(",")
+                        .append(input.getDoubleByField("newScore")).append(",")
                         .append(input.getStringByField("model")).append(",")
                         .append(input.getStringByField("source")).append(",")
-                        .append(row.get("zip").toString()).toString());
+                        .append(zip.toString()).toString();
+                System.out.println(" *** message : " + message);
+
+                jedis.publish(pattern, message);
             }
 	}
 
