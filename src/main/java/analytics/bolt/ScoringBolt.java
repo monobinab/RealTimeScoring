@@ -96,7 +96,7 @@ public class ScoringBolt extends BaseRichBolt {
 	 * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
 	 */
         
-        System.out.println("PREPARING SCORING BOLT");
+        //System.out.println("PREPARING SCORING BOLT");
 
         try {
             mongoClient = new MongoClient("shrdmdb301p.stag.ch3.s.com", 20000);
@@ -149,7 +149,7 @@ public class ScoringBolt extends BaseRichBolt {
              }
         }
 
-        System.out.println(" variableVidToNameMap: " + variableVidToNameMap);
+        //System.out.println(" variableVidToNameMap: " + variableVidToNameMap);
 
 
         //jedis = new Jedis("151.149.116.48");
@@ -178,15 +178,15 @@ public class ScoringBolt extends BaseRichBolt {
 		List<String> modelIdList = restoreModelListFromJson(input.getString(1));
 		//List<TransactionLineItem> lineItemList = new ArrayList<TransactionLineItem>();
 
-		System.out.println("RE-SCORING MODELS");
-		System.out.println(" *** model ID list: " + modelIdList);
+		//System.out.println("RE-SCORING MODELS");
+		//System.out.println(" *** model ID list: " + modelIdList);
 		
 		// 1) PULL OUT HASHED LOYALTY ID FROM THE FIRST RECORD IN lineItemList
 		
 		// 2) FETCH MEMBER VARIABLES FROM memberVariables COLLECTION
 		DBObject mbrVariables = memberVariablesCollection.findOne(new BasicDBObject("l_id",l_id));
 		if(mbrVariables == null) {
-			System.out.println(" $$$ SCORING BOLT COULD NOT FIND MEMBER VARIABLES");
+			//System.out.println(" ### SCORING BOLT COULD NOT FIND MEMBER VARIABLES");
 			return;
 		}
 		
@@ -207,7 +207,7 @@ public class ScoringBolt extends BaseRichBolt {
 		Map<String,Change> allChanges = new HashMap<String,Change>();
     	SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		
-    	System.out.println(" ### CHANGED MEMBER VARIABLES: " + changedMbrVariables);
+    	//System.out.println(" ### CHANGED MEMBER VARIABLES: " + changedMbrVariables);
     	if(changedMbrVariables!=null && changedMbrVariables.keySet()!=null) {
 			Iterator<String> collectionChangesIter = changedMbrVariables.keySet().iterator();
 		    
@@ -242,9 +242,9 @@ public class ScoringBolt extends BaseRichBolt {
         {
         	// recalculate score for model
         	
-        	System.out.println(" ### SCORING MODEL ID: " + modelId);
+        	//System.out.println(" ### SCORING MODEL ID: " + modelId);
             double newScore = 1/(1+ Math.exp(-1*(calcMbrVar(memberVariablesMap, allChanges,  Integer.valueOf(modelId))))) * 1000;
-            System.out.println(l_id + ": " + Double.toString(newScore));
+            //System.out.println(l_id + ": " + Double.toString(newScore));
             
             // FIND THE MIN AND MAX EXPIRATION DATE OF ALL VARIABLE CHANGES FOR CHANGED MODEL SCORE TO WRITE TO SCORE CHANGES COLLECTION
 			Date minDate = null;
@@ -279,14 +279,14 @@ public class ScoringBolt extends BaseRichBolt {
         	listToEmit.add(newScore);
         	listToEmit.add(modelId);
         	listToEmit.add(source);
-        	System.out.println(" ### scoring bolt emitting: " + listToEmit);
+        	//System.out.println(" ### scoring bolt emitting: " + listToEmit);
         	this.outputCollector.emit(listToEmit);
 
             
-            System.out.println(message);
+            //System.out.println(message);
             //jedis.publish("score_changes", message);
         }
-    	System.out.println(" ### UPDATE RECORD CHANGED SCORE: " + updateRec);
+    	//System.out.println(" ### UPDATE RECORD CHANGED SCORE: " + updateRec);
         if(updateRec != null) {
         	changedMemberScoresCollection.update(new BasicDBObject("l_id", l_id), new BasicDBObject("$set", updateRec), true, false);
 
@@ -329,7 +329,7 @@ public class ScoringBolt extends BaseRichBolt {
 
 	public static List<String> restoreModelListFromJson(String json)
     {
-        System.out.println(" ### MODEL LIST STRING: " + json);
+        //System.out.println(" ### MODEL LIST STRING: " + json);
 		//modelList = new ArrayList<Object>();
         
         String strings[]=StringUtils.split(json,",");
@@ -337,7 +337,7 @@ public class ScoringBolt extends BaseRichBolt {
         for(String s: strings) {
         	modelList.add(s);
         }
-        System.out.println(" ### MODEL LIST PARSED: " + json);
+        //System.out.println(" ### MODEL LIST PARSED: " + json);
         /*
         Type lineItemListType = new TypeToken<List<Object>>() {}.getType();
         List<Object> modelList = new Gson().fromJson(json, lineItemListType);
@@ -391,7 +391,7 @@ public class ScoringBolt extends BaseRichBolt {
 		if(var != null) {
 			if(changes.containsKey(var.getName().toUpperCase())) {
 				changedValue = changes.get(var.getName().toUpperCase()).getValue();
-				System.out.println("changed variable: " + var.getName().toUpperCase() + "  value: " + changedValue);
+				//System.out.println("changed variable: " + var.getName().toUpperCase() + "  value: " + changedValue);
 			}
 			if(changedValue == null) {
 				changedValue=mbrVarMap.get(var.getName().toUpperCase());

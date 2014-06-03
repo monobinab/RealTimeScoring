@@ -95,7 +95,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 	 * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
 	 */
 
-        System.out.println("PREPARING PARSING BOLT FOR WEB TRAITS");
+        //System.out.println("PREPARING PARSING BOLT FOR WEB TRAITS");
         try {
             mongoClient = new MongoClient("shrdmdb301p.stag.ch3.s.com", 20000);
         } catch (UnknownHostException e) {
@@ -183,7 +183,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
         	if(i==0) splitRec = webTraitsSplitRec[i];
         	else splitRec = splitRec + "  " + webTraitsSplitRec[i];
         }
-        System.out.println("  split string: " + splitRec);
+        //System.out.println("  split string: " + splitRec);
 		
         
         //2014-03-08 10:56:17,00000388763646853831116694914086674166,743651,US,Sears
@@ -197,15 +197,19 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
         		//System.out.println(" NULL l_id -- return");
         		return;
         	}
-        	l_idToTraitCollectionMap.get(current_l_id).add(webTraitsSplitRec[2]);
-            System.out.println(" *** ADDING WEB TRAIT: " + webTraitsSplitRec[2]);
+        	
+        	Collection<String> traits = l_idToTraitCollectionMap.get(current_l_id);
+			if (traits != null) {
+				traits.add(webTraitsSplitRec[2]);
+			}
+            //System.out.println(" *** ADDING WEB TRAIT: " + webTraitsSplitRec[2]);
         	return;
         }
         
         if(l_idToTraitCollectionMap != null && !l_idToTraitCollectionMap.isEmpty()) {
         	Map<String,String> variableValueMap = processTraitsList();
         	if(variableValueMap==null || variableValueMap.isEmpty()) {
-        		System.out.println(" *** NO VARIBALES FOUND - NOTHING TO EMIT");
+        		//System.out.println(" *** NO VARIBALES FOUND - NOTHING TO EMIT");
             	l_idToTraitCollectionMap.remove(current_l_id);
         		return;
         	}
@@ -217,14 +221,14 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
         	l_idToTraitCollectionMap.remove(current_l_id);
             this.currentUUID=null;
             this.current_l_id=null;
-        	System.out.println(" *** PARSING BOLT EMITTING: " + listToEmit);
+        	//System.out.println(" *** PARSING BOLT EMITTING: " + listToEmit);
         	this.outputCollector.emit(listToEmit);
         }
         
 		// 2) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN RETURN
         DBObject uuid = memberUUIDCollection.findOne(new BasicDBObject("u",webTraitsSplitRec[1]));
         if(uuid == null) {
-            System.out.println(" *** COULD NOT FIND UUID");
+            //System.out.println(" *** COULD NOT FIND UUID");
             this.currentUUID=webTraitsSplitRec[1];
         	this.current_l_id=null;
         	return;
@@ -247,13 +251,13 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 			e.printStackTrace();
 		}
         
-        System.out.println(" *** FOUND l_id: " + l_id + " interaction time: " + interactionDateTime + " trait: " + webTraitsSplitRec[2]);
+        //System.out.println(" *** FOUND l_id: " + l_id + " interaction time: " + interactionDateTime + " trait: " + webTraitsSplitRec[2]);
         this.current_l_id = l_id;
         
         Collection<String> firstTrait = new ArrayList<String>();
         firstTrait.add(webTraitsSplitRec[2]);
         
-        System.out.println(" *** PUT IN FIRST RECORD: " + this.current_l_id + " trait: " + firstTrait);
+        //System.out.println(" *** PUT IN FIRST RECORD: " + this.current_l_id + " trait: " + firstTrait);
         
         l_idToTraitCollectionMap.put(this.current_l_id,firstTrait);
         
@@ -262,7 +266,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 	}
 
     private String[] splitRec(String webRec) {
-        System.out.println("WEB RECORD: " + webRec);
+        //System.out.println("WEB RECORD: " + webRec);
         String split[]=StringUtils.split(webRec,",");
         
         if(split !=null && split.length>0) {

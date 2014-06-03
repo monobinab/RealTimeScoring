@@ -96,7 +96,7 @@ public class StrategyBolt extends BaseRichBolt {
 	 * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
 	 */
 
-        System.out.println("PREPARING STRATEGY BOLT");
+        //System.out.println("PREPARING STRATEGY BOLT");
         
         try {
             mongoClient = new MongoClient("shrdmdb301p.stag.ch3.s.com", 20000);
@@ -173,7 +173,7 @@ public class StrategyBolt extends BaseRichBolt {
 		// 9) FIND ALL MODELS THAT ARE AFFECTED BY CHANGES
 		// 10) EMIT LIST OF MODEL IDs
 		
-		System.out.println("APPLYING STRATEGIES");
+		//System.out.println("APPLYING STRATEGIES");
 		
 		String l_id = input.getString(0);
 		String source = input.getString(2);
@@ -189,7 +189,7 @@ public class StrategyBolt extends BaseRichBolt {
 		// 2) FETCH MEMBER VARIABLES FROM memberVariables COLLECTION
 		DBObject mbrVariables = memberVariablesCollection.findOne(new BasicDBObject("l_id",l_id));
 		if(mbrVariables == null) {
-			System.out.println(" ~~~ STRATEGY BOLD COULD NOT FIND MEMBER VARIABLES");
+			//System.out.println(" ~~~ STRATEGY BOLD COULD NOT FIND MEMBER VARIABLES");
 			return;
 		}
 		
@@ -230,19 +230,19 @@ public class StrategyBolt extends BaseRichBolt {
 		}
         	
 		Set<String> varAmoutMapKeySet = varAmountMap.keySet();
-		for(String v: varAmoutMapKeySet) {
-			System.out.println(" variable: " + v + "  amount: " + varAmountMap.get(v));
-		}
+//		for(String v: varAmoutMapKeySet) {
+//			System.out.println(" variable: " + v + "  amount: " + varAmountMap.get(v));
+//		}
 		        
 		// 6) CREATE MAP FROM NEW CHANGES TO CHANGE CLASS
         Map<String,Change> newChanges = new HashMap<String,Change>();
         for(String variableName: varAmoutMapKeySet) {
             DBObject variableFromVariablesCollection = variablesCollection.findOne(new BasicDBObject("name", variableName.toUpperCase()));
             if (variableFromVariablesCollection == null ) {
-            	System.out.println(" ~~~ DID NOT FIND VARIBALE: " + variableName);
+            	//System.out.println(" ~~~ DID NOT FIND VARIBALE: " + variableName);
             	continue;
             }
-        	System.out.println(" ~~~ FOUND VARIABLE - name: " + variableName + " amount: "  + Double.valueOf(varAmountMap.get(variableName)));
+        	//System.out.println(" ~~~ FOUND VARIABLE - name: " + variableName + " amount: "  + Double.valueOf(varAmountMap.get(variableName)));
             
 	        RealTimeScoringContext context = new RealTimeScoringContext();
             context.setAmount(Double.valueOf(varAmountMap.get(variableName)));
@@ -294,9 +294,9 @@ public class StrategyBolt extends BaseRichBolt {
 
 		    BasicDBObject searchQuery = new BasicDBObject().append("l_id", l_id);
 		    
-		    System.out.println(" ~~~ DOCUMENT TO INSERT:");
-		    System.out.println(newDocument.toString());
-		    System.out.println(" ~~~ END DOCUMENT");
+//		    System.out.println(" ~~~ DOCUMENT TO INSERT:");
+//		    System.out.println(newDocument.toString());
+//		    System.out.println(" ~~~ END DOCUMENT");
 		    
 		    //upsert document
 		    changedVariablesCollection.update(searchQuery, new BasicDBObject("$set", newDocument), true, false);
@@ -321,7 +321,7 @@ public class StrategyBolt extends BaseRichBolt {
             	listToEmit.add(l_id);
             	listToEmit.add(createStringFromModelList(modelIdList));
             	listToEmit.add(source);
-            	System.out.println(" ~~~ strategy bolt emitting: " + listToEmit);
+            	//System.out.println(" ~~~ strategy bolt emitting: " + listToEmit);
             	this.outputCollector.emit(listToEmit);
             }
         }

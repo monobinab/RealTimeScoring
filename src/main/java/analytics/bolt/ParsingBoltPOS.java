@@ -81,7 +81,7 @@ public class ParsingBoltPOS extends BaseRichBolt {
 	 * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
 	 */
 
-        System.out.println("PREPARING PARSING POS BOLT");
+        //System.out.println("PREPARING PARSING POS BOLT");
         try {
             mongoClient = new MongoClient("shrdmdb301p.stag.ch3.s.com", 20000);
         } catch (UnknownHostException e) {
@@ -137,7 +137,7 @@ public class ParsingBoltPOS extends BaseRichBolt {
 		// 8) EMIT LINE ITEMS
 
         	
-		System.out.println("PARSING NPOS DOCUMENT");
+		//System.out.println("PARSING NPOS DOCUMENT");
 		
 		// 1) FETCH SEGMENT "B1"
     	
@@ -182,7 +182,7 @@ public class ParsingBoltPOS extends BaseRichBolt {
             
 		// 5) HASH LOYALTY ID
     	String l_id = hashLoyaltyId(lyl_id_no);
-    	System.out.println(lyl_id_no + " : " + l_id);
+    	//System.out.println(lyl_id_no + " : " + l_id);
         	
 		// 6) FETCH SEGMENT "C1"
         Collection<Segment> c1Segments = SegmentUtils.findAllSegments(nposTransaction, "C1");
@@ -224,24 +224,24 @@ public class ParsingBoltPOS extends BaseRichBolt {
 						}
 					}
 					lineItem.setVariableList(foundVariablesList);
-					System.out.println("  div: " + lineItem.getDiv() 
-							+ " ln: " + lineItem.getLine() 
-							+ " itm: " + lineItem.getItem() 
-							+ " amt: " + lineItem.getAmount()
-							+ " variable list: " + lineItem.getVariableList());
+//					System.out.println("  div: " + lineItem.getDiv() 
+//							+ " ln: " + lineItem.getLine() 
+//							+ " itm: " + lineItem.getItem() 
+//							+ " amt: " + lineItem.getAmount()
+//							+ " variable list: " + lineItem.getVariableList());
 					lineItemList.add(lineItem);
 				}	
             }
         }
         
-        System.out.println("list size: " + lineItemList.size());
+        //System.out.println("list size: " + lineItemList.size());
         if(lineItemList.size()>0){
 	        List<Object> lineItemAsJsonString = new ArrayList<Object>();
 	        lineItemAsJsonString.add(l_id);
 	        lineItemAsJsonString.add(createJsonFromLineItemList(lineItemList));
 	        lineItemAsJsonString.add("NPOS");
 
-	        System.out.println(" *** parsing bolt emitting: " + lineItemAsJsonString.toString());
+	        //System.out.println(" *** parsing bolt emitting: " + lineItemAsJsonString.toString());
 	        
 			// 8) EMIT LINE ITEMS
 	        if(lineItemAsJsonString!=null && !lineItemAsJsonString.isEmpty()) {
@@ -324,7 +324,9 @@ public class ParsingBoltPOS extends BaseRichBolt {
 		queryLine.put("d", div);
 		queryLine.put("i", item);
 		
+		//System.out.println("query: " + queryLine);
 		DBObject divLnItm = divLnItmCollection.findOne(queryLine);
+		//System.out.println("line: " + divLnItm);
 		
 		if(divLnItm==null || divLnItm.keySet()==null || divLnItm.keySet().isEmpty()) {
 			return null;
