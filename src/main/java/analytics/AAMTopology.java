@@ -1,7 +1,6 @@
 package analytics;
 
 import analytics.bolt.ParsingBoltWebTraits;
-import analytics.bolt.RedisCounterBolt;
 import analytics.bolt.ScorePublishBolt;
 import analytics.bolt.ScoringBolt;
 import analytics.bolt.StrategyBolt;
@@ -11,6 +10,7 @@ import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
 import backtype.storm.topology.BoltDeclarer;
 import backtype.storm.topology.TopologyBuilder;
+import backtype.storm.tuple.Fields;
 
 /**
  * This topology demonstrates Storm's stream groupings and multilang capabilities.
@@ -45,23 +45,16 @@ public class AAMTopology {
         }
     }
 
-//
-//    builder.setSpout("spout", new RedisPubSubSpout("rtsapp301p.qa.ch3.s.com", 6379, "Products"), 1);
-//    builder.setSpout("spout", new RedisPubSubSpout("rtsapp302p.qa.ch3.s.com", 6379, "Products"), 1);
-//    builder.setSpout("spout", new RedisPubSubSpout("rtsapp303p.qa.ch3.s.com", 6379, "Products"), 1);
-
-
-//      BoltDeclarer boltDeclarer = builder.setBolt("count", new RedisCounterBolt("rtsapp401p.prod.ch4.s.com", 6379), 10);
-      BoltDeclarer boltDeclarer = builder.setBolt("ParsingBoltWebTraits", new ParsingBoltWebTraits("rtsapp401p.prod.ch4.s.com", 6379), 1);
-      builder.setBolt("strategy_bolt", new StrategyBolt()).shuffleGrouping("ParsingBoltWebTraits");
-      builder.setBolt("scoring_bolt", new ScoringBolt()).shuffleGrouping("strategy_bolt");
+      BoltDeclarer boltDeclarer = builder.setBolt("ParsingBoltWebTraits", new ParsingBoltWebTraits("rtsapp401p.prod.ch4.s.com", 6379), 10);
+      builder.setBolt("strategy_bolt", new StrategyBolt(),10).shuffleGrouping("ParsingBoltWebTraits");
+      builder.setBolt("scoring_bolt", new ScoringBolt(),10).shuffleGrouping("strategy_bolt");
       builder.setBolt("ScorePublishBolt", new ScorePublishBolt("rtsapp401p.prod.ch4.s.com", 6379,"score")).shuffleGrouping("scoring_bolt");
       
       
       for(String topic:topics){
           for(String server:servers)
           {
-              boltDeclarer.shuffleGrouping(topic+server);
+              boltDeclarer.fieldsGrouping(topic + server, new Fields("uuid"));
           }
       }
     //builder.setBolt("print", new RealtyTracBolt(), 2).shuffleGrouping("spout").shuffleGrouping("spout2");
