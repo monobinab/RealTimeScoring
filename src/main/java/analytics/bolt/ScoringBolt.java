@@ -373,10 +373,14 @@ public class ScoringBolt extends BaseRichBolt {
             var.setVid(variableFromVariablesCollection.get("VID").toString());
             var.makePojoFromBson( dbo );
 
-//		    System.out.println( var.getName() + ", " + var.getRealTimeFlag() + ", " + var.getType()  + ", " + var.getStrategy() + ", " + var.getCoefficeint() +", " + var.getVid());
-//		    System.out.println("PASS: " + mbrVarMap + " varNm: " + var.getName() + " varType: " + var.getType() + " cng: " + changes + var.getCoefficeint());
-		    if(  var.getType().equals("Integer")) val = val + ((Integer)calculateVariableValue(mbrVarMap, var, changes, var.getType()) * var.getCoefficeint());
-		    else if( var.getType().equals("Double")) val = val + ((Double)calculateVariableValue(mbrVarMap, var, changes, var.getType()) * var.getCoefficeint());
+		    //System.out.println( var.getName() + ", " + var.getRealTimeFlag() + ", " + var.getType()  + ", " + var.getStrategy() + ", " + var.getCoefficeint() +", " + var.getVid());
+		    //System.out.println("PASS: " + mbrVarMap + " varNm: " + var.getName() + " varType: " + var.getType() + " cng: " + changes + var.getCoefficeint());
+		    if(  var.getType().equals("Integer")) {
+		    	val = val + ((Integer)calculateVariableValue(mbrVarMap, var, changes, var.getType()) * var.getCoefficeint());
+		    }
+		    else if( var.getType().equals("Double")) {
+		    	val = val + ((Double)calculateVariableValue(mbrVarMap, var, changes, var.getType()) * var.getCoefficeint());
+		    }
 		    else {
 		    	val = 0;
 		    	break;
@@ -391,10 +395,13 @@ public class ScoringBolt extends BaseRichBolt {
 		if(var != null) {
 			if(changes.containsKey(var.getName().toUpperCase())) {
 				changedValue = changes.get(var.getName().toUpperCase()).getValue();
-				//System.out.println("changed variable: " + var.getName().toUpperCase() + "  value: " + changedValue);
+				//System.out.println(" ### changed variable: " + var.getName().toUpperCase() + "  value: " + changedValue);
 			}
 			if(changedValue == null) {
 				changedValue=mbrVarMap.get(var.getName().toUpperCase());
+				if(changedValue==null){
+					changedValue=0;
+				}
 			}
 			else{
 				if(dataType.equals("Integer")) {
