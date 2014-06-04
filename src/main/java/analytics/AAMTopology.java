@@ -38,6 +38,7 @@ public class AAMTopology {
 
     String[] servers = new String[]{"rtsapp302p.qa.ch3.s.com","rtsapp303p.qa.ch3.s.com"};
 
+
     for(String topic:topics){
         for(String server:servers)
         {

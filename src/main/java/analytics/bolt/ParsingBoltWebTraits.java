@@ -30,8 +30,6 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 	private static final long serialVersionUID = 1L;
     private OutputCollector outputCollector;
     
-    final String host;
-    final int port;
 
     DB db;
     MongoClient mongoClient;
@@ -48,11 +46,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
     private String currentUUID;
     private String new_l_id;
     private String current_l_id;
-    
-    public ParsingBoltWebTraits(String host, int port) {
-        this.host = host;
-        this.port = port;
-    }
+
 
     public void setOutputCollector(OutputCollector outputCollector) {
         this.outputCollector = outputCollector;
@@ -168,7 +162,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 		
 		
 		
-		//System.out.println("PARSING DOCUMENT -- WEB TRAIT RECORD");
+		//System.out.println("PARSING DOCUMENT -- WEB TRAIT RECORD " + input.getString(0));
 		
 		// 1) SPLIT INPUT STRING
         String webTraitInteractionRec = input.getString(1);

@@ -243,7 +243,19 @@ public class ScoringBolt extends BaseRichBolt {
         	// recalculate score for model
         	
         	//System.out.println(" ### SCORING MODEL ID: " + modelId);
-            double newScore = 1/(1+ Math.exp(-1*(calcMbrVar(memberVariablesMap, allChanges,  Integer.valueOf(modelId))))) * 1000;
+        	double baseScore = calcMbrVar(memberVariablesMap, allChanges,  Integer.valueOf(modelId));
+        	double newScore;
+        	
+        	if(baseScore <= -100) {
+        		newScore = 0;
+        	}
+        	else if(baseScore >= 35) {
+        		newScore = 1;
+        	}
+        	else {
+	            //newScore = 1/(1+ Math.exp(-1*(   baseScore  ))) * 1000;
+	            newScore = Math.exp(baseScore)/(1+ Math.exp(baseScore));
+        	}
             //System.out.println(l_id + ": " + Double.toString(newScore));
             
             // FIND THE MIN AND MAX EXPIRATION DATE OF ALL VARIABLE CHANGES FOR CHANGED MODEL SCORE TO WRITE TO SCORE CHANGES COLLECTION
