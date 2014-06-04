@@ -4,7 +4,7 @@ import analytics.bolt.ParsingBoltWebTraits;
 import analytics.bolt.ScorePublishBolt;
 import analytics.bolt.ScoringBolt;
 import analytics.bolt.StrategyBolt;
-import analytics.spout.RedisPubSubSpout;
+import analytics.spout.AAMRedisPubSubSpout;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
@@ -36,19 +36,19 @@ public class AAMTopology {
 //            "AAM_CDF_AbanBrow",
             "AAM_CDF_Traits"};
 
-    String[] servers = new String[]{"rtsapp301p.qa.ch3.s.com","rtsapp302p.qa.ch3.s.com","rtsapp303p.qa.ch3.s.com"};
+    String[] servers = new String[]{"rtsapp302p.qa.ch3.s.com","rtsapp303p.qa.ch3.s.com"};
 
     for(String topic:topics){
         for(String server:servers)
         {
-            builder.setSpout(topic+server, new RedisPubSubSpout(server, 6379, topic), 1);
+            builder.setSpout(topic+server, new AAMRedisPubSubSpout(server, 6379, topic), 1);
         }
     }
 
-      BoltDeclarer boltDeclarer = builder.setBolt("ParsingBoltWebTraits", new ParsingBoltWebTraits("rtsapp401p.prod.ch4.s.com", 6379), 10);
+      BoltDeclarer boltDeclarer = builder.setBolt("ParsingBoltWebTraits", new ParsingBoltWebTraits(), 10);
       builder.setBolt("strategy_bolt", new StrategyBolt(),10).shuffleGrouping("ParsingBoltWebTraits");
       builder.setBolt("scoring_bolt", new ScoringBolt(),10).shuffleGrouping("strategy_bolt");
-      builder.setBolt("ScorePublishBolt", new ScorePublishBolt("rtsapp401p.prod.ch4.s.com", 6379,"score")).shuffleGrouping("scoring_bolt");
+      builder.setBolt("ScorePublishBolt", new ScorePublishBolt("rtsapp401p.prod.ch4.s.com", 6379,"score"), 10).shuffleGrouping("scoring_bolt");
       
       
       for(String topic:topics){
