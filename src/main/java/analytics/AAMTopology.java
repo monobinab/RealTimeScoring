@@ -36,7 +36,7 @@ public class AAMTopology {
 //            "AAM_CDF_AbanBrow",
             "AAM_CDF_Traits"};
 
-    String[] servers = new String[]{"rtsapp302p.qa.ch3.s.com","rtsapp303p.qa.ch3.s.com"};
+    String[] servers = new String[]{"rtsapp301p.qa.ch3.s.com","rtsapp303p.qa.ch3.s.com"};
 
 
     for(String topic:topics){
@@ -46,10 +46,10 @@ public class AAMTopology {
         }
     }
 
-      BoltDeclarer boltDeclarer = builder.setBolt("ParsingBoltWebTraits", new ParsingBoltWebTraits(), 10);
-      builder.setBolt("strategy_bolt", new StrategyBolt(),10).shuffleGrouping("ParsingBoltWebTraits");
-      builder.setBolt("scoring_bolt", new ScoringBolt(),10).shuffleGrouping("strategy_bolt");
-      builder.setBolt("ScorePublishBolt", new ScorePublishBolt("rtsapp401p.prod.ch4.s.com", 6379,"score"), 10).shuffleGrouping("scoring_bolt");
+      BoltDeclarer boltDeclarer = builder.setBolt("ParsingBoltWebTraits", new ParsingBoltWebTraits(), 1);
+      builder.setBolt("strategy_bolt", new StrategyBolt(),1).shuffleGrouping("ParsingBoltWebTraits");
+      builder.setBolt("scoring_bolt", new ScoringBolt(),1).shuffleGrouping("strategy_bolt");
+      builder.setBolt("ScorePublishBolt", new ScorePublishBolt("rtsapp401p.prod.ch4.s.com", 6379,"score"), 1).shuffleGrouping("scoring_bolt");
       
       
       for(String topic:topics){

@@ -257,11 +257,13 @@ public class ScoringBolt extends BaseRichBolt {
 	            newScore = Math.exp(baseScore)/(1+ Math.exp(baseScore));
         	}
         	
+        	//System.out.println(" ### NEW SCORE: " + newScore);
     		if(newScore<0.0078921) {
     			Change change = allChanges.get("BOOST_WEB_TRAIT_HA");
 				if(change!=null && change.getValue()!=null) {
-        			int traits = Integer.valueOf(change.getValue().toString()) ;
-        			newScore=0.0078921+Math.exp(-4.612724344 + traits * 0.01)/(1+Math.exp(-4.612724344 + traits * 0.01));
+					double traits = Double.valueOf(change.getValue().toString()) ;
+        			newScore=0.0078921 + .00009 * traits;   // Math.exp(-4.612724344 + traits * 0.01)/(1+Math.exp(-4.612724344 + traits * 0.01));
+                	//System.out.println(" ### SUPER BOOST NEW SCORE: " + newScore + "  traits: " + traits);
     			}
     		}
         	
