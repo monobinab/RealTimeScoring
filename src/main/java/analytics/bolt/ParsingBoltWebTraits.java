@@ -1,18 +1,19 @@
 package analytics.bolt;
 
-import analytics.util.TransactionLineItem;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
-import com.ibm.jms.JMSMessage;
 import com.mongodb.*;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import java.lang.reflect.Type;
 import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
@@ -20,11 +21,6 @@ import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringUtils;
 
 
 public class ParsingBoltWebTraits extends BaseRichBolt {
@@ -34,8 +30,6 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 	private static final long serialVersionUID = 1L;
     private OutputCollector outputCollector;
     
-    final String host;
-    final int port;
 
     DB db;
     MongoClient mongoClient;
@@ -52,11 +46,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
     private String currentUUID;
     private String new_l_id;
     private String current_l_id;
-    
-    public ParsingBoltWebTraits(String host, int port) {
-        this.host = host;
-        this.port = port;
-    }
+
 
     public void setOutputCollector(OutputCollector outputCollector) {
         this.outputCollector = outputCollector;
@@ -172,10 +162,10 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 		
 		
 		
-		//System.out.println("PARSING DOCUMENT -- WEB TRAIT RECORD");
+		//System.out.println("PARSING DOCUMENT -- WEB TRAIT RECORD " + input.getString(0));
 		
 		// 1) SPLIT INPUT STRING
-        String webTraitInteractionRec = input.getString(0);
+        String webTraitInteractionRec = input.getString(1);
         String webTraitsSplitRec[] = splitRec(webTraitInteractionRec);
         
         String splitRec = new String();

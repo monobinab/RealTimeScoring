@@ -113,8 +113,12 @@ public class RedisPubSubSpout extends BaseRichSpout {
         if(ret==null) {
             Utils.sleep(50);
         } else {
-            _collector.emit(tuple(ret));
+            emit(ret);
         }
+    }
+
+    protected void emit(String ret) {
+        _collector.emit(tuple(ret));
     }
 
     public void ack(Object msgId) {
