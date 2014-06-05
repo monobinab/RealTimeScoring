@@ -256,6 +256,15 @@ public class ScoringBolt extends BaseRichBolt {
 	            //newScore = 1/(1+ Math.exp(-1*(   baseScore  ))) * 1000;
 	            newScore = Math.exp(baseScore)/(1+ Math.exp(baseScore));
         	}
+        	
+    		if(newScore<0.0078921) {
+    			Change change = allChanges.get("BOOST_WEB_TRAIT_HA");
+				if(change!=null && change.getValue()!=null) {
+        			int traits = Integer.valueOf(change.getValue().toString()) ;
+        			newScore=0.0078921+Math.exp(-4.612724344 + traits * 0.01)/(1+Math.exp(-4.612724344 + traits * 0.01));
+    			}
+    		}
+        	
             //System.out.println(l_id + ": " + Double.toString(newScore));
             
             // FIND THE MIN AND MAX EXPIRATION DATE OF ALL VARIABLE CHANGES FOR CHANGED MODEL SCORE TO WRITE TO SCORE CHANGES COLLECTION

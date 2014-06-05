@@ -91,7 +91,7 @@ public class ScorePublishBolt extends BaseRichBolt {
         haAllRankToScoreMap.put(94,0.0184591);
 		haAllRankToScoreMap.put(93,0.0168337);
 		haAllRankToScoreMap.put(92,0.0154968);
-		haAllRankToScoreMap.put(91,0.0416451);
+		haAllRankToScoreMap.put(91,0.0141645);
 		haAllRankToScoreMap.put(90,0.0133917);
 		haAllRankToScoreMap.put(89,0.0124964);
 		haAllRankToScoreMap.put(88,0.0116958);
@@ -313,7 +313,7 @@ public class ScorePublishBolt extends BaseRichBolt {
         int newRank = 0;
         String modelDescription = new String();
         if(modelName.equals("S_SCR_HA_ALL")) {
-        	modelDescription="ALL HOME APPLIANCES";
+        	modelDescription="HOME APPLIANCE";
         	if(Double.valueOf(oldScore)==0) {
         		oldRank=1;
         	}
