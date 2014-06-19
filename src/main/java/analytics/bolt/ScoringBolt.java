@@ -234,6 +234,10 @@ public class ScoringBolt extends BaseRichBolt {
 				}
 		    }
 		}
+    	if(allChanges==null || allChanges.isEmpty()) {
+    		return;
+    	}
+    		
 //		System.out.println(" *** ALL CHANGES MAP: " + allChanges);
 	
         // Score each model in a loop
