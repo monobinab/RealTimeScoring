@@ -256,16 +256,33 @@ public class ParsingBoltAAM_ATC extends BaseRichBolt {
     	for(String pid: l_idToPidCollectionMap.get(current_l_id)) {
     		DBObject divLnDBO = pidDivLnCollection.findOne(new BasicDBObject().append("pid", pid));
     		if(divLnDBO != null) {
-	    		String divLn = divLnDBO.get("d").toString();
-	    		if(divLnVariablesMap.containsKey(divLn)) {
-	    			String var = divLnVariablesMap.get(divLn).toString();
-	    			if(variableValueMap.containsKey(var)) {
-	    				int value = 1 + Integer.valueOf(variableValueMap.get(var));
-	    				variableValueMap.remove(var);
-	    				variableValueMap.put(var, String.valueOf(value));
+	    		String div = divLnDBO.get("d").toString();
+	    		String divLn = divLnDBO.get("l").toString();
+	    		Collection<String> var = new ArrayList<String>();
+	    		if(divLnVariablesMap.containsKey(div)) {
+	    			var = divLnVariablesMap.get(div);
+	    			for(String v:var) {
+		    			if(variableValueMap.containsKey(var)) {
+		    				int value = 1 + Integer.valueOf(variableValueMap.get(v));
+		    				variableValueMap.remove(v);
+		    				variableValueMap.put(v, String.valueOf(value));
+		    			}
+		    			else {
+		    				variableValueMap.put(v, "1");
+		    			}
 	    			}
-	    			else {
-	    				variableValueMap.put(var, "1");
+	    		}
+	    		if(divLnVariablesMap.containsKey(divLn)) {
+	    			var = divLnVariablesMap.get(divLn);
+	    			for(String v:var) {
+		    			if(variableValueMap.containsKey(var)) {
+		    				int value = 1 + Integer.valueOf(variableValueMap.get(v));
+		    				variableValueMap.remove(v);
+		    				variableValueMap.put(v, String.valueOf(value));
+		    			}
+		    			else {
+		    				variableValueMap.put(v, "1");
+		    			}
 	    			}
 	    		}
     		}
