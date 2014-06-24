@@ -195,7 +195,7 @@ public class ParsingBoltAAM_InternalSearch  extends BaseRichBolt{
         }
         
         if(l_idToKeyWordMap != null && !l_idToKeyWordMap.isEmpty()) {
-        	Map<String,String> variableValueMap = processPidList();
+        	Map<String,String> variableValueMap = processKeyWordList();
         	if(variableValueMap==null || variableValueMap.isEmpty()) {
         		System.out.println(" @@@ NO VARIBALES FOUND - NOTHING TO EMIT");
         		l_idToKeyWordMap.remove(current_l_id);
@@ -284,11 +284,11 @@ public class ParsingBoltAAM_InternalSearch  extends BaseRichBolt{
 		}
 	}
 
-    private Map<String,String> processPidList() {
+    private Map<String,String> processKeyWordList() {
     	Map<String,String> variableValueMap = new HashMap<String,String>();
     	
-    	for(String pid: l_idToKeyWordMap.get(current_l_id)) {
-    		DBObject divLnDBO = pidDivLnCollection.findOne(new BasicDBObject().append("pid", pid));
+    	for(String keyWord: l_idToKeyWordMap.get(current_l_id)) {
+    		DBObject divLnDBO = pidDivLnCollection.findOne(new BasicDBObject().append("pid", keyWord));
     		if(divLnDBO != null) {
 	    		String div = divLnDBO.get("d").toString();
 	    		String divLn = divLnDBO.get("l").toString();
