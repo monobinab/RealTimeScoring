@@ -126,7 +126,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 
 		// 1) SPLIT STRING
 		// 2) IF THE CURRENT RECORD HAS THE SAME UUID AS PREVIOUS RECORD(S) THEN ADD TRAIT TO LIST AND RETURN
-		// 3) IF THE CURRENT RECORD HAS A DIFFERENT UUID THEN PROCESS THE TRAIT LIST AND EMIT VARIABLES
+		// 3) IF THE CURRENT RECORD HAS A DIFFERENT UUID THEN PROCESS THE CURRENT TRAITS LIST AND EMIT VARIABLES
 		// 4) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN SET CURRENT UUID FROM RECORD, SET CURRENT l_id TO NULL AND RETURN
 		// 5) POPULATE TRAITS COLLECTION WITH THE FIRST TRAIT
 		
@@ -154,6 +154,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
         
 		// 2) IF THE CURRENT RECORD HAS THE SAME UUID AS PREVIOUS RECORD(S) THEN ADD TRAIT TO LIST AND RETURN
         if(this.currentUUID !=null && this.currentUUID.equalsIgnoreCase(webTraitsSplitRec[1])) {
+        	//skip processing if l_id is null
         	if(this.current_l_id == null) {
         		//System.out.println(" NULL l_id -- return");
         		return;
@@ -167,7 +168,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
         	return;
         }
         
-		// 3) IF THE CURRENT RECORD HAS A DIFFERENT UUID THEN PROCESS THE TRAIT LIST AND EMIT VARIABLES
+		// 3) IF THE CURRENT RECORD HAS A DIFFERENT UUID THEN PROCESS THE CURRENT TRAITS LIST AND EMIT VARIABLES
         if(l_idToTraitCollectionMap != null && !l_idToTraitCollectionMap.isEmpty()) {
         	Map<String,String> variableValueMap = processTraitsList();
         	if(variableValueMap==null || variableValueMap.isEmpty()) {
@@ -188,6 +189,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
         }
         
 		// 4) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN SET CURRENT UUID FROM RECORD, SET CURRENT l_id TO NULL AND RETURN
+        //		If l_id is null and the next UUID is the same the current, then the next record will not be processed
         DBObject uuid = memberUUIDCollection.findOne(new BasicDBObject("u",webTraitsSplitRec[1]));
         if(uuid == null) {
             //System.out.println(" *** COULD NOT FIND UUID");
@@ -303,23 +305,4 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 		}
 		return hashed;
 	}
-	
-//	public String getLineFromCollection(String div, String item) {
-//		//System.out.println("searching for line");
-//		
-//		BasicDBObject queryLine = new BasicDBObject();
-//		queryLine.put("d", div);
-//		queryLine.put("i", item);
-//		
-//		DBObject divLnItm = divLnItmCollection.findOne(queryLine);
-//		
-//		if(divLnItm==null || divLnItm.keySet()==null || divLnItm.keySet().isEmpty()) {
-//			return null;
-//		}
-//		String line = divLnItm.get("l").toString();
-//		//System.out.println("  found line: " + line);
-//		return line;
-//	}
-	
-
 }

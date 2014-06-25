@@ -37,14 +37,12 @@ public class ParsingBoltAAM_ATC extends BaseRichBolt {
     MongoClient mongoClient;
     DBCollection memberCollection;
     DBCollection memberUUIDCollection;
-//    DBCollection divLnItmCollection;
     DBCollection pidDivLnCollection;
     DBCollection divLnVariableCollection;
 
     private Map<String,Collection<String>> divLnVariablesMap;
     private Map<String,Collection<String>> l_idToPidCollectionMap; // USED TO MAP BETWEEN l_id AND THE DIVISION AND LINE ASSOCIATED WITH THAT ID UNTIL A NEW UUID IS FOUND
     private String currentUUID;
-    private String new_l_id;
     private String current_l_id;
 
 
@@ -99,7 +97,6 @@ public class ParsingBoltAAM_ATC extends BaseRichBolt {
         
         this.currentUUID=null;
         this.current_l_id=null;
-        this.new_l_id=null;
         l_idToPidCollectionMap = new HashMap<String,Collection<String>>();
         
         pidDivLnCollection = db.getCollection("pidDivLn");
@@ -134,13 +131,11 @@ public class ParsingBoltAAM_ATC extends BaseRichBolt {
 	@Override
 	public void execute(Tuple input) {
 
-		// 1) SPLIT STRIN
-		// 2) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN RETURN
-		// 3) POPULATE TRAITS COLLECTION UNTIL A DIFFERENT UUID IS FOUND
-		// 4) 
-		// 5) 
-		// 6) 
-		// 7) 
+		// 1) SPLIT STRING
+		// 2) IF THE CURRENT RECORD HAS THE SAME UUID AS PREVIOUS RECORD(S) THEN ADD PID TO LIST AND RETURN
+		// 3) IF THE CURRENT RECORD HAS A DIFFERENT UUID THEN PROCESS THE CURRENT PIDs LIST AND EMIT VARIABLES
+		// 4) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN SET CURRENT UUID FROM RECORD, SET CURRENT l_id TO NULL AND RETURN
+		// 5) POPULATE PID COLLECTION WITH THE FIRST PID
 		
 		
 		
@@ -159,13 +154,14 @@ public class ParsingBoltAAM_ATC extends BaseRichBolt {
 //        System.out.println("  split string: " + splitRec);
 		
         
-        //2014-03-08 10:56:17,00000388763646853831116694914086674166,743651,US,Sears
         if(pidSplitRec == null || pidSplitRec.length==0) {
         	return;
         }
         
         
+		// 2) IF THE CURRENT RECORD HAS THE SAME UUID AS PREVIOUS RECORD(S) THEN ADD PID TO LIST AND RETURN
         if(this.currentUUID !=null && this.currentUUID.equalsIgnoreCase(pidSplitRec[1])) {
+        	//do not process if current_l_id is null
         	if(this.current_l_id == null) {
         		System.out.println(" @@@ NULL l_id -- return");
         		return;
@@ -179,6 +175,7 @@ public class ParsingBoltAAM_ATC extends BaseRichBolt {
         	return;
         }
         
+		// 3) IF THE CURRENT RECORD HAS A DIFFERENT UUID THEN PROCESS THE CURRENT PIDs LIST AND EMIT VARIABLES
         if(l_idToPidCollectionMap != null && !l_idToPidCollectionMap.isEmpty()) {
         	Map<String,String> variableValueMap = processPidList();
         	if(variableValueMap==null || variableValueMap.isEmpty()) {
@@ -198,7 +195,7 @@ public class ParsingBoltAAM_ATC extends BaseRichBolt {
         	this.outputCollector.emit(listToEmit);
         }
         
-		// 2) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN RETURN
+		// 4) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN SET CURRENT UUID FROM RECORD, SET CURRENT l_id TO NULL AND RETURN
         DBObject uuid = memberUUIDCollection.findOne(new BasicDBObject("u",pidSplitRec[1]));
         if(uuid == null) {
             System.out.println(" @@@ COULD NOT FIND UUID");
@@ -227,11 +224,12 @@ public class ParsingBoltAAM_ATC extends BaseRichBolt {
         System.out.println(" @@@ FOUND l_id: " + l_id + " interaction time: " + interactionDateTime + " trait: " + pidSplitRec[2]);
         this.current_l_id = l_id;
         
+
+		// 5) POPULATE PID COLLECTION WITH THE FIRST PID
         Collection<String> firstPid = new ArrayList<String>();
         firstPid.add(pidSplitRec[2]);
         
         //System.out.println(" @@@ PUT IN FIRST RECORD: " + this.current_l_id + " trait: " + firstTrait);
-        
         l_idToPidCollectionMap.put(this.current_l_id,firstPid);
         
         return;
@@ -254,10 +252,12 @@ public class ParsingBoltAAM_ATC extends BaseRichBolt {
     	Map<String,String> variableValueMap = new HashMap<String,String>();
     	
     	for(String pid: l_idToPidCollectionMap.get(current_l_id)) {
-    		DBObject divLnDBO = pidDivLnCollection.findOne(new BasicDBObject().append("pid", pid));
-    		if(divLnDBO != null) {
-	    		String div = divLnDBO.get("d").toString();
-	    		String divLn = divLnDBO.get("l").toString();
+    		//query MongoDB for division and line associated with the pid
+    		DBObject pidDivLnQueryResult = pidDivLnCollection.findOne(new BasicDBObject().append("pid", pid));
+    		if(pidDivLnQueryResult != null) {
+    			//get division and division/line concatenation from query results
+	    		String div = pidDivLnQueryResult.get("d").toString();
+	    		String divLn = pidDivLnQueryResult.get("l").toString();
 	    		Collection<String> var = new ArrayList<String>();
 	    		if(divLnVariablesMap.containsKey(div)) {
 	    			var = divLnVariablesMap.get(div);
@@ -287,7 +287,6 @@ public class ParsingBoltAAM_ATC extends BaseRichBolt {
 	    		}
     		}
     	}
-    	
     	return variableValueMap;
     }
     
