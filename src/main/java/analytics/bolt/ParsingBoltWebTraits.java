@@ -36,15 +36,10 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
     DBCollection memberCollection;
     DBCollection memberUUIDCollection;
     DBCollection traitVariablesCollection;
-    //TODO: not sure if these are needed
-//    DBCollection divLnItmCollection;
-//    DBCollection divLnVariableCollection;
-    private Map<String,String> traitVariablesMap;
 
-//    private Map<String,Collection<String>> divLnVariablesMap;
+    private Map<String,String> traitVariablesMap;
     private Map<String,Collection<String>> l_idToTraitCollectionMap; // USED TO MAP BETWEEN l_id AND THE TRAITS ASSOCIATED WITH THAT ID UNTIL A NEW UUID IS FOUND
     private String currentUUID;
-    private String new_l_id;
     private String current_l_id;
 
 
@@ -100,13 +95,8 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
         
         this.currentUUID=null;
         this.current_l_id=null;
-        this.new_l_id=null;
-        l_idToTraitCollectionMap = new HashMap<String,Collection<String>>();
+         l_idToTraitCollectionMap = new HashMap<String,Collection<String>>();
         
-        // TODO: NOT SURE IF THESE ARE NEEDED
-//        divLnItmCollection = db.getCollection("divLnItm");
-//        divLnVariableCollection = db.getCollection("divLnVariable");
-
         traitVariablesMap = new HashMap<String, String>();
 		DBCursor traitVarCursor = traitVariablesCollection.find();
 		for(DBObject traitDBObject: traitVarCursor) {
@@ -123,24 +113,6 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 //		System.out.println("*** TRAIT TO VARIABLES MAP >>>");
 //		System.out.println(traitVariablesMap);
 		
-        // populate divLnVariablesMap
-        // TODO: NOT SURE IF THIS IS NEEDED        
-//        divLnVariablesMap = new HashMap<String, Collection<String>>();
-//        DBCursor divLnVarCursor = divLnVariableCollection.find();
-//        for(DBObject divLnDBObject: divLnVarCursor) {
-//            if (divLnVariablesMap.get(divLnDBObject.get("d")) == null)
-//            {
-//                Collection<String> varColl = new ArrayList<String>();
-//                varColl.add(divLnDBObject.get("v").toString());
-//                divLnVariablesMap.put(divLnDBObject.get("d").toString(), varColl);
-//            }
-//            else
-//            {
-//                Collection<String> varColl = divLnVariablesMap.get(divLnDBObject.get("d").toString());
-//                varColl.add(divLnDBObject.get("v").toString().toUpperCase());
-//                divLnVariablesMap.put(divLnDBObject.get("d").toString(), varColl);
-//            }
-//        }
     }
 
 
@@ -152,13 +124,11 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 	@Override
 	public void execute(Tuple input) {
 
-		// 1) SPLIT STRIN
-		// 2) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN RETURN
-		// 3) POPULATE TRAITS COLLECTION UNTIL A DIFFERENT UUID IS FOUND
-		// 4) 
-		// 5) 
-		// 6) 
-		// 7) 
+		// 1) SPLIT STRING
+		// 2) IF THE CURRENT RECORD HAS THE SAME UUID AS PREVIOUS RECORD(S) THEN ADD TRAIT TO LIST AND RETURN
+		// 3) IF THE CURRENT RECORD HAS A DIFFERENT UUID THEN PROCESS THE TRAIT LIST AND EMIT VARIABLES
+		// 4) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN SET CURRENT UUID FROM RECORD, SET CURRENT l_id TO NULL AND RETURN
+		// 5) POPULATE TRAITS COLLECTION WITH THE FIRST TRAIT
 		
 		
 		
@@ -182,6 +152,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
         }
         
         
+		// 2) IF THE CURRENT RECORD HAS THE SAME UUID AS PREVIOUS RECORD(S) THEN ADD TRAIT TO LIST AND RETURN
         if(this.currentUUID !=null && this.currentUUID.equalsIgnoreCase(webTraitsSplitRec[1])) {
         	if(this.current_l_id == null) {
         		//System.out.println(" NULL l_id -- return");
@@ -196,6 +167,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
         	return;
         }
         
+		// 3) IF THE CURRENT RECORD HAS A DIFFERENT UUID THEN PROCESS THE TRAIT LIST AND EMIT VARIABLES
         if(l_idToTraitCollectionMap != null && !l_idToTraitCollectionMap.isEmpty()) {
         	Map<String,String> variableValueMap = processTraitsList();
         	if(variableValueMap==null || variableValueMap.isEmpty()) {
@@ -215,7 +187,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
         	this.outputCollector.emit(listToEmit);
         }
         
-		// 2) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN RETURN
+		// 4) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN SET CURRENT UUID FROM RECORD, SET CURRENT l_id TO NULL AND RETURN
         DBObject uuid = memberUUIDCollection.findOne(new BasicDBObject("u",webTraitsSplitRec[1]));
         if(uuid == null) {
             //System.out.println(" *** COULD NOT FIND UUID");
@@ -224,6 +196,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
         	return;
         }
         
+        // set current uuid and l_id from mongoDB query results
         this.currentUUID = (String) uuid.get("u");
         String l_id = (String) uuid.get("l_id");
         
@@ -244,11 +217,12 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
         //System.out.println(" *** FOUND l_id: " + l_id + " interaction time: " + interactionDateTime + " trait: " + webTraitsSplitRec[2]);
         this.current_l_id = l_id;
         
+
+		// 5) POPULATE TRAITS COLLECTION WITH THE FIRST TRAIT
         Collection<String> firstTrait = new ArrayList<String>();
         firstTrait.add(webTraitsSplitRec[2]);
         
         //System.out.println(" *** PUT IN FIRST RECORD: " + this.current_l_id + " trait: " + firstTrait);
-        
         l_idToTraitCollectionMap.put(this.current_l_id,firstTrait);
         
         return;
