@@ -178,8 +178,8 @@ public class ScoringBolt extends BaseRichBolt {
 		List<String> modelIdList = restoreModelListFromJson(input.getString(1));
 		//List<TransactionLineItem> lineItemList = new ArrayList<TransactionLineItem>();
 
-		//System.out.println("RE-SCORING MODELS");
-		//System.out.println(" *** model ID list: " + modelIdList);
+		System.out.println("RE-SCORING MODELS");
+		System.out.println(" ### model ID list: " + modelIdList);
 		
 		// 1) PULL OUT HASHED LOYALTY ID FROM THE FIRST RECORD IN lineItemList
 		
@@ -238,7 +238,7 @@ public class ScoringBolt extends BaseRichBolt {
     		return;
     	}
     		
-//		System.out.println(" *** ALL CHANGES MAP: " + allChanges);
+		System.out.println(" ### ALL CHANGES MAP: " + allChanges);
 	
         // Score each model in a loop
 		BasicDBObject updateRec = new BasicDBObject();
@@ -306,7 +306,7 @@ public class ScoringBolt extends BaseRichBolt {
         	listToEmit.add(newScore);
         	listToEmit.add(modelId);
         	listToEmit.add(source);
-        	//System.out.println(" ### scoring bolt emitting: " + listToEmit);
+        	System.out.println(" ### scoring bolt emitting: " + listToEmit);
         	this.outputCollector.emit(listToEmit);
 
             

@@ -45,7 +45,7 @@ public class AAM_ATCTopology {
 		}
 		
 		BoltDeclarer boltDeclarer = builder.setBolt("ParsingBoltAAM_ATC", new ParsingBoltAAM_ATC(), 1);
-		builder.setBolt("strategy_bolt", new StrategyBolt(),1).shuffleGrouping("ParsingBoltWebTraits");
+		builder.setBolt("strategy_bolt", new StrategyBolt(),1).shuffleGrouping("ParsingBoltAAM_ATC");
 		builder.setBolt("scoring_bolt", new ScoringBolt(),1).shuffleGrouping("strategy_bolt");
 		builder.setBolt("ScorePublishBolt", new ScorePublishBolt("rtsapp401p.prod.ch4.s.com", 6379,"score"), 1).shuffleGrouping("scoring_bolt");
 		

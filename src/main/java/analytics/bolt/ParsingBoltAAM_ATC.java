@@ -80,7 +80,7 @@ public class ParsingBoltAAM_ATC extends BaseRichBolt {
 	 * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
 	 */
 
-        //System.out.println("PREPARING PARSING BOLT FOR WEB TRAITS");
+        System.out.println("PREPARING PARSING BOLT FOR ADD-TO-CART");
         try {
             mongoClient = new MongoClient("shrdmdb301p.stag.ch3.s.com", 20000);
         } catch (UnknownHostException e) {

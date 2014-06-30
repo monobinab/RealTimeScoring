@@ -173,13 +173,13 @@ public class StrategyBolt extends BaseRichBolt {
 		// 9) FIND ALL MODELS THAT ARE AFFECTED BY CHANGES
 		// 10) EMIT LIST OF MODEL IDs
 		
-		//System.out.println("APPLYING STRATEGIES");
+		System.out.println("APPLYING STRATEGIES");
 		
 		String l_id = input.getString(0);
 		String source = input.getString(2);
 //		System.out.println(" ~~~ STRATEGY BOLT PARSED l_id AS: " + l_id);
 		Map<String, String> varAmountMap = restoreVariableListFromJson(input.getString(1));
-//		System.out.println(" ~~~ STRATEGY BOLT PARSED VARIABLE MAP AS: " + varAmountMap);
+		System.out.println(" ~~~ STRATEGY BOLT PARSED VARIABLE MAP AS: " + varAmountMap);
 		
 //		System.out.println(" ~~~ input tuple: " + input);
 //		System.out.println(" ~~~ line items: " + lineItemList.size());
@@ -189,7 +189,7 @@ public class StrategyBolt extends BaseRichBolt {
 		// 2) FETCH MEMBER VARIABLES FROM memberVariables COLLECTION
 		DBObject mbrVariables = memberVariablesCollection.findOne(new BasicDBObject("l_id",l_id));
 		if(mbrVariables == null) {
-			//System.out.println(" ~~~ STRATEGY BOLD COULD NOT FIND MEMBER VARIABLES");
+			System.out.println(" ~~~ STRATEGY BOLD COULD NOT FIND MEMBER VARIABLES");
 			return;
 		}
 		
@@ -321,7 +321,7 @@ public class StrategyBolt extends BaseRichBolt {
             	listToEmit.add(l_id);
             	listToEmit.add(createStringFromModelList(modelIdList));
             	listToEmit.add(source);
-            	//System.out.println(" ~~~ strategy bolt emitting: " + listToEmit);
+            	System.out.println(" ~~~ strategy bolt emitting: " + listToEmit);
             	this.outputCollector.emit(listToEmit);
             }
         }
