@@ -62,9 +62,6 @@ public class ParsingBoltAAM_ATC extends BaseRichBolt {
         this.memberCollection = memberCollection;
     }
 
-//    public void setDivLnItmCollection(DBCollection divLnItmCollection) {
-//        this.divLnItmCollection = divLnItmCollection;
-//    }
 
     /*
          * (non-Javadoc)
@@ -131,7 +128,7 @@ public class ParsingBoltAAM_ATC extends BaseRichBolt {
 	@Override
 	public void execute(Tuple input) {
 
-		// 1) SPLIT STRING
+		// 1) SPLIT INPUT STRING
 		// 2) IF THE CURRENT RECORD HAS THE SAME UUID AS PREVIOUS RECORD(S) THEN ADD PID TO LIST AND RETURN
 		// 3) IF THE CURRENT RECORD HAS A DIFFERENT UUID THEN PROCESS THE CURRENT PIDs LIST AND EMIT VARIABLES
 		// 4) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN SET CURRENT UUID FROM RECORD, SET CURRENT l_id TO NULL AND RETURN

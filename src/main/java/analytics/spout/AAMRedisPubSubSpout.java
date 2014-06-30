@@ -10,7 +10,11 @@ import static backtype.storm.utils.Utils.tuple;
 
 public class AAMRedisPubSubSpout extends RedisPubSubSpout {
 
-    static Logger LOG = Logger.getLogger(AAMRedisPubSubSpout.class);
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	static Logger LOG = Logger.getLogger(AAMRedisPubSubSpout.class);
 
 
 

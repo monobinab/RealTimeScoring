@@ -47,14 +47,12 @@ public class ParsingBoltAAM_InternalSearch  extends BaseRichBolt{
     MongoClient mongoClient;
     DBCollection memberCollection;
     DBCollection memberUUIDCollection;
-//    DBCollection divLnItmCollection;
     DBCollection pidDivLnCollection;
     DBCollection divLnVariableCollection;
 
     private Map<String,Collection<String>> divLnVariablesMap;
     private Map<String,Collection<String>> l_idToKeyWordMap; // USED TO MAP BETWEEN l_id AND THE DIVISION AND LINE ASSOCIATED WITH THAT ID UNTIL A NEW UUID IS FOUND
     private String currentUUID;
-    private String new_l_id;
     private String current_l_id;
 
 
@@ -109,7 +107,7 @@ public class ParsingBoltAAM_InternalSearch  extends BaseRichBolt{
         
         this.currentUUID=null;
         this.current_l_id=null;
-        this.new_l_id=null;
+
         l_idToKeyWordMap = new HashMap<String,Collection<String>>();
         
         pidDivLnCollection = db.getCollection("pidDivLn");
@@ -144,13 +142,11 @@ public class ParsingBoltAAM_InternalSearch  extends BaseRichBolt{
 	@Override
 	public void execute(Tuple input) {
 
-		// 1) SPLIT STRIN
-		// 2) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN RETURN
-		// 3) POPULATE TRAITS COLLECTION UNTIL A DIFFERENT UUID IS FOUND
-		// 4) 
-		// 5) 
-		// 6) 
-		// 7) 
+		// 1) SPLIT INPUT STRING
+		// 2) IF THE CURRENT RECORD HAS THE SAME UUID AS PREVIOUS RECORD(S) THEN ADD KEY WORDS TO LIST AND RETURN
+		// 3) IF THE CURRENT RECORD HAS A DIFFERENT UUID THEN PROCESS THE CURRENT KEY WORDS LIST AND EMIT VARIABLES
+		// 4) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN SET CURRENT UUID FROM RECORD, SET CURRENT l_id TO NULL AND RETURN
+		// 5) POPULATE PID COLLECTION WITH THE FIRST KEY WORDS
 		
 		
 		
@@ -175,6 +171,7 @@ public class ParsingBoltAAM_InternalSearch  extends BaseRichBolt{
         }
         
         
+		// 2) IF THE CURRENT RECORD HAS THE SAME UUID AS PREVIOUS RECORD(S) THEN ADD KEY WORDS TO LIST AND RETURN
         if(this.currentUUID !=null && this.currentUUID.equalsIgnoreCase(searchSplitRec[1])) {
         	if(this.current_l_id == null) {
         		System.out.println(" @@@ NULL l_id -- return");
@@ -194,6 +191,7 @@ public class ParsingBoltAAM_InternalSearch  extends BaseRichBolt{
         	return;
         }
         
+		// 3) IF THE CURRENT RECORD HAS A DIFFERENT UUID THEN PROCESS THE CURRENT KEY WORDS LIST AND EMIT VARIABLES
         if(l_idToKeyWordMap != null && !l_idToKeyWordMap.isEmpty()) {
         	Map<String,String> variableValueMap = processKeyWordList();
         	if(variableValueMap==null || variableValueMap.isEmpty()) {
@@ -213,7 +211,7 @@ public class ParsingBoltAAM_InternalSearch  extends BaseRichBolt{
         	this.outputCollector.emit(listToEmit);
         }
         
-		// 2) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN RETURN
+		// 4) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN SET CURRENT UUID FROM RECORD, SET CURRENT l_id TO NULL AND RETURN
         DBObject uuid = memberUUIDCollection.findOne(new BasicDBObject("u",searchSplitRec[1]));
         if(uuid == null) {
             System.out.println(" @@@ COULD NOT FIND UUID");
@@ -242,6 +240,8 @@ public class ParsingBoltAAM_InternalSearch  extends BaseRichBolt{
         System.out.println(" @@@ FOUND l_id: " + l_id + " interaction time: " + interactionDateTime + " key words: " + searchSplitRec[2]);
         this.current_l_id = l_id;
         
+        
+		// 5) POPULATE KEY WORDS COLLECTION WITH THE FIRST PID
         Collection<String> firstKeyWords = new ArrayList<String>();
         String[] firstSplitKeyWords = splitKeyWords(searchSplitRec[2]);
         if(firstSplitKeyWords != null && firstSplitKeyWords.length>0) {
