@@ -209,6 +209,12 @@
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
+		<dependency>
+		  <!-- jsoup HTML parser library @ http://jsoup.org/ -->
+		  <groupId>org.jsoup</groupId>
+		  <artifactId>jsoup</artifactId>
+		  <version>1.7.3</version>
+		</dependency>
     </dependencies>
 
 	<build>
@@ -233,9 +239,10 @@
 					<archive>
 						<manifest>
 							<!--<mainClass></mainClass>-->
-                            <mainClass>analytics.AAMTopology</mainClass>
+                            <!--mainClass>analytics.AAMTopology</mainClass-->
                             <!--mainClass>analytics.RealTimeScoringTopology</mainClass-->
-
+                            <!--mainClass>analytics.AAM_ATCTopology</mainClass-->
+                            <mainClass>analytics.AAM_InternalSearchTopology</mainClass>
 						</manifest>
 					</archive>
 				</configuration>

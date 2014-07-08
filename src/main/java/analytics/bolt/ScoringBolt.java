@@ -12,6 +12,7 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import com.mongodb.*;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import redis.clients.jedis.Jedis;
@@ -96,18 +97,21 @@ public class ScoringBolt extends BaseRichBolt {
 	 * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
 	 */
         
-        //System.out.println("PREPARING SCORING BOLT");
+        System.out.println("PREPARING SCORING BOLT");
 
         try {
-            mongoClient = new MongoClient("shrdmdb301p.stag.ch3.s.com", 20000);
+//        	mongoClient = new MongoClient("shrdmdb301p.stag.ch3.s.com", 20000);
+        	mongoClient = new MongoClient("trprrta2mong4.vm.itg.corp.us.shldcorp.com", 27000);
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
 
-        db = mongoClient.getDB("RealTimeScoring");
-        //db.authenticate(configuration.getString("mongo.db.user"), configuration.getString("mongo.db.password").toCharArray());
-	    db.authenticate("rtsw", "5core123".toCharArray());
-        memberVariablesCollection = db.getCollection("memberVariables");
+//      db = mongoClient.getDB("RealTimeScoring");
+//      db.authenticate(configuration.getString("mongo.db.user"), configuration.getString("mongo.db.password").toCharArray());
+//	    db.authenticate("rtsw", "5core123".toCharArray());
+        db = mongoClient.getDB("test");
+
+	    memberVariablesCollection = db.getCollection("memberVariables");
         modelCollection = db.getCollection("modelVariables");
         memberScoreCollection = db.getCollection("memberScore");
         variablesCollection = db.getCollection("Variables");
@@ -178,8 +182,8 @@ public class ScoringBolt extends BaseRichBolt {
 		List<String> modelIdList = restoreModelListFromJson(input.getString(1));
 		//List<TransactionLineItem> lineItemList = new ArrayList<TransactionLineItem>();
 
-		System.out.println("RE-SCORING MODELS");
-		System.out.println(" ### model ID list: " + modelIdList);
+//		System.out.println("RE-SCORING MODELS");
+//		System.out.println(" ### model ID list: " + modelIdList);
 		
 		// 1) PULL OUT HASHED LOYALTY ID FROM THE FIRST RECORD IN lineItemList
 		
@@ -238,7 +242,7 @@ public class ScoringBolt extends BaseRichBolt {
     		return;
     	}
     		
-		System.out.println(" ### ALL CHANGES MAP: " + allChanges);
+//		System.out.println(" ### ALL CHANGES MAP: " + allChanges);
 	
         // Score each model in a loop
 		BasicDBObject updateRec = new BasicDBObject();
@@ -306,7 +310,7 @@ public class ScoringBolt extends BaseRichBolt {
         	listToEmit.add(newScore);
         	listToEmit.add(modelId);
         	listToEmit.add(source);
-        	System.out.println(" ### scoring bolt emitting: " + listToEmit);
+        	System.out.println(" ### SCORING BOLT EMITTING: " + listToEmit);
         	this.outputCollector.emit(listToEmit);
 
             

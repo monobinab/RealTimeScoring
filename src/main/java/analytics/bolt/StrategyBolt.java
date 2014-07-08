@@ -96,17 +96,20 @@ public class StrategyBolt extends BaseRichBolt {
 	 * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
 	 */
 
-        //System.out.println("PREPARING STRATEGY BOLT");
+        System.out.println("PREPARING STRATEGY BOLT");
         
         try {
-            mongoClient = new MongoClient("shrdmdb301p.stag.ch3.s.com", 20000);
+//        	mongoClient = new MongoClient("shrdmdb301p.stag.ch3.s.com", 20000);
+        	mongoClient = new MongoClient("trprrta2mong4.vm.itg.corp.us.shldcorp.com", 27000);
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
 
-        db = mongoClient.getDB("RealTimeScoring");
-        //db.authenticate(configuration.getString("mongo.db.user"), configuration.getString("mongo.db.password").toCharArray());
-	    db.authenticate("rtsw", "5core123".toCharArray());
+//        db = mongoClient.getDB("RealTimeScoring");
+//        db.authenticate(configuration.getString("mongo.db.user"), configuration.getString("mongo.db.password").toCharArray());
+//	    db.authenticate("rtsw", "5core123".toCharArray());
+        db = mongoClient.getDB("test");
+
         modelCollection = db.getCollection("modelVariables");
         memberVariablesCollection = db.getCollection("memberVariables");
         variablesCollection = db.getCollection("Variables");
@@ -173,14 +176,14 @@ public class StrategyBolt extends BaseRichBolt {
 		// 9) FIND ALL MODELS THAT ARE AFFECTED BY CHANGES
 		// 10) EMIT LIST OF MODEL IDs
 		
-		System.out.println("APPLYING STRATEGIES");
+//		System.out.println("APPLYING STRATEGIES");
 		
 		String l_id = input.getString(0);
 		String source = input.getString(2);
 //		System.out.println(" ~~~ STRATEGY BOLT PARSED l_id AS: " + l_id);
 		Map<String, String> varAmountMap = restoreVariableListFromJson(input.getString(1));
-		System.out.println(" ~~~ STRATEGY BOLT PARSED VARIABLE MAP AS: " + varAmountMap);
-		
+
+//		System.out.println(" ~~~ STRATEGY BOLT PARSED VARIABLE MAP AS: " + varAmountMap);
 //		System.out.println(" ~~~ input tuple: " + input);
 //		System.out.println(" ~~~ line items: " + lineItemList.size());
 		
@@ -189,7 +192,7 @@ public class StrategyBolt extends BaseRichBolt {
 		// 2) FETCH MEMBER VARIABLES FROM memberVariables COLLECTION
 		DBObject mbrVariables = memberVariablesCollection.findOne(new BasicDBObject("l_id",l_id));
 		if(mbrVariables == null) {
-			System.out.println(" ~~~ STRATEGY BOLD COULD NOT FIND MEMBER VARIABLES");
+//			System.out.println(" ~~~ STRATEGY BOLD COULD NOT FIND MEMBER VARIABLES");
 			return;
 		}
 		
@@ -321,7 +324,7 @@ public class StrategyBolt extends BaseRichBolt {
             	listToEmit.add(l_id);
             	listToEmit.add(createStringFromModelList(modelIdList));
             	listToEmit.add(source);
-            	System.out.println(" ~~~ strategy bolt emitting: " + listToEmit);
+            	System.out.println(" ~~~ STRATEGY BOLT EMITTING: " + listToEmit);
             	this.outputCollector.emit(listToEmit);
             }
         }

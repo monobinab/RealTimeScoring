@@ -36,7 +36,7 @@ public class AAMTopology {
 //            "AAM_CDF_AbanBrow",
             "AAM_CDF_Traits"};
 
-    String[] servers = new String[]{"rtsapp301p.qa.ch3.s.com","rtsapp303p.qa.ch3.s.com"};
+    String[] servers = new String[]{"rtsapp301p.qa.ch3.s.com","rtsapp302p.qa.ch3.s.com","rtsapp303p.qa.ch3.s.com"};
 
 
     for(String topic:topics){

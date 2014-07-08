@@ -1,5 +1,6 @@
 package analytics.bolt;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
@@ -18,9 +19,18 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -51,7 +61,9 @@ public class ParsingBoltAAM_InternalSearch  extends BaseRichBolt{
     DBCollection divLnVariableCollection;
 
     private Map<String,Collection<String>> divLnVariablesMap;
-    private Map<String,Collection<String>> l_idToKeyWordMap; // USED TO MAP BETWEEN l_id AND THE DIVISION AND LINE ASSOCIATED WITH THAT ID UNTIL A NEW UUID IS FOUND
+    //private Map<String,Collection<String>> l_idToKeyWordMap; // USED TO MAP BETWEEN l_id AND THE DIVISION AND LINE ASSOCIATED WITH THAT ID UNTIL A NEW UUID IS FOUND
+    private Map<String,Collection<String>> l_idToPidMap; //after a single search is mapped, the PIDs are put into this collection
+    
     private String currentUUID;
     private String current_l_id;
 
@@ -108,7 +120,8 @@ public class ParsingBoltAAM_InternalSearch  extends BaseRichBolt{
         this.currentUUID=null;
         this.current_l_id=null;
 
-        l_idToKeyWordMap = new HashMap<String,Collection<String>>();
+        //l_idToKeyWordMap = new HashMap<String,Collection<String>>();
+        l_idToPidMap = new HashMap<String,Collection<String>>();
         
         pidDivLnCollection = db.getCollection("pidDivLn");
         divLnVariableCollection = db.getCollection("divLnVariable");
@@ -178,33 +191,26 @@ public class ParsingBoltAAM_InternalSearch  extends BaseRichBolt{
         		return;
         	}
         	
-        	Collection<String> keyWords = l_idToKeyWordMap.get(current_l_id);
-			if (keyWords != null) {
-				String[] keyWordsSplit = splitKeyWords(searchSplitRec[2]);
-				if(keyWordsSplit != null && keyWordsSplit.length>0) {
-					for(int i=0; i<keyWordsSplit.length; i++) {
-						keyWords.add(keyWordsSplit[i]);
-					}
-				}
-			}
-            System.out.println(" @@@ ADDING WEB TRAIT: " + searchSplitRec[2]);
+			String[] searchKeyWords = splitKeyWords(searchSplitRec[2]);
+            System.out.println(" @@@ PROCESSING KEY WORDS: " + searchSplitRec[2]);
+            processKeyWordList(searchKeyWords);
         	return;
         }
         
 		// 3) IF THE CURRENT RECORD HAS A DIFFERENT UUID THEN PROCESS THE CURRENT KEY WORDS LIST AND EMIT VARIABLES
-        if(l_idToKeyWordMap != null && !l_idToKeyWordMap.isEmpty()) {
-        	Map<String,String> variableValueMap = processKeyWordList();
+        if(l_idToPidMap != null && !l_idToPidMap.isEmpty()) {
+        	Map<String,String> variableValueMap = processPidList();
         	if(variableValueMap==null || variableValueMap.isEmpty()) {
         		System.out.println(" @@@ NO VARIBALES FOUND - NOTHING TO EMIT");
-        		l_idToKeyWordMap.remove(current_l_id);
+        		l_idToPidMap.remove(current_l_id);
         		return;
         	}
         	Object variableValueJSON = createJsonFromVariableValueMap(variableValueMap);
         	List<Object> listToEmit = new ArrayList<Object>();
         	listToEmit.add(current_l_id);
         	listToEmit.add(variableValueJSON);
-        	listToEmit.add("AAM_ATC");
-        	l_idToKeyWordMap.remove(current_l_id);
+        	listToEmit.add("AAM_InternalSearch");
+        	l_idToPidMap.remove(current_l_id);
             this.currentUUID=null;
             this.current_l_id=null;
         	System.out.println(" @@@ PARSING BOLT EMITTING: " + listToEmit);
@@ -241,21 +247,17 @@ public class ParsingBoltAAM_InternalSearch  extends BaseRichBolt{
         this.current_l_id = l_id;
         
         
-		// 5) POPULATE KEY WORDS COLLECTION WITH THE FIRST PID
-        Collection<String> firstKeyWords = new ArrayList<String>();
-        String[] firstSplitKeyWords = splitKeyWords(searchSplitRec[2]);
-        if(firstSplitKeyWords != null && firstSplitKeyWords.length>0) {
-        	for(int i=0; i<firstSplitKeyWords.length; i++) {
-                firstKeyWords.add(firstSplitKeyWords[i]);
-        	}
+		// 5) POPULATE l_id TO PID MAP, PROCESS KEY WORDS AND ADD FIRST PIDs TO COLLECTION
+        l_idToPidMap.put(this.current_l_id, new ArrayList<String>());
+        String[] firstKeyWords = splitKeyWords(searchSplitRec[2]);
+        if(firstKeyWords != null && firstKeyWords.length>0) {
+        	processKeyWordList(firstKeyWords);
         }
         else {
         	return;
         }
         
         //System.out.println(" @@@ PUT IN FIRST RECORD: " + this.current_l_id + " trait: " + firstTrait);
-        
-        l_idToKeyWordMap.put(this.current_l_id,firstKeyWords);
         
         return;
         
@@ -284,11 +286,97 @@ public class ParsingBoltAAM_InternalSearch  extends BaseRichBolt{
 		}
 	}
 
-    private Map<String,String> processKeyWordList() {
+    private boolean processKeyWordList(String[] search) {
+    	
+    	String queryResultsDoc = new String();
+    	
+    	//CONSTRUCT URL - queries Solr
+		String URL1 = "http://solrx416p.prod.ch4.s.com:8180/search/select?qt=search&wt=json&q=";
+		String URL2 = "&start=0&rows=50&fq=catalogs:%28%2212605%22%29&sort=instock%20desc,score%20desc,revenue%20desc&sortPrefix=L6;S4;10153&globalPrefix=L6,S4,10153&spuAvailability=S4&lmpAvailability=L6&fvCutoff=22&fqx=!%28storeAttributes:%28%2210153_DEFAULT_FULFILLMENT=SPU%22%29%20AND%20storeOrigin:%28%22Sears%22%29%29&site=prod";
+		String query = new String();
+		
+		query = URL1;
+		int countKeyWords=0;
+		for(String keyWord:search) {
+			if(!keyWord.equalsIgnoreCase("N/A")) {
+				countKeyWords++;
+				if(countKeyWords==1) {
+					query = query + keyWord;
+				}
+				else {
+					query = query + "%20" + keyWord;
+				}
+			}
+		}
+		query = query + URL2;
+		
+		if(countKeyWords>0) {
+		
+			try {
+				Document doc = Jsoup.connect(query).get();
+				doc.body().wrap("<pre></pre>");
+				String text = doc.text();
+				// Converting nbsp entities
+				text = text.replaceAll("\u00A0", " ");
+				
+				queryResultsDoc = text;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			if(queryResultsDoc==null) {
+				System.out.println("query results null");
+			}
+			
+			else {
+				if(isJSONValid(queryResultsDoc)) {
+					if(new JsonParser().parse(queryResultsDoc).isJsonObject()) {
+						JsonObject queryResultsToJson = new JsonParser().parse(queryResultsDoc).getAsJsonObject();
+						if(queryResultsToJson.get("response").isJsonObject()) {
+							JsonObject response = queryResultsToJson.get("response").getAsJsonObject();
+							if(response.get("docs").isJsonArray()) {
+								JsonArray docs = response.getAsJsonArray("docs").getAsJsonArray();
+								for(JsonElement doc:docs){
+									if(doc.isJsonObject() && doc.getAsJsonObject().get("partnumber") != null) {
+										if(!l_idToPidMap.get(current_l_id).contains(doc.getAsJsonObject().get("partnumber").toString().replace("\"", ""))) {
+											l_idToPidMap.get(current_l_id).add(doc.getAsJsonObject().get("partnumber").toString().replace("\"", ""));
+										}
+									}
+								}
+								return true;
+							}
+						}
+					}
+				}
+			}
+		}
+		return false;
+    }
+
+    private boolean isJSONValid(String test) {
+    	 
+        try {
+            new JSONObject(test);
+            return true;
+        } catch (JSONException ex) {
+            try {
+                new JSONArray(test);
+                return true;
+            } catch (JSONException ex1) {
+                System.out.println(test);
+                return false;
+            }
+        }
+    }
+        	
+    private Map<String, String> processPidList() {
+    	
     	Map<String,String> variableValueMap = new HashMap<String,String>();
     	
-    	for(String keyWord: l_idToKeyWordMap.get(current_l_id)) {
-    		DBObject divLnDBO = pidDivLnCollection.findOne(new BasicDBObject().append("pid", keyWord));
+    	for(String pid: l_idToPidMap.get(current_l_id)) {
+    		System.out.println(pid);
+    		DBObject divLnDBO = pidDivLnCollection.findOne(new BasicDBObject().append("pid", pid));
     		if(divLnDBO != null) {
 	    		String div = divLnDBO.get("d").toString();
 	    		String divLn = divLnDBO.get("l").toString();
@@ -329,7 +417,7 @@ public class ParsingBoltAAM_InternalSearch  extends BaseRichBolt{
 	private Object createJsonFromVariableValueMap(Map<String, String> variableValueMap) {
 		// Create string in JSON format to emit
     	Gson gson = new Gson();
-    	Type varValueType = new TypeToken<Map<String, String>>() {}.getType();
+    	Type varValueType = new TypeToken<Map<String, String>>() {private static final long serialVersionUID = 1L;}.getType();
     	String varValueString = gson.toJson(variableValueMap, varValueType);
     	
 		return varValueString;

@@ -80,15 +80,17 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 	 * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
 	 */
 
-        //System.out.println("PREPARING PARSING BOLT FOR WEB TRAITS");
+        System.out.println("PREPARING PARSING BOLT FOR WEB TRAITS");
         try {
-            mongoClient = new MongoClient("shrdmdb301p.stag.ch3.s.com", 20000);
+//            mongoClient = new MongoClient("shrdmdb301p.stag.ch3.s.com", 20000);
+            mongoClient = new MongoClient("trprrta2mong4.vm.itg.corp.us.shldcorp.com", 27000);
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
 
-        db = mongoClient.getDB("RealTimeScoring");
-	    db.authenticate("rtsw", "5core123".toCharArray());
+//		db = mongoClient.getDB("RealTimeScoring");
+//	    db.authenticate("rtsw", "5core123".toCharArray());
+        db = mongoClient.getDB("test");
         memberCollection = db.getCollection("memberVariables");
         memberUUIDCollection = db.getCollection("memberUUID");
         traitVariablesCollection = db.getCollection("traitVariables");
@@ -259,7 +261,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
     			}
     		}
     	}
-    	
+    	//if(variableValueMap == null || variableValueMap.isEmpty()) System.out.println(" *** NO TRAITS FOUND TO RESCORE");
     	return variableValueMap;
     }
     
