@@ -107,13 +107,15 @@ public class ParsingBoltAAM_InternalSearch  extends BaseRichBolt{
 
         //System.out.println("PREPARING PARSING BOLT FOR WEB TRAITS");
         try {
-            mongoClient = new MongoClient("shrdmdb301p.stag.ch3.s.com", 20000);
+//            mongoClient = new MongoClient("shrdmdb301p.stag.ch3.s.com", 20000);
+        	mongoClient = new MongoClient("trprrta2mong4.vm.itg.corp.us.shldcorp.com", 27000);
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
 
-        db = mongoClient.getDB("RealTimeScoring");
-	    db.authenticate("rtsw", "5core123".toCharArray());
+        //db = mongoClient.getDB("RealTimeScoring");
+	    //db.authenticate("rtsw", "5core123".toCharArray());
+        db = mongoClient.getDB("test");
         memberCollection = db.getCollection("memberVariables");
         memberUUIDCollection = db.getCollection("memberUUID");
         
@@ -163,7 +165,7 @@ public class ParsingBoltAAM_InternalSearch  extends BaseRichBolt{
 		
 		
 		
-		System.out.println("PARSING DOCUMENT -- ATC RECORD " + input.getString(0));
+		System.out.println("PARSING DOCUMENT -- INTERNAL SEARCH RECORD " + input.getString(0));
 		
 		// 1) SPLIT INPUT STRING
         String searchRec = input.getString(1);
@@ -187,7 +189,7 @@ public class ParsingBoltAAM_InternalSearch  extends BaseRichBolt{
 		// 2) IF THE CURRENT RECORD HAS THE SAME UUID AS PREVIOUS RECORD(S) THEN ADD KEY WORDS TO LIST AND RETURN
         if(this.currentUUID !=null && this.currentUUID.equalsIgnoreCase(searchSplitRec[1])) {
         	if(this.current_l_id == null) {
-        		System.out.println(" @@@ NULL l_id -- return");
+        		//System.out.println(" @@@ NULL l_id -- return");
         		return;
         	}
         	
@@ -220,7 +222,7 @@ public class ParsingBoltAAM_InternalSearch  extends BaseRichBolt{
 		// 4) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN SET CURRENT UUID FROM RECORD, SET CURRENT l_id TO NULL AND RETURN
         DBObject uuid = memberUUIDCollection.findOne(new BasicDBObject("u",searchSplitRec[1]));
         if(uuid == null) {
-            System.out.println(" @@@ COULD NOT FIND UUID");
+            //System.out.println(" @@@ COULD NOT FIND UUID");
             this.currentUUID=searchSplitRec[1];
         	this.current_l_id=null;
         	return;
@@ -373,6 +375,30 @@ public class ParsingBoltAAM_InternalSearch  extends BaseRichBolt{
     private Map<String, String> processPidList() {
     	
     	Map<String,String> variableValueMap = new HashMap<String,String>();
+//    	String div = new String(); //holds the substring of the first 3 characters from the PID
+//    	Collection<String> var = new ArrayList<String>(); //variable collection
+//    	
+//    	for(String pid: l_idToPidMap.get(current_l_id)) {
+//    		System.out.println(pid);
+//    		if(pid.substring(pid.length() - 1).equals("P") && isNumbers(pid.substring(0,3))) {
+//    			div = pid.substring(0,3);
+//	    		if(divLnVariablesMap.containsKey(div)) {
+//	    			var = divLnVariablesMap.get(div);
+//	    			for(String v:var) {
+//		    			if(variableValueMap.containsKey(var)) {
+//		    				int value = 1 + Integer.valueOf(variableValueMap.get(v));
+//		    				variableValueMap.remove(v);
+//		    				variableValueMap.put(v, String.valueOf(value));
+//		    			}
+//		    			else {
+//		    				variableValueMap.put(v, "1");
+//		    			}
+//	    			}
+//	    		}
+//    		}
+//    	}
+    	
+    	
     	
     	for(String pid: l_idToPidMap.get(current_l_id)) {
     		System.out.println(pid);
@@ -414,6 +440,23 @@ public class ParsingBoltAAM_InternalSearch  extends BaseRichBolt{
     }
     
     
+	private boolean isNumbers(String s) {
+		for(int i=0;i<s.length();i++) {
+			if(!s.substring(i, i+1).equals("0")
+					&& !s.substring(i, i+1).equals("1")
+					&& !s.substring(i, i+1).equals("2")
+					&& !s.substring(i, i+1).equals("3")
+					&& !s.substring(i, i+1).equals("4")
+					&& !s.substring(i, i+1).equals("5")
+					&& !s.substring(i, i+1).equals("6")
+					&& !s.substring(i, i+1).equals("7")
+					&& !s.substring(i, i+1).equals("8")
+					&& !s.substring(i, i+1).equals("9")
+			) return false;
+		}
+		return true;
+	}
+
 	private Object createJsonFromVariableValueMap(Map<String, String> variableValueMap) {
 		// Create string in JSON format to emit
     	Gson gson = new Gson();
