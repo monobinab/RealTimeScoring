@@ -83,14 +83,16 @@ public class ParsingBoltPOS extends BaseRichBolt {
 
         //System.out.println("PREPARING PARSING POS BOLT");
         try {
-            mongoClient = new MongoClient("shrdmdb301p.stag.ch3.s.com", 20000);
+//            mongoClient = new MongoClient("shrdmdb301p.stag.ch3.s.com", 20000);
+            mongoClient = new MongoClient("trprrta2mong4.vm.itg.corp.us.shldcorp.com", 27000);
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
 
-        db = mongoClient.getDB("RealTimeScoring");
-        //db.authenticate(configuration.getString("mongo.db.user"), configuration.getString("mongo.db.password").toCharArray());
-	    db.authenticate("rtsw", "5core123".toCharArray());
+//        db = mongoClient.getDB("RealTimeScoring");
+//        db.authenticate(configuration.getString("mongo.db.user"), configuration.getString("mongo.db.password").toCharArray());
+//	    db.authenticate("rtsw", "5core123".toCharArray());
+        db = mongoClient.getDB("test");
         memberCollection = db.getCollection("memberVariables");
         divLnItmCollection = db.getCollection("divLnItm");
         divLnVariableCollection = db.getCollection("divLnVariable");
@@ -241,7 +243,7 @@ public class ParsingBoltPOS extends BaseRichBolt {
 	        lineItemAsJsonString.add(createJsonFromLineItemList(lineItemList));
 	        lineItemAsJsonString.add("NPOS");
 
-	        //System.out.println(" *** parsing bolt emitting: " + lineItemAsJsonString.toString());
+	        System.out.println(" *** parsing bolt emitting: " + lineItemAsJsonString.toString());
 	        
 			// 8) EMIT LINE ITEMS
 	        if(lineItemAsJsonString!=null && !lineItemAsJsonString.isEmpty()) {

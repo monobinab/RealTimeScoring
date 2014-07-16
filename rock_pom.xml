@@ -240,9 +240,9 @@
 						<manifest>
 							<!--<mainClass></mainClass>-->
                             <!--mainClass>analytics.AAMTopology</mainClass-->
-                            <!--mainClass>analytics.RealTimeScoringTopology</mainClass-->
+                            <mainClass>analytics.RealTimeScoringTopology</mainClass>
                             <!--mainClass>analytics.AAM_ATCTopology</mainClass-->
-                            <mainClass>analytics.AAM_InternalSearchTopology</mainClass>
+                            <!--mainClass>analytics.AAM_InternalSearchTopology</mainClass-->
 						</manifest>
 					</archive>
 				</configuration>

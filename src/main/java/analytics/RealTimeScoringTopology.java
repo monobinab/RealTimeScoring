@@ -47,7 +47,7 @@ public class RealTimeScoringTopology {
         topologyBuilder.setBolt("parsing_bolt", new ParsingBoltPOS()).shuffleGrouping("npos1").shuffleGrouping("npos2");
         topologyBuilder.setBolt("strategy_bolt", new StrategyBolt()).shuffleGrouping("parsing_bolt");
         topologyBuilder.setBolt("scoring_bolt", new ScoringBolt()).shuffleGrouping("strategy_bolt");
-        topologyBuilder.setBolt("ScorePublishBolt", new ScorePublishBolt("rtsapp401p.prod.ch4.s.com", 6379,"score")).shuffleGrouping("scoring_bolt");
+//        topologyBuilder.setBolt("ScorePublishBolt", new ScorePublishBolt("rtsapp401p.prod.ch4.s.com", 6379,"score")).shuffleGrouping("scoring_bolt");
         //topologyBuilder.setBolt("map_bolt", new RedisBolt("rtsapp302p.qa.ch3.s.com", 6379,"sale_info")).shuffleGrouping("npos1").shuffleGrouping("npos2");
 
         Config conf = new Config();
