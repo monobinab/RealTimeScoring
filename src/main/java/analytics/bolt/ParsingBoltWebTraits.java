@@ -9,6 +9,7 @@ import backtype.storm.tuple.Tuple;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.mongodb.*;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 
@@ -34,10 +35,13 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
     DB db;
     MongoClient mongoClient;
     DBCollection memberCollection;
+    DBCollection memberTraitsCollection;
     DBCollection memberUUIDCollection;
     DBCollection traitVariablesCollection;
 
-    private Map<String,String> traitVariablesMap;
+    private Map<String,Collection<String>> traitVariablesMap;
+    private Map<String,Collection<String>> variableTraitsMap;
+    private Map<String,Map<String,String>> memberTraitsMap; // MAP BETWEEN l_id AND SET OF TRAITS
     private Map<String,Collection<String>> l_idToTraitCollectionMap; // USED TO MAP BETWEEN l_id AND THE TRAITS ASSOCIATED WITH THAT ID UNTIL A NEW UUID IS FOUND
     private String currentUUID;
     private String current_l_id;
@@ -92,29 +96,79 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 //	    db.authenticate("rtsw", "5core123".toCharArray());
         db = mongoClient.getDB("test");
         memberCollection = db.getCollection("memberVariables");
+        memberTraitsCollection = db.getCollection("memberTraits");
         memberUUIDCollection = db.getCollection("memberUUID");
         traitVariablesCollection = db.getCollection("traitVariables");
         
         this.currentUUID=null;
         this.current_l_id=null;
-         l_idToTraitCollectionMap = new HashMap<String,Collection<String>>();
+        l_idToTraitCollectionMap = new HashMap<String,Collection<String>>();
         
-        traitVariablesMap = new HashMap<String, String>();
+        
+        // POPULATE THE TRAIT TO VARIABLES MAP AND THE VARIABLE TO TRAITS MAP
+        
+        traitVariablesMap = new HashMap<String, Collection<String>>();
+        variableTraitsMap = new HashMap<String, Collection<String>>();
 		DBCursor traitVarCursor = traitVariablesCollection.find();
-		for(DBObject traitDBObject: traitVarCursor) {
-		    if (traitDBObject.get("v") == null || traitDBObject.get("t") == null)
-			{
-		    	continue;			
+		
+		for(DBObject traitVariablesDBO: traitVarCursor) {
+			for(String trait:traitVariablesDBO.keySet()) {
+				BasicDBList variables = (BasicDBList) traitVariablesDBO.get(trait);
+				for(Object v:variables) {
+					String variable = (String) v;
+					if(traitVariablesMap.containsKey(trait)) {
+						if(!traitVariablesMap.get(trait).contains(variable)) {
+							traitVariablesMap.get(trait).add(variable);
+						}
+					}
+					else {
+						Collection<String> newTraitVariable = new ArrayList<String>();
+						traitVariablesMap.put(trait, newTraitVariable);
+						traitVariablesMap.get(trait).add(variable);
+					}
+					if(variableTraitsMap.containsKey(variable)) {
+						if(!variableTraitsMap.get(variable).contains(trait)) {
+							variableTraitsMap.get(variable).add(trait);
+						}
+					}
+					else {
+						Collection<String> newVariableTraits = new ArrayList<String>();
+						variableTraitsMap.put(variable, newVariableTraits);
+						variableTraitsMap.get(variable).add(trait);
+					}
+				}
 			}
-			else
-			{
-				traitVariablesMap.put(traitDBObject.get("t").toString().toUpperCase(),traitDBObject.get("v").toString());
-		    }
 		}
-        
 //		System.out.println("*** TRAIT TO VARIABLES MAP >>>");
 //		System.out.println(traitVariablesMap);
 		
+		memberTraitsMap = new HashMap<String,Map<String,String>>();
+		DBCursor memberTraitsCursor = memberTraitsCollection.find();
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		
+		for(DBObject memberTraits: memberTraitsCursor) {
+			if(!memberTraitsMap.containsKey(memberTraits.get("l_id").toString())) {
+				String l_id = memberTraits.get("l_id").toString();
+				Map<String,String> traitsMap = new HashMap<String,String>();
+				memberTraitsMap.put(l_id, traitsMap);
+				
+				BasicDBList traits = (BasicDBList) memberTraits.get("traits");
+				
+				for( Iterator<Object> it = traits.iterator(); it.hasNext(); ) {
+					BasicDBObject trait = (BasicDBObject) it.next();
+					try {
+						if(!simpleDateFormat.parse(trait.get("d").toString()).after(new Date())) {
+							memberTraitsMap.get(l_id).put(trait.get("t").toString(), trait.get("d").toString());
+						}
+					} catch (ParseException e) {
+						e.printStackTrace();
+					}
+				}
+				if(memberTraitsMap.get(l_id).isEmpty()) {
+					memberTraitsMap.remove(l_id);
+				}
+			}
+		}
     }
 
 
@@ -173,21 +227,21 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 		// 3) IF THE CURRENT RECORD HAS A DIFFERENT UUID THEN PROCESS THE CURRENT TRAITS LIST AND EMIT VARIABLES
         if(l_idToTraitCollectionMap != null && !l_idToTraitCollectionMap.isEmpty()) {
         	Map<String,String> variableValueMap = processTraitsList();
-        	if(variableValueMap==null || variableValueMap.isEmpty()) {
-        		//System.out.println(" *** NO VARIBALES FOUND - NOTHING TO EMIT");
-            	l_idToTraitCollectionMap.remove(current_l_id);
-        		return;
+        	if(variableValueMap!=null && !variableValueMap.isEmpty()) {
+ 	        	Object variableValueJSON = createJsonFromVariableValueMap(variableValueMap);
+	        	List<Object> listToEmit = new ArrayList<Object>();
+	        	listToEmit.add(current_l_id);
+	        	listToEmit.add(variableValueJSON);
+	        	listToEmit.add("WebTraits");
+	        	this.outputCollector.emit(listToEmit);
         	}
-        	Object variableValueJSON = createJsonFromVariableValueMap(variableValueMap);
-        	List<Object> listToEmit = new ArrayList<Object>();
-        	listToEmit.add(current_l_id);
-        	listToEmit.add(variableValueJSON);
-        	listToEmit.add("WebTraits");
+        	else {
+           		//System.out.println(" *** NO VARIBALES FOUND - NOTHING TO EMIT");
+        	}
         	l_idToTraitCollectionMap.remove(current_l_id);
             this.currentUUID=null;
             this.current_l_id=null;
         	//System.out.println(" *** PARSING BOLT EMITTING: " + listToEmit);
-        	this.outputCollector.emit(listToEmit);
         }
         
 		// 4) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN SET CURRENT UUID FROM RECORD, SET CURRENT l_id TO NULL AND RETURN
@@ -247,22 +301,51 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 
     private Map<String,String> processTraitsList() {
     	Map<String,String> variableValueMap = new HashMap<String,String>();
+    	SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
     	
+    	//FOR EACH TRAIT FOUND FROM AAM DATA FIND THE VARIABLES THAT ARE IMPACTED
     	for(String trait: l_idToTraitCollectionMap.get(current_l_id)) {
     		if(traitVariablesMap.containsKey(trait)) {
-    			String var = traitVariablesMap.get(trait);
-    			if(variableValueMap.containsKey(var)) {
-    				int value = 1 + Integer.valueOf(variableValueMap.get(var));
-    				variableValueMap.remove(var);
-    				variableValueMap.put(var, String.valueOf(value));
-    			}
-    			else {
-    				variableValueMap.put(var, "1");
+    			Collection<String> varCollection = traitVariablesMap.get(trait);
+    			for(String variable:varCollection) {
+	    			if(variableValueMap.containsKey(variable)) {
+	    				int value = 1 + Integer.valueOf(variableValueMap.get(variable));
+	    				variableValueMap.remove(variable);
+	    				variableValueMap.put(variable, String.valueOf(value));
+	    			}
+	    			else {
+	    				variableValueMap.put(variable, "1");
+	    			}
+	    			if(memberTraitsMap.containsKey(trait)) {
+	    				memberTraitsMap.get(current_l_id).remove(trait);
+	    			}
+	    			memberTraitsMap.get(current_l_id).put(trait,simpleDateFormat.format(new Date()));
     			}
     		}
     	}
-    	//if(variableValueMap == null || variableValueMap.isEmpty()) System.out.println(" *** NO TRAITS FOUND TO RESCORE");
-    	return variableValueMap;
+    	
+    	//FOR EACH VARIABLE FOUND FIND ALL TRAITS IN MEMBER TO TRAITS MAP ASSOCIATED WITH THOSE VARIABLES, COUNT TRAITS AND RETURN
+    	if(variableValueMap != null && !variableValueMap.isEmpty()) {
+    		int uniqueTraitCount = 0;
+    		Map<String,String> variableUniqueCountMap = new HashMap<String,String>();
+    		for(String variable:variableValueMap.keySet()) {
+    			for(String trait: variableTraitsMap.get(variable)) {
+    				if(memberTraitsMap.containsKey(trait)) {
+    					uniqueTraitCount++;
+    				}
+    			}
+    			if(uniqueTraitCount>0) {
+    				variableUniqueCountMap.put(variable, String.valueOf(uniqueTraitCount));
+    			}
+    		}
+    		if(variableUniqueCountMap!=null && !variableUniqueCountMap.isEmpty()) {
+    			return variableUniqueCountMap;
+    		}
+    	}
+    	else {
+    		System.out.println(" *** NO TRAITS FOUND TO RESCORE");
+    	}
+    	return null;
     }
     
     

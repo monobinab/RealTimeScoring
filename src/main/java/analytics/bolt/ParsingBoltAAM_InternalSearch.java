@@ -202,21 +202,22 @@ public class ParsingBoltAAM_InternalSearch  extends BaseRichBolt{
 		// 3) IF THE CURRENT RECORD HAS A DIFFERENT UUID THEN PROCESS THE CURRENT KEY WORDS LIST AND EMIT VARIABLES
         if(l_idToPidMap != null && !l_idToPidMap.isEmpty()) {
         	Map<String,String> variableValueMap = processPidList();
-        	if(variableValueMap==null || variableValueMap.isEmpty()) {
-        		System.out.println(" @@@ NO VARIBALES FOUND - NOTHING TO EMIT");
-        		l_idToPidMap.remove(current_l_id);
-        		return;
+        	if(variableValueMap!=null && !variableValueMap.isEmpty()) {
+	        	Object variableValueJSON = createJsonFromVariableValueMap(variableValueMap);
+	        	List<Object> listToEmit = new ArrayList<Object>();
+	        	listToEmit.add(current_l_id);
+	        	listToEmit.add(variableValueJSON);
+	        	listToEmit.add("AAM_InternalSearch");
+	        	System.out.println(" @@@ PARSING BOLT EMITTING: " + listToEmit);
+	        	this.outputCollector.emit(listToEmit);
+
         	}
-        	Object variableValueJSON = createJsonFromVariableValueMap(variableValueMap);
-        	List<Object> listToEmit = new ArrayList<Object>();
-        	listToEmit.add(current_l_id);
-        	listToEmit.add(variableValueJSON);
-        	listToEmit.add("AAM_InternalSearch");
+        	else {
+        		System.out.println(" @@@ NO VARIBALES FOUND - NOTHING TO EMIT");
+        	}
         	l_idToPidMap.remove(current_l_id);
             this.currentUUID=null;
             this.current_l_id=null;
-        	System.out.println(" @@@ PARSING BOLT EMITTING: " + listToEmit);
-        	this.outputCollector.emit(listToEmit);
         }
         
 		// 4) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN SET CURRENT UUID FROM RECORD, SET CURRENT l_id TO NULL AND RETURN
