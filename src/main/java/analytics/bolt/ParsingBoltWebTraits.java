@@ -142,6 +142,8 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 //		System.out.println("*** TRAIT TO VARIABLES MAP >>>");
 //		System.out.println(traitVariablesMap);
 		
+		//POPULATE THE MEMBER TO TRAITS MAP.... MAP
+		
 		memberTraitsMap = new HashMap<String,Map<String,String>>();
 		DBCursor memberTraitsCursor = memberTraitsCollection.find();
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -330,8 +332,17 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
     		Map<String,String> variableUniqueCountMap = new HashMap<String,String>();
     		for(String variable:variableValueMap.keySet()) {
     			for(String trait: variableTraitsMap.get(variable)) {
-    				if(memberTraitsMap.containsKey(trait)) {
-    					uniqueTraitCount++;
+    				if(memberTraitsMap.get(current_l_id).containsKey(trait)) {
+    					boolean checkDate = false;
+    					try {
+    						checkDate = simpleDateFormat.parse(memberTraitsMap.get(current_l_id).get(trait)).after(new Date());
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+    					if(checkDate) {
+    						uniqueTraitCount++;
+    					}
     				}
     			}
     			if(uniqueTraitCount>0) {
