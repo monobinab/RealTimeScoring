@@ -36,7 +36,7 @@ public class ScoringBolt extends BaseRichBolt {
 
     DB db;
     MongoClient mongoClient;
-    DBCollection modelCollection;
+    DBCollection modelVariablesCollection;
     DBCollection memberVariablesCollection;
     DBCollection memberScoreCollection;
     DBCollection variablesCollection;
@@ -65,7 +65,7 @@ public class ScoringBolt extends BaseRichBolt {
     }
 
     public void setModelCollection(DBCollection modelCollection) {
-        this.modelCollection = modelCollection;
+        this.modelVariablesCollection = modelCollection;
     }
 
     public void setMemberCollection(DBCollection memberCollection) {
@@ -112,7 +112,7 @@ public class ScoringBolt extends BaseRichBolt {
         db = mongoClient.getDB("test");
 
 	    memberVariablesCollection = db.getCollection("memberVariables");
-        modelCollection = db.getCollection("modelVariables");
+        modelVariablesCollection = db.getCollection("modelVariables");
         memberScoreCollection = db.getCollection("memberScore");
         variablesCollection = db.getCollection("Variables");
         changedVariablesCollection = db.getCollection("changedMemberVariables");
@@ -120,7 +120,7 @@ public class ScoringBolt extends BaseRichBolt {
 
         // populate the variableModelsMap
         variableModelsMap = new HashMap<String, Collection<Integer>>();
-        DBCursor models = modelCollection.find();
+        DBCursor models = modelVariablesCollection.find();
         for(DBObject model:models){
              BasicDBList modelVariables = (BasicDBList) model.get("variable");
              for(Object modelVariable:modelVariables)
@@ -381,7 +381,7 @@ public class ScoringBolt extends BaseRichBolt {
     {
 	    
         BasicDBObject queryModel = new BasicDBObject("modelId", modelId);
-	    DBCursor modelCollectionCursor = modelCollection.find( queryModel );
+	    DBCursor modelCollectionCursor = modelVariablesCollection.find( queryModel );
 
         DBObject model = null;
 	    while( modelCollectionCursor.hasNext() ) {

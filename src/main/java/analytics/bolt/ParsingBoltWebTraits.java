@@ -112,30 +112,28 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 		DBCursor traitVarCursor = traitVariablesCollection.find();
 		
 		for(DBObject traitVariablesDBO: traitVarCursor) {
-			for(String trait:traitVariablesDBO.keySet()) {
-				BasicDBList variables = (BasicDBList) traitVariablesDBO.get(trait);
-				for(Object v:variables) {
-					String variable = (String) v;
-					if(traitVariablesMap.containsKey(trait)) {
-						if(!traitVariablesMap.get(trait).contains(variable)) {
-							traitVariablesMap.get(trait).add(variable);
-						}
+			BasicDBList variables = (BasicDBList) traitVariablesDBO.get("v");
+			for(Object v:variables) {
+				String variable = (String) v;
+				if(traitVariablesMap.containsKey(traitVariablesDBO.get("t"))) {
+					if(!traitVariablesMap.get(traitVariablesDBO.get("t")).contains(variable)) {
+						traitVariablesMap.get(traitVariablesDBO.get("t")).add(variable);
 					}
-					else {
-						Collection<String> newTraitVariable = new ArrayList<String>();
-						traitVariablesMap.put(trait, newTraitVariable);
-						traitVariablesMap.get(trait).add(variable);
+				}
+				else {
+					Collection<String> newTraitVariable = new ArrayList<String>();
+					traitVariablesMap.put(traitVariablesDBO.get("t").toString(), newTraitVariable);
+					traitVariablesMap.get(traitVariablesDBO.get("t")).add(variable);
+				}
+				if(variableTraitsMap.containsKey(variable)) {
+					if(!variableTraitsMap.get(variable).contains(traitVariablesDBO.get("t"))) {
+						variableTraitsMap.get(variable).add(traitVariablesDBO.get("t").toString());
 					}
-					if(variableTraitsMap.containsKey(variable)) {
-						if(!variableTraitsMap.get(variable).contains(trait)) {
-							variableTraitsMap.get(variable).add(trait);
-						}
-					}
-					else {
-						Collection<String> newVariableTraits = new ArrayList<String>();
-						variableTraitsMap.put(variable, newVariableTraits);
-						variableTraitsMap.get(variable).add(trait);
-					}
+				}
+				else {
+					Collection<String> newVariableTraits = new ArrayList<String>();
+					variableTraitsMap.put(variable, newVariableTraits);
+					variableTraitsMap.get(variable).add(traitVariablesDBO.get("t").toString());
 				}
 			}
 		}
@@ -236,6 +234,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 	        	listToEmit.add(variableValueJSON);
 	        	listToEmit.add("WebTraits");
 	        	this.outputCollector.emit(listToEmit);
+	        	System.out.println(" *** PARSING BOLT EMITTING: " + listToEmit);
         	}
         	else {
            		//System.out.println(" *** NO VARIBALES FOUND - NOTHING TO EMIT");
@@ -243,7 +242,6 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
         	l_idToTraitCollectionMap.remove(current_l_id);
             this.currentUUID=null;
             this.current_l_id=null;
-        	//System.out.println(" *** PARSING BOLT EMITTING: " + listToEmit);
         }
         
 		// 4) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN SET CURRENT UUID FROM RECORD, SET CURRENT l_id TO NULL AND RETURN
@@ -270,7 +268,6 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
         try {
 			interactionDateTime = dateTimeFormat.parse(webTraitsSplitRec[0]);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
         
@@ -306,7 +303,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
     	SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
     	
     	//FOR EACH TRAIT FOUND FROM AAM DATA FIND THE VARIABLES THAT ARE IMPACTED
-    	for(String trait: l_idToTraitCollectionMap.get(current_l_id)) {
+    	for(String trait: l_idToTraitCollectionMap.get(this.current_l_id)) {
     		if(traitVariablesMap.containsKey(trait)) {
     			Collection<String> varCollection = traitVariablesMap.get(trait);
     			for(String variable:varCollection) {
@@ -317,27 +314,36 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 	    			}
 	    			else {
 	    				variableValueMap.put(variable, "1");
+	    				System.out.println(" *** FOUND VARIABLE: " + variable);
 	    			}
 	    			if(memberTraitsMap.containsKey(trait)) {
-	    				memberTraitsMap.get(current_l_id).remove(trait);
+	    				memberTraitsMap.get(this.current_l_id).remove(trait);
 	    			}
-	    			memberTraitsMap.get(current_l_id).put(trait,simpleDateFormat.format(new Date()));
+	    			
+	    			if(memberTraitsMap.containsKey(this.current_l_id)) {
+	    				memberTraitsMap.get(this.current_l_id).put(trait,simpleDateFormat.format(new Date()));
+	    			}
+	    			else {
+	    				memberTraitsMap.put(this.current_l_id, new HashMap<String, String>());
+	    				memberTraitsMap.get(this.current_l_id).put(trait,simpleDateFormat.format(new Date()));
+	    			}
     			}
     		}
     	}
     	
     	//FOR EACH VARIABLE FOUND FIND ALL TRAITS IN MEMBER TO TRAITS MAP ASSOCIATED WITH THOSE VARIABLES, COUNT TRAITS AND RETURN
     	if(variableValueMap != null && !variableValueMap.isEmpty()) {
+	    	System.out.println(" *** VARIABLE-VALUE MAP: " + variableValueMap);
     		int uniqueTraitCount = 0;
     		Map<String,String> variableUniqueCountMap = new HashMap<String,String>();
     		for(String variable:variableValueMap.keySet()) {
     			for(String trait: variableTraitsMap.get(variable)) {
-    				if(memberTraitsMap.get(current_l_id).containsKey(trait)) {
+    				if(memberTraitsMap.get(this.current_l_id).containsKey(trait)) {
     					boolean checkDate = false;
     					try {
-    						checkDate = simpleDateFormat.parse(memberTraitsMap.get(current_l_id).get(trait)).after(new Date());
+    						//TODO change to current date after testing is completed
+    						checkDate = simpleDateFormat.parse(memberTraitsMap.get(this.current_l_id).get(trait)).after(simpleDateFormat.parse("2014-07-14")    /*new Date()*/);
 						} catch (ParseException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
     					if(checkDate) {
@@ -350,6 +356,9 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
     			}
     		}
     		if(variableUniqueCountMap!=null && !variableUniqueCountMap.isEmpty()) {
+        		for(String t: variableUniqueCountMap.keySet()) {
+        			System.out.println(" *** UNIQUE TRAITS COUNT FOR VARIABLE [" + t + "]: " + variableUniqueCountMap.get(t));
+        		}
     			return variableUniqueCountMap;
     		}
     	}
@@ -390,13 +399,11 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 			try {
 				mac.init(signingKey);
 			} catch (InvalidKeyException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			byte[] rawHmac = mac.doFinal(l_id.getBytes());
 			hashed = new String(Base64.encodeBase64(rawHmac));
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return hashed;
