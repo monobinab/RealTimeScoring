@@ -41,7 +41,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 
     private Map<String,Collection<String>> traitVariablesMap;
     private Map<String,Collection<String>> variableTraitsMap;
-    private Map<String,Map<String,String>> memberTraitsMap; // MAP BETWEEN l_id AND SET OF TRAITS
+    private Map<String,Map<String,String>> memberTraitsMap; // MAP BETWEEN l_id AND SET OF TRAITS - HISTORICAL AND CURRENT TRAITS
     private Map<String,Collection<String>> l_idToTraitCollectionMap; // USED TO MAP BETWEEN l_id AND THE TRAITS ASSOCIATED WITH THAT ID UNTIL A NEW UUID IS FOUND
     private String currentUUID;
     private String current_l_id;
@@ -140,37 +140,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 //		System.out.println("*** TRAIT TO VARIABLES MAP >>>");
 //		System.out.println(traitVariablesMap);
 		
-		//POPULATE THE MEMBER TO TRAITS MAP.... MAP
-		
-		memberTraitsMap = new HashMap<String,Map<String,String>>();
-		DBCursor memberTraitsCursor = memberTraitsCollection.find();
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		
-		for(DBObject memberTraits: memberTraitsCursor) {
-			if(!memberTraitsMap.containsKey(memberTraits.get("l_id").toString())) {
-				String l_id = memberTraits.get("l_id").toString();
-				Map<String,String> traitsMap = new HashMap<String,String>();
-				memberTraitsMap.put(l_id, traitsMap);
-				
-				BasicDBList traits = (BasicDBList) memberTraits.get("traits");
-				
-				for( Iterator<Object> it = traits.iterator(); it.hasNext(); ) {
-					BasicDBObject trait = (BasicDBObject) it.next();
-					try {
-						if(!simpleDateFormat.parse(trait.get("d").toString()).after(new Date())) {
-							memberTraitsMap.get(l_id).put(trait.get("t").toString(), trait.get("d").toString());
-						}
-					} catch (ParseException e) {
-						e.printStackTrace();
-					}
-				}
-				if(memberTraitsMap.get(l_id).isEmpty()) {
-					memberTraitsMap.remove(l_id);
-				}
-			}
-		}
     }
-
 
     /*
      * (non-Javadoc)
@@ -194,12 +164,12 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
         String webTraitInteractionRec = input.getString(1);
         String webTraitsSplitRec[] = splitRec(webTraitInteractionRec);
         
-        String splitRec = new String();
-        for(int i=0;i<webTraitsSplitRec.length;i++) {
-        	if(i==0) splitRec = webTraitsSplitRec[i];
-        	else splitRec = splitRec + "  " + webTraitsSplitRec[i];
-        }
-        //System.out.println("  split string: " + splitRec);
+//        String splitRec = new String();
+//        for(int i=0;i<webTraitsSplitRec.length;i++) {
+//        	if(i==0) splitRec = webTraitsSplitRec[i];
+//        	else splitRec = splitRec + "  " + webTraitsSplitRec[i];
+//        }
+//        System.out.println("  split string: " + splitRec);
 		
         
         //2014-03-08 10:56:17,00000388763646853831116694914086674166,743651,US,Sears
@@ -236,9 +206,9 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 	        	this.outputCollector.emit(listToEmit);
 	        	System.out.println(" *** PARSING BOLT EMITTING: " + listToEmit);
         	}
-        	else {
-           		//System.out.println(" *** NO VARIBALES FOUND - NOTHING TO EMIT");
-        	}
+//        	else {
+//           		System.out.println(" *** NO VARIBALES FOUND - NOTHING TO EMIT");
+//        	}
         	l_idToTraitCollectionMap.remove(current_l_id);
             this.currentUUID=null;
             this.current_l_id=null;
@@ -264,7 +234,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
         }
         
         SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
-        Date interactionDateTime = null;
+        Date interactionDateTime = new Date();
         try {
 			interactionDateTime = dateTimeFormat.parse(webTraitsSplitRec[0]);
 		} catch (ParseException e) {
@@ -301,10 +271,15 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
     private Map<String,String> processTraitsList() {
     	Map<String,String> variableValueMap = new HashMap<String,String>();
     	SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    	boolean firstTrait = true; //flag to indicate if the AMM trait found is the first for that member - if true then populate the memberTraitsMap
     	
     	//FOR EACH TRAIT FOUND FROM AAM DATA FIND THE VARIABLES THAT ARE IMPACTED
     	for(String trait: l_idToTraitCollectionMap.get(this.current_l_id)) {
     		if(traitVariablesMap.containsKey(trait)) {
+    			if(firstTrait) {
+    				prepareMemberTraitsMap();
+    				firstTrait = false;
+    			}
     			Collection<String> varCollection = traitVariablesMap.get(trait);
     			for(String variable:varCollection) {
 	    			if(variableValueMap.containsKey(variable)) {
@@ -314,16 +289,17 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 	    			}
 	    			else {
 	    				variableValueMap.put(variable, "1");
-	    				System.out.println(" *** FOUND VARIABLE: " + variable);
-	    			}
-	    			if(memberTraitsMap.containsKey(trait)) {
-	    				memberTraitsMap.get(this.current_l_id).remove(trait);
+	    				//System.out.println(" *** FOUND VARIABLE: " + variable);
 	    			}
 	    			
 	    			if(memberTraitsMap.containsKey(this.current_l_id)) {
+		    			if(memberTraitsMap.get(this.current_l_id).containsKey(trait)) {
+		    				memberTraitsMap.get(this.current_l_id).remove(trait);
+		    			}
 	    				memberTraitsMap.get(this.current_l_id).put(trait,simpleDateFormat.format(new Date()));
 	    			}
 	    			else {
+	    				// IF MEMBER NOT FOUND IN QUERY, ADD MEMBER TO TRAIT MAP - NO HISTORY
 	    				memberTraitsMap.put(this.current_l_id, new HashMap<String, String>());
 	    				memberTraitsMap.get(this.current_l_id).put(trait,simpleDateFormat.format(new Date()));
 	    			}
@@ -342,7 +318,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
     					boolean checkDate = false;
     					try {
     						//TODO change to current date after testing is completed
-    						checkDate = simpleDateFormat.parse(memberTraitsMap.get(this.current_l_id).get(trait)).after(simpleDateFormat.parse("2014-07-14")    /*new Date()*/);
+    						checkDate = simpleDateFormat.parse(memberTraitsMap.get(this.current_l_id).get(trait)).after(simpleDateFormat.parse("2014-07-14") /*format(new Date().getTime() + (-7 * 1000 * 60 * 60 * 24)*/);
 						} catch (ParseException e) {
 							e.printStackTrace();
 						}
@@ -367,6 +343,32 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
     	}
     	return null;
     }
+    
+    
+    private void prepareMemberTraitsMap() {
+		memberTraitsMap = new HashMap<String,Map<String,String>>();
+		BasicDBObject queryMemberTraitsCollection = new BasicDBObject().append("l_id", this.current_l_id);
+		DBObject memberTraitsDBO = memberTraitsCollection.findOne(queryMemberTraitsCollection);
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		
+		if(memberTraitsDBO != null && memberTraitsDBO.keySet().contains(this.current_l_id)) {
+			Map<String,String> traitsMap = new HashMap<String,String>();
+			memberTraitsMap.put(this.current_l_id, traitsMap);
+			
+			BasicDBList traits = (BasicDBList) memberTraitsDBO.get("traits");
+			
+			for( Iterator<Object> it = traits.iterator(); it.hasNext(); ) {
+				BasicDBObject trait = (BasicDBObject) it.next();
+				try {
+					if(!simpleDateFormat.parse(trait.get("d").toString()).after(new Date())) {
+						memberTraitsMap.get(this.current_l_id).put(trait.get("t").toString(), trait.get("d").toString());
+					}
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
     
     
 	private Object createJsonFromVariableValueMap(Map<String, String> variableValueMap) {
