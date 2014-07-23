@@ -7,7 +7,7 @@ import org.joda.time.LocalDate;
 import analytics.util.Change;
 import analytics.util.RealTimeScoringContext;
 
-public class strategyDaysSinceLast implements Strategy {
+public class StrategyDaysSinceLast implements Strategy {
 
 	private int daysToExpiration = 2;
 	private Object value = 1;
