@@ -248,7 +248,7 @@ public class StrategyBolt extends BaseRichBolt {
         	//System.out.println(" ~~~ FOUND VARIABLE - name: " + variableName + " amount: "  + Double.valueOf(varAmountMap.get(variableName)));
             
 	        RealTimeScoringContext context = new RealTimeScoringContext();
-            context.setAmount(Double.valueOf(varAmountMap.get(variableName)));
+            context.setValue(Double.valueOf(varAmountMap.get(variableName)));
 	        context.setPreviousValue(0);
 
     		// 7) FOR EACH CHANGE EXECUTE STRATEGY

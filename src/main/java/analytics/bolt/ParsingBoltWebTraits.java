@@ -196,9 +196,9 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
         
 		// 3) IF THE CURRENT RECORD HAS A DIFFERENT UUID THEN PROCESS THE CURRENT TRAITS LIST AND EMIT VARIABLES
         if(l_idToTraitCollectionMap != null && !l_idToTraitCollectionMap.isEmpty()) {
-        	Map<String,String> variableValueMap = processTraitsList();
-        	if(variableValueMap!=null && !variableValueMap.isEmpty()) {
- 	        	Object variableValueJSON = createJsonFromVariableValueMap(variableValueMap);
+        	List<String> foundVariables = processTraitsList();
+        	if(foundVariables != null && !foundVariables.isEmpty()) {
+ 	        	Object variableValueJSON = createJsonFromMemberTraitsMap(foundVariables);
 	        	List<Object> listToEmit = new ArrayList<Object>();
 	        	listToEmit.add(current_l_id);
 	        	listToEmit.add(variableValueJSON);
@@ -268,8 +268,9 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 		}
 	}
 
-    private Map<String,String> processTraitsList() {
-    	Map<String,String> variableValueMap = new HashMap<String,String>();
+    private List<String> processTraitsList() {
+		memberTraitsMap = new HashMap<String,Map<String,Collection<String>>>();
+		List<String> variableList = new ArrayList<String>();
     	SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
     	boolean firstTrait = true; //flag to indicate if the AMM trait found is the first for that member - if true then populate the memberTraitsMap
     	
@@ -277,71 +278,56 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
     	for(String trait: l_idToTraitCollectionMap.get(this.current_l_id)) {
     		if(traitVariablesMap.containsKey(trait)) {
     			if(firstTrait) {
-    				prepareMemberTraitsMap();
+    				BasicDBObject queryMemberTraitsCollection = new BasicDBObject().append("l_id", this.current_l_id);
+    				DBObject memberTraitsDBO = memberTraitsCollection.findOne(queryMemberTraitsCollection);
+    				
+    				if(memberTraitsDBO != null && memberTraitsDBO.keySet().contains(this.current_l_id)) {
+    					Map<String,String> traitsMap = new HashMap<String,String>();
+    					memberTraitsMap.put(this.current_l_id, traitsMap);
+    					
+    					BasicDBList traits = (BasicDBList) memberTraitsDBO.get("traits");
+    					
+    					for( Iterator<Object> it = traits.iterator(); it.hasNext(); ) {
+    						BasicDBObject traitDBO = (BasicDBObject) it.next();
+    						try {
+    							if(!simpleDateFormat.parse(traitDBO.get("d").toString()).after(new Date(new Date().getTime() + (-7 * 1000 * 60 * 60 * 24)))) {
+    								memberTraitsMap.get(this.current_l_id).put(traitDBO.get("t").toString(), traitDBO.get("d").toString());
+    							}
+    						} catch (ParseException e) {
+    							e.printStackTrace();
+    						}
+    					}
+    				}
+    				else {
+    					// IF MEMBER NOT FOUND IN QUERY, ADD MEMBER TO TRAIT MAP - NO HISTORY
+    					memberTraitsMap.put(this.current_l_id, new HashMap<String, String>());
+    				}
     				firstTrait = false;
     			}
     			Collection<String> varCollection = traitVariablesMap.get(trait);
     			for(String variable:varCollection) {
-	    			if(variableValueMap.containsKey(variable)) {
-	    				int value = 1 + Integer.valueOf(variableValueMap.get(variable));
-	    				variableValueMap.remove(variable);
-	    				variableValueMap.put(variable, String.valueOf(value));
-	    			}
-	    			else {
-	    				variableValueMap.put(variable, "1");
-	    				//System.out.println(" *** FOUND VARIABLE: " + variable);
-	    			}
-	    			
 	    			if(memberTraitsMap.containsKey(this.current_l_id)) {
 		    			if(memberTraitsMap.get(this.current_l_id).containsKey(trait)) {
-		    				memberTraitsMap.get(this.current_l_id).remove(trait);
+		    				if(!memberTraitsMap.get(this.current_l_id).get(trait).equals(simpleDateFormat.format(new Date()))) {
+		    					memberTraitsMap.get(this.current_l_id).put(trait,simpleDateFormat.format(new Date()));
+		    				}
 		    			}
-	    				memberTraitsMap.get(this.current_l_id).put(trait,simpleDateFormat.format(new Date()));
+		    			else {
+		    				memberTraitsMap.get(this.current_l_id).put(trait,simpleDateFormat.format(new Date()));
+		    			}
 	    			}
-	    			else {
-	    				// IF MEMBER NOT FOUND IN QUERY, ADD MEMBER TO TRAIT MAP - NO HISTORY
-	    				memberTraitsMap.put(this.current_l_id, new HashMap<String, String>());
-	    				memberTraitsMap.get(this.current_l_id).put(trait,simpleDateFormat.format(new Date()));
+	    			if(!variableList.contains(variable)) {
+	    				variableList.add(variable);
 	    			}
     			}
     		}
     	}
-    	
-    	//FOR EACH VARIABLE FOUND FIND ALL TRAITS IN MEMBER TO TRAITS MAP ASSOCIATED WITH THOSE VARIABLES, COUNT TRAITS AND RETURN
-    	if(variableValueMap != null && !variableValueMap.isEmpty()) {
-	    	System.out.println(" *** VARIABLE-VALUE MAP: " + variableValueMap);
-    		int uniqueTraitCount = 0;
-    		Map<String,String> variableUniqueCountMap = new HashMap<String,String>();
-    		for(String variable:variableValueMap.keySet()) {
-    			for(String trait: variableTraitsMap.get(variable)) {
-    				if(memberTraitsMap.get(this.current_l_id).containsKey(trait)) {
-    					boolean checkDate = false;
-    					try {
-    						//TODO change to current date after testing is completed
-    						checkDate = simpleDateFormat.parse(memberTraitsMap.get(this.current_l_id).get(trait)).after(simpleDateFormat.parse("2014-07-14") /*format(new Date().getTime() + (-7 * 1000 * 60 * 60 * 24)*/);
-						} catch (ParseException e) {
-							e.printStackTrace();
-						}
-    					if(checkDate) {
-    						uniqueTraitCount++;
-    					}
-    				}
-    			}
-    			if(uniqueTraitCount>0) {
-    				variableUniqueCountMap.put(variable, String.valueOf(uniqueTraitCount));
-    			}
-    		}
-    		if(variableUniqueCountMap!=null && !variableUniqueCountMap.isEmpty()) {
-        		for(String t: variableUniqueCountMap.keySet()) {
-        			System.out.println(" *** UNIQUE TRAITS COUNT FOR VARIABLE [" + t + "]: " + variableUniqueCountMap.get(t));
-        		}
-    			return variableUniqueCountMap;
-    		}
+    	if(memberTraitsMap.containsKey(current_l_id) && !memberTraitsMap.get(current_l_id).isEmpty() && !variableList.isEmpty()) {
+    		return variableList;
     	}
     	else {
-    		System.out.println(" *** NO TRAITS FOUND TO RESCORE");
+    		return null;
     	}
-    	return null;
     }
     
     
@@ -360,7 +346,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 			for( Iterator<Object> it = traits.iterator(); it.hasNext(); ) {
 				BasicDBObject trait = (BasicDBObject) it.next();
 				try {
-					if(!simpleDateFormat.parse(trait.get("d").toString()).after(new Date())) {
+					if(!simpleDateFormat.parse(trait.get("d").toString()).after(new Date(new Date().getTime() + (-7 * 1000 * 60 * 60 * 24)))) {
 						memberTraitsMap.get(this.current_l_id).put(trait.get("t").toString(), trait.get("d").toString());
 					}
 				} catch (ParseException e) {
@@ -368,15 +354,28 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 				}
 			}
 		}
+		else {
+			// IF MEMBER NOT FOUND IN QUERY, ADD MEMBER TO TRAIT MAP - NO HISTORY
+			memberTraitsMap.put(this.current_l_id, new HashMap<String, String>());
+		}
 	}
     
     
-	private Object createJsonFromVariableValueMap(Map<String, String> variableValueMap) {
+	private Object createJsonFromMemberTraitsMap(List<String> variableList) {
 		// Create string in JSON format to emit
     	Gson gson = new Gson();
-    	Type varValueType = new TypeToken<Map<String, String>>() {}.getType();
-    	String varValueString = gson.toJson(variableValueMap, varValueType);
-    	
+    	Type varValueType = new TypeToken<Map<String, String>>() {
+			private static final long serialVersionUID = 1L;
+		}.getType();
+		
+		String traitDateString = gson.toJson(memberTraitsMap.get(current_l_id), varValueType);
+		Map<String, String> varValueMap = new HashMap<String, String>();
+		
+		for(String s:variableList) {
+			varValueMap.put(s, traitDateString);
+		}
+				
+    	String varValueString = gson.toJson(varValueMap, varValueType);
 		return varValueString;
 	}
 

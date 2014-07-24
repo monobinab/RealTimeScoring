@@ -8,19 +8,19 @@ import java.util.Map;
 public class RealTimeScoringContext {
 
     private Object previousValue;
+    private Object value; // Map should contain variable as key and amount as value
 
     /* need no-argument constructor */
     public RealTimeScoringContext() {
     }
 
-    private Double amount; // Map should contain variable as key and amount as value
 
-    public Double getAmount() {
-        return amount;
+    public Object getValue() {
+        return value;
     }
 
-    public void setAmount(Double a) {
-        this.amount = a;
+    public void setValue(Object a) {
+        this.value = a;
     }
 
     public Object getPreviousValue() {

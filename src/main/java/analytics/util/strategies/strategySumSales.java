@@ -14,7 +14,8 @@ public class StrategySumSales implements Strategy {
 
     @Override
     public Change execute(RealTimeScoringContext context) {
-		return new Change(new Double(context.getPreviousValue().toString()) + context.getAmount(), calculateExpirationDate());
+		//return new Change(new Double(context.getPreviousValue().toString()) + context.getValue(), calculateExpirationDate());
+		return new Change((Object) (Double.valueOf(context.getPreviousValue().toString()) + Double.valueOf(context.getValue().toString())), calculateExpirationDate()   );
     }
 	
     private Date calculateExpirationDate() {
