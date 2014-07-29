@@ -14,23 +14,21 @@ public class Variable implements Serializable
 	private static final long serialVersionUID = 1L;
 	private ObjectId _id;
 	private String name;
-	private String VID;
-	private int realTimeFlag;
+	private String vid;
+	private int month;
 	private String type;
-	private String strategy;
 	private double coefficeint;
 	 
 
 	public Variable() {}
 	 
-	public Variable( String name, String VID, int realTimeFlag, String type, String strategy, double coefficeint)
+	public Variable( String nm, String id, int mnth, String typ, double coefficnt)
 	{
-		this.name   = name;
-		this.VID   = VID;
-		this.realTimeFlag = realTimeFlag;
-		this.type   = type;
-		this.strategy  = strategy;
-		this.coefficeint = coefficeint;
+		this.name   = nm;
+		this.vid   = id;
+		this.month = mnth;
+		this.type   = typ;
+		this.coefficeint = coefficnt;
 	}
 	 
 	public ObjectId getId() { return this._id; }
@@ -40,17 +38,15 @@ public class Variable implements Serializable
 	public String getName() { return this.name; }
 	public void setName( String name ) { this.name = name; }
 
-	public String getVid() { return this.VID; }
-	public void setVid( String VID ) { this.VID = VID; }
+	public String getVid() { return this.vid; }
+	public void setVid( String VID ) { this.vid = VID; }
 	
-	public int getRealTimeFlag() { return this.realTimeFlag; }
-	public void setRealTimeFlag( int realTimeFlag ) { this.realTimeFlag = realTimeFlag; }
+	public int getMonth() { return this.month; }
+	public void setMonth( int mnth ) { this.month = mnth; }
 	 
 	public String getType() { return this.type; }
 	public void setType( String type ) { this.type = type; }
 	 
-	public String getStrategy() { return this.strategy; }
-	public void setStrategy( String strategy ) { this.strategy = strategy; }
 	 
 	public double getCoefficeint() { return this.coefficeint; }
 	public void setCoefficeint( double coefficeint ) { this.coefficeint = coefficeint; }
@@ -61,9 +57,8 @@ public class Variable implements Serializable
 		 
 		document.put( "_id",    this._id );
 		document.put( "name",   this.name );
-		document.put( "realTimeFlag", this.realTimeFlag );
+		document.put( "month", this.month );
 		document.put( "type",   this.type );
-		document.put( "strategy",  this.strategy );
 		document.put( "coefficeint",  this.coefficeint );
 		 
 		return document;
@@ -75,9 +70,8 @@ public class Variable implements Serializable
 		 
 		this._id    	= ( ObjectId ) b.get( "_id" );
 		this.name   	= ( String )   b.get( "name" );
-		this.realTimeFlag = ( Integer )   b.get( "realTimeFlag" );
+		this.month = ( Integer )   b.get( "realTimeFlag" );
 		this.type   	= ( String )   b.get( "type" );
-		this.strategy  	= ( String )   b.get( "strategy" );
 		this.coefficeint= ( Double )   b.get( "coefficeint" );
 	}
 }
