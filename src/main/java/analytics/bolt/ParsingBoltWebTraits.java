@@ -38,9 +38,11 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
     DBCollection memberTraitsCollection;
     DBCollection memberUUIDCollection;
     DBCollection traitVariablesCollection;
+    DBCollection modelVariablesCollection;
 
     private Map<String,Collection<String>> traitVariablesMap;
     private Map<String,Collection<String>> variableTraitsMap;
+    private List<String> modelVariablesList;
     private Map<String,Collection<String>> l_idToTraitCollectionMap; // USED TO MAP BETWEEN l_id AND THE TRAITS ASSOCIATED WITH THAT ID UNTIL A NEW UUID IS FOUND
     private String currentUUID;
     private String current_l_id;
@@ -98,6 +100,8 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
         memberTraitsCollection = db.getCollection("memberTraits");
         memberUUIDCollection = db.getCollection("memberUUID");
         traitVariablesCollection = db.getCollection("traitVariables");
+        modelVariablesCollection = db.getCollection("modelVariables");
+        modelVariablesList = new ArrayList<String>();
         
         this.currentUUID=null;
         this.current_l_id=null;
@@ -113,7 +117,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 		for(DBObject traitVariablesDBO: traitVarCursor) {
 			BasicDBList variables = (BasicDBList) traitVariablesDBO.get("v");
 			for(Object v:variables) {
-				String variable = (String) v;
+				String variable = v.toString();
 				if(traitVariablesMap.containsKey(traitVariablesDBO.get("t"))) {
 					if(!traitVariablesMap.get(traitVariablesDBO.get("t")).contains(variable)) {
 						traitVariablesMap.get(traitVariablesDBO.get("t")).add(variable);
@@ -139,6 +143,16 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 //		System.out.println("*** TRAIT TO VARIABLES MAP >>>");
 //		System.out.println(traitVariablesMap);
 		
+		//POPULATE MODEL VARIABLES LIST
+		DBCursor modelVaribalesCursor = modelVariablesCollection.find();
+		for(DBObject modelDBO:modelVaribalesCursor) {
+			BasicDBList variablesDBList = (BasicDBList) modelDBO.get("variable");
+			for(Object var:variablesDBList) {
+				if(!modelVariablesList.contains(var.toString())) {
+					modelVariablesList.add(var.toString());
+				}
+			}
+		}
     }
 
     /*
@@ -278,7 +292,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
     	
     	//FOR EACH TRAIT FOUND FROM AAM DATA FIND THE VARIABLES THAT ARE IMPACTED
     	for(String trait: l_idToTraitCollectionMap.get(this.current_l_id)) {
-    		if(traitVariablesMap.containsKey(trait)) {
+    		if(traitVariablesMap.containsKey(trait) && hasModelVariable(traitVariablesMap.get(trait))) {
     			if(firstTrait) {
     				prepareDateTraitsMap(dateTraitsMap);
     				firstTrait = false;
@@ -288,7 +302,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 				if(newTrait) {
 					traitCount++;
 	    			for(String variable: traitVariablesMap.get(trait)) {
-		    			if(!variableList.contains(variable)) {
+		    			if(modelVariablesList.contains(variable) && !variableList.contains(variable)) {
 		    				variableList.add(variable);
 		    				variableCount++;
 		    			}
@@ -304,6 +318,16 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
     		return null;
     	}
     }
+
+	private boolean hasModelVariable(Collection<String> varCollection) {
+		boolean isModVar = false;
+		for(String v:varCollection) {
+			if(modelVariablesList.contains(v)) {
+				isModVar = true;
+			}
+		}
+		return isModVar;
+	}
 
 	private boolean addTraitToDateTraitMap(String trait, Map<String, Collection<String>> dateTraitsMap) {
 		boolean addedTrait = false;
