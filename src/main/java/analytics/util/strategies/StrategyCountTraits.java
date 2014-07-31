@@ -37,8 +37,7 @@ public class StrategyCountTraits implements Strategy {
     		try {
 				if(simpleDateFormat.parse(date).after(new Date(new Date().getTime() + (-7 * 1000 * 60 * 60 * 24)))) {
 					for(String trait: dateTraitsMap.get(date)) {
-						if(!traitSet.contains(trait)) {
-							traitSet.add(trait);
+						if(traitSet.add(trait)) {
 							traitCount++;
 						}
 					}

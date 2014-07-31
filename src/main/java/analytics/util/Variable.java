@@ -39,7 +39,7 @@ public class Variable implements Serializable
 	public void setName( String name ) { this.name = name; }
 
 	public String getVid() { return this.vid; }
-	public void setVid( String VID ) { this.vid = VID; }
+	public void setVid( String id ) { this.vid = id; }
 	
 	public int getMonth() { return this.month; }
 	public void setMonth( int mnth ) { this.month = mnth; }
@@ -70,7 +70,7 @@ public class Variable implements Serializable
 		 
 		this._id    	= ( ObjectId ) b.get( "_id" );
 		this.name   	= ( String )   b.get( "name" );
-		this.month = ( Integer )   b.get( "realTimeFlag" );
+		this.month = ( Integer )   b.get( "month" );
 		this.type   	= ( String )   b.get( "type" );
 		this.coefficeint= ( Double )   b.get( "coefficeint" );
 	}
