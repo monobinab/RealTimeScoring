@@ -176,12 +176,12 @@ public class StrategyBolt extends BaseRichBolt {
 		// 9) FIND ALL MODELS THAT ARE AFFECTED BY CHANGES
 		// 10) EMIT LIST OF MODEL IDs
 		
-//		System.out.println("APPLYING STRATEGIES");
+		System.out.println("APPLYING STRATEGIES");
 		
 		String l_id = input.getString(0);
 		String source = input.getString(2);
 //		System.out.println(" ~~~ STRATEGY BOLT PARSED l_id AS: " + l_id);
-		Map<String, String> varAmountMap = restoreVariableListFromJson(input.getString(1));
+		Map<String, String> varValueMap = restoreVariableListFromJson(input.getString(1));
 
 //		System.out.println(" ~~~ STRATEGY BOLT PARSED VARIABLE MAP AS: " + varAmountMap);
 //		System.out.println(" ~~~ input tuple: " + input);
@@ -192,7 +192,7 @@ public class StrategyBolt extends BaseRichBolt {
 		// 2) FETCH MEMBER VARIABLES FROM memberVariables COLLECTION
 		DBObject mbrVariables = memberVariablesCollection.findOne(new BasicDBObject("l_id",l_id));
 		if(mbrVariables == null) {
-//			System.out.println(" ~~~ STRATEGY BOLD COULD NOT FIND MEMBER VARIABLES");
+			System.out.println(" ~~~ STRATEGY BOLD COULD NOT FIND MEMBER VARIABLES");
 			return;
 		}
 		
@@ -232,7 +232,7 @@ public class StrategyBolt extends BaseRichBolt {
 		    }
 		}
         	
-		Set<String> varAmoutMapKeySet = varAmountMap.keySet();
+		Set<String> varAmoutMapKeySet = varValueMap.keySet();
 //		for(String v: varAmoutMapKeySet) {
 //			System.out.println(" variable: " + v + "  amount: " + varAmountMap.get(v));
 //		}
@@ -248,7 +248,7 @@ public class StrategyBolt extends BaseRichBolt {
         	//System.out.println(" ~~~ FOUND VARIABLE - name: " + variableName + " amount: "  + Double.valueOf(varAmountMap.get(variableName)));
             
 	        RealTimeScoringContext context = new RealTimeScoringContext();
-            context.setValue(Double.valueOf(varAmountMap.get(variableName)));
+            context.setValue(Double.valueOf(varValueMap.get(variableName)));
 	        context.setPreviousValue(0);
 
     		// 7) FOR EACH CHANGE EXECUTE STRATEGY

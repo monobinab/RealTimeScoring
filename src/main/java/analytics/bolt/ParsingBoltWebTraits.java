@@ -198,7 +198,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
         if(l_idToTraitCollectionMap != null && !l_idToTraitCollectionMap.isEmpty()) {
             Map<String, Collection<String>> dateTraitsMap  = new HashMap<String,Collection<String>>(); // MAP BETWEEN DATES AND SET OF TRAITS - HISTORICAL AND CURRENT TRAITS
         	List<String> foundVariables = processTraitsList(dateTraitsMap); //LIST OF VARIABLES FOUND DURING TRAITS PROCESSING
-        	if(foundVariables != null && !foundVariables.isEmpty()) {
+        	if(dateTraitsMap !=null && !dateTraitsMap.isEmpty() && foundVariables != null && !foundVariables.isEmpty()) {
  	        	Object variableValueJSON = createJsonFromMemberTraitsMap(foundVariables, dateTraitsMap);
 	        	List<Object> listToEmit = new ArrayList<Object>();
 	        	listToEmit.add(current_l_id);
@@ -207,9 +207,9 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 	        	this.outputCollector.emit(listToEmit);
 	        	System.out.println(" *** PARSING BOLT EMITTING: " + listToEmit);
         	}
-//        	else {
-//           		System.out.println(" *** NO VARIBALES FOUND - NOTHING TO EMIT");
-//        	}
+        	else {
+           		System.out.println(" *** NO VARIBALES FOUND - NOTHING TO EMIT");
+        	}
         	l_idToTraitCollectionMap.remove(current_l_id);
             this.currentUUID=null;
             this.current_l_id=null;
@@ -309,11 +309,9 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 		boolean addedTrait = false;
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		if(!dateTraitsMap.containsKey(simpleDateFormat.format(new Date()))) {
-			if(!dateTraitsMap.get(simpleDateFormat.format(new Date())).contains(trait)) {
-				dateTraitsMap.put(simpleDateFormat.format(new Date()), new ArrayList<String>());
-				dateTraitsMap.get(simpleDateFormat.format(new Date())).add(trait);
-				addedTrait=true;
-			}
+			dateTraitsMap.put(simpleDateFormat.format(new Date()), new ArrayList<String>());
+			dateTraitsMap.get(simpleDateFormat.format(new Date())).add(trait);
+			addedTrait=true;
 		}
 		else if(!dateTraitsMap.get(simpleDateFormat.format(new Date())).contains(trait)) {
 			dateTraitsMap.get(simpleDateFormat.format(new Date())).add(trait);
@@ -354,13 +352,15 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
     
     
 	private Object createJsonFromMemberTraitsMap(List<String> variableList, Map<String, Collection<String>> dateTraitsMap) {
+		System.out.println("dateTraitMap: " + dateTraitsMap);
 		// Create string in JSON format to emit
     	Gson gson = new Gson();
     	Type dateTraitValueType = new TypeToken<Map<String, Collection<String>>>() {
 			private static final long serialVersionUID = 1L;
 		}.getType();
 		
-		String dateTraitString = gson.toJson(dateTraitsMap.get(current_l_id), dateTraitValueType);
+		String dateTraitString = gson.toJson(dateTraitsMap, dateTraitValueType);
+		System.out.println("JSON string of dateTraitMap: " + dateTraitString);
 		
 		Map<String, String> varValueMap = new HashMap<String, String>();
 		for(String s:variableList) {
