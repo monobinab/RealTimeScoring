@@ -117,7 +117,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 		for(DBObject traitVariablesDBO: traitVarCursor) {
 			BasicDBList variables = (BasicDBList) traitVariablesDBO.get("v");
 			for(Object v:variables) {
-				String variable = v.toString();
+				String variable = v.toString().toUpperCase();
 				if(traitVariablesMap.containsKey(traitVariablesDBO.get("t"))) {
 					if(!traitVariablesMap.get(traitVariablesDBO.get("t")).contains(variable)) {
 						traitVariablesMap.get(traitVariablesDBO.get("t")).add(variable);
@@ -142,6 +142,8 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 		}
 //		System.out.println("*** TRAIT TO VARIABLES MAP >>>");
 //		System.out.println(traitVariablesMap);
+//		System.out.println(" *** ");
+//		System.out.println(" *** ");
 		
 		//POPULATE MODEL VARIABLES LIST
 		DBCursor modelVaribalesCursor = modelVariablesCollection.find();
@@ -149,10 +151,12 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 			BasicDBList variablesDBList = (BasicDBList) modelDBO.get("variable");
 			for(Object var:variablesDBList) {
 				if(!modelVariablesList.contains(var.toString())) {
-					modelVariablesList.add(var.toString());
+					modelVariablesList.add(((BasicDBObject) var).get("name").toString());
 				}
 			}
 		}
+//		System.out.println(" *** PARSING BOLT MODEL VARIABLE LIST: ");
+//		System.out.println(modelVariablesList);
     }
 
     /*
@@ -204,13 +208,16 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 			if (traits != null) {
 				traits.add(webTraitsSplitRec[2]);
 			}
-            //System.out.println(" *** ADDING WEB TRAIT: " + webTraitsSplitRec[2]);
+            System.out.println(" *** ADDING WEB TRAIT: " + webTraitsSplitRec[2]);
         	return;
         }
         
 		// 3) IF THE CURRENT RECORD HAS A DIFFERENT UUID THEN PROCESS THE CURRENT TRAITS LIST AND EMIT VARIABLES
         if(l_idToTraitCollectionMap != null && !l_idToTraitCollectionMap.isEmpty()) {
-            Map<String, Collection<String>> dateTraitsMap  = new HashMap<String,Collection<String>>(); // MAP BETWEEN DATES AND SET OF TRAITS - HISTORICAL AND CURRENT TRAITS
+            System.out.println("processing found traits...");
+            System.out.println(l_idToTraitCollectionMap.get(current_l_id));
+            
+        	Map<String, Collection<String>> dateTraitsMap  = new HashMap<String,Collection<String>>(); // MAP BETWEEN DATES AND SET OF TRAITS - HISTORICAL AND CURRENT TRAITS
         	List<String> foundVariables = processTraitsList(dateTraitsMap); //LIST OF VARIABLES FOUND DURING TRAITS PROCESSING
         	if(dateTraitsMap !=null && !dateTraitsMap.isEmpty() && foundVariables != null && !foundVariables.isEmpty()) {
  	        	Object variableValueJSON = createJsonFromMemberTraitsMap(foundVariables, dateTraitsMap);
@@ -233,7 +240,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
         //		If l_id is null and the next UUID is the same the current, then the next record will not be processed
         DBObject uuid = memberUUIDCollection.findOne(new BasicDBObject("u",webTraitsSplitRec[1]));
         if(uuid == null) {
-            //System.out.println(" *** COULD NOT FIND UUID");
+            System.out.println(" *** COULD NOT FIND UUID");
             this.currentUUID=webTraitsSplitRec[1];
         	this.current_l_id=null;
         	return;
@@ -256,7 +263,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 			e.printStackTrace();
 		}
         
-        //System.out.println(" *** FOUND l_id: " + l_id + " interaction time: " + interactionDateTime + " trait: " + webTraitsSplitRec[2]);
+        System.out.println(" *** FOUND l_id: " + l_id + " interaction time: " + interactionDateTime + " trait: " + webTraitsSplitRec[2]);
         this.current_l_id = l_id;
         
 
@@ -264,7 +271,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
         Collection<String> firstTrait = new ArrayList<String>();
         firstTrait.add(webTraitsSplitRec[2]);
         
-        //System.out.println(" *** PUT IN FIRST RECORD: " + this.current_l_id + " trait: " + firstTrait);
+        System.out.println(" *** PUT IN FIRST RECORD: " + this.current_l_id + " trait: " + firstTrait);
         l_idToTraitCollectionMap.put(this.current_l_id,firstTrait);
         
         return;
@@ -286,7 +293,6 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
     private List<String> processTraitsList(Map<String, Collection<String>> dateTraitsMap) {
 		List<String> variableList = new ArrayList<String>();
     	boolean firstTrait = true; //flag to indicate if the AMM trait found is the first for that member - if true then populate the memberTraitsMap
-    	boolean newTrait = false;
     	int traitCount = 0;
     	int variableCount = 0;
     	
@@ -297,13 +303,12 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
     				prepareDateTraitsMap(dateTraitsMap);
     				firstTrait = false;
     			}
-				newTrait = addTraitToDateTraitMap(trait, dateTraitsMap);
     			
-				if(newTrait) {
+				if(addTraitToDateTraitMap(trait, dateTraitsMap)) {
 					traitCount++;
 	    			for(String variable: traitVariablesMap.get(trait)) {
-		    			if(modelVariablesList.contains(variable) && !variableList.contains(variable)) {
-		    				variableList.add(variable);
+		    			if(modelVariablesList.contains(variable.toUpperCase()) && !variableList.contains(variable.toUpperCase())) {
+		    				variableList.add(variable.toUpperCase());
 		    				variableCount++;
 		    			}
 	    			}
@@ -335,10 +340,12 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 		if(!dateTraitsMap.containsKey(simpleDateFormat.format(new Date()))) {
 			dateTraitsMap.put(simpleDateFormat.format(new Date()), new ArrayList<String>());
 			dateTraitsMap.get(simpleDateFormat.format(new Date())).add(trait);
+			System.out.println(" added trait: " + trait);
 			addedTrait=true;
 		}
 		else if(!dateTraitsMap.get(simpleDateFormat.format(new Date())).contains(trait)) {
 			dateTraitsMap.get(simpleDateFormat.format(new Date())).add(trait);
+			System.out.println(" added trait: " + trait);
 			addedTrait=true;
 		}
 		return addedTrait;

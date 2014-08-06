@@ -64,19 +64,19 @@ public class AAMTopology {
     Config conf = new Config();
 
 
-
-    if (args != null && args.length > 0) {
-      conf.setNumWorkers(3);
-
-      StormSubmitter.submitTopology(args[0], conf, builder.createTopology());
-    }
-    else {
+//TODO: UNCOMMENT THIS IF STATEMENT!!!
+//    if (args != null && args.length > 0) {
+//      conf.setNumWorkers(3);
+//
+//      StormSubmitter.submitTopology(args[0], conf, builder.createTopology());
+//    }
+//    else {
         conf.setDebug(false);
       conf.setMaxTaskParallelism(3);
       LocalCluster cluster = new LocalCluster();
       cluster.submitTopology("aam", conf, builder.createTopology());
       Thread.sleep(10000000);
       cluster.shutdown();
-    }
+//    }
   }
 }
