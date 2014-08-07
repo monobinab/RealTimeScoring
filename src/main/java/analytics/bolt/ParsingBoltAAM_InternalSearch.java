@@ -165,7 +165,7 @@ public class ParsingBoltAAM_InternalSearch  extends BaseRichBolt{
 		
 		
 		
-		System.out.println("PARSING DOCUMENT -- INTERNAL SEARCH RECORD " + input.getString(0));
+//		System.out.println("PARSING DOCUMENT -- INTERNAL SEARCH RECORD " + input.getString(0));
 		
 		// 1) SPLIT INPUT STRING
         String searchRec = input.getString(1);
@@ -223,7 +223,7 @@ public class ParsingBoltAAM_InternalSearch  extends BaseRichBolt{
 		// 4) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN SET CURRENT UUID FROM RECORD, SET CURRENT l_id TO NULL AND RETURN
         DBObject uuid = memberUUIDCollection.findOne(new BasicDBObject("u",searchSplitRec[1]));
         if(uuid == null) {
-            //System.out.println(" @@@ COULD NOT FIND UUID");
+            System.out.println(" @@@ COULD NOT FIND UUID");
             this.currentUUID=searchSplitRec[1];
         	this.current_l_id=null;
         	return;
@@ -242,7 +242,6 @@ public class ParsingBoltAAM_InternalSearch  extends BaseRichBolt{
         try {
 			interactionDateTime = dateTimeFormat.parse(searchSplitRec[0]);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
         
@@ -294,8 +293,8 @@ public class ParsingBoltAAM_InternalSearch  extends BaseRichBolt{
     	String queryResultsDoc = new String();
     	
     	//CONSTRUCT URL - queries Solr
-		String URL1 = "http://solrx416p.prod.ch4.s.com:8180/search/select?qt=search&wt=json&q=";
-		String URL2 = "&start=0&rows=50&fq=catalogs:%28%2212605%22%29&sort=instock%20desc,score%20desc,revenue%20desc&sortPrefix=L6;S4;10153&globalPrefix=L6,S4,10153&spuAvailability=S4&lmpAvailability=L6&fvCutoff=22&fqx=!%28storeAttributes:%28%2210153_DEFAULT_FULFILLMENT=SPU%22%29%20AND%20storeOrigin:%28%22Sears%22%29%29&site=prod";
+		String URL1 = "http://solrx308p.stress.ch3.s.com:8180/search/select?qt=search&wt=json&q=";
+		String URL2 = "&start=0&rows=50&fq=catalogs:%28%2212605%22%29&sort=instock%20desc,score%20desc,revenue%20desc&sortPrefix=L6;S4;10153&globalPrefix=L6,S4,10153&spuAvailability=S4&lmpAvailability=L6&fvCutoff=22&fqx=!%28storeAttributes:%28%2210153_DEFAULT_FULFILLMENT=SPU%22%29%20AND%20storeOrigin:%28%22Kmart%22%29%29&site=prod";
 		String query = new String();
 		
 		query = URL1;
@@ -324,7 +323,6 @@ public class ParsingBoltAAM_InternalSearch  extends BaseRichBolt{
 				
 				queryResultsDoc = text;
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
@@ -488,13 +486,11 @@ public class ParsingBoltAAM_InternalSearch  extends BaseRichBolt{
 			try {
 				mac.init(signingKey);
 			} catch (InvalidKeyException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			byte[] rawHmac = mac.doFinal(l_id.getBytes());
 			hashed = new String(Base64.encodeBase64(rawHmac));
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return hashed;

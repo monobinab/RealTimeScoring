@@ -176,7 +176,7 @@ public class StrategyBolt extends BaseRichBolt {
 		// 9) FIND ALL MODELS THAT ARE AFFECTED BY CHANGES
 		// 10) EMIT LIST OF MODEL IDs
 		
-		System.out.println("APPLYING STRATEGIES");
+//		System.out.println("APPLYING STRATEGIES");
 		
 		String l_id = input.getString(0);
 		String source = input.getString(2);
@@ -226,7 +226,6 @@ public class StrategyBolt extends BaseRichBolt {
 						allChanges.put(key.toUpperCase(), new Change(key.toUpperCase(), ((DBObject) changedMbrVariables.get(key)).get("v"), simpleDateFormat.parse(((DBObject) changedMbrVariables.get(key)).get("e").toString())));
 					}
 				} catch (ParseException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 		    }
@@ -245,7 +244,7 @@ public class StrategyBolt extends BaseRichBolt {
             	//System.out.println(" ~~~ DID NOT FIND VARIBALE: " + variableName);
             	continue;
             }
-        	System.out.println(" ~~~ FOUND VARIABLE - name: " + variableName + " varValueMap: "  + varValueMap.get(variableName));
+        	//System.out.println(" ~~~ FOUND VARIABLE - name: " + variableName + " varValueMap: "  + varValueMap.get(variableName));
             
 	        RealTimeScoringContext context = new RealTimeScoringContext();
             context.setValue(varValueMap.get(variableName));

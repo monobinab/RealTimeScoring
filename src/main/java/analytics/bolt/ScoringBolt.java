@@ -190,7 +190,7 @@ public class ScoringBolt extends BaseRichBolt {
 		// 2) FETCH MEMBER VARIABLES FROM memberVariables COLLECTION
 		DBObject mbrVariables = memberVariablesCollection.findOne(new BasicDBObject("l_id",l_id));
 		if(mbrVariables == null) {
-			//System.out.println(" ### SCORING BOLT COULD NOT FIND MEMBER VARIABLES");
+			System.out.println(" ### SCORING BOLT COULD NOT FIND MEMBER VARIABLES");
 			return;
 		}
 		
@@ -332,13 +332,11 @@ public class ScoringBolt extends BaseRichBolt {
 			try {
 				mac.init(signingKey);
 			} catch (InvalidKeyException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			byte[] rawHmac = mac.doFinal(l_id.getBytes());
 			hashed = new String(Base64.encodeBase64(rawHmac));
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return hashed;
