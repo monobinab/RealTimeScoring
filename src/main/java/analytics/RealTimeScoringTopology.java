@@ -40,7 +40,7 @@ public class RealTimeScoringTopology {
             }
         };
 
-          topologyBuilder.setSpout("npos1", new WebsphereMQSpout("iasapp304p.prod.ch3.s.com", 1414, "SQLP0393", "MARKETAN.SVRCONN", "STORM.NPOS.MASCORED.QC01"), 1);
+        topologyBuilder.setSpout("npos1", new WebsphereMQSpout("iasapp304p.prod.ch3.s.com", 1414, "SQLP0393", "MARKETAN.SVRCONN", "STORM.NPOS.MASCORED.QC01"), 1);
         topologyBuilder.setSpout("npos2", new WebsphereMQSpout("iasapp305p.prod.ch3.s.com", 1414, "SQLP0394", "MARKETAN.SVRCONN", "STORM.NPOS.MASCORED.QC01"), 1);
         
         // create definition of main spout for queue 1
