@@ -14,7 +14,10 @@ public class StrategyCountTransactions implements Strategy {
 
     @Override
     public Change execute(RealTimeScoringContext context) {
-		return new Change(new Double(context.getPreviousValue().toString()) + 1, calculateExpirationDate());
+    	if(context.getPreviousValue() == null || !(context.getPreviousValue() instanceof Integer)) {
+    		return new Change(1, calculateExpirationDate());
+    	}
+		return new Change(new Integer(context.getPreviousValue().toString()) + 1, calculateExpirationDate());
     }
 	
     private Date calculateExpirationDate() {

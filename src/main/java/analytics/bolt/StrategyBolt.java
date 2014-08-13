@@ -46,7 +46,7 @@ public class StrategyBolt extends BaseRichBolt {
 
     DB db;
     MongoClient mongoClient;
-    DBCollection modelCollection;
+    DBCollection modelVariablesCollection;
     DBCollection memberVariablesCollection;
     DBCollection variablesCollection;
     DBCollection divLnVariableCollection;
@@ -55,6 +55,7 @@ public class StrategyBolt extends BaseRichBolt {
     
     private Map<String,Collection<Integer>> variableModelsMap;
     private Map<String, String> variableVidToNameMap;
+    private Map<String, String> variableNameToVidMap;
 
     private Jedis jedis;
 
@@ -71,8 +72,8 @@ public class StrategyBolt extends BaseRichBolt {
         this.mongoClient = mongoClient;
     }
 
-    public void setModelCollection(DBCollection modelCollection) {
-        this.modelCollection = modelCollection;
+    public void setModelCollection(DBCollection modVariablesCollection) {
+        this.modelVariablesCollection = modVariablesCollection;
     }
 
     public void setVariablesCollection(DBCollection variablesCollection) {
@@ -110,7 +111,7 @@ public class StrategyBolt extends BaseRichBolt {
 //	    db.authenticate("rtsw", "5core123".toCharArray());
         db = mongoClient.getDB("test");
 
-        modelCollection = db.getCollection("modelVariables");
+        modelVariablesCollection = db.getCollection("modelVariables");
         memberVariablesCollection = db.getCollection("memberVariables");
         variablesCollection = db.getCollection("Variables");
         divLnVariableCollection = db.getCollection("divLnVariable");
@@ -120,7 +121,7 @@ public class StrategyBolt extends BaseRichBolt {
         
         // populate the variableModelsMap
         variableModelsMap = new HashMap<String, Collection<Integer>>();
-        DBCursor models = modelCollection.find();
+        DBCursor models = modelVariablesCollection.find();
         for(DBObject model:models){
              BasicDBList modelVariables = (BasicDBList) model.get("variable");
              for(Object modelVariable:modelVariables)
@@ -141,6 +142,7 @@ public class StrategyBolt extends BaseRichBolt {
 
         // populate the variableVidToNameMap
         variableVidToNameMap = new HashMap<String, String>();
+        variableNameToVidMap = new HashMap<String, String>();
         DBCursor vCursor = variablesCollection.find();
         for(DBObject variable:vCursor){
 			String variableName = ((DBObject) variable).get("name").toString().toUpperCase();
@@ -148,6 +150,7 @@ public class StrategyBolt extends BaseRichBolt {
 			if (variableName != null && vid != null)
 			{
 				variableVidToNameMap.put(vid, variableName.toUpperCase());
+				variableNameToVidMap.put(variableName.toUpperCase(),vid);
 			}
         }
     }
@@ -178,21 +181,27 @@ public class StrategyBolt extends BaseRichBolt {
 		
 //		System.out.println("APPLYING STRATEGIES");
 		
+		// 1) PULL OUT HASHED LOYALTY ID FROM THE FIRST RECORD
 		String l_id = input.getString(0);
 		String source = input.getString(2);
 //		System.out.println(" ~~~ STRATEGY BOLT PARSED l_id AS: " + l_id);
-		Map<String, String> varValueMap = restoreVariableListFromJson(input.getString(1));
+		Map<String, String> newChangesVarValueMap = restoreVariableListFromJson(input.getString(1));
 
 //		System.out.println(" ~~~ STRATEGY BOLT PARSED VARIABLE MAP AS: " + varAmountMap);
 //		System.out.println(" ~~~ input tuple: " + input);
 //		System.out.println(" ~~~ line items: " + lineItemList.size());
 		
-		// 1) PULL OUT HASHED LOYALTY ID FROM THE FIRST RECORD IN lineItemList
 		
 		// 2) FETCH MEMBER VARIABLES FROM memberVariables COLLECTION
-		DBObject mbrVariables = memberVariablesCollection.findOne(new BasicDBObject("l_id",l_id));
+		BasicDBObject variableFields = new BasicDBObject("l_id", 1);
+		variableFields.append("_id", 0);
+		for(String v:newChangesVarValueMap.keySet()) {
+			variableFields.append(variableNameToVidMap.get(v), 1);
+		}
+		
+		DBObject mbrVariables = memberVariablesCollection.findOne(new BasicDBObject("l_id",l_id),variableFields);
 		if(mbrVariables == null) {
-			System.out.println(" ~~~ STRATEGY BOLD COULD NOT FIND MEMBER VARIABLES");
+			System.out.println(" ~~~ STRATEGY BOLT COULD NOT FIND MEMBER VARIABLES");
 			return;
 		}
 		
@@ -204,9 +213,6 @@ public class StrategyBolt extends BaseRichBolt {
 			if(!key.equals("l_id") && !key.equals("_id")) {
 				if(mbrVariables.get(key) != null) {
 					memberVariablesMap.put(variableVidToNameMap.get(key).toUpperCase(), mbrVariables.get(key));
-				}
-				else {
-					memberVariablesMap.put(variableVidToNameMap.get(key).toUpperCase(), (Object)"0");
 				}
 			}
 		}
@@ -236,15 +242,14 @@ public class StrategyBolt extends BaseRichBolt {
 		    }
 		}
         	
-		Set<String> varAmoutMapKeySet = varValueMap.keySet();
 //		for(String v: varAmoutMapKeySet) {
 //			System.out.println(" variable: " + v + "  amount: " + varAmountMap.get(v));
 //		}
 		        
 		// 6) CREATE MAP FROM NEW CHANGES TO CHANGE CLASS
         Map<String,Change> newChanges = new HashMap<String,Change>();
-        for(String variableName: varAmoutMapKeySet) {
-            DBObject variableFromVariablesCollection = variablesCollection.findOne(new BasicDBObject("name", variableName.toUpperCase()));
+        for(String newChangeVariableName: newChangesVarValueMap.keySet()) {
+            DBObject variableFromVariablesCollection = variablesCollection.findOne(new BasicDBObject("name", newChangeVariableName.toUpperCase()));
             if (variableFromVariablesCollection == null ) {
             	//System.out.println(" ~~~ DID NOT FIND VARIBALE: " + variableName);
             	continue;
@@ -252,28 +257,28 @@ public class StrategyBolt extends BaseRichBolt {
         	//System.out.println(" ~~~ FOUND VARIABLE - name: " + variableName + " varValueMap: "  + varValueMap.get(variableName));
             
 	        RealTimeScoringContext context = new RealTimeScoringContext();
-            context.setValue(varValueMap.get(variableName));
+            context.setValue(newChangesVarValueMap.get(newChangeVariableName));
 	        context.setPreviousValue(0);
 
     		// 7) FOR EACH CHANGE EXECUTE STRATEGY
             try {
                 //arbitrate between memberVariables and changedMemberVariables to send as previous value
-            	if(variableModelsMap.containsKey(variableName)) {
+            	if(variableModelsMap.containsKey(newChangeVariableName)) {
             		if(variableFromVariablesCollection.get("strategy") == "NONE") {
             			continue;
             		}
             		
             		Strategy strategy = (Strategy) Class.forName("analytics.util.strategies."+ variableFromVariablesCollection.get("strategy")).newInstance();
-                    if(allChanges.containsKey(variableName)) {
-                    	context.setPreviousValue(allChanges.get(variableName.toUpperCase()).getValue());
+                    if(allChanges.containsKey(newChangeVariableName)) {
+                    	context.setPreviousValue(allChanges.get(newChangeVariableName.toUpperCase()).getValue());
                     }
                     else {
-                    	if(memberVariablesMap.get(variableName.toUpperCase()) != null) {
-                    		context.setPreviousValue(memberVariablesMap.get(variableName.toUpperCase()));
+                    	if(memberVariablesMap.get(newChangeVariableName.toUpperCase()) != null) {
+                    		context.setPreviousValue(memberVariablesMap.get(newChangeVariableName.toUpperCase()));
                     	}
                     }
 //                    System.out.println(" ~~~ STRATEGY BOLT CHANGES - variable: " + variableName + " context: " + context);
-                    newChanges.put(variableName, strategy.execute(context));
+                    newChanges.put(newChangeVariableName, strategy.execute(context));
             	}
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
@@ -292,11 +297,11 @@ public class StrategyBolt extends BaseRichBolt {
 			BasicDBObject newDocument = new BasicDBObject();
 		    while (newChangesIter.hasNext()) {
 		        Map.Entry<String, Change> pairsVarValue = (Map.Entry<String, Change>)newChangesIter.next();
-		    	String varNm = pairsVarValue.getKey().toString().toUpperCase();
+		    	String varVid =  variableNameToVidMap.get(pairsVarValue.getKey().toString().toUpperCase());
 				Object val = pairsVarValue.getValue().value;
-				newDocument.append(varNm, new BasicDBObject().append("v", val).append("e", pairsVarValue.getValue().getExpirationDateAsString()));
+				newDocument.append(varVid, new BasicDBObject().append("v", val).append("e", pairsVarValue.getValue().getExpirationDateAsString()));
 		    	
-		    	allChanges.put(varNm, new Change(varNm, val, pairsVarValue.getValue().expirationDate));
+		    	allChanges.put(varVid, new Change(varVid, val, pairsVarValue.getValue().expirationDate));
 		    }
 
 		    BasicDBObject searchQuery = new BasicDBObject().append("l_id", l_id);
