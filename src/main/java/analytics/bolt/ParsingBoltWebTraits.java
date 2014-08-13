@@ -34,7 +34,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 
     DB db;
     MongoClient mongoClient;
-    DBCollection memberCollection;
+    DBCollection memberVariablesCollection;
     DBCollection memberTraitsCollection;
     DBCollection memberUUIDCollection;
     DBCollection traitVariablesCollection;
@@ -61,7 +61,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
     }
 
     public void setMemberCollection(DBCollection memberCollection) {
-        this.memberCollection = memberCollection;
+        this.memberVariablesCollection = memberCollection;
     }
 
 //    public void setDivLnItmCollection(DBCollection divLnItmCollection) {
@@ -96,7 +96,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 //		db = mongoClient.getDB("RealTimeScoring");
 //	    db.authenticate("rtsw", "5core123".toCharArray());
         db = mongoClient.getDB("test");
-        memberCollection = db.getCollection("memberVariables");
+        memberVariablesCollection = db.getCollection("memberVariables");
         memberTraitsCollection = db.getCollection("memberTraits");
         memberUUIDCollection = db.getCollection("memberUUID");
         traitVariablesCollection = db.getCollection("traitVariables");
@@ -182,12 +182,12 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
         String webTraitsSplitRec[] = splitRec(webTraitInteractionRec);
         
         //does nothing but print out split string
-//        String splitRec = new String();
-//        for(int i=0;i<webTraitsSplitRec.length;i++) {
-//        	if(i==0) splitRec = webTraitsSplitRec[i];
-//        	else splitRec = splitRec + "  " + webTraitsSplitRec[i];
-//        }
-//        System.out.println("  split string: " + splitRec);
+        String splitRec = new String();
+        for(int i=0;i<webTraitsSplitRec.length;i++) {
+        	if(i==0) splitRec = webTraitsSplitRec[i];
+        	else splitRec = splitRec + "  " + webTraitsSplitRec[i];
+        }
+        System.out.println("  split string: " + splitRec);
 		
         
         //2014-03-08 10:56:17,00000388763646853831116694914086674166,743651,US,Sears
@@ -197,7 +197,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
         
         
 		// 2) IF THE CURRENT RECORD HAS THE SAME UUID AS PREVIOUS RECORD(S) THEN ADD TRAIT TO LIST AND RETURN
-        if(this.currentUUID !=null && this.currentUUID.equalsIgnoreCase(webTraitsSplitRec[1])) {
+        if(this.currentUUID != null && this.currentUUID.equalsIgnoreCase(webTraitsSplitRec[1])) {
         	//skip processing if l_id is null
         	if(this.current_l_id == null) {
         		//System.out.println(" NULL l_id -- return");
@@ -208,7 +208,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 			if (traits != null) {
 				traits.add(webTraitsSplitRec[2]);
 			}
-            System.out.println(" *** ADDING WEB TRAIT: " + webTraitsSplitRec[2]);
+            //System.out.println(" *** ADDING WEB TRAIT: " + webTraitsSplitRec[2]);
         	return;
         }
         
@@ -240,8 +240,8 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
         //		If l_id is null and the next UUID is the same the current, then the next record will not be processed
         DBObject uuid = memberUUIDCollection.findOne(new BasicDBObject("u",webTraitsSplitRec[1]));
         if(uuid == null) {
-            System.out.println(" *** COULD NOT FIND UUID");
             this.currentUUID=webTraitsSplitRec[1];
+            System.out.println(" *** COULD NOT FIND UUID: " + this.currentUUID);
         	this.current_l_id=null;
         	return;
         }
@@ -263,7 +263,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 			e.printStackTrace();
 		}
         
-        System.out.println(" *** FOUND l_id: " + l_id + " interaction time: " + interactionDateTime + " trait: " + webTraitsSplitRec[2]);
+        System.out.println(" *** FOUND l_id: " + l_id + "  from UUID: " + this.currentUUID);
         this.current_l_id = l_id;
         
 
@@ -271,7 +271,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
         Collection<String> firstTrait = new ArrayList<String>();
         firstTrait.add(webTraitsSplitRec[2]);
         
-        System.out.println(" *** PUT IN FIRST RECORD: " + this.current_l_id + " trait: " + firstTrait);
+        //System.out.println(" *** PUT IN FIRST RECORD: " + this.current_l_id + " trait: " + firstTrait);
         l_idToTraitCollectionMap.put(this.current_l_id,firstTrait);
         
         return;

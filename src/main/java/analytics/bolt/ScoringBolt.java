@@ -375,7 +375,7 @@ public class ScoringBolt extends BaseRichBolt {
     }
 	
 
-    double calcMbrVar( Map<String,Object> mbrVarMap, Map<String,Change> changes, int modelId)
+    double calcMbrVar( Map<String,Object> mbrVarMap, Map<String,Change> varChangeMap, int modelId)
     {
 	    
         BasicDBObject queryModel = new BasicDBObject("modelId", modelId);
@@ -390,29 +390,35 @@ public class ScoringBolt extends BaseRichBolt {
 	    
 	    double val = (Double) model.get( "constant" );
 	    
-	    BasicDBList variable = ( BasicDBList ) model.get( "variable" );
-	    Variable var = new Variable();
+	    BasicDBList modelVariableDBList = ( BasicDBList ) model.get( "variable" );
+	    Variable variable = new Variable();
 	    
-	    for( Iterator< Object > it = variable.iterator(); it.hasNext(); )
+	    for( Object varObject:modelVariableDBList )
 	    {
-	    	BasicDBObject dbo     = ( BasicDBObject ) it.next();
-	    	BasicDBObject queryVariableId = new BasicDBObject("name", dbo.get("name").toString().toUpperCase());
-		    
-	    	DBObject variableFromVariablesCollection = this.variablesCollection.findOne(queryVariableId);
-            var.setVid(variableFromVariablesCollection.get("VID").toString());
-            var.makePojoFromBson( dbo );
+	    	DBObject variableFromVariablesCollection = this.variablesCollection.findOne(new BasicDBObject("name", ((BasicDBObject) varObject).get("name").toString().toUpperCase()));
+            variable.setVid(variableFromVariablesCollection.get("VID").toString());
+            variable.makePojoFromBson((BasicDBObject) varObject );
 
-		    //System.out.println( var.getName() + ", " + var.getRealTimeFlag() + ", " + var.getType()  + ", " + var.getStrategy() + ", " + var.getCoefficeint() +", " + var.getVid());
-		    //System.out.println("PASS: " + mbrVarMap + " varNm: " + var.getName() + " varType: " + var.getType() + " cng: " + changes + var.getCoefficeint());
-		    if(  var.getType().equals("Integer")) {
-		    	val = val + ((Integer)calculateVariableValue(mbrVarMap, var, changes, var.getType()) * var.getCoefficeint());
+		    //System.out.println("PASS - varNm: " + variable.getName() + " varType: " + variable.getType() + " value: " + mbrVarMap.get(variable.getName().toUpperCase()) + " coef: " + variable.getCoefficeint());
+		    if(variable.getName() != null && mbrVarMap.get(variable.getName().toUpperCase()) != null ) {
+			    if( mbrVarMap.get(variable.getName().toUpperCase()) instanceof Integer ) {
+			    	val = val + ((Integer)calculateVariableValue(mbrVarMap, variable, varChangeMap, "Integer") * variable.getCoefficeint());
+			    }
+			    else if( mbrVarMap.get(variable.getName().toUpperCase()) instanceof Double) {
+			    	val = val + ((Double)calculateVariableValue(mbrVarMap, variable, varChangeMap, "Double") * variable.getCoefficeint());
+			    }
 		    }
-		    else if( var.getType().equals("Double")) {
-		    	val = val + ((Double)calculateVariableValue(mbrVarMap, var, changes, var.getType()) * var.getCoefficeint());
+		    else if (variable.getName() != null && varChangeMap.get(variable.getName().toUpperCase()) != null) {
+			    if( varChangeMap.get(variable.getName().toUpperCase()).getValue() instanceof Integer ) {
+			    	val = val + ((Integer)calculateVariableValue(mbrVarMap, variable, varChangeMap, "Integer") * variable.getCoefficeint());
+			    }
+			    else if( varChangeMap.get(variable.getName().toUpperCase()).getValue() instanceof Double) {
+			    	val = val + ((Double)calculateVariableValue(mbrVarMap, variable, varChangeMap, "Double") * variable.getCoefficeint());
+			    }
+		    	
 		    }
 		    else {
-		    	val = 0;
-		    	break;
+		    	continue;
 		    }
 	    }
         return val;

@@ -202,7 +202,12 @@ public class StrategyBolt extends BaseRichBolt {
 		while(mbrVariablesIter.hasNext()) {
 			String key = mbrVariablesIter.next();
 			if(!key.equals("l_id") && !key.equals("_id")) {
-				memberVariablesMap.put(variableVidToNameMap.get(key).toUpperCase(), mbrVariables.get(key));
+				if(mbrVariables.get(key) != null) {
+					memberVariablesMap.put(variableVidToNameMap.get(key).toUpperCase(), mbrVariables.get(key));
+				}
+				else {
+					memberVariablesMap.put(variableVidToNameMap.get(key).toUpperCase(), (Object)"0");
+				}
 			}
 		}
 		

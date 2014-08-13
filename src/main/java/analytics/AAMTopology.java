@@ -36,30 +36,33 @@ public class AAMTopology {
 //            "AAM_CDF_AbanBrow",
             "AAM_CDF_Traits"};
 
-    String[] servers = new String[]{"rtsapp301p.qa.ch3.s.com","rtsapp302p.qa.ch3.s.com","rtsapp303p.qa.ch3.s.com"};
+    String[] servers = new String[]{"rtsapp301p.qa.ch3.s.com"/*,"rtsapp302p.qa.ch3.s.com","rtsapp303p.qa.ch3.s.com"*/};
 
 
-    for(String topic:topics){
-        for(String server:servers)
-        {
-            builder.setSpout(topic+server, new AAMRedisPubSubSpout(server, 6379, topic), 1);
-        }
-    }
+//    for(String topic:topics){
+//        for(String server:servers)
+//        {
+//            builder.setSpout(topic+server, new AAMRedisPubSubSpout(server, 6379, topic), 1);
+//        }
+//    }
+    builder.setSpout("AAM_CDF_Traits1", new AAMRedisPubSubSpout(servers[0], 6379, "AAM_CDF_Traits"), 1);
 
-      BoltDeclarer boltDeclarer = builder.setBolt("ParsingBoltWebTraits", new ParsingBoltWebTraits(), 1);
-      builder.setBolt("strategy_bolt", new StrategyBolt(),1).shuffleGrouping("ParsingBoltWebTraits");
-      builder.setBolt("scoring_bolt", new ScoringBolt(),1).shuffleGrouping("strategy_bolt");
+//    BoltDeclarer boltDeclarer = 
+    builder.setBolt("ParsingBoltWebTraits", new ParsingBoltWebTraits(), 1).shuffleGrouping("AAM_CDF_Traits1");
+    builder.setBolt("strategy_bolt", new StrategyBolt(),1).shuffleGrouping("ParsingBoltWebTraits");
+    builder.setBolt("scoring_bolt", new ScoringBolt(),1).shuffleGrouping("strategy_bolt");
       //builder.setBolt("ScorePublishBolt", new ScorePublishBolt("rtsapp401p.prod.ch4.s.com", 6379,"score"), 1).shuffleGrouping("scoring_bolt");
       
       
-      for(String topic:topics){
-          for(String server:servers)
-          {
-              boltDeclarer.fieldsGrouping(topic + server, new Fields("uuid"));
-          }
-      }
+//      for(String topic:topics){
+//          for(String server:servers)
+//          {
+//              boltDeclarer.fieldsGrouping(topic + server, new Fields("uuid"));
+//          }
+//      }
     //builder.setBolt("print", new RealtyTracBolt(), 2).shuffleGrouping("spout").shuffleGrouping("spout2");
 
+//    boltDeclarer.fieldsGrouping("AAM_CDF_Traits1", new Fields("uuid"));
 
     Config conf = new Config();
 

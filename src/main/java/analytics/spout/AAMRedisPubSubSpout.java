@@ -1,6 +1,8 @@
 package analytics.spout;
 
 
+import java.util.concurrent.TimeUnit;
+
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 import org.apache.commons.lang.StringUtils;
@@ -24,12 +26,20 @@ public class AAMRedisPubSubSpout extends RedisPubSubSpout {
 
     @Override
     protected void emit(String ret) {
-        if (ret != null )
+    	try {
+			TimeUnit.MILLISECONDS.sleep(2);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	if (ret != null )
         {
             String tokens[]= StringUtils.split(ret, ",");
             if (tokens.length >= 2)
             {
-                _collector.emit(tuple(tokens[1], ret));
+                //System.out.println(tokens[1]);
+            	_collector.emit(tuple(tokens[1], ret));
+            	
             }
         }
     }

@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -163,9 +164,8 @@ public class ParsingBoltAAM_InternalSearch  extends BaseRichBolt{
 		// 4) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN SET CURRENT UUID FROM RECORD, SET CURRENT l_id TO NULL AND RETURN
 		// 5) POPULATE PID COLLECTION WITH THE FIRST KEY WORDS
 		
-		
-		
-//		System.out.println("PARSING DOCUMENT -- INTERNAL SEARCH RECORD " + input.getString(0));
+	
+		System.out.println("PARSING DOCUMENT -- INTERNAL SEARCH RECORD " + input.getString(0));
 		
 		// 1) SPLIT INPUT STRING
         String searchRec = input.getString(1);
@@ -221,11 +221,17 @@ public class ParsingBoltAAM_InternalSearch  extends BaseRichBolt{
         }
         
 		// 4) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN SET CURRENT UUID FROM RECORD, SET CURRENT l_id TO NULL AND RETURN
+        
+        long t1 = System.currentTimeMillis();
         DBObject uuid = memberUUIDCollection.findOne(new BasicDBObject("u",searchSplitRec[1]));
+        long t2 = System.currentTimeMillis() - t1;
+        System.out.println(" @@@ Time to search for UUID: " + t2);
+        
         if(uuid == null) {
             System.out.println(" @@@ COULD NOT FIND UUID");
             this.currentUUID=searchSplitRec[1];
         	this.current_l_id=null;
+//        	this.current_l_id=currentUUID; // REMOVE ME!!!
         	return;
         }
         
@@ -245,8 +251,8 @@ public class ParsingBoltAAM_InternalSearch  extends BaseRichBolt{
 			e.printStackTrace();
 		}
         
-        System.out.println(" @@@ FOUND l_id: " + l_id + " interaction time: " + interactionDateTime + " key words: " + searchSplitRec[2]);
-        this.current_l_id = l_id;
+        //System.out.println(" @@@ FOUND l_id: " + l_id + " interaction time: " + interactionDateTime + " key words: " + searchSplitRec[2]);
+//        this.current_l_id = l_id;
         
         
 		// 5) POPULATE l_id TO PID MAP, PROCESS KEY WORDS AND ADD FIRST PIDs TO COLLECTION
@@ -315,7 +321,16 @@ public class ParsingBoltAAM_InternalSearch  extends BaseRichBolt{
 		if(countKeyWords>0) {
 		
 			try {
+				//System.out.println(query);
+				try {
+					TimeUnit.MILLISECONDS.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				long t1 = System.currentTimeMillis();
 				Document doc = Jsoup.connect(query).get();
+				long t2 = System.currentTimeMillis() - t1;
+				System.out.println(" @@@ Query time: " + t2);
 				doc.body().wrap("<pre></pre>");
 				String text = doc.text();
 				// Converting nbsp entities
@@ -334,7 +349,7 @@ public class ParsingBoltAAM_InternalSearch  extends BaseRichBolt{
 				if(isJSONValid(queryResultsDoc)) {
 					if(new JsonParser().parse(queryResultsDoc).isJsonObject()) {
 						JsonObject queryResultsToJson = new JsonParser().parse(queryResultsDoc).getAsJsonObject();
-						if(queryResultsToJson.get("response").isJsonObject()) {
+						if(queryResultsToJson.get("response")!=null && queryResultsToJson.get("response").isJsonObject()) {
 							JsonObject response = queryResultsToJson.get("response").getAsJsonObject();
 							if(response.get("docs").isJsonArray()) {
 								JsonArray docs = response.getAsJsonArray("docs").getAsJsonArray();
@@ -365,7 +380,7 @@ public class ParsingBoltAAM_InternalSearch  extends BaseRichBolt{
                 new JSONArray(test);
                 return true;
             } catch (JSONException ex1) {
-                System.out.println(test);
+                //System.out.println(test);
                 return false;
             }
         }
@@ -400,7 +415,7 @@ public class ParsingBoltAAM_InternalSearch  extends BaseRichBolt{
     	
     	
     	for(String pid: l_idToPidMap.get(current_l_id)) {
-    		System.out.println(pid);
+    		//System.out.println(pid);
     		DBObject divLnDBO = pidDivLnCollection.findOne(new BasicDBObject().append("pid", pid));
     		if(divLnDBO != null) {
 	    		String div = divLnDBO.get("d").toString();

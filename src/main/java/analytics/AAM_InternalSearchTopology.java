@@ -48,17 +48,18 @@ public class AAM_InternalSearchTopology {
 //		BoltDeclarer boltDeclarer = builder.setBolt("ParsingBoltAAM_InternalSearch", new ParsingBoltAAM_InternalSearch(), 1);
 
 		
-		builder.setSpout("AAM_CDF_InternalSearch1", new AAMRedisPubSubSpout("rtsapp301p.qa.ch3.s.com", 6379, "AAM_CDF_InternalSearch1"), 1);
-		builder.setSpout("AAM_CDF_InternalSearch2", new AAMRedisPubSubSpout("rtsapp302p.qa.ch3.s.com", 6379, "AAM_CDF_InternalSearch2"), 1);
-		builder.setSpout("AAM_CDF_InternalSearch3", new AAMRedisPubSubSpout("rtsapp303p.qa.ch3.s.com", 6379, "AAM_CDF_InternalSearch3"), 1);
+		builder.setSpout("AAM_CDF_InternalSearch1", new AAMRedisPubSubSpout("rtsapp301p.qa.ch3.s.com", 6379, "AAM_CDF_InternalSearch"), 1);
+		builder.setSpout("AAM_CDF_InternalSearch2", new AAMRedisPubSubSpout("rtsapp302p.qa.ch3.s.com", 6379, "AAM_CDF_InternalSearch"), 1);
+		builder.setSpout("AAM_CDF_InternalSearch3", new AAMRedisPubSubSpout("rtsapp303p.qa.ch3.s.com", 6379, "AAM_CDF_InternalSearch"), 1);
 		
-		BoltDeclarer boltDeclarer1 = builder.setBolt("ParsingBoltAAM_InternalSearch1", new ParsingBoltAAM_InternalSearch(), 1).shuffleGrouping("ParsingBoltAAM_InternalSearch1");
-		BoltDeclarer boltDeclarer2 = builder.setBolt("ParsingBoltAAM_InternalSearch2", new ParsingBoltAAM_InternalSearch(), 1).shuffleGrouping("ParsingBoltAAM_InternalSearch2");
-		BoltDeclarer boltDeclarer3 = builder.setBolt("ParsingBoltAAM_InternalSearch3", new ParsingBoltAAM_InternalSearch(), 1).shuffleGrouping("ParsingBoltAAM_InternalSearch3");
+		builder.setBolt("ParsingBoltAAM_InternalSearch1", new ParsingBoltAAM_InternalSearch(), 1).shuffleGrouping("AAM_CDF_InternalSearch1");
+		builder.setBolt("ParsingBoltAAM_InternalSearch2", new ParsingBoltAAM_InternalSearch(), 1).shuffleGrouping("AAM_CDF_InternalSearch2");
+		builder.setBolt("ParsingBoltAAM_InternalSearch3", new ParsingBoltAAM_InternalSearch(), 1).shuffleGrouping("AAM_CDF_InternalSearch3");
 
-		builder.setBolt("strategy_bolt", new StrategyBolt(),1).shuffleGrouping("ParsingBoltAAM_InternalSearch");
-		builder.setBolt("scoring_bolt", new ScoringBolt(),1).shuffleGrouping("strategy_bolt");
-		builder.setBolt("ScorePublishBolt", new ScorePublishBolt("rtsapp401p.prod.ch4.s.com", 6379,"score"), 1).shuffleGrouping("scoring_bolt");
+		//BoltDeclarer boltDeclarer = 
+//		builder.setBolt("strategy_bolt", new StrategyBolt(),1).shuffleGrouping("ParsingBoltAAM_InternalSearch");
+//		builder.setBolt("scoring_bolt", new ScoringBolt(),1).shuffleGrouping("strategy_bolt");
+//		builder.setBolt("ScorePublishBolt", new ScorePublishBolt("rtsapp401p.prod.ch4.s.com", 6379,"score"), 1).shuffleGrouping("scoring_bolt");
 		
 		
 //		for(String topic:topics){
@@ -69,9 +70,9 @@ public class AAM_InternalSearchTopology {
 //		}
 		//builder.setBolt("print", new RealtyTracBolt(), 2).shuffleGrouping("spout").shuffleGrouping("spout2");
 		
-		boltDeclarer1.fieldsGrouping("AAM_CDF_InternalSearch1", new Fields("uuid"));
-		boltDeclarer2.fieldsGrouping("AAM_CDF_InternalSearch2", new Fields("uuid"));
-		boltDeclarer3.fieldsGrouping("AAM_CDF_InternalSearch3", new Fields("uuid"));
+//		boltDeclarer1.fieldsGrouping("AAM_CDF_InternalSearch1", new Fields("uuid"));
+//		boltDeclarer2.fieldsGrouping("AAM_CDF_InternalSearch2", new Fields("uuid"));
+//		boltDeclarer3.fieldsGrouping("AAM_CDF_InternalSearch3", new Fields("uuid"));
 		
 		Config conf = new Config();
 		
