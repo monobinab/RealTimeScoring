@@ -281,7 +281,8 @@ public class ScoringBolt extends BaseRichBolt {
 			Date minDate = null;
 			Date maxDate = null;
             for(String key: allChanges.keySet()) {
-            	if(variableModelsMap.get(key).contains(Integer.valueOf(modelId))) {
+            	//Get variable name from vid mapping and then lookup in variable models map
+            	if(variableModelsMap.get(variableVidToNameMap.get(key)).contains(Integer.valueOf(modelId))) {
             		if(minDate == null) {
             			minDate = allChanges.get(key).getExpirationDate();
             			maxDate = allChanges.get(key).getExpirationDate();
