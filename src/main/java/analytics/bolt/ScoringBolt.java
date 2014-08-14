@@ -180,7 +180,7 @@ public class ScoringBolt extends BaseRichBolt {
 		// SCORING BOLTS READS A LIST OF OBJECTS WITH THE FIRST ELEMENT BEING THE HASHED LOYALTY ID
 		// AND n MODEL IDs AFTER
 		List<String> modelIdList = restoreModelListFromJson(input.getString(1));
-		//List<TransactionLineItem> lineItemList = new ArrayList<TransactionLineItem>();
+
 
 //		System.out.println("RE-SCORING MODELS");
 //		System.out.println(" ### model ID list: " + modelIdList);
@@ -379,7 +379,7 @@ public class ScoringBolt extends BaseRichBolt {
     {
 	    
         BasicDBObject queryModel = new BasicDBObject("modelId", modelId);
-	    DBCursor modelCollectionCursor = modelVariablesCollection.find( queryModel );
+	    DBCursor modelCollectionCursor = modelVariablesCollection.find( queryModel.append("month", Calendar.getInstance().get(Calendar.MONTH)+1));
 
         DBObject model = null;
 	    while( modelCollectionCursor.hasNext() ) {

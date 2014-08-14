@@ -54,6 +54,7 @@ public class StrategyBolt extends BaseRichBolt {
     DBCollection changedMemberScoresCollection;
     
     private Map<String,Collection<Integer>> variableModelsMap;
+    private Map<String,Collection<Integer>> modelVariablesMap;
     private Map<String, String> variableVidToNameMap;
     private Map<String, String> variableNameToVidMap;
 
@@ -121,6 +122,7 @@ public class StrategyBolt extends BaseRichBolt {
         
         // populate the variableModelsMap
         variableModelsMap = new HashMap<String, Collection<Integer>>();
+        modelVariablesMap = new HashMap<String, Collection<Integer>>();
         DBCursor models = modelVariablesCollection.find();
         for(DBObject model:models){
              BasicDBList modelVariables = (BasicDBList) model.get("variable");

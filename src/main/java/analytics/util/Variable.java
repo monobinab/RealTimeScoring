@@ -15,8 +15,6 @@ public class Variable implements Serializable
 	private ObjectId _id;
 	private String name;
 	private String vid;
-	private int month;
-	private String type;
 	private double coefficeint;
 	 
 
@@ -26,8 +24,6 @@ public class Variable implements Serializable
 	{
 		this.name   = nm;
 		this.vid   = id;
-		this.month = mnth;
-		this.type   = typ;
 		this.coefficeint = coefficnt;
 	}
 	 
@@ -41,11 +37,6 @@ public class Variable implements Serializable
 	public String getVid() { return this.vid; }
 	public void setVid( String id ) { this.vid = id; }
 	
-	public int getMonth() { return this.month; }
-	public void setMonth( int mnth ) { this.month = mnth; }
-	 
-	public String getType() { return this.type; }
-	public void setType( String type ) { this.type = type; }
 	 
 	 
 	public double getCoefficeint() { return this.coefficeint; }
@@ -57,8 +48,6 @@ public class Variable implements Serializable
 		 
 		document.put( "_id",    this._id );
 		document.put( "name",   this.name );
-		document.put( "month", this.month );
-		document.put( "type",   this.type );
 		document.put( "coefficeint",  this.coefficeint );
 		 
 		return document;
@@ -70,8 +59,6 @@ public class Variable implements Serializable
 		 
 		this._id    	= ( ObjectId ) b.get( "_id" );
 		this.name   	= ( String )   b.get( "name" );
-		this.month = ( Integer )   b.get( "month" );
-		this.type   	= ( String )   b.get( "type" );
 		this.coefficeint= ( Double )   b.get( "coefficeint" );
 	}
 }
