@@ -378,9 +378,15 @@ public class ScoringBolt extends BaseRichBolt {
     double calcMbrVar( Map<String,Object> mbrVarMap, Map<String,Change> varChangeMap, int modelId)
     {
 	    
-        BasicDBObject queryModel = new BasicDBObject("modelId", modelId);
-	    DBCursor modelCollectionCursor = modelVariablesCollection.find( queryModel.append("month", Calendar.getInstance().get(Calendar.MONTH)+1));
+	    BasicDBObject queryModel = new BasicDBObject("modelId", 34);
+	    BasicDBList monthQuery = new BasicDBList();
+	    monthQuery.add(new BasicDBObject("month", 0));
+	    monthQuery.add(new BasicDBObject("month", Calendar.getInstance().get(Calendar.MONTH)+1));
+	    queryModel.append("$or", monthQuery);
+		
+	    DBCursor modelCollectionCursor = modelVariablesCollection.find( queryModel);
 
+	    	    
         DBObject model = null;
 	    while( modelCollectionCursor.hasNext() ) {
 	    	model = ( BasicDBObject ) modelCollectionCursor.next();
