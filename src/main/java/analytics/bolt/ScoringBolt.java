@@ -230,7 +230,8 @@ public class ScoringBolt extends BaseRichBolt {
 						allChanges.put(key.toUpperCase()
 								, new Change(key.toUpperCase()
 								, ((DBObject) changedMbrVariables.get(key)).get("v")
-								, simpleDateFormat.parse(((DBObject) changedMbrVariables.get(key)).get("e").toString())));
+								, simpleDateFormat.parse(((DBObject) changedMbrVariables.get(key)).get("e").toString())
+								, simpleDateFormat.parse(((DBObject) changedMbrVariables.get(key)).get("f").toString())));
 					}
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
@@ -265,17 +266,6 @@ public class ScoringBolt extends BaseRichBolt {
 	            newScore = Math.exp(baseScore)/(1+ Math.exp(baseScore));
         	}
         	
-        	//System.out.println(" ### NEW SCORE: " + newScore);
-    		if(newScore<0.0078921) {
-    			Change change = allChanges.get("BOOST_WEB_TRAIT_HA");
-				if(change!=null && change.getValue()!=null) {
-					double traits = Double.valueOf(change.getValue().toString()) ;
-        			newScore=0.0078921 + .00009 * traits;   // Math.exp(-4.612724344 + traits * 0.01)/(1+Math.exp(-4.612724344 + traits * 0.01));
-                	//System.out.println(" ### SUPER BOOST NEW SCORE: " + newScore + "  traits: " + traits);
-    			}
-    		}
-        	
-            //System.out.println(l_id + ": " + Double.toString(newScore));
             
             // FIND THE MIN AND MAX EXPIRATION DATE OF ALL VARIABLE CHANGES FOR CHANGED MODEL SCORE TO WRITE TO SCORE CHANGES COLLECTION
 			Date minDate = null;
@@ -299,9 +289,12 @@ public class ScoringBolt extends BaseRichBolt {
             }
 	                            
             //APPEND CHANGED SCORE AND MIN/MAX EXPIRATION DATES TO DOCUMENT FOR UPDATE
-            updateRec.append(modelId.toString(), new BasicDBObject().append("s", newScore).append("minEx", simpleDateFormat.format(minDate)).append("maxEx", simpleDateFormat.format(maxDate)));
+            updateRec.append(modelId.toString(), new BasicDBObject().append("s", newScore).append("minEx", simpleDateFormat.format(minDate)).append("maxEx", simpleDateFormat.format(maxDate)).append("f", simpleDateFormat.format(new Date())));
             
             DBObject oldScore = changedMemberScoresCollection.findOne(new BasicDBObject("l_id", l_id));
+            if(oldScore == null) {
+            	memberScoreCollection.findOne(new BasicDBObject("l_id", l_id));
+            }
             String message = new StringBuffer().append(l_id).append("-").append(modelId).append("-").append(oldScore == null ? "0" : oldScore.get("1")).append("-").append(newScore).toString();
             
             // EMIT CHANGES

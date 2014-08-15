@@ -236,7 +236,11 @@ public class StrategyBolt extends BaseRichBolt {
 		    	}
 		    	try {
 					if(!simpleDateFormat.parse(((DBObject) changedMbrVariables.get(key)).get("e").toString()).after(new Date())) {
-						allChanges.put(key.toUpperCase(), new Change(key.toUpperCase(), ((DBObject) changedMbrVariables.get(key)).get("v"), simpleDateFormat.parse(((DBObject) changedMbrVariables.get(key)).get("e").toString())));
+						allChanges.put(key.toUpperCase()
+								, new Change(key.toUpperCase()
+									, ((DBObject) changedMbrVariables.get(key)).get("v")
+									, simpleDateFormat.parse(((DBObject) changedMbrVariables.get(key)).get("e").toString())
+									, simpleDateFormat.parse(((DBObject) changedMbrVariables.get(key)).get("f").toString())));
 					}
 				} catch (ParseException e) {
 					e.printStackTrace();
@@ -301,7 +305,7 @@ public class StrategyBolt extends BaseRichBolt {
 		        Map.Entry<String, Change> pairsVarValue = (Map.Entry<String, Change>)newChangesIter.next();
 		    	String varVid =  variableNameToVidMap.get(pairsVarValue.getKey().toString().toUpperCase());
 				Object val = pairsVarValue.getValue().value;
-				newDocument.append(varVid, new BasicDBObject().append("v", val).append("e", pairsVarValue.getValue().getExpirationDateAsString()));
+				newDocument.append(varVid, new BasicDBObject().append("v", val).append("e", pairsVarValue.getValue().getExpirationDateAsString()).append("f", pairsVarValue.getValue().getEffectiveDateAsString()));
 		    	
 		    	allChanges.put(varVid, new Change(varVid, val, pairsVarValue.getValue().expirationDate));
 		    }
