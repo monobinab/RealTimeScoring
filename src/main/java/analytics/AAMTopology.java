@@ -1,6 +1,7 @@
 package analytics;
 
 import analytics.bolt.ParsingBoltWebTraits;
+import analytics.bolt.PersistTraitsBolt;
 import analytics.bolt.ScorePublishBolt;
 import analytics.bolt.ScoringBolt;
 import analytics.bolt.StrategyBolt;
@@ -50,6 +51,7 @@ public class AAMTopology {
 //    BoltDeclarer boltDeclarer = 
     builder.setBolt("ParsingBoltWebTraits", new ParsingBoltWebTraits(), 1).shuffleGrouping("AAM_CDF_Traits1");
     builder.setBolt("strategy_bolt", new StrategyBolt(),1).shuffleGrouping("ParsingBoltWebTraits");
+    builder.setBolt("persist_traits" , new PersistTraitsBolt(), 1).shuffleGrouping("ParsingBoltWebTraits");
     builder.setBolt("scoring_bolt", new ScoringBolt(),1).shuffleGrouping("strategy_bolt");
       //builder.setBolt("ScorePublishBolt", new ScorePublishBolt("rtsapp401p.prod.ch4.s.com", 6379,"score"), 1).shuffleGrouping("scoring_bolt");
       
