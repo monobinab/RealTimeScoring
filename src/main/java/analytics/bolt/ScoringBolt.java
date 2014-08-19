@@ -126,20 +126,22 @@ public class ScoringBolt extends BaseRichBolt {
              for(Object modelVariable:modelVariables)
              {
                  String variableName = ((DBObject) modelVariable).get("name").toString().toUpperCase();
-                 if (variableModelsMap.get(variableName) == null)
+                 if (!variableModelsMap.containsKey(variableName))
                  {
                      Collection<Integer> modelIds = new ArrayList<Integer>();
-                     addModel(model, variableName.toUpperCase(), modelIds);
+                     variableModelsMap.put(variableName.toUpperCase(),modelIds);
+                     variableModelsMap.get(variableName.toUpperCase()).add(Integer.valueOf(model.get("modelId").toString()));
                  }
                  else
                  {
-                     Collection<Integer> modelIds = variableModelsMap.get(variableName.toUpperCase());
-                     addModel(model, variableName.toUpperCase(), modelIds);
+                     if(!variableModelsMap.get(variableName).contains(Integer.valueOf(model.get("modelId").toString()))) {
+                    	 variableModelsMap.get(variableName.toUpperCase()).add(Integer.valueOf(model.get("modelId").toString()));
+                     }
                  }
              }
         }
 
-        //System.out.println(" variablesModelMap: " + variableModelsMap);
+        System.out.println(" variablesModelMap: " + variableModelsMap);
 
         // populate the variableVidToNameMap
         variableVidToNameMap = new HashMap<String, String>();
@@ -158,11 +160,6 @@ public class ScoringBolt extends BaseRichBolt {
 
         //jedis = new Jedis("151.149.116.48");
 
-    }
-
-    private void addModel(DBObject model, String variableName, Collection<Integer> modelIds) {
-        modelIds.add(Integer.valueOf(model.get("modelId").toString()));
-        variableModelsMap.put(variableName.toUpperCase(), modelIds);
     }
 
     /*
@@ -224,8 +221,8 @@ public class ScoringBolt extends BaseRichBolt {
 //		    	System.out.println("   ### VARIABLE: " + key);
 //		    	System.out.println("   ### GET VARIABLE: " + changedMbrVariables.get(key));
 //		    	System.out.println("   ### EXPIRATION: " + ((DBObject) changedMbrVariables.get(key)).get("e"));
+
 		    	try {
-//			    	System.out.println("   ### THE WHOLE THING: " + simpleDateFormat.parse(((DBObject) changedMbrVariables.get(key)).get("e").toString()));
 					if(simpleDateFormat.parse(((DBObject) changedMbrVariables.get(key)).get("e").toString()).after(Calendar.getInstance().getTime())) {
 						allChanges.put(key.toUpperCase()
 								, new Change(key.toUpperCase()
@@ -372,21 +369,15 @@ public class ScoringBolt extends BaseRichBolt {
     double calcMbrVar( Map<String,Object> mbrVarMap, Map<String,Change> varChangeMap, int modelId)
     {
 	    
-	    BasicDBObject queryModel = new BasicDBObject("modelId", 34);
+	    BasicDBObject queryModel = new BasicDBObject("modelId", modelId);
 	    BasicDBList monthQuery = new BasicDBList();
 	    monthQuery.add(new BasicDBObject("month", 0));
 	    monthQuery.add(new BasicDBObject("month", Calendar.getInstance().get(Calendar.MONTH)+1));
 	    queryModel.append("$or", monthQuery);
 		
-	    DBCursor modelCollectionCursor = modelVariablesCollection.find( queryModel);
+	    DBObject model = modelVariablesCollection.findOne( queryModel);
 
-	    	    
-        DBObject model = null;
-	    while( modelCollectionCursor.hasNext() ) {
-	    	model = ( BasicDBObject ) modelCollectionCursor.next();
-	    }
-	    
-	    //System.out.println( model.get( "modelId" ) + ": " + model.get( "constant" ).toString());
+	    //System.out.println( " Model ID: " + model.get("modelId") + " ~~ constant: " + model.get("constant").toString() + " ~~ month: " + model.get("month"));
 	    
 	    double val = (Double) model.get( "constant" );
 	    
@@ -402,18 +393,18 @@ public class ScoringBolt extends BaseRichBolt {
 		    //System.out.println("PASS - varNm: " + variable.getName() + " varType: " + variable.getType() + " value: " + mbrVarMap.get(variable.getName().toUpperCase()) + " coef: " + variable.getCoefficeint());
 		    if(variable.getName() != null && mbrVarMap.get(variable.getName().toUpperCase()) != null ) {
 			    if( mbrVarMap.get(variable.getName().toUpperCase()) instanceof Integer ) {
-			    	val = val + ((Integer)calculateVariableValue(mbrVarMap, variable, varChangeMap, "Integer") * variable.getCoefficeint());
+			    	val = val + ((Integer)calculateVariableValue(mbrVarMap, variable, varChangeMap, "Integer") * variable.getCoefficient());
 			    }
 			    else if( mbrVarMap.get(variable.getName().toUpperCase()) instanceof Double) {
-			    	val = val + ((Double)calculateVariableValue(mbrVarMap, variable, varChangeMap, "Double") * variable.getCoefficeint());
+			    	val = val + ((Double)calculateVariableValue(mbrVarMap, variable, varChangeMap, "Double") * variable.getCoefficient());
 			    }
 		    }
 		    else if (variable.getName() != null && varChangeMap.get(variable.getName().toUpperCase()) != null) {
 			    if( varChangeMap.get(variable.getName().toUpperCase()).getValue() instanceof Integer ) {
-			    	val = val + ((Integer)calculateVariableValue(mbrVarMap, variable, varChangeMap, "Integer") * variable.getCoefficeint());
+			    	val = val + ((Integer)calculateVariableValue(mbrVarMap, variable, varChangeMap, "Integer") * variable.getCoefficient());
 			    }
 			    else if( varChangeMap.get(variable.getName().toUpperCase()).getValue() instanceof Double) {
-			    	val = val + ((Double)calculateVariableValue(mbrVarMap, variable, varChangeMap, "Double") * variable.getCoefficeint());
+			    	val = val + ((Double)calculateVariableValue(mbrVarMap, variable, varChangeMap, "Double") * variable.getCoefficient());
 			    }
 		    	
 		    }
@@ -421,6 +412,7 @@ public class ScoringBolt extends BaseRichBolt {
 		    	continue;
 		    }
 	    }
+	    //System.out.println(" base value: " + val);
         return val;
     }
 

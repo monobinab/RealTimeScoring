@@ -93,7 +93,8 @@ public class ParsingBoltPOS extends BaseRichBolt {
 //        db.authenticate(configuration.getString("mongo.db.user"), configuration.getString("mongo.db.password").toCharArray());
 //	    db.authenticate("rtsw", "5core123".toCharArray());
         db = mongoClient.getDB("test");
-        memberCollection = db.getCollection("memberVariables");
+
+	    memberCollection = db.getCollection("memberVariables");
         divLnItmCollection = db.getCollection("divLnItm");
         divLnVariableCollection = db.getCollection("divLnVariable");
 
@@ -263,7 +264,7 @@ public class ParsingBoltPOS extends BaseRichBolt {
 	        listToEmit.add(createJsonFromVarValueMap(varAmountMap));
 	        listToEmit.add("NPOS");
 
-	        System.out.println(" *** parsing bolt emitting: " + listToEmit.toString());
+	        //System.out.println(" *** parsing bolt emitting: " + listToEmit.toString());
 	        
 			// 9) EMIT VARIABLES TO VALUES MAP IN GSON DOCUMENT
 	        if(listToEmit!=null && !listToEmit.isEmpty()) {

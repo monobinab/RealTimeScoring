@@ -96,6 +96,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 //		db = mongoClient.getDB("RealTimeScoring");
 //	    db.authenticate("rtsw", "5core123".toCharArray());
         db = mongoClient.getDB("test");
+        
         memberVariablesCollection = db.getCollection("memberVariables");
         memberTraitsCollection = db.getCollection("memberTraits");
         memberUUIDCollection = db.getCollection("memberUUID");
@@ -187,7 +188,7 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
         	if(i==0) splitRec = webTraitsSplitRec[i];
         	else splitRec = splitRec + "  " + webTraitsSplitRec[i];
         }
-        System.out.println("  split string: " + splitRec);
+//        System.out.println("  split string: " + splitRec);
 		
         
         //2014-03-08 10:56:17,00000388763646853831116694914086674166,743651,US,Sears

@@ -181,12 +181,11 @@ public class StrategyBolt extends BaseRichBolt {
 		// 9) FIND ALL MODELS THAT ARE AFFECTED BY CHANGES
 		// 10) EMIT LIST OF MODEL IDs
 		
-//		System.out.println("APPLYING STRATEGIES");
+		//System.out.println("APPLYING STRATEGIES");
 		
 		// 1) PULL OUT HASHED LOYALTY ID FROM THE FIRST RECORD
 		String l_id = input.getString(0);
 		String source = input.getString(2);
-//		System.out.println(" ~~~ STRATEGY BOLT PARSED l_id AS: " + l_id);
 		Map<String, String> newChangesVarValueMap = restoreVariableListFromJson(input.getString(1));
 
 //		System.out.println(" ~~~ STRATEGY BOLT PARSED VARIABLE MAP AS: " + varAmountMap);
