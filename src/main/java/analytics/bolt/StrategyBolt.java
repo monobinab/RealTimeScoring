@@ -181,12 +181,11 @@ public class StrategyBolt extends BaseRichBolt {
 		// 9) FIND ALL MODELS THAT ARE AFFECTED BY CHANGES
 		// 10) EMIT LIST OF MODEL IDs
 		
-//		System.out.println("APPLYING STRATEGIES");
+		//System.out.println("APPLYING STRATEGIES");
 		
 		// 1) PULL OUT HASHED LOYALTY ID FROM THE FIRST RECORD
 		String l_id = input.getString(0);
 		String source = input.getString(2);
-//		System.out.println(" ~~~ STRATEGY BOLT PARSED l_id AS: " + l_id);
 		Map<String, String> newChangesVarValueMap = restoreVariableListFromJson(input.getString(1));
 
 //		System.out.println(" ~~~ STRATEGY BOLT PARSED VARIABLE MAP AS: " + varAmountMap);
@@ -236,7 +235,11 @@ public class StrategyBolt extends BaseRichBolt {
 		    	}
 		    	try {
 					if(!simpleDateFormat.parse(((DBObject) changedMbrVariables.get(key)).get("e").toString()).after(new Date())) {
-						allChanges.put(key.toUpperCase(), new Change(key.toUpperCase(), ((DBObject) changedMbrVariables.get(key)).get("v"), simpleDateFormat.parse(((DBObject) changedMbrVariables.get(key)).get("e").toString())));
+						allChanges.put(key.toUpperCase()
+								, new Change(key.toUpperCase()
+									, ((DBObject) changedMbrVariables.get(key)).get("v")
+									, simpleDateFormat.parse(((DBObject) changedMbrVariables.get(key)).get("e").toString())
+									, simpleDateFormat.parse(((DBObject) changedMbrVariables.get(key)).get("f").toString())));
 					}
 				} catch (ParseException e) {
 					e.printStackTrace();
@@ -301,7 +304,7 @@ public class StrategyBolt extends BaseRichBolt {
 		        Map.Entry<String, Change> pairsVarValue = (Map.Entry<String, Change>)newChangesIter.next();
 		    	String varVid =  variableNameToVidMap.get(pairsVarValue.getKey().toString().toUpperCase());
 				Object val = pairsVarValue.getValue().value;
-				newDocument.append(varVid, new BasicDBObject().append("v", val).append("e", pairsVarValue.getValue().getExpirationDateAsString()));
+				newDocument.append(varVid, new BasicDBObject().append("v", val).append("e", pairsVarValue.getValue().getExpirationDateAsString()).append("f", pairsVarValue.getValue().getEffectiveDateAsString()));
 		    	
 		    	allChanges.put(varVid, new Change(varVid, val, pairsVarValue.getValue().expirationDate));
 		    }

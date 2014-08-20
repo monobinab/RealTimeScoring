@@ -7,15 +7,24 @@ public class Change {
 	public String variableName;
 	public Object value;
 	public Date expirationDate;
+	public Date effectivDate;
 	
 	public Change() {}
 	
 	private static SimpleDateFormat dtFormat = new SimpleDateFormat("yyyy-MM-dd");
 	
+	public Change(String varName, Object val, Date expDate, Date effDate) {
+		this.variableName = varName;
+		this.value = val;
+		this.expirationDate = expDate;
+		this.effectivDate = effDate;
+	}
+	
 	public Change(String varName, Object val, Date expDate) {
 		this.variableName = varName;
 		this.value = val;
 		this.expirationDate = expDate;
+		this.effectivDate = new Date();
 	}
 	
 	public Change(Object val, Date expDate) {
@@ -49,5 +58,12 @@ public class Change {
 	
 	public String getExpirationDateAsString() {
 		return dtFormat.format(this.expirationDate);
+	}
+
+	public Object getEffectiveDateAsString() {
+		if(this.effectivDate != null) {
+			return dtFormat.format(this.effectivDate);
+		}
+		else return dtFormat.format(new Date());
 	}
 }

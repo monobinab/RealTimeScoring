@@ -93,7 +93,8 @@ public class ParsingBoltPOS extends BaseRichBolt {
 //        db.authenticate(configuration.getString("mongo.db.user"), configuration.getString("mongo.db.password").toCharArray());
 //	    db.authenticate("rtsw", "5core123".toCharArray());
         db = mongoClient.getDB("test");
-        memberCollection = db.getCollection("memberVariables");
+
+	    memberCollection = db.getCollection("memberVariables");
         divLnItmCollection = db.getCollection("divLnItm");
         divLnVariableCollection = db.getCollection("divLnVariable");
 
@@ -136,8 +137,8 @@ public class ParsingBoltPOS extends BaseRichBolt {
 		// 6) FETCH SEGMENT "C1"
 		// 7) FOR EACH SUB-SEGMENT IN "C1" FIND DIVISION #, ITEM #, AMOUNT AND FIND LINE FROM DIVISION # + ITEM #
 		//    AND PUT INTO LINE ITEM CLASS CONTAINER WITH HASHED LOYALTY ID + ALL TRANSACTION LEVEL DATA
-		// 8) EMIT LINE ITEMS
-
+		// 8) FOR EACH LINE ITEM FIND ASSOCIATED VARIABLES BY DIVISION AND LINE
+		// 9) EMIT VARIABLES TO VALUES MAP IN GSON DOCUMENT
         	
 		//System.out.println("PARSING NPOS DOCUMENT");
 		
@@ -237,50 +238,48 @@ public class ParsingBoltPOS extends BaseRichBolt {
         }
         
         //System.out.println("list size: " + lineItemList.size());
-        if(lineItemList.size()>0){
-	        List<Object> lineItemAsJsonString = new ArrayList<Object>();
-	        lineItemAsJsonString.add(l_id);
-	        lineItemAsJsonString.add(createJsonFromLineItemList(lineItemList));
-	        lineItemAsJsonString.add("NPOS");
+    	if(lineItemList != null && !lineItemList.isEmpty()) {
+    		
+    		// 8) FOR EACH LINE ITEM FIND ASSOCIATED VARIABLES BY DIVISION AND LINE
+        	Map<String, String> varAmountMap = new HashMap<String, String>();
+        	for(TransactionLineItem lnItm : lineItemList) {
+        		List<String> varList = lnItm.getVariableList();
+        		if(varList == null || varList.isEmpty()) {
+        			continue;
+        		}
+        		for(String v : varList) {
+        			if(!varAmountMap.containsKey(v.toUpperCase())) {
+    	    			varAmountMap.put(v.toUpperCase(), String.valueOf(lnItm.getAmount()));
+        			}
+        			else {
+        				Double a1 = Double.valueOf(varAmountMap.get(v));
+        				a1 = a1 + lnItm.getAmount();
+        				varAmountMap.remove(v.toUpperCase());
+    	    			varAmountMap.put(v.toUpperCase(), String.valueOf(a1));
+        			}
+        		}
+    		}
+	        List<Object> listToEmit = new ArrayList<Object>();
+	        listToEmit.add(l_id);
+	        listToEmit.add(createJsonFromVarValueMap(varAmountMap));
+	        listToEmit.add("NPOS");
 
-	        System.out.println(" *** parsing bolt emitting: " + lineItemAsJsonString.toString());
+	        //System.out.println(" *** parsing bolt emitting: " + listToEmit.toString());
 	        
-			// 8) EMIT LINE ITEMS
-	        if(lineItemAsJsonString!=null && !lineItemAsJsonString.isEmpty()) {
-	        	this.outputCollector.emit(lineItemAsJsonString);
+			// 9) EMIT VARIABLES TO VALUES MAP IN GSON DOCUMENT
+	        if(listToEmit!=null && !listToEmit.isEmpty()) {
+	        	this.outputCollector.emit(listToEmit);
 	        }
         }
     }
 
-    private Object createJsonFromLineItemList(Collection<TransactionLineItem> lineItemCollection) {
+    private Object createJsonFromVarValueMap(Map<String,String> varAmountMap) {
 		// Create string in JSON format to emit
 
     	Gson gson = new Gson();
-    	Map<String, String> varAmountMap = new HashMap<String, String>();
     	Type transLineItemType = new TypeToken<Map<String, String>>() {
 			private static final long serialVersionUID = 1L;}.getType();
     	
-    	if(lineItemCollection == null || lineItemCollection.isEmpty()) {
-    		return null;
-    	}
-    	
-    	for(TransactionLineItem lnItm : lineItemCollection) {
-    		List<String> varList = lnItm.getVariableList();
-    		if(varList == null || varList.isEmpty()) {
-    			continue;
-    		}
-    		for(String v : varList) {
-    			if(!varAmountMap.containsKey(v.toUpperCase())) {
-	    			varAmountMap.put(v.toUpperCase(), String.valueOf(lnItm.getAmount()));
-    			}
-    			else {
-    				Double a1 = Double.valueOf(varAmountMap.get(v));
-    				a1 = a1 + lnItm.getAmount();
-    				varAmountMap.remove(v.toUpperCase());
-	    			varAmountMap.put(v.toUpperCase(), String.valueOf(a1));
-    			}
-    		}
-		}
     	
     	String transLineItemListString = gson.toJson(varAmountMap, transLineItemType);
 		return transLineItemListString;

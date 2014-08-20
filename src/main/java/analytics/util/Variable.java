@@ -15,16 +15,16 @@ public class Variable implements Serializable
 	private ObjectId _id;
 	private String name;
 	private String vid;
-	private double coefficeint;
+	private double coefficient;
 	 
 
 	public Variable() {}
 	 
-	public Variable( String nm, String id, int mnth, String typ, double coefficnt)
+	public Variable( String nm, String id, double coefficnt)
 	{
 		this.name   = nm;
 		this.vid   = id;
-		this.coefficeint = coefficnt;
+		this.coefficient = coefficnt;
 	}
 	 
 	public ObjectId getId() { return this._id; }
@@ -39,8 +39,8 @@ public class Variable implements Serializable
 	
 	 
 	 
-	public double getCoefficeint() { return this.coefficeint; }
-	public void setCoefficeint( double coefficeint ) { this.coefficeint = coefficeint; }
+	public double getCoefficient() { return this.coefficient; }
+	public void setCoefficient( double coefficient ) { this.coefficient = coefficient; }
 	 
 	public DBObject bsonFromPojo()
 	{
@@ -48,7 +48,7 @@ public class Variable implements Serializable
 		 
 		document.put( "_id",    this._id );
 		document.put( "name",   this.name );
-		document.put( "coefficeint",  this.coefficeint );
+		document.put( "coefficient",  this.coefficient );
 		 
 		return document;
 	}
@@ -59,6 +59,6 @@ public class Variable implements Serializable
 		 
 		this._id    	= ( ObjectId ) b.get( "_id" );
 		this.name   	= ( String )   b.get( "name" );
-		this.coefficeint= ( Double )   b.get( "coefficeint" );
+		this.coefficient= ( Double )   b.get( "coefficient" );
 	}
 }
