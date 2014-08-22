@@ -1,6 +1,21 @@
 package analytics.bolt;
 
-import analytics.util.TransactionLineItem;
+import java.lang.reflect.Type;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.jms.JMSException;
+import javax.jms.TextMessage;
+
+import shc.npos.segments.Segment;
+import shc.npos.util.SegmentUtils;
+import analytics.util.MongoUtils;
+import analytics.util.SecurityUtils;
+import analytics.util.objects.TransactionLineItem;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -11,22 +26,11 @@ import backtype.storm.tuple.Tuple;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.ibm.jms.JMSMessage;
-import com.mongodb.*;
-
-import shc.npos.segments.Segment;
-import shc.npos.util.SegmentUtils;
-
-import javax.jms.JMSException;
-import javax.jms.TextMessage;
-
-import java.lang.reflect.Type;
-import java.net.UnknownHostException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.util.*;
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import org.apache.commons.codec.binary.Base64;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
 
 
 public class ParsingBoltPOS extends BaseRichBolt {
@@ -37,7 +41,6 @@ public class ParsingBoltPOS extends BaseRichBolt {
     private OutputCollector outputCollector;
 
     DB db;
-    MongoClient mongoClient;
     DBCollection memberCollection;
     DBCollection divLnItmCollection;
     DBCollection divLnVariableCollection;
@@ -46,14 +49,6 @@ public class ParsingBoltPOS extends BaseRichBolt {
 
     public void setOutputCollector(OutputCollector outputCollector) {
         this.outputCollector = outputCollector;
-    }
-
-    public void setDb(DB db) {
-        this.db = db;
-    }
-
-    public void setMongoClient(MongoClient mongoClient) {
-        this.mongoClient = mongoClient;
     }
 
     public void setMemberCollection(DBCollection memberCollection) {
@@ -83,16 +78,10 @@ public class ParsingBoltPOS extends BaseRichBolt {
 
         //System.out.println("PREPARING PARSING POS BOLT");
         try {
-//            mongoClient = new MongoClient("shrdmdb301p.stag.ch3.s.com", 20000);
-            mongoClient = new MongoClient("trprrta2mong4.vm.itg.corp.us.shldcorp.com", 27000);
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-
-//        db = mongoClient.getDB("RealTimeScoring");
-//        db.authenticate(configuration.getString("mongo.db.user"), configuration.getString("mongo.db.password").toCharArray());
-//	    db.authenticate("rtsw", "5core123".toCharArray());
-        db = mongoClient.getDB("test");
+			db = MongoUtils.getClient("DEV");
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
 
 	    memberCollection = db.getCollection("memberVariables");
         divLnItmCollection = db.getCollection("divLnItm");
@@ -184,7 +173,7 @@ public class ParsingBoltPOS extends BaseRichBolt {
         }
             
 		// 5) HASH LOYALTY ID
-    	String l_id = hashLoyaltyId(lyl_id_no);
+    	String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no);
     	//System.out.println(lyl_id_no + " : " + l_id);
         	
 		// 6) FETCH SEGMENT "C1"
@@ -297,26 +286,6 @@ public class ParsingBoltPOS extends BaseRichBolt {
 		declarer.declare(new Fields("l_id","lineItemAsJsonString","source"));
 	}
 
-
-	public String hashLoyaltyId(String l_id) {
-		String hashed = new String();
-		try {
-			SecretKeySpec signingKey = new SecretKeySpec("mykey".getBytes(), "HmacSHA1");
-			Mac mac = Mac.getInstance("HmacSHA1");
-			try {
-				mac.init(signingKey);
-			} catch (InvalidKeyException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			byte[] rawHmac = mac.doFinal(l_id.getBytes());
-			hashed = new String(Base64.encodeBase64(rawHmac));
-		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return hashed;
-	}
 	
 	public String getLineFromCollection(String div, String item) {
 		//System.out.println("searching for line");

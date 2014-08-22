@@ -1,7 +1,7 @@
 package analytics.util.strategies;
 
-import analytics.util.Change;
-import analytics.util.RealTimeScoringContext;
+import analytics.util.objects.Change;
+import analytics.util.objects.RealTimeScoringContext;
 
 /**
  * Created by syermalk on 4/1/14.

@@ -4,8 +4,8 @@ import java.util.Date;
 
 import org.joda.time.LocalDate;
 
-import analytics.util.Change;
-import analytics.util.RealTimeScoringContext;
+import analytics.util.objects.Change;
+import analytics.util.objects.RealTimeScoringContext;
 
 public class StrategyCountTransactions implements Strategy {
 

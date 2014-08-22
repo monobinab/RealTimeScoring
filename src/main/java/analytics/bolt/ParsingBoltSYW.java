@@ -1,15 +1,8 @@
 package analytics.bolt;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-
-import org.apache.commons.codec.binary.Base64;
 
 import static backtype.storm.utils.Utils.tuple;
 
@@ -19,7 +12,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import analytics.util.SYWAPICalls;
-import analytics.util.Signing;
+import analytics.util.SecurityUtils;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -37,33 +30,44 @@ public class ParsingBoltSYW extends BaseRichBolt {
 			OutputCollector collector) {
 		this.outputCollector = collector;
 		listOfInteractionsForRTS = new ArrayList<String>();
+		//TODO: This is where more interactions are added. 
+		//We should ideally just ignore the interactions in our subscription request
+		//If this is a performance hit, we can change that piece
+		
 		//Master list of interactions we process
 		listOfInteractionsForRTS.add("Like");
+		listOfInteractionsForRTS.add("Want");
 	}
 
 	@Override
 	public void execute(Tuple input) {
-
+		//Read the JSON message from the spout
 		JsonParser parser = new JsonParser();
 		JsonArray interactionArray = parser.parse(
 				input.getStringByField("message")).getAsJsonArray();
 
-		// Each record can have multiple elements in it, though it is generally
-		// only one
+		// Each record can have multiple elements in it, though it is generally only one
 		for (JsonElement interaction : interactionArray) {
 			JsonObject interactionObject = interaction.getAsJsonObject();
 			String l_id = SYWAPICalls.getLoyaltyId(interactionObject.get(
 					"UserId").getAsString());
+			/*Ignore if we can not get member information
+			Possible causes are
+			1. user is not subscribed to our app
+			*/
 			if (l_id == null) {
 				System.out
 						.println("Unable to get member info, skipping record");
 				continue;
 			} else {
-				l_id = Signing.hashLoyaltyId(l_id);
+				/*
+				 * RTS only wants encrypted loyalty ids
+				 */
+				l_id = SecurityUtils.hashLoyaltyId(l_id);
 			}
 			JsonElement interactionType = interactionObject
 					.get("InteractionType");
-			//Ignore interactions that we dont want
+			/*Ignore interactions that we dont want.*/
 			if (listOfInteractionsForRTS
 					.contains(interactionType.getAsString())) {
 				outputCollector.emit(tuple(l_id, interactionObject,
@@ -77,6 +81,7 @@ public class ParsingBoltSYW extends BaseRichBolt {
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		declarer.declare(new Fields("l_id", "message", "InteractionType"));
+		/*Possible interactions*/
 		/*
 		 * AddProductMedia AddToCatalog AddToPendingPoll Answer Ask
 		 * CatalogCreated Comment CommentOnStory CreatePoll EarnBadge

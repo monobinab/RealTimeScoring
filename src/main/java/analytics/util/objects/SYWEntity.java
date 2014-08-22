@@ -1,4 +1,4 @@
-package analytics.util;
+package analytics.util.objects;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;

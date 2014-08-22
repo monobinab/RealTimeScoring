@@ -1,9 +1,24 @@
 package analytics.bolt;
 
-import analytics.util.Change;
-import analytics.util.RealTimeScoringContext;
-import analytics.util.TransactionLineItem;
-import analytics.util.Variable;
+import java.lang.reflect.Type;
+import java.net.UnknownHostException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.apache.commons.lang.StringUtils;
+
+import redis.clients.jedis.Jedis;
+import analytics.util.MongoUtils;
+import analytics.util.objects.Change;
+import analytics.util.objects.RealTimeScoringContext;
 import analytics.util.strategies.Strategy;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -14,26 +29,12 @@ import backtype.storm.tuple.Tuple;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
-import com.mongodb.*;
-
-import redis.clients.jedis.Jedis;
-import shc.npos.segments.Segment;
-
-import java.lang.reflect.Type;
-import java.net.UnknownHostException;
-import java.security.InvalidKeyException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.Map.Entry;
-
-import java.security.SignatureException;
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringUtils;
+import com.mongodb.BasicDBList;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
 
 
 public class StrategyBolt extends BaseRichBolt {
@@ -45,7 +46,6 @@ public class StrategyBolt extends BaseRichBolt {
     private OutputCollector outputCollector;
 
     DB db;
-    MongoClient mongoClient;
     DBCollection modelVariablesCollection;
     DBCollection memberVariablesCollection;
     DBCollection variablesCollection;
@@ -63,14 +63,6 @@ public class StrategyBolt extends BaseRichBolt {
     
     public void setOutputCollector(OutputCollector outputCollector) {
         this.outputCollector = outputCollector;
-    }
-
-    public void setDb(DB db) {
-        this.db = db;
-    }
-
-    public void setMongoClient(MongoClient mongoClient) {
-        this.mongoClient = mongoClient;
     }
 
     public void setModelCollection(DBCollection modVariablesCollection) {
@@ -101,16 +93,10 @@ public class StrategyBolt extends BaseRichBolt {
         System.out.println("PREPARING STRATEGY BOLT");
         
         try {
-//        	mongoClient = new MongoClient("shrdmdb301p.stag.ch3.s.com", 20000);
-        	mongoClient = new MongoClient("trprrta2mong4.vm.itg.corp.us.shldcorp.com", 27000);
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-
-//        db = mongoClient.getDB("RealTimeScoring");
-//        db.authenticate(configuration.getString("mongo.db.user"), configuration.getString("mongo.db.password").toCharArray());
-//	    db.authenticate("rtsw", "5core123".toCharArray());
-        db = mongoClient.getDB("test");
+			db = MongoUtils.getClient("DEV");
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
 
         modelVariablesCollection = db.getCollection("modelVariables");
         memberVariablesCollection = db.getCollection("memberVariables");

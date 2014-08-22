@@ -3,29 +3,38 @@
  */
 package analytics.bolt;
 
-import analytics.util.Change;
-import analytics.util.Model;
-import analytics.util.Variable;
+import java.net.UnknownHostException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
+
+import redis.clients.jedis.Jedis;
+import analytics.util.MongoUtils;
+import analytics.util.objects.Change;
+import analytics.util.objects.Model;
+import analytics.util.objects.Variable;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-import com.mongodb.*;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringUtils;
-import redis.clients.jedis.Jedis;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import java.net.UnknownHostException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import com.mongodb.BasicDBList;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
 
 public class ScoringBolt extends BaseRichBolt {
 
@@ -36,7 +45,6 @@ public class ScoringBolt extends BaseRichBolt {
     private OutputCollector outputCollector;
 
     DB db;
-    MongoClient mongoClient;
     DBCollection modelVariablesCollection;
     DBCollection memberVariablesCollection;
     DBCollection memberScoreCollection;
@@ -52,19 +60,8 @@ public class ScoringBolt extends BaseRichBolt {
 
     private Jedis jedis;
 
-
-
-
     public void setOutputCollector(OutputCollector outputCollector) {
         this.outputCollector = outputCollector;
-    }
-
-    public void setDb(DB db) {
-        this.db = db;
-    }
-
-    public void setMongoClient(MongoClient mongoClient) {
-        this.mongoClient = mongoClient;
     }
 
     public void setModelCollection(DBCollection modelCollection) {
@@ -103,16 +100,10 @@ public class ScoringBolt extends BaseRichBolt {
         System.out.println("PREPARING SCORING BOLT");
 
         try {
-//        	mongoClient = new MongoClient("shrdmdb301p.stag.ch3.s.com", 20000);
-        	mongoClient = new MongoClient("trprrta2mong4.vm.itg.corp.us.shldcorp.com", 27000);
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-
-//      db = mongoClient.getDB("RealTimeScoring");
-//      db.authenticate(configuration.getString("mongo.db.user"), configuration.getString("mongo.db.password").toCharArray());
-//	    db.authenticate("rtsw", "5core123".toCharArray());
-        db = mongoClient.getDB("test");
+			db = MongoUtils.getClient("DEV");
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
 
 	    memberVariablesCollection = db.getCollection("memberVariables");
         modelVariablesCollection = db.getCollection("modelVariables");
@@ -339,23 +330,6 @@ public class ScoringBolt extends BaseRichBolt {
         }
     }
 
-	public String hashLoyaltyId(String l_id) {
-		String hashed = new String();
-		try {
-			SecretKeySpec signingKey = new SecretKeySpec("mykey".getBytes(), "HmacSHA1");
-			Mac mac = Mac.getInstance("HmacSHA1");
-			try {
-				mac.init(signingKey);
-			} catch (InvalidKeyException e) {
-				e.printStackTrace();
-			}
-			byte[] rawHmac = mac.doFinal(l_id.getBytes());
-			hashed = new String(Base64.encodeBase64(rawHmac));
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
-		return hashed;
-	}
 
 
     /*

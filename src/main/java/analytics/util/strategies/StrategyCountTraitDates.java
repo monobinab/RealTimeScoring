@@ -12,8 +12,8 @@ import java.util.Set;
 
 import org.joda.time.LocalDate;
 
-import analytics.util.Change;
-import analytics.util.RealTimeScoringContext;
+import analytics.util.objects.Change;
+import analytics.util.objects.RealTimeScoringContext;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;

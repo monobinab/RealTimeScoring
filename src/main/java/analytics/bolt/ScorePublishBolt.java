@@ -3,15 +3,18 @@
  */
 package analytics.bolt;
 
+import analytics.util.MongoUtils;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
+
 import com.mongodb.*;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+
 import redis.clients.jedis.Jedis;
 
 import java.net.UnknownHostException;
@@ -32,7 +35,6 @@ public class ScorePublishBolt extends BaseRichBolt {
 
 
     DB db;
-    MongoClient mongoClient;
     DBCollection memberZipCollection;
     DBCollection memberScoreCollection;
 
@@ -65,15 +67,13 @@ public class ScorePublishBolt extends BaseRichBolt {
 
 
         //prepare mongo
-        try {
-            mongoClient = new MongoClient("shrdmdb301p.stag.ch3.s.com", 20000);
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
 
-        db = mongoClient.getDB("RealTimeScoring");
-        //db.authenticate(configuration.getString("mongo.db.user"), configuration.getString("mongo.db.password").toCharArray());
-        db.authenticate("rtsw", "5core123".toCharArray());
+        try {
+			db = MongoUtils.getClient("QA");
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         memberZipCollection = db.getCollection("memberZip");
         memberScoreCollection = db.getCollection("memberScore");
         

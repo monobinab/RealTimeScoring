@@ -16,8 +16,8 @@ import org.joda.time.LocalDate;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 
-import analytics.util.Change;
-import analytics.util.RealTimeScoringContext;
+import analytics.util.objects.Change;
+import analytics.util.objects.RealTimeScoringContext;
 
 
 public class StrategyCountTraits implements Strategy {

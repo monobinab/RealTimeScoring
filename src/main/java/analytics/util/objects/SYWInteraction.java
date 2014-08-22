@@ -1,4 +1,4 @@
-package analytics.util;
+package analytics.util.objects;
 
 import java.util.List;
 

@@ -1,11 +1,13 @@
 package analytics.bolt;
 
+import analytics.util.MongoUtils;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.mongodb.*;
@@ -15,6 +17,7 @@ import org.apache.commons.lang.StringUtils;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+
 import java.lang.reflect.Type;
 import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
@@ -34,7 +37,6 @@ public class ParsingBoltAAM_ATC extends BaseRichBolt {
     
 
     DB db;
-    MongoClient mongoClient;
     DBCollection memberCollection;
     DBCollection memberUUIDCollection;
     DBCollection pidDivLnCollection;
@@ -48,14 +50,6 @@ public class ParsingBoltAAM_ATC extends BaseRichBolt {
 
     public void setOutputCollector(OutputCollector outputCollector) {
         this.outputCollector = outputCollector;
-    }
-
-    public void setDb(DB db) {
-        this.db = db;
-    }
-
-    public void setMongoClient(MongoClient mongoClient) {
-        this.mongoClient = mongoClient;
     }
 
     public void setMemberCollection(DBCollection memberCollection) {
@@ -82,13 +76,10 @@ public class ParsingBoltAAM_ATC extends BaseRichBolt {
 
         System.out.println("PREPARING PARSING BOLT FOR ADD-TO-CART");
         try {
-            mongoClient = new MongoClient("shrdmdb301p.stag.ch3.s.com", 20000);
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-
-        db = mongoClient.getDB("RealTimeScoring");
-	    db.authenticate("rtsw", "5core123".toCharArray());
+			db = MongoUtils.getClient("QA");
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
         memberCollection = db.getCollection("memberVariables");
         memberUUIDCollection = db.getCollection("memberUUID");
         
@@ -309,26 +300,6 @@ public class ParsingBoltAAM_ATC extends BaseRichBolt {
 		declarer.declare(new Fields("l_id","lineItemAsJsonString","source"));
 	}
 
-
-	public String hashLoyaltyId(String l_id) {
-		String hashed = new String();
-		try {
-			SecretKeySpec signingKey = new SecretKeySpec("mykey".getBytes(), "HmacSHA1");
-			Mac mac = Mac.getInstance("HmacSHA1");
-			try {
-				mac.init(signingKey);
-			} catch (InvalidKeyException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			byte[] rawHmac = mac.doFinal(l_id.getBytes());
-			hashed = new String(Base64.encodeBase64(rawHmac));
-		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return hashed;
-	}
 	
 //	public String getLineFromCollection(String div, String item) {
 //		//System.out.println("searching for line");
