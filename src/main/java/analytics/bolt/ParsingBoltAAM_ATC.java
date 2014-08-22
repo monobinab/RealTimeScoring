@@ -1,5 +1,18 @@
 package analytics.bolt;
 
+import java.lang.reflect.Type;
+import java.net.UnknownHostException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
+
 import analytics.util.MongoUtils;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -10,21 +23,11 @@ import backtype.storm.tuple.Tuple;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
-import com.mongodb.*;
-
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringUtils;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-
-import java.lang.reflect.Type;
-import java.net.UnknownHostException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
 
 
 public class ParsingBoltAAM_ATC extends BaseRichBolt {
