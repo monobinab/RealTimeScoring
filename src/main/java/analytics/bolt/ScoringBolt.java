@@ -4,6 +4,7 @@
 package analytics.bolt;
 
 import analytics.util.Change;
+import analytics.util.Model;
 import analytics.util.Variable;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -46,6 +47,8 @@ public class ScoringBolt extends BaseRichBolt {
     
     private Map<String,Collection<Integer>> variableModelsMap;
     private Map<String, String> variableVidToNameMap;
+    private Map<String, String> variableNameToVidMap;
+    private Map<Integer,Map<Integer, Model>> modelsMap;
 
     private Jedis jedis;
 
@@ -118,14 +121,43 @@ public class ScoringBolt extends BaseRichBolt {
         changedVariablesCollection = db.getCollection("changedMemberVariables");
         changedMemberScoresCollection = db.getCollection("changedMemberScores");
 
-        // populate the variableModelsMap
+        // populate the variableVidToNameMap
+        variableVidToNameMap = new HashMap<String, String>();
+        variableNameToVidMap = new HashMap<String, String>();
+        DBCursor vCursor = variablesCollection.find();
+        for(DBObject variable:vCursor){
+             String variableName = ((DBObject) variable).get("name").toString().toUpperCase();
+             String vid = ((DBObject) variable).get("VID").toString();
+             if (variableName != null && vid != null)
+             {
+                 variableVidToNameMap.put(vid, variableName.toUpperCase());
+                 variableNameToVidMap.put(variableName.toUpperCase(), vid);
+             }
+        }
+
+        // populate the variableModelsMap and modelsMap
+        modelsMap = new HashMap<Integer, Map<Integer,Model>>();
         variableModelsMap = new HashMap<String, Collection<Integer>>();
+        
         DBCursor models = modelVariablesCollection.find();
         for(DBObject model:models){
+        	
+        	System.out.println("modelId: " + model.get("modelId"));
+        	System.out.println("month: " + model.get("month"));
+        	System.out.println("constant: " + model.get("constant"));
+        	
+        	int modelId = Integer.valueOf(model.get("modelId").toString());
+        	int month = Integer.valueOf(model.get("month").toString());
+        	double constant = Double.valueOf(model.get("constant").toString());
+        	
              BasicDBList modelVariables = (BasicDBList) model.get("variable");
+             Collection<Variable> variablesCollection = new ArrayList<Variable>();
              for(Object modelVariable:modelVariables)
              {
                  String variableName = ((DBObject) modelVariable).get("name").toString().toUpperCase();
+                 Double coefficient = Double.valueOf(((DBObject) modelVariable).get("coefficient").toString());
+                 variablesCollection.add(new Variable(variableName, variableNameToVidMap.get(variableName), coefficient));
+                 
                  if (!variableModelsMap.containsKey(variableName))
                  {
                      Collection<Integer> modelIds = new ArrayList<Integer>();
@@ -139,24 +171,13 @@ public class ScoringBolt extends BaseRichBolt {
                      }
                  }
              }
+             Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
+             monthModelMap.put(month, new Model(modelId, month, constant, variablesCollection));
+             modelsMap.put(modelId, monthModelMap);
         }
 
-        System.out.println(" variablesModelMap: " + variableModelsMap);
-
-        // populate the variableVidToNameMap
-        variableVidToNameMap = new HashMap<String, String>();
-        DBCursor vCursor = variablesCollection.find();
-        for(DBObject variable:vCursor){
-             String variableName = ((DBObject) variable).get("name").toString().toUpperCase();
-             String vid = ((DBObject) variable).get("VID").toString();
-             if (variableName != null && vid != null)
-             {
-                 variableVidToNameMap.put(vid, variableName.toUpperCase());
-             }
-        }
-
+        //System.out.println(" variablesModelMap: " + variableModelsMap);
         //System.out.println(" variableVidToNameMap: " + variableVidToNameMap);
-
 
         //jedis = new Jedis("151.149.116.48");
 
@@ -369,28 +390,22 @@ public class ScoringBolt extends BaseRichBolt {
     double calcMbrVar( Map<String,Object> mbrVarMap, Map<String,Change> varChangeMap, int modelId)
     {
 	    
-	    BasicDBObject queryModel = new BasicDBObject("modelId", modelId);
-	    BasicDBList monthQuery = new BasicDBList();
-	    monthQuery.add(new BasicDBObject("month", 0));
-	    monthQuery.add(new BasicDBObject("month", Calendar.getInstance().get(Calendar.MONTH)+1));
-	    queryModel.append("$or", monthQuery);
-		
-	    DBObject model = modelVariablesCollection.findOne( queryModel);
-
-	    //System.out.println( " Model ID: " + model.get("modelId") + " ~~ constant: " + model.get("constant").toString() + " ~~ month: " + model.get("month"));
+	    Model model = new Model(); 
 	    
-	    double val = (Double) model.get( "constant" );
+	    if(modelsMap.get(modelId).containsKey(0)) {
+	    	model = modelsMap.get(modelId).get(0);
+	    }
+	    else if(modelsMap.get(modelId).containsKey(Calendar.getInstance().get(Calendar.MONTH)+1)) {
+	    	model = modelsMap.get(modelId).get(Calendar.getInstance().get(Calendar.MONTH)+1);
+	    }
+	    else {
+	    	return 0;
+	    }
 	    
-	    BasicDBList modelVariableDBList = ( BasicDBList ) model.get( "variable" );
-	    Variable variable = new Variable();
+	    double val = (Double) model.getConstant();
 	    
-	    for( Object varObject:modelVariableDBList )
+	    for( Variable variable: model.getVariables() )
 	    {
-	    	DBObject variableFromVariablesCollection = this.variablesCollection.findOne(new BasicDBObject("name", ((BasicDBObject) varObject).get("name").toString().toUpperCase()));
-            variable.setVid(variableFromVariablesCollection.get("VID").toString());
-            variable.makePojoFromBson((BasicDBObject) varObject );
-
-		    //System.out.println("PASS - varNm: " + variable.getName() + " varType: " + variable.getType() + " value: " + mbrVarMap.get(variable.getName().toUpperCase()) + " coef: " + variable.getCoefficeint());
 		    if(variable.getName() != null && mbrVarMap.get(variable.getName().toUpperCase()) != null ) {
 			    if( mbrVarMap.get(variable.getName().toUpperCase()) instanceof Integer ) {
 			    	val = val + ((Integer)calculateVariableValue(mbrVarMap, variable, varChangeMap, "Integer") * variable.getCoefficient());
