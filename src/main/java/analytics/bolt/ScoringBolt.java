@@ -299,6 +299,22 @@ public class ScoringBolt extends BaseRichBolt {
             		}
             	}
             }
+
+            //IF THE MODEL IS MONTH SPECIFIC AND THE MIN/MAX DATE IS AFTER THE END OF THE MONTH SET TO THE LAST DAY OF THIS MONTH
+            if(modelsMap.containsKey(modelId) && modelsMap.get(modelId).containsKey(Calendar.getInstance().get(Calendar.MONTH)+1)) {
+        		Calendar calendar = Calendar.getInstance();
+        		calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DATE));
+        		Date lastDayOfMonth = calendar.getTime();
+
+            	if(minDate.after(lastDayOfMonth)) {
+            		minDate = lastDayOfMonth;
+            		maxDate = lastDayOfMonth;
+            	}
+            	else if(maxDate.after(lastDayOfMonth)) {
+            		maxDate = lastDayOfMonth;
+            	}
+            }
+
 	                            
             //APPEND CHANGED SCORE AND MIN/MAX EXPIRATION DATES TO DOCUMENT FOR UPDATE
             updateRec.append(modelId.toString(), new BasicDBObject().append("s", newScore).append("minEx", simpleDateFormat.format(minDate)).append("maxEx", simpleDateFormat.format(maxDate)).append("f", simpleDateFormat.format(new Date())));
