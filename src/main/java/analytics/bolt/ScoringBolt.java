@@ -244,7 +244,10 @@ public class ScoringBolt extends BaseRichBolt {
 //		    	System.out.println("   ### EXPIRATION: " + ((DBObject) changedMbrVariables.get(key)).get("e"));
 
 		    	try {
-					if(simpleDateFormat.parse(((DBObject) changedMbrVariables.get(key)).get("e").toString()).after(Calendar.getInstance().getTime())) {
+					if(((DBObject) changedMbrVariables.get(key)).get("v") != null 
+							&& ((DBObject) changedMbrVariables.get(key)).get("e") != null
+							&& ((DBObject) changedMbrVariables.get(key)).get("f") != null
+							&& simpleDateFormat.parse(((DBObject) changedMbrVariables.get(key)).get("e").toString()).after(Calendar.getInstance().getTime())) {
 						allChanges.put(key.toUpperCase()
 								, new Change(key.toUpperCase()
 								, ((DBObject) changedMbrVariables.get(key)).get("v")
