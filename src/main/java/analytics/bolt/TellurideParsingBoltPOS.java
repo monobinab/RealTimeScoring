@@ -164,18 +164,19 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 	public void execute(Tuple input) {
 
 		String lyl_id_no = null;
-		JMSMessage document = (JMSMessage) input.getValueByField("npos");
-
-		// 1) TEST IF TRANSACTION TYPE CODE IS = 1 (RETURN IF FALSE)
-		// 2) TEST IF TRANSACTION IS A MEMBER TRANSACTION (IF NOT RETURN)
-		// 3) HASH LOYALTY ID
-		// 4) FIND DIVISION #, ITEM #, AMOUNT AND
-		// FIND LINE FROM DIVISION # + ITEM #
-		// AND PUT INTO LINE ITEM CLASS CONTAINER WITH HASHED LOYALTY ID + ALL
-		// TRANSACTION LEVEL DATA
-		// 5) EMIT LINE ITEMS
-
+		ProcessTransaction processTransaction =null;
+		
 		String nposTransaction = null;
+		String requestorID = processTransaction.getRequestorID();
+		JMSMessage document = null;
+		//KPOS and KCOM
+		if("KPOS".equalsIgnoreCase(requestorID)){
+		document = (JMSMessage) input.getValueByField("kpos");
+		}else if ("KCOM".equalsIgnoreCase(requestorID)){
+		document = (JMSMessage) input.getValueByField("kcom");
+		}else if ("NPOS".equalsIgnoreCase(requestorID)){
+		document = (JMSMessage) input.getValueByField("npos");
+		}
 		try {
 
 			nposTransaction = convertStreamToString(document);
@@ -189,7 +190,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 		if (nposTransaction == null) {
 			return;
 		}
-		ProcessTransaction processTransaction =null;
+
 		
 		if(nposTransaction.contains("xmlns:soapenv")){
 			logger.info("Processing Soap Envelop xml String...");
@@ -209,7 +210,19 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 			processTransaction = XMLParser
 					.parseXMLProcessTransaction(nposTransaction);
 		}
+	
 		
+		
+		// 1) TEST IF TRANSACTION TYPE CODE IS = 1 (RETURN IF FALSE)
+		// 2) TEST IF TRANSACTION IS A MEMBER TRANSACTION (IF NOT RETURN)
+		// 3) HASH LOYALTY ID
+		// 4) FIND DIVISION #, ITEM #, AMOUNT AND
+		// FIND LINE FROM DIVISION # + ITEM #
+		// AND PUT INTO LINE ITEM CLASS CONTAINER WITH HASHED LOYALTY ID + ALL
+		// TRANSACTION LEVEL DATA
+		// 5) EMIT LINE ITEMS
+
+			
 		boolean isSale = false;
 		if (processTransaction != null
 				&& !"".equalsIgnoreCase(processTransaction
@@ -237,7 +250,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 			logger.info("Line Items are ...>>>>>>>>>>>>>>>>>>>>>>>>>>.."+lineItems.toString());
 			String tempVal = "";
 			Integer i = null;
-			String requestorID = processTransaction.getRequestorID();
+			
 			if (lineItems != null && lineItems.size() != 0) {
 				for (LineItem lineItem : lineItems) {
 					String div = lineItem.getDivision();
@@ -380,10 +393,21 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 	        			}
 	        		}
 	    		}
-		        
-		        listToEmit.add(l_id);
-		        listToEmit.add(createJsonFromVarValueMap(varAmountMap));
-		        listToEmit.add("NPOS");
+	        	
+				if("NPOS".equalsIgnoreCase(requestorID)){
+			        listToEmit.add(l_id);
+			        listToEmit.add(createJsonFromVarValueMap(varAmountMap));
+			        listToEmit.add("NPOS");
+			      //KPOS and KCOM
+				}else if ("KCOM".equalsIgnoreCase(requestorID)){
+					listToEmit.add(l_id);
+			        listToEmit.add(createJsonFromVarValueMap(varAmountMap));
+			        listToEmit.add("KCOM");
+			    }else if ("KPOS".equalsIgnoreCase(requestorID)){
+					listToEmit.add(l_id);
+			        listToEmit.add(createJsonFromVarValueMap(varAmountMap));
+			        listToEmit.add("KPOS");
+			    }
 
 		       logger.info(" *** parsing bolt emitting: " + listToEmit.toString());
 		        
