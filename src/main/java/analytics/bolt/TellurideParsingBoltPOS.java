@@ -167,19 +167,26 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 		ProcessTransaction processTransaction =null;
 		
 		String nposTransaction = null;
-		String requestorID = processTransaction.getRequestorID();
-		JMSMessage document = null;
+		String kcomTransaction = null;
+		String kposTransaction = null;
+		
+		JMSMessage documentKPOS = null;
+		JMSMessage documentKCOM = null;
+		JMSMessage documentNPOS = null;
 		//KPOS and KCOM
-		if("KPOS".equalsIgnoreCase(requestorID)){
-		document = (JMSMessage) input.getValueByField("kpos");
-		}else if ("KCOM".equalsIgnoreCase(requestorID)){
-		document = (JMSMessage) input.getValueByField("kcom");
-		}else if ("NPOS".equalsIgnoreCase(requestorID)){
-		document = (JMSMessage) input.getValueByField("npos");
-		}
+		
+			//documentKPOS = (JMSMessage) input.getValueByField("kpos");
+		
+			//documentKCOM = (JMSMessage) input.getValueByField("kcom");
+		
+			documentNPOS = (JMSMessage) input.getValueByField("npos");
+		
 		try {
 
-			nposTransaction = convertStreamToString(document);
+			nposTransaction = convertStreamToString(documentNPOS);
+			kcomTransaction = convertStreamToString(documentKCOM);
+			kposTransaction = convertStreamToString(documentKPOS);
+			
 		} catch (JMSException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -190,8 +197,12 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 		if (nposTransaction == null) {
 			return;
 		}
-
-		
+		if (kcomTransaction == null) {
+			return;
+		}
+		if (kposTransaction == null) {
+			return;
+		}
 		if(nposTransaction.contains("xmlns:soapenv")){
 			logger.info("Processing Soap Envelop xml String...");
 			StringUtils.substringBetween(nposTransaction.toString(),
@@ -210,8 +221,45 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 			processTransaction = XMLParser
 					.parseXMLProcessTransaction(nposTransaction);
 		}
+	    
+		if(kcomTransaction.contains("xmlns:soapenv")){
+			logger.info("Processing Soap Envelop xml String...");
+			StringUtils.substringBetween(kcomTransaction.toString(),
+					"<soapenv:Envelope xmlns:soapenv="
+							+ "http://www.w3.org/2003/05/soap-envelope>"
+							+ "<soapenv:Body>/",
+					"</soapenv:Body></soapenv:Envelope>");
+			processTransaction = XMLParser
+					.parseXMLProcessTransaction(kcomTransaction);
+			//XMLParser.parseXMLLineItems(nposTransaction);
 	
-		
+		}else if(kcomTransaction.contains("tns:ProcessTransaction")){
+			StringUtils.substringBetween(kcomTransaction.toString(),
+					"<tns:ProcessTransaction xmlns:tns=\"http://www.w3.org/2003/05/tns\">",
+					"</tns:ProcessTransaction>");
+			processTransaction = XMLParser
+					.parseXMLProcessTransaction(kcomTransaction);
+		}
+	
+		if(kposTransaction.contains("xmlns:soapenv")){
+			logger.info("Processing Soap Envelop xml String...");
+			StringUtils.substringBetween(kposTransaction.toString(),
+					"<soapenv:Envelope xmlns:soapenv="
+							+ "http://www.w3.org/2003/05/soap-envelope>"
+							+ "<soapenv:Body>/",
+					"</soapenv:Body></soapenv:Envelope>");
+			processTransaction = XMLParser
+					.parseXMLProcessTransaction(kposTransaction);
+			//XMLParser.parseXMLLineItems(nposTransaction);
+	
+		}else if(kposTransaction.contains("tns:ProcessTransaction")){
+			StringUtils.substringBetween(kposTransaction.toString(),
+					"<tns:ProcessTransaction xmlns:tns=\"http://www.w3.org/2003/05/tns\">",
+					"</tns:ProcessTransaction>");
+			processTransaction = XMLParser
+					.parseXMLProcessTransaction(kposTransaction);
+		}
+			
 		
 		// 1) TEST IF TRANSACTION TYPE CODE IS = 1 (RETURN IF FALSE)
 		// 2) TEST IF TRANSACTION IS A MEMBER TRANSACTION (IF NOT RETURN)
@@ -222,7 +270,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 		// TRANSACTION LEVEL DATA
 		// 5) EMIT LINE ITEMS
 
-			
+		String requestorID = processTransaction.getRequestorID();	
 		boolean isSale = false;
 		if (processTransaction != null
 				&& !"".equalsIgnoreCase(processTransaction
@@ -246,6 +294,8 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 
 			Collection<TransactionLineItem> lineItemList = new ArrayList<TransactionLineItem>();
 			logger.info("nposTransaction XML is" + nposTransaction.toString());
+			logger.info("kposTransaction XML is" + kposTransaction.toString());
+			logger.info("kcomTransaction XML is" + kcomTransaction.toString());
 			List<LineItem> lineItems = processTransaction.getLineItemList();
 			logger.info("Line Items are ...>>>>>>>>>>>>>>>>>>>>>>>>>>.."+lineItems.toString());
 			String tempVal = "";
@@ -395,18 +445,21 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 	    		}
 	        	
 				if("NPOS".equalsIgnoreCase(requestorID)){
-			        listToEmit.add(l_id);
+					listToEmit.add(l_id);
 			        listToEmit.add(createJsonFromVarValueMap(varAmountMap));
 			        listToEmit.add("NPOS");
+			        logger.info("NPOS Point of SALE is touched...");
 			      //KPOS and KCOM
 				}else if ("KCOM".equalsIgnoreCase(requestorID)){
 					listToEmit.add(l_id);
 			        listToEmit.add(createJsonFromVarValueMap(varAmountMap));
 			        listToEmit.add("KCOM");
+			        logger.info("KCOM Point of SALE is touched...");
 			    }else if ("KPOS".equalsIgnoreCase(requestorID)){
 					listToEmit.add(l_id);
 			        listToEmit.add(createJsonFromVarValueMap(varAmountMap));
 			        listToEmit.add("KPOS");
+			        logger.info("KPOS Point of SALE is touched...");
 			    }
 
 		       logger.info(" *** parsing bolt emitting: " + listToEmit.toString());
