@@ -163,22 +163,24 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 	@Override
 	public void execute(Tuple input) {
 
-		String lyl_id_no = null;
+		String lyl_id_no = "";
 		ProcessTransaction processTransaction =null;
 		
-		String nposTransaction = null;
-		String kcomTransaction = null;
-		String kposTransaction = null;
-		
+		String nposTransaction = "";
+		String kcomTransaction = "";
+		String kposTransaction = "";
+		String category  = "";
+		String line = "";
 		JMSMessage documentKPOS = null;
 		JMSMessage documentKCOM = null;
 		JMSMessage documentNPOS = null;
 		//KPOS and KCOM
 		
-			//documentKPOS = (JMSMessage) input.getValueByField("kpos");
-		
-			//documentKCOM = (JMSMessage) input.getValueByField("kcom");
-		
+		  if(input.contains("kpos"))
+			documentKPOS = (JMSMessage) input.getValueByField("kpos");
+		  if(input.contains("kcom"))
+			documentKCOM = (JMSMessage) input.getValueByField("kcom");
+		  if(input.contains("npos"))
 			documentNPOS = (JMSMessage) input.getValueByField("npos");
 		
 		try {
@@ -319,11 +321,17 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 							item = lineItem.getItemNumber();
 						}	
 					}
-					String category = getCategoryFromCollection(div,item);;
+					if("KPOS".equalsIgnoreCase(requestorID)||"KCOM".equalsIgnoreCase(requestorID)){
+					    category = getCategoryFromCollection(div,item);
+					    logger.info("category is ...."+category);
+					}else{
+						line = getLineFromCollection(div,item);
+						logger.info("Line is ...."+line);
+					}
 					String amount = lineItem.getDollarValuePostDisc();
-					logger.info("category is ...."+category+"...item is...."+item +"...amount is...."+amount);
+					logger.info("Item is...."+item +"...Amount is...."+amount);
 					//String line = lineItem.getLineNumber();
-					String line = getLineFromCollection(div,item);
+					
 					if (line == null) {
 						logger.info("Line is null");
 						continue;
@@ -463,7 +471,13 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 			        listToEmit.add(createJsonFromVarValueMap(varAmountMap));
 			        listToEmit.add("KPOS");
 			        logger.info("KPOS Point of SALE is touched...");
+			    }else if ("SCOM".equalsIgnoreCase(requestorID)){
+					listToEmit.add(l_id);
+			        listToEmit.add(createJsonFromVarValueMap(varAmountMap));
+			        listToEmit.add("SCOM");
+			        logger.info("SCOM Point of SALE is touched...");
 			    }
+
 
 		       logger.info(" *** parsing bolt emitting: " + listToEmit.toString());
 		        
