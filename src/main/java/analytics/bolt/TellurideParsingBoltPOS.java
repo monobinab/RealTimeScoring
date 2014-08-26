@@ -183,9 +183,12 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 		
 		try {
 
-			nposTransaction = convertStreamToString(documentNPOS);
-			kcomTransaction = convertStreamToString(documentKCOM);
-			kposTransaction = convertStreamToString(documentKPOS);
+			if(documentNPOS!=null)
+			 nposTransaction = convertStreamToString(documentNPOS);
+			if(documentKCOM!=null)
+			 kcomTransaction = convertStreamToString(documentKCOM);
+			if(documentKPOS!=null)
+			 kposTransaction = convertStreamToString(documentKPOS);
 			
 		} catch (JMSException e) {
 			// TODO Auto-generated catch block
