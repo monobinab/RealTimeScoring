@@ -49,7 +49,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 	static final Logger logger = Logger
 			.getLogger(TellurideParsingBoltPOS.class);
 	/**
-	 * Created by Rock Wasserman 4/18/2014
+	 * Created by Devarshi Das 8/27/2014
 	 */
 	private static final long serialVersionUID = 1L;
 	private OutputCollector outputCollector;
@@ -60,9 +60,11 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 	DBCollection divLnItmCollection;
 	DBCollection KsndivcatCollection;
 	DBCollection divLnVariableCollection;
+	
 
 	private Map<String, Collection<String>> divLnVariablesMap;
-
+	private Map<String, Collection<String>> divCatVariablesMap;
+	private String requestorID ="";
 	public void setOutputCollector(OutputCollector outputCollector) {
 		this.outputCollector = outputCollector;
 	}
@@ -118,24 +120,30 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}*/
-		
+		try {
+			db = new DBConnection().getDBConnectionWithoutCredentials();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	    //System.out.println("PREPARING PARSING POS BOLT");
-        try {
+       /* try {
 		// mongoClient = new MongoClient("shrdmdb301p.stag.ch3.s.com", 20000);
             mongoClient = new MongoClient("trprrta2mong4.vm.itg.corp.us.shldcorp.com", 27000);
         } catch (UnknownHostException e) {
             e.printStackTrace();
-        }
+        }*/
 
 		//db = mongoClient.getDB("RealTimeScoring");
 		//db.authenticate(configuration.getString("mongo.db.user"), configuration.getString("mongo.db.password").toCharArray());
 		//db.authenticate("rtsw", "5core123".toCharArray());
-        db = mongoClient.getDB("test");
+       // db = mongoClient.getDB("test");
 
 		memberCollection = db.getCollection("memberVariables");
 		divLnItmCollection = db.getCollection("divLnItm");
 		divLnVariableCollection = db.getCollection("divLnVariable");
 		KsndivcatCollection = db.getCollection("divCatKsn");
+		
 		// populate divLnVariablesMap
 		divLnVariablesMap = new HashMap<String, Collection<String>>();
 		DBCursor divLnVarCursor = divLnVariableCollection.find();
@@ -169,11 +177,13 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 		String nposTransaction = "";
 		String kcomTransaction = "";
 		String kposTransaction = "";
+		
 		String category  = "";
 		String line = "";
 		JMSMessage documentKPOS = null;
 		JMSMessage documentKCOM = null;
 		JMSMessage documentNPOS = null;
+		JMSMessage documentSCOM =null;
 		//KPOS and KCOM
 		
 		  if(input.contains("kpos"))
@@ -182,14 +192,16 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 			documentKCOM = (JMSMessage) input.getValueByField("kcom");
 		  if(input.contains("npos"))
 			documentNPOS = (JMSMessage) input.getValueByField("npos");
-		
+		  if(input.contains("scom"))
+				documentSCOM = (JMSMessage) input.getValueByField("scom");
+		  
 		try {
 
 			if(documentNPOS!=null)
 			 nposTransaction = convertStreamToString(documentNPOS);
 			if(documentKCOM!=null)
 			 kcomTransaction = convertStreamToString(documentKCOM);
-			if(documentKPOS!=null)
+			if(documentKPOS!=null)//TODO
 			 kposTransaction = convertStreamToString(documentKPOS);
 			
 		} catch (JMSException e) {
@@ -275,7 +287,16 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 		// TRANSACTION LEVEL DATA
 		// 5) EMIT LINE ITEMS
 
-		String requestorID = processTransaction.getRequestorID();	
+		
+		if(processTransaction!=null){
+		requestorID = processTransaction.getRequestorID();
+		logger.info("Requestor ID is..."+requestorID);
+		}else{
+			logger.info("Requestor ID is null....");
+		}
+		/*if (requestorID == null) {
+			return;
+		}*/
 		boolean isSale = false;
 		if (processTransaction != null
 				&& !"".equalsIgnoreCase(processTransaction
@@ -310,7 +331,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 				for (LineItem lineItem : lineItems) {
 					String div = lineItem.getDivision();
 					String item="";
-					if("KPOS".equalsIgnoreCase(requestorID)||"KCOM".equalsIgnoreCase(requestorID)){
+					/*if("KPOS".equalsIgnoreCase(requestorID)||"KCOM".equalsIgnoreCase(requestorID)){
 						item = lineItem.getItemNumber();
 					}else{
 						if(lineItem.getItemNumber().length()>=6){
@@ -321,45 +342,42 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 							item = lineItem.getItemNumber();
 						}	
 					}
-					if("KPOS".equalsIgnoreCase(requestorID)||"KCOM".equalsIgnoreCase(requestorID)){
-					    category = getCategoryFromCollection(div,item);
-					    logger.info("category is ...."+category);
-					}else{
-						line = getLineFromCollection(div,item);
-						logger.info("Line is ...."+line);
-					}
-					String amount = lineItem.getDollarValuePostDisc();
+					
+*/					String amount = lineItem.getDollarValuePostDisc();
 					logger.info("Item is...."+item +"...Amount is...."+amount);
 					//String line = lineItem.getLineNumber();
 					
-					if (line == null) {
+					/*if (line == null) {
 						logger.info("Line is null");
 						continue;
-					}
+					}*/
 					if (amount.contains("-")) {
 						logger.info("amount_contains -");
 						continue;
 					} else {
 						//KPOS and KCOM
 						if("KPOS".equalsIgnoreCase(requestorID)||"KCOM".equalsIgnoreCase(requestorID)){
-						line ="";
+							item = lineItem.getItemNumber();
+							category = getCategoryFromCollection(div,item);
+							 logger.info("category is ...."+category);
+							line ="";
 						TransactionLineItem transactionLineItem = new TransactionLineItem(
 								l_id, div, item, line,category,
 								Double.valueOf(amount) / 100);
 							logger.info("Transaction Line Item is ..."+transactionLineItem);
 						// find all variables affected by div-line
 						List<String> foundVariablesList = new ArrayList<String>();
-						if (divLnVariablesMap.containsKey(transactionLineItem
-								.getDiv() + transactionLineItem.getLine())
-								|| divLnVariablesMap
+						if (divCatVariablesMap.containsKey(transactionLineItem
+								.getDiv() + transactionLineItem.getCategory())
+								|| divCatVariablesMap 
 										.containsKey(transactionLineItem
 												.getDiv())) {
 
-							Collection<String> divVariableCollection = divLnVariablesMap
+							Collection<String> divVariableCollection = divCatVariablesMap
 									.get(transactionLineItem.getDiv());
-							Collection<String> divLnVariableCollection = divLnVariablesMap
+							Collection<String> divCatVariableCollection = divCatVariablesMap
 									.get(transactionLineItem.getDiv()
-											+ transactionLineItem.getLine());
+											+ transactionLineItem.getCategory());
 							if (divVariableCollection != null) {
 								for (String var : divVariableCollection) {
 									logger.info("Div is added.....  in variable List"+transactionLineItem.getDiv());
@@ -367,7 +385,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 								}
 							}
 							if (divLnVariableCollection != null) {
-								for (String var : divLnVariableCollection) {
+								for (String var : divCatVariableCollection) {
 									logger.info("Div is added..... in lnvariable List"+transactionLineItem.getDiv());
 									foundVariablesList.add(var);
 								}
@@ -378,6 +396,19 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 							logger.info("Line Items are added inside lineItemList......"+lineItemList.size());
 						}
 					}else {
+						if(lineItem.getItemNumber().length()>=6){
+							
+							item = lineItem.getItemNumber().substring(lineItem.getItemNumber().length() - 5);
+							 
+						}else{
+							item = lineItem.getItemNumber();
+						}
+						line = getLineFromCollection(div,item);
+						if (line == null) {
+							logger.info("Line is null");
+							continue;
+						}
+						logger.info("Line is ...."+line);
 						TransactionLineItem transactionLineItem = new TransactionLineItem(
 								l_id, div, item, line,
 								Double.valueOf(amount) / 100);
@@ -475,7 +506,12 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 					listToEmit.add(l_id);
 			        listToEmit.add(createJsonFromVarValueMap(varAmountMap));
 			        listToEmit.add("SCOM");
-			        logger.info("SCOM Point of SALE is touched...");
+			        logger.info("1....SCOM Point of SALE is touched...");
+			    }else{
+					listToEmit.add(l_id);
+			        listToEmit.add(createJsonFromVarValueMap(varAmountMap));
+			        listToEmit.add("SCOM");
+			        logger.info("2...SCOM Point of SALE is touched...");
 			    }
 
 
@@ -600,7 +636,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 
 		BasicDBObject queryLine = new BasicDBObject();
 		queryLine.put("d", div);
-		queryLine.put("i", item);
+		/*queryLine.put("i", item);*/
 
 		logger.info("query: " + queryLine);
 		DBObject Ksndivcat = KsndivcatCollection.findOne(queryLine);
