@@ -41,6 +41,29 @@ public class DBConnection {
 		return conn;
 	}
 
+	public DB getDBConnectionWithoutCredentials() throws Exception {
+		DB conn = null;
+
+		PropertiesConfiguration properties = new PropertiesConfiguration("./src/main/resources/connection_config.properties");
+						
+		sServerName = properties.getString("server.name");
+		sPort = Integer.parseInt( properties.getString("port.no"));
+		sDatabaseName = properties.getString("database.name");
+		sUserName = properties.getString("user.name");
+		sPassword = properties.getString("user.password");
+		
+		try {
+			mongoClient = new MongoClient(sServerName, sPort);
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+
+		conn = mongoClient.getDB(sDatabaseName);
+		logger.info("Connection is established...."+conn.getName());
+		//conn.authenticate(sUserName, sPassword.toCharArray());
+		return conn;
+	}
+
 	public MongoClient getMongoClient() {
 		return mongoClient;
 	}
