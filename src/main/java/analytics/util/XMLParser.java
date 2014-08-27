@@ -93,6 +93,8 @@ public class XMLParser {
 
 	private static boolean bTenderAmount;
 
+	private static boolean bRequestorID;
+
 	public static void main(String[] args) throws FileNotFoundException,
 			XMLStreamException, JAXBException {
 
@@ -128,6 +130,10 @@ public class XMLParser {
 					} else if (xmlStreamReader.getLocalName().equals(
 							"MemberNumber")) {
 						bMemberNumber = true;
+					}//RequestorID
+					else if (xmlStreamReader.getLocalName().equals(
+							"RequestorID")) {
+						bRequestorID = true;
 					}else if (xmlStreamReader.getLocalName().equals(
 							"TransactionNumber")) {
 						bTransactionNumber = true;
@@ -208,6 +214,11 @@ public class XMLParser {
 								.getText());
 
 						bMemberNumber = false;
+					} else if (bRequestorID) {
+						processTransaction.setRequestorID(xmlStreamReader
+								.getText());
+						logger.info("Requestor Id is..."+processTransaction.getRequestorID());
+						bRequestorID = false;
 					} else if (bTransactionNumber) {
 						processTransaction.setTransactionNumber(xmlStreamReader
 								.getText());
