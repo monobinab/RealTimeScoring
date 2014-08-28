@@ -253,7 +253,7 @@ public class ParsingBoltPOS extends BaseRichBolt {
 	        listToEmit.add(createJsonFromVarValueMap(varAmountMap));
 	        listToEmit.add("NPOS");
 
-	        //System.out.println(" *** parsing bolt emitting: " + listToEmit.toString());
+	        System.out.println(" *** PARSING BOLT EMITTING: " + listToEmit.toString());
 	        
 			// 9) EMIT VARIABLES TO VALUES MAP IN GSON DOCUMENT
 	        if(listToEmit!=null && !listToEmit.isEmpty()) {
