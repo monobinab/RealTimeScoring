@@ -18,7 +18,6 @@ public class AAM_ATCTopology {
 	public static void main(String[] args) throws Exception {
 		
 		TopologyBuilder builder = new TopologyBuilder();
-		
 		String[] topics = new String[]{
 		// "AAM_CDF_SID",
 		// "AAM_CDF_APP_Performance",
@@ -28,7 +27,7 @@ public class AAM_ATCTopology {
 		// "AAM_CDF_NaturalSearch",
 		// "AAM_CDF_InternalSearch",
 		// "AAM_CDF_CheckoutProducts",
-		"AAM_CDF_ATCProducts",
+			"AAM_CDF_ATCProducts",
 		// "AAM_CDF_AbanCart",
 		// "AAM_CDF_AbanBrow",
 		// "AAM_CDF_Traits"
@@ -36,18 +35,19 @@ public class AAM_ATCTopology {
 		
 		String[] servers = new String[]{"rtsapp301p.qa.ch3.s.com","rtsapp303p.qa.ch3.s.com"};
 		
-		
+		String topicForBoost = null;
 		for(String topic:topics){
+			topicForBoost=topic;
 			for(String server:servers)
 			{
 				builder.setSpout(topic+server, new AAMRedisPubSubSpout(server, 6379, topic), 1);
 			}
 		}
 		
-		BoltDeclarer boltDeclarer = builder.setBolt("ParsingBoltAAM_ATC", new ParsingBoltAAM_ATC(), 1);
+		BoltDeclarer boltDeclarer = builder.setBolt("ParsingBoltAAM_ATC", new ParsingBoltAAM_ATC(topicForBoost), 1);
 		builder.setBolt("strategy_bolt", new StrategyBolt(),1).shuffleGrouping("ParsingBoltAAM_ATC");
 		builder.setBolt("scoring_bolt", new ScoringBolt(),1).shuffleGrouping("strategy_bolt");
-		builder.setBolt("ScorePublishBolt", new ScorePublishBolt("rtsapp401p.prod.ch4.s.com", 6379,"score"), 1).shuffleGrouping("scoring_bolt");
+	//	builder.setBolt("ScorePublishBolt", new ScorePublishBolt("rtsapp401p.prod.ch4.s.com", 6379,"score"), 1).shuffleGrouping("scoring_bolt");
 		
 		
 		for(String topic:topics){
