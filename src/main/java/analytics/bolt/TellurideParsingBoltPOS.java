@@ -178,9 +178,9 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 						varColl);
 			}
 		}
-		DBCursor divCatVarCursor = divCatVariableCollection.find();
+		/*DBCursor divCatVarCursor = divCatVariableCollection.find();
 		for (DBObject divCatDBObject : divCatVarCursor) {
-			logger.info("Division and Category are..."+divCatDBObject.get("d").toString().concat(divCatDBObject.get("c").toString()));
+			logger.info("Division and Category are..."+divCatDBObject.get("d")+divCatDBObject.get("c").toString());
 			if (divCatVariablesMap.get(divCatDBObject.get("d").toString().concat(divCatDBObject.get("c").toString())) == null) {
 				Collection<String> varColl = new ArrayList<String>();
 				varColl.add(divCatDBObject.get("v").toString());
@@ -193,7 +193,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 				divCatVariablesMap.put(divCatDBObject.get("d").toString().trim().concat(divCatDBObject.get("c").toString().trim()),
 						varColl);
 			}
-		}
+		}*/
 	}
 
 	/*
@@ -433,7 +433,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 										foundVariablesList.add(var);
 									}
 								}
-								if (divLnVariableCollection != null) {
+								if (divCatVariableCollection != null) {
 									for (String var : divCatVariableCollection) {
 										logger.info("Div is added..... in lnvariable List"
 												+ transactionLineItem.getDiv());
