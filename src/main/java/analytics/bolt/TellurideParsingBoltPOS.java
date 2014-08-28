@@ -58,13 +58,14 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 	MongoClient mongoClient;
 	DBCollection memberCollection;
 	DBCollection divLnItmCollection;
-	DBCollection KsndivcatCollection;
+	DBCollection ksndivcatCollection;
 	DBCollection divLnVariableCollection;
-	
-
+	private DBCollection divCatVariableCollection; 
 	private Map<String, Collection<String>> divLnVariablesMap;
 	private Map<String, Collection<String>> divCatVariablesMap;
-	private String requestorID ="";
+	private String requestorID = "";
+	
+
 	public void setOutputCollector(OutputCollector outputCollector) {
 		this.outputCollector = outputCollector;
 	}
@@ -104,7 +105,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 		 * backtype.storm.task.OutputCollector)
 		 */
 
-		 logger.info("PREPARING PARSING POS BOLT");
+		logger.info("PREPARING PARSING POS BOLT");
 		/*
 		 * try { mongoClient = new MongoClient("shrdmdb301p.stag.ch3.s.com",
 		 * 20000); } catch (UnknownHostException e) { e.printStackTrace(); }
@@ -114,36 +115,35 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 		 * configuration.getString("mongo.db.password").toCharArray());
 		 * db.authenticate("rtsw", "5core123".toCharArray());
 		 */
-		/*try {
-			db = new DBConnection().getDBConnection();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
+		/*
+		 * try { db = new DBConnection().getDBConnection(); } catch (Exception
+		 * e) { // TODO Auto-generated catch block e.printStackTrace(); }
+		 */
 		try {
 			db = new DBConnection().getDBConnectionWithoutCredentials();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	    //System.out.println("PREPARING PARSING POS BOLT");
-       /* try {
-		// mongoClient = new MongoClient("shrdmdb301p.stag.ch3.s.com", 20000);
-            mongoClient = new MongoClient("trprrta2mong4.vm.itg.corp.us.shldcorp.com", 27000);
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }*/
+		// System.out.println("PREPARING PARSING POS BOLT");
+		/*
+		 * try { // mongoClient = new MongoClient("shrdmdb301p.stag.ch3.s.com",
+		 * 20000); mongoClient = new
+		 * MongoClient("trprrta2mong4.vm.itg.corp.us.shldcorp.com", 27000); }
+		 * catch (UnknownHostException e) { e.printStackTrace(); }
+		 */
 
-		//db = mongoClient.getDB("RealTimeScoring");
-		//db.authenticate(configuration.getString("mongo.db.user"), configuration.getString("mongo.db.password").toCharArray());
-		//db.authenticate("rtsw", "5core123".toCharArray());
-       // db = mongoClient.getDB("test");
+		// db = mongoClient.getDB("RealTimeScoring");
+		// db.authenticate(configuration.getString("mongo.db.user"),
+		// configuration.getString("mongo.db.password").toCharArray());
+		// db.authenticate("rtsw", "5core123".toCharArray());
+		// db = mongoClient.getDB("test");
 
 		memberCollection = db.getCollection("memberVariables");
 		divLnItmCollection = db.getCollection("divLnItm");
 		divLnVariableCollection = db.getCollection("divLnVariable");
-		KsndivcatCollection = db.getCollection("divCatKsn");
-		
+		ksndivcatCollection = db.getCollection("divCatKsn");
+		divCatVariableCollection = db.getCollection("divCatVariable");
 		// populate divLnVariablesMap
 		divLnVariablesMap = new HashMap<String, Collection<String>>();
 		DBCursor divLnVarCursor = divLnVariableCollection.find();
@@ -161,6 +161,39 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 						varColl);
 			}
 		}
+		//populate divCatVariablesMap
+		divCatVariablesMap = new HashMap<String, Collection<String>>();
+		DBCursor divVarCursor = divCatVariableCollection.find();
+		for (DBObject divDBObject : divVarCursor) {
+			if (divCatVariablesMap.get(divDBObject.get("d").toString().trim()) == null) {
+				Collection<String> varColl = new ArrayList<String>();
+				varColl.add(divDBObject.get("v").toString());
+				divCatVariablesMap.put(divDBObject.get("d").toString(),
+						varColl);
+			} else {
+				Collection<String> varColl = divCatVariablesMap
+						.get(divDBObject.get("d").toString().trim());
+				varColl.add(divDBObject.get("v").toString().toUpperCase());
+				divCatVariablesMap.put(divDBObject.get("d").toString(),
+						varColl);
+			}
+		}
+		DBCursor divCatVarCursor = divCatVariableCollection.find();
+		for (DBObject divCatDBObject : divCatVarCursor) {
+			logger.info("Division and Category are..."+divCatDBObject.get("d").toString().concat(divCatDBObject.get("c").toString()));
+			if (divCatVariablesMap.get(divCatDBObject.get("d").toString().concat(divCatDBObject.get("c").toString())) == null) {
+				Collection<String> varColl = new ArrayList<String>();
+				varColl.add(divCatDBObject.get("v").toString());
+				divCatVariablesMap.put(divCatDBObject.get("d").toString().trim().concat(divCatDBObject.get("c").toString().trim()),
+						varColl);
+			} else {
+				Collection<String> varColl = divCatVariablesMap
+						.get(divCatDBObject.get("d").toString().trim().concat(divCatDBObject.get("c").toString().trim()));
+				varColl.add(divCatDBObject.get("v").toString().toUpperCase());
+				divCatVariablesMap.put(divCatDBObject.get("d").toString().trim().concat(divCatDBObject.get("c").toString().trim()),
+						varColl);
+			}
+		}
 	}
 
 	/*
@@ -172,38 +205,39 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 	public void execute(Tuple input) {
 
 		String lyl_id_no = "";
-		ProcessTransaction processTransaction =null;
-		
+		ProcessTransaction processTransaction = null;
+
 		String nposTransaction = "";
 		String kcomTransaction = "";
 		String kposTransaction = "";
-		
-		String category  = "";
+
+		String category = "";
+		String div = "";
 		String line = "";
 		JMSMessage documentKPOS = null;
 		JMSMessage documentKCOM = null;
 		JMSMessage documentNPOS = null;
-		JMSMessage documentSCOM =null;
-		//KPOS and KCOM
-		
-		  if(input.contains("kpos"))
+		JMSMessage documentSCOM = null;
+		// KPOS and KCOM
+
+		if (input.contains("kpos"))
 			documentKPOS = (JMSMessage) input.getValueByField("kpos");
-		  if(input.contains("kcom"))
+		if (input.contains("kcom"))
 			documentKCOM = (JMSMessage) input.getValueByField("kcom");
-		  if(input.contains("npos"))
+		if (input.contains("npos"))
 			documentNPOS = (JMSMessage) input.getValueByField("npos");
-		  if(input.contains("scom"))
-				documentSCOM = (JMSMessage) input.getValueByField("scom");
-		  
+		if (input.contains("scom"))
+			documentSCOM = (JMSMessage) input.getValueByField("scom");
+
 		try {
 
-			if(documentNPOS!=null)
-			 nposTransaction = convertStreamToString(documentNPOS);
-			if(documentKCOM!=null)
-			 kcomTransaction = convertStreamToString(documentKCOM);
-			if(documentKPOS!=null)//TODO
-			 kposTransaction = convertStreamToString(documentKPOS);
-			
+			if (documentNPOS != null)
+				nposTransaction = convertStreamToString(documentNPOS);
+			if (documentKCOM != null)
+				kcomTransaction = convertStreamToString(documentKCOM);
+			if (documentKPOS != null)// TODO
+				kposTransaction = convertStreamToString(documentKPOS);
+
 		} catch (JMSException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -220,7 +254,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 		if (kposTransaction == null) {
 			return;
 		}
-		if(nposTransaction.contains("xmlns:soapenv")){
+		if (nposTransaction.contains("xmlns:soapenv")) {
 			logger.info("Processing Soap Envelop xml String...");
 			StringUtils.substringBetween(nposTransaction.toString(),
 					"<soapenv:Envelope xmlns:soapenv="
@@ -229,17 +263,19 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 					"</soapenv:Body></soapenv:Envelope>");
 			processTransaction = XMLParser
 					.parseXMLProcessTransaction(nposTransaction);
-			//XMLParser.parseXMLLineItems(nposTransaction);
-	
-		}else if(nposTransaction.contains("tns:ProcessTransaction")){
-			StringUtils.substringBetween(nposTransaction.toString(),
-					"<tns:ProcessTransaction xmlns:tns=\"http://www.w3.org/2003/05/tns\">",
-					"</tns:ProcessTransaction>");
+			// XMLParser.parseXMLLineItems(nposTransaction);
+
+		} else if (nposTransaction.contains("tns:ProcessTransaction")) {
+			StringUtils
+					.substringBetween(
+							nposTransaction.toString(),
+							"<tns:ProcessTransaction xmlns:tns=\"http://www.w3.org/2003/05/tns\">",
+							"</tns:ProcessTransaction>");
 			processTransaction = XMLParser
 					.parseXMLProcessTransaction(nposTransaction);
 		}
-	    
-		if(kcomTransaction.contains("xmlns:soapenv")){
+
+		if (kcomTransaction.contains("xmlns:soapenv")) {
 			logger.info("Processing Soap Envelop xml String...");
 			StringUtils.substringBetween(kcomTransaction.toString(),
 					"<soapenv:Envelope xmlns:soapenv="
@@ -248,17 +284,19 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 					"</soapenv:Body></soapenv:Envelope>");
 			processTransaction = XMLParser
 					.parseXMLProcessTransaction(kcomTransaction);
-			//XMLParser.parseXMLLineItems(nposTransaction);
-	
-		}else if(kcomTransaction.contains("tns:ProcessTransaction")){
-			StringUtils.substringBetween(kcomTransaction.toString(),
-					"<tns:ProcessTransaction xmlns:tns=\"http://www.w3.org/2003/05/tns\">",
-					"</tns:ProcessTransaction>");
+			// XMLParser.parseXMLLineItems(nposTransaction);
+
+		} else if (kcomTransaction.contains("tns:ProcessTransaction")) {
+			StringUtils
+					.substringBetween(
+							kcomTransaction.toString(),
+							"<tns:ProcessTransaction xmlns:tns=\"http://www.w3.org/2003/05/tns\">",
+							"</tns:ProcessTransaction>");
 			processTransaction = XMLParser
 					.parseXMLProcessTransaction(kcomTransaction);
 		}
-	
-		if(kposTransaction.contains("xmlns:soapenv")){
+
+		if (kposTransaction.contains("xmlns:soapenv")) {
 			logger.info("Processing Soap Envelop xml String...");
 			StringUtils.substringBetween(kposTransaction.toString(),
 					"<soapenv:Envelope xmlns:soapenv="
@@ -267,17 +305,18 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 					"</soapenv:Body></soapenv:Envelope>");
 			processTransaction = XMLParser
 					.parseXMLProcessTransaction(kposTransaction);
-			//XMLParser.parseXMLLineItems(nposTransaction);
-	
-		}else if(kposTransaction.contains("tns:ProcessTransaction")){
-			StringUtils.substringBetween(kposTransaction.toString(),
-					"<tns:ProcessTransaction xmlns:tns=\"http://www.w3.org/2003/05/tns\">",
-					"</tns:ProcessTransaction>");
+			// XMLParser.parseXMLLineItems(nposTransaction);
+
+		} else if (kposTransaction.contains("tns:ProcessTransaction")) {
+			StringUtils
+					.substringBetween(
+							kposTransaction.toString(),
+							"<tns:ProcessTransaction xmlns:tns=\"http://www.w3.org/2003/05/tns\">",
+							"</tns:ProcessTransaction>");
 			processTransaction = XMLParser
 					.parseXMLProcessTransaction(kposTransaction);
 		}
-			
-		
+
 		// 1) TEST IF TRANSACTION TYPE CODE IS = 1 (RETURN IF FALSE)
 		// 2) TEST IF TRANSACTION IS A MEMBER TRANSACTION (IF NOT RETURN)
 		// 3) HASH LOYALTY ID
@@ -287,16 +326,15 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 		// TRANSACTION LEVEL DATA
 		// 5) EMIT LINE ITEMS
 
-		
-		if(processTransaction!=null){
-		requestorID = processTransaction.getRequestorID();
-		logger.info("Requestor ID is..."+requestorID);
-		}else{
+		if (processTransaction != null) {
+			requestorID = processTransaction.getRequestorID();
+			logger.info("Requestor ID is..." + requestorID);
+		} else {
 			logger.info("Requestor ID is null....");
 		}
-		/*if (requestorID == null) {
-			return;
-		}*/
+		/*
+		 * if (requestorID == null) { return; }
+		 */
 		boolean isSale = false;
 		if (processTransaction != null
 				&& !"".equalsIgnoreCase(processTransaction
@@ -323,217 +361,259 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 			logger.info("kposTransaction XML is" + kposTransaction.toString());
 			logger.info("kcomTransaction XML is" + kcomTransaction.toString());
 			List<LineItem> lineItems = processTransaction.getLineItemList();
-			logger.info("Line Items are ...>>>>>>>>>>>>>>>>>>>>>>>>>>.."+lineItems.toString());
+			logger.info("Line Items are ...>>>>>>>>>>>>>>>>>>>>>>>>>>.."
+					+ lineItems.toString());
 			String tempVal = "";
 			Integer i = null;
-			
+
 			if (lineItems != null && lineItems.size() != 0) {
 				for (LineItem lineItem : lineItems) {
-					String div = lineItem.getDivision();
-					String item="";
-					/*if("KPOS".equalsIgnoreCase(requestorID)||"KCOM".equalsIgnoreCase(requestorID)){
-						item = lineItem.getItemNumber();
-					}else{
-						if(lineItem.getItemNumber().length()>=6){
-							
-							item = lineItem.getItemNumber().substring(lineItem.getItemNumber().length() - 5);
-							 
-						}else{
-							item = lineItem.getItemNumber();
-						}	
-					}
-					
-*/					String amount = lineItem.getDollarValuePostDisc();
-					logger.info("Item is...."+item +"...Amount is...."+amount);
-					//String line = lineItem.getLineNumber();
-					
-					/*if (line == null) {
-						logger.info("Line is null");
-						continue;
-					}*/
+
+					String item = "";
+					/*
+					 * if("KPOS".equalsIgnoreCase(requestorID)||"KCOM".
+					 * equalsIgnoreCase(requestorID)){ item =
+					 * lineItem.getItemNumber(); }else{
+					 * if(lineItem.getItemNumber().length()>=6){
+					 * 
+					 * item =
+					 * lineItem.getItemNumber().substring(lineItem.getItemNumber
+					 * ().length() - 5);
+					 * 
+					 * }else{ item = lineItem.getItemNumber(); } }
+					 */String amount = lineItem.getDollarValuePostDisc();
+					logger.info("Item is...." + item + "...Amount is...."
+							+ amount);
+					// String line = lineItem.getLineNumber();
+
+					/*
+					 * if (line == null) { logger.info("Line is null");
+					 * continue; }
+					 */
 					if (amount.contains("-")) {
 						logger.info("amount_contains -");
 						continue;
 					} else {
-						//KPOS and KCOM
-						if("KPOS".equalsIgnoreCase(requestorID)||"KCOM".equalsIgnoreCase(requestorID)){
+						// KPOS and KCOM
+						if ("KPOS".equalsIgnoreCase(requestorID)
+								|| "KCOM".equalsIgnoreCase(requestorID)) {
 							item = lineItem.getItemNumber();
-							category = getCategoryFromCollection(div,item);
-							 logger.info("category is ...."+category);
-							line ="";
-						TransactionLineItem transactionLineItem = new TransactionLineItem(
-								l_id, div, item, line,category,
-								Double.valueOf(amount) / 100);
-							logger.info("Transaction Line Item is ..."+transactionLineItem);
-						// find all variables affected by div-line
-						List<String> foundVariablesList = new ArrayList<String>();
-						if (divCatVariablesMap.containsKey(transactionLineItem
-								.getDiv() + transactionLineItem.getCategory())
-								|| divCatVariablesMap 
-										.containsKey(transactionLineItem
-												.getDiv())) {
+							logger.info("Item is..."+item);
+							category = getCategoryFromCollection(item);
+							logger.info("category is ...." + category);
+							div = getDivFromCollection(item);
+							logger.info("div is ...." + div);
+							line = "";
+							TransactionLineItem transactionLineItem = new TransactionLineItem(
+									l_id, div, item, line, category,
+									Double.valueOf(amount) / 100);
+							logger.info("Transaction Line Item is ..."
+									+ transactionLineItem);
+							transactionLineItem.setDiv(div);
+							transactionLineItem.setCategory(category);
+							// find all variables affected by div-line
+							List<String> foundVariablesList = new ArrayList<String>();
+							if (divCatVariablesMap
+									.containsKey(transactionLineItem.getDiv()
+											+ transactionLineItem.getCategory())
+									|| divCatVariablesMap
+											.containsKey(transactionLineItem
+													.getDiv())) {
 
-							Collection<String> divVariableCollection = divCatVariablesMap
-									.get(transactionLineItem.getDiv());
-							Collection<String> divCatVariableCollection = divCatVariablesMap
-									.get(transactionLineItem.getDiv()
-											+ transactionLineItem.getCategory());
-							if (divVariableCollection != null) {
-								for (String var : divVariableCollection) {
-									logger.info("Div is added.....  in variable List"+transactionLineItem.getDiv());
-									foundVariablesList.add(var);
+								Collection<String> divVariableCollection = divCatVariablesMap
+										.get(transactionLineItem.getDiv());
+								Collection<String> divCatVariableCollection = divCatVariablesMap
+										.get(transactionLineItem.getDiv()
+												+ transactionLineItem
+														.getCategory());
+								if (divVariableCollection != null) {
+									for (String var : divVariableCollection) {
+										logger.info("Div is added.....  in variable List"
+												+ transactionLineItem.getDiv());
+										foundVariablesList.add(var);
+									}
 								}
-							}
-							if (divLnVariableCollection != null) {
-								for (String var : divCatVariableCollection) {
-									logger.info("Div is added..... in lnvariable List"+transactionLineItem.getDiv());
-									foundVariablesList.add(var);
+								if (divLnVariableCollection != null) {
+									for (String var : divCatVariableCollection) {
+										logger.info("Div is added..... in lnvariable List"
+												+ transactionLineItem.getDiv());
+										foundVariablesList.add(var);
+									}
 								}
+								transactionLineItem
+										.setVariableList(foundVariablesList);
+								lineItemList.add(transactionLineItem);
+								logger.info("Line Items are added inside lineItemList......"
+										+ lineItemList.size());
 							}
-							transactionLineItem
-									.setVariableList(foundVariablesList);
-							lineItemList.add(transactionLineItem);
-							logger.info("Line Items are added inside lineItemList......"+lineItemList.size());
-						}
-					}else {
-						if(lineItem.getItemNumber().length()>=6){
-							
-							item = lineItem.getItemNumber().substring(lineItem.getItemNumber().length() - 5);
-							 
-						}else{
-							item = lineItem.getItemNumber();
-						}
-						line = getLineFromCollection(div,item);
-						if (line == null) {
-							logger.info("Line is null");
-							continue;
-						}
-						logger.info("Line is ...."+line);
-						TransactionLineItem transactionLineItem = new TransactionLineItem(
-								l_id, div, item, line,
-								Double.valueOf(amount) / 100);
-							logger.info("Transaction Line Item is ..."+transactionLineItem);
-						// find all variables affected by div-line
-						List<String> foundVariablesList = new ArrayList<String>();
-						if (divLnVariablesMap.containsKey(transactionLineItem
-								.getDiv() + transactionLineItem.getLine())
-								|| divLnVariablesMap
-										.containsKey(transactionLineItem
-												.getDiv())) {
+						} else {
+							if (lineItem.getItemNumber().length() >= 6) {
 
-							Collection<String> divVariableCollection = divLnVariablesMap
-									.get(transactionLineItem.getDiv());
-							Collection<String> divLnVariableCollection = divLnVariablesMap
-									.get(transactionLineItem.getDiv()
-											+ transactionLineItem.getLine());
-							if (divVariableCollection != null) {
-								for (String var : divVariableCollection) {
-									logger.info("Div is added.....  in variable List"+transactionLineItem.getDiv());
-									foundVariablesList.add(var);
-								}
+								item = lineItem.getItemNumber().substring(
+										lineItem.getItemNumber().length() - 5);
+
+							} else {
+								item = lineItem.getItemNumber();
 							}
-							if (divLnVariableCollection != null) {
-								for (String var : divLnVariableCollection) {
-									logger.info("Div is added..... in lnvariable List"+transactionLineItem.getDiv());
-									foundVariablesList.add(var);
-								}
+							line = getLineFromCollection(div, item);
+							if (line == null) {
+								logger.info("Line is null");
+								continue;
 							}
-							transactionLineItem
-									.setVariableList(foundVariablesList);
-							lineItemList.add(transactionLineItem);
-							logger.info("Line Items are added inside lineItemList......"+lineItemList.size());
+							div = lineItem.getDivision();
+							logger.info("Line is ...." + line);
+							TransactionLineItem transactionLineItem = new TransactionLineItem(
+									l_id, div, item, line,
+									Double.valueOf(amount) / 100);
+							logger.info("Transaction Line Item is ..."
+									+ transactionLineItem);
+							// find all variables affected by div-line
+							List<String> foundVariablesList = new ArrayList<String>();
+							if (divLnVariablesMap
+									.containsKey(transactionLineItem.getDiv()
+											+ transactionLineItem.getLine())
+									|| divLnVariablesMap
+											.containsKey(transactionLineItem
+													.getDiv())) {
+
+								Collection<String> divVariableCollection = divLnVariablesMap
+										.get(transactionLineItem.getDiv());
+								Collection<String> divLnVariableCollection = divLnVariablesMap
+										.get(transactionLineItem.getDiv()
+												+ transactionLineItem.getLine());
+								if (divVariableCollection != null) {
+									for (String var : divVariableCollection) {
+										logger.info("Div is added.....  in variable List"
+												+ transactionLineItem.getDiv());
+										foundVariablesList.add(var);
+									}
+								}
+								if (divLnVariableCollection != null) {
+									for (String var : divLnVariableCollection) {
+										logger.info("Div is added..... in lnvariable List"
+												+ transactionLineItem.getDiv());
+										foundVariablesList.add(var);
+									}
+								}
+								transactionLineItem
+										.setVariableList(foundVariablesList);
+								lineItemList.add(transactionLineItem);
+								logger.info("Line Items are added inside lineItemList......"
+										+ lineItemList.size());
+							}
+
 						}
-					
-					}	
 					}
 				}
 			}
 			if (lineItemList != null && !lineItemList.isEmpty()) {/*
-				List<Object> lineItemAsJsonString = new ArrayList<Object>();
-				lineItemAsJsonString.add(l_id);
-				lineItemAsJsonString
-						.add(createJsonFromLineItemList(lineItemList));
-				lineItemAsJsonString.add("NPOS");
+																 * List<Object>
+																 * lineItemAsJsonString
+																 * = new
+																 * ArrayList
+																 * <Object>();
+																 * lineItemAsJsonString
+																 * .add(l_id);
+																 * lineItemAsJsonString
+																 * .add(
+																 * createJsonFromLineItemList
+																 * (
+																 * lineItemList)
+																 * );
+																 * lineItemAsJsonString
+																 * .add("NPOS");
+																 * 
+																 * logger.info(
+																 * " ************************** parsing bolt emitting: "
+																 * +
+																 * lineItemAsJsonString
+																 * .toString());
+																 * // 8) EMIT
+																 * LINE ITEMS if
+																 * (
+																 * lineItemAsJsonString
+																 * != null && !
+																 * lineItemAsJsonString
+																 * .isEmpty()) {
+																 * this
+																 * .outputCollector
+																 * .emit(
+																 * lineItemAsJsonString
+																 * ); }
+																 */
 
-				logger.info(" ************************** parsing bolt emitting: "
-						+ lineItemAsJsonString.toString());
-				// 8) EMIT LINE ITEMS
-				if (lineItemAsJsonString != null
-						&& !lineItemAsJsonString.isEmpty()) {
-					this.outputCollector.emit(lineItemAsJsonString);
+				// 8) FOR EACH LINE ITEM FIND ASSOCIATED VARIABLES BY DIVISION
+				// AND LINE
+				Map<String, String> varAmountMap = new HashMap<String, String>();
+				List<Object> listToEmit = new ArrayList<Object>();
+				for (TransactionLineItem lnItm : lineItemList) {
+					List<String> varList = lnItm.getVariableList();
+					if (varList == null || varList.isEmpty()) {
+						continue;
+					}
+					for (String v : varList) {
+						if (!varAmountMap.containsKey(v.toUpperCase())) {
+							varAmountMap.put(v.toUpperCase(),
+									String.valueOf(lnItm.getAmount()));
+						} else {
+							Double a1 = Double.valueOf(varAmountMap.get(v));
+							a1 = a1 + lnItm.getAmount();
+							varAmountMap.remove(v.toUpperCase());
+							varAmountMap.put(v.toUpperCase(),
+									String.valueOf(a1));
+						}
+					}
 				}
-			*/
 
-	    		
-	    		// 8) FOR EACH LINE ITEM FIND ASSOCIATED VARIABLES BY DIVISION AND LINE
-	        	Map<String, String> varAmountMap = new HashMap<String, String>();
-	        	List<Object> listToEmit = new ArrayList<Object>();
-	        	for(TransactionLineItem lnItm : lineItemList) {
-	        		List<String> varList = lnItm.getVariableList();
-	        		if(varList == null || varList.isEmpty()) {
-	        			continue;
-	        		}
-	        		for(String v : varList) {
-	        			if(!varAmountMap.containsKey(v.toUpperCase())) {
-	    	    			varAmountMap.put(v.toUpperCase(), String.valueOf(lnItm.getAmount()));
-	        			}
-	        			else {
-	        				Double a1 = Double.valueOf(varAmountMap.get(v));
-	        				a1 = a1 + lnItm.getAmount();
-	        				varAmountMap.remove(v.toUpperCase());
-	    	    			varAmountMap.put(v.toUpperCase(), String.valueOf(a1));
-	        			}
-	        		}
-	    		}
-	        	
-				if("NPOS".equalsIgnoreCase(requestorID)){
+				if ("NPOS".equalsIgnoreCase(requestorID)) {
 					listToEmit.add(l_id);
-			        listToEmit.add(createJsonFromVarValueMap(varAmountMap));
-			        listToEmit.add("NPOS");
-			        logger.info("NPOS Point of SALE is touched...");
-			      //KPOS and KCOM
-				}else if ("KCOM".equalsIgnoreCase(requestorID)){
+					listToEmit.add(createJsonFromVarValueMap(varAmountMap));
+					listToEmit.add("NPOS");
+					logger.info("NPOS Point of SALE is touched...");
+					// KPOS and KCOM
+				} else if ("KCOM".equalsIgnoreCase(requestorID)) {
 					listToEmit.add(l_id);
-			        listToEmit.add(createJsonFromVarValueMap(varAmountMap));
-			        listToEmit.add("KCOM");
-			        logger.info("KCOM Point of SALE is touched...");
-			    }else if ("KPOS".equalsIgnoreCase(requestorID)){
+					listToEmit.add(createJsonFromVarValueMap(varAmountMap));
+					listToEmit.add("KCOM");
+					logger.info("KCOM Point of SALE is touched...");
+				} else if ("KPOS".equalsIgnoreCase(requestorID)) {
 					listToEmit.add(l_id);
-			        listToEmit.add(createJsonFromVarValueMap(varAmountMap));
-			        listToEmit.add("KPOS");
-			        logger.info("KPOS Point of SALE is touched...");
-			    }else if ("SCOM".equalsIgnoreCase(requestorID)){
+					listToEmit.add(createJsonFromVarValueMap(varAmountMap));
+					listToEmit.add("KPOS");
+					logger.info("KPOS Point of SALE is touched...");
+				} else if ("SCOM".equalsIgnoreCase(requestorID)) {
 					listToEmit.add(l_id);
-			        listToEmit.add(createJsonFromVarValueMap(varAmountMap));
-			        listToEmit.add("SCOM");
-			        logger.info("1....SCOM Point of SALE is touched...");
-			    }else{
+					listToEmit.add(createJsonFromVarValueMap(varAmountMap));
+					listToEmit.add("SCOM");
+					logger.info("1....SCOM Point of SALE is touched...");
+				} else {
 					listToEmit.add(l_id);
-			        listToEmit.add(createJsonFromVarValueMap(varAmountMap));
-			        listToEmit.add("SCOM");
-			        logger.info("2...SCOM Point of SALE is touched...");
-			    }
+					listToEmit.add(createJsonFromVarValueMap(varAmountMap));
+					listToEmit.add("SCOM");
+					logger.info("2...SCOM Point of SALE is touched...");
+				}
 
+				logger.info(" *** parsing bolt emitting: "
+						+ listToEmit.toString());
 
-		       logger.info(" *** parsing bolt emitting: " + listToEmit.toString());
-		        
 				// 9) EMIT VARIABLES TO VALUES MAP IN GSON DOCUMENT
-		        if(listToEmit!=null && !listToEmit.isEmpty()) {
-		        	this.outputCollector.emit(listToEmit);
-		        }
-	        }
+				if (listToEmit != null && !listToEmit.isEmpty()) {
+					this.outputCollector.emit(listToEmit);
+				}
+			}
 		}
 	}
 
-	private Object createJsonFromVarValueMap(Map<String,String> varAmountMap) {
+	private Object createJsonFromVarValueMap(Map<String, String> varAmountMap) {
 		// Create string in JSON format to emit
 
-    	Gson gson = new Gson();
-    	Type transLineItemType = new TypeToken<Map<String, String>>() {
-			private static final long serialVersionUID = 1L;}.getType();
-    	
-    	
-    	String transLineItemListString = gson.toJson(varAmountMap, transLineItemType);
+		Gson gson = new Gson();
+		Type transLineItemType = new TypeToken<Map<String, String>>() {
+			private static final long serialVersionUID = 1L;
+		}.getType();
+
+		String transLineItemListString = gson.toJson(varAmountMap,
+				transLineItemType);
 		return transLineItemListString;
 	}
 
@@ -610,7 +690,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 		return hashed;
 	}
 
-	public String getLineFromCollection(String div, String item) {
+	private String getLineFromCollection(String div, String item) {
 		logger.info("searching for line");
 
 		BasicDBObject queryLine = new BasicDBObject();
@@ -627,29 +707,48 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 			return null;
 		}
 		String line = divLnItm.get("l").toString();
-		 logger.info("  found line: " + line);
+		logger.info("  found line: " + line);
 		return line;
 	}
 
-	public String getCategoryFromCollection(String div, String item) {
+	private String getCategoryFromCollection(String item) {
 		logger.info("searching for category");
 
 		BasicDBObject queryLine = new BasicDBObject();
-		queryLine.put("d", div);
-		/*queryLine.put("i", item);*/
+		queryLine.put("k", item);
 
 		logger.info("query: " + queryLine);
-		DBObject Ksndivcat = KsndivcatCollection.findOne(queryLine);
-		logger.info("category: " + Ksndivcat);
+		DBObject ksndivcat = ksndivcatCollection.findOne(queryLine);
+		logger.info("category: " + ksndivcat);
+
+		if (ksndivcat == null || ksndivcat.keySet() == null
+				|| ksndivcat.keySet().isEmpty()) {
+			logger.info("Ksndivcat is null");
+			return null;
+		}
+		String category = ksndivcat.get("c").toString();
+		logger.info("  found category: " + category);
+		return category;
+	}
+
+	private String getDivFromCollection(String item) {
+		logger.info("searching for category");
+
+		BasicDBObject queryLine = new BasicDBObject();
+		queryLine.put("k", item);
+
+		logger.info("query: " + queryLine);
+		DBObject Ksndivcat = ksndivcatCollection.findOne(queryLine);
+		logger.info("division: " + Ksndivcat);
 
 		if (Ksndivcat == null || Ksndivcat.keySet() == null
 				|| Ksndivcat.keySet().isEmpty()) {
 			logger.info("Ksndivcat is null");
 			return null;
 		}
-		String category = Ksndivcat.get("l").toString();
-		 logger.info("  found category: " + category);
-		return category;
+		String div = Ksndivcat.get("d").toString();
+		logger.info("  found division: " + div);
+		return div;
 	}
 
 	private static String convertStreamToString(final Message jmsMsg)
@@ -670,5 +769,4 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 		return stringMessage;
 	}
 
-	
 }
