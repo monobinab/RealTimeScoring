@@ -111,9 +111,9 @@ public class ScoringSingleton {
 		DBCursor models = modelVariablesCollection.find();
 		for (DBObject model : models) {
 
-			System.out.println("modelId: " + model.get("modelId"));
-			System.out.println("month: " + model.get("month"));
-			System.out.println("constant: " + model.get("constant"));
+//			System.out.println("modelId: " + model.get("modelId"));
+//			System.out.println("month: " + model.get("month"));
+//			System.out.println("constant: " + model.get("constant"));
 
 			int modelId = Integer.valueOf(model.get("modelId").toString());
 			int month = Integer.valueOf(model.get("month").toString());

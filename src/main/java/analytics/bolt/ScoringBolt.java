@@ -4,6 +4,7 @@
 package analytics.bolt;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
@@ -65,7 +66,7 @@ public class ScoringBolt extends BaseRichBolt {
 
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
-		
+		this.outputCollector = collector;
 	}
 	
 
@@ -89,16 +90,17 @@ public class ScoringBolt extends BaseRichBolt {
 		Map<String, Double> modelScoresMap = ScoringSingleton.getInstance().execute(l_id, modelIdList);
 		
         // EMIT CHANGES
-//		double oldScore = 0;
-//    	List<Object> listToEmit = new ArrayList<Object>();
-//    	listToEmit.add(l_id);
-//    	listToEmit.add(oldScore);
-//    	listToEmit.add(newScore);
-//    	listToEmit.add(modelId);
-//    	listToEmit.add(source);
-//    	System.out.println(" ### SCORING BOLT EMITTING: " + listToEmit);
-//    	this.outputCollector.emit(listToEmit);
-
+		double oldScore = 0;
+		for(String modelId : modelScoresMap.keySet()) {
+	    	List<Object> listToEmit = new ArrayList<Object>();
+	    	listToEmit.add(l_id);
+	    	listToEmit.add(oldScore);
+	    	listToEmit.add(modelScoresMap.get(modelId));
+	    	listToEmit.add(modelId);
+	    	listToEmit.add(source);
+	    	System.out.println(" ### SCORING BOLT EMITTING: " + listToEmit);
+	    	this.outputCollector.emit(listToEmit);
+		}
             
             //System.out.println(message);
             //jedis.publish("score_changes", message);
