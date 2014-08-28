@@ -162,8 +162,6 @@ public class ScoringSingleton {
 		
 		// List<String> modelIdList = modelIdList;
 
-		// 1) PULL OUT HASHED LOYALTY ID FROM THE FIRST RECORD IN lineItemList
-
 		// 2) FETCH MEMBER VARIABLES FROM memberVariables COLLECTION
 		DBObject mbrVariables = memberVariablesCollection
 				.findOne(new BasicDBObject("l_id", loyaltyId));
@@ -245,14 +243,14 @@ public class ScoringSingleton {
 		// ////////////////////////////////////////////////////////////////////////////////
 		// IF NO VARIABLE'S EXPIRATION DATE IS STILL THERE, WE HAVE TO GO ABCK
 		// TO THE ORIGINAL SCORES
-		HashMap<String, Double> scopreMap = new LinkedHashMap<String, Double>();
+		HashMap<String, Double> modelScoreMap = new LinkedHashMap<String, Double>();
 		if (allChanges == null || allChanges.isEmpty()) {
 			
 			for (String modelId : modelIdList) {
 
 				DBObject mbrScores = memberScoreCollection
 						.findOne(new BasicDBObject("l_id", loyaltyId));
-				scopreMap.put(modelId, (Double) mbrScores.get(modelId));
+				modelScoreMap.put(modelId, (Double) mbrScores.get(modelId));
 			}
 		}
 
@@ -341,7 +339,7 @@ public class ScoringSingleton {
 					.append(oldScore == null ? "0" : oldScore.get("1"))
 					.append("-").append(newScore).toString();
 
-			scopreMap.put(modelId, newScore);
+			modelScoreMap.put(modelId, newScore);
 			
 		}
 		// System.out.println(" ### UPDATE RECORD CHANGED SCORE: " + updateRec);
@@ -351,7 +349,7 @@ public class ScoringSingleton {
 							updateRec), true, false);
 
 		}
-		return scopreMap;
+		return modelScoreMap;
 	}
 
 	
