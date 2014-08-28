@@ -1,19 +1,5 @@
 package analytics;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
-
-import analytics.bolt.ScorePublishBolt;
-import analytics.bolt.ScoringBolt;
-import analytics.bolt.StrategyBolt;
 import analytics.bolt.TellurideParsingBoltPOS;
 import analytics.spout.WebsphereMQSpout;
 import analytics.util.MQConnectionConfig;
@@ -25,8 +11,10 @@ import backtype.storm.StormSubmitter;
 import backtype.storm.generated.AlreadyAliveException;
 import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.topology.TopologyBuilder;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.log4j.*;
 
-import com.mongodb.DBObject;
+import java.io.File;
 
 /**
  * Created with IntelliJ IDEA. User: syermalk Date: 10/9/13 Time: 10:14 AM To
@@ -50,21 +38,6 @@ public class RealTimeScoringTellurideTopology {
 		MqSender.initJMS();
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 
-		MongoObjectGrabber mongoMapper = new MongoObjectGrabber() {
-			@Override
-			public List<Object> map(DBObject object) {
-				if (object != null)
-					logger.info(" in Mapper: " + object);
-				List<Object> tuple = new ArrayList<Object>();
-				tuple.add(object);
-				return tuple;
-			}
-
-			@Override
-			public String[] fields() {
-				return new String[] { "document" };
-			}
-		};
 
 		MQConnectionConfig mqConnection = new MQConnectionConfig();
 		WebsphereMQCredential mqCredential = mqConnection
@@ -90,14 +63,14 @@ public class RealTimeScoringTellurideTopology {
 		// create definition of main spout for queue 1
 		topologyBuilder.setBolt("parsing_bolt", new TellurideParsingBoltPOS())
 				.shuffleGrouping("npos1").shuffleGrouping("npos2");
-		topologyBuilder.setBolt("strategy_bolt", new StrategyBolt())
-				.shuffleGrouping("parsing_bolt");
-		topologyBuilder.setBolt("scoring_bolt", new ScoringBolt())
-				.shuffleGrouping("strategy_bolt");
-		topologyBuilder
-				.setBolt(
-						"ScorePublishBolt",	new ScorePublishBolt("rtsapp401p.prod.ch4.s.com", 6379,
-								"score")).shuffleGrouping("scoring_bolt");
+//		topologyBuilder.setBolt("strategy_bolt", new StrategyBolt())
+//				.shuffleGrouping("parsing_bolt");
+//		topologyBuilder.setBolt("scoring_bolt", new ScoringBolt())
+//				.shuffleGrouping("strategy_bolt");
+//		topologyBuilder
+//				.setBolt(
+//						"ScorePublishBolt",	new ScorePublishBolt("rtsapp401p.prod.ch4.s.com", 6379,
+//								"score")).shuffleGrouping("scoring_bolt");
 		// topologyBuilder.setBolt("map_bolt", new
 		// RedisBolt("rtsapp302p.qa.ch3.s.com",
 		// 6379,"sale_info")).shuffleGrouping("npos1").shuffleGrouping("npos2");
