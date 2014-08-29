@@ -1,27 +1,14 @@
 package analytics.util;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import com.ibm.mq.jms.*;
+import org.apache.log4j.Logger;
 
 import javax.jms.BytesMessage;
 import javax.jms.JMSException;
-import javax.jms.Message;
 import javax.jms.Session;
-
-import org.apache.log4j.Logger;
-
-import com.ibm.mq.jms.JMSC;
-import com.ibm.mq.jms.MQQueue;
-import com.ibm.mq.jms.MQQueueConnection;
-import com.ibm.mq.jms.MQQueueConnectionFactory;
-import com.ibm.mq.jms.MQQueueReceiver;
-import com.ibm.mq.jms.MQQueueSender;
-import com.ibm.mq.jms.MQQueueSession;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.nio.charset.Charset;
 
 public class MqSender {
 	private static final Logger logger = org.apache.log4j.Logger
@@ -124,10 +111,5 @@ public class MqSender {
 		}
 
 	}
-	static String readFile(String path, Charset encoding) 
-			  throws IOException 
-			{
-			  byte[] encoded = Files.readAllBytes(Paths.get(path));
-			  return encoding.decode(ByteBuffer.wrap(encoded)).toString();
-			}
+
 }

@@ -1,27 +1,5 @@
 package analytics.bolt;
 
-import java.io.ByteArrayOutputStream;
-import java.lang.reflect.Type;
-import java.net.UnknownHostException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import javax.jms.BytesMessage;
-import javax.jms.JMSException;
-import javax.jms.Message;
-
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
-
-import analytics.RealTimeScoringTopology;
 import analytics.service.impl.LineItem;
 import analytics.service.impl.ProcessTransaction;
 import analytics.service.impl.TransactionLineItem;
@@ -33,16 +11,24 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.ibm.jms.JMSMessage;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
-import com.mongodb.MongoClient;
+import com.mongodb.*;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import javax.jms.BytesMessage;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import java.io.ByteArrayOutputStream;
+import java.lang.reflect.Type;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
 
 public class TellurideParsingBoltPOS extends BaseRichBolt {
 
@@ -97,53 +83,21 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 			OutputCollector collector) {
 		this.outputCollector = collector;
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see backtype.storm.task.IBolt#prepare(java.util.Map,
-		 * backtype.storm.task.TopologyContext,
-		 * backtype.storm.task.OutputCollector)
-		 */
-
 		logger.info("PREPARING PARSING POS BOLT");
-		/*
-		 * try { mongoClient = new MongoClient("shrdmdb301p.stag.ch3.s.com",
-		 * 20000); } catch (UnknownHostException e) { e.printStackTrace(); }
-		 * 
-		 * db = mongoClient.getDB("RealTimeScoring");
-		 * //db.authenticate(configuration.getString("mongo.db.user"),
-		 * configuration.getString("mongo.db.password").toCharArray());
-		 * db.authenticate("rtsw", "5core123".toCharArray());
-		 */
-		/*
-		 * try { db = new DBConnection().getDBConnection(); } catch (Exception
-		 * e) { // TODO Auto-generated catch block e.printStackTrace(); }
-		 */
+
 		try {
 			db = new DBConnection().getDBConnectionWithoutCredentials();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		// System.out.println("PREPARING PARSING POS BOLT");
-		/*
-		 * try { // mongoClient = new MongoClient("shrdmdb301p.stag.ch3.s.com",
-		 * 20000); mongoClient = new
-		 * MongoClient("trprrta2mong4.vm.itg.corp.us.shldcorp.com", 27000); }
-		 * catch (UnknownHostException e) { e.printStackTrace(); }
-		 */
-
-		// db = mongoClient.getDB("RealTimeScoring");
-		// db.authenticate(configuration.getString("mongo.db.user"),
-		// configuration.getString("mongo.db.password").toCharArray());
-		// db.authenticate("rtsw", "5core123".toCharArray());
-		// db = mongoClient.getDB("test");
 
 		memberCollection = db.getCollection("memberVariables");
 		divLnItmCollection = db.getCollection("divLnItm");
 		divLnVariableCollection = db.getCollection("divLnVariable");
 		ksndivcatCollection = db.getCollection("divCatKsn");
 		divCatVariableCollection = db.getCollection("divCatVariable");
+
 		// populate divLnVariablesMap
 		divLnVariablesMap = new HashMap<String, Collection<String>>();
 		DBCursor divLnVarCursor = divLnVariableCollection.find();
@@ -161,6 +115,8 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 						varColl);
 			}
 		}
+
+
 		//populate divCatVariablesMap
 		divCatVariablesMap = new HashMap<String, Collection<String>>();
 		DBCursor divVarCursor = divCatVariableCollection.find();
@@ -207,36 +163,22 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 		String lyl_id_no = "";
 		ProcessTransaction processTransaction = null;
 
-		String nposTransaction = "";
+		String transactionXmlAsString = "";
 		String kcomTransaction = "";
 		String kposTransaction = "";
 
-		String category = "";
-		String div = "";
-		String line = "";
 		JMSMessage documentKPOS = null;
 		JMSMessage documentKCOM = null;
-		JMSMessage documentNPOS = null;
 		JMSMessage documentSCOM = null;
 		// KPOS and KCOM
 
-		if (input.contains("kpos"))
-			documentKPOS = (JMSMessage) input.getValueByField("kpos");
-		if (input.contains("kcom"))
-			documentKCOM = (JMSMessage) input.getValueByField("kcom");
-		if (input.contains("npos"))
-			documentNPOS = (JMSMessage) input.getValueByField("npos");
-		if (input.contains("scom"))
-			documentSCOM = (JMSMessage) input.getValueByField("scom");
+
+
+		JMSMessage documentNPOS = (JMSMessage) input.getValueByField("npos");
 
 		try {
 
-			if (documentNPOS != null)
-				nposTransaction = convertStreamToString(documentNPOS);
-			if (documentKCOM != null)
-				kcomTransaction = convertStreamToString(documentKCOM);
-			if (documentKPOS != null)// TODO
-				kposTransaction = convertStreamToString(documentKPOS);
+			transactionXmlAsString = convertStreamToString(documentNPOS);
 
 		} catch (JMSException e) {
 			// TODO Auto-generated catch block
@@ -245,77 +187,33 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		if (nposTransaction == null) {
+		if ( StringUtils.isEmpty(transactionXmlAsString)) {
 			return;
 		}
-		if (kcomTransaction == null) {
-			return;
-		}
-		if (kposTransaction == null) {
-			return;
-		}
-		if (nposTransaction.contains("xmlns:soapenv")) {
+
+		if (transactionXmlAsString.contains("xmlns:soapenv")) {
+
 			logger.info("Processing Soap Envelop xml String...");
-			StringUtils.substringBetween(nposTransaction.toString(),
+			StringUtils.substringBetween(transactionXmlAsString.toString(),
 					"<soapenv:Envelope xmlns:soapenv="
 							+ "http://www.w3.org/2003/05/soap-envelope>"
 							+ "<soapenv:Body>/",
 					"</soapenv:Body></soapenv:Envelope>");
 			processTransaction = XMLParser
-					.parseXMLProcessTransaction(nposTransaction);
+					.parseXMLProcessTransaction(transactionXmlAsString);
 			// XMLParser.parseXMLLineItems(nposTransaction);
 
-		} else if (nposTransaction.contains("tns:ProcessTransaction")) {
+		} else if (transactionXmlAsString.contains("tns:ProcessTransaction")) {
 			StringUtils
 					.substringBetween(
-							nposTransaction.toString(),
+							transactionXmlAsString.toString(),
 							"<tns:ProcessTransaction xmlns:tns=\"http://www.w3.org/2003/05/tns\">",
 							"</tns:ProcessTransaction>");
 			processTransaction = XMLParser
-					.parseXMLProcessTransaction(nposTransaction);
+					.parseXMLProcessTransaction(transactionXmlAsString);
 		}
 
-		if (kcomTransaction.contains("xmlns:soapenv")) {
-			logger.info("Processing Soap Envelop xml String...");
-			StringUtils.substringBetween(kcomTransaction.toString(),
-					"<soapenv:Envelope xmlns:soapenv="
-							+ "http://www.w3.org/2003/05/soap-envelope>"
-							+ "<soapenv:Body>/",
-					"</soapenv:Body></soapenv:Envelope>");
-			processTransaction = XMLParser
-					.parseXMLProcessTransaction(kcomTransaction);
-			// XMLParser.parseXMLLineItems(nposTransaction);
 
-		} else if (kcomTransaction.contains("tns:ProcessTransaction")) {
-			StringUtils
-					.substringBetween(
-							kcomTransaction.toString(),
-							"<tns:ProcessTransaction xmlns:tns=\"http://www.w3.org/2003/05/tns\">",
-							"</tns:ProcessTransaction>");
-			processTransaction = XMLParser
-					.parseXMLProcessTransaction(kcomTransaction);
-		}
-
-		if (kposTransaction.contains("xmlns:soapenv")) {
-			logger.info("Processing Soap Envelop xml String...");
-			StringUtils.substringBetween(kposTransaction.toString(),
-					"<soapenv:Envelope xmlns:soapenv="
-							+ "http://www.w3.org/2003/05/soap-envelope>"
-							+ "<soapenv:Body>/",
-					"</soapenv:Body></soapenv:Envelope>");
-			processTransaction = XMLParser
-					.parseXMLProcessTransaction(kposTransaction);
-			// XMLParser.parseXMLLineItems(nposTransaction);
-
-		} else if (kposTransaction.contains("tns:ProcessTransaction")) {
-			StringUtils
-					.substringBetween(
-							kposTransaction.toString(),
-							"<tns:ProcessTransaction xmlns:tns=\"http://www.w3.org/2003/05/tns\">",
-							"</tns:ProcessTransaction>");
-			processTransaction = XMLParser
-					.parseXMLProcessTransaction(kposTransaction);
-		}
 
 		// 1) TEST IF TRANSACTION TYPE CODE IS = 1 (RETURN IF FALSE)
 		// 2) TEST IF TRANSACTION IS A MEMBER TRANSACTION (IF NOT RETURN)
@@ -335,15 +233,13 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 		/*
 		 * if (requestorID == null) { return; }
 		 */
-		boolean isSale = false;
 		if (processTransaction != null
 				&& !"".equalsIgnoreCase(processTransaction
 						.getTransactionNumber())) {
-			String transactionNumber = processTransaction
-					.getTransactionNumber();
+
 			lyl_id_no = processTransaction.getMemberNumber();
 
-			if (lyl_id_no == null) {
+			if (StringUtils.isEmpty(lyl_id_no)) {
 				return;
 			}
 
@@ -357,14 +253,11 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 			// TRANSACTION LEVEL DATA
 
 			Collection<TransactionLineItem> lineItemList = new ArrayList<TransactionLineItem>();
-			logger.info("nposTransaction XML is" + nposTransaction.toString());
-			logger.info("kposTransaction XML is" + kposTransaction.toString());
-			logger.info("kcomTransaction XML is" + kcomTransaction.toString());
+			logger.info("nposTransaction XML is" + transactionXmlAsString.toString());
+
 			List<LineItem> lineItems = processTransaction.getLineItemList();
 			logger.info("Line Items are ...>>>>>>>>>>>>>>>>>>>>>>>>>>.."
 					+ lineItems.toString());
-			String tempVal = "";
-			Integer i = null;
 
 			if (lineItems != null && lineItems.size() != 0) {
 				for (LineItem lineItem : lineItems) {
@@ -399,18 +292,16 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 								|| "KCOM".equalsIgnoreCase(requestorID)) {
 							item = lineItem.getItemNumber();
 							logger.info("Item is..."+item);
-							category = getCategoryFromCollection(item);
-							logger.info("category is ...." + category);
-							div = getDivFromCollection(item);
-							logger.info("div is ...." + div);
-							line = "";
-							TransactionLineItem transactionLineItem = new TransactionLineItem(
-									l_id, div, item, line, category,
-									Double.valueOf(amount) / 100);
+							String divCategory = getDivCategoryFromCollection(item);
+							logger.info("division and category are ...." + divCategory);
+                            String div = StringUtils.substring(divCategory, 0, 2);
+                            String cat = StringUtils.substring(divCategory, 3, 6);
+                            TransactionLineItem transactionLineItem = new TransactionLineItem(
+									l_id, div, item, "", cat,
+									Double.valueOf(amount));
 							logger.info("Transaction Line Item is ..."
 									+ transactionLineItem);
-							transactionLineItem.setDiv(div);
-							transactionLineItem.setCategory(category);
+
 							// find all variables affected by div-line
 							List<String> foundVariablesList = new ArrayList<String>();
 							if (divCatVariablesMap
@@ -455,16 +346,17 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 							} else {
 								item = lineItem.getItemNumber();
 							}
-							line = getLineFromCollection(div, item);
+                            String div = lineItem.getDivision();
+
+                            String line = getLineFromCollection(div, item);
 							if (line == null) {
 								logger.info("Line is null");
 								continue;
 							}
-							div = lineItem.getDivision();
 							logger.info("Line is ...." + line);
 							TransactionLineItem transactionLineItem = new TransactionLineItem(
 									l_id, div, item, line,
-									Double.valueOf(amount) / 100);
+									Double.valueOf(amount));
 							logger.info("Transaction Line Item is ..."
 									+ transactionLineItem);
 							// find all variables affected by div-line
@@ -475,6 +367,8 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 									|| divLnVariablesMap
 											.containsKey(transactionLineItem
 													.getDiv())) {
+
+
 
 								Collection<String> divVariableCollection = divLnVariablesMap
 										.get(transactionLineItem.getDiv());
@@ -565,33 +459,10 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 					}
 				}
 
-				if ("NPOS".equalsIgnoreCase(requestorID)) {
 					listToEmit.add(l_id);
 					listToEmit.add(createJsonFromVarValueMap(varAmountMap));
-					listToEmit.add("NPOS");
-					logger.info("NPOS Point of SALE is touched...");
-					// KPOS and KCOM
-				} else if ("KCOM".equalsIgnoreCase(requestorID)) {
-					listToEmit.add(l_id);
-					listToEmit.add(createJsonFromVarValueMap(varAmountMap));
-					listToEmit.add("KCOM");
-					logger.info("KCOM Point of SALE is touched...");
-				} else if ("KPOS".equalsIgnoreCase(requestorID)) {
-					listToEmit.add(l_id);
-					listToEmit.add(createJsonFromVarValueMap(varAmountMap));
-					listToEmit.add("KPOS");
-					logger.info("KPOS Point of SALE is touched...");
-				} else if ("SCOM".equalsIgnoreCase(requestorID)) {
-					listToEmit.add(l_id);
-					listToEmit.add(createJsonFromVarValueMap(varAmountMap));
-					listToEmit.add("SCOM");
-					logger.info("1....SCOM Point of SALE is touched...");
-				} else {
-					listToEmit.add(l_id);
-					listToEmit.add(createJsonFromVarValueMap(varAmountMap));
-					listToEmit.add("SCOM");
-					logger.info("2...SCOM Point of SALE is touched...");
-				}
+					listToEmit.add(requestorID);
+					logger.info(requestorID + " Point of SALE is touched...");
 
 				logger.info(" *** parsing bolt emitting: "
 						+ listToEmit.toString());
@@ -711,7 +582,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 		return line;
 	}
 
-	private String getCategoryFromCollection(String item) {
+	private String getDivCategoryFromCollection(String item) {
 		logger.info("searching for category");
 
 		BasicDBObject queryLine = new BasicDBObject();
@@ -727,8 +598,12 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 			return null;
 		}
 		String category = ksndivcat.get("c").toString();
-		logger.info("  found category: " + category);
-		return category;
+        String div = ksndivcat.get("d").toString();
+
+        logger.info("  found category: " + category);
+        logger.info("  found division: " + div);
+
+        return div+category;
 	}
 
 	private String getDivFromCollection(String item) {

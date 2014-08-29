@@ -3,34 +3,23 @@
  */
 package analytics.util;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.bind.JAXBException;
-import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.stream.StreamSource;
-
-import org.apache.log4j.Logger;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
 import analytics.service.impl.LineItem;
 import analytics.service.impl.OrderDetails;
 import analytics.service.impl.ProcessTransaction;
 import analytics.service.impl.Tender;
+import org.apache.log4j.Logger;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author ddas1
@@ -502,10 +491,12 @@ public class XMLParser {
 				event = xmlStreamReader.next();
 			}
 
-		} catch (FileNotFoundException | XMLStreamException e) {
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (XMLStreamException e) {
 			e.printStackTrace();
 		}
-		return orderDetailsList;
+        return orderDetailsList;
 	}
 
 	public static List<Tender> parseTenderXML(String fileName) {
@@ -557,10 +548,12 @@ public class XMLParser {
 				event = xmlStreamReader.next();
 			}
 
-		} catch (FileNotFoundException | XMLStreamException e) {
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (XMLStreamException e) {
 			e.printStackTrace();
 		}
-		return tenderList;
+        return tenderList;
 	}
 
 

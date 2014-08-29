@@ -47,7 +47,6 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
     private List<String> modelVariablesList;
     private Map<String,Collection<String>> l_idToTraitCollectionMap; // USED TO MAP BETWEEN l_id AND THE TRAITS ASSOCIATED WITH THAT ID UNTIL A NEW UUID IS FOUND
     private String currentUUID;
-    private String current_l_id;
 
 
     public void setOutputCollector(OutputCollector outputCollector) {
@@ -95,7 +94,6 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
         modelVariablesList = new ArrayList<String>();
         
         this.currentUUID=null;
-        this.current_l_id=null;
         l_idToTraitCollectionMap = new HashMap<String,Collection<String>>();
         
         
@@ -190,59 +188,61 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 		// 2) IF THE CURRENT RECORD HAS THE SAME UUID AS PREVIOUS RECORD(S) THEN ADD TRAIT TO LIST AND RETURN
         if(this.currentUUID != null && this.currentUUID.equalsIgnoreCase(webTraitsSplitRec[1])) {
         	//skip processing if l_id is null
-        	if(this.current_l_id == null) {
-        		//System.out.println(" NULL l_id -- return");
+        	if(this.l_idToTraitCollectionMap == null) {
         		return;
         	}
         	
-        	Collection<String> traits = l_idToTraitCollectionMap.get(current_l_id);
-			if (traits != null) {
-				traits.add(webTraitsSplitRec[2]);
-			}
-            //System.out.println(" *** ADDING WEB TRAIT: " + webTraitsSplitRec[2]);
+        	for(String l : l_idToTraitCollectionMap.keySet()) {
+        		l_idToTraitCollectionMap.get(l).add(webTraitsSplitRec[2]);
+        	}
         	return;
         }
         
 		// 3) IF THE CURRENT RECORD HAS A DIFFERENT UUID THEN PROCESS THE CURRENT TRAITS LIST AND EMIT VARIABLES
         if(l_idToTraitCollectionMap != null && !l_idToTraitCollectionMap.isEmpty()) {
             System.out.println("processing found traits...");
-            System.out.println(l_idToTraitCollectionMap.get(current_l_id));
             
-        	Map<String, Collection<String>> dateTraitsMap  = new HashMap<String,Collection<String>>(); // MAP BETWEEN DATES AND SET OF TRAITS - HISTORICAL AND CURRENT TRAITS
-        	List<String> foundVariables = processTraitsList(dateTraitsMap); //LIST OF VARIABLES FOUND DURING TRAITS PROCESSING
-        	if(dateTraitsMap !=null && !dateTraitsMap.isEmpty() && foundVariables != null && !foundVariables.isEmpty()) {
- 	        	Object variableValueJSON = createJsonFromMemberTraitsMap(foundVariables, dateTraitsMap);
-	        	List<Object> listToEmit = new ArrayList<Object>();
-	        	listToEmit.add(current_l_id);
-	        	listToEmit.add(variableValueJSON);
-	        	listToEmit.add("WebTraits");
-	        	this.outputCollector.emit(listToEmit);
-	        	System.out.println(" *** PARSING BOLT EMITTING: " + listToEmit);
-        	}
-        	else {
-           		System.out.println(" *** NO VARIBALES FOUND - NOTHING TO EMIT");
-        	}
-        	l_idToTraitCollectionMap.remove(current_l_id);
+            for(String current_l_id : l_idToTraitCollectionMap.keySet()) {
+	        	Map<String, Collection<String>> dateTraitsMap  = new HashMap<String,Collection<String>>(); // MAP BETWEEN DATES AND SET OF TRAITS - HISTORICAL AND CURRENT TRAITS
+	        	List<String> foundVariables = processTraitsList(dateTraitsMap, current_l_id); //LIST OF VARIABLES FOUND DURING TRAITS PROCESSING
+	        	if(dateTraitsMap !=null && !dateTraitsMap.isEmpty() && foundVariables != null && !foundVariables.isEmpty()) {
+	 	        	Object variableValueJSON = createJsonFromMemberTraitsMap(foundVariables, dateTraitsMap);
+		        	List<Object> listToEmit = new ArrayList<Object>();
+		        	listToEmit.add(current_l_id);
+		        	listToEmit.add(variableValueJSON);
+		        	listToEmit.add("WebTraits");
+		        	this.outputCollector.emit(listToEmit);
+		        	System.out.println(" *** PARSING BOLT EMITTING: " + listToEmit);
+	        	}
+	        	else {
+	           		System.out.println(" *** NO VARIBALES FOUND - NOTHING TO EMIT");
+	        	}
+            }
             this.currentUUID=null;
-            this.current_l_id=null;
+            this.l_idToTraitCollectionMap=null;
         }
         
 		// 4) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN SET CURRENT UUID FROM RECORD, SET CURRENT l_id TO NULL AND RETURN
         //		If l_id is null and the next UUID is the same the current, then the next record will not be processed
-        DBObject uuid = memberUUIDCollection.findOne(new BasicDBObject("u",webTraitsSplitRec[1]));
-        if(uuid == null) {
+        DBCursor uuidCursor = memberUUIDCollection.find(new BasicDBObject("u",webTraitsSplitRec[1]));
+        if(uuidCursor == null) {
             this.currentUUID=webTraitsSplitRec[1];
             System.out.println(" *** COULD NOT FIND UUID: " + this.currentUUID);
-        	this.current_l_id=null;
+        	this.l_idToTraitCollectionMap=null;
         	return;
         }
         
         // set current uuid and l_id from mongoDB query results
-        this.currentUUID = (String) uuid.get("u");
-        String l_id = (String) uuid.get("l_id");
+        for(DBObject uuidDbo:uuidCursor) {
+        	if(this.currentUUID == null) {
+        		this.currentUUID = uuidDbo.get("u").toString();
+        	}
+        	l_idToTraitCollectionMap.put(uuidDbo.get("l_id").toString(), new ArrayList<String>());
+        	l_idToTraitCollectionMap.get(uuidDbo.get("l_id")).add(webTraitsSplitRec[2]);
+        }
         
-        if(l_id == null || l_id == "") {
-        	this.current_l_id=null;
+        if(l_idToTraitCollectionMap == null || l_idToTraitCollectionMap.isEmpty()) {
+        	this.l_idToTraitCollectionMap=null;
         	return;
         }
         
@@ -253,17 +253,6 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-        
-        System.out.println(" *** FOUND l_id: " + l_id + "  from UUID: " + this.currentUUID);
-        this.current_l_id = l_id;
-        
-
-		// 5) POPULATE TRAITS COLLECTION WITH THE FIRST TRAIT
-        Collection<String> firstTrait = new ArrayList<String>();
-        firstTrait.add(webTraitsSplitRec[2]);
-        
-        //System.out.println(" *** PUT IN FIRST RECORD: " + this.current_l_id + " trait: " + firstTrait);
-        l_idToTraitCollectionMap.put(this.current_l_id,firstTrait);
         
         return;
         
@@ -281,17 +270,17 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 		}
 	}
 
-    private List<String> processTraitsList(Map<String, Collection<String>> dateTraitsMap) {
+    private List<String> processTraitsList(Map<String, Collection<String>> dateTraitsMap, String current_l_id) {
 		List<String> variableList = new ArrayList<String>();
     	boolean firstTrait = true; //flag to indicate if the AMM trait found is the first for that member - if true then populate the memberTraitsMap
     	int traitCount = 0;
     	int variableCount = 0;
     	
     	//FOR EACH TRAIT FOUND FROM AAM DATA FIND THE VARIABLES THAT ARE IMPACTED
-    	for(String trait: l_idToTraitCollectionMap.get(this.current_l_id)) {
+    	for(String trait: l_idToTraitCollectionMap.get(current_l_id)) {
     		if(traitVariablesMap.containsKey(trait) && hasModelVariable(traitVariablesMap.get(trait))) {
     			if(firstTrait) {
-    				prepareDateTraitsMap(dateTraitsMap);
+    				prepareDateTraitsMap(dateTraitsMap, current_l_id);
     				firstTrait = false;
     			}
     			
@@ -343,11 +332,11 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 	}
     
     
-    private void prepareDateTraitsMap(Map<String, Collection<String>> dateTraitsMap) {
-		DBObject memberTraitsDBO = memberTraitsCollection.findOne(new BasicDBObject().append("l_id", this.current_l_id));
+    private void prepareDateTraitsMap(Map<String, Collection<String>> dateTraitsMap, String current_l_id) {
+		DBObject memberTraitsDBO = memberTraitsCollection.findOne(new BasicDBObject().append("l_id", current_l_id));
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-		if(memberTraitsDBO != null && memberTraitsDBO.keySet().contains(this.current_l_id)) {
+		if(memberTraitsDBO != null && memberTraitsDBO.keySet().contains(current_l_id)) {
 			
 			BasicDBList dates = (BasicDBList) memberTraitsDBO.get("date");
 			
