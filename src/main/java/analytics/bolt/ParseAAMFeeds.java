@@ -44,12 +44,24 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
     protected DBCollection memberUUIDCollection;
     protected DBCollection modelVariablesCollection;
 
-    protected Map<String,Collection<String>> traitVariablesMap;
-    protected Map<String,Collection<String>> variableTraitsMap;
+
     protected List<String> modelVariablesList;
     protected Map<String,Collection<String>> l_idToValueCollectionMap; // USED TO MAP BETWEEN l_id AND THE TRAITS OR PID OR SearchKeyword ASSOCIATED WITH THAT ID UNTIL A NEW UUID IS FOUND
     protected String currentUUID;
+    
+    protected String topic;
+	protected String sourceTopic;
 
+    public ParseAAMFeeds() {
+
+	}
+
+	// Overloaded Paramterized constructor to get the topic to which the spout
+	// is listening to
+	public ParseAAMFeeds(String topic) {
+		this.topic = topic;
+	}
+	
     public void setOutputCollector(OutputCollector outputCollector) {
         this.outputCollector = outputCollector;
     }
@@ -69,7 +81,7 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 	 * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
 	 */
 
-        System.out.println("PREPARING PARSING BOLT FOR AAM TRAITS");
+        System.out.println("PREPARING PARSING BOLT FOR AAM Feeds");
 
         try {
 			db = MongoUtils.getClient("DEV");
@@ -87,8 +99,8 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
         
 
 		//POPULATE MODEL VARIABLES LIST
-		DBCursor modelVaribalesCursor = modelVariablesCollection.find();
-		for(DBObject modelDBO:modelVaribalesCursor) {
+		DBCursor modelVariablesCursor = modelVariablesCollection.find();
+		for(DBObject modelDBO:modelVariablesCursor) {
 			BasicDBList variablesDBList = (BasicDBList) modelDBO.get("variable");
 			for(Object var:variablesDBList) {
 				if(!modelVariablesList.contains(var.toString())) {
@@ -117,33 +129,33 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 		//System.out.println("PARSING DOCUMENT -- WEB TRAIT RECORD " + input.getString(0));
 		
 		// 1) SPLIT INPUT STRING
-        String webTraitInteractionRec = input.getString(1);
-        String webTraitsSplitRec[] = splitRec(webTraitInteractionRec);
+        String interactionRec = input.getString(1);
+        String splitRecArray[] = splitRec(interactionRec);
         
         //does nothing but print out split string
         String splitRec = new String();
-        for(int i=0;i<webTraitsSplitRec.length;i++) {
-        	if(i==0) splitRec = webTraitsSplitRec[i];
-        	else splitRec = splitRec + "  " + webTraitsSplitRec[i];
+        for(int i=0;i<splitRecArray.length;i++) {
+        	if(i==0) splitRec = splitRecArray[i];
+        	else splitRec = splitRec + "  " + splitRecArray[i];
         }
 //        System.out.println("  split string: " + splitRec);
 		
         
         //2014-03-08 10:56:17,00000388763646853831116694914086674166,743651,US,Sears
-        if(webTraitsSplitRec == null || webTraitsSplitRec.length==0) {
+        if(splitRecArray == null || splitRecArray.length==0) {
         	return;
         }
         
         
 		// 2) IF THE CURRENT RECORD HAS THE SAME UUID AS PREVIOUS RECORD(S) THEN ADD TRAIT TO LIST AND RETURN
-        if(this.currentUUID != null && this.currentUUID.equalsIgnoreCase(webTraitsSplitRec[1])) {
+        if(this.currentUUID != null && this.currentUUID.equalsIgnoreCase(splitRecArray[1])) {
         	//skip processing if l_id is null
         	if(this.l_idToValueCollectionMap==null || this.l_idToValueCollectionMap.isEmpty()) {
         		return;
         	}
         	
         	for(String l : l_idToValueCollectionMap.keySet()) {
-        		l_idToValueCollectionMap.get(l).add(webTraitsSplitRec[2]);
+        		l_idToValueCollectionMap.get(l).add(splitRecArray[2]);
         	}
         	return;
         }
@@ -160,12 +172,12 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 		        	List<Object> listToEmit = new ArrayList<Object>();
 		        	listToEmit.add(current_l_id);
 		        	listToEmit.add(variableValueJSON);
-		        	listToEmit.add("WebTraits");
+		        	listToEmit.add(sourceTopic);
 		        	this.outputCollector.emit(listToEmit);
 		        	System.out.println(" *** PARSING BOLT EMITTING: " + listToEmit);
 	        	}
 	        	else {
-	           		System.out.println(" *** NO VARIBALES FOUND - NOTHING TO EMIT");
+	           		System.out.println(" *** NO VARIABLES FOUND - NOTHING TO EMIT");
 	        	}
             }
             this.currentUUID=null;
@@ -174,9 +186,9 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
         
 		// 4) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN SET CURRENT UUID FROM RECORD, SET CURRENT l_id TO NULL AND RETURN
         //		If l_id is null and the next UUID is the same the current, then the next record will not be processed
-        DBCursor uuidCursor = memberUUIDCollection.find(new BasicDBObject("u",webTraitsSplitRec[1]));
+        DBCursor uuidCursor = memberUUIDCollection.find(new BasicDBObject("u",splitRecArray[1]));
         if(uuidCursor == null) {
-            this.currentUUID=webTraitsSplitRec[1];
+            this.currentUUID=splitRecArray[1];
             System.out.println(" *** COULD NOT FIND UUID: " + this.currentUUID);
         	this.l_idToValueCollectionMap=new HashMap<String, Collection<String>>();
         	return;
@@ -195,7 +207,7 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
         		System.out.println(uuidDbo.get("l_id").toString());
         		System.exit(0);
         	}
-        	l_idToValueCollectionMap.get(uuidDbo.get("l_id")).add(webTraitsSplitRec[2]);
+        	l_idToValueCollectionMap.get(uuidDbo.get("l_id")).add(splitRecArray[2]);
         }
         
         if(l_idToValueCollectionMap == null || l_idToValueCollectionMap.isEmpty()) {
@@ -206,7 +218,7 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
         SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
         Date interactionDateTime = new Date();
         try {
-			interactionDateTime = dateTimeFormat.parse(webTraitsSplitRec[0]);
+			interactionDateTime = dateTimeFormat.parse(splitRecArray[0]);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}

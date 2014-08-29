@@ -1,31 +1,26 @@
 package analytics.bolt;
 
-import analytics.util.MongoUtils;
+import java.lang.reflect.Type;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
-import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Tuple;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
-import com.mongodb.*;
-
-import org.apache.cassandra.thrift.Cassandra.system_add_column_family_args;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringUtils;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-
-import java.lang.reflect.Type;
-import java.net.UnknownHostException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import com.mongodb.BasicDBList;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
 
 
 public class ParsingBoltWebTraits extends ParseAAMFeeds {
@@ -35,6 +30,8 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
 
     private DBCollection memberTraitsCollection;
     private DBCollection traitVariablesCollection;
+    protected Map<String,Collection<String>> traitVariablesMap;
+    protected Map<String,Collection<String>> variableTraitsMap;
     /*
          * (non-Javadoc)
          *
@@ -44,6 +41,7 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
+		sourceTopic="WebTraits";
         
 
         System.out.println("PREPARING PARSING BOLT FOR WEB TRAITS");
