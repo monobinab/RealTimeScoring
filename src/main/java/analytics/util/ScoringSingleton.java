@@ -143,10 +143,15 @@ public class ScoringSingleton {
 					}
 				}
 			}
-			Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
-			monthModelMap.put(month, new Model(modelId, month, constant,
+			if(!modelsMap.containsKey(modelId)) {
+				Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
+				monthModelMap.put(month, new Model(modelId, month, constant,
+						variablesCollection));
+				modelsMap.put(modelId, monthModelMap);
+			} else {
+				modelsMap.get(modelId).put(month, new Model(modelId, month, constant,
 					variablesCollection));
-			modelsMap.put(modelId, monthModelMap);
+			}
 		}
 	}
 	
