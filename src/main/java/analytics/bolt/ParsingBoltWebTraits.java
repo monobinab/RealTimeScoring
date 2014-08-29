@@ -12,6 +12,7 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.mongodb.*;
 
+import org.apache.cassandra.thrift.Cassandra.system_add_column_family_args;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 
@@ -27,40 +28,13 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 
-public class ParsingBoltWebTraits extends BaseRichBolt {
+public class ParsingBoltWebTraits extends ParseAAMFeeds {
 	/**
 	 * Created by Rock Wasserman 4/18/2014
 	 */
-	private static final long serialVersionUID = 1L;
-    private OutputCollector outputCollector;
-    
 
-    DB db;
-    DBCollection memberVariablesCollection;
-    DBCollection memberTraitsCollection;
-    DBCollection memberUUIDCollection;
-    DBCollection traitVariablesCollection;
-    DBCollection modelVariablesCollection;
-
-    private Map<String,Collection<String>> traitVariablesMap;
-    private Map<String,Collection<String>> variableTraitsMap;
-    private List<String> modelVariablesList;
-    private Map<String,Collection<String>> l_idToTraitCollectionMap; // USED TO MAP BETWEEN l_id AND THE TRAITS ASSOCIATED WITH THAT ID UNTIL A NEW UUID IS FOUND
-    private String currentUUID;
-
-
-    public void setOutputCollector(OutputCollector outputCollector) {
-        this.outputCollector = outputCollector;
-    }
-
-    public void setMemberCollection(DBCollection memberCollection) {
-        this.memberVariablesCollection = memberCollection;
-    }
-
-//    public void setDivLnItmCollection(DBCollection divLnItmCollection) {
-//        this.divLnItmCollection = divLnItmCollection;
-//    }
-
+    private DBCollection memberTraitsCollection;
+    private DBCollection traitVariablesCollection;
     /*
          * (non-Javadoc)
          *
@@ -69,38 +43,22 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
          */
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
-        this.outputCollector = collector;
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see backtype.storm.task.IBolt#prepare(java.util.Map,
-	 * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
-	 */
+		super.prepare(stormConf, context, collector);
+        
 
         System.out.println("PREPARING PARSING BOLT FOR WEB TRAITS");
-
-        try {
-			db = MongoUtils.getClient("DEV");
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
-        
-        memberVariablesCollection = db.getCollection("memberVariables");
-        memberTraitsCollection = db.getCollection("memberTraits");
-        memberUUIDCollection = db.getCollection("memberUUID");
-        traitVariablesCollection = db.getCollection("traitVariables");
-        modelVariablesCollection = db.getCollection("modelVariables");
-        modelVariablesList = new ArrayList<String>();
-        
-        this.currentUUID=null;
-        l_idToTraitCollectionMap = new HashMap<String,Collection<String>>();
-        
-        
         // POPULATE THE TRAIT TO VARIABLES MAP AND THE VARIABLE TO TRAITS MAP
-        
+        memberTraitsCollection = db.getCollection("memberTraits");
+        traitVariablesCollection = db.getCollection("traitVariables");
         traitVariablesMap = new HashMap<String, Collection<String>>();
         variableTraitsMap = new HashMap<String, Collection<String>>();
+		
+//		System.out.println("*** TRAIT TO VARIABLES MAP >>>");
+//		System.out.println(traitVariablesMap);
+//		System.out.println(" *** ");
+//		System.out.println(" *** ");
+		
+
 		DBCursor traitVarCursor = traitVariablesCollection.find();
 		
 		for(DBObject traitVariablesDBO: traitVarCursor) {
@@ -129,155 +87,21 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 				}
 			}
 		}
-//		System.out.println("*** TRAIT TO VARIABLES MAP >>>");
-//		System.out.println(traitVariablesMap);
-//		System.out.println(" *** ");
-//		System.out.println(" *** ");
-		
-		//POPULATE MODEL VARIABLES LIST
-		DBCursor modelVaribalesCursor = modelVariablesCollection.find();
-		for(DBObject modelDBO:modelVaribalesCursor) {
-			BasicDBList variablesDBList = (BasicDBList) modelDBO.get("variable");
-			for(Object var:variablesDBList) {
-				if(!modelVariablesList.contains(var.toString())) {
-					modelVariablesList.add(((BasicDBObject) var).get("name").toString());
-				}
-			}
-		}
-//		System.out.println(" *** PARSING BOLT MODEL VARIABLE LIST: ");
-//		System.out.println(modelVariablesList);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see backtype.storm.task.IBolt#execute(backtype.storm.tuple.Tuple)
-     */
-	@Override
-	public void execute(Tuple input) {
+    
 
-		// 1) SPLIT STRING
-		// 2) IF THE CURRENT RECORD HAS THE SAME UUID AS PREVIOUS RECORD(S) THEN ADD TRAIT TO LIST AND RETURN
-		// 3) IF THE CURRENT RECORD HAS A DIFFERENT UUID THEN PROCESS THE CURRENT TRAITS LIST AND EMIT VARIABLES
-		// 4) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN SET CURRENT UUID FROM RECORD, SET CURRENT l_id TO NULL AND RETURN
-		// 5) POPULATE TRAITS COLLECTION WITH THE FIRST TRAIT
-		
-		
-		
-		//System.out.println("PARSING DOCUMENT -- WEB TRAIT RECORD " + input.getString(0));
-		
-		// 1) SPLIT INPUT STRING
-        String webTraitInteractionRec = input.getString(1);
-        String webTraitsSplitRec[] = splitRec(webTraitInteractionRec);
-        
-        //does nothing but print out split string
-        String splitRec = new String();
-        for(int i=0;i<webTraitsSplitRec.length;i++) {
-        	if(i==0) splitRec = webTraitsSplitRec[i];
-        	else splitRec = splitRec + "  " + webTraitsSplitRec[i];
-        }
-//        System.out.println("  split string: " + splitRec);
-		
-        
-        //2014-03-08 10:56:17,00000388763646853831116694914086674166,743651,US,Sears
-        if(webTraitsSplitRec == null || webTraitsSplitRec.length==0) {
-        	return;
-        }
-        
-        
-		// 2) IF THE CURRENT RECORD HAS THE SAME UUID AS PREVIOUS RECORD(S) THEN ADD TRAIT TO LIST AND RETURN
-        if(this.currentUUID != null && this.currentUUID.equalsIgnoreCase(webTraitsSplitRec[1])) {
-        	//skip processing if l_id is null
-        	if(this.l_idToTraitCollectionMap == null) {
-        		return;
-        	}
-        	
-        	for(String l : l_idToTraitCollectionMap.keySet()) {
-        		l_idToTraitCollectionMap.get(l).add(webTraitsSplitRec[2]);
-        	}
-        	return;
-        }
-        
-		// 3) IF THE CURRENT RECORD HAS A DIFFERENT UUID THEN PROCESS THE CURRENT TRAITS LIST AND EMIT VARIABLES
-        if(l_idToTraitCollectionMap != null && !l_idToTraitCollectionMap.isEmpty()) {
-            System.out.println("processing found traits...");
-            
-            for(String current_l_id : l_idToTraitCollectionMap.keySet()) {
-	        	Map<String, Collection<String>> dateTraitsMap  = new HashMap<String,Collection<String>>(); // MAP BETWEEN DATES AND SET OF TRAITS - HISTORICAL AND CURRENT TRAITS
-	        	List<String> foundVariables = processTraitsList(dateTraitsMap, current_l_id); //LIST OF VARIABLES FOUND DURING TRAITS PROCESSING
-	        	if(dateTraitsMap !=null && !dateTraitsMap.isEmpty() && foundVariables != null && !foundVariables.isEmpty()) {
-	 	        	Object variableValueJSON = createJsonFromMemberTraitsMap(foundVariables, dateTraitsMap);
-		        	List<Object> listToEmit = new ArrayList<Object>();
-		        	listToEmit.add(current_l_id);
-		        	listToEmit.add(variableValueJSON);
-		        	listToEmit.add("WebTraits");
-		        	this.outputCollector.emit(listToEmit);
-		        	System.out.println(" *** PARSING BOLT EMITTING: " + listToEmit);
-	        	}
-	        	else {
-	           		System.out.println(" *** NO VARIBALES FOUND - NOTHING TO EMIT");
-	        	}
-            }
-            this.currentUUID=null;
-            this.l_idToTraitCollectionMap=null;
-        }
-        
-		// 4) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN SET CURRENT UUID FROM RECORD, SET CURRENT l_id TO NULL AND RETURN
-        //		If l_id is null and the next UUID is the same the current, then the next record will not be processed
-        DBCursor uuidCursor = memberUUIDCollection.find(new BasicDBObject("u",webTraitsSplitRec[1]));
-        if(uuidCursor == null) {
-            this.currentUUID=webTraitsSplitRec[1];
-            System.out.println(" *** COULD NOT FIND UUID: " + this.currentUUID);
-        	this.l_idToTraitCollectionMap=null;
-        	return;
-        }
-        
-        // set current uuid and l_id from mongoDB query results
-        for(DBObject uuidDbo:uuidCursor) {
-        	if(this.currentUUID == null) {
-        		this.currentUUID = uuidDbo.get("u").toString();
-        	}
-        	l_idToTraitCollectionMap.put(uuidDbo.get("l_id").toString(), new ArrayList<String>());
-        	l_idToTraitCollectionMap.get(uuidDbo.get("l_id")).add(webTraitsSplitRec[2]);
-        }
-        
-        if(l_idToTraitCollectionMap == null || l_idToTraitCollectionMap.isEmpty()) {
-        	this.l_idToTraitCollectionMap=null;
-        	return;
-        }
-        
-        SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
-        Date interactionDateTime = new Date();
-        try {
-			interactionDateTime = dateTimeFormat.parse(webTraitsSplitRec[0]);
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-        
-        return;
-        
-	}
-
-    private String[] splitRec(String webRec) {
-        //System.out.println("WEB RECORD: " + webRec);
-        String split[]=StringUtils.split(webRec,",");
-        
-        if(split !=null && split.length>0) {
-			return split;
-		}
-		else {
-			return null;
-		}
-	}
-
-    private List<String> processTraitsList(Map<String, Collection<String>> dateTraitsMap, String current_l_id) {
+	//TODO: Generalize with parsing bolt aam atc - processPidList
+	//[2014-29-08]:{Trait1,Trait2}, [2014-28-08]:{Trait3,Trait2}
+    protected Map<String,String> processList(String current_l_id) {
+    	Map<String, Collection<String>> dateTraitsMap  = new HashMap<String,Collection<String>>(); // MAP BETWEEN DATES AND SET OF TRAITS - HISTORICAL AND CURRENT TRAITS
 		List<String> variableList = new ArrayList<String>();
     	boolean firstTrait = true; //flag to indicate if the AMM trait found is the first for that member - if true then populate the memberTraitsMap
     	int traitCount = 0;
     	int variableCount = 0;
     	
     	//FOR EACH TRAIT FOUND FROM AAM DATA FIND THE VARIABLES THAT ARE IMPACTED
-    	for(String trait: l_idToTraitCollectionMap.get(current_l_id)) {
+    	for(String trait: l_idToValueCollectionMap.get(current_l_id)) {
     		if(traitVariablesMap.containsKey(trait) && hasModelVariable(traitVariablesMap.get(trait))) {
     			if(firstTrait) {
     				prepareDateTraitsMap(dateTraitsMap, current_l_id);
@@ -296,23 +120,31 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
     		}
     	}
 		System.out.println(" traits found: " + traitCount + " ... variables found: " + variableCount);
+		Map<String,String> variableDateTraitMap = new HashMap<String, String>();
     	if(dateTraitsMap != null && !dateTraitsMap.isEmpty() && !variableList.isEmpty()) {
-    		return variableList;
+    		for(String v : variableList) {
+        	String dateTraitString = createJsonFromDateTraitsMap(dateTraitsMap);
+        	variableDateTraitMap.put(v, dateTraitString);
+    		}
+    		return variableDateTraitMap;
     	}
     	else {
     		return null;
     	}
     }
-
-	private boolean hasModelVariable(Collection<String> varCollection) {
-		boolean isModVar = false;
-		for(String v:varCollection) {
-			if(modelVariablesList.contains(v)) {
-				isModVar = true;
-			}
-		}
-		return isModVar;
+    
+    private String createJsonFromDateTraitsMap(Map<String, Collection<String>> stringCollectionMap) {
+		System.out.println("dateTraitMap: " + stringCollectionMap);
+		// Create string in JSON format to emit
+    	Gson gson = new Gson();
+    	Type dateTraitValueType = new TypeToken<Map<String, Collection<String>>>() {
+			private static final long serialVersionUID = 1L;
+		}.getType();
+		
+		String dateTraitString = gson.toJson(stringCollectionMap, dateTraitValueType);
+		return dateTraitString;
 	}
+	
 
 	private boolean addTraitToDateTraitMap(String trait, Map<String, Collection<String>> dateTraitsMap) {
 		boolean addedTrait = false;
@@ -361,40 +193,4 @@ public class ParsingBoltWebTraits extends BaseRichBolt {
 		}
 	}
     
-    
-	private Object createJsonFromMemberTraitsMap(List<String> variableList, Map<String, Collection<String>> dateTraitsMap) {
-		System.out.println("dateTraitMap: " + dateTraitsMap);
-		// Create string in JSON format to emit
-    	Gson gson = new Gson();
-    	Type dateTraitValueType = new TypeToken<Map<String, Collection<String>>>() {
-			private static final long serialVersionUID = 1L;
-		}.getType();
-		
-		String dateTraitString = gson.toJson(dateTraitsMap, dateTraitValueType);
-		System.out.println("JSON string of dateTraitMap: " + dateTraitString);
-		
-		Map<String, String> varValueMap = new HashMap<String, String>();
-		for(String s:variableList) {
-			varValueMap.put(s, dateTraitString);
-		}
-				
-    	Type varValueType = new TypeToken<Map<String, String>>() {
-			private static final long serialVersionUID = 1L;
-		}.getType();
-		
-    	String varValueString = gson.toJson(varValueMap, varValueType);
-		return varValueString;
-	}
-
-	/*
-     * (non-Javadoc)
-     *
-     * @see
-     * backtype.storm.topology.IComponent#declareOutputFields(backtype.storm.
-     * topology.OutputFieldsDeclarer)
-     */
-	@Override
-	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("l_id","lineItemAsJsonString","source"));
-	}
 }
