@@ -14,6 +14,7 @@ import com.mongodb.*;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 
 import redis.clients.jedis.Jedis;
 
@@ -24,6 +25,8 @@ import java.util.Map;
 
 public class ScorePublishBolt extends BaseRichBolt {
 
+	static final Logger logger = Logger
+			.getLogger(ScorePublishBolt.class);
 	/**
 	 *
 	 */
