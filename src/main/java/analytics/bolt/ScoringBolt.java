@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 
 import analytics.util.ScoringSingleton;
 import backtype.storm.task.OutputCollector;
@@ -22,6 +23,8 @@ import com.mongodb.DBCollection;
 
 public class ScoringBolt extends BaseRichBolt {
 
+	static final Logger logger = Logger
+			.getLogger(ScoringBolt.class);
 	/**
 	 * 
 	 */
@@ -98,11 +101,12 @@ public class ScoringBolt extends BaseRichBolt {
 	    	listToEmit.add(modelScoresMap.get(modelId));
 	    	listToEmit.add(modelId);
 	    	listToEmit.add(source);
-	    	System.out.println(" ### SCORING BOLT EMITTING: " + listToEmit);
+	    	logger.info(" ### SCORING BOLT EMITTING: " + listToEmit);
+	    	logger.info("The time spent for creating scores..... "+System.currentTimeMillis());
 	    	this.outputCollector.emit(listToEmit);
 		}
             
-            //System.out.println(message);
+		//logger.info(message);
             //jedis.publish("score_changes", message);
     	//System.out.println(" ### UPDATE RECORD CHANGED SCORE: " + updateRec);
 //        if(updateRec != null) {
@@ -126,9 +130,9 @@ public class ScoringBolt extends BaseRichBolt {
 		
 	}
 
-	public static ArrayList<String> restoreModelListFromJson(String json)
+	private static final ArrayList<String> restoreModelListFromJson(String json)
     {
-        //System.out.println(" ### MODEL LIST STRING: " + json);
+        logger.info(" ### MODEL LIST STRING: " + json);
 		//modelList = new ArrayList<Object>();
         
         String strings[]=StringUtils.split(json,",");
@@ -136,7 +140,7 @@ public class ScoringBolt extends BaseRichBolt {
         for(String s: strings) {
         	modelList.add(s);
         }
-        //System.out.println(" ### MODEL LIST PARSED: " + json);
+        logger.info(" ### MODEL LIST PARSED: " + json);
         /*
         Type lineItemListType = new TypeToken<List<Object>>() {}.getType();
         List<Object> modelList = new Gson().fromJson(json, lineItemListType);
