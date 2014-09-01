@@ -1,5 +1,17 @@
 package analytics;
 
+import java.io.File;
+
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.FileAppender;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
+
+import analytics.bolt.ScorePublishBolt;
+import analytics.bolt.ScoringBolt;
+import analytics.bolt.StrategyBolt;
 import analytics.bolt.TellurideParsingBoltPOS;
 import analytics.spout.WebsphereMQSpout;
 import analytics.util.MQConnectionConfig;
@@ -11,10 +23,6 @@ import backtype.storm.StormSubmitter;
 import backtype.storm.generated.AlreadyAliveException;
 import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.topology.TopologyBuilder;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.log4j.*;
-
-import java.io.File;
 
 /**
  * Created with IntelliJ IDEA. User: syermalk Date: 10/9/13 Time: 10:14 AM To
@@ -28,12 +36,6 @@ public class RealTimeScoringTellurideTopology {
 	public static void main(String[] args) throws ConfigurationException {
 
 		// Configure logger
-		/*BasicConfigurator.configure();
-		String log4jConfigFile = System.getProperty("user.dir")
-				+ File.separator + "." + File.separator + "src"
-				+ File.separator + "main" + File.separator + "resources"
-				+ File.separator + "log4j.properties";
-		PropertyConfigurator.configure(log4jConfigFile);*/
 		creatLogger();
 		MqSender.initJMS();
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
@@ -63,17 +65,10 @@ public class RealTimeScoringTellurideTopology {
 		// create definition of main spout for queue 1
 		topologyBuilder.setBolt("parsing_bolt", new TellurideParsingBoltPOS())
 				.shuffleGrouping("npos1").shuffleGrouping("npos2");
-//		topologyBuilder.setBolt("strategy_bolt", new StrategyBolt())
-//				.shuffleGrouping("parsing_bolt");
-//		topologyBuilder.setBolt("scoring_bolt", new ScoringBolt())
-//				.shuffleGrouping("strategy_bolt");
-//		topologyBuilder
-//				.setBolt(
-//						"ScorePublishBolt",	new ScorePublishBolt("rtsapp401p.prod.ch4.s.com", 6379,
-//								"score")).shuffleGrouping("scoring_bolt");
-		// topologyBuilder.setBolt("map_bolt", new
-		// RedisBolt("rtsapp302p.qa.ch3.s.com",
-		// 6379,"sale_info")).shuffleGrouping("npos1").shuffleGrouping("npos2");
+        topologyBuilder.setBolt("strategy_bolt", new StrategyBolt()).shuffleGrouping("parsing_bolt");
+        topologyBuilder.setBolt("scoring_bolt", new ScoringBolt()).shuffleGrouping("strategy_bolt");
+        //topologyBuilder.setBolt("ScorePublishBolt", new ScorePublishBolt("rtsapp401p.prod.ch4.s.com", 6379,"score")).shuffleGrouping("scoring_bolt");
+
 
 		Config conf = new Config();
 		conf.setDebug(false);
@@ -104,7 +99,7 @@ public class RealTimeScoringTellurideTopology {
 		}
 	}
 
-	private static void creatLogger() {
+	private static final void creatLogger() {
 		// creates pattern layout
 		PatternLayout layout = new PatternLayout();
 		String conversionPattern = "%-7p %d [%t] %c %x - %m%n";
