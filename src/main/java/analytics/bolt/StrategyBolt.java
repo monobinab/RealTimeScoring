@@ -14,8 +14,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 
 import redis.clients.jedis.Jedis;
+import analytics.RealTimeScoringTellurideTopology;
 import analytics.util.MongoUtils;
 import analytics.util.objects.Change;
 import analytics.util.objects.RealTimeScoringContext;
@@ -39,6 +41,9 @@ import com.mongodb.DBObject;
 
 public class StrategyBolt extends BaseRichBolt {
 
+	static final Logger logger = Logger
+			.getLogger(StrategyBolt.class);
+
 	/**
 	 * 
 	 */
@@ -46,13 +51,13 @@ public class StrategyBolt extends BaseRichBolt {
     private OutputCollector outputCollector;
 
     DB db;
-    DBCollection modelVariablesCollection;
-    DBCollection memberVariablesCollection;
-    DBCollection variablesCollection;
-    DBCollection divLnVariableCollection;
-    DBCollection changedVariablesCollection;
-    DBCollection changedMemberScoresCollection;
-    
+    private DBCollection modelVariablesCollection;
+    private DBCollection memberVariablesCollection;
+    private DBCollection variablesCollection;
+    private DBCollection divLnVariableCollection;
+    private DBCollection changedVariablesCollection;
+    private DBCollection changedMemberScoresCollection;
+    private DBCollection divCatVariableCollection;
     private Map<String,Collection<Integer>> variableModelsMap;
     private Map<String,Collection<Integer>> modelVariablesMap;
     private Map<String, String> variableVidToNameMap;
@@ -102,9 +107,10 @@ public class StrategyBolt extends BaseRichBolt {
         memberVariablesCollection = db.getCollection("memberVariables");
         variablesCollection = db.getCollection("Variables");
         divLnVariableCollection = db.getCollection("divLnVariable");
+        divCatVariableCollection = db.getCollection("divCatVariable");
         changedVariablesCollection = db.getCollection("changedMemberVariables");
         changedMemberScoresCollection = db.getCollection("changedMemberScores");
-
+        
         
         // populate the variableModelsMap
         variableModelsMap = new HashMap<String, Collection<Integer>>();
@@ -167,16 +173,17 @@ public class StrategyBolt extends BaseRichBolt {
 		// 9) FIND ALL MODELS THAT ARE AFFECTED BY CHANGES
 		// 10) EMIT LIST OF MODEL IDs
 		
-		//System.out.println("APPLYING STRATEGIES");
+		logger.info("APPLYING STRATEGIES");
 		
 		// 1) PULL OUT HASHED LOYALTY ID FROM THE FIRST RECORD
 		String l_id = input.getString(0);
+		//String l_id = "CXcU+gBUakT3ro2ILK21u2Q8ujY=";
 		String source = input.getString(2);
 		Map<String, String> newChangesVarValueMap = restoreVariableListFromJson(input.getString(1));
 
-//		System.out.println(" ~~~ STRATEGY BOLT PARSED VARIABLE MAP AS: " + varAmountMap);
-//		System.out.println(" ~~~ input tuple: " + input);
-//		System.out.println(" ~~~ line items: " + lineItemList.size());
+		//logger.info(" ~~~ STRATEGY BOLT PARSED VARIABLE MAP AS: " + varAmountMap);
+		logger.info(" ~~~ input tuple: " + input);
+		//logger.info(" ~~~ line items: " + lineItemList.size());
 		
 		
 		// 2) FETCH MEMBER VARIABLES FROM memberVariables COLLECTION
@@ -186,9 +193,10 @@ public class StrategyBolt extends BaseRichBolt {
 			variableFields.append(variableNameToVidMap.get(v), 1);
 		}
 		
+		logger.info("Member Variables for Loyality ID is..."+l_id+"variableFields  are ...."+variableFields.toString());
 		DBObject mbrVariables = memberVariablesCollection.findOne(new BasicDBObject("l_id",l_id),variableFields);
 		if(mbrVariables == null) {
-			System.out.println(" ~~~ STRATEGY BOLT COULD NOT FIND MEMBER VARIABLES");
+			logger.info(" ~~~ STRATEGY BOLT COULD NOT FIND MEMBER VARIABLES");
 			return;
 		}
 		
@@ -242,10 +250,10 @@ public class StrategyBolt extends BaseRichBolt {
         for(String newChangeVariableName: newChangesVarValueMap.keySet()) {
             DBObject variableFromVariablesCollection = variablesCollection.findOne(new BasicDBObject("name", newChangeVariableName.toUpperCase()));
             if (variableFromVariablesCollection == null ) {
-            	//System.out.println(" ~~~ DID NOT FIND VARIBALE: " + variableName);
+            	logger.info(" ~~~ DID NOT FIND VARIBALE: ");
             	continue;
             }
-        	//System.out.println(" ~~~ FOUND VARIABLE - name: " + variableName + " varValueMap: "  + varValueMap.get(variableName));
+        	//logger.info(" ~~~ FOUND VARIABLE - name: " + variableName + " varValueMap: "  + varValueMap.get(variableName));
             
 	        RealTimeScoringContext context = new RealTimeScoringContext();
             context.setValue(newChangesVarValueMap.get(newChangeVariableName));
@@ -268,7 +276,7 @@ public class StrategyBolt extends BaseRichBolt {
                     		context.setPreviousValue(memberVariablesMap.get(newChangeVariableName.toUpperCase()));
                     	}
                     }
-//                    System.out.println(" ~~~ STRATEGY BOLT CHANGES - variable: " + variableName + " context: " + context);
+                    logger.info(" ~~~ STRATEGY BOLT CHANGES - context: " + context);
                     newChanges.put(newChangeVariableName, strategy.execute(context));
             	}
             } catch (ClassNotFoundException e) {
@@ -297,9 +305,9 @@ public class StrategyBolt extends BaseRichBolt {
 
 		    BasicDBObject searchQuery = new BasicDBObject().append("l_id", l_id);
 		    
-//		    System.out.println(" ~~~ DOCUMENT TO INSERT:");
-//		    System.out.println(newDocument.toString());
-//		    System.out.println(" ~~~ END DOCUMENT");
+		    logger.info(" ~~~ DOCUMENT TO INSERT:");
+		    logger.info(newDocument.toString());
+		    logger.info(" ~~~ END DOCUMENT");
 		    
 		    //upsert document
 		    changedVariablesCollection.update(searchQuery, new BasicDBObject("$set", newDocument), true, false);
@@ -324,7 +332,7 @@ public class StrategyBolt extends BaseRichBolt {
             	listToEmit.add(l_id);
             	listToEmit.add(createStringFromModelList(modelIdList));
             	listToEmit.add(source);
-            	System.out.println(" ~~~ STRATEGY BOLT EMITTING: " + listToEmit);
+            	logger.info(" ~~~ STRATEGY BOLT EMITTING: " + listToEmit);
             	this.outputCollector.emit(listToEmit);
             }
         }
@@ -351,8 +359,8 @@ public class StrategyBolt extends BaseRichBolt {
 			private static final long serialVersionUID = 1L;}.getType();
 
         varList = new Gson().fromJson(json, varListType);
-//        System.out.println(" JSON string: " + json);
-//        System.out.println(" Map: " + varList);
+        logger.info(" JSON string: " + json);
+        logger.info(" Map: " + varList);
         return varList;
     }
 	
