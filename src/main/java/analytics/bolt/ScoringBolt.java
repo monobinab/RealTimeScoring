@@ -101,7 +101,7 @@ public class ScoringBolt extends BaseRichBolt {
 	    	listToEmit.add(modelScoresMap.get(modelId));
 	    	listToEmit.add(modelId);
 	    	listToEmit.add(source);
-	    	logger.info(" ### SCORING BOLT EMITTING: " + listToEmit);
+	    	//logger.info(" ### SCORING BOLT EMITTING: " + listToEmit);
 	    	logger.info("The time spent for creating scores..... "+System.currentTimeMillis());
 	    	this.outputCollector.emit(listToEmit);
 		}
@@ -132,7 +132,7 @@ public class ScoringBolt extends BaseRichBolt {
 
 	private static final ArrayList<String> restoreModelListFromJson(String json)
     {
-        logger.info(" ### MODEL LIST STRING: " + json);
+        //logger.info(" ### MODEL LIST STRING: " + json);
 		//modelList = new ArrayList<Object>();
         
         String strings[]=StringUtils.split(json,",");
@@ -140,7 +140,7 @@ public class ScoringBolt extends BaseRichBolt {
         for(String s: strings) {
         	modelList.add(s);
         }
-        logger.info(" ### MODEL LIST PARSED: " + json);
+        //logger.info(" ### MODEL LIST PARSED: " + json);
         /*
         Type lineItemListType = new TypeToken<List<Object>>() {}.getType();
         List<Object> modelList = new Gson().fromJson(json, lineItemListType);

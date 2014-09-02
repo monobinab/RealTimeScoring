@@ -173,7 +173,7 @@ public class StrategyBolt extends BaseRichBolt {
 		// 9) FIND ALL MODELS THAT ARE AFFECTED BY CHANGES
 		// 10) EMIT LIST OF MODEL IDs
 		
-		logger.info("APPLYING STRATEGIES");
+		//logger.info("APPLYING STRATEGIES");
 		
 		// 1) PULL OUT HASHED LOYALTY ID FROM THE FIRST RECORD
 		String l_id = input.getString(0);
@@ -182,7 +182,7 @@ public class StrategyBolt extends BaseRichBolt {
 		Map<String, String> newChangesVarValueMap = restoreVariableListFromJson(input.getString(1));
 
 		//logger.info(" ~~~ STRATEGY BOLT PARSED VARIABLE MAP AS: " + varAmountMap);
-		logger.info(" ~~~ input tuple: " + input);
+		//logger.info(" ~~~ input tuple: " + input);
 		//logger.info(" ~~~ line items: " + lineItemList.size());
 		
 		
@@ -193,7 +193,7 @@ public class StrategyBolt extends BaseRichBolt {
 			variableFields.append(variableNameToVidMap.get(v), 1);
 		}
 		
-		logger.info("Member Variables for Loyality ID is..."+l_id+"variableFields  are ...."+variableFields.toString());
+		//logger.info("Member Variables for Loyality ID is..."+l_id+"variableFields  are ...."+variableFields.toString());
 		DBObject mbrVariables = memberVariablesCollection.findOne(new BasicDBObject("l_id",l_id),variableFields);
 		if(mbrVariables == null) {
 			logger.info(" ~~~ STRATEGY BOLT COULD NOT FIND MEMBER VARIABLES");

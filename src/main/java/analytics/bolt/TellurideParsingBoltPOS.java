@@ -191,7 +191,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 
 		if (transactionXmlAsString.contains("xmlns:soapenv")) {
 
-			logger.info("Processing Soap Envelop xml String...");
+			//logger.info("Processing Soap Envelop xml String...");
 			StringUtils.substringBetween(transactionXmlAsString.toString(),
 					"<soapenv:Envelope xmlns:soapenv="
 							+ "http://www.w3.org/2003/05/soap-envelope>"
@@ -251,19 +251,19 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 			// TRANSACTION LEVEL DATA
 
 			Collection<TransactionLineItem> lineItemList = new ArrayList<TransactionLineItem>();
-			logger.info("nposTransaction XML is" + transactionXmlAsString.toString());
+			//logger.info("nposTransaction XML is" + transactionXmlAsString.toString());
 
 			List<LineItem> lineItems = processTransaction.getLineItemList();
-			logger.info("Line Items are ...>>>>>>>>>>>>>>>>>>>>>>>>>>.."
-					+ lineItems.toString());
+			/*logger.info("Line Items are ...>>>>>>>>>>>>>>>>>>>>>>>>>>.."
+					+ lineItems.toString());*/
 
 			if (lineItems != null && lineItems.size() != 0) {
 				for (LineItem lineItem : lineItems) {
 
 					String item = "";
 					String amount = lineItem.getDollarValuePostDisc();
-					logger.info("Item is...." + item + "...Amount is...."
-							+ amount);
+					/*logger.info("Item is...." + item + "...Amount is...."
+							+ amount);*/
 										if (amount.contains("-")) {
 						logger.info("amount_contains -");
 						continue;
@@ -272,16 +272,16 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 						if ("KPOS".equalsIgnoreCase(requestorID)
 								|| "KCOM".equalsIgnoreCase(requestorID)) {
 							item = lineItem.getItemNumber();
-							logger.info("Item is..."+item);
+							//logger.info("Item is..."+item);
 							String divCategory = getDivCategoryFromCollection(item);
-							logger.info("division and category are ...." + divCategory);
+							//logger.info("division and category are ...." + divCategory);
                             String div = StringUtils.substring(divCategory, 0, 2);
                             String cat = StringUtils.substring(divCategory, 3, 6);
                             TransactionLineItem transactionLineItem = new TransactionLineItem(
 									l_id, div, item, "", cat,
 									Double.valueOf(amount));
-							logger.info("Transaction Line Item is ..."
-									+ transactionLineItem);
+							/*logger.info("Transaction Line Item is ..."
+									+ transactionLineItem);*/
 
 							// find all variables affected by div-line
 							List<String> foundVariablesList = null;
@@ -301,23 +301,23 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 														.getCategory());
 								if (divVariableCollection != null) {
 									for (String var : divVariableCollection) {
-										logger.info("Div is added.....  in variable List"
-												+ transactionLineItem.getDiv());
+										/*logger.info("Div is added.....  in variable List"
+												+ transactionLineItem.getDiv());*/
 										foundVariablesList.add(var);
 									}
 								}
 								if (divCatVariableCollection != null) {
 									for (String var : divCatVariableCollection) {
-										logger.info("Div is added..... in lnvariable List"
-												+ transactionLineItem.getDiv());
+										/*logger.info("Div is added..... in lnvariable List"
+												+ transactionLineItem.getDiv());*/
 										foundVariablesList.add(var);
 									}
 								}
 								transactionLineItem
 										.setVariableList(foundVariablesList);
 								lineItemList.add(transactionLineItem);
-								logger.info("Line Items are added inside lineItemList......"
-										+ lineItemList.size());
+								/*logger.info("Line Items are added inside lineItemList......"
+										+ lineItemList.size());*/
 							}
 						} else {
 							if (lineItem.getItemNumber().length() >= 6) {
@@ -332,16 +332,16 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 
                             String line = getLineFromCollection(div, item);
 							if (line == null) {
-								logger.info("Line is null");
+								/*logger.info("Line is null");*/
 								continue;
 							}
-							logger.info("Line is ...." + line);
+							//logger.info("Line is ...." + line);
 							TransactionLineItem transactionLineItem = null; 
 							transactionLineItem = new TransactionLineItem(
 									l_id, div, item, line,
 									Double.valueOf(amount));
-							logger.info("Transaction Line Item is ..."
-									+ transactionLineItem);
+							/*logger.info("Transaction Line Item is ..."
+									+ transactionLineItem);*/
 							// find all variables affected by div-line
 							List<String> foundVariablesList = null;
 									 foundVariablesList = new ArrayList<String>();
@@ -361,23 +361,23 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 												+ transactionLineItem.getLine());
 								if (divVariableCollection != null) {
 									for (String var : divVariableCollection) {
-										logger.info("Div is added.....  in variable List"
-												+ transactionLineItem.getDiv());
+										/*logger.info("Div is added.....  in variable List"
+												+ transactionLineItem.getDiv());*/
 										foundVariablesList.add(var);
 									}
 								}
 								if (divLnVariableCollection != null) {
 									for (String var : divLnVariableCollection) {
-										logger.info("Div is added..... in lnvariable List"
-												+ transactionLineItem.getDiv());
+										/*logger.info("Div is added..... in lnvariable List"
+												+ transactionLineItem.getDiv());*/
 										foundVariablesList.add(var);
 									}
 								}
 								transactionLineItem
 										.setVariableList(foundVariablesList);
 								lineItemList.add(transactionLineItem);
-								logger.info("Line Items are added inside lineItemList......"
-										+ lineItemList.size());
+								/*logger.info("Line Items are added inside lineItemList......"
+										+ lineItemList.size());*/
 							}
 
 						}
@@ -471,9 +471,9 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 
 		String transLineItemListString = gson.toJson(varAmountMap,
 				transLineItemType);
-		logger.info(">>>>>>>>>>>>>>>>Trans LineItemList String"
+		/*logger.info(">>>>>>>>>>>>>>>>Trans LineItemList String"
 				+ transLineItemListString
-				+ "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+				+ "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");*/
 		return transLineItemListString;
 	}
 
@@ -511,13 +511,13 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 	}
 
 	private final String getLineFromCollection(String div, String item) {
-		logger.info("searching for line");
+		/*logger.info("searching for line");*/
 
 		BasicDBObject queryLine = new BasicDBObject();
 		queryLine.put("d", div);
 		queryLine.put("i", item);
 
-		logger.info("query: " + queryLine);
+		/*logger.info("query: " + queryLine);*/
 		DBObject divLnItm = divLnItmCollection.findOne(queryLine);
 		logger.info("line: " + divLnItm);
 
@@ -537,41 +537,41 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 		BasicDBObject queryLine = new BasicDBObject();
 		queryLine.put("k", item);
 
-		logger.info("query: " + queryLine);
+		//logger.info("query: " + queryLine);
 		DBObject ksndivcat = ksndivcatCollection.findOne(queryLine);
-		logger.info("category: " + ksndivcat);
+		//logger.info("category: " + ksndivcat);
 
 		if (ksndivcat == null || ksndivcat.keySet() == null
 				|| ksndivcat.keySet().isEmpty()) {
-			logger.info("Ksndivcat is null");
+			//logger.info("Ksndivcat is null");
 			return null;
 		}
 		String category = ksndivcat.get("c").toString();
         String div = ksndivcat.get("d").toString();
 
-        logger.info("  found category: " + category);
-        logger.info("  found division: " + div);
+        /*logger.info("  found category: " + category);
+        logger.info("  found division: " + div);*/
 
         return div+category;
 	}
 
 	private final String getDivFromCollection(String item) {
-		logger.info("searching for category");
+		/*logger.info("searching for category");*/
 
 		BasicDBObject queryLine = new BasicDBObject();
 		queryLine.put("k", item);
 
-		logger.info("query: " + queryLine);
+		//logger.info("query: " + queryLine);
 		DBObject Ksndivcat = ksndivcatCollection.findOne(queryLine);
-		logger.info("division: " + Ksndivcat);
+		//logger.info("division: " + Ksndivcat);
 
 		if (Ksndivcat == null || Ksndivcat.keySet() == null
 				|| Ksndivcat.keySet().isEmpty()) {
-			logger.info("Ksndivcat is null");
+			//logger.info("Ksndivcat is null");
 			return null;
 		}
 		String div = Ksndivcat.get("d").toString();
-		logger.info("  found division: " + div);
+		//logger.info("  found division: " + div);
 		return div;
 	}
 
@@ -589,7 +589,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 		stringMessage = new String(bout.toByteArray());
 
 		bout.close();
-		logger.info(stringMessage.toString());
+		//logger.info(stringMessage.toString());
 		return stringMessage;
 	}
 
