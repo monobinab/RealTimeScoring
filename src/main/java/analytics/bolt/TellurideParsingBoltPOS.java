@@ -160,7 +160,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 	@Override
 	public void execute(Tuple input) {
      
-		logger.info("The time it enters inside execute method"+System.currentTimeMillis());
+		logger.info("The time it enters inside Telluride parsing bolt execute method"+System.currentTimeMillis());
 		String lyl_id_no = "";
 		ProcessTransaction processTransaction = null;
 

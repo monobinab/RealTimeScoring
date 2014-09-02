@@ -80,7 +80,7 @@ public class ScoringBolt extends BaseRichBolt {
      */
 	@Override
 	public void execute(Tuple input) {
-		
+		logger.info("The time it enters inside Scoring Bolt execute method"+System.currentTimeMillis());
 		// 1) PULL OUT HASHED LOYALTY ID FROM THE FIRST RECORD
 		String l_id = input.getString(0);
 		String source = input.getString(2);

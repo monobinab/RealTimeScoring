@@ -297,7 +297,7 @@ public class ScorePublishBolt extends BaseRichBolt {
 	 */
 	@Override
 	public void execute(Tuple input) {
-
+		logger.info("The time it enters inside Score Publish Bolt execute method"+System.currentTimeMillis());
         //System.out.println(" %%% scorepublishbolt :" + input);
         String l_id = input.getStringByField("l_id");
         DBObject row = memberZipCollection.findOne(new BasicDBObject("l_id", l_id));

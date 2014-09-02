@@ -161,7 +161,7 @@ public class StrategyBolt extends BaseRichBolt {
      */
 	@Override
 	public void execute(Tuple input) {
-		
+		logger.info("The time it enters inside Strategy Bolt execute method"+System.currentTimeMillis());
 		// 1) PULL OUT HASHED LOYALTY ID FROM THE FIRST RECORD IN lineItemList
 		// 2) FETCH MEMBER VARIABLES FROM memberVariables COLLECTION
 		// 3) CREATE MAP FROM VARIABLES TO VALUE (OBJECT)
