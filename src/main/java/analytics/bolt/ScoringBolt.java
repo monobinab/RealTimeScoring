@@ -16,6 +16,7 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.MessageId;
 import backtype.storm.tuple.Tuple;
 
 import com.mongodb.DB;
@@ -81,9 +82,14 @@ public class ScoringBolt extends BaseRichBolt {
 	@Override
 	public void execute(Tuple input) {
 		logger.info("The time it enters inside Scoring Bolt execute method"+System.currentTimeMillis());
+		MessageId messageId = input.getMessageId();
+		logger.info("The message id is ..."+messageId +"and the time in millisecond is..."+System.currentTimeMillis());
+		
 		// 1) PULL OUT HASHED LOYALTY ID FROM THE FIRST RECORD
+		
 		String l_id = input.getString(0);
 		String source = input.getString(2);
+		String messageID = input.getString(3);
 		
 		
 		// SCORING BOLTS READS A LIST OF OBJECTS WITH THE FIRST ELEMENT BEING THE HASHED LOYALTY ID
@@ -101,8 +107,9 @@ public class ScoringBolt extends BaseRichBolt {
 	    	listToEmit.add(modelScoresMap.get(modelId));
 	    	listToEmit.add(modelId);
 	    	listToEmit.add(source);
+	    	listToEmit.add(messageID);
 	    	//logger.info(" ### SCORING BOLT EMITTING: " + listToEmit);
-	    	logger.info("The time spent for creating scores..... "+System.currentTimeMillis());
+	    	logger.info("The time spent for creating scores..... "+System.currentTimeMillis()+" and the message ID is ..."+messageID);
 	    	this.outputCollector.emit(listToEmit);
 		}
             
@@ -126,7 +133,7 @@ public class ScoringBolt extends BaseRichBolt {
       */
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("l_id","oldScore","newScore","model","source"));
+		declarer.declare(new Fields("l_id","oldScore","newScore","model","source","messageID"));
 		
 	}
 

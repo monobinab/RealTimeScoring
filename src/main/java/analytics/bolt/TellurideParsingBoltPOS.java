@@ -50,6 +50,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 	private Map<String, Collection<String>> divLnVariablesMap;
 	private Map<String, Collection<String>> divCatVariablesMap;
 	private String requestorID = "";
+	private String [] messageIDs;
 	
 
 	public void setOutputCollector(OutputCollector outputCollector) {
@@ -160,7 +161,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 	@Override
 	public void execute(Tuple input) {
      
-		logger.info("The time it enters inside Telluride parsing bolt execute method"+System.currentTimeMillis());
+		logger.info("The time it enters inside Telluride parsing bolt execute method"+System.currentTimeMillis()+" and the message ID is ..."+input.getMessageId());
 		String lyl_id_no = "";
 		ProcessTransaction processTransaction = null;
 
@@ -413,11 +414,12 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 					listToEmit.add(l_id);
 					listToEmit.add(createJsonFromVarValueMap(varAmountMap));
 					listToEmit.add(requestorID);
+					listToEmit.add(input.getMessageId().toString());
 					logger.info(requestorID + " Point of SALE is touched...");
 					logger.info(" *** parsing bolt emitting: "
 						+ listToEmit.toString());
 
-				// 9) EMIT VARIABLES TO VALUES MAP IN GSON DOCUMENT
+				// 9) EMIT VARIABLES TO VALUES MAP IN JSON DOCUMENT
 				if (listToEmit != null && !listToEmit.isEmpty()) {
 					this.outputCollector.emit(listToEmit);
 				}
@@ -486,7 +488,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 	 */
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("l_id", "lineItemAsJsonString", "source"));
+		declarer.declare(new Fields("l_id", "lineItemAsJsonString", "source","messageID"));
 	}
 
 	public String hashLoyaltyId(String l_id) {

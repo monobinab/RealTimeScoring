@@ -17,7 +17,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import redis.clients.jedis.Jedis;
-import analytics.RealTimeScoringTellurideTopology;
 import analytics.util.MongoUtils;
 import analytics.util.objects.Change;
 import analytics.util.objects.RealTimeScoringContext;
@@ -27,6 +26,7 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.MessageId;
 import backtype.storm.tuple.Tuple;
 
 import com.google.common.reflect.TypeToken;
@@ -179,6 +179,8 @@ public class StrategyBolt extends BaseRichBolt {
 		String l_id = input.getString(0);
 		//String l_id = "CXcU+gBUakT3ro2ILK21u2Q8ujY=";
 		String source = input.getString(2);
+		String messageID = input.getString(3);
+		//MessageId messageID = input.getMessageId();
 		Map<String, String> newChangesVarValueMap = restoreVariableListFromJson(input.getString(1));
 
 		//logger.info(" ~~~ STRATEGY BOLT PARSED VARIABLE MAP AS: " + varAmountMap);
@@ -332,6 +334,7 @@ public class StrategyBolt extends BaseRichBolt {
             	listToEmit.add(l_id);
             	listToEmit.add(createStringFromModelList(modelIdList));
             	listToEmit.add(source);
+            	listToEmit.add(messageID);
             	logger.info(" ~~~ STRATEGY BOLT EMITTING: " + listToEmit);
             	this.outputCollector.emit(listToEmit);
             }
@@ -348,7 +351,7 @@ public class StrategyBolt extends BaseRichBolt {
       */
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("l_id","modelIdList","source"));
+		declarer.declare(new Fields("l_id","modelIdList","source","messageID"));
 		
 	}
     
