@@ -1,22 +1,30 @@
 package analytics.spout;
 
+import java.util.Map;
+
+import javax.jms.JMSException;
+import javax.jms.Session;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
+
 import com.ibm.jms.JMSMessage;
-import com.ibm.mq.jms.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.jms.JMSException;
-import javax.jms.Session;
-import java.util.Map;
-
+import com.ibm.mq.jms.JMSC;
+import com.ibm.mq.jms.MQQueue;
+import com.ibm.mq.jms.MQQueueConnection;
+import com.ibm.mq.jms.MQQueueConnectionFactory;
+import com.ibm.mq.jms.MQQueueReceiver;
+import com.ibm.mq.jms.MQQueueSession;
 public class WebsphereMQSpout extends BaseRichSpout {
 
+	
 	private SpoutOutputCollector collector;
 	private MQQueueReceiver receiver;
 	private MQQueueSession queueSession;
@@ -77,8 +85,13 @@ public class WebsphereMQSpout extends BaseRichSpout {
 
 	@Override
 	public void nextTuple() {
+		
 		try {
 			JMSMessage receivedMessage = (JMSMessage) receiver.receive();
+			String messageID = receivedMessage.getJMSMessageID();
+			long timeStamp = receivedMessage.getJMSTimestamp();
+			LOG.info("The time it enters with next message with it " +
+					"id" +messageID+ " and its time stamp" +timeStamp + "Start Time in millisecond "+System.currentTimeMillis());
 			collector.emit(new Values(receivedMessage), receivedMessage);
 		} catch (JMSException e) {
 			LOG.error("Exception occurred while receiving message from queue ", e);
