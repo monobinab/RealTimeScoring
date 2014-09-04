@@ -11,6 +11,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
+
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 
@@ -190,5 +192,21 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
 			}
 		}
 	}
+    
+    @Override
+    protected String[] splitRec(String webRec) {
+    	//TODO: Do not use regex. Have a better way. This is temp
+    	webRec = webRec.replaceAll("['\\[\\]\"]",""); 
+        //System.out.println("WEB RECORD: " + webRec);
+        String split[]=StringUtils.split(webRec,",");
+        
+        if(split !=null && split.length>0) {
+			return split;
+		}
+		else {
+			return null;
+		}
+	}
+    
     
 }

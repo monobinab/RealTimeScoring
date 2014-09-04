@@ -276,5 +276,20 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
     	
     	return variableValueMap;
     }
+	@Override
+	protected String[] splitRec(String webRec) {
+		//TODO: See if other fields in the record are relevant. It was anyway not being used, so made this change
+	        //System.out.println("WEB RECORD: " + webRec);
+		webRec = webRec.replaceAll("[']",""); ;
+	        String split[]=StringUtils.split(webRec,",");
+	       
+	        if(split !=null && split.length>0) {
+	            String[] returnArray = { split[1], split[2] };
+				return returnArray;
+			}
+			else {
+				return null;
+			}
+		}
     
 }

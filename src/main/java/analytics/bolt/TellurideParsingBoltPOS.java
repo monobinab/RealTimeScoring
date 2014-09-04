@@ -87,7 +87,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 		logger.info("PREPARING PARSING POS BOLT");
 
 		try {
-			db = new DBConnection().getDBConnectionWithoutCredentials();
+			db = new DBConnection().getDBConnection();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
