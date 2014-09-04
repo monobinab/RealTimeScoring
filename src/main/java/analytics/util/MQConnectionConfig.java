@@ -16,7 +16,7 @@ public class MQConnectionConfig {
     	//Configure logger
         BasicConfigurator.configure();
         
-		PropertiesConfiguration properties = new PropertiesConfiguration("./src/main/resources/Websphere_MQ_config.properties");
+		PropertiesConfiguration properties = new PropertiesConfiguration("resources/Websphere_MQ_config.properties");
 		
 		WebsphereMQCredential websphereMQCredential = new WebsphereMQCredential();
 		

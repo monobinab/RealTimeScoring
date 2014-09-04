@@ -67,7 +67,7 @@ public class MqSender {
 			String sCurrentLine;
 			BufferedReader br = null; 
 			Charset charset = Charset.forName("UTF-8");
-			br = new BufferedReader(new FileReader("./src/main/resources/PROCTRAN3.txt"));
+			br = new BufferedReader(new FileReader("resources/PROCTRAN3.txt"));
 			while ((sCurrentLine = br.readLine()) != null && counter<=1) {
 				BytesMessage message = (BytesMessage)session.createBytesMessage();
 				message.writeBytes(sCurrentLine.getBytes("UTF-8"));
