@@ -75,13 +75,11 @@ public class ScoringSingleton {
 	}*/
 	private ScoringSingleton(){
 		try {
-
-			mongoClient = new MongoClient(
-					"trprrta2mong4.vm.itg.corp.us.shldcorp.com", 27000);
-		} catch (UnknownHostException e) {
+			db = DBConnection.getDBConnection();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		db = mongoClient.getDB("test");
 		//System.out.println(" collections: " + db.getCollectionNames());
 		memberVariablesCollection = db.getCollection("memberVariables");
 		modelVariablesCollection = db.getCollection("modelVariables");

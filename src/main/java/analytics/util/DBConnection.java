@@ -11,14 +11,14 @@ import com.mongodb.MongoClient;
 public class DBConnection {
 
 	static final Logger logger = Logger.getLogger(DBConnection.class);
-	private MongoClient mongoClient;
-	private String sServerName = "";
-	private int sPort = 0;
-	private String sDatabaseName = "";
-	private String sUserName = "";
-	private String sPassword = "";
+	private static MongoClient mongoClient;
+	private static String sServerName = "";
+	private static int sPort = 0;
+	private static String sDatabaseName = "";
+	private static String sUserName = "";
+	private static String sPassword = "";
 
-	public DB getDBConnection() throws Exception {
+	public static DB getDBConnection() throws Exception {
 		DB conn = null;
 
 		PropertiesConfiguration properties = new PropertiesConfiguration("./src/main/resources/connection_config.properties");

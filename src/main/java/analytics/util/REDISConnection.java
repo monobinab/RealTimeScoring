@@ -10,7 +10,7 @@ public class REDISConnection {
 		Properties prop = new Properties();
 		try {
 		    //load a properties file from class path, inside static method
-		    prop.load(REDISConnection.class.getClassLoader().getResourceAsStream("redis_server.properties"));
+		    prop.load(REDISConnection.class.getClassLoader().getResourceAsStream("resources/redis_server.properties"));
 		    List<String> servers= new ArrayList<String>();
 		    int i=1;
 		    while(prop.containsKey("server"+i)){
