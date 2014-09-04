@@ -2,6 +2,7 @@ package analytics.bolt;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -75,7 +76,7 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
 	 * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
 	 */
 
-        
+		sourceTopic = "InternalSearch";
         pidDivLnCollection = db.getCollection("pidDivLn");
         divLnVariableCollection = db.getCollection("divLnVariable");
 
@@ -207,7 +208,6 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				
 				if(queryResultsDoc==null) {
 					System.out.println("query results null");
 				}
