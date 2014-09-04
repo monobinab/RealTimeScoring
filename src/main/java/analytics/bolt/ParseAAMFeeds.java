@@ -129,6 +129,7 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 		//System.out.println("PARSING DOCUMENT -- WEB TRAIT RECORD " + input.getString(0));
 		
 		// 1) SPLIT INPUT STRING
+		
         String interactionRec = input.getString(1);
         String splitRecArray[] = splitRec(interactionRec);
         
@@ -148,14 +149,16 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
         
         
 		// 2) IF THE CURRENT RECORD HAS THE SAME UUID AS PREVIOUS RECORD(S) THEN ADD TRAIT TO LIST AND RETURN
-        if(this.currentUUID != null && this.currentUUID.equalsIgnoreCase(splitRecArray[1])) {
+        if(this.currentUUID != null && this.currentUUID.equalsIgnoreCase(splitRecArray[0])) {
         	//skip processing if l_id is null
         	if(this.l_idToValueCollectionMap==null || this.l_idToValueCollectionMap.isEmpty()) {
         		return;
         	}
         	
         	for(String l : l_idToValueCollectionMap.keySet()) {
-        		l_idToValueCollectionMap.get(l).add(splitRecArray[2]);
+        		for(int i=1;i<splitRecArray.length;i++){
+        			l_idToValueCollectionMap.get(l).add(splitRecArray[i].trim());
+        		}
         	}
         	return;
         }
@@ -186,9 +189,9 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
         
 		// 4) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN SET CURRENT UUID FROM RECORD, SET CURRENT l_id TO NULL AND RETURN
         //		If l_id is null and the next UUID is the same the current, then the next record will not be processed
-        DBCursor uuidCursor = memberUUIDCollection.find(new BasicDBObject("u",splitRecArray[1]));
+        DBCursor uuidCursor = memberUUIDCollection.find(new BasicDBObject("u",splitRecArray[0]));
         if(uuidCursor == null) {
-            this.currentUUID=splitRecArray[1];
+            this.currentUUID=splitRecArray[0];
             System.out.println(" *** COULD NOT FIND UUID: " + this.currentUUID);
         	this.l_idToValueCollectionMap=new HashMap<String, Collection<String>>();
         	return;
@@ -207,7 +210,10 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
         		System.out.println(uuidDbo.get("l_id").toString());
         		System.exit(0);
         	}
-        	l_idToValueCollectionMap.get(uuidDbo.get("l_id")).add(splitRecArray[2]);
+    		for(int i=1;i<splitRecArray.length;i++){
+    			l_idToValueCollectionMap.get(uuidDbo.get("l_id")).add(splitRecArray[i].trim());
+    		}
+        	
         }
         
         if(l_idToValueCollectionMap == null || l_idToValueCollectionMap.isEmpty()) {
@@ -215,13 +221,14 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
         	return;
         }
         
-        SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
+        //TODO: If we need this, we should ask Dustin to send it to Traits feed as well
+        /*SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
         Date interactionDateTime = new Date();
         try {
 			interactionDateTime = dateTimeFormat.parse(splitRecArray[0]);
 		} catch (ParseException e) {
 			e.printStackTrace();
-		}
+		}*/
         
         return;
         
@@ -244,17 +251,7 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 	
 	
 	//TODO: Move this to a util class
-    protected String[] splitRec(String webRec) {
-        //System.out.println("WEB RECORD: " + webRec);
-        String split[]=StringUtils.split(webRec,",");
-        
-        if(split !=null && split.length>0) {
-			return split;
-		}
-		else {
-			return null;
-		}
-	}
+    abstract protected String[] splitRec(String webRec);
     
 	//TODO: Move this to a util class
 	protected boolean hasModelVariable(Collection<String> varCollection) {
@@ -280,5 +277,6 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 		return varValueString;
 	}
 
+	
 
 }
