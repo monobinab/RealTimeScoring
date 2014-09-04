@@ -41,7 +41,7 @@ public class DBConnection {
 		return conn;
 	}
 
-	public DB getDBConnectionWithoutCredentials() throws Exception {
+	/*public DB getDBConnectionWithoutCredentials() throws Exception {
 		DB conn = null;
 
 		PropertiesConfiguration properties = new PropertiesConfiguration("./src/main/resources/connection_config.properties");
@@ -62,7 +62,7 @@ public class DBConnection {
 		logger.info("Connection is established...."+conn.getName());
 		//conn.authenticate(sUserName, sPassword.toCharArray());
 		return conn;
-	}
+	}*/
 
 	public MongoClient getMongoClient() {
 		return mongoClient;
