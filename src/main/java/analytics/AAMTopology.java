@@ -2,16 +2,12 @@ package analytics;
 
 import analytics.bolt.ParsingBoltWebTraits;
 import analytics.bolt.PersistTraitsBolt;
-import analytics.bolt.ScorePublishBolt;
 import analytics.bolt.ScoringBolt;
 import analytics.bolt.StrategyBolt;
 import analytics.spout.AAMRedisPubSubSpout;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
-import backtype.storm.StormSubmitter;
-import backtype.storm.topology.BoltDeclarer;
 import backtype.storm.topology.TopologyBuilder;
-import backtype.storm.tuple.Fields;
 
 /**
  * This topology demonstrates Storm's stream groupings and multilang capabilities.
@@ -53,7 +49,7 @@ public class AAMTopology {
     builder.setBolt("strategy_bolt", new StrategyBolt(),1).shuffleGrouping("ParsingBoltWebTraits");
     builder.setBolt("persist_traits" , new PersistTraitsBolt(), 1).shuffleGrouping("ParsingBoltWebTraits");
     builder.setBolt("scoring_bolt", new ScoringBolt(),1).shuffleGrouping("strategy_bolt");
-      //builder.setBolt("ScorePublishBolt", new ScorePublishBolt("rtsapp401p.prod.ch4.s.com", 6379,"score"), 1).shuffleGrouping("scoring_bolt");
+      //builder.setBolt("RankPublishBolt", new RankPublishBolt("rtsapp401p.prod.ch4.s.com", 6379,"score"), 1).shuffleGrouping("scoring_bolt");
       
       
 //      for(String topic:topics){

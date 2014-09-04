@@ -1,21 +1,8 @@
 package analytics;
 
-import java.io.File;
-
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
-
-import analytics.bolt.ScorePublishBolt;
-import analytics.bolt.ScoringBolt;
-import analytics.bolt.StrategyBolt;
-import analytics.bolt.TellurideParsingBoltPOS;
+import analytics.bolt.*;
 import analytics.spout.WebsphereMQSpout;
 import analytics.util.MQConnectionConfig;
-import analytics.util.MqSender;
 import analytics.util.WebsphereMQCredential;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
@@ -23,6 +10,10 @@ import backtype.storm.StormSubmitter;
 import backtype.storm.generated.AlreadyAliveException;
 import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.topology.TopologyBuilder;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.log4j.*;
+
+import java.io.File;
 
 /**
  * Created with IntelliJ IDEA. User: syermalk Date: 10/9/13 Time: 10:14 AM To
@@ -37,8 +28,9 @@ public class RealTimeScoringTellurideTopology {
 
 		// Configure logger
 		creatLogger();
-		MqSender.initJMS();
+		//MqSender.initJMS();
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
+
 
 
 		MQConnectionConfig mqConnection = new MQConnectionConfig();
@@ -67,7 +59,7 @@ public class RealTimeScoringTellurideTopology {
 				.shuffleGrouping("npos1").shuffleGrouping("npos2");
         topologyBuilder.setBolt("strategy_bolt", new StrategyBolt()).shuffleGrouping("parsing_bolt");
         topologyBuilder.setBolt("scoring_bolt", new ScoringBolt()).shuffleGrouping("strategy_bolt");
-        //topologyBuilder.setBolt("ScorePublishBolt", new ScorePublishBolt("rtsapp401p.prod.ch4.s.com", 6379,"score")).shuffleGrouping("scoring_bolt");
+        topologyBuilder.setBolt("score_publish_bolt", new ScorePublishBolt("rtsapp401p.prod.ch4.s.com", 6379,"score")).shuffleGrouping("scoring_bolt");
 
 
 		Config conf = new Config();

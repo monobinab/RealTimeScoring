@@ -1,20 +1,13 @@
 package analytics;
 
 import analytics.bolt.ParsingBoltSYW;
-import analytics.bolt.ParsingBoltWebTraits;
-import analytics.bolt.PersistTraitsBolt;
 import analytics.bolt.ProcessSYWInteractions;
-import analytics.bolt.ScorePublishBolt;
 import analytics.bolt.ScoringBolt;
 import analytics.bolt.StrategyBolt;
-import analytics.spout.AAMRedisPubSubSpout;
 import analytics.spout.SYWRedisSpout;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
-import backtype.storm.StormSubmitter;
-import backtype.storm.topology.BoltDeclarer;
 import backtype.storm.topology.TopologyBuilder;
-import backtype.storm.tuple.Fields;
 
 /**
  * This topology demonstrates Storm's stream groupings and multilang capabilities.
