@@ -8,11 +8,15 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
+
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
+
 import org.apache.log4j.Logger;
+
 import redis.clients.jedis.Jedis;
 
+import java.net.SocketException;
 import java.util.Collection;
 import java.util.Map;
 
@@ -80,7 +84,23 @@ public class ScorePublishBolt extends BaseRichBolt {
             .append(input.getDoubleByField("newScore")).toString();
         //System.out.println(" %%% message : " + message);
 
-        jedis.publish(pattern, message);
+        int retryCount=0;
+        while(retryCount<5)
+        try{
+        	jedis.publish(pattern, message);
+        	break;
+        }
+        catch(Exception e){
+        	e.printStackTrace();
+        	try {
+				Thread.sleep(200);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+        	jedis.publish(pattern, message);
+        	retryCount++;
+        }
 
 	}
 
