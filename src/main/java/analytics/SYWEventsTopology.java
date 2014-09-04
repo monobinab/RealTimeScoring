@@ -30,7 +30,7 @@ public class SYWEventsTopology {
 
     //Read REDIS
     //TODO: Change this to the read from where Karththikka's web app sends
-    builder.setSpout("SYWEventsSpout", new SYWRedisSpout(servers[0], 6379, "SYWEvents"), 1);
+    builder.setSpout("SYWEventsSpout", new SYWRedisSpout(servers[0], 6379, "Message"), 1);
     //Parse the JSON 
     builder.setBolt("ParseEventsBolt", new ParsingBoltSYW(),1).shuffleGrouping("SYWEventsSpout");
     //Get the div line and boost variable 
