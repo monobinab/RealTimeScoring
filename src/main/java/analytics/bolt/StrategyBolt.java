@@ -161,6 +161,7 @@ public class StrategyBolt extends BaseRichBolt {
      */
 	@Override
 	public void execute(Tuple input) {
+		System.out.println("STRATEGY BOLT GOT " + input.toString());
 		logger.info("The time it enters inside Strategy Bolt execute method"+System.currentTimeMillis());
 		// 1) PULL OUT HASHED LOYALTY ID FROM THE FIRST RECORD IN lineItemList
 		// 2) FETCH MEMBER VARIABLES FROM memberVariables COLLECTION
@@ -176,11 +177,12 @@ public class StrategyBolt extends BaseRichBolt {
 		//logger.info("APPLYING STRATEGIES");
 		
 		// 1) PULL OUT HASHED LOYALTY ID FROM THE FIRST RECORD
-		String l_id = input.getString(0);
-		//String l_id = "CXcU+gBUakT3ro2ILK21u2Q8ujY=";
-		String source = input.getString(2);
-		String messageID = input.getString(3);
-		//MessageId messageID = input.getMessageId();
+		String l_id = input.getStringByField("l_id");
+		String source = input.getStringByField("source");
+		String messageID = "";
+		if(input.contains("messageID")){
+			messageID = input.getStringByField("messageID");
+		}
 		Map<String, String> newChangesVarValueMap = restoreVariableListFromJson(input.getString(1));
 
 		//logger.info(" ~~~ STRATEGY BOLT PARSED VARIABLE MAP AS: " + varAmountMap);
@@ -352,7 +354,7 @@ public class StrategyBolt extends BaseRichBolt {
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		declarer.declare(new Fields("l_id","modelIdList","source","messageID"));
-		
+	
 	}
     
 	public static Map<String, String> restoreVariableListFromJson(String json)

@@ -86,10 +86,14 @@ public class ScoringBolt extends BaseRichBolt {
 		logger.info("The message id is ..."+messageId +"and the time in millisecond is..."+System.currentTimeMillis());
 		
 		// 1) PULL OUT HASHED LOYALTY ID FROM THE FIRST RECORD
-		
-		String l_id = input.getString(0);
-		String source = input.getString(2);
-		String messageID = input.getString(3);
+
+		String l_id = input.getStringByField("l_id");
+		String source = input.getStringByField("source");
+		String messageID = "";
+		if(input.contains("messageID")){
+			messageID = input.getStringByField("messageID");
+		}
+	//	
 		
 		
 		// SCORING BOLTS READS A LIST OF OBJECTS WITH THE FIRST ELEMENT BEING THE HASHED LOYALTY ID
