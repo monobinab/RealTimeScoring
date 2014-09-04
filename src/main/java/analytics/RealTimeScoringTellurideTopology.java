@@ -1,19 +1,13 @@
 package analytics;
 
-import java.io.File;
-
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
 
-import analytics.bolt.ScorePublishBolt;
 import analytics.bolt.ScoringBolt;
 import analytics.bolt.StrategyBolt;
 import analytics.bolt.TellurideParsingBoltPOS;
 import analytics.spout.WebsphereMQSpout;
+import analytics.util.Logging;
 import analytics.util.MQConnectionConfig;
 import analytics.util.MqSender;
 import analytics.util.WebsphereMQCredential;
@@ -36,7 +30,7 @@ public class RealTimeScoringTellurideTopology {
 	public static void main(String[] args) throws ConfigurationException {
 
 		// Configure logger
-		creatLogger();
+		Logging.creatLogger("RealTimeScoringTellurideLog.log");
 		MqSender.initJMS();
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 
@@ -97,32 +91,5 @@ public class RealTimeScoringTellurideTopology {
 			cluster.shutdown();
 
 		}
-	}
-
-	private static final void creatLogger() {
-		// creates pattern layout
-		PatternLayout layout = new PatternLayout();
-		String conversionPattern = "%-7p %d [%t] %c %x - %m%n";
-		layout.setConversionPattern(conversionPattern);
-
-		// creates console appender
-		ConsoleAppender consoleAppender = new ConsoleAppender();
-		consoleAppender.setLayout(layout);
-		consoleAppender.activateOptions();
-
-		// creates file appender
-		FileAppender fileAppender = new FileAppender();
-		fileAppender.setFile(System.getProperty("user.dir") + File.separator
-				+ "." + File.separator + "src" + File.separator + "main"
-				+ File.separator + "resources" + File.separator + "RealTimeScoringLog.log");
-		fileAppender.setLayout(layout);
-		fileAppender.activateOptions();
-
-		// configures the root logger
-		Logger rootLogger = Logger.getRootLogger();
-		rootLogger.setLevel(Level.INFO);
-		rootLogger.addAppender(consoleAppender);
-		rootLogger.addAppender(fileAppender);
-
 	}
 }
