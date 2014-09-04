@@ -17,6 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import redis.clients.jedis.Jedis;
+import analytics.util.DBConnection;
 import analytics.util.MongoUtils;
 import analytics.util.objects.Change;
 import analytics.util.objects.RealTimeScoringContext;
@@ -98,8 +99,11 @@ public class StrategyBolt extends BaseRichBolt {
         System.out.println("PREPARING STRATEGY BOLT");
         
         try {
-			db = MongoUtils.getClient("DEV");
+			db = DBConnection.getDBConnection();
 		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

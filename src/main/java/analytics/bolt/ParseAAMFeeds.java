@@ -22,6 +22,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
+import analytics.util.DBConnection;
 import analytics.util.MongoUtils;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -84,8 +85,8 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
         System.out.println("PREPARING PARSING BOLT FOR AAM Feeds");
 
         try {
-			db = MongoUtils.getClient("DEV");
-		} catch (UnknownHostException e) {
+			db = DBConnection.getDBConnection();
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
         

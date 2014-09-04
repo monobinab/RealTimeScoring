@@ -19,7 +19,6 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.MessageId;
 import backtype.storm.tuple.Tuple;
 
-import com.mongodb.DB;
 import com.mongodb.DBCollection;
 
 public class ScoringBolt extends BaseRichBolt {
@@ -32,7 +31,7 @@ public class ScoringBolt extends BaseRichBolt {
 	private static final long serialVersionUID = 1L;
     private OutputCollector outputCollector;
 
-    DB db;
+    //DB db;
     DBCollection modelVariablesCollection;
     DBCollection memberVariablesCollection;
     DBCollection memberScoreCollection;
