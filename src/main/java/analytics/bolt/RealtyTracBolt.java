@@ -3,7 +3,7 @@
  */
 package analytics.bolt;
 
-import analytics.util.MongoUtils;
+import analytics.util.DBConnection;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -16,6 +16,8 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
+
+import org.apache.commons.configuration.ConfigurationException;
 
 public class RealtyTracBolt extends BaseRichBolt {
 
@@ -61,9 +63,9 @@ public class RealtyTracBolt extends BaseRichBolt {
 	 * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
 	 */
 
-	    try {
-			db = MongoUtils.getClient("QA");
-		} catch (UnknownHostException e) {
+        try {
+			db = DBConnection.getDBConnection();
+		} catch (ConfigurationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

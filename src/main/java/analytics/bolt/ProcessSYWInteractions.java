@@ -7,7 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import analytics.util.MongoUtils;
+import org.apache.commons.configuration.ConfigurationException;
+
+import analytics.util.DBConnection;
 import analytics.util.SYWAPICalls;
 import analytics.util.objects.SYWEntity;
 import analytics.util.objects.SYWInteraction;
@@ -45,11 +47,12 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 		 * right at the parsing bolt level
 		 */	
 
-      try {
-		db = MongoUtils.getClient("DEV");
-	} catch (UnknownHostException e) {
-		e.printStackTrace();
-	}
+		 try {
+				db = DBConnection.getDBConnection();
+			} catch (ConfigurationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
       pidVarCollection = db.getCollection("pidDivLn");
 	}
@@ -83,7 +86,8 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 						DBObject obj1 = pidVarCollection.findOne(new BasicDBObject("pid", productId));
 						if(obj1 != null)
 						{
-							String variable = MongoUtils.getBoostVariable((String)obj1.get("d"), (String)obj1.get("l"));
+							String variable = "BOOST_HA_WH_SYW";
+							//MongoUtils.getBoostVariable((String)obj1.get("d"), (String)obj1.get("l"));
 							variableValueMap.put(variable, "1");
 						}
 						else

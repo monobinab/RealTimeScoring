@@ -15,10 +15,7 @@ import backtype.storm.StormSubmitter;
 import backtype.storm.generated.AlreadyAliveException;
 import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.topology.TopologyBuilder;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.log4j.*;
 
-import java.io.File;
 
 /**
  * Created with IntelliJ IDEA. User: syermalk Date: 10/9/13 Time: 10:14 AM To
@@ -63,6 +60,7 @@ public class RealTimeScoringTellurideTopology {
 				.shuffleGrouping("npos1").shuffleGrouping("npos2");
         topologyBuilder.setBolt("strategy_bolt", new StrategyBolt()).shuffleGrouping("parsing_bolt");
         topologyBuilder.setBolt("scoring_bolt", new ScoringBolt()).shuffleGrouping("strategy_bolt");
+        //TODO: Change hardcoded redis
         topologyBuilder.setBolt("score_publish_bolt", new ScorePublishBolt("rtsapp401p.prod.ch4.s.com", 6379,"score")).shuffleGrouping("scoring_bolt");
 
 

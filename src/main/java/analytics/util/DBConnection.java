@@ -2,6 +2,7 @@ package analytics.util;
 
 import java.net.UnknownHostException;
 
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
 
@@ -18,10 +19,10 @@ public class DBConnection {
 	private static String sUserName = "";
 	private static String sPassword = "";
 
-	public static DB getDBConnection() throws Exception {
+	public static DB getDBConnection() throws ConfigurationException {
 		DB conn = null;
 
-		PropertiesConfiguration properties = new PropertiesConfiguration("./src/main/resources/connection_config.properties");
+		PropertiesConfiguration properties = new PropertiesConfiguration("resources/connection_config.properties");
 						
 		sServerName = properties.getString("server.name");
 		sPort = Integer.parseInt( properties.getString("port.no"));

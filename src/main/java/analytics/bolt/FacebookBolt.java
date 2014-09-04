@@ -36,7 +36,7 @@ import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.util.Hash;
 
-import analytics.util.MongoUtils;
+import analytics.util.DBConnection;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -56,8 +56,8 @@ public class FacebookBolt extends BaseRichBolt{
 			OutputCollector collector) {
 		this.collector = collector;
 		try {
-			db = MongoUtils.getClient("DEV");
-		} catch (UnknownHostException e) {
+			db = DBConnection.getDBConnection();
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

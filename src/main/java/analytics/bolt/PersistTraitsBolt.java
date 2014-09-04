@@ -5,7 +5,9 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
-import analytics.util.MongoUtils;
+import org.apache.commons.configuration.ConfigurationException;
+
+import analytics.util.DBConnection;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -29,8 +31,9 @@ public class PersistTraitsBolt extends BaseRichBolt {
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
 		try {
-			db = MongoUtils.getClient("DEV");
-		} catch (UnknownHostException e) {
+			db = DBConnection.getDBConnection();
+		} catch (ConfigurationException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		memberTraitsCollection = db.getCollection("memberTraits");

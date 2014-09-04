@@ -13,12 +13,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import redis.clients.jedis.Jedis;
 import analytics.util.DBConnection;
-import analytics.util.MongoUtils;
 import analytics.util.objects.Change;
 import analytics.util.objects.RealTimeScoringContext;
 import analytics.util.strategies.Strategy;
@@ -27,7 +27,6 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.MessageId;
 import backtype.storm.tuple.Tuple;
 
 import com.google.common.reflect.TypeToken;
@@ -100,9 +99,7 @@ public class StrategyBolt extends BaseRichBolt {
         
         try {
 			db = DBConnection.getDBConnection();
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
+		} catch (ConfigurationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

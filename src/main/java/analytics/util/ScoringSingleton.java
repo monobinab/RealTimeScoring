@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang.StringUtils;
 
 import analytics.util.objects.Change;
@@ -74,9 +75,10 @@ public class ScoringSingleton {
 		System.out.println(x);
 	}*/
 	private ScoringSingleton(){
-		try {
+        
+        try {
 			db = DBConnection.getDBConnection();
-		} catch (Exception e) {
+		} catch (ConfigurationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

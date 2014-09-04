@@ -11,9 +11,11 @@ import java.util.Map;
 import javax.jms.JMSException;
 import javax.jms.TextMessage;
 
+import org.apache.commons.configuration.ConfigurationException;
+
 import shc.npos.segments.Segment;
 import shc.npos.util.SegmentUtils;
-import analytics.util.MongoUtils;
+import analytics.util.DBConnection;
 import analytics.util.SecurityUtils;
 import analytics.util.objects.TransactionLineItem;
 import backtype.storm.task.OutputCollector;
@@ -78,8 +80,9 @@ public class ParsingBoltPOS extends BaseRichBolt {
 
         //System.out.println("PREPARING PARSING POS BOLT");
         try {
-			db = MongoUtils.getClient("DEV");
-		} catch (UnknownHostException e) {
+			db = DBConnection.getDBConnection();
+		} catch (ConfigurationException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

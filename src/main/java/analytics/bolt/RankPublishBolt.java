@@ -3,7 +3,7 @@
  */
 package analytics.bolt;
 
-import analytics.util.MongoUtils;
+import analytics.util.DBConnection;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -12,6 +12,7 @@ import backtype.storm.tuple.Tuple;
 
 import com.mongodb.*;
 
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -72,8 +73,8 @@ public class RankPublishBolt extends BaseRichBolt {
         //prepare mongo
 
         try {
-			db = MongoUtils.getClient("QA");
-		} catch (UnknownHostException e) {
+			db = DBConnection.getDBConnection();
+		} catch (ConfigurationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
