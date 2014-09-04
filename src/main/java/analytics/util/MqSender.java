@@ -20,19 +20,24 @@ public class MqSender {
 			MQQueueConnectionFactory cf1 = new MQQueueConnectionFactory();
 			MQQueueConnectionFactory cf2 = new MQQueueConnectionFactory();
 			
-			cf1.setHostName("hofdvmq1.searshc.com");
-			cf1.setPort(1415);
+			MQConnectionConfig mqConnection = new MQConnectionConfig();
+			WebsphereMQCredential mqCredential = mqConnection
+					.getWebsphereMQCredential();
+			cf1.setHostName(mqCredential.getHostOneName());
+			cf1.setPort(mqCredential.getPort());
 			cf1.setTransportType(JMSC.MQJMS_TP_CLIENT_MQ_TCPIP);
 
-			cf1.setQueueManager("SQAT0001");
-			cf1.setChannel("PROCTRAN.SVRCONN");
+			cf1.setQueueManager(mqCredential.getQueueOneManager());
+			cf1.setChannel(mqCredential.getQueueChannel());
 
-			cf2.setHostName("hofdvmq2.searshc.com");
-			cf2.setPort(1415);
+			cf2.setHostName(mqCredential.getHostTwoName());
+			cf2.setPort(mqCredential.getPort());
 			cf2.setTransportType(JMSC.MQJMS_TP_CLIENT_MQ_TCPIP);
 
-			cf2.setQueueManager("SQAT9999");
-			cf2.setChannel("PROCTRAN.SVRCONN");
+			cf2.setQueueManager(mqCredential
+					.getQueueTwoManager());
+			cf2.setChannel(mqCredential
+					.getQueueChannel());
 			
 			
 			MQQueueConnection connection = (MQQueueConnection) cf1
@@ -41,14 +46,14 @@ public class MqSender {
 					.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
 		
 			MQQueue queue = (MQQueue) session
-					.createQueue("MDS0.PROCTRAN.TO.STORM.QC01");
+					.createQueue(mqCredential.getQueueName());
 			
             MQQueueConnection connection2 = (MQQueueConnection)
                     cf2.createQueueConnection();
             MQQueueSession session2 = (MQQueueSession)
                     connection2.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
         	MQQueue queue2 = (MQQueue) session2
-					.createQueue("MDS0.PROCTRAN.TO.STORM.QC01");
+					.createQueue(mqCredential.getQueueName());
             MQQueueSender sender = (MQQueueSender) session.createSender(queue);
             MQQueueSender sender2 = (MQQueueSender) session2.createSender(queue2);
             
@@ -63,7 +68,7 @@ public class MqSender {
 			BufferedReader br = null; 
 			Charset charset = Charset.forName("UTF-8");
 			br = new BufferedReader(new FileReader("./src/main/resources/PROCTRAN3.txt"));
-			while ((sCurrentLine = br.readLine()) != null && counter<=10) {
+			while ((sCurrentLine = br.readLine()) != null && counter<=1) {
 				BytesMessage message = (BytesMessage)session.createBytesMessage();
 				message.writeBytes(sCurrentLine.getBytes("UTF-8"));
 				logger.info(sCurrentLine);
