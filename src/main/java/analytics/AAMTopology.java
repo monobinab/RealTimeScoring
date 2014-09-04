@@ -8,7 +8,7 @@ import analytics.bolt.ScoringBolt;
 import analytics.bolt.StrategyBolt;
 import analytics.spout.AAMRedisPubSubSpout;
 import analytics.util.Logging;
-import analytics.util.REDISConnection;
+import analytics.util.RedisConnection;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
@@ -27,7 +27,7 @@ public class AAMTopology {
 	Logging.creatLogger("AAMTraitsTopology.log");
     TopologyBuilder builder = new TopologyBuilder();
 
-   	String[] servers = REDISConnection.getServers();
+   	String[] servers = RedisConnection.getServers();
     builder.setSpout("AAM_CDF_Traits1", new AAMRedisPubSubSpout(servers[0], 6379, "AAM_CDF_Traits"), 1);
     builder.setSpout("AAM_CDF_Traits2", new AAMRedisPubSubSpout(servers[1], 6379, "AAM_CDF_Traits"), 1);
     builder.setSpout("AAM_CDF_Traits3", new AAMRedisPubSubSpout(servers[2], 6379, "AAM_CDF_Traits"), 1);

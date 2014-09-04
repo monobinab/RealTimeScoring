@@ -3,11 +3,13 @@ package analytics;
 import org.apache.commons.configuration.ConfigurationException;
 
 import analytics.bolt.*;
+
 import org.apache.log4j.Logger;
 
 import analytics.spout.WebsphereMQSpout;
 import analytics.util.Logging;
 import analytics.util.MQConnectionConfig;
+import analytics.util.RedisConnection;
 import analytics.util.WebsphereMQCredential;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
@@ -61,7 +63,7 @@ public class RealTimeScoringTellurideTopology {
         topologyBuilder.setBolt("strategy_bolt", new StrategyBolt()).shuffleGrouping("parsing_bolt");
         topologyBuilder.setBolt("scoring_bolt", new ScoringBolt()).shuffleGrouping("strategy_bolt");
         //TODO: Change hardcoded redis
-        topologyBuilder.setBolt("score_publish_bolt", new ScorePublishBolt("rtsapp401p.prod.ch4.s.com", 6379,"score")).shuffleGrouping("scoring_bolt");
+        topologyBuilder.setBolt("score_publish_bolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score")).shuffleGrouping("scoring_bolt");
 
 
 		Config conf = new Config();
