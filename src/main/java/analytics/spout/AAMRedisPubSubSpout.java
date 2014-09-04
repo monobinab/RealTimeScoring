@@ -38,7 +38,7 @@ public class AAMRedisPubSubSpout extends RedisPubSubSpout {
             if (tokens.length >= 2)
             {
                 //System.out.println(tokens[1]);
-            	_collector.emit(tuple(tokens[1], ret));
+            	_collector.emit(tuple(tokens[0], ret));
             	
             }
         }
