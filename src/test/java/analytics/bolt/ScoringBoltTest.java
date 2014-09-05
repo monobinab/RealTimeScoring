@@ -19,8 +19,8 @@ public class ScoringBoltTest {
 		MongoClient mockedMongoClient = mock(MongoClient.class);
 		
 		
-		scoringBolt.setMemberCollection(mockedMemberVariables);
-		scoringBolt.setModelCollection(mockedModelVariables);
+		//scoringBolt.setMemberCollection(mockedMemberVariables);
+		//scoringBolt.setModelCollection(mockedModelVariables);
 		//TODO: Understand and fix this
 		//scoringBolt.setMongoClient(mockedMongoClient);
 		assertTrue(true);
