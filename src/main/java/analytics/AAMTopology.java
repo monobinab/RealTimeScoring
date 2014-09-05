@@ -9,7 +9,6 @@ import analytics.bolt.ScorePublishBolt;
 import analytics.bolt.ScoringBolt;
 import analytics.bolt.StrategyBolt;
 import analytics.spout.AAMRedisPubSubSpout;
-import analytics.util.Logging;
 import analytics.util.RedisConnection;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
@@ -26,7 +25,7 @@ public class AAMTopology {
 			.getLogger(AAMTopology.class);
 
   public static void main(String[] args) throws Exception {
-	Logging.creatLogger("AAMTraitsTopology.log");
+	logger.info("Starting aam traits topology");
     TopologyBuilder builder = new TopologyBuilder();
 
    	String[] servers = RedisConnection.getServers();
@@ -49,9 +48,9 @@ public class AAMTopology {
 			StormSubmitter.submitTopology(args[0], conf,
 					builder.createTopology());
 		} catch (AlreadyAliveException e) {
-			e.printStackTrace();
+			logger.error(e.getClass() + ": " +  e.getMessage(), e);
 		} catch (InvalidTopologyException e) {
-			e.printStackTrace();
+			logger.error(e.getClass() + ": " +  e.getMessage(), e);
 		}
 	} else {
 		conf.setDebug(false);
@@ -62,8 +61,7 @@ public class AAMTopology {
 		try {
 			Thread.sleep(10000000);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.debug("Unable to wait for topology", e);
 		}
 		cluster.shutdown();
 

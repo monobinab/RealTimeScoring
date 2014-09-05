@@ -1,11 +1,12 @@
 package analytics.bolt;
 
 import java.lang.reflect.Type;
-import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import analytics.util.DBConnection;
 import backtype.storm.task.OutputCollector;
@@ -24,7 +25,8 @@ import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
 
 public class PersistTraitsBolt extends BaseRichBolt {
-
+	static final Logger logger = LoggerFactory
+			.getLogger(PersistTraitsBolt.class);
 	 DB db;
 	 DBCollection memberTraitsCollection;
 	@Override
@@ -33,8 +35,7 @@ public class PersistTraitsBolt extends BaseRichBolt {
 		try {
 			db = DBConnection.getDBConnection();
 		} catch (ConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Unable to obtain DB connection",e);
 		}
 		memberTraitsCollection = db.getCollection("memberTraits");
 		
@@ -42,6 +43,7 @@ public class PersistTraitsBolt extends BaseRichBolt {
 
 	@Override
 	public void execute(Tuple input) {
+		logger.debug("Persisting trait date map in mongo");
 		//Get the encrypted loyalty id
 		String l_id = input.getString(0);
 		//The data comes as below
@@ -86,8 +88,8 @@ public class PersistTraitsBolt extends BaseRichBolt {
 			private static final long serialVersionUID = 1L;}.getType();
 
         varList = new Gson().fromJson(json, varListType);
-        System.out.println(" JSON string: " + json);
-        System.out.println(" Map: " + varList);
+        logger.debug(" JSON string: " + json);
+        logger.debug(" Map: " + varList);
         return varList;
     }
 

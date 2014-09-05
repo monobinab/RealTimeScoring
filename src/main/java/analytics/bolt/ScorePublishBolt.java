@@ -17,7 +17,6 @@ import com.mongodb.DBCollection;
 
 import redis.clients.jedis.Jedis;
 
-import java.util.Collection;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -40,13 +39,6 @@ public class ScorePublishBolt extends BaseRichBolt {
     DB db;
     DBCollection memberZipCollection;
     DBCollection memberScoreCollection;
-
-
-    private Map<String,Collection<Integer>> variableModelsMap;
-    private Map<String, String> variableVidToNameMap;
-    private Map<String,String> modelIdToModelNameMap;
-    private Map<Integer,Double> haAllRankToScoreMap;
-    private Map<Integer,Double> haCookRankToScoreMap;
 
     private Jedis jedis;
 
@@ -76,7 +68,7 @@ public class ScorePublishBolt extends BaseRichBolt {
 	 */
 	@Override
 	public void execute(Tuple input) {
-		logger.info("The time it enters inside Score Publish Bolt execute method "+System.currentTimeMillis());
+		logger.debug("The time it enters inside Score Publish Bolt execute method "+System.currentTimeMillis());
         //System.out.println(" %%% scorepublishbolt :" + input);
         String l_id = input.getStringByField("l_id");
         String modelName = input.getStringByField("model");

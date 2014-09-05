@@ -1,7 +1,6 @@
 package analytics.bolt;
 
 import java.lang.reflect.Type;
-import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -18,7 +17,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import redis.clients.jedis.Jedis;
 import analytics.util.DBConnection;
 import analytics.util.objects.Change;
 import analytics.util.objects.RealTimeScoringContext;
@@ -55,16 +53,10 @@ public class StrategyBolt extends BaseRichBolt {
     private DBCollection modelVariablesCollection;
     private DBCollection memberVariablesCollection;
     private DBCollection variablesCollection;
-    private DBCollection divLnVariableCollection;
     private DBCollection changedVariablesCollection;
-    private DBCollection changedMemberScoresCollection;
-    private DBCollection divCatVariableCollection;
     private Map<String,Collection<Integer>> variableModelsMap;
-    private Map<String,Collection<Integer>> modelVariablesMap;
     private Map<String, String> variableVidToNameMap;
     private Map<String, String> variableNameToVidMap;
-
-    private Jedis jedis;
 
     
     public void setOutputCollector(OutputCollector outputCollector) {
@@ -96,27 +88,22 @@ public class StrategyBolt extends BaseRichBolt {
 	 * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
 	 */
 
-        System.out.println("PREPARING STRATEGY BOLT");
+        logger.info("PREPARING STRATEGY BOLT");
         
         try {
 			db = DBConnection.getDBConnection();
 		} catch (ConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.debug("Unable to contain DB connection",e);
 		}
 
         modelVariablesCollection = db.getCollection("modelVariables");
         memberVariablesCollection = db.getCollection("memberVariables");
         variablesCollection = db.getCollection("Variables");
-        divLnVariableCollection = db.getCollection("divLnVariable");
-        divCatVariableCollection = db.getCollection("divCatVariable");
         changedVariablesCollection = db.getCollection("changedMemberVariables");
-        changedMemberScoresCollection = db.getCollection("changedMemberScores");
         
-        
+        logger.debug("Populate variable models map");
         // populate the variableModelsMap
         variableModelsMap = new HashMap<String, Collection<Integer>>();
-        modelVariablesMap = new HashMap<String, Collection<Integer>>();
         DBCursor models = modelVariablesCollection.find();
         for(DBObject model:models){
              BasicDBList modelVariables = (BasicDBList) model.get("variable");
@@ -136,6 +123,7 @@ public class StrategyBolt extends BaseRichBolt {
              }
         }
 
+        logger.debug("Populate variable vid map");
         // populate the variableVidToNameMap
         variableVidToNameMap = new HashMap<String, String>();
         variableNameToVidMap = new HashMap<String, String>();
@@ -163,8 +151,7 @@ public class StrategyBolt extends BaseRichBolt {
      */
 	@Override
 	public void execute(Tuple input) {
-		System.out.println("STRATEGY BOLT GOT " + input.toString());
-		logger.info("The time it enters inside Strategy Bolt execute method"+System.currentTimeMillis());
+		logger.debug("The time it enters inside Strategy Bolt execute method"+System.currentTimeMillis());
 		// 1) PULL OUT HASHED LOYALTY ID FROM THE FIRST RECORD IN lineItemList
 		// 2) FETCH MEMBER VARIABLES FROM memberVariables COLLECTION
 		// 3) CREATE MAP FROM VARIABLES TO VALUE (OBJECT)
@@ -242,7 +229,7 @@ public class StrategyBolt extends BaseRichBolt {
 									, simpleDateFormat.parse(((DBObject) changedMbrVariables.get(key)).get("f").toString())));
 					}
 				} catch (ParseException e) {
-					e.printStackTrace();
+					logger.error(e.getMessage(),e);
 				}
 		    }
 		}
@@ -282,15 +269,15 @@ public class StrategyBolt extends BaseRichBolt {
                     		context.setPreviousValue(memberVariablesMap.get(newChangeVariableName.toUpperCase()));
                     	}
                     }
-                    logger.info(" ~~~ STRATEGY BOLT CHANGES - context: " + context);
+                    logger.debug(" ~~~ STRATEGY BOLT CHANGES - context: " + context);
                     newChanges.put(newChangeVariableName, strategy.execute(context));
             	}
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(),e);
             } catch (InstantiationException e) {
-                e.printStackTrace();
+            	logger.error(e.getMessage(),e);
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+            	logger.error(e.getMessage(),e);
             }
         }
 	            	
@@ -311,9 +298,9 @@ public class StrategyBolt extends BaseRichBolt {
 
 		    BasicDBObject searchQuery = new BasicDBObject().append("l_id", l_id);
 		    
-		    logger.info(" ~~~ DOCUMENT TO INSERT:");
-		    logger.info(newDocument.toString());
-		    logger.info(" ~~~ END DOCUMENT");
+		    logger.trace(" ~~~ DOCUMENT TO INSERT:");
+		    logger.debug(newDocument.toString());
+		    logger.trace(" ~~~ END DOCUMENT");
 		    
 		    //upsert document
 		    changedVariablesCollection.update(searchQuery, new BasicDBObject("$set", newDocument), true, false);
@@ -339,7 +326,7 @@ public class StrategyBolt extends BaseRichBolt {
             	listToEmit.add(createStringFromModelList(modelIdList));
             	listToEmit.add(source);
             	listToEmit.add(messageID);
-            	logger.info(" ~~~ STRATEGY BOLT EMITTING: " + listToEmit);
+            	logger.debug(" ~~~ STRATEGY BOLT EMITTING: " + listToEmit);
             	this.outputCollector.emit(listToEmit);
             }
         }
@@ -366,8 +353,8 @@ public class StrategyBolt extends BaseRichBolt {
 			private static final long serialVersionUID = 1L;}.getType();
 
         varList = new Gson().fromJson(json, varListType);
-        logger.info(" JSON string: " + json);
-        logger.info(" Map: " + varList);
+        logger.trace(" JSON string: " + json);
+        logger.trace(" Map: " + varList);
         return varList;
     }
 	

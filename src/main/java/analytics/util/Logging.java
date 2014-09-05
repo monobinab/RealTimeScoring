@@ -8,6 +8,8 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 
+//Using logging properties file instead of this
+@Deprecated
 public class Logging {
 	public static void creatLogger(String fileName) {
 		// creates pattern layout

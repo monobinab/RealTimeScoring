@@ -3,7 +3,6 @@
  */
 package analytics.util;
 
-import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -13,30 +12,31 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import analytics.util.objects.Change;
 import analytics.util.objects.Model;
 import analytics.util.objects.Variable;
 
-import com.mongodb.MongoClient;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
+import com.mongodb.MongoClient;
 
 public class ScoringSingleton {
 
 	private static ScoringSingleton instance = null;
 	private static final long serialVersionUID = 1L;
-
+	static final Logger logger = LoggerFactory
+			.getLogger(ScoringSingleton.class);
+	
 	MongoClient mongoClient;
 	DB db;
 	DBCollection modelVariablesCollection;
@@ -79,8 +79,7 @@ public class ScoringSingleton {
         try {
 			db = DBConnection.getDBConnection();
 		} catch (ConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Unable to obtain DB connection");
 		}
 		//System.out.println(" collections: " + db.getCollectionNames());
 		memberVariablesCollection = db.getCollection("memberVariables");
@@ -171,8 +170,7 @@ public class ScoringSingleton {
 		DBObject mbrVariables = memberVariablesCollection
 				.findOne(new BasicDBObject("l_id", loyaltyId));
 		if (mbrVariables == null) {
-			System.out
-					.println(" ### SCORING BOLT COULD NOT FIND MEMBER VARIABLES");
+			logger.info(" ### SCORING BOLT COULD NOT FIND MEMBER VARIABLES");
 
 		}
 		// 3) CREATE MAP FROM VARIABLES TO VALUE (OBJECT)
@@ -239,8 +237,7 @@ public class ScoringSingleton {
 																"f").toString())));
 					}
 				} catch (ParseException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					logger.error(e.getMessage(),e);
 				}
 			}
 		}

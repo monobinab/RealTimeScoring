@@ -32,7 +32,6 @@ public class ScoringBolt extends BaseRichBolt {
 	private static final long serialVersionUID = 1L;
     private OutputCollector outputCollector;
 
-    //DB db;
     DBCollection modelVariablesCollection;
     DBCollection memberVariablesCollection;
     DBCollection memberScoreCollection;
@@ -70,6 +69,7 @@ public class ScoringBolt extends BaseRichBolt {
 
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
+		logger.info("Initializing scoring bolt");
 		this.outputCollector = collector;
 	}
 	
@@ -81,9 +81,9 @@ public class ScoringBolt extends BaseRichBolt {
      */
 	@Override
 	public void execute(Tuple input) {
-		logger.info("The time it enters inside Scoring Bolt execute method"+System.currentTimeMillis());
+		logger.debug("The time it enters inside Scoring Bolt execute method"+System.currentTimeMillis());
 		MessageId messageId = input.getMessageId();
-		logger.info("The message id is ..."+messageId +"and the time in millisecond is..."+System.currentTimeMillis());
+		logger.debug("The message id is ..."+messageId +"and the time in millisecond is..."+System.currentTimeMillis());
 		
 		// 1) PULL OUT HASHED LOYALTY ID FROM THE FIRST RECORD
 
@@ -113,7 +113,7 @@ public class ScoringBolt extends BaseRichBolt {
 	    	listToEmit.add(source);
 	    	listToEmit.add(messageID);
 	    	//logger.info(" ### SCORING BOLT EMITTING: " + listToEmit);
-	    	logger.info("The time spent for creating scores..... "+System.currentTimeMillis()+" and the message ID is ..."+messageID);
+	    	logger.debug("The time spent for creating scores..... "+System.currentTimeMillis()+" and the message ID is ..."+messageID);
 	    	this.outputCollector.emit(listToEmit);
 		}
             
