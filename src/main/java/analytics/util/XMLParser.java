@@ -3,11 +3,6 @@
  */
 package analytics.util;
 
-import analytics.service.impl.LineItem;
-import analytics.service.impl.OrderDetails;
-import analytics.service.impl.ProcessTransaction;
-import analytics.service.impl.Tender;
-
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
@@ -17,6 +12,11 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import analytics.util.objects.LineItem;
+import analytics.util.objects.OrderDetails;
+import analytics.util.objects.ProcessTransaction;
+import analytics.util.objects.Tender;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

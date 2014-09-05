@@ -206,9 +206,9 @@ public class ParsingBoltPOS extends BaseRichBolt {
 
             	// find all variables affected by div-line
 				List<String> foundVariablesList = new ArrayList<String>();
-	            if(divLnVariablesMap.containsKey(lineItem.getDiv()+lineItem.getLine()) || divLnVariablesMap.containsKey(lineItem.getDiv())) {
+	            if(divLnVariablesMap.containsKey(lineItem.getDiv()+lineItem.getLineOrCategory()) || divLnVariablesMap.containsKey(lineItem.getDiv())) {
 					Collection<String> divVariableCollection = divLnVariablesMap.get(lineItem.getDiv());
-					Collection<String> divLnVariableCollection = divLnVariablesMap.get(lineItem.getDiv()+lineItem.getLine());
+					Collection<String> divLnVariableCollection = divLnVariablesMap.get(lineItem.getDiv()+lineItem.getLineOrCategory());
 					if(divVariableCollection!=null) {
 						for(String var: divVariableCollection) {
 							foundVariablesList.add(var);

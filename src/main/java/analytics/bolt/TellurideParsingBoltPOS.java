@@ -15,13 +15,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.service.impl.LineItem;
-import analytics.service.impl.ProcessTransaction;
-import analytics.service.impl.TransactionLineItem;
 import analytics.util.DBConnection;
 import analytics.util.JsonUtils;
 import analytics.util.SecurityUtils;
 import analytics.util.XMLParser;
+import analytics.util.objects.LineItem;
+import analytics.util.objects.ProcessTransaction;
+import analytics.util.objects.TransactionLineItem;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -247,10 +247,10 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 							//logger.info("Item is..."+item);
 							String divCategory = getDivCategoryFromCollection(item);
 							//logger.info("division and category are ...." + divCategory);
-                            String div = StringUtils.substring(divCategory, 0, 2);
-                            String cat = StringUtils.substring(divCategory, 3, 6);
+                            String div = StringUtils.substring(divCategory, 0, 3);//Picks up start, end-1
+                            String cat = StringUtils.substring(divCategory, 3, 7);
                             TransactionLineItem transactionLineItem = new TransactionLineItem(
-									l_id, div, item, "", cat,
+									l_id, div, item, cat,
 									Double.valueOf(amount));
 							/*logger.info("Transaction Line Item is ..."
 									+ transactionLineItem);*/
@@ -260,7 +260,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 							foundVariablesList = new ArrayList<String>();
 							if (divCatVariablesMap
 									.containsKey(transactionLineItem.getDiv()
-											+ transactionLineItem.getCategory())
+											+ transactionLineItem.getLineOrCategory())
 									|| divCatVariablesMap
 											.containsKey(transactionLineItem
 													.getDiv())) {
@@ -270,7 +270,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 								Collection<String> divCatVariableCollection = divCatVariablesMap
 										.get(transactionLineItem.getDiv()
 												+ transactionLineItem
-														.getCategory());
+														.getLineOrCategory());
 								if (divVariableCollection != null) {
 									for (String var : divVariableCollection) {
 										/*logger.info("Div is added.....  in variable List"
@@ -320,7 +320,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 									 foundVariablesList = new ArrayList<String>();
 							if (divLnVariablesMap
 									.containsKey(transactionLineItem.getDiv()
-											+ transactionLineItem.getLine())
+											+ transactionLineItem.getLineOrCategory())
 									|| divLnVariablesMap
 											.containsKey(transactionLineItem
 													.getDiv())) {
@@ -331,7 +331,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 										.get(transactionLineItem.getDiv());
 								Collection<String> divLnVariableCollection = divLnVariablesMap
 										.get(transactionLineItem.getDiv()
-												+ transactionLineItem.getLine());
+												+ transactionLineItem.getLineOrCategory());
 								if (divVariableCollection != null) {
 									for (String var : divVariableCollection) {
 										/*logger.info("Div is added.....  in variable List"

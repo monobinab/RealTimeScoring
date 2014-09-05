@@ -11,7 +11,7 @@ public class TransactionLineItem implements Serializable {
 	public String l_id;
 	public String div;
 	public String item;
-	public String line;
+	public String lineOrCategory;//Based on sears or Kmart
 //	public boolean searsCardUsed;
 	public double amount;
 	public List<String> variableList;
@@ -28,7 +28,7 @@ public class TransactionLineItem implements Serializable {
 		this.l_id=id;
 		this.div=d;
 		this.item=i;
-		this.line=l;
+		this.lineOrCategory=l;
 		this.amount=a;
 	}
 	
@@ -55,8 +55,8 @@ public class TransactionLineItem implements Serializable {
 		this.amount=a;
 	}
 	
-	public void setLine(String l) {
-		this.line=l;
+	public void setLineOrCategory(String l) {
+		this.lineOrCategory=l;
 	}
 	
 	public void setVariableList(List<String> v) {
@@ -68,8 +68,8 @@ public class TransactionLineItem implements Serializable {
 		return this.div;
 	}
 	
-	public String getLine() {
-		return this.line;
+	public String getLineOrCategory() {
+		return this.lineOrCategory;
 	}
 	
 	public String getItem() {
