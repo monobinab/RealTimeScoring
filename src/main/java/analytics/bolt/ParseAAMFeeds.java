@@ -1,20 +1,14 @@
 package analytics.bolt;
 
-import java.lang.reflect.Type;
-import java.net.UnknownHostException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
@@ -23,6 +17,7 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
 import analytics.util.DBConnection;
+import analytics.util.JsonUtils;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -32,6 +27,8 @@ import backtype.storm.tuple.Tuple;
 
 public abstract class ParseAAMFeeds  extends BaseRichBolt {
 
+	static final Logger logger = LoggerFactory
+			.getLogger(ParseAAMFeeds.class);
 	/**
 	 * 
 	 */
@@ -81,12 +78,10 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 	 * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
 	 */
 
-        System.out.println("PREPARING PARSING BOLT FOR AAM Feeds");
-
         try {
 			db = DBConnection.getDBConnection();
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("Unable to get Db connection",e);
 		}
         
         memberVariablesCollection = db.getCollection("memberVariables");
@@ -109,7 +104,6 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 			}
 		}
 //		System.out.println(" *** PARSING BOLT MODEL VARIABLE LIST: ");
-//		System.out.println(modelVariablesList);
     }
 
 	/*
@@ -126,7 +120,7 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 		// 4) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN SET CURRENT UUID FROM RECORD, SET CURRENT l_id TO NULL AND RETURN
 		// 5) POPULATE TRAITS COLLECTION WITH THE FIRST TRAIT
 		
-		//System.out.println("PARSING DOCUMENT -- WEB TRAIT RECORD " + input.getString(0));
+		logger.debug("PARSING DOCUMENT -- WEB TRAIT RECORD " + input.getString(0));
 		
 		// 1) SPLIT INPUT STRING
 		
@@ -165,22 +159,22 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
         
 		// 3) IF THE CURRENT RECORD HAS A DIFFERENT UUID THEN PROCESS THE CURRENT VALUES(TRAIT/PID/Keyword) LIST AND EMIT VARIABLES
         if(l_idToValueCollectionMap != null && !l_idToValueCollectionMap.isEmpty()) {
-            System.out.println("processing found traits...");
+            logger.debug("processing found traits...");
             
             for(String current_l_id : l_idToValueCollectionMap.keySet()) {
 	        	
 	        	Map<String,String> variableValueMap = processList(current_l_id); //LIST OF VARIABLES FOUND DURING TRAITS PROCESSING
 	        	if(variableValueMap !=null && !variableValueMap.isEmpty()) {
-	 	        	Object variableValueJSON = createJsonFromStringStringMap(variableValueMap);
+	 	        	Object variableValueJSON = JsonUtils.createJsonFromStringStringMap(variableValueMap);
 		        	List<Object> listToEmit = new ArrayList<Object>();
 		        	listToEmit.add(current_l_id);
 		        	listToEmit.add(variableValueJSON);
 		        	listToEmit.add(sourceTopic);
 		        	this.outputCollector.emit(listToEmit);
-		        	System.out.println(" *** PARSING BOLT EMITTING: " + listToEmit);
+		        	logger.debug(" *** PARSING BOLT EMITTING: " + listToEmit);
 	        	}
 	        	else {
-	           		System.out.println(" *** NO VARIABLES FOUND - NOTHING TO EMIT");
+	        		logger.debug(" *** NO VARIABLES FOUND - NOTHING TO EMIT");
 	        	}
             }
             this.currentUUID=null;
@@ -192,7 +186,7 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
         DBCursor uuidCursor = memberUUIDCollection.find(new BasicDBObject("u",splitRecArray[0]));
         if(uuidCursor == null) {
             this.currentUUID=splitRecArray[0];
-            System.out.println(" *** COULD NOT FIND UUID: " + this.currentUUID);
+            logger.info(" *** COULD NOT FIND UUID: " + this.currentUUID);
         	this.l_idToValueCollectionMap=new HashMap<String, Collection<String>>();
         	return;
         }
@@ -205,9 +199,7 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
         	try{
         	l_idToValueCollectionMap.put(uuidDbo.get("l_id").toString(), new ArrayList<String>());
         	}catch(NullPointerException e){
-        		System.out.println("should not reach here");
-        		System.out.println(l_idToValueCollectionMap);
-        		System.out.println(uuidDbo.get("l_id").toString());
+        		logger.error("l_id to value collection is null", e);
         		System.exit(0);
         	}
     		for(int i=1;i<splitRecArray.length;i++){
@@ -227,7 +219,7 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
         try {
 			interactionDateTime = dateTimeFormat.parse(splitRecArray[0]);
 		} catch (ParseException e) {
-			e.printStackTrace();
+			logger.debug("Can not parse date",e);
 		}*/
         
         return;
@@ -250,33 +242,8 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 	}
 	
 	
-	//TODO: Move this to a util class
     abstract protected String[] splitRec(String webRec);
     
-	//TODO: Move this to a util class
-	protected boolean hasModelVariable(Collection<String> varCollection) {
-		boolean isModVar = false;
-		for(String v:varCollection) {
-			if(modelVariablesList.contains(v)) {
-				isModVar = true;
-			}
-		}
-		return isModVar;
-	}
 
-	
-	//TODO: Move this to a util class
-	protected Object createJsonFromStringStringMap(Map<String,String> variableValuesMap) {
-		
-		Gson gson = new Gson();		
-    	Type varValueType = new TypeToken<Map<String, String>>() {
-			private static final long serialVersionUID = 1L;
-		}.getType();
-		
-    	String varValueString = gson.toJson(variableValuesMap, varValueType);
-		return varValueString;
-	}
-
-	
 
 }

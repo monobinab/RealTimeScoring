@@ -1,13 +1,11 @@
 package analytics;
 
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.bolt.*;
 import analytics.spout.WebsphereMQSpout;
-import analytics.util.Logging;
 import analytics.util.MQConnectionConfig;
 import analytics.util.RedisConnection;
 import analytics.util.WebsphereMQCredential;
@@ -30,14 +28,9 @@ public class RealTimeScoringTellurideTopology {
 	
 	
 	public static void main(String[] args) throws ConfigurationException {
-		
-		System.setProperty("logfile.name","resources/RealTimeTelluride.log");
-		System.setProperty("log4j.configuration","resources/log4j.properties");
-		
+		logger.info("Starting telluride real time scoring topology");
 		// Configure logger
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
-
-
 
 		MQConnectionConfig mqConnection = new MQConnectionConfig();
 		WebsphereMQCredential mqCredential = mqConnection
@@ -45,7 +38,7 @@ public class RealTimeScoringTellurideTopology {
 
 		topologyBuilder
 				.setSpout(
-						"npos1",
+						"telluride1",
 						new WebsphereMQSpout(mqCredential.getHostOneName(),
 								mqCredential.getPort(), mqCredential
 										.getQueueOneManager(), mqCredential
@@ -53,7 +46,7 @@ public class RealTimeScoringTellurideTopology {
 										.getQueueName()), 1);
 		topologyBuilder
 				.setSpout(
-						"npos2",
+						"telluride2",
 						new WebsphereMQSpout(mqCredential.getHostTwoName(),
 								mqCredential.getPort(), mqCredential
 										.getQueueTwoManager(), mqCredential
@@ -62,10 +55,10 @@ public class RealTimeScoringTellurideTopology {
 
 		// create definition of main spout for queue 1
 		topologyBuilder.setBolt("parsing_bolt", new TellurideParsingBoltPOS())
-				.shuffleGrouping("npos1").shuffleGrouping("npos2");
+				.shuffleGrouping("telluride1").shuffleGrouping("telluride2");
         topologyBuilder.setBolt("strategy_bolt", new StrategyBolt()).shuffleGrouping("parsing_bolt");
         topologyBuilder.setBolt("scoring_bolt", new ScoringBolt()).shuffleGrouping("strategy_bolt");
-        //TODO: Change hardcoded redis
+        //Redis publish to server 1
         topologyBuilder.setBolt("score_publish_bolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score")).shuffleGrouping("scoring_bolt");
 
 
@@ -77,21 +70,20 @@ public class RealTimeScoringTellurideTopology {
 				StormSubmitter.submitTopology(args[0], conf,
 						topologyBuilder.createTopology());
 			} catch (AlreadyAliveException e) {
-				e.printStackTrace();
+				logger.error(e.getClass() + ": " +  e.getMessage(), e);
 			} catch (InvalidTopologyException e) {
-				e.printStackTrace();
+				logger.error(e.getClass() + ": " +  e.getMessage(), e);
 			}
 		} else {
 			conf.setDebug(false);
 			conf.setMaxTaskParallelism(3);
 			LocalCluster cluster = new LocalCluster();
-			cluster.submitTopology("meetup_topology", conf,
+			cluster.submitTopology("telluride_topology", conf,
 					topologyBuilder.createTopology());
 			try {
 				Thread.sleep(10000000);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.error(e.getClass() + ": " +  e.getMessage(), e);
 			}
 			cluster.shutdown();
 

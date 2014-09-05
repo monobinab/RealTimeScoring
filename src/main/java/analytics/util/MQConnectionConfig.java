@@ -6,8 +6,6 @@ import org.apache.log4j.BasicConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.RealTimeScoringTopology;
-
 public class MQConnectionConfig {
 	
 	static final Logger logger = LoggerFactory.getLogger(MQConnectionConfig.class);
@@ -35,7 +33,7 @@ public class MQConnectionConfig {
 		
 		websphereMQCredential.setQueueName(properties.getString("queue.name"));
 		
-		logger.info("websphereMQCredential Port is..." +websphereMQCredential.getPort());
+		logger.debug("websphereMQCredential configured" + websphereMQCredential.getHostOneName()+ "," + websphereMQCredential.getHostTwoName()+ ":" + websphereMQCredential.getPort());
 		
 		return websphereMQCredential;
 	}

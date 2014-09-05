@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 
+import analytics.util.JsonUtils;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 
@@ -46,21 +47,17 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
 		sourceTopic="WebTraits";
         
 
-        System.out.println("PREPARING PARSING BOLT FOR WEB TRAITS");
+        logger.info("PREPARING PARSING BOLT FOR WEB TRAITS");
         // POPULATE THE TRAIT TO VARIABLES MAP AND THE VARIABLE TO TRAITS MAP
         memberTraitsCollection = db.getCollection("memberTraits");
         traitVariablesCollection = db.getCollection("traitVariables");
         traitVariablesMap = new HashMap<String, Collection<String>>();
         variableTraitsMap = new HashMap<String, Collection<String>>();
-		
-//		System.out.println("*** TRAIT TO VARIABLES MAP >>>");
-//		System.out.println(traitVariablesMap);
-//		System.out.println(" *** ");
-//		System.out.println(" *** ");
-		
+
 
 		DBCursor traitVarCursor = traitVariablesCollection.find();
 		
+		logger.debug("Getting trait variables");
 		for(DBObject traitVariablesDBO: traitVarCursor) {
 			BasicDBList variables = (BasicDBList) traitVariablesDBO.get("v");
 			for(Object v:variables) {
@@ -91,9 +88,10 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
 
     
 
-	//TODO: Generalize with parsing bolt aam atc - processPidList
+	//Generalize with parsing bolt aam atc - processPidList
 	//[2014-29-08]:{Trait1,Trait2}, [2014-28-08]:{Trait3,Trait2}
     protected Map<String,String> processList(String current_l_id) {
+    	logger.debug("Processing list of traits");
     	Map<String, Collection<String>> dateTraitsMap  = new HashMap<String,Collection<String>>(); // MAP BETWEEN DATES AND SET OF TRAITS - HISTORICAL AND CURRENT TRAITS
 		List<String> variableList = new ArrayList<String>();
     	boolean firstTrait = true; //flag to indicate if the AMM trait found is the first for that member - if true then populate the memberTraitsMap
@@ -101,8 +99,9 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
     	int variableCount = 0;
     	
     	//FOR EACH TRAIT FOUND FROM AAM DATA FIND THE VARIABLES THAT ARE IMPACTED
+    	logger.debug("Finding list of variables for each trait");
     	for(String trait: l_idToValueCollectionMap.get(current_l_id)) {
-    		if(traitVariablesMap.containsKey(trait) && hasModelVariable(traitVariablesMap.get(trait))) {
+    		if(traitVariablesMap.containsKey(trait) && JsonUtils.hasModelVariable(modelVariablesList,traitVariablesMap.get(trait))) {
     			if(firstTrait) {
     				prepareDateTraitsMap(dateTraitsMap, current_l_id);
     				firstTrait = false;
@@ -119,7 +118,7 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
 	    		}
     		}
     	}
-		System.out.println(" traits found: " + traitCount + " ... variables found: " + variableCount);
+		logger.debug(" traits found: " + traitCount + " ... variables found: " + variableCount);
 		Map<String,String> variableDateTraitMap = new HashMap<String, String>();
     	if(dateTraitsMap != null && !dateTraitsMap.isEmpty() && !variableList.isEmpty()) {
     		for(String v : variableList) {
@@ -134,7 +133,7 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
     }
     
     private String createJsonFromDateTraitsMap(Map<String, Collection<String>> stringCollectionMap) {
-		System.out.println("dateTraitMap: " + stringCollectionMap);
+    	logger.debug("dateTraitMap: " + stringCollectionMap);
 		// Create string in JSON format to emit
     	Gson gson = new Gson();
     	Type dateTraitValueType = new TypeToken<Map<String, Collection<String>>>() {
@@ -147,17 +146,18 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
 	
 
 	private boolean addTraitToDateTraitMap(String trait, Map<String, Collection<String>> dateTraitsMap) {
+		logger.debug("add trait to date trait map");
 		boolean addedTrait = false;
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		if(!dateTraitsMap.containsKey(simpleDateFormat.format(new Date()))) {
 			dateTraitsMap.put(simpleDateFormat.format(new Date()), new ArrayList<String>());
 			dateTraitsMap.get(simpleDateFormat.format(new Date())).add(trait);
-			System.out.println(" added trait: " + trait);
+			logger.trace(" added trait: " + trait);
 			addedTrait=true;
 		}
 		else if(!dateTraitsMap.get(simpleDateFormat.format(new Date())).contains(trait)) {
 			dateTraitsMap.get(simpleDateFormat.format(new Date())).add(trait);
-			System.out.println(" added trait: " + trait);
+			logger.trace(" added trait: " + trait);
 			addedTrait=true;
 		}
 		return addedTrait;
@@ -187,7 +187,7 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
 						}
 					}
 				} catch (ParseException e) {
-					e.printStackTrace();
+					logger.error("Unable to parse", e);
 				}
 			}
 		}
@@ -195,9 +195,9 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
     
     @Override
     protected String[] splitRec(String webRec) {
+    	logger.debug("Parsing trait record");
     	//TODO: Do not use regex. Have a better way. This is temp
     	webRec = webRec.replaceAll("['\\[\\]\"]",""); 
-        //System.out.println("WEB RECORD: " + webRec);
         String split[]=StringUtils.split(webRec,",");
         
         if(split !=null && split.length>0) {

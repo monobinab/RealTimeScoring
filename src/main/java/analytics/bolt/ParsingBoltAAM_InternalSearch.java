@@ -192,12 +192,12 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
 					try {
 						TimeUnit.MILLISECONDS.sleep(100);
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+						logger.debug("Unable to wait",e);
 					}
 					long t1 = System.currentTimeMillis();
 					Document doc = Jsoup.connect(query).get();
 					long t2 = System.currentTimeMillis() - t1;
-					System.out.println(" @@@ Query time: " + t2);
+					logger.debug(" @@@ Query time: " + t2);
 					doc.body().wrap("<pre></pre>");
 					String text = doc.text();
 					// Converting nbsp entities
@@ -205,10 +205,10 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
 					
 					queryResultsDoc = text;
 				} catch (IOException e) {
-					e.printStackTrace();
+					logger.debug("Unable to process keywords",e);
 				}
 				if(queryResultsDoc==null) {
-					System.out.println("query results null");
+					logger.debug("query results null");
 				}
 				
 				else {

@@ -1,7 +1,6 @@
 package analytics.bolt;
 
 import java.lang.reflect.Type;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -12,10 +11,13 @@ import javax.jms.JMSException;
 import javax.jms.TextMessage;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import shc.npos.segments.Segment;
 import shc.npos.util.SegmentUtils;
 import analytics.util.DBConnection;
+import analytics.util.JsonUtils;
 import analytics.util.SecurityUtils;
 import analytics.util.objects.TransactionLineItem;
 import backtype.storm.task.OutputCollector;
@@ -25,8 +27,6 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
-import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
 import com.ibm.jms.JMSMessage;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
@@ -39,6 +39,9 @@ public class ParsingBoltPOS extends BaseRichBolt {
 	/**
 	 * Created by Rock Wasserman 4/18/2014
 	 */
+	
+	static final Logger logger = LoggerFactory
+			.getLogger(ParsingBoltPOS.class);
 	private static final long serialVersionUID = 1L;
     private OutputCollector outputCollector;
 
@@ -82,8 +85,7 @@ public class ParsingBoltPOS extends BaseRichBolt {
         try {
 			db = DBConnection.getDBConnection();
 		} catch (ConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Unable to obtain DB connection", e);
 		}
 
 	    memberCollection = db.getCollection("memberVariables");
@@ -140,8 +142,7 @@ public class ParsingBoltPOS extends BaseRichBolt {
 		try {
 			nposTransaction = ((TextMessage) document).getText();
 		} catch (JMSException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.info("JMS exception",e);
 		}
 		if(nposTransaction == null) {
 			return;
@@ -253,10 +254,10 @@ public class ParsingBoltPOS extends BaseRichBolt {
     		}
 	        List<Object> listToEmit = new ArrayList<Object>();
 	        listToEmit.add(l_id);
-	        listToEmit.add(createJsonFromVarValueMap(varAmountMap));
+	        listToEmit.add(JsonUtils.createJsonFromStringStringMap(varAmountMap));
 	        listToEmit.add("NPOS");
 
-	        System.out.println(" *** PARSING BOLT EMITTING: " + listToEmit.toString());
+	        logger.debug(" *** PARSING BOLT EMITTING: " + listToEmit.toString());
 	        
 			// 9) EMIT VARIABLES TO VALUES MAP IN GSON DOCUMENT
 	        if(listToEmit!=null && !listToEmit.isEmpty()) {
@@ -265,18 +266,7 @@ public class ParsingBoltPOS extends BaseRichBolt {
         }
     }
 
-    private Object createJsonFromVarValueMap(Map<String,String> varAmountMap) {
-		// Create string in JSON format to emit
-
-    	Gson gson = new Gson();
-    	Type transLineItemType = new TypeToken<Map<String, String>>() {
-			private static final long serialVersionUID = 1L;}.getType();
-    	
-    	
-    	String transLineItemListString = gson.toJson(varAmountMap, transLineItemType);
-		return transLineItemListString;
-	}
-
+    
 	/*
      * (non-Javadoc)
      *

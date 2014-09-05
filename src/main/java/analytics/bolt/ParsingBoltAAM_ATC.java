@@ -60,7 +60,7 @@ public class ParsingBoltAAM_ATC extends ParseAAMFeeds {
 
 		// //populate divLnBoostvariablesMap
 		DBCursor divLnBoostVarCursor = divLnBoostVariableCollection.find();
-		System.out.println("cursor size: " + divLnBoostVarCursor.size());
+		logger.debug("cursor size: " + divLnBoostVarCursor.size());
 		divLnBoostVariblesMap = new LinkedHashMap<String, List<String>>();
 		for (DBObject divLnBoostDBObject : divLnBoostVarCursor) {
 
