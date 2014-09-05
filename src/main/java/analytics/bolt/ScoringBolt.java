@@ -30,15 +30,7 @@ public class ScoringBolt extends BaseRichBolt {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-    private OutputCollector outputCollector;
-
-    DBCollection modelVariablesCollection;
-    DBCollection memberVariablesCollection;
-    DBCollection memberScoreCollection;
-    DBCollection variablesCollection;
-    DBCollection changedVariablesCollection;
-    DBCollection changedMemberScoresCollection;
-    
+    private OutputCollector outputCollector;  
     
 //    private Map<String,Collection<Integer>> variableModelsMap;
 //    private Map<String, String> variableVidToNameMap;
@@ -49,22 +41,6 @@ public class ScoringBolt extends BaseRichBolt {
 
     public void setOutputCollector(OutputCollector outputCollector) {
         this.outputCollector = outputCollector;
-    }
-
-    public void setModelCollection(DBCollection modelCollection) {
-        this.modelVariablesCollection = modelCollection;
-    }
-
-    public void setMemberCollection(DBCollection memberCollection) {
-        this.memberVariablesCollection = memberCollection;
-    }
-
-    public void setMemberScoreCollection(DBCollection memberScoreCollection) {
-        this.memberScoreCollection = memberScoreCollection;
-    }
-
-    public void setVariablesCollection(DBCollection variablesCollection) {
-        this.variablesCollection = variablesCollection;
     }
 
 	@Override
