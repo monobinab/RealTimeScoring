@@ -17,7 +17,7 @@ public class RedisConnection {
 		String isProd = System.getProperty("rtseprod");
 		try {
 		    //load a properties file from class path, inside static method
-			if(isProd.equals("true")){
+			if(isProd!=null && isProd.equals("true")){
 				prop.load(RedisConnection.class.getClassLoader().getResourceAsStream("resources/redis_server_prod.properties"));
 				logger.info("Using production properties");
 			}

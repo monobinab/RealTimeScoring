@@ -24,7 +24,7 @@ public class DBConnection {
 		DB conn = null;
 		PropertiesConfiguration properties = null;
 		String isProd = System.getProperty("rtseprod");
-		if(isProd.equals("true")){
+		if(isProd!=null &&isProd.equals("true")){
 			properties=  new PropertiesConfiguration("resources/connection_config_prod.properties");
 			logger.info("Using production properties");
 		}
