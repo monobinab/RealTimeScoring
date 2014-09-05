@@ -7,7 +7,6 @@ import analytics.service.impl.LineItem;
 import analytics.service.impl.OrderDetails;
 import analytics.service.impl.ProcessTransaction;
 import analytics.service.impl.Tender;
-import org.apache.log4j.Logger;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
@@ -15,6 +14,10 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.StringReader;
@@ -26,7 +29,7 @@ import java.util.List;
  * 
  */
 public class XMLParser {
-	private static final Logger logger = org.apache.log4j.Logger
+	private static final Logger logger = LoggerFactory
 			.getLogger(XMLParser.class);
 
 	private static boolean bMessageVersion;

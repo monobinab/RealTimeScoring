@@ -15,7 +15,8 @@ import com.mongodb.*;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import redis.clients.jedis.Jedis;
 
@@ -26,7 +27,7 @@ import java.util.Map;
 
 public class RankPublishBolt extends BaseRichBolt {
 
-	static final Logger logger = Logger
+	static final Logger logger = LoggerFactory
 			.getLogger(RankPublishBolt.class);
 	/**
 	 *

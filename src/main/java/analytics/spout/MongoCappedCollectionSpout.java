@@ -1,8 +1,11 @@
 package analytics.spout;
 
 import com.mongodb.DBObject;
-import org.apache.log4j.Logger;
+
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import analytics.*;
 
 import java.io.Serializable;
@@ -12,7 +15,7 @@ public class MongoCappedCollectionSpout extends MongoSpoutBase implements Serial
 
   private static final long serialVersionUID = 1221725440580018348L;
 
-  static Logger LOG = Logger.getLogger(MongoCappedCollectionSpout.class);
+  static Logger LOG = LoggerFactory.getLogger(MongoCappedCollectionSpout.class);
 
   public MongoCappedCollectionSpout(String url, String collectionName) {
     super(url, null, new String[]{collectionName}, null, null);

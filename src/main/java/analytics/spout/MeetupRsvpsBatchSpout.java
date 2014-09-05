@@ -3,12 +3,15 @@ package analytics.spout;
 
 import backtype.storm.task.TopologyContext;
 import backtype.storm.tuple.Fields;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.log4j.Logger;
 import org.json.simple.parser.JSONParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import storm.trident.operation.TridentCollector;
 import storm.trident.spout.IBatchSpout;
 
@@ -25,7 +28,7 @@ public class MeetupRsvpsBatchSpout implements IBatchSpout {
 
     private DefaultHttpClient client;
 
-    static Logger LOG = Logger.getLogger(MeetupRsvpsBatchSpout.class);
+    static Logger LOG = LoggerFactory.getLogger(MeetupRsvpsBatchSpout.class);
     static JSONParser jsonParser = new JSONParser();
 
 

@@ -3,13 +3,14 @@ package analytics.service.impl;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import analytics.bolt.TellurideParsingBoltPOS;
 
 public class Change {
 	
-	static final Logger logger = Logger
+	static final Logger logger = LoggerFactory
 			.getLogger(Change.class);
 
 	public String variableName;

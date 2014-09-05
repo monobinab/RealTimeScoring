@@ -12,16 +12,20 @@ import backtype.storm.tuple.Tuple;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 
-import org.apache.log4j.Logger;
+
+
 
 import redis.clients.jedis.Jedis;
 
 import java.util.Collection;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ScorePublishBolt extends BaseRichBolt {
 
-	static final Logger logger = Logger
+	static final Logger logger = LoggerFactory
 			.getLogger(ScorePublishBolt.class);
 	/**
 	 *

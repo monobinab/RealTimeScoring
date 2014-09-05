@@ -5,8 +5,9 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
+
 import com.mongodb.DBObject;
-import org.apache.log4j.Logger;
+
 import analytics.*;
 
 import java.util.ArrayList;
@@ -14,8 +15,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public abstract class MongoSpoutBase extends BaseRichSpout {
-  static Logger LOG = Logger.getLogger(MongoSpoutBase.class);
+  static Logger LOG = LoggerFactory.getLogger(MongoSpoutBase.class);
 
   protected static MongoObjectGrabber wholeDocumentMapper = null;
 

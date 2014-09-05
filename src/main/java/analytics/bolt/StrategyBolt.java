@@ -15,7 +15,8 @@ import java.util.Map.Entry;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import redis.clients.jedis.Jedis;
 import analytics.util.DBConnection;
@@ -41,7 +42,7 @@ import com.mongodb.DBObject;
 
 public class StrategyBolt extends BaseRichBolt {
 
-	static final Logger logger = Logger
+	static final Logger logger = LoggerFactory
 			.getLogger(StrategyBolt.class);
 
 	/**

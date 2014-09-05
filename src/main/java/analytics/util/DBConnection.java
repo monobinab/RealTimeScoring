@@ -4,14 +4,15 @@ import java.net.UnknownHostException;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.mongodb.DB;
 import com.mongodb.MongoClient;
 
 public class DBConnection {
 
-	static final Logger logger = Logger.getLogger(DBConnection.class);
+	static final Logger logger = LoggerFactory.getLogger(DBConnection.class);
 	private static MongoClient mongoClient;
 	private static String sServerName = "";
 	private static int sPort = 0;

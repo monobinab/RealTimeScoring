@@ -1,6 +1,7 @@
 package analytics;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import analytics.bolt.ParsingBoltWebTraits;
 import analytics.bolt.PersistTraitsBolt;
@@ -20,7 +21,7 @@ import backtype.storm.topology.TopologyBuilder;
  * This topology demonstrates Storm's stream groupings and multilang capabilities.
  */
 public class AAMTopology {
-	static final Logger logger = Logger
+	static final Logger logger = LoggerFactory
 			.getLogger(AAMTopology.class);
 
   public static void main(String[] args) throws Exception {

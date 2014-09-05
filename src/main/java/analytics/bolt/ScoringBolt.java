@@ -8,7 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import analytics.util.ScoringSingleton;
 import backtype.storm.task.OutputCollector;
@@ -23,7 +24,7 @@ import com.mongodb.DBCollection;
 
 public class ScoringBolt extends BaseRichBolt {
 
-	static final Logger logger = Logger
+	static final Logger logger = LoggerFactory
 			.getLogger(ScoringBolt.class);
 	/**
 	 * 

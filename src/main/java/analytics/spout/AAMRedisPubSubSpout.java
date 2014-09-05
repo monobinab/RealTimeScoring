@@ -5,8 +5,10 @@ import java.util.concurrent.TimeUnit;
 
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
+
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static backtype.storm.utils.Utils.tuple;
 
@@ -16,7 +18,7 @@ public class AAMRedisPubSubSpout extends RedisPubSubSpout {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	static Logger LOG = Logger.getLogger(AAMRedisPubSubSpout.class);
+	static Logger LOG = LoggerFactory.getLogger(AAMRedisPubSubSpout.class);
 
 
 

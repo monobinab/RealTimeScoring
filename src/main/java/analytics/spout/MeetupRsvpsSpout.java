@@ -7,12 +7,14 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.log4j.Logger;
 import org.json.simple.parser.JSONParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -27,7 +29,7 @@ public class MeetupRsvpsSpout extends BaseRichSpout{
     private DefaultHttpClient client;
     private SpoutOutputCollector collector;
 
-    static Logger LOG = Logger.getLogger(MeetupRsvpsSpout.class);
+    static Logger LOG = LoggerFactory.getLogger(MeetupRsvpsSpout.class);
     static JSONParser jsonParser = new JSONParser();
 
     @Override

@@ -1,8 +1,11 @@
 package analytics.spout;
 
 import com.mongodb.DBObject;
-import org.apache.log4j.Logger;
+
 import org.bson.BSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import analytics.*;
 
 import java.io.Serializable;
@@ -11,7 +14,7 @@ import java.util.List;
 public class MongoOpLogSpout extends MongoSpoutBase implements Serializable {
 
   private static final long serialVersionUID = 5498284114575395939L;
-  static Logger LOG = Logger.getLogger(MongoOpLogSpout.class);
+  static Logger LOG = LoggerFactory.getLogger(MongoOpLogSpout.class);
 
   private static String[] collectionNames = {"oplog.$main", "oplog.rs"};
   private String filterByNamespace;

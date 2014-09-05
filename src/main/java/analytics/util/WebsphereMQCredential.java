@@ -1,9 +1,10 @@
 package analytics.util;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class WebsphereMQCredential {
-	static final Logger logger = Logger.getLogger(WebsphereMQCredential.class);
+	static final Logger logger = LoggerFactory.getLogger(WebsphereMQCredential.class);
 	
 	private String hostOneName;
 	private String hostTwoName;

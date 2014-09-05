@@ -7,7 +7,6 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.utils.Utils;
-import org.apache.log4j.Logger;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -16,11 +15,14 @@ import redis.clients.jedis.JedisPubSub;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static backtype.storm.utils.Utils.tuple;
 
 public class RedisPubSubSpout extends BaseRichSpout {
 
-    static Logger LOG = Logger.getLogger(RedisPubSubSpout.class);
+    static Logger LOG = LoggerFactory.getLogger(RedisPubSubSpout.class);
 
     SpoutOutputCollector _collector;
     final String host;

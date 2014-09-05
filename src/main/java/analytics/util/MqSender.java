@@ -1,18 +1,20 @@
 package analytics.util;
 
 import com.ibm.mq.jms.*;
-import org.apache.log4j.Logger;
 
 import javax.jms.BytesMessage;
 import javax.jms.JMSException;
 import javax.jms.Session;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.nio.charset.Charset;
 
 public class MqSender {
-	private static final Logger logger = org.apache.log4j.Logger
-			.getLogger(MqSender.class);
+	static final Logger logger = LoggerFactory.getLogger(MqSender.class);
 
 	static int counter = 0;
 	public static void initJMS() {
@@ -108,10 +110,10 @@ public class MqSender {
 			
 			
 		} catch (JMSException jmsex) {
-			logger.info(jmsex);
+			logger.debug(jmsex.toString());
 			logger.info("FAILURE");
 		} catch (Exception ex) {
-			logger.info(ex);
+			logger.info(ex.toString());
 			logger.info("FAILURE");
 		}
 

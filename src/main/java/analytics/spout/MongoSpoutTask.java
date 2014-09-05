@@ -1,7 +1,6 @@
 package analytics.spout;
 
 import com.mongodb.*;
-import org.apache.log4j.Logger;
 
 import java.io.Serializable;
 import java.net.UnknownHostException;
@@ -9,11 +8,14 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 // We need to handle the actual messages in an internal thread to ensure we never block, so we will be using a non blocking queue between the
 // driver and the db
 class MongoSpoutTask implements Callable<Boolean>, Runnable, Serializable {
   private static final long serialVersionUID = 4440209304544126477L;
-  static Logger LOG = Logger.getLogger(MongoSpoutTask.class);
+  static Logger LOG = LoggerFactory.getLogger(MongoSpoutTask.class);
 
   private LinkedBlockingQueue<DBObject> queue;
   private Mongo mongo;
@@ -119,7 +121,7 @@ class MongoSpoutTask implements Callable<Boolean>, Runnable, Serializable {
     try {
       call();
     } catch (Exception e) {
-      LOG.error(e);
+      LOG.debug(e.toString());
     }
   }
 }

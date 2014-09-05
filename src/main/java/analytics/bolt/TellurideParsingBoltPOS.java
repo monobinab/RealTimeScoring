@@ -11,19 +11,23 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.ibm.jms.JMSMessage;
 import com.mongodb.*;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.jms.BytesMessage;
 import javax.jms.JMSException;
 import javax.jms.Message;
+
 import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Type;
 import java.security.InvalidKeyException;
@@ -32,7 +36,7 @@ import java.util.*;
 
 public class TellurideParsingBoltPOS extends BaseRichBolt {
 
-	static final Logger logger = Logger
+	static final Logger logger = LoggerFactory
 			.getLogger(TellurideParsingBoltPOS.class);
 	/**
 	 * Created by Devarshi Das 8/27/2014

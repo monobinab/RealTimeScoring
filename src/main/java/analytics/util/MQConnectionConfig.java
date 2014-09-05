@@ -3,13 +3,14 @@ package analytics.util;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import analytics.RealTimeScoringTopology;
 
 public class MQConnectionConfig {
 	
-	static final Logger logger = Logger.getLogger(MQConnectionConfig.class);
+	static final Logger logger = LoggerFactory.getLogger(MQConnectionConfig.class);
 	
 	public WebsphereMQCredential getWebsphereMQCredential() throws ConfigurationException{
 	
