@@ -45,6 +45,9 @@
     </profile>
     <profile>
     	<id>Local</id>
+    	<activation>
+            <activeByDefault>true</activeByDefault>
+        </activation>
     	 <properties>
     		<storm.version>0.9.0.1</storm.version>
     	</properties>
