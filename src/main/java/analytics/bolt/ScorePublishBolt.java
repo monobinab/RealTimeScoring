@@ -86,17 +86,17 @@ public class ScorePublishBolt extends BaseRichBolt {
         	break;
         }
         catch(Exception e){
-        	e.printStackTrace();
+        	logger.error(e.getMessage(),e);
         	try {
 				Thread.sleep(200);
 			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+	        	logger.error(e.getMessage(),e);
+	        	outputCollector.fail(input);
 			}
         	jedis.publish(pattern, message);
         	retryCount++;
         }
-
+        outputCollector.ack(input);
 	}
 
     /*

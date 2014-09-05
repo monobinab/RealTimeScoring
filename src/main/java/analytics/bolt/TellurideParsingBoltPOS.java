@@ -151,8 +151,10 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 			transactionXmlAsString = convertStreamToString(documentNPOS);
 		} catch (JMSException e) {
 			logger.error("Unable to read message from MQ",e);
+			outputCollector.fail(input);
 		} catch (Exception e) {
 			logger.error("Unable to read message from MQ",e);
+			outputCollector.fail(input);
 		}
 		if ( StringUtils.isEmpty(transactionXmlAsString)) {
 			return;
@@ -395,6 +397,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 				}
 			}
 		}
+		outputCollector.ack(input);
 	}
 	/*
 	 * (non-Javadoc)

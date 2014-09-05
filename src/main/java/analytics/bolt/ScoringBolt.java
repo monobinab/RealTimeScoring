@@ -124,6 +124,7 @@ public class ScoringBolt extends BaseRichBolt {
 //        	changedMemberScoresCollection.update(new BasicDBObject("l_id", l_id), new BasicDBObject("$set", updateRec), true, false);
 //
 //        }
+		outputCollector.ack(input);
     }
 
 

@@ -209,7 +209,7 @@ public class XMLParser {
 					} else if (bRequestorID) {
 						processTransaction.setRequestorID(xmlStreamReader
 								.getText());
-						logger.info("Requestor Id is..."+processTransaction.getRequestorID());
+						logger.debug("Requestor Id is..."+processTransaction.getRequestorID());
 						bRequestorID = false;
 					} else if (bTransactionNumber) {
 						processTransaction.setTransactionNumber(xmlStreamReader

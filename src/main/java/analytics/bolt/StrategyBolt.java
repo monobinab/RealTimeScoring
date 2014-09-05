@@ -93,7 +93,7 @@ public class StrategyBolt extends BaseRichBolt {
         try {
 			db = DBConnection.getDBConnection();
 		} catch (ConfigurationException e) {
-			logger.debug("Unable to contain DB connection",e);
+			logger.error("Unable to contain DB connection",e);
 		}
 
         modelVariablesCollection = db.getCollection("modelVariables");
@@ -230,6 +230,7 @@ public class StrategyBolt extends BaseRichBolt {
 					}
 				} catch (ParseException e) {
 					logger.error(e.getMessage(),e);
+	            	outputCollector.fail(input);
 				}
 		    }
 		}
@@ -274,10 +275,13 @@ public class StrategyBolt extends BaseRichBolt {
             	}
             } catch (ClassNotFoundException e) {
                 logger.error(e.getMessage(),e);
+            	outputCollector.fail(input);
             } catch (InstantiationException e) {
             	logger.error(e.getMessage(),e);
+            	outputCollector.fail(input);
             } catch (IllegalAccessException e) {
             	logger.error(e.getMessage(),e);
+            	outputCollector.fail(input);
             }
         }
 	            	
@@ -330,6 +334,7 @@ public class StrategyBolt extends BaseRichBolt {
             	this.outputCollector.emit(listToEmit);
             }
         }
+    	outputCollector.ack(input);
 	}
 
 

@@ -22,9 +22,17 @@ public class DBConnection {
 
 	public static DB getDBConnection() throws ConfigurationException {
 		DB conn = null;
+		PropertiesConfiguration properties = null;
+		String isProd = System.getProperty("rtseprod");
+		if(isProd.equals("true")){
+			properties=  new PropertiesConfiguration("resources/connection_config_prod.properties");
+			logger.info("Using production properties");
+		}
+		else{
+			properties=  new PropertiesConfiguration("resources/connection_config.properties");
+			logger.info("Using test properties");	
+		}		
 
-		PropertiesConfiguration properties = new PropertiesConfiguration("resources/connection_config.properties");
-						
 		sServerName = properties.getString("server.name");
 		sPort = Integer.parseInt( properties.getString("port.no"));
 		sDatabaseName = properties.getString("database.name");
