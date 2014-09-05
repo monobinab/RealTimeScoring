@@ -16,7 +16,6 @@ import org.apache.log4j.Logger;
 
 import redis.clients.jedis.Jedis;
 
-import java.net.SocketException;
 import java.util.Collection;
 import java.util.Map;
 

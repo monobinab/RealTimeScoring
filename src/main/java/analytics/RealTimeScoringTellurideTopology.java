@@ -1,11 +1,11 @@
 package analytics;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.log4j.PropertyConfigurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import analytics.bolt.*;
-
-import org.apache.log4j.Logger;
-
 import analytics.spout.WebsphereMQSpout;
 import analytics.util.Logging;
 import analytics.util.MQConnectionConfig;
@@ -25,13 +25,16 @@ import backtype.storm.topology.TopologyBuilder;
  */
 public class RealTimeScoringTellurideTopology {
 
-	static final Logger logger = Logger
+	static final Logger logger = LoggerFactory
 			.getLogger(RealTimeScoringTellurideTopology.class);
-
+	
+	
 	public static void main(String[] args) throws ConfigurationException {
-
+		
+		System.setProperty("logfile.name","resources/RealTimeTelluride.log");
+		System.setProperty("log4j.configuration","resources/log4j.properties");
+		
 		// Configure logger
-		Logging.creatLogger("RealTimeScoringTellurideLog.log");
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 
 
