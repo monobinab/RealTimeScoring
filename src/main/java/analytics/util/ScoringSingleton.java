@@ -50,6 +50,9 @@ public class ScoringSingleton {
 	private Map<String, String> variableVidToNameMap;
 	private Map<String, String> variableNameToVidMap;
 	private Map<Integer, Map<Integer, Model>> modelsMap;
+	
+
+	String boostVar;
 
 	public void setModelCollection(DBCollection modelCollection) {
 		this.modelVariablesCollection = modelCollection;
@@ -161,7 +164,7 @@ public class ScoringSingleton {
 	      return instance;
 	   }
 	public HashMap<String, Double> execute(String loyaltyId,
-			ArrayList<String> modelIdList) {
+			ArrayList<String> modelIdList, String source) {
 
 		
 		// List<String> modelIdList = modelIdList;
@@ -277,6 +280,33 @@ public class ScoringSingleton {
 				newScore = Math.exp(baseScore) / (1 + Math.exp(baseScore));
 			}
 
+			
+			logger.info("new score before boost var: " + newScore);
+			int modelIdInt = Integer.valueOf(modelId);
+			
+			if(source.equalsIgnoreCase("ATC")){
+				boostVar = "BOOST_ODL_ATC";
+			}
+			else if(source.equalsIgnoreCase("BROWSE")){
+				boostVar = "BOOST_ODL_BROWSE";
+			}
+			DBObject dbObject = (DBObject) modelVariablesCollection
+					.findOne(new BasicDBObject("modelId", modelIdInt));
+			ArrayList<HashMap> list = (ArrayList<HashMap>) dbObject
+					.get("variable");
+			double coeff = 0;
+			for (Object map : list) {
+				String variableName = ((DBObject) map).get("name").toString()
+						.toUpperCase();
+				if (variableName.equalsIgnoreCase(boostVar)) {
+					coeff = (double) ((DBObject) map).get("coefficient");
+					newScore = newScore + coeff;
+
+				}
+			}
+			
+			logger.info("new score after boost var: " + newScore);
+			
 			
 			// FIND THE MIN AND MAX EXPIRATION DATE OF ALL VARIABLE CHANGES FOR
 			// CHANGED MODEL SCORE TO WRITE TO SCORE CHANGES COLLECTION
