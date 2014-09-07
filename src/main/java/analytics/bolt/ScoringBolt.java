@@ -76,7 +76,7 @@ public class ScoringBolt extends BaseRichBolt {
 		// AND n MODEL IDs AFTER
 		ArrayList<String> modelIdList = restoreModelListFromJson(input.getString(1));
 
-		Map<String, Double> modelScoresMap = ScoringSingleton.getInstance().execute(l_id, modelIdList);
+		Map<String, Double> modelScoresMap = ScoringSingleton.getInstance().execute(l_id, modelIdList,source);
 		
         // EMIT CHANGES
 		double oldScore = 0;
