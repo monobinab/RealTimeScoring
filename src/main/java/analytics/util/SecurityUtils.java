@@ -25,30 +25,13 @@ public class SecurityUtils {
 			e.printStackTrace();
 		}
 
-	}
-
-	/*public static String hashLoyaltyId(String l_id) {
-		String hashed = new String();
-		byte[] rawHmac = mac.doFinal(l_id.getBytes());
-		hashed = new String(Base64.encodeBase64(rawHmac));
-		return hashed;
-	}*/
-	
+	}	
 
 	public static String hashLoyaltyId(String l_id) {
 		String hashed = new String();
-		try {
-			SecretKeySpec signingKey = new SecretKeySpec("mykey".getBytes(), "HmacSHA1");
-			Mac mac = Mac.getInstance("HmacSHA1");
-			try {
-				mac.init(signingKey);
-			} catch (InvalidKeyException e) {
-				e.printStackTrace();
-			}
-			byte[] rawHmac = mac.doFinal(l_id.getBytes());
-			hashed = new String(Base64.encodeBase64(rawHmac));
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
+		if(mac!=null){
+				byte[] rawHmac = mac.doFinal(l_id.getBytes());
+				hashed = new String(Base64.encodeBase64(rawHmac));	
 		}
 		return hashed;
 	}
