@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.configuration.ConfigurationException;
@@ -158,24 +159,39 @@ public class ScoringSingleton {
 	}
 	
 	public static ScoringSingleton getInstance() {
-	      if(instance == null) {
-	         instance = new ScoringSingleton();
-	      }
-	      return instance;
-	   }
+		if(instance == null) {
+			instance = new ScoringSingleton();
+		}
+		return instance;
+	}
+	
 	public HashMap<String, Double> execute(String loyaltyId,
 			ArrayList<String> modelIdList, String source) {
-
 		
-		// List<String> modelIdList = modelIdList;
+		
+		BasicDBObject variableFilterDBO = new BasicDBObject("_id",0);
+		for(String modId:modelIdList) {
+			int month;
+			if(modelsMap.get(Integer.valueOf(modId)).containsKey(0)) {
+				month = 0;
+			} else {
+				month = Calendar.getInstance().get(Calendar.MONTH) + 1;
+			}
+				
+			for(Variable var:modelsMap.get(Integer.valueOf(modId)).get(month).getVariables()) {
+				variableFilterDBO.append(var.getVid(),1);
+			}
+		}
+		
 
 		// 2) FETCH MEMBER VARIABLES FROM memberVariables COLLECTION
 		DBObject mbrVariables = memberVariablesCollection
-				.findOne(new BasicDBObject("l_id", loyaltyId));
+				.findOne(new BasicDBObject("l_id", loyaltyId),variableFilterDBO);
+		logger.info(" ### SCORING BOLT FOUND VARIABLES");
 		if (mbrVariables == null) {
 			logger.info(" ### SCORING BOLT COULD NOT FIND MEMBER VARIABLES");
-
 		}
+
 		// 3) CREATE MAP FROM VARIABLES TO VALUE (OBJECT)
 		Map<String, Object> memberVariablesMap = new HashMap<String, Object>();
 		Iterator<String> mbrVariablesIter = mbrVariables.keySet().iterator();
@@ -299,7 +315,7 @@ public class ScoringSingleton {
 				String variableName = ((DBObject) map).get("name").toString()
 						.toUpperCase();
 				if (variableName.equalsIgnoreCase(boostVar)) {
-					coeff = (double) ((DBObject) map).get("coefficient");
+					coeff = Double.valueOf(((DBObject) map).get("coefficient").toString());
 					newScore = newScore + coeff;
 
 				}
