@@ -12,6 +12,7 @@ import java.util.Set;
 
 import org.joda.time.LocalDate;
 
+import analytics.util.JsonUtils;
 import analytics.util.objects.Change;
 import analytics.util.objects.RealTimeScoringContext;
 
@@ -25,7 +26,7 @@ public class StrategyCountTraitDates implements Strategy {
     @Override
     public Change execute(RealTimeScoringContext context) {
 		
-    	Map<String,Collection<String>> dateTraitsMap = restoreDateTraitsMapFromJson((String) context.getValue());
+    	Map<String,Collection<String>> dateTraitsMap = JsonUtils.restoreDateTraitsMapFromJson((String) context.getValue());
     	SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
     	int dateCount = 0;
     			
@@ -43,19 +44,6 @@ public class StrategyCountTraitDates implements Strategy {
     	}
     	
     	return new Change(dateCount, calculateExpirationDate());
-    }
-
-	public static Map<String, Collection<String>> restoreDateTraitsMapFromJson(String json)
-    {
-		Map<String, Collection<String>> dateTraitsMap = new HashMap<String, Collection<String>>();
-        Type dateTraitType = new TypeToken<Map<String, Collection<String>>>() {
-			private static final long serialVersionUID = 1L;
-		}.getType();
-
-		dateTraitsMap = new Gson().fromJson(json, dateTraitType);
-//        System.out.println(" JSON string: " + json);
-//        System.out.println(" Map: " + dateTraitsMap);
-        return dateTraitsMap;
     }
 
     private Date calculateExpirationDate() {
