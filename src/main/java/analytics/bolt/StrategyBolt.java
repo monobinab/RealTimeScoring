@@ -18,8 +18,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.util.DBConnection;
+import analytics.util.ScoringSingleton;
 import analytics.util.objects.Change;
 import analytics.util.objects.RealTimeScoringContext;
+import analytics.util.objects.StrategyMapper;
 import analytics.util.strategies.Strategy;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -254,35 +256,24 @@ public class StrategyBolt extends BaseRichBolt {
 	        context.setPreviousValue(0);
 
     		// 7) FOR EACH CHANGE EXECUTE STRATEGY
-            try {
-                //arbitrate between memberVariables and changedMemberVariables to send as previous value
-            	if(variableModelsMap.containsKey(newChangeVariableName)) {
-            		if(variableFromVariablesCollection.get("strategy").equals("NONE")) {
-            			continue;
-            		}
-            		
-            		Strategy strategy = (Strategy) Class.forName("analytics.util.strategies."+ variableFromVariablesCollection.get("strategy")).newInstance();
-                    if(allChanges.containsKey(newChangeVariableName)) {
-                    	context.setPreviousValue(allChanges.get(newChangeVariableName.toUpperCase()).getValue());
-                    }
-                    else {
-                    	if(memberVariablesMap.get(newChangeVariableName.toUpperCase()) != null) {
-                    		context.setPreviousValue(memberVariablesMap.get(newChangeVariableName.toUpperCase()));
-                    	}
-                    }
-                    logger.debug(" ~~~ STRATEGY BOLT CHANGES - context: " + context);
-                    newChanges.put(newChangeVariableName, strategy.execute(context));
-            	}
-            } catch (ClassNotFoundException e) {
-                logger.error(e.getMessage(),e);
-            	outputCollector.fail(input);
-            } catch (InstantiationException e) {
-            	logger.error(e.getMessage(),e);
-            	outputCollector.fail(input);
-            } catch (IllegalAccessException e) {
-            	logger.error(e.getMessage(),e);
-            	outputCollector.fail(input);
-            }
+            //arbitrate between memberVariables and changedMemberVariables to send as previous value
+        	if(variableModelsMap.containsKey(newChangeVariableName)) {
+        		if(variableFromVariablesCollection.get("strategy").equals("NONE")) {
+        			continue;
+        		}
+        		
+        		Strategy strategy = StrategyMapper.getInstance().getStrategy(variableFromVariablesCollection.get("strategy").toString());
+                if(allChanges.containsKey(newChangeVariableName)) {
+                	context.setPreviousValue(allChanges.get(newChangeVariableName.toUpperCase()).getValue());
+                }
+                else {
+                	if(memberVariablesMap.get(newChangeVariableName.toUpperCase()) != null) {
+                		context.setPreviousValue(memberVariablesMap.get(newChangeVariableName.toUpperCase()));
+                	}
+                }
+                logger.debug(" ~~~ STRATEGY BOLT CHANGES - context: " + context);
+                newChanges.put(newChangeVariableName, strategy.execute(context));
+        	}
         }
 	            	
 		// 8) FORMAT DOCUMENT FOR MONGODB UPSERT
