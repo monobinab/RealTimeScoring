@@ -1,71 +1,78 @@
 package analytics;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import analytics.bolt.ParsingBoltAAM_ATC;
 import analytics.bolt.ScoringBolt;
 import analytics.bolt.StrategyBolt;
 import analytics.spout.AAMRedisPubSubSpout;
+import analytics.util.RedisConnection;
+import analytics.util.TopicConstants;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
+import backtype.storm.generated.AlreadyAliveException;
+import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.topology.BoltDeclarer;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
 
 public class AAM_BrowseTopology {
+	static final Logger logger = LoggerFactory
+			.getLogger(AAM_BrowseTopology.class);
 
-public static void main(String[] args) throws Exception {
-		
-		TopologyBuilder builder = new TopologyBuilder();
-		
-		String[] topics = new String[]{
-	
-		 "AAM_CDF_Products",
-					
-				
-		};
-		
-		String[] servers = new String[]{"rtsapp301p.qa.ch3.s.com","rtsapp303p.qa.ch3.s.com"};
-		
-		String topicForBoost = null;
-		for(String topic:topics){
-			topicForBoost = topic;
-			for(String server:servers)
-			{
-				builder.setSpout(topic+server, new AAMRedisPubSubSpout(server, 6379, topic), 1);
-			}
+	public static void main(String[] args) throws Exception {
+		logger.info("Starting web feed topology from browse source");
+
+		TopologyBuilder topologyBuilder = new TopologyBuilder();
+
+		String topic = TopicConstants.AAM_BROWSE_PRODUCTS;
+		int port = TopicConstants.PORT;
+
+		RedisConnection redisConnection = new RedisConnection();
+		String[] servers = redisConnection.getServers();
+
+		for (String server : servers) {
+			topologyBuilder.setSpout(topic + server, new AAMRedisPubSubSpout(
+					server, port, topic), 1);
 		}
-		
-		BoltDeclarer boltDeclarer = builder.setBolt("ParsingBoltAAM_ATC", new ParsingBoltAAM_ATC(topicForBoost), 1);
-		builder.setBolt("strategy_bolt", new StrategyBolt(),1).shuffleGrouping("ParsingBoltAAM_ATC");
-		builder.setBolt("scoring_bolt", new ScoringBolt(),1).shuffleGrouping("strategy_bolt");
-	//	builder.setBolt("RankPublishBolt", new RankPublishBolt("rtsapp401p.prod.ch4.s.com", 6379,"score"), 1).shuffleGrouping("scoring_bolt");
-		
-		
-		for(String topic:topics){
-			for(String server:servers)
-			{
-				boltDeclarer.fieldsGrouping(topic + server, new Fields("uuid"));
-			}
+
+		BoltDeclarer boltDeclarer = topologyBuilder.setBolt(
+				"ParsingBoltAAM_ATC", new ParsingBoltAAM_ATC(topic), 1);
+		topologyBuilder.setBolt("strategy_bolt", new StrategyBolt(), 1)
+				.shuffleGrouping("ParsingBoltAAM_ATC");
+		topologyBuilder.setBolt("scoring_bolt", new ScoringBolt(), 1)
+				.shuffleGrouping("strategy_bolt");
+
+		for (String server : servers) {
+			boltDeclarer.fieldsGrouping(topic + server, new Fields("uuid"));
 		}
-		//builder.setBolt("print", new RealtyTracBolt(), 2).shuffleGrouping("spout").shuffleGrouping("spout2");
-		
-		
+
 		Config conf = new Config();
-		
-		
-		
-		if (args != null && args.length > 0) {
-			conf.setNumWorkers(3);
-			
-			StormSubmitter.submitTopology(args[0], conf, builder.createTopology());
-		}
-		else {
+		if (args.length > 0) {
+			try {
+				StormSubmitter.submitTopology(args[0], conf,
+						topologyBuilder.createTopology());
+			} catch (AlreadyAliveException e) {
+				logger.error(e.getClass() + ": " + e.getMessage(), e);
+			} catch (InvalidTopologyException e) {
+				logger.error(e.getClass() + ": " + e.getMessage(), e);
+			}
+		} else {
 			conf.setDebug(false);
 			conf.setMaxTaskParallelism(3);
 			LocalCluster cluster = new LocalCluster();
-			cluster.submitTopology("aambrowse", conf, builder.createTopology());
-			Thread.sleep(10000000);
+			cluster.submitTopology("aam_browse_topology", conf,
+					topologyBuilder.createTopology());
+			try {
+				Thread.sleep(10000000);
+			} catch (InterruptedException e) {
+				logger.error(e.getClass() + ": " + e.getMessage(), e);
+			}
 			cluster.shutdown();
+
 		}
+
 	}
 }
