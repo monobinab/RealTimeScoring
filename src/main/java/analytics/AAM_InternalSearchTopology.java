@@ -1,88 +1,80 @@
 package analytics;
 
-import analytics.bolt.ParsingBoltAAM_InternalSearch;
-import analytics.spout.AAMRedisPubSubSpout;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
+import backtype.storm.generated.AlreadyAliveException;
+import backtype.storm.generated.InvalidTopologyException;
+import backtype.storm.topology.BoltDeclarer;
 import backtype.storm.topology.TopologyBuilder;
-
+import analytics.bolt.ParsingBoltAAM_ATC;
+import analytics.bolt.ParsingBoltAAM_InternalSearch;
+import analytics.bolt.ScoringBolt;
+import analytics.bolt.StrategyBolt;
+import analytics.spout.AAMRedisPubSubSpout;
+import analytics.util.RedisConnection;
+import analytics.util.TopicConstants;
 
 public class AAM_InternalSearchTopology {
-	public static void main(String[] args) throws Exception {
-		
-		TopologyBuilder builder = new TopologyBuilder();
-		
-		String[] topics = new String[]{
-		// "AAM_CDF_SID",
-		// "AAM_CDF_APP_Performance",
-		// "AAM_CDF_PSID",
-		// "AAM_CDF_Products",
-		// "AAM_CDF_PaidSearch",
-		// "AAM_CDF_NaturalSearch",
-		"AAM_CDF_InternalSearch"
-		// "AAM_CDF_CheckoutProducts",
-		// "AAM_CDF_ATCProducts",
-		// "AAM_CDF_AbanCart",
-		// "AAM_CDF_AbanBrow",
-		// "AAM_CDF_Traits"
-		};
-		
-		String[] servers = new String[]{"rtsapp301p.qa.ch3.s.com","rtsapp302p.qa.ch3.s.com","rtsapp303p.qa.ch3.s.com"};
-		
-		
-//		for(String topic:topics){
-//			for(String server:servers)
-//			{
-//				builder.setSpout(topic+server, new AAMRedisPubSubSpout(server, 6379, topic), 1);
-//			}
-//		}
-		
-//		BoltDeclarer boltDeclarer = builder.setBolt("ParsingBoltAAM_InternalSearch", new ParsingBoltAAM_InternalSearch(), 1);
 
-		
-		builder.setSpout("AAM_CDF_InternalSearch1", new AAMRedisPubSubSpout("rtsapp301p.qa.ch3.s.com", 6379, "AAM_CDF_InternalSearch"), 1);
-		builder.setSpout("AAM_CDF_InternalSearch2", new AAMRedisPubSubSpout("rtsapp302p.qa.ch3.s.com", 6379, "AAM_CDF_InternalSearch"), 1);
-		builder.setSpout("AAM_CDF_InternalSearch3", new AAMRedisPubSubSpout("rtsapp303p.qa.ch3.s.com", 6379, "AAM_CDF_InternalSearch"), 1);
-		
-		builder.setBolt("ParsingBoltAAM_InternalSearch1", new ParsingBoltAAM_InternalSearch(), 1).shuffleGrouping("AAM_CDF_InternalSearch1");
-		builder.setBolt("ParsingBoltAAM_InternalSearch2", new ParsingBoltAAM_InternalSearch(), 1).shuffleGrouping("AAM_CDF_InternalSearch2");
-		builder.setBolt("ParsingBoltAAM_InternalSearch3", new ParsingBoltAAM_InternalSearch(), 1).shuffleGrouping("AAM_CDF_InternalSearch3");
+	static final Logger logger = LoggerFactory
+			.getLogger(AAM_InternalSearchTopology.class);
 
-		//BoltDeclarer boltDeclarer = 
-//		builder.setBolt("strategy_bolt", new StrategyBolt(),1).shuffleGrouping("ParsingBoltAAM_InternalSearch");
-//		builder.setBolt("scoring_bolt", new ScoringBolt(),1).shuffleGrouping("strategy_bolt");
-//		builder.setBolt("RankPublishBolt", new RankPublishBolt("rtsapp401p.prod.ch4.s.com", 6379,"score"), 1).shuffleGrouping("scoring_bolt");
-		
-		
-//		for(String topic:topics){
-//			for(String server:servers)
-//			{
-//				boltDeclarer.fieldsGrouping(topic + server, new Fields("uuid"));
-//			}
-//		}
-		//builder.setBolt("print", new RealtyTracBolt(), 2).shuffleGrouping("spout").shuffleGrouping("spout2");
-		
-//		boltDeclarer1.fieldsGrouping("AAM_CDF_InternalSearch1", new Fields("uuid"));
-//		boltDeclarer2.fieldsGrouping("AAM_CDF_InternalSearch2", new Fields("uuid"));
-//		boltDeclarer3.fieldsGrouping("AAM_CDF_InternalSearch3", new Fields("uuid"));
-		
+	public static void main(String[] args) {
+		String topic = TopicConstants.AAM_CDF_INTERNALSEARCH;
+		int port = TopicConstants.PORT;
+
+		RedisConnection redisConnection = new RedisConnection();
+		String[] servers = redisConnection.getServers();
+
+		TopologyBuilder topologyBuilder = new TopologyBuilder();
+
+		topologyBuilder.setSpout("AAM_CDF_InternalSearch1",
+				new AAMRedisPubSubSpout(servers[0], port, topic), 1);
+		topologyBuilder.setSpout("AAM_CDF_InternalSearch2",
+				new AAMRedisPubSubSpout(servers[1], port, topic), 1);
+		topologyBuilder.setSpout("AAM_CDF_InternalSearch3",
+				new AAMRedisPubSubSpout(servers[2], port, topic), 1);
+
+		topologyBuilder
+				.setBolt("ParsingBoltAAM_InternalSearch",
+						new ParsingBoltAAM_InternalSearch())
+				.shuffleGrouping("AAM_CDF_InternalSearch1")
+				.shuffleGrouping("AAM_CDF_InternalSearch2")
+				.shuffleGrouping("AAM_CDF_InternalSearch3");
+
+		topologyBuilder.setBolt("strategy_bolt", new StrategyBolt(), 1)
+				.shuffleGrouping("ParsingBoltAAM_InternalSearch");
+		topologyBuilder.setBolt("scoring_bolt", new ScoringBolt(), 1)
+				.shuffleGrouping("strategy_bolt");
 		Config conf = new Config();
-		
-		
-		
-		if (args != null && args.length > 0) {
-			conf.setNumWorkers(3);
-			
-			StormSubmitter.submitTopology(args[0], conf, builder.createTopology());
-		}
-		else {
+
+		if (args.length > 0) {
+			try {
+				StormSubmitter.submitTopology(args[0], conf,
+						topologyBuilder.createTopology());
+			} catch (AlreadyAliveException e) {
+				logger.error(e.getClass() + ": " + e.getMessage(), e);
+			} catch (InvalidTopologyException e) {
+				logger.error(e.getClass() + ": " + e.getMessage(), e);
+			}
+		} else {
 			conf.setDebug(false);
 			conf.setMaxTaskParallelism(3);
 			LocalCluster cluster = new LocalCluster();
-			cluster.submitTopology("aam", conf, builder.createTopology());
-			Thread.sleep(10000000);
+			cluster.submitTopology("aam_internal_search_topology", conf,
+					topologyBuilder.createTopology());
+			try {
+				Thread.sleep(10000000);
+			} catch (InterruptedException e) {
+				logger.error(e.getClass() + ": " + e.getMessage(), e);
+			}
 			cluster.shutdown();
+
 		}
+
 	}
 }
