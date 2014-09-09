@@ -43,7 +43,7 @@ public class RealTimeScoringTellurideTopology {
 								mqCredential.getPort(), mqCredential
 										.getQueueOneManager(), mqCredential
 										.getQueueChannel(), mqCredential
-										.getQueueName()), 1);
+										.getQueueName()), 2);
 		topologyBuilder
 				.setSpout(
 						"telluride2",
@@ -51,15 +51,15 @@ public class RealTimeScoringTellurideTopology {
 								mqCredential.getPort(), mqCredential
 										.getQueueTwoManager(), mqCredential
 										.getQueueChannel(), mqCredential
-										.getQueueName()), 1);
+										.getQueueName()), 2);
 
 		// create definition of main spout for queue 1
-		topologyBuilder.setBolt("parsing_bolt", new TellurideParsingBoltPOS())
+		topologyBuilder.setBolt("parsing_bolt", new TellurideParsingBoltPOS(), 4)
 				.shuffleGrouping("telluride1").shuffleGrouping("telluride2");
-        topologyBuilder.setBolt("strategy_bolt", new StrategyBolt()).shuffleGrouping("parsing_bolt");
-        topologyBuilder.setBolt("scoring_bolt", new ScoringBolt()).shuffleGrouping("strategy_bolt");
+        topologyBuilder.setBolt("strategy_bolt", new StrategyBolt(), 4).shuffleGrouping("parsing_bolt");
+        topologyBuilder.setBolt("scoring_bolt", new ScoringBolt(), 8).shuffleGrouping("strategy_bolt");
         //Redis publish to server 1
-        topologyBuilder.setBolt("score_publish_bolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score")).shuffleGrouping("scoring_bolt");
+        topologyBuilder.setBolt("score_publish_bolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 2).shuffleGrouping("scoring_bolt");
 
 
 		Config conf = new Config();
@@ -67,6 +67,10 @@ public class RealTimeScoringTellurideTopology {
 
 		if (args.length > 0) {
 			try {
+                conf.setNumAckers(5);
+                conf.setMessageTimeoutSecs(300);
+                conf.setStatsSampleRate(1.0);
+                conf.setNumWorkers(5);
 				StormSubmitter.submitTopology(args[0], conf,
 						topologyBuilder.createTopology());
 			} catch (AlreadyAliveException e) {
