@@ -214,16 +214,17 @@ public class StrategyBolt extends BaseRichBolt {
 		Map<String,Change> allChanges = new HashMap<String,Change>();
     	SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		if(changedMbrVariables!=null && changedMbrVariables.keySet()!=null) {
-			Iterator<String> collectionChangesIter = changedMbrVariables.keySet().iterator();
-		    
-			while (collectionChangesIter.hasNext()){
-		    	String key = collectionChangesIter.next();
+			for(String key:changedMbrVariables.keySet()){
 		    	//skip expired changes
 		    	if("_id".equals(key) || "l_id".equals(key)) {
 		    		continue;
 		    	}
 		    	try {
-					if(!simpleDateFormat.parse(((DBObject) changedMbrVariables.get(key)).get("e").toString()).after(new Date())) {
+		    		// v = VID : e = expiration date : f = effective date 
+					if(((DBObject) changedMbrVariables.get(key)).get("e") != null 
+							&& ((DBObject) changedMbrVariables.get(key)).get("f") != null
+							&& ((DBObject) changedMbrVariables.get(key)).get("v") != null
+							&& !simpleDateFormat.parse(((DBObject) changedMbrVariables.get(key)).get("e").toString()).after(new Date())) {
 						allChanges.put(key.toUpperCase()
 								, new Change(key.toUpperCase()
 									, ((DBObject) changedMbrVariables.get(key)).get("v")
