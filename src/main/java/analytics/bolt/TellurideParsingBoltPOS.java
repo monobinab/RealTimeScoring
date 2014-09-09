@@ -45,7 +45,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 	 */
 	private static final long serialVersionUID = 1L;
 	private OutputCollector outputCollector;
-
+	
 	private DB db;
 	private DBCollection divLnItmCollection;
 	private DBCollection ksndivcatCollection;
