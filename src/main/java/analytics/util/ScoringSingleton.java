@@ -42,7 +42,6 @@ public class ScoringSingleton {
 	DB db;
 	DBCollection modelVariablesCollection;
 	DBCollection memberVariablesCollection;
-	DBCollection memberScoreCollection;
 	DBCollection variablesCollection;
 	DBCollection changedVariablesCollection;
 	DBCollection changedMemberScoresCollection;
@@ -61,10 +60,6 @@ public class ScoringSingleton {
 
 	public void setMemberCollection(DBCollection memberCollection) {
 		this.memberVariablesCollection = memberCollection;
-	}
-
-	public void setMemberScoreCollection(DBCollection memberScoreCollection) {
-		this.memberScoreCollection = memberScoreCollection;
 	}
 
 	public void setVariablesCollection(DBCollection variablesCollection) {
@@ -88,7 +83,6 @@ public class ScoringSingleton {
 		//System.out.println(" collections: " + db.getCollectionNames());
 		memberVariablesCollection = db.getCollection("memberVariables");
 		modelVariablesCollection = db.getCollection("modelVariables");
-		memberScoreCollection = db.getCollection("memberScore");
 		variablesCollection = db.getCollection("Variables");
 		changedVariablesCollection = db.getCollection("changedMemberVariables");
 		changedMemberScoresCollection = db.getCollection("changedMemberScores");
@@ -265,17 +259,6 @@ public class ScoringSingleton {
 		// IF NO VARIABLE'S EXPIRATION DATE IS STILL THERE, WE HAVE TO GO ABCK
 		// TO THE ORIGINAL SCORES
 		HashMap<String, Double> modelScoreMap = new LinkedHashMap<String, Double>();
-		if (allChanges == null || allChanges.isEmpty()) {
-			
-			for (String modelId : modelIdList) {
-
-				DBObject mbrScores = memberScoreCollection
-						.findOne(new BasicDBObject("l_id", loyaltyId));
-				modelScoreMap.put(modelId, (Double) mbrScores.get(modelId));
-			}
-		}
-
-		// System.out.println(" ### ALL CHANGES MAP: " + allChanges);
 
 		// Score each model in a loop
 		BasicDBObject updateRec = new BasicDBObject();
@@ -376,16 +359,6 @@ public class ScoringSingleton {
 							.append("minEx", minDate != null ? simpleDateFormat.format(minDate):null)
 							.append("maxEx", maxDate != null ? simpleDateFormat.format(maxDate):null)
 							.append("f", simpleDateFormat.format(new Date())));
-
-			DBObject oldScore = changedMemberScoresCollection
-					.findOne(new BasicDBObject("l_id", loyaltyId));
-			if (oldScore == null) {
-				memberScoreCollection.findOne(new BasicDBObject("l_id", loyaltyId));
-			}
-			String message = new StringBuffer().append(loyaltyId).append("-")
-					.append(modelId).append("-")
-					.append(oldScore == null ? "0" : oldScore.get("1"))
-					.append("-").append(newScore).toString();
 
 			modelScoreMap.put(modelId, newScore);
 			
