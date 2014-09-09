@@ -24,7 +24,6 @@ public class AAM_BrowseTopology {
 
 	public static void main(String[] args) throws Exception {
 		logger.info("Starting web feed topology from browse source");
-
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 
 		String topic = TopicConstants.AAM_BROWSE_PRODUCTS;
