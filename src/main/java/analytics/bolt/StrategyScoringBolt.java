@@ -13,6 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.slf4j.Logger;
@@ -37,6 +38,7 @@ import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
 public class StrategyScoringBolt extends BaseRichBolt {
@@ -54,11 +56,13 @@ public class StrategyScoringBolt extends BaseRichBolt {
 	private DBCollection memberVariablesCollection;
 	private DBCollection variablesCollection;
 	private DBCollection changedVariablesCollection;
+	private DBCollection changedMemberScoresCollection;
 	private Map<String, List<Integer>> variableModelsMap;
 	private Map<Integer, Map<Integer, Model>> modelsMap;
 	private Map<String, String> variableVidToNameMap;
 	private Map<String, String> variableNameToVidMap;
 	private Map<String, String> variableNameToStrategyMap;
+	
 
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
@@ -85,6 +89,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 		memberVariablesCollection = db.getCollection("memberVariables");
 		variablesCollection = db.getCollection("Variables");
 		changedVariablesCollection = db.getCollection("changedMemberVariables");
+		changedMemberScoresCollection = db.getCollection("changedMemberScores");
 		logger.debug("Populate variable vid map");
 		// populate the variableVidToNameMap
 		variableNameToStrategyMap = new HashMap<String, String>();
@@ -226,6 +231,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 		logger.info(" ### SCORING BOLT FOUND VARIABLES");
 		if (mbrVariables == null) {
 			logger.info(" ### SCORING BOLT COULD NOT FIND MEMBER VARIABLES");
+			return;
 		}
 
 		// CREATE MAP FROM VARIABLES TO VALUE (OBJECT)
@@ -336,11 +342,10 @@ public class StrategyScoringBolt extends BaseRichBolt {
 		// newChanges has both changedMemberVariables and changes
 
 		// 8) Rescore - arbitrate between all changes and memberVariables
-		HashMap<String, Double> modelScoreMap = new LinkedHashMap<String, Double>();
 
 		// Score each model in a loop
-		BasicDBObject updateRec = new BasicDBObject();
-		for (Integer modelId : modelIdList) {
+		Map<Integer, Double> modelIdScoreMap = new HashMap<Integer, Double>();
+		for (Integer modelId : modelIdList) {//Score and emit for all modelIds before mongo inserts
 			// recalculate score for model
 
 			// System.out.println(" ### SCORING MODEL ID: " + modelId);
@@ -359,17 +364,117 @@ public class StrategyScoringBolt extends BaseRichBolt {
 			logger.info("new score before boost var: " + newScore);
 			//TODO: Add boosting logic here
 			
+			// 9) Emit the new score
+			double oldScore = 0;
+			//TODO: Why are we even emiting oldScore if its always 0
+			List<Object> listToEmit = new ArrayList<Object>();
+	    	listToEmit.add(l_id);
+	    	listToEmit.add(oldScore);
+	    	listToEmit.add(newScore);
+	    	listToEmit.add(modelId);
+	    	listToEmit.add(source);
+	    	listToEmit.add(messageID);
+	    	modelIdScoreMap.put(modelId, newScore);
+	    	//logger.info(" ### SCORING BOLT EMITTING: " + listToEmit);
+	    	System.out.println("Scored" + modelId + " " + newScore);
+	    	logger.debug("The time spent for creating scores..... "+System.currentTimeMillis()+" and the message ID is ..."+messageID);
+	    	this.outputCollector.emit(listToEmit);
 		}
-		
-		// 9) Emit the score
-		// 10) Write changedMemberScores with expiry
-		// 11) Write changedMemberVariables with expiry
+		BasicDBObject updateRec = new BasicDBObject();
+		for (Integer modelId: modelIdList){
+			// 10) Write changedMemberScores with expiry
+			// FIND THE MIN AND MAX EXPIRATION DATE OF ALL VARIABLE CHANGES FOR
+				// CHANGED MODEL SCORE TO WRITE TO SCORE CHANGES COLLECTION
+				Date minDate = null;
+				Date maxDate = null;
+				//TODO: Even if variable is in multiple models, the min and max date are same, so we need not loop through after finding one result 
+				for (String key : allChanges.keySet()) {
+					// variable models map
+					if (variableModelsMap.get(key).contains(modelId)) {
+						if (minDate == null) {
+							minDate = allChanges.get(key).getExpirationDate();
+							maxDate = allChanges.get(key).getExpirationDate();
+						} else {
+							if (allChanges.get(key).getExpirationDate()
+									.before(minDate)) {
+								minDate = allChanges.get(key).getExpirationDate();
+							}
+							if (allChanges.get(key).getExpirationDate()
+									.after(maxDate)) {
+								maxDate = allChanges.get(key).getExpirationDate();
+							}
+						}
+					}
+				}
+				
+				// IF THE MODEL IS MONTH SPECIFIC AND THE MIN/MAX DATE IS AFTER THE
+				// END OF THE MONTH SET TO THE LAST DAY OF THIS MONTH
+				if (modelsMap.containsKey(modelId)
+						&& modelsMap.get(modelId).containsKey(
+								Calendar.getInstance().get(Calendar.MONTH) + 1)) {
+					Calendar calendar = Calendar.getInstance();
+					calendar.set(Calendar.DATE,
+							calendar.getActualMaximum(Calendar.DATE));
+					Date lastDayOfMonth = calendar.getTime();
+
+					if (minDate.after(lastDayOfMonth)) {
+						minDate = lastDayOfMonth;
+						maxDate = lastDayOfMonth;
+					} else if (maxDate.after(lastDayOfMonth)) {
+						maxDate = lastDayOfMonth;
+					}
+				}
+
+				// APPEND CHANGED SCORE AND MIN/MAX EXPIRATION DATES TO DOCUMENT FOR
+				// UPDATE
+				updateRec.append(
+						modelId.toString(),
+						new BasicDBObject().append("s", modelIdScoreMap.get(modelId))
+								.append("minEx", minDate != null ? simpleDateFormat.format(minDate):null)
+								.append("maxEx", maxDate != null ? simpleDateFormat.format(maxDate):null)
+								.append("f", simpleDateFormat.format(new Date())));
+
+			
+				if (updateRec != null) {
+					changedMemberScoresCollection.update(
+							new BasicDBObject("l_id", l_id), new BasicDBObject("$set",
+									updateRec), true, false);
+
+				}
+				
+				// 11) Write changedMemberVariables with expiry
+		        if(!allChanges.isEmpty()){
+//		            System.out.println(" ~~~ CHANGES: " + newChanges );
+		            
+					Iterator<Entry<String, Change>> newChangesIter = newChanges.entrySet().iterator();
+					BasicDBObject newDocument = new BasicDBObject();
+				    while (newChangesIter.hasNext()) {
+				        Map.Entry<String, Change> pairsVarValue = (Map.Entry<String, Change>)newChangesIter.next();
+				    	String varVid =  variableNameToVidMap.get(pairsVarValue.getKey().toString().toUpperCase());
+						Object val = pairsVarValue.getValue().value;
+						newDocument.append(varVid, new BasicDBObject().append("v", val).append("e", pairsVarValue.getValue().getExpirationDateAsString()).append("f", pairsVarValue.getValue().getEffectiveDateAsString()));
+				    	
+				    //	allChanges.put(varVid, new Change(varVid, val, pairsVarValue.getValue().expirationDate));
+				    }
+
+				    BasicDBObject searchQuery = new BasicDBObject().append("l_id", l_id);
+				    
+				    logger.trace(" ~~~ DOCUMENT TO INSERT:");
+				    logger.debug(newDocument.toString());
+				    logger.trace(" ~~~ END DOCUMENT");
+				    
+				    //upsert document
+				    changedVariablesCollection.update(searchQuery, new BasicDBObject("$set", newDocument), true, false);
+			
+		        }
+		}
+
 
 	}
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		// TODO Auto-generated method stub
+		declarer.declare(new Fields("l_id","oldScore","newScore","model","source","messageID"));
 
 	}
 	
