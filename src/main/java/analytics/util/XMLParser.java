@@ -20,6 +20,7 @@ import analytics.util.objects.Tender;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -87,28 +88,37 @@ public class XMLParser {
 
 	private static boolean bRequestorID;
 
-	public static void main(String[] args) throws FileNotFoundException,
-			XMLStreamException, JAXBException {
+	public static void main(String[] args) throws
+			XMLStreamException, JAXBException, FileNotFoundException {
 
 		// String fileName = "./src/main/resources/soap_env.xml";
-		String fileName = "./src/main/resources/POS.xml";
+		String fileName = "	<ProcessTransaction><MessageVersion>08</MessageVersion><MemberNumber>7081390000061954</MemberNumber><RequestorID>KCOM</RequestorID><OrderStoreNumber>07840</OrderStoreNumber></ProcessTransaction>";
+	
 		//processPOS(fileName);
 		//print(fileName);
+		System.out.println("I AM CHECKING");
 		parseXMLProcessTransaction(fileName);
+		System.out.println("I CHECKED");
 		//parseXML(fileName);
 	}
 
-	public static ProcessTransaction parseXMLProcessTransaction(String fileName) {
+	public static ProcessTransaction parseXMLProcessTransaction(String fileName)  {
 		ProcessTransaction processTransaction = null;
 		XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
 		List<LineItem> lineItemList = new ArrayList<LineItem>();
 		LineItem lineItem = null;
 		try {
+			//XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(
+				//    new FileReader(fileName));
+
 			XMLStreamReader xmlStreamReader = xmlInputFactory
 					.createXMLStreamReader(new StringReader(fileName));
-			int event = xmlStreamReader.getEventType();
+			//int event = xmlStreamReader.getEventType();
 
-			while (true) {				
+			while (xmlStreamReader.hasNext())	{
+				xmlStreamReader.next();
+				int event = xmlStreamReader.getEventType();
+				
 				switch (event) {
 
 				case XMLStreamConstants.START_ELEMENT:
@@ -196,6 +206,7 @@ public class XMLParser {
 					}
 					break;
 				case XMLStreamConstants.CHARACTERS:
+					//System.out.println("///CHECKLING:////// " + xmlStreamReader.getLocalName());
 					if (bMessageVersion) {
 						processTransaction.setMessageVersion(xmlStreamReader
 								.getText());
