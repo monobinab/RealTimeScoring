@@ -45,5 +45,16 @@ public class JsonUtils {
 //        System.out.println(" Map: " + dateTraitsMap);
         return dateTraitsMap;
     }
+	
+	public static Map<String, String> restoreVariableListFromJson(String json)
+    {
+		Map<String, String> varList = new HashMap<String, String>();
+        Type varListType = new TypeToken<Map<String, String>>() {
+			private static final long serialVersionUID = 1L;}.getType();
+
+        varList = new Gson().fromJson(json, varListType);
+        return varList;
+    }
+	
 
 }
