@@ -300,7 +300,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 		// 6) For each variable in new changes, execute strategy and store in
 		// allChanges
 		// allChanges will contain newChanges and the changedMemberVariables
-		Map<String, Change> newChanges = new HashMap<String, Change>();
+		//Map<String, Change> newChanges = new HashMap<String, Change>();
 		for (String variableName : newChangesVarValueMap.keySet()) {
 			if (variableModelsMap.containsKey(variableName)) {
 				variableName = variableName.toUpperCase();
@@ -446,7 +446,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 		        if(!allChanges.isEmpty()){
 //		            System.out.println(" ~~~ CHANGES: " + newChanges );
 		            
-					Iterator<Entry<String, Change>> newChangesIter = newChanges.entrySet().iterator();
+					Iterator<Entry<String, Change>> newChangesIter = allChanges.entrySet().iterator();
 					BasicDBObject newDocument = new BasicDBObject();
 				    while (newChangesIter.hasNext()) {
 				        Map.Entry<String, Change> pairsVarValue = (Map.Entry<String, Change>)newChangesIter.next();
@@ -478,6 +478,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 
 	}
 	
+	//TODO: THese methods will not be in bolt
 	double calcBaseScore(Map<String, Object> mbrVarMap,
 			Map<String, Change> varChangeMap, int modelId) {
 
