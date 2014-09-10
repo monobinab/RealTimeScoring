@@ -96,7 +96,7 @@ public class FacebookBolt extends BaseRichBolt{
 		    Gson gson = new Gson();
 		    Map<String,String> variableValueMap = new HashMap<String, String>();
 		    //TODO: Maybe they also map to multiple variables
-		    variableValueMap.put((String)fbVar.get("v"), positive.substring(1, positive.indexOf(']')-1));
+		    variableValueMap.put((String)fbVar.get("v"), positive.substring(1, positive.indexOf(']')));
 		    Type varValueType = new TypeToken<Map<String, String>>() {}.getType();
 	    	String varValueString = gson.toJson(variableValueMap, varValueType);
         	List<Object> listToEmit = new ArrayList<Object>();
