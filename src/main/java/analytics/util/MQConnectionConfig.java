@@ -23,15 +23,28 @@ public class MQConnectionConfig {
 		
 		websphereMQCredential.setHostTwoName(properties.getString("hostTwo.name"));
 		
+		websphereMQCredential.setHostRtsThreeName(properties.getString("hostRtsThree.name"));
+		
+		websphereMQCredential.setHostRtsFourName(properties.getString("hostRtsFour.name"));
+		
 		websphereMQCredential.setPort(Integer.valueOf(properties.getString("port.no")));
 		
 		websphereMQCredential.setQueueOneManager(properties.getString("queueOne.manager"));
 		
 		websphereMQCredential.setQueueTwoManager(properties.getString("queueTwo.manager"));
 		
+		websphereMQCredential.setQueueRtsThreeManager(properties.getString("queueRtsThree.manager"));
+		
+		websphereMQCredential.setQueueRtsFourManager(properties.getString("queueRtsFour.manager"));
+		
 		websphereMQCredential.setQueueChannel(properties.getString("queue.channel"));
 		
 		websphereMQCredential.setQueueName(properties.getString("queue.name"));
+		
+		websphereMQCredential.setQueueRts2Channel(properties.getString("queueRts2.channel"));
+		
+		websphereMQCredential.setQueueRts2Name(properties.getString("queueRts2.name"));
+		
 		
 		logger.debug("websphereMQCredential configured" + websphereMQCredential.getHostOneName()+ "," + websphereMQCredential.getHostTwoName()+ ":" + websphereMQCredential.getPort());
 		
