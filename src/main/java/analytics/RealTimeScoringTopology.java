@@ -53,18 +53,18 @@ public class RealTimeScoringTopology {
 
 		topologyBuilder.setSpout(
 				"npos1",
-				new WebsphereMQSpout(mqCredential.getHostThreeName(),
+				new WebsphereMQSpout(mqCredential.getHostRtsThreeName(),
 						mqCredential.getPort(), mqCredential
-								.getQueueThreeManager(), mqCredential
-								.getQueue2Channel(), mqCredential
-								.getQueue2Name()), 1);
+								.getQueueRtsThreeManager(), mqCredential
+								.getQueueRts2Channel(), mqCredential
+								.getQueueRts2Name()), 1);
 		topologyBuilder.setSpout(
 				"npos2",
-				new WebsphereMQSpout(mqCredential.getHostFourName(),
+				new WebsphereMQSpout(mqCredential.getHostRtsFourName(),
 						mqCredential.getPort(), mqCredential
-								.getQueueFourManager(), mqCredential
-								.getQueue2Channel(), mqCredential
-								.getQueue2Name()), 1);
+								.getQueueRtsFourManager(), mqCredential
+								.getQueueRts2Channel(), mqCredential
+								.getQueueRts2Name()), 1);
 
 		topologyBuilder.setBolt("parsing_bolt", new ParsingBoltPOS())
 				.shuffleGrouping("npos1").shuffleGrouping("npos2");
