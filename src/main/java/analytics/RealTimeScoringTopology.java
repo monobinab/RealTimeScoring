@@ -25,7 +25,7 @@ import com.mongodb.DBObject;
 public class RealTimeScoringTopology {
 
 	static final Logger logger = LoggerFactory
-			.getLogger(RealTimeScoringTopology1.class);
+			.getLogger(RealTimeScoringTopology.class);
 
 	public static void main(String[] args) throws ConfigurationException {
 
