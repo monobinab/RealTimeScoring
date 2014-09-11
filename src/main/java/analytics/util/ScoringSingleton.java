@@ -1,27 +1,21 @@
-/**
- * 
- */
 package analytics.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import analytics.util.objects.Change;
-import analytics.util.objects.Model;
-import analytics.util.objects.Variable;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
@@ -29,244 +23,330 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import com.mongodb.MongoClient;
+
+import analytics.util.objects.Change;
+import analytics.util.objects.Model;
+import analytics.util.objects.RealTimeScoringContext;
+import analytics.util.objects.StrategyMapper;
+import analytics.util.objects.Variable;
+import analytics.util.strategies.Strategy;
 
 public class ScoringSingleton {
-
-	private static ScoringSingleton instance = null;
-	private static final long serialVersionUID = 1L;
-	static final Logger logger = LoggerFactory
+	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ScoringSingleton.class);
-	
-	MongoClient mongoClient;
-	DB db;
-	DBCollection modelVariablesCollection;
-	DBCollection memberVariablesCollection;
-	DBCollection variablesCollection;
-	DBCollection changedVariablesCollection;
-	DBCollection changedMemberScoresCollection;
-
-	private Map<String, Collection<Integer>> variableModelsMap;
+	private DB db;
+	private DBCollection modelVariablesCollection;
+	private DBCollection memberVariablesCollection;
+	private DBCollection variablesCollection;
+	private DBCollection changedVariablesCollection;
+	private DBCollection changedMemberScoresCollection;
+	private Map<String, List<Integer>> variableModelsMap;
+	private Map<Integer, Map<Integer, Model>> modelsMap;
 	private Map<String, String> variableVidToNameMap;
 	private Map<String, String> variableNameToVidMap;
-	private Map<Integer, Map<Integer, Model>> modelsMap;
+	private Map<String, String> variableNameToStrategyMap;
 	
-
-	String boostVar;
-
-	public void setModelCollection(DBCollection modelCollection) {
-		this.modelVariablesCollection = modelCollection;
+	private static ScoringSingleton instance=null;
+	
+	public static ScoringSingleton getInstance() {
+		if(instance == null) {
+			synchronized (ScoringSingleton.class) {
+				if(instance == null)
+					instance = new ScoringSingleton();
+			}
+		}
+		return instance;
 	}
-
-	public void setMemberCollection(DBCollection memberCollection) {
-		this.memberVariablesCollection = memberCollection;
-	}
-
-	public void setVariablesCollection(DBCollection variablesCollection) {
-		this.variablesCollection = variablesCollection;
-	}
-
-	/*public static void main(String[] args){
-		ScoringBolt sb = new ScoringBolt();
-		ArrayList<String> list = new ArrayList<String>();
-		list.add(35+"");
-		HashMap<String, Double> x = sb.execute("E06EMltfrFqV69PK0CO8G1xOUAQ=", list);
-		System.out.println(x);
-	}*/
-	private ScoringSingleton(){
-        
-        try {
+	private ScoringSingleton() {
+		//Get DB connection
+		try {
 			db = DBConnection.getDBConnection();
 		} catch (ConfigurationException e) {
-			logger.error("Unable to obtain DB connection");
+			LOGGER.error("Unable to contain DB connection", e);
 		}
-		//System.out.println(" collections: " + db.getCollectionNames());
-		memberVariablesCollection = db.getCollection("memberVariables");
 		modelVariablesCollection = db.getCollection("modelVariables");
+		memberVariablesCollection = db.getCollection("memberVariables");
 		variablesCollection = db.getCollection("Variables");
 		changedVariablesCollection = db.getCollection("changedMemberVariables");
 		changedMemberScoresCollection = db.getCollection("changedMemberScores");
 
+		LOGGER.debug("Populate variable vid map");
 		// populate the variableVidToNameMap
+		variableNameToStrategyMap = new HashMap<String, String>();
 		variableVidToNameMap = new HashMap<String, String>();
 		variableNameToVidMap = new HashMap<String, String>();
+		
 		DBCursor vCursor = variablesCollection.find();
 		for (DBObject variable : vCursor) {
-			String variableName = ((DBObject) variable).get("name").toString()
+			String variableName = ((DBObject) variable).get(MongoNameConstants.V_NAME).toString()
 					.toUpperCase();
-			String vid = ((DBObject) variable).get("VID").toString();
+			String vid = ((DBObject) variable).get(MongoNameConstants.V_ID).toString();
+			String strategy = ((DBObject) variable).get(MongoNameConstants.V_STRATEGY).toString();
 			if (variableName != null && vid != null) {
 				variableVidToNameMap.put(vid, variableName.toUpperCase());
 				variableNameToVidMap.put(variableName.toUpperCase(), vid);
+				variableNameToStrategyMap.put(variableName.toUpperCase(),
+						strategy);
 			}
 		}
-
+		
+		LOGGER.debug("Populate variable models map");
+		// populate the variableModelsMap
+		variableModelsMap = new HashMap<String, List<Integer>>();
 		// populate the variableModelsMap and modelsMap
 		modelsMap = new HashMap<Integer, Map<Integer, Model>>();
-		variableModelsMap = new HashMap<String, Collection<Integer>>();
 
 		DBCursor models = modelVariablesCollection.find();
 		for (DBObject model : models) {
+			int modelId = Integer.valueOf(model.get(MongoNameConstants.MODEL_ID).toString());
+			int month = Integer.valueOf(model.get(MongoNameConstants.MONTH).toString());
+			double constant = Double.valueOf(model.get(MongoNameConstants.CONSTANT).toString());
 
-//			System.out.println("modelId: " + model.get("modelId"));
-//			System.out.println("month: " + model.get("month"));
-//			System.out.println("constant: " + model.get("constant"));
-
-			int modelId = Integer.valueOf(model.get("modelId").toString());
-			int month = Integer.valueOf(model.get("month").toString());
-			double constant = Double.valueOf(model.get("constant").toString());
-
-			BasicDBList modelVariables = (BasicDBList) model.get("variable");
-			Map<String, Variable> variablesMap = new HashMap<String, Variable>();
-			for (Object modelVariable : modelVariables) {
-				String variableName = ((DBObject) modelVariable).get("name")
-						.toString().toUpperCase();
-				Double coefficient = Double.valueOf(((DBObject) modelVariable)
-						.get("coefficient").toString());
-				variablesMap.put(variableName, new Variable(variableName,
-						variableNameToVidMap.get(variableName), coefficient));
-
-				if (!variableModelsMap.containsKey(variableName)) {
-					Collection<Integer> modelIds = new ArrayList<Integer>();
-					variableModelsMap.put(variableName.toUpperCase(), modelIds);
-					variableModelsMap.get(variableName.toUpperCase()).add(
-							Integer.valueOf(model.get("modelId").toString()));
-				} else {
-					if (!variableModelsMap.get(variableName).contains(
-							Integer.valueOf(model.get("modelId").toString()))) {
-						variableModelsMap.get(variableName.toUpperCase())
-								.add(Integer.valueOf(model.get("modelId")
-										.toString()));
-					}
-				}
-			}
-			if(!modelsMap.containsKey(modelId)) {
+			Map<String, Variable> variablesMap = populateVariableModelsMap(
+					model, modelId);
+			
+			if (!modelsMap.containsKey(modelId)) {
 				Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
 				monthModelMap.put(month, new Model(modelId, month, constant,
 						variablesMap));
 				modelsMap.put(modelId, monthModelMap);
 			} else {
-				modelsMap.get(modelId).put(month, new Model(modelId, month, constant,
-					variablesMap));
+				modelsMap.get(modelId).put(month,
+						new Model(modelId, month, constant, variablesMap));
 			}
 		}
+
 	}
-	
-	public static ScoringSingleton getInstance() {
-		if(instance == null) {
-			instance = new ScoringSingleton();
-		}
-		return instance;
-	}
-	
-	public HashMap<String, Double> execute(String loyaltyId,
-			ArrayList<String> modelIdList, String source) {
-		
-		
-		BasicDBObject variableFilterDBO = new BasicDBObject("_id",0);
-		for(String modId:modelIdList) {
-			int month;
-			if(modelsMap.get(Integer.valueOf(modId)).containsKey(0)) {
-				month = 0;
+	private Map<String, Variable> populateVariableModelsMap(DBObject model,
+			int modelId) {
+		BasicDBList modelVariables = (BasicDBList) model.get(MongoNameConstants.VARIABLE);
+		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
+		for (Object modelVariable : modelVariables) {
+			String variableName = ((DBObject) modelVariable).get(MongoNameConstants.VAR_NAME)
+					.toString().toUpperCase();
+			Double coefficient = Double.valueOf(((DBObject) modelVariable)
+					.get(MongoNameConstants.COEFFICIENT).toString());
+			variablesMap.put(variableName, new Variable(variableName,
+					variableNameToVidMap.get(variableName), coefficient));
+
+			if (!variableModelsMap.containsKey(variableName)) {
+				List<Integer> modelIds = new ArrayList<Integer>();
+				variableModelsMap.put(variableName.toUpperCase(), modelIds);
+				variableModelsMap.get(variableName.toUpperCase()).add(modelId);
 			} else {
-				month = Calendar.getInstance().get(Calendar.MONTH) + 1;
-			}
-				
-			for(String v:modelsMap.get(Integer.valueOf(modId)).get(month).getVariables().keySet()) {
-				Variable var = modelsMap.get(Integer.valueOf(modId)).get(month).getVariables().get(v);
-				variableFilterDBO.append(var.getVid(),1);
+				if (!variableModelsMap.get(variableName).contains(modelId)) {
+					variableModelsMap.get(variableName.toUpperCase())
+							.add(modelId);
+				}
 			}
 		}
-		
+		return variablesMap;
+	}
+	
+	//TODO: Replace this method. Its for backward compatibility. Bad coding
+	public HashMap<String, Double> execute(String loyaltyId,
+			ArrayList<String> modelIdArrayList, String source) {
+		Set<Integer> modelIdList = new HashSet<Integer>();
+		for(String model: modelIdArrayList){
+			modelIdList.add(Integer.parseInt(model));
+		}
+		BasicDBObject variableFilterDBO = createVariableFilterQuery(modelIdList);
+		Map<String, Object> memberVariablesMap = ScoringSingleton.getInstance().createVariableValueMap(loyaltyId, variableFilterDBO);
+		if(memberVariablesMap==null){
+			LOGGER.warn("Unable to find member variables");
+			return null;
+					
+		}
+		Map<String, Change> allChanges = ScoringSingleton.getInstance().createChangedVariablesMap(loyaltyId);
+		Map<Integer, Double> modelIdScoreMap = new HashMap<Integer, Double>();
+		for (Integer modelId : modelIdList) {
+			double score = ScoringSingleton.getInstance().calcScore(memberVariablesMap, allChanges,
+					modelId);
+			modelIdScoreMap.put(modelId, score);
+		}
+		updateChangedMemberScore(loyaltyId, modelIdList, allChanges, modelIdScoreMap);
+		//TODO: This is a very bad way of defining, but a very temp fix before fixing other topologies
+		HashMap<String, Double> modelIdStringScoreMap = new HashMap<String, Double>();
+		for(Integer modelId: modelIdScoreMap.keySet()){
+			modelIdStringScoreMap.put(modelId.toString(), modelIdScoreMap.get(modelId));
+		}
+		return modelIdStringScoreMap;
+	}
+	
+	public Set<Integer> getModelIdList(Map<String, String> newChangesVarValueMap){
+		Set<Integer> modelIdList = new HashSet<Integer>();
+		for (String changedVariable : newChangesVarValueMap.keySet()) {
+			List<Integer> models = variableModelsMap.get(changedVariable);
+			for (Integer modelId : models) {
+				modelIdList.add(modelId);
+			}
+		}
+		return modelIdList;
+	}
+	
+	public BasicDBObject createVariableFilterQuery(Set<Integer> modelIdList)
+	{
+	// Create query
+			BasicDBObject variableFilterDBO = new BasicDBObject(MongoNameConstants.ID, 0);
+			for (Integer modId : modelIdList) {
+				int month;
+				if (modelsMap.get(modId).containsKey(0)) {
+					month = 0;
+				} else {
+					month = Calendar.getInstance().get(Calendar.MONTH) + 1;
+				}
 
-		// 2) FETCH MEMBER VARIABLES FROM memberVariables COLLECTION
-		DBObject mbrVariables = memberVariablesCollection
-				.findOne(new BasicDBObject("l_id", loyaltyId),variableFilterDBO);
-		logger.info(" ### SCORING BOLT FOUND VARIABLES");
+				for (String var : modelsMap.get(modId).get(month).getVariables()
+						.keySet()) {
+					variableFilterDBO.append(variableNameToVidMap.get(var), 1);
+				}
+			}
+			return variableFilterDBO;
+	}
+	public Map<String, Object> createVariableValueMap(String lId,
+			BasicDBObject variableFilterDBO) {
+		DBObject mbrVariables = memberVariablesCollection.findOne(
+				new BasicDBObject("l_id", lId), variableFilterDBO);
+		LOGGER.info(" ### FOUND VARIABLES");
 		if (mbrVariables == null) {
-			logger.info(" ### SCORING BOLT COULD NOT FIND MEMBER VARIABLES");
+			LOGGER.info(" ### BOLT COULD NOT FIND MEMBER VARIABLES");
+			return null;
 		}
 
-		// 3) CREATE MAP FROM VARIABLES TO VALUE (OBJECT)
+		// CREATE MAP FROM VARIABLES TO VALUE (OBJECT)
 		Map<String, Object> memberVariablesMap = new HashMap<String, Object>();
 		Iterator<String> mbrVariablesIter = mbrVariables.keySet().iterator();
 		while (mbrVariablesIter.hasNext()) {
 			String key = mbrVariablesIter.next();
-			if (!key.equals("l_id") && !key.equals("_id")) {
+			if (!key.equals(MongoNameConstants.L_ID) && !key.equals(MongoNameConstants.ID)) {
 				memberVariablesMap.put(variableVidToNameMap.get(key)
 						.toUpperCase(), mbrVariables.get(key));
-					
+
 			}
 		}
-
-		// 4) FETCH CHANGED VARIABLES FROM changedMemberVariables COLLECTION
+		return memberVariablesMap;
+	}
+	public Map<String, Change> createChangedVariablesMap(String lId) {
 		DBObject changedMbrVariables = changedVariablesCollection
-				.findOne(new BasicDBObject("l_id", loyaltyId));
-		// 5) CREATE MAP FROM CHANGED VARIABLES TO VALUE AND EXPIRATION DATE
-		// (CHANGE CLASS)
+				.findOne(new BasicDBObject(MongoNameConstants.L_ID, lId));
+
 		Map<String, Change> allChanges = new HashMap<String, Change>();
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-		// System.out.println(" ### CHANGED MEMBER VARIABLES: " +
-		// changedMbrVariables);
 		if (changedMbrVariables != null && changedMbrVariables.keySet() != null) {
-			Iterator<String> collectionChangesIter = changedMbrVariables
-					.keySet().iterator();
-
-			while (collectionChangesIter.hasNext()) {
-				String key = collectionChangesIter.next();
+			for (String key : changedMbrVariables.keySet()) {
 				// skip expired changes
-				if ("_id".equals(key) || "l_id".equals(key)) {
+				if (MongoNameConstants.L_ID.equals(key) || MongoNameConstants.ID.equals(key)) {
 					continue;
 				}
-				// System.out.println("   ### VARIABLE: " + key);
-				// System.out.println("   ### GET VARIABLE: " +
-				// changedMbrVariables.get(key));
-				// System.out.println("   ### EXPIRATION: " + ((DBObject)
-				// changedMbrVariables.get(key)).get("e"));
-
 				try {
-					if (((DBObject) changedMbrVariables.get(key)).get("v") != null
-							&& ((DBObject) changedMbrVariables.get(key)).get("e") != null
-							&& ((DBObject) changedMbrVariables.get(key)).get("f") != null
-							&& simpleDateFormat.parse(
+					// v = VID : e = expiration date : f = effective date
+					if (((DBObject) changedMbrVariables.get(key)).get(MongoNameConstants.MV_EXPIRY_DATE) != null
+							&& ((DBObject) changedMbrVariables.get(key))
+									.get(MongoNameConstants.MV_EFFECTIVE_DATE) != null
+							&& ((DBObject) changedMbrVariables.get(key))
+									.get(MongoNameConstants.MV_VID) != null
+							&& !simpleDateFormat.parse(
 									((DBObject) changedMbrVariables.get(key))
-											.get("e").toString()).after(
-									Calendar.getInstance().getTime())) {
+											.get(MongoNameConstants.MV_EXPIRY_DATE).toString()).after(
+									new Date())) {
 						allChanges
 								.put(key.toUpperCase(),
 										new Change(
 												key.toUpperCase(),
 												((DBObject) changedMbrVariables
-														.get(key)).get("v"),
+														.get(key)).get(MongoNameConstants.MV_VID),
 												simpleDateFormat
 														.parse(((DBObject) changedMbrVariables
 																.get(key)).get(
-																"e").toString()),
+																		MongoNameConstants.MV_EXPIRY_DATE).toString()),
 												simpleDateFormat
 														.parse(((DBObject) changedMbrVariables
 																.get(key)).get(
-																"f").toString())));
+																		MongoNameConstants.MV_EFFECTIVE_DATE).toString())));
+					} else {
+						LOGGER.error("Got a null value for "
+								+ changedMbrVariables.get(key));
 					}
 				} catch (ParseException e) {
-					logger.error(e.getMessage(),e);
+					LOGGER.error(e.getMessage(), e);
+					return allChanges;
+				}
+			}
+		}
+		return allChanges;
+	}
+	public Map<String, Change> executeStrategy(Map<String, Change> allChanges,
+			Map<String, String> newChangesVarValueMap, Map<String, Object> memberVariablesMap) {
+		for (String variableName : newChangesVarValueMap.keySet()) {
+			if (variableModelsMap.containsKey(variableName)) {
+				variableName = variableName.toUpperCase();
+				if (variableNameToStrategyMap.get(variableName) == null) {
+					LOGGER.info(" ~~~ DID NOT FIND VARIABLE: ");
+					continue;
+				}
+
+				RealTimeScoringContext context = new RealTimeScoringContext();
+				context.setValue(newChangesVarValueMap.get(variableName));
+				context.setPreviousValue(0);
+
+				if (variableNameToStrategyMap.get(variableName).equals("NONE")) {
+					continue;
+				}
+
+				Strategy strategy = StrategyMapper.getInstance().getStrategy(
+						variableNameToStrategyMap.get(variableName));
+				// If this member had a changed variable
+				if (allChanges.containsKey(variableName)) {
+					context.setPreviousValue(allChanges.get(variableName)
+							.getValue());
+				}
+				// else get it from memberVariablesMap
+				else {
+					if (memberVariablesMap.get(variableName) != null) {
+						context.setPreviousValue(memberVariablesMap
+								.get(variableName));
+					}
+				}
+				LOGGER.debug(" ~~~ STRATEGY BOLT CHANGES - context: " + context);
+				Change executedValue = strategy.execute(context);
+				// TODO: Verify this
+				// newChanges so that iterate over it and upsert
+				allChanges.put(variableName, executedValue);// We do not need
+															// newChanges. We
+															// upsert allChanges
+			}
+		}
+		return allChanges;
+	}
+
+	public double getBoostScore(Map<String, Change> allChanges, Integer modelId) {
+		double boosts = 0;
+		for(String ch:allChanges.keySet()) {
+			if(ch.substring(0,5).toUpperCase().equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
+				if(modelsMap.get(modelId).containsKey(0)) {
+					if(modelsMap.get(modelId).get(0).getVariables().containsKey(ch)){
+						boosts = boosts 
+								+ Double.valueOf(allChanges.get(ch).getValue().toString()) 
+								* modelsMap.get(modelId).get(0).getVariables().get(ch).getCoefficient();
+					}
+				} else {
+					if(modelsMap.get(modelId).containsKey(Calendar.getInstance().get(Calendar.MONTH) + 1)) {
+						boosts = boosts 
+								+ Double.valueOf(allChanges.get(ch).getValue().toString()) 
+								* modelsMap.get(modelId).get(Calendar.getInstance().get(Calendar.MONTH) + 1).getVariables().get(ch).getCoefficient();
+					}
 				}
 			}
 		}
 
-		// ////////////////////////////////////////////////////////////////////////////////
-		// IF NO VARIABLE'S EXPIRATION DATE IS STILL THERE, WE HAVE TO GO ABCK
-		// TO THE ORIGINAL SCORES
-		HashMap<String, Double> modelScoreMap = new LinkedHashMap<String, Double>();
-
-		// Score each model in a loop
-		BasicDBObject updateRec = new BasicDBObject();
-		for (String modelId : modelIdList) {
-			// recalculate score for model
-
-			// System.out.println(" ### SCORING MODEL ID: " + modelId);
-			double baseScore = calcMbrVar(memberVariablesMap, allChanges,
-					Integer.valueOf(modelId));
+		return boosts;
+	}
+	
+	public double calcScore(Map<String, Object> mbrVarMap,
+			Map<String, Change> varChangeMap, int modelId){
+		// recalculate score for model
+			double baseScore = ScoringSingleton.getInstance().calcBaseScore(mbrVarMap, varChangeMap,
+					modelId);
 			double newScore;
 
 			if (baseScore <= -100) {
@@ -274,115 +354,22 @@ public class ScoringSingleton {
 			} else if (baseScore >= 35) {
 				newScore = 1;
 			} else {
-				// newScore = 1/(1+ Math.exp(-1*( baseScore ))) * 1000;
 				newScore = Math.exp(baseScore) / (1 + Math.exp(baseScore));
 			}
-
-			
-			logger.info("new score before boost var: " + newScore);
-			int modelIdInt = Integer.valueOf(modelId);
-			
-			if(source.equalsIgnoreCase("ATC")){
-				boostVar = "BOOST_ODL_ATC";
-			}
-			else if(source.equalsIgnoreCase("BROWSE")){
-				boostVar = "BOOST_ODL_BROWSE";
-			}
-			DBObject dbObject = (DBObject) modelVariablesCollection
-					.findOne(new BasicDBObject("modelId", modelIdInt));
-			ArrayList<HashMap> list = (ArrayList<HashMap>) dbObject
-					.get("variable");
-			double coeff = 0;
-			for (Object map : list) {
-				String variableName = ((DBObject) map).get("name").toString()
-						.toUpperCase();
-				if (variableName.equalsIgnoreCase(boostVar)) {
-					coeff = Double.valueOf(((DBObject) map).get("coefficient").toString());
-					newScore = newScore + coeff;
-
-				}
-			}
-			
-			logger.info("new score after boost var: " + newScore);
-			
-			
-			// FIND THE MIN AND MAX EXPIRATION DATE OF ALL VARIABLE CHANGES FOR
-			// CHANGED MODEL SCORE TO WRITE TO SCORE CHANGES COLLECTION
-			Date minDate = null;
-			Date maxDate = null;
-			for (String key : allChanges.keySet()) {
-				// Get variable name from vid mapping and then lookup in
-				// variable models map
-				if (variableModelsMap.get(variableVidToNameMap.get(key))
-						.contains(Integer.valueOf(modelId))) {
-					if (minDate == null) {
-						minDate = allChanges.get(key).getExpirationDate();
-						maxDate = allChanges.get(key).getExpirationDate();
-					} else {
-						if (allChanges.get(key).getExpirationDate()
-								.before(minDate)) {
-							minDate = allChanges.get(key).getExpirationDate();
-						}
-						if (allChanges.get(key).getExpirationDate()
-								.after(maxDate)) {
-							maxDate = allChanges.get(key).getExpirationDate();
-						}
-					}
-				}
-			}
-			//System.out.println(variableVidToNameMap);
-
-			// IF THE MODEL IS MONTH SPECIFIC AND THE MIN/MAX DATE IS AFTER THE
-			// END OF THE MONTH SET TO THE LAST DAY OF THIS MONTH
-			if (modelsMap.containsKey(modelId)
-					&& modelsMap.get(modelId).containsKey(
-							Calendar.getInstance().get(Calendar.MONTH) + 1)) {
-				Calendar calendar = Calendar.getInstance();
-				calendar.set(Calendar.DATE,
-						calendar.getActualMaximum(Calendar.DATE));
-				Date lastDayOfMonth = calendar.getTime();
-
-				if (minDate.after(lastDayOfMonth)) {
-					minDate = lastDayOfMonth;
-					maxDate = lastDayOfMonth;
-				} else if (maxDate.after(lastDayOfMonth)) {
-					maxDate = lastDayOfMonth;
-				}
-			}
-
-			// APPEND CHANGED SCORE AND MIN/MAX EXPIRATION DATES TO DOCUMENT FOR
-			// UPDATE
-			updateRec.append(
-					modelId.toString(),
-					new BasicDBObject().append("s", newScore)
-							.append("minEx", minDate != null ? simpleDateFormat.format(minDate):null)
-							.append("maxEx", maxDate != null ? simpleDateFormat.format(maxDate):null)
-							.append("f", simpleDateFormat.format(new Date())));
-
-			modelScoreMap.put(modelId, newScore);
-			
-		}
-		// System.out.println(" ### UPDATE RECORD CHANGED SCORE: " + updateRec);
-		if (updateRec != null) {
-			changedMemberScoresCollection.update(
-					new BasicDBObject("l_id", loyaltyId), new BasicDBObject("$set",
-							updateRec), true, false);
-
-		}
-		return modelScoreMap;
+			return newScore;
 	}
-
 	
-
-	double calcMbrVar(Map<String, Object> mbrVarMap,
+	public double calcBaseScore(Map<String, Object> mbrVarMap,
 			Map<String, Change> varChangeMap, int modelId) {
 
-		Model model = new Model();
-		
-		if (modelsMap.get(modelId) != null && modelsMap.get(modelId).containsKey(0)) {
+		Model model = null;
+
+		if (modelsMap.get(modelId) != null
+				&& modelsMap.get(modelId).containsKey(0)) {
 			model = modelsMap.get(modelId).get(0);
-		} else if (modelsMap.get(modelId) != null && modelsMap.get(modelId).containsKey(
-				Calendar.getInstance().get(Calendar.MONTH) + 1)) {
+		} else if (modelsMap.get(modelId) != null
+				&& modelsMap.get(modelId).containsKey(
+						Calendar.getInstance().get(Calendar.MONTH) + 1)) {
 			model = modelsMap.get(modelId).get(
 					Calendar.getInstance().get(Calendar.MONTH) + 1);
 		} else {
@@ -394,7 +381,9 @@ public class ScoringSingleton {
 		for (String v : model.getVariables().keySet()) {
 			Variable variable = model.getVariables().get(v);
 			if (variable.getName() != null
-					&& mbrVarMap.get(variable.getName().toUpperCase()) != null) {
+					&& mbrVarMap.get(variable.getName().toUpperCase()) != null
+					&& !variable.getName().substring(0, 4).toUpperCase()
+							.equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
 				if (mbrVarMap.get(variable.getName().toUpperCase()) instanceof Integer) {
 					val = val
 							+ ((Integer) calculateVariableValue(mbrVarMap,
@@ -426,7 +415,6 @@ public class ScoringSingleton {
 				continue;
 			}
 		}
-		// System.out.println(" base value: " + val);
 		return val;
 	}
 
@@ -437,8 +425,6 @@ public class ScoringSingleton {
 			if (changes.containsKey(var.getName().toUpperCase())) {
 				changedValue = changes.get(var.getName().toUpperCase())
 						.getValue();
-				// System.out.println(" ### changed variable: " +
-				// var.getName().toUpperCase() + "  value: " + changedValue);
 			}
 			if (changedValue == null) {
 				changedValue = mbrVarMap.get(var.getName().toUpperCase());
@@ -447,7 +433,6 @@ public class ScoringSingleton {
 				}
 			} else {
 				if (dataType.equals("Integer")) {
-					// changedValue=Integer.parseInt(changedValue.toString());
 					changedValue = (int) Math.round(Double.valueOf(changedValue
 							.toString()));
 				} else {
@@ -459,5 +444,114 @@ public class ScoringSingleton {
 		}
 		return changedValue;
 	}
+	
+	public void updateChangedMemberScore(String lId, Set<Integer> modelIdList, Map<String, Change> allChanges, Map<Integer,Double> modelIdScoreMap) {
+		BasicDBObject updateRec = new BasicDBObject();
+		for(Integer modelId: modelIdList){
+		// FIND THE MIN AND MAX EXPIRATION DATE OF ALL VARIABLE CHANGES FOR
+			// CHANGED MODEL SCORE TO WRITE TO SCORE CHANGES COLLECTION
+			Date minDate = null;
+			Date maxDate = null;
 
+			for (String key : allChanges.keySet()) {
+				// variable models map
+				if (variableModelsMap.get(key).contains(modelId)) {
+					if (minDate == null) {
+						minDate = allChanges.get(key).getExpirationDate();
+						maxDate = allChanges.get(key).getExpirationDate();
+					} else {
+						if (allChanges.get(key).getExpirationDate()
+								.before(minDate)) {
+							minDate = allChanges.get(key).getExpirationDate();
+						}
+						if (allChanges.get(key).getExpirationDate()
+								.after(maxDate)) {
+							maxDate = allChanges.get(key).getExpirationDate();
+						}
+					}
+				}
+			}
+
+			// IF THE MODEL IS MONTH SPECIFIC AND THE MIN/MAX DATE IS AFTER THE
+			// END OF THE MONTH SET TO THE LAST DAY OF THIS MONTH
+			if (modelsMap.containsKey(modelId)
+					&& modelsMap.get(modelId).containsKey(
+							Calendar.getInstance().get(Calendar.MONTH) + 1)) {
+				Calendar calendar = Calendar.getInstance();
+				calendar.set(Calendar.DATE,
+						calendar.getActualMaximum(Calendar.DATE));
+				Date lastDayOfMonth = calendar.getTime();
+
+				if (minDate.after(lastDayOfMonth)) {
+					minDate = lastDayOfMonth;
+					maxDate = lastDayOfMonth;
+				} else if (maxDate.after(lastDayOfMonth)) {
+					maxDate = lastDayOfMonth;
+				}
+			}
+			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			// APPEND CHANGED SCORE AND MIN/MAX EXPIRATION DATES TO DOCUMENT FOR
+			// UPDATE
+			updateRec.append(
+					modelId.toString(),
+					new BasicDBObject()
+							.append(MongoNameConstants.CMS_SCORE, modelIdScoreMap.get(modelId))
+							.append(MongoNameConstants.CMS_MIN_EXPIRY_DATE,
+									minDate != null ? simpleDateFormat
+											.format(minDate) : null)
+							.append(MongoNameConstants.CMS_MAX_EXPIRY_DATE,
+									maxDate != null ? simpleDateFormat
+											.format(maxDate) : null)
+							.append(MongoNameConstants.CMS_EFFECTIVE_DATE, simpleDateFormat.format(new Date())));
+		}
+		if (updateRec != null) {
+			changedMemberScoresCollection.update(new BasicDBObject(MongoNameConstants.L_ID,
+					lId), new BasicDBObject("$set", updateRec), true,
+					false);
+
+		}	
+	}
+	public void updateChangedVariables(String lId, Integer modelId,
+			Map<String, Change> allChanges) {
+		// 11) Write changedMemberVariables with expiry
+		if (!allChanges.isEmpty()) {
+			Iterator<Entry<String, Change>> newChangesIter = allChanges
+					.entrySet().iterator();
+			BasicDBObject newDocument = new BasicDBObject();
+			while (newChangesIter.hasNext()) {
+				Map.Entry<String, Change> pairsVarValue = (Map.Entry<String, Change>) newChangesIter
+						.next();
+				String varVid = variableNameToVidMap.get(pairsVarValue
+						.getKey().toString().toUpperCase());
+				Object val = pairsVarValue.getValue().value;
+				newDocument
+						.append(varVid,
+								new BasicDBObject()
+										.append(MongoNameConstants.MV_VID, val)
+										.append(MongoNameConstants.MV_EXPIRY_DATE,
+												pairsVarValue
+														.getValue()
+														.getExpirationDateAsString())
+										.append(MongoNameConstants.MV_EFFECTIVE_DATE,
+												pairsVarValue
+														.getValue()
+														.getEffectiveDateAsString()));
+
+			}
+
+			BasicDBObject searchQuery = new BasicDBObject().append(MongoNameConstants.L_ID,
+					lId);
+
+			LOGGER.trace(" ~~~ DOCUMENT TO INSERT:");
+			LOGGER.debug(newDocument.toString());
+			LOGGER.trace(" ~~~ END DOCUMENT");
+
+			// upsert document
+			changedVariablesCollection.update(searchQuery,
+					new BasicDBObject("$set", newDocument), true, false);
+
+		}
+				
+		
+	}
 }
