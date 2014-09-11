@@ -454,8 +454,10 @@ public class ScoringSingleton {
 			Date maxDate = null;
 
 			for (String key : allChanges.keySet()) {
+				System.out.println(allChanges);
+				System.out.println(variableModelsMap);
 				// variable models map
-				if (variableModelsMap.get(key).contains(modelId)) {
+				if (variableModelsMap.get(variableVidToNameMap.get(key)).contains(modelId)) {
 					if (minDate == null) {
 						minDate = allChanges.get(key).getExpirationDate();
 						maxDate = allChanges.get(key).getExpirationDate();
@@ -482,10 +484,10 @@ public class ScoringSingleton {
 						calendar.getActualMaximum(Calendar.DATE));
 				Date lastDayOfMonth = calendar.getTime();
 
-				if (minDate.after(lastDayOfMonth)) {
+				if (minDate!=null && minDate.after(lastDayOfMonth)) {
 					minDate = lastDayOfMonth;
 					maxDate = lastDayOfMonth;
-				} else if (maxDate.after(lastDayOfMonth)) {
+				} else if (maxDate !=  null && maxDate.after(lastDayOfMonth)) {
 					maxDate = lastDayOfMonth;
 				}
 			}
