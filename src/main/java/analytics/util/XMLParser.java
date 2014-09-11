@@ -39,7 +39,6 @@ public class XMLParser {
 		boolean bDollarValuePostDisc = false;
 		boolean bRequestorID = false;
 		try {
-			System.out.println("//////////XML STRING//////: " + fileName);
 			XMLStreamReader xmlStreamReader = xmlInputFactory
 					.createXMLStreamReader(new StringReader(fileName));
 		
@@ -55,7 +54,6 @@ public class XMLParser {
 
 
                     QName qname = xmlStreamReader.getName();
-					System.out.println(elementName);
 					if (elementName.contains("MemberNumber")) {
 						bMemberNumber = true;
 					} else if (elementName.equals(
@@ -92,14 +90,10 @@ public class XMLParser {
 					if (bMemberNumber) {
 						processTransaction.setMemberNumber(xmlStreamReader
 								.getText());
-						System.out.println("member number: "
-								+ processTransaction.getMemberNumber());
 						bMemberNumber = false;
 					} else if (bRequestorID) {
 						processTransaction.setRequestorID(xmlStreamReader
 								.getText());
-						System.out.println("requestor id: "
-								+ processTransaction.getRequestorID());
 						logger.debug("Requestor Id is..."
 								+ processTransaction.getRequestorID());
 						bRequestorID = false;
@@ -136,7 +130,7 @@ public class XMLParser {
 			}
 
 		} catch (XMLStreamException e) {
-			e.printStackTrace();
+			logger.error(e.getClass() + ": " +  e.getMessage(), e);
 		}
 		return processTransaction;
 
