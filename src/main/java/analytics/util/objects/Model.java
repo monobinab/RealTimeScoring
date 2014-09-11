@@ -1,13 +1,13 @@
 package analytics.util.objects;
 
-import java.util.Collection;
+import java.util.Map;
 
 public class Model {
 
 	int modelId;
 	int month;
 	double constant;
-	Collection<Variable> variables;
+	Map<String, Variable> variables;
 	
 	public Model() {}
 	
@@ -17,7 +17,7 @@ public class Model {
 		this.constant = cnst;
 	}
 	
-	public Model(int modId, int mth, double cnst, Collection<Variable> vars) {
+	public Model(int modId, int mth, double cnst, Map<String, Variable> vars) {
 		this.modelId = modId;
 		this.month = mth;
 		this.constant = cnst;
@@ -36,7 +36,7 @@ public class Model {
 		return this.constant;
 	}
 
-	public Collection<Variable> getVariables() {
+	public Map<String, Variable> getVariables() {
 		return this.variables;
 	}
 

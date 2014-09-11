@@ -126,13 +126,13 @@ public class StrategyScoringBolt extends BaseRichBolt {
 			double constant = Double.valueOf(model.get("constant").toString());
 
 			BasicDBList modelVariables = (BasicDBList) model.get("variable");
-			Collection<Variable> variablesCollection = new ArrayList<Variable>();
+			Map<String, Variable> variablesMap = new HashMap<String, Variable>();
 			for (Object modelVariable : modelVariables) {
 				String variableName = ((DBObject) modelVariable).get("name")
 						.toString().toUpperCase();
 				Double coefficient = Double.valueOf(((DBObject) modelVariable)
 						.get("coefficient").toString());
-				variablesCollection.add(new Variable(variableName,
+				variablesMap.put(variableName, new Variable(variableName,
 						variableNameToVidMap.get(variableName), coefficient));
 
 				if (!variableModelsMap.containsKey(variableName)) {
@@ -152,13 +152,13 @@ public class StrategyScoringBolt extends BaseRichBolt {
 			if (!modelsMap.containsKey(modelId)) {
 				Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
 				monthModelMap.put(month, new Model(modelId, month, constant,
-						variablesCollection));
+						variablesMap));
 				modelsMap.put(modelId, monthModelMap);
 			} else {
 				modelsMap.get(modelId)
 						.put(month,
 								new Model(modelId, month, constant,
-										variablesCollection));
+										variablesMap));
 			}
 		}
 
@@ -220,8 +220,8 @@ public class StrategyScoringBolt extends BaseRichBolt {
 				month = Calendar.getInstance().get(Calendar.MONTH) + 1;
 			}
 
-			for (Variable var : modelsMap.get(modId).get(month).getVariables()) {
-				variableFilterDBO.append(var.getVid(), 1);
+			for (String var : modelsMap.get(modId).get(month).getVariables().keySet()) {
+				variableFilterDBO.append(variableNameToVidMap.get(var), 1);
 			}
 		}
 
@@ -362,7 +362,25 @@ public class StrategyScoringBolt extends BaseRichBolt {
 			}
 		
 			logger.info("new score before boost var: " + newScore);
-			//TODO: Add boosting logic here
+			
+			double boosts = 0;
+			for(String ch:allChanges.keySet()) {
+				if(ch.substring(0,5).toUpperCase().equals("BOOST")) {
+					if(modelsMap.get(modelId).containsKey(0)) {
+						if(modelsMap.get(modelId).get(0).getVariables().containsKey(ch)){
+							boosts = boosts + Double.valueOf(allChanges.get(ch).getValue().toString()) * modelsMap.get(modelId).get(0).getVariables().get(ch).getCoefficient();
+						}
+					} else {
+						if(modelsMap.get(modelId).containsKey(Calendar.getInstance().get(Calendar.MONTH) + 1)) {
+							boosts = boosts + Double.valueOf(allChanges.get(ch).getValue().toString()) * modelsMap.get(modelId).get(Calendar.getInstance().get(Calendar.MONTH) + 1).getVariables().get(ch).getCoefficient();
+						}
+					}
+				}
+			}
+			
+			
+			
+
 			
 			// 9) Emit the new score
 			double oldScore = 0;
@@ -496,9 +514,11 @@ public class StrategyScoringBolt extends BaseRichBolt {
 
 		double val = (Double) model.getConstant();
 
-		for (Variable variable : model.getVariables()) {
+		for (String v : model.getVariables().keySet()) {
+			Variable variable = model.getVariables().get(v);
 			if (variable.getName() != null
-					&& mbrVarMap.get(variable.getName().toUpperCase()) != null) {
+					&& mbrVarMap.get(variable.getName().toUpperCase()) != null
+					&& !variable.getName().substring(0,4).toUpperCase().equals("BOOST")) {
 				if (mbrVarMap.get(variable.getName().toUpperCase()) instanceof Integer) {
 					val = val
 							+ ((Integer) calculateVariableValue(mbrVarMap,
