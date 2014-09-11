@@ -13,14 +13,12 @@ import javax.xml.stream.XMLStreamReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.util.objects.LineItem;
-import analytics.util.objects.OrderDetails;
-import analytics.util.objects.ProcessTransaction;
-import analytics.util.objects.Tender;
 
-import java.io.FileInputStream;
+
+import analytics.util.objects.LineItem;
+import analytics.util.objects.ProcessTransaction;
+
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,143 +31,54 @@ public class XMLParser {
 	private static final Logger logger = LoggerFactory
 			.getLogger(XMLParser.class);
 
-	private static boolean bMessageVersion;
-	private static boolean bMemberNumber;
-	private static boolean bLineItem;
-	private static boolean bLineNumber;
-	private static boolean bItemType;
-	private static boolean bDivision;
-	private static boolean bItemNumber;
-	private static boolean bLineItemAmountTypeCode;
-	private static boolean bDollarValuePreDisc;
-	private static boolean bDollarValuePostDisc;
-	private static boolean bPriceMatchAmount;
-	private static boolean bPriceMatchBonusAmount;
-	private static boolean bQuantity;
-	private static boolean bTaxAmount;
-	private static boolean bPostSalesAdjustmentAmount;
-	/*private static boolean bRequestorID;
-
-	private static boolean bOrderStoreNumber;
-
-	private static boolean bTenderStoreNumber;
-
-	private static boolean bRegisterNumber;
-*/
-	private static boolean bTransactionNumber;
-
-/*	private static boolean bTransactionTotal;
-
-	private static boolean bTransactionTotalTax;
-
-	private static boolean bTransactionDate;
-
-	private static boolean bTransactionTime;
-
-	private static boolean bAssociateID;
-
-	private static boolean bEarnFlag;*/
-
-	private static boolean bOrderDetails;
-
-	private static boolean bOrderId;
-
-	private static boolean bOrderSource;
-
-	private static boolean bTotalTransactions;
-
-	private static boolean bTransactionSequence;
-
-	private static boolean bTender;
-
-	private static boolean bTenderType;
-
-	private static boolean bTenderAmount;
-
-	private static boolean bRequestorID;
-
-	public static void main(String[] args) throws
-			XMLStreamException, JAXBException, FileNotFoundException {
-
-		// String fileName = "./src/main/resources/soap_env.xml";
-		String fileName = "	<ProcessTransaction><MessageVersion>08</MessageVersion><MemberNumber>7081390000061954</MemberNumber><RequestorID>KCOM</RequestorID><OrderStoreNumber>07840</OrderStoreNumber></ProcessTransaction>";
-	
-		//processPOS(fileName);
-		//print(fileName);
-		System.out.println("I AM CHECKING");
-		parseXMLProcessTransaction(fileName);
-		System.out.println("I CHECKED");
-		//parseXML(fileName);
-	}
-
-	public static ProcessTransaction parseXMLProcessTransaction(String fileName)  {
+	public static ProcessTransaction parseXMLProcessTransaction(String fileName) {
+		
 		ProcessTransaction processTransaction = null;
 		XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
 		List<LineItem> lineItemList = new ArrayList<LineItem>();
 		LineItem lineItem = null;
+		boolean bMemberNumber = false;
+		boolean bLineItem = false;
+		boolean bDivision = false;
+		boolean bItemNumber = false;
+		boolean bDollarValuePostDisc = false;
+		boolean bRequestorID = false;
 		try {
-			//XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(
-				//    new FileReader(fileName));
-
+			System.out.println("//////////XML STRING//////: " + fileName);
 			XMLStreamReader xmlStreamReader = xmlInputFactory
 					.createXMLStreamReader(new StringReader(fileName));
-			//int event = xmlStreamReader.getEventType();
-
-			while (xmlStreamReader.hasNext())	{
-				xmlStreamReader.next();
-				int event = xmlStreamReader.getEventType();
+		
+			// int event = xmlStreamReader.getEventType();
+			processTransaction = new ProcessTransaction();
+			while (xmlStreamReader.hasNext()) {
 				
+				int event = xmlStreamReader.getEventType();
 				switch (event) {
-
+									
 				case XMLStreamConstants.START_ELEMENT:
+				
 					QName qname = xmlStreamReader.getName();
-					String pref = qname.getPrefix();
-					String name = qname.getLocalPart();
-					
-					if (xmlStreamReader.getLocalName().equals("MessageVersion")) {
-						processTransaction = new ProcessTransaction();
-						bMessageVersion = true;
-					} else if (xmlStreamReader.getLocalName().equals(
-							"MemberNumber")) {
+										
+					if (xmlStreamReader.getLocalName().equals("MemberNumber")) {
 						bMemberNumber = true;
-					}//RequestorID
-					else if (xmlStreamReader.getLocalName().equals(
+					} else if (xmlStreamReader.getLocalName().equals(
 							"RequestorID")) {
 						bRequestorID = true;
-					}else if (xmlStreamReader.getLocalName().equals(
-							"TransactionNumber")) {
-						bTransactionNumber = true;
-					} 
-					
-					if (xmlStreamReader.getLocalName().equals("LineItem")) {
-						lineItem = new LineItem();
-						bLineItem = true;
-					} else if (xmlStreamReader.getLocalName().equals(
-							"LineNumber")) {
-						bLineNumber = true;
-					} else if (xmlStreamReader.getLocalName()
-							.equals("ItemType")) {
-						bItemType = true;
-					} else if (xmlStreamReader.getLocalName()
-							.equals("Division")) {
-						bDivision = true;
-					} else if (xmlStreamReader.getLocalName().equals(
-							"ItemNumber")) {
-						bItemNumber = true;
-					} else if (xmlStreamReader.getLocalName().equals(
-							"PostSalesAdjustmentAmount")) {
-						bPostSalesAdjustmentAmount = true;
 					}
-					
 					if (xmlStreamReader.getLocalName().equals("LineItem")) {
 						lineItem = new LineItem();
 						bLineItem = true;
-					} else if (xmlStreamReader.getLocalName().equals(
-							"LineNumber")) {
-						bLineNumber = true;
 					} else if (xmlStreamReader.getLocalName()
-							.equals("ItemType")) {
-						bItemType = true;
+							.equals("Division")) {
+						bDivision = true;
+					} else if (xmlStreamReader.getLocalName().equals(
+							"ItemNumber")) {
+						bItemNumber = true;
+					}
+
+					if (xmlStreamReader.getLocalName().equals("LineItem")) {
+						lineItem = new LineItem();
+						bLineItem = true;
 					} else if (xmlStreamReader.getLocalName()
 							.equals("Division")) {
 						bDivision = true;
@@ -177,121 +86,42 @@ public class XMLParser {
 							"ItemNumber")) {
 						bItemNumber = true;
 					} else if (xmlStreamReader.getLocalName().equals(
-							"LineItemAmountTypeCode")) {
-						bLineItemAmountTypeCode = true;
-					} else if (xmlStreamReader.getLocalName().equals(
-							"DollarValuePreDisc")) {
-						bDollarValuePreDisc = true;
-					} else if (xmlStreamReader.getLocalName().equals(
 							"DollarValuePostDisc")) {
 						bDollarValuePostDisc = true;
-					} else if (xmlStreamReader.getLocalName().equals(
-							"DollarValuePostDisc")) {
-						bDollarValuePostDisc = true;
-					} else if (xmlStreamReader.getLocalName().equals(
-							"PriceMatchAmount")) {
-						bPriceMatchAmount = true;
-					} else if (xmlStreamReader.getLocalName().equals(
-							"PriceMatchBonusAmount")) {
-						bPriceMatchBonusAmount = true;
-					} else if (xmlStreamReader.getLocalName()
-							.equals("Quantity")) {
-						bQuantity = true;
-					} else if (xmlStreamReader.getLocalName().equals(
-							"TaxAmount")) {
-						bTaxAmount = true;
-					} else if (xmlStreamReader.getLocalName().equals(
-							"PostSalesAdjustmentAmount")) {
-						bPostSalesAdjustmentAmount = true;
 					}
 					break;
 				case XMLStreamConstants.CHARACTERS:
-					//System.out.println("///CHECKLING:////// " + xmlStreamReader.getLocalName());
-					if (bMessageVersion) {
-						processTransaction.setMessageVersion(xmlStreamReader
-								.getText());
 
-						bMessageVersion = false;
-					} else if (bMemberNumber) {
+					if (bMemberNumber) {
 						processTransaction.setMemberNumber(xmlStreamReader
 								.getText());
-
+						System.out.println("member number: "
+								+ processTransaction.getMemberNumber());
 						bMemberNumber = false;
 					} else if (bRequestorID) {
 						processTransaction.setRequestorID(xmlStreamReader
 								.getText());
-						logger.debug("Requestor Id is..."+processTransaction.getRequestorID());
+						System.out.println("requestor id: "
+								+ processTransaction.getRequestorID());
+						logger.debug("Requestor Id is..."
+								+ processTransaction.getRequestorID());
 						bRequestorID = false;
-					} else if (bTransactionNumber) {
-						processTransaction.setTransactionNumber(xmlStreamReader
-								.getText());
-
-						bTransactionNumber = false;
-					}else if (bLineItem) {
+					} else if (bLineItem) {
 						bLineItem = false;
-					}else if (bLineNumber) {
-						lineItem.setLineNumber(xmlStreamReader.getText());
-						bLineNumber = false;
-					} else if (bItemType) {
-						lineItem.setItemType(xmlStreamReader.getText()
-								.toString());
-						bItemType = false;
 					} else if (bDivision) {
 						lineItem.setDivision(xmlStreamReader.getText());
 						bDivision = false;
 					} else if (bItemNumber) {
 						lineItem.setItemNumber(xmlStreamReader.getText());
 						bItemNumber = false;
-					} else if (bPostSalesAdjustmentAmount) {
-						lineItem.setPostSalesAdjustmentAmount(xmlStreamReader
-								.getText());
-						bPostSalesAdjustmentAmount = false;
 					}
-					
-					if (bLineNumber) {
-						lineItem.setLineNumber(xmlStreamReader.getText());
-						bLineNumber = false;
-					} else if (bItemType) {
-						lineItem.setItemType(xmlStreamReader.getText()
-								.toString());
-						bItemType = false;
-					} else if (bDivision) {
-						lineItem.setDivision(xmlStreamReader.getText());
-						bDivision = false;
-					} else if (bItemNumber) {
-						lineItem.setItemNumber(xmlStreamReader.getText());
-						bItemNumber = false;
-					} else if (bLineItemAmountTypeCode) {
-						lineItem.setLineItemAmountTypeCode(xmlStreamReader
-								.getText());
-						bLineItemAmountTypeCode = false;
-					} else if (bDollarValuePreDisc) {
-						lineItem.setDollarValuePreDisc(xmlStreamReader
-								.getText());
-						bDollarValuePreDisc = false;
-					} else if (bDollarValuePostDisc) {
+
+					else if (bDollarValuePostDisc) {
 						lineItem.setDollarValuePostDisc(xmlStreamReader
 								.getText());
 						bDollarValuePostDisc = false;
-					} else if (bPriceMatchAmount) {
-						lineItem.setPriceMatchAmount(xmlStreamReader.getText());
-						bPriceMatchAmount = false;
-					} else if (bPriceMatchBonusAmount) {
-						lineItem.setPriceMatchBonusAmount(xmlStreamReader
-								.getText());
-						bPriceMatchBonusAmount = false;
-					} else if (bQuantity) {
-						lineItem.setQuantity(xmlStreamReader.getText());
-						bQuantity = false;
-					} else if (bTaxAmount) {
-						lineItem.setTaxAmount(xmlStreamReader.getText());
-						bTaxAmount = false;
-					} else if (bPostSalesAdjustmentAmount) {
-						lineItem.setPostSalesAdjustmentAmount(xmlStreamReader
-								.getText());
-						bPostSalesAdjustmentAmount = false;
 					}
-					
+
 					break;
 				case XMLStreamConstants.END_ELEMENT:
 
@@ -304,7 +134,7 @@ public class XMLParser {
 				if (!xmlStreamReader.hasNext())
 					break;
 				event = xmlStreamReader.next();
-				
+
 			}
 
 		} catch (XMLStreamException e) {
@@ -314,262 +144,4 @@ public class XMLParser {
 
 	}
 
-	
-	 	
-	public static List<LineItem> parseXMLLineItems(String fileName) {
-		List<LineItem> lineItemList = new ArrayList<LineItem>();
-		LineItem lineItem = null;
-
-		XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-		try {
-			XMLStreamReader xmlStreamReader = xmlInputFactory
-					.createXMLStreamReader(new StringReader(fileName));
-			int event = xmlStreamReader.getEventType();
-			while (true) {
-				switch (event) {
-
-				case XMLStreamConstants.START_ELEMENT:
-
-					if (xmlStreamReader.getLocalName().equals("LineItem")) {
-						lineItem = new LineItem();
-						bLineItem = true;
-					} else if (xmlStreamReader.getLocalName().equals(
-							"LineNumber")) {
-						bLineNumber = true;
-					} else if (xmlStreamReader.getLocalName()
-							.equals("ItemType")) {
-						bItemType = true;
-					} else if (xmlStreamReader.getLocalName()
-							.equals("Division")) {
-						bDivision = true;
-					} else if (xmlStreamReader.getLocalName().equals(
-							"ItemNumber")) {
-						bItemNumber = true;
-					} else if (xmlStreamReader.getLocalName().equals(
-							"LineItemAmountTypeCode")) {
-						bLineItemAmountTypeCode = true;
-					} else if (xmlStreamReader.getLocalName().equals(
-							"DollarValuePreDisc")) {
-						bDollarValuePreDisc = true;
-					} else if (xmlStreamReader.getLocalName().equals(
-							"DollarValuePostDisc")) {
-						bDollarValuePostDisc = true;
-					} else if (xmlStreamReader.getLocalName().equals(
-							"DollarValuePostDisc")) {
-						bDollarValuePostDisc = true;
-					} else if (xmlStreamReader.getLocalName().equals(
-							"PriceMatchAmount")) {
-						bPriceMatchAmount = true;
-					} else if (xmlStreamReader.getLocalName().equals(
-							"PriceMatchBonusAmount")) {
-						bPriceMatchBonusAmount = true;
-					} else if (xmlStreamReader.getLocalName()
-							.equals("Quantity")) {
-						bQuantity = true;
-					} else if (xmlStreamReader.getLocalName().equals(
-							"TaxAmount")) {
-						bTaxAmount = true;
-					} else if (xmlStreamReader.getLocalName().equals(
-							"PostSalesAdjustmentAmount")) {
-						bPostSalesAdjustmentAmount = true;
-					}
-
-					break;
-				case XMLStreamConstants.CHARACTERS:
-					if (bLineNumber) {
-						lineItem.setLineNumber(xmlStreamReader.getText());
-						bLineNumber = false;
-					} else if (bItemType) {
-						lineItem.setItemType(xmlStreamReader.getText()
-								.toString());
-						bItemType = false;
-					} else if (bDivision) {
-						lineItem.setDivision(xmlStreamReader.getText());
-						bDivision = false;
-					} else if (bItemNumber) {
-						lineItem.setItemNumber(xmlStreamReader.getText());
-						bItemNumber = false;
-					} else if (bLineItemAmountTypeCode) {
-						lineItem.setLineItemAmountTypeCode(xmlStreamReader
-								.getText());
-						bLineItemAmountTypeCode = false;
-					} else if (bDollarValuePreDisc) {
-						lineItem.setDollarValuePreDisc(xmlStreamReader
-								.getText());
-						bDollarValuePreDisc = false;
-					} else if (bDollarValuePostDisc) {
-						lineItem.setDollarValuePostDisc(xmlStreamReader
-								.getText());
-						bDollarValuePostDisc = false;
-					} else if (bPriceMatchAmount) {
-						lineItem.setPriceMatchAmount(xmlStreamReader.getText());
-						bPriceMatchAmount = false;
-					} else if (bPriceMatchBonusAmount) {
-						lineItem.setPriceMatchBonusAmount(xmlStreamReader
-								.getText());
-						bPriceMatchBonusAmount = false;
-					} else if (bQuantity) {
-						lineItem.setQuantity(xmlStreamReader.getText());
-						bQuantity = false;
-					} else if (bTaxAmount) {
-						lineItem.setTaxAmount(xmlStreamReader.getText());
-						bTaxAmount = false;
-					} else if (bPostSalesAdjustmentAmount) {
-						lineItem.setPostSalesAdjustmentAmount(xmlStreamReader
-								.getText());
-						bPostSalesAdjustmentAmount = false;
-					}
-
-					break;
-				case XMLStreamConstants.END_ELEMENT:
-
-					if (xmlStreamReader.getLocalName().equals("LineItem")) {
-						lineItemList.add(lineItem);
-					}
-
-					break;
-				}
-				if (!xmlStreamReader.hasNext())
-					break;
-
-				event = xmlStreamReader.next();
-			}
-
-		} catch (XMLStreamException e) {
-			e.printStackTrace();
-		}
-		return lineItemList;
-	}
-
-	
-	public static List<OrderDetails> parseOrderDetailsXML(String fileName) {
-		List<OrderDetails> orderDetailsList = new ArrayList<OrderDetails>();
-		OrderDetails orderDetails = null;
-
-		XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-		try {
-
-			XMLStreamReader xmlStreamReader = xmlInputFactory
-					.createXMLStreamReader(new FileInputStream(fileName));
-			int event = xmlStreamReader.getEventType();
-			while (true) {
-				switch (event) {
-
-				case XMLStreamConstants.START_ELEMENT:
-
-					if (xmlStreamReader.getLocalName().equals("OrderDetails")) {
-						orderDetails = new OrderDetails();
-						bOrderDetails = true;
-					} else if (xmlStreamReader.getLocalName().equals("OrderId")) {
-						bOrderId = true;
-					} else if (xmlStreamReader.getLocalName().equals(
-							"OrderSource")) {
-						bOrderSource = true;
-					} else if (xmlStreamReader.getLocalName().equals(
-							"TotalTransactions")) {
-						bTotalTransactions = true;
-					} else if (xmlStreamReader.getLocalName().equals(
-							"TransactionSequence")) {
-						bTransactionSequence = true;
-					}
-					break;
-				case XMLStreamConstants.CHARACTERS:
-					if (bOrderId) {
-						orderDetails.setOrderId(xmlStreamReader.getText());
-						bOrderId = false;
-					} else if (bOrderSource) {
-						orderDetails.setOrderSource(xmlStreamReader.getText()
-								.toString());
-						bOrderSource = false;
-					} else if (bTotalTransactions) {
-						orderDetails.setTotalTransactions(xmlStreamReader
-								.getText());
-						bTotalTransactions = false;
-					} else if (bTransactionSequence) {
-						orderDetails.setTransactionSequence(xmlStreamReader
-								.getText());
-						bTransactionSequence = false;
-					}
-					break;
-				case XMLStreamConstants.END_ELEMENT:
-
-					if (xmlStreamReader.getLocalName().equals("OrderDetails")) {
-						orderDetailsList.add(orderDetails);
-					}
-
-					break;
-				}
-				if (!xmlStreamReader.hasNext())
-					break;
-
-				event = xmlStreamReader.next();
-			}
-
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (XMLStreamException e) {
-			e.printStackTrace();
-		}
-        return orderDetailsList;
-	}
-
-	public static List<Tender> parseTenderXML(String fileName) {
-		List<Tender> tenderList = new ArrayList<Tender>();
-		Tender tender = null;
-
-		XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-		try {
-			XMLStreamReader xmlStreamReader = xmlInputFactory
-					.createXMLStreamReader(new FileInputStream(fileName));
-			int event = xmlStreamReader.getEventType();
-			while (true) {
-				switch (event) {
-
-				case XMLStreamConstants.START_ELEMENT:
-
-					if (xmlStreamReader.getLocalName().equals("Tender")) {
-						tender = new Tender();
-						bTender = true;
-					} else if (xmlStreamReader.getLocalName().equals(
-							"TenderType")) {
-						bTenderType = true;
-					} else if (xmlStreamReader.getLocalName().equals(
-							"TenderAmount")) {
-						bTenderAmount = true;
-					}
-					break;
-				case XMLStreamConstants.CHARACTERS:
-					if (bTenderType) {
-						tender.setTenderType(xmlStreamReader.getText());
-						bTenderType = false;
-					} else if (bTenderAmount) {
-						tender.setTenderAmount(xmlStreamReader.getText()
-								.toString());
-						bTenderAmount = false;
-					}
-					break;
-				case XMLStreamConstants.END_ELEMENT:
-
-					if (xmlStreamReader.getLocalName().equals("Tender")) {
-						tenderList.add(tender);
-					}
-
-					break;
-				}
-				if (!xmlStreamReader.hasNext())
-					break;
-
-				event = xmlStreamReader.next();
-			}
-
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (XMLStreamException e) {
-			e.printStackTrace();
-		}
-        return tenderList;
-	}
-
-
-	   
 }
