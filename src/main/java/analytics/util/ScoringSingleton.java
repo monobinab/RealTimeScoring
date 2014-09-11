@@ -250,7 +250,7 @@ public class ScoringSingleton {
 											.get(MongoNameConstants.MV_EXPIRY_DATE).toString()).after(
 									new Date())) {
 						allChanges
-								.put(key.toUpperCase(),
+								.put(variableVidToNameMap.get(key),
 										new Change(
 												key.toUpperCase(),
 												((DBObject) changedMbrVariables
@@ -455,7 +455,7 @@ public class ScoringSingleton {
 
 			for (String key : allChanges.keySet()) {
 				// variable models map
-				if (variableModelsMap.get(variableVidToNameMap.get(key)).contains(modelId)) {
+				if (variableModelsMap.get(key).contains(modelId)) {
 					if (minDate == null) {
 						minDate = allChanges.get(key).getExpirationDate();
 						maxDate = allChanges.get(key).getExpirationDate();
