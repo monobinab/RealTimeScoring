@@ -117,13 +117,13 @@ public class ScoringSingleton {
 			double constant = Double.valueOf(model.get("constant").toString());
 
 			BasicDBList modelVariables = (BasicDBList) model.get("variable");
-			Collection<Variable> variablesCollection = new ArrayList<Variable>();
+			Map<String, Variable> variablesMap = new HashMap<String, Variable>();
 			for (Object modelVariable : modelVariables) {
 				String variableName = ((DBObject) modelVariable).get("name")
 						.toString().toUpperCase();
 				Double coefficient = Double.valueOf(((DBObject) modelVariable)
 						.get("coefficient").toString());
-				variablesCollection.add(new Variable(variableName,
+				variablesMap.put(variableName, new Variable(variableName,
 						variableNameToVidMap.get(variableName), coefficient));
 
 				if (!variableModelsMap.containsKey(variableName)) {
@@ -143,11 +143,11 @@ public class ScoringSingleton {
 			if(!modelsMap.containsKey(modelId)) {
 				Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
 				monthModelMap.put(month, new Model(modelId, month, constant,
-						variablesCollection));
+						variablesMap));
 				modelsMap.put(modelId, monthModelMap);
 			} else {
 				modelsMap.get(modelId).put(month, new Model(modelId, month, constant,
-					variablesCollection));
+					variablesMap));
 			}
 		}
 	}
@@ -172,7 +172,8 @@ public class ScoringSingleton {
 				month = Calendar.getInstance().get(Calendar.MONTH) + 1;
 			}
 				
-			for(Variable var:modelsMap.get(Integer.valueOf(modId)).get(month).getVariables()) {
+			for(String v:modelsMap.get(Integer.valueOf(modId)).get(month).getVariables().keySet()) {
+				Variable var = modelsMap.get(Integer.valueOf(modId)).get(month).getVariables().get(v);
 				variableFilterDBO.append(var.getVid(),1);
 			}
 		}
@@ -226,10 +227,8 @@ public class ScoringSingleton {
 
 				try {
 					if (((DBObject) changedMbrVariables.get(key)).get("v") != null
-							&& ((DBObject) changedMbrVariables.get(key))
-									.get("e") != null
-							&& ((DBObject) changedMbrVariables.get(key))
-									.get("f") != null
+							&& ((DBObject) changedMbrVariables.get(key)).get("e") != null
+							&& ((DBObject) changedMbrVariables.get(key)).get("f") != null
 							&& simpleDateFormat.parse(
 									((DBObject) changedMbrVariables.get(key))
 											.get("e").toString()).after(
@@ -392,7 +391,8 @@ public class ScoringSingleton {
 
 		double val = (Double) model.getConstant();
 
-		for (Variable variable : model.getVariables()) {
+		for (String v : model.getVariables().keySet()) {
+			Variable variable = model.getVariables().get(v);
 			if (variable.getName() != null
 					&& mbrVarMap.get(variable.getName().toUpperCase()) != null) {
 				if (mbrVarMap.get(variable.getName().toUpperCase()) instanceof Integer) {
