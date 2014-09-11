@@ -368,17 +368,21 @@ public class StrategyScoringBolt extends BaseRichBolt {
 				if(ch.substring(0,5).toUpperCase().equals("BOOST")) {
 					if(modelsMap.get(modelId).containsKey(0)) {
 						if(modelsMap.get(modelId).get(0).getVariables().containsKey(ch)){
-							boosts = boosts + Double.valueOf(allChanges.get(ch).getValue().toString()) * modelsMap.get(modelId).get(0).getVariables().get(ch).getCoefficient();
+							boosts = boosts 
+									+ Double.valueOf(allChanges.get(ch).getValue().toString()) 
+									* modelsMap.get(modelId).get(0).getVariables().get(ch).getCoefficient();
 						}
 					} else {
 						if(modelsMap.get(modelId).containsKey(Calendar.getInstance().get(Calendar.MONTH) + 1)) {
-							boosts = boosts + Double.valueOf(allChanges.get(ch).getValue().toString()) * modelsMap.get(modelId).get(Calendar.getInstance().get(Calendar.MONTH) + 1).getVariables().get(ch).getCoefficient();
+							boosts = boosts 
+									+ Double.valueOf(allChanges.get(ch).getValue().toString()) 
+									* modelsMap.get(modelId).get(Calendar.getInstance().get(Calendar.MONTH) + 1).getVariables().get(ch).getCoefficient();
 						}
 					}
 				}
 			}
 			
-			
+			newScore = newScore + boosts;
 			
 
 			
