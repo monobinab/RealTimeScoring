@@ -1,8 +1,5 @@
 package analytics;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.configuration.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,22 +21,20 @@ import backtype.storm.tuple.Fields;
 
 public class AAM_ATCTopology {
 
-	static final Logger logger = LoggerFactory
+	private static final Logger LOGGER = LoggerFactory
 			.getLogger(AAM_ATCTopology.class);
 
 	public static void main(String[] args) throws ConfigurationException {
 
-		logger.info("Starting web feed topology from ATC source");
+		LOGGER.info("Starting web feed topology from ATC source");
 		String topic = TopicConstants.AAM_ATC_PRODUCTS;
-		int port = TopicConstants.PORT;
 
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
-		RedisConnection redisConnection = new RedisConnection();
-		String[] servers = redisConnection.getServers();
+		String[] servers = RedisConnection.getServers();
 
 		for (String server : servers) {
 			topologyBuilder.setSpout(topic + server, new AAMRedisPubSubSpout(
-					server, port, topic), 1);
+					server, TopicConstants.PORT, topic), 1);
 		}
 
 		BoltDeclarer boltDeclarer = topologyBuilder.setBolt(
@@ -60,9 +55,9 @@ public class AAM_ATCTopology {
 				StormSubmitter.submitTopology(args[0], conf,
 						topologyBuilder.createTopology());
 			} catch (AlreadyAliveException e) {
-				logger.error(e.getClass() + ": " + e.getMessage(), e);
+				LOGGER.error(e.getClass() + ": " + e.getMessage(), e);
 			} catch (InvalidTopologyException e) {
-				logger.error(e.getClass() + ": " + e.getMessage(), e);
+				LOGGER.error(e.getClass() + ": " + e.getMessage(), e);
 			}
 		} else {
 			conf.setDebug(false);
@@ -73,7 +68,7 @@ public class AAM_ATCTopology {
 			try {
 				Thread.sleep(10000000);
 			} catch (InterruptedException e) {
-				logger.error(e.getClass() + ": " + e.getMessage(), e);
+				LOGGER.error(e.getClass() + ": " + e.getMessage(), e);
 			}
 			cluster.shutdown();
 
