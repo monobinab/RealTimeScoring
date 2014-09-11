@@ -19,14 +19,14 @@ public class XMLParserTest {
         ProcessTransaction processTransaction = XMLParser.parseXMLProcessTransaction(fileName);
 
         assertTrue(processTransaction != null);
-        assertEquals("7081390000061954",processTransaction.getMemberNumber());
+        assertEquals("7081253419145216",processTransaction.getMemberNumber());
         assertTrue(processTransaction.getLineItemList()!=null);
         assertEquals( 1,processTransaction.getLineItemList().size());
-        assertEquals( "082453511",processTransaction.getLineItemList().get(0).getItemNumber());
+        assertEquals( "000084902",processTransaction.getLineItemList().get(0).getItemNumber());
     }
     
 
-    static String oneLineItem="<request>\n" +
+    static String oneLineItem=//"<request>\n" +
             "  <tns:ProcessTransaction>\n" +
             "    <tns:MessageVersion>09</tns:MessageVersion>\n" +
             "    <tns:MemberNumber>7081253419145216</tns:MemberNumber>\n" +
@@ -99,87 +99,10 @@ public class XMLParserTest {
             "          </tns:Coupon>\n" +
             "        </tns:Coupons>\n" +
             "      </tns:LineItem>\n" +
-            "      <tns:LineItem>\n" +
-            "        <tns:LineNumber>0002</tns:LineNumber>\n" +
-            "        <tns:ItemType>1</tns:ItemType>\n" +
-            "        <tns:Division>067</tns:Division>\n" +
-            "        <tns:ItemNumber>000084910</tns:ItemNumber>\n" +
-            "        <tns:SKU>000</tns:SKU>\n" +
-            "        <tns:UPC>0018466471579</tns:UPC>\n" +
-            "        <tns:LineItemAmountTypeCode>2</tns:LineItemAmountTypeCode>\n" +
-            "        <tns:DollarValuePreDisc>69</tns:DollarValuePreDisc>\n" +
-            "        <tns:DollarValuePostDisc>62.11</tns:DollarValuePostDisc>\n" +
-            "        <tns:PriceMatchAmount>0</tns:PriceMatchAmount>\n" +
-            "        <tns:PriceMatchBonusAmount>0</tns:PriceMatchBonusAmount>\n" +
-            "        <tns:PostSalesAdjustmentAmount>0</tns:PostSalesAdjustmentAmount>\n" +
-            "        <tns:Quantity>0001</tns:Quantity>\n" +
-            "        <tns:OriginalLineNumber>0000</tns:OriginalLineNumber>\n" +
-            "        <tns:OriginalStoreNumber>00000</tns:OriginalStoreNumber>\n" +
-            "        <tns:OriginalRegisterNumber>000</tns:OriginalRegisterNumber>\n" +
-            "        <tns:OriginalTransactionNumber>0000</tns:OriginalTransactionNumber>\n" +
-            "        <tns:OriginalTransactionTime>00000000</tns:OriginalTransactionTime>\n" +
-            "        <tns:PointsRedeemed>000003440</tns:PointsRedeemed>\n" +
-            "        <tns:DollarValueOfPointsRedeemed>3.44</tns:DollarValueOfPointsRedeemed>\n" +
-            "        <tns:RedemptionExclusionFlag>N</tns:RedemptionExclusionFlag>\n" +
-            "        <tns:TaxAmount>3.73</tns:TaxAmount>\n" +
-            "        <tns:NonMemberPrice>115</tns:NonMemberPrice>\n" +
-            "        <tns:Coupons>\n" +
-            "          <tns:Coupon>\n" +
-            "            <tns:CouponNumber>32</tns:CouponNumber>\n" +
-            "            <tns:DiscountAmount>-3.44</tns:DiscountAmount>\n" +
-            "            <tns:CouponType>2</tns:CouponType>\n" +
-            "            <tns:AlternateCouponDecision>D</tns:AlternateCouponDecision>\n" +
-            "          </tns:Coupon>\n" +
-            "          <tns:Coupon>\n" +
-            "            <tns:CouponNumber>29683</tns:CouponNumber>\n" +
-            "            <tns:DiscountAmount>-3.45</tns:DiscountAmount>\n" +
-            "            <tns:CouponType>2</tns:CouponType>\n" +
-            "            <tns:AlternateCouponDecision>D</tns:AlternateCouponDecision>\n" +
-            "          </tns:Coupon>\n" +
-            "        </tns:Coupons>\n" +
-            "      </tns:LineItem>\n" +
-            "      <tns:LineItem>\n" +
-            "        <tns:LineNumber>0003</tns:LineNumber>\n" +
-            "        <tns:ItemType>1</tns:ItemType>\n" +
-            "        <tns:Division>067</tns:Division>\n" +
-            "        <tns:ItemNumber>000006628</tns:ItemNumber>\n" +
-            "        <tns:SKU>570</tns:SKU>\n" +
-            "        <tns:UPC>4895158305512</tns:UPC>\n" +
-            "        <tns:LineItemAmountTypeCode>2</tns:LineItemAmountTypeCode>\n" +
-            "        <tns:DollarValuePreDisc>30</tns:DollarValuePreDisc>\n" +
-            "        <tns:DollarValuePostDisc>27.01</tns:DollarValuePostDisc>\n" +
-            "        <tns:PriceMatchAmount>0</tns:PriceMatchAmount>\n" +
-            "        <tns:PriceMatchBonusAmount>0</tns:PriceMatchBonusAmount>\n" +
-            "        <tns:PostSalesAdjustmentAmount>0</tns:PostSalesAdjustmentAmount>\n" +
-            "        <tns:Quantity>0001</tns:Quantity>\n" +
-            "        <tns:OriginalLineNumber>0000</tns:OriginalLineNumber>\n" +
-            "        <tns:OriginalStoreNumber>00000</tns:OriginalStoreNumber>\n" +
-            "        <tns:OriginalRegisterNumber>000</tns:OriginalRegisterNumber>\n" +
-            "        <tns:OriginalTransactionNumber>0000</tns:OriginalTransactionNumber>\n" +
-            "        <tns:OriginalTransactionTime>00000000</tns:OriginalTransactionTime>\n" +
-            "        <tns:PointsRedeemed>000001490</tns:PointsRedeemed>\n" +
-            "        <tns:DollarValueOfPointsRedeemed>1.49</tns:DollarValueOfPointsRedeemed>\n" +
-            "        <tns:RedemptionExclusionFlag>N</tns:RedemptionExclusionFlag>\n" +
-            "        <tns:TaxAmount>1.62</tns:TaxAmount>\n" +
-            "        <tns:NonMemberPrice>50</tns:NonMemberPrice>\n" +
-            "        <tns:Coupons>\n" +
-            "          <tns:Coupon>\n" +
-            "            <tns:CouponNumber>29683</tns:CouponNumber>\n" +
-            "            <tns:DiscountAmount>-1.5</tns:DiscountAmount>\n" +
-            "            <tns:CouponType>2</tns:CouponType>\n" +
-            "            <tns:AlternateCouponDecision>D</tns:AlternateCouponDecision>\n" +
-            "          </tns:Coupon>\n" +
-            "          <tns:Coupon>\n" +
-            "            <tns:CouponNumber>32</tns:CouponNumber>\n" +
-            "            <tns:DiscountAmount>-1.49</tns:DiscountAmount>\n" +
-            "            <tns:CouponType>2</tns:CouponType>\n" +
-            "            <tns:AlternateCouponDecision>D</tns:AlternateCouponDecision>\n" +
-            "          </tns:Coupon>\n" +
-            "        </tns:Coupons>\n" +
-            "      </tns:LineItem>\n" +
+
             "    </tns:LineItems>\n" +
-            "  </tns:ProcessTransaction>\n" +
-            "</request>";
+            "  </tns:ProcessTransaction>\n" ;
+           // "</request>";
 
     @Test
     public void testParsingWithTwoLineItem()

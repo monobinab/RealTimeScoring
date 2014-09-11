@@ -3,22 +3,16 @@
  */
 package analytics.util;
 
-import javax.xml.bind.JAXBException;
+import analytics.util.objects.LineItem;
+import analytics.util.objects.ProcessTransaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-
-
-import analytics.util.objects.LineItem;
-import analytics.util.objects.ProcessTransaction;
-
-import java.io.FileNotFoundException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +29,7 @@ public class XMLParser {
 		
 		ProcessTransaction processTransaction = null;
 		XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+        xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, Boolean.FALSE);
 		List<LineItem> lineItemList = new ArrayList<LineItem>();
 		LineItem lineItem = null;
 		boolean bMemberNumber = false;
@@ -53,40 +48,42 @@ public class XMLParser {
 			while (xmlStreamReader.hasNext()) {
 				
 				int event = xmlStreamReader.getEventType();
-				switch (event) {
+                switch (event) {
 									
 				case XMLStreamConstants.START_ELEMENT:
-				
-					QName qname = xmlStreamReader.getName();
-										
-					if (xmlStreamReader.getLocalName().equals("MemberNumber")) {
+                    String elementName = xmlStreamReader.getLocalName().replace("tns:","");
+
+
+                    QName qname = xmlStreamReader.getName();
+					System.out.println(elementName);
+					if (elementName.contains("MemberNumber")) {
 						bMemberNumber = true;
-					} else if (xmlStreamReader.getLocalName().equals(
-							"RequestorID")) {
+					} else if (elementName.equals(
+                            "RequestorID")) {
 						bRequestorID = true;
 					}
-					if (xmlStreamReader.getLocalName().equals("LineItem")) {
+					if (elementName.equals("LineItem")) {
 						lineItem = new LineItem();
 						bLineItem = true;
-					} else if (xmlStreamReader.getLocalName()
+					} else if (elementName
 							.equals("Division")) {
 						bDivision = true;
-					} else if (xmlStreamReader.getLocalName().equals(
-							"ItemNumber")) {
+					} else if (elementName.equals(
+                            "ItemNumber")) {
 						bItemNumber = true;
 					}
 
-					if (xmlStreamReader.getLocalName().equals("LineItem")) {
+					if (elementName.equals("LineItem")) {
 						lineItem = new LineItem();
 						bLineItem = true;
-					} else if (xmlStreamReader.getLocalName()
+					} else if (elementName
 							.equals("Division")) {
 						bDivision = true;
-					} else if (xmlStreamReader.getLocalName().equals(
-							"ItemNumber")) {
+					} else if (elementName.equals(
+                            "ItemNumber")) {
 						bItemNumber = true;
-					} else if (xmlStreamReader.getLocalName().equals(
-							"DollarValuePostDisc")) {
+					} else if (elementName.equals(
+                            "DollarValuePostDisc")) {
 						bDollarValuePostDisc = true;
 					}
 					break;
@@ -124,8 +121,9 @@ public class XMLParser {
 
 					break;
 				case XMLStreamConstants.END_ELEMENT:
+                    elementName = xmlStreamReader.getLocalName().replace("tns:","");
 
-					if (xmlStreamReader.getLocalName().equals("LineItem")) {
+                    if (elementName.equals("LineItem")) {
 						lineItemList.add(lineItem);
 					}
 					processTransaction.setLineItemList(lineItemList);
