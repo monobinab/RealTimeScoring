@@ -207,9 +207,9 @@ public class ScoringSingleton {
 			BasicDBObject variableFilterDBO) {
 		DBObject mbrVariables = memberVariablesCollection.findOne(
 				new BasicDBObject("l_id", lId), variableFilterDBO);
-		LOGGER.info(" ### FOUND VARIABLES");
+		LOGGER.debug(" Creating variable value map");
 		if (mbrVariables == null) {
-			LOGGER.info(" ### BOLT COULD NOT FIND MEMBER VARIABLES");
+			LOGGER.info("Bolt could not find member variables for " + lId);
 			return null;
 		}
 
@@ -264,7 +264,7 @@ public class ScoringSingleton {
 																.get(key)).get(
 																		MongoNameConstants.MV_EFFECTIVE_DATE).toString())));
 					} else {
-						LOGGER.error("Got a null value for "
+						LOGGER.debug("Got a null value for "
 								+ changedMbrVariables.get(key));
 					}
 				} catch (ParseException e) {

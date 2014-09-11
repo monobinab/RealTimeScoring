@@ -56,10 +56,9 @@ public class RealTimeScoringTellurideTopology {
 		// create definition of main spout for queue 1
 		topologyBuilder.setBolt("parsing_bolt", new TellurideParsingBoltPOS(), 4)
 				.shuffleGrouping("telluride1").shuffleGrouping("telluride2");
-        topologyBuilder.setBolt("strategy_bolt", new StrategyBolt(), 4).shuffleGrouping("parsing_bolt");
-        topologyBuilder.setBolt("scoring_bolt", new ScoringBolt(), 8).shuffleGrouping("strategy_bolt");
+        topologyBuilder.setBolt("strategy_scoring_bolt", new StrategyScoringBolt(), 4).shuffleGrouping("parsing_bolt");
         //Redis publish to server 1
-        topologyBuilder.setBolt("score_publish_bolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 2).shuffleGrouping("scoring_bolt");
+        topologyBuilder.setBolt("score_publish_bolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 2).shuffleGrouping("strategy_scoring_bolt");
 
 
 		Config conf = new Config();

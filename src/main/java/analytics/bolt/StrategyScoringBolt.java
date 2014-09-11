@@ -116,7 +116,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 			double newScore = ScoringSingleton.getInstance().calcScore(memberVariablesMap, allChanges,
 					modelId);
 
-			LOGGER.info("new score before boost var: " + newScore);
+			LOGGER.debug("new score before boost var: " + newScore);
 
 			newScore = newScore + ScoringSingleton.getInstance().getBoostScore(allChanges, modelId );
 
@@ -127,7 +127,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 			listToEmit.add(lId);
 			listToEmit.add(oldScore);
 			listToEmit.add(newScore);
-			listToEmit.add(modelId);
+			listToEmit.add(modelId.toString());
 			listToEmit.add(source);
 			listToEmit.add(messageID);
 			modelIdScoreMap.put(modelId, newScore);
