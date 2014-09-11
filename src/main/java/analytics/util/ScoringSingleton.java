@@ -454,8 +454,6 @@ public class ScoringSingleton {
 			Date maxDate = null;
 
 			for (String key : allChanges.keySet()) {
-				System.out.println(allChanges);
-				System.out.println(variableModelsMap);
 				// variable models map
 				if (variableModelsMap.get(variableVidToNameMap.get(key)).contains(modelId)) {
 					if (minDate == null) {
