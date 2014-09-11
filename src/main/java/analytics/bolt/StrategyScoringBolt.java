@@ -346,34 +346,26 @@ public class StrategyScoringBolt extends BaseRichBolt {
 			LOGGER.info("new score before boost var: " + newScore);
 
 			double boosts = 0;
-			for (String ch : allChanges.keySet()) {
-				if (ch.substring(0, 5).toUpperCase().equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
-					if (modelsMap.get(modelId).containsKey(0)) {
-						if (modelsMap.get(modelId).get(0).getVariables()
-								.containsKey(ch)) {
-							boosts = boosts
-									+ Double.valueOf(allChanges.get(ch)
-											.getValue().toString())
-									* modelsMap.get(modelId).get(0)
-											.getVariables().get(ch)
-											.getCoefficient();
+			for(String ch:allChanges.keySet()) {
+				if(ch.substring(0,5).toUpperCase().equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
+					if(modelsMap.get(modelId).containsKey(0)) {
+						if(modelsMap.get(modelId).get(0).getVariables().containsKey(ch)){
+							boosts = boosts 
+									+ Double.valueOf(allChanges.get(ch).getValue().toString()) 
+									* modelsMap.get(modelId).get(0).getVariables().get(ch).getCoefficient();
 						}
 					} else {
-						if (modelsMap.get(modelId).containsKey(
-								Calendar.getInstance().get(Calendar.MONTH) + 1)) {
-							boosts = boosts
-									+ Double.valueOf(allChanges.get(ch)
-											.getValue().toString())
-									* modelsMap
-											.get(modelId)
-											.get(Calendar.getInstance().get(
-													Calendar.MONTH) + 1)
-											.getVariables().get(ch)
-											.getCoefficient();
+						if(modelsMap.get(modelId).containsKey(Calendar.getInstance().get(Calendar.MONTH) + 1)) {
+							boosts = boosts 
+									+ Double.valueOf(allChanges.get(ch).getValue().toString()) 
+									* modelsMap.get(modelId).get(Calendar.getInstance().get(Calendar.MONTH) + 1).getVariables().get(ch).getCoefficient();
 						}
 					}
 				}
 			}
+	
+			newScore = newScore + boosts;
+
 			// 9) Emit the new score
 			double oldScore = 0;
 			// TODO: Why are we even emiting oldScore if its always 0
