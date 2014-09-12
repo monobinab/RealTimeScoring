@@ -88,8 +88,8 @@ public class StrategyScoringBolt extends BaseRichBolt {
 		Map<String, Object> memberVariablesMap = ScoringSingleton.getInstance().createVariableValueMap(lId, variableFilterDBO);
 		if(memberVariablesMap==null){
 			LOGGER.warn("Unable to find member variables");
+			this.outputCollector.fail(input);
 			return;
-					
 		}
 		
 		// 7) Fetch changedMemberVariables for rescoring and create a map- fetch
@@ -137,6 +137,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 					+ System.currentTimeMillis() + " and the message ID is ..."
 					+ messageID);
 			this.outputCollector.emit(listToEmit);
+			this.outputCollector.ack(input);
 		}
 
 		// 10) Write changedMemberScores with expiry
