@@ -137,8 +137,8 @@ public class StrategyScoringBolt extends BaseRichBolt {
 					+ System.currentTimeMillis() + " and the message ID is ..."
 					+ messageID);
 			this.outputCollector.emit(listToEmit);
-			this.outputCollector.ack(input);
 		}
+		this.outputCollector.ack(input);
 
 		// 10) Write changedMemberScores with expiry
 		ScoringSingleton.getInstance().updateChangedMemberScore(lId, modelIdList, allChanges, modelIdScoreMap);
