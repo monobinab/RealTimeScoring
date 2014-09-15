@@ -19,8 +19,6 @@ import backtype.storm.generated.AlreadyAliveException;
 import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.topology.TopologyBuilder;
 
-import com.mongodb.DBObject;
-
 public class RealTimeScoringTopology {
 
 	static final Logger logger = LoggerFactory
@@ -29,22 +27,6 @@ public class RealTimeScoringTopology {
 	public static void main(String[] args) throws ConfigurationException {
 
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
-
-		MongoObjectGrabber mongoMapper = new MongoObjectGrabber() {
-			@Override
-			public List<Object> map(DBObject object) {
-				if (object != null)
-					System.out.println(" in Mapper: " + object);
-				List<Object> tuple = new ArrayList<Object>();
-				tuple.add(object);
-				return tuple;
-			}
-
-			@Override
-			public String[] fields() {
-				return new String[] { "document" };
-			}
-		};
 
 		MQConnectionConfig mqConnection = new MQConnectionConfig();
 		WebsphereMQCredential mqCredential = mqConnection
