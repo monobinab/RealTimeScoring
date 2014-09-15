@@ -8,8 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.bolt.ParsingBoltPOS;
-import analytics.bolt.ScoringBolt;
-import analytics.bolt.StrategyBolt;
+import analytics.bolt.StrategyScoringBolt;
 import analytics.spout.WebsphereMQSpout;
 import analytics.util.MQConnectionConfig;
 import analytics.util.WebsphereMQCredential;
@@ -68,10 +67,8 @@ public class RealTimeScoringTopology {
 
 		topologyBuilder.setBolt("parsing_bolt", new ParsingBoltPOS())
 				.shuffleGrouping("npos1").shuffleGrouping("npos2");
-		topologyBuilder.setBolt("strategy_bolt", new StrategyBolt())
+		topologyBuilder.setBolt("strategy_bolt", new StrategyScoringBolt())
 				.shuffleGrouping("parsing_bolt");
-		topologyBuilder.setBolt("scoring_bolt", new ScoringBolt())
-				.shuffleGrouping("strategy_bolt");
 
 		Config conf = new Config();
 		conf.setDebug(false);

@@ -4,8 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.bolt.ParsingBoltAAM_ATC;
-import analytics.bolt.ScoringBolt;
-import analytics.bolt.StrategyBolt;
+import analytics.bolt.StrategyScoringBolt;
 import analytics.spout.AAMRedisPubSubSpout;
 import analytics.util.RedisConnection;
 import analytics.util.TopicConstants;
@@ -39,10 +38,8 @@ public class AAM_BrowseTopology {
 
 		BoltDeclarer boltDeclarer = topologyBuilder.setBolt(
 				"ParsingBoltAAM_ATC", new ParsingBoltAAM_ATC(topic), 1);
-		topologyBuilder.setBolt("strategy_bolt", new StrategyBolt(), 1)
+		topologyBuilder.setBolt("strategy_bolt", new StrategyScoringBolt(), 1)
 				.shuffleGrouping("ParsingBoltAAM_ATC");
-		topologyBuilder.setBolt("scoring_bolt", new ScoringBolt(), 1)
-				.shuffleGrouping("strategy_bolt");
 
 		for (String server : servers) {
 			boltDeclarer.fieldsGrouping(topic + server, new Fields("uuid"));

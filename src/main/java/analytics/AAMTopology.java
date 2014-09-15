@@ -6,8 +6,7 @@ import org.slf4j.LoggerFactory;
 import analytics.bolt.ParsingBoltWebTraits;
 import analytics.bolt.PersistTraitsBolt;
 import analytics.bolt.ScorePublishBolt;
-import analytics.bolt.ScoringBolt;
-import analytics.bolt.StrategyBolt;
+import analytics.bolt.StrategyScoringBolt;
 import analytics.spout.AAMRedisPubSubSpout;
 import analytics.util.RedisConnection;
 import analytics.util.TopicConstants;
@@ -35,10 +34,9 @@ public class AAMTopology {
 
 	    builder.setBolt("ParsingBoltWebTraits", new ParsingBoltWebTraits(), 1)
 	    .shuffleGrouping("AAM_CDF_Traits1").shuffleGrouping("AAM_CDF_Traits2").shuffleGrouping("AAM_CDF_Traits3");
-	    builder.setBolt("strategy_bolt", new StrategyBolt(),1).shuffleGrouping("ParsingBoltWebTraits");
+	    builder.setBolt("strategy_bolt", new StrategyScoringBolt(),1).shuffleGrouping("ParsingBoltWebTraits");
 	    builder.setBolt("persist_traits" , new PersistTraitsBolt(), 1).shuffleGrouping("ParsingBoltWebTraits");
-	    builder.setBolt("scoring_bolt", new ScoringBolt(),1).shuffleGrouping("strategy_bolt");
-	    builder.setBolt("score_publish_bolt", new ScorePublishBolt(servers[0], port,"score"), 1).shuffleGrouping("scoring_bolt");
+	    builder.setBolt("score_publish_bolt", new ScorePublishBolt(servers[0], port,"score"), 1).shuffleGrouping("strategy_bolt");
 	      
 	    Config conf = new Config();
 		conf.setDebug(false);

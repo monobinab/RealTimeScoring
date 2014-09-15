@@ -1,10 +1,8 @@
 package analytics;
 
 import analytics.bolt.FacebookBolt;
-import analytics.bolt.ScoringBolt;
-import analytics.bolt.StrategyBolt;
+import analytics.bolt.StrategyScoringBolt;
 import analytics.spout.FacebookRedisSpout;
-import analytics.spout.SYWRedisSpout;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
@@ -19,8 +17,7 @@ public static void main(String[] args) throws AlreadyAliveException, InvalidTopo
 
 	builder.setSpout("facebookSpout", new FacebookRedisSpout(servers[0], 6379, "FB"), 1);
 	builder.setBolt("facebookBolt", new FacebookBolt()).shuffleGrouping("facebookSpout");
-	builder.setBolt("strategyBolt", new StrategyBolt(),1).shuffleGrouping("facebookBolt");
-    builder.setBolt("scoringBolt", new ScoringBolt(),1).shuffleGrouping("strategyBolt");
+	builder.setBolt("strategyBolt", new StrategyScoringBolt(),1).shuffleGrouping("facebookBolt");
 	Config conf = new Config();
 
     if (args != null && args.length > 0) {

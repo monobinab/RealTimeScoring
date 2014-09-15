@@ -150,8 +150,7 @@ public class ScoringSingleton {
 		for(String model: modelIdArrayList){
 			modelIdList.add(Integer.parseInt(model));
 		}
-		BasicDBObject variableFilterDBO = createVariableFilterQuery(modelIdList);
-		Map<String, Object> memberVariablesMap = ScoringSingleton.getInstance().createVariableValueMap(loyaltyId, variableFilterDBO);
+		Map<String, Object> memberVariablesMap = ScoringSingleton.getInstance().createVariableValueMap(loyaltyId, modelIdList);
 		if(memberVariablesMap==null){
 			LOGGER.warn("Unable to find member variables");
 			return null;
@@ -184,27 +183,22 @@ public class ScoringSingleton {
 		return modelIdList;
 	}
 	
-	public BasicDBObject createVariableFilterQuery(Set<Integer> modelIdList)
-	{
-	// Create query
-			BasicDBObject variableFilterDBO = new BasicDBObject(MongoNameConstants.ID, 0);
-			for (Integer modId : modelIdList) {
-				int month;
-				if (modelsMap.get(modId).containsKey(0)) {
-					month = 0;
-				} else {
-					month = Calendar.getInstance().get(Calendar.MONTH) + 1;
-				}
-
-				for (String var : modelsMap.get(modId).get(month).getVariables()
-						.keySet()) {
-					variableFilterDBO.append(variableNameToVidMap.get(var), 1);
-				}
+	public Map<String, Object> createVariableValueMap(String lId,Set<Integer> modelIdList ) {
+		BasicDBObject variableFilterDBO = new BasicDBObject(MongoNameConstants.ID, 0);
+		for (Integer modId : modelIdList) {
+			int month;
+			if (modelsMap.get(modId).containsKey(0)) {
+				month = 0;
+			} else {
+				month = Calendar.getInstance().get(Calendar.MONTH) + 1;
 			}
-			return variableFilterDBO;
-	}
-	public Map<String, Object> createVariableValueMap(String lId,
-			BasicDBObject variableFilterDBO) {
+
+			for (String var : modelsMap.get(modId).get(month).getVariables()
+					.keySet()) {
+				variableFilterDBO.append(variableNameToVidMap.get(var), 1);
+			}
+		}
+		
 		DBObject mbrVariables = memberVariablesCollection.findOne(
 				new BasicDBObject("l_id", lId), variableFilterDBO);
 		LOGGER.debug(" Creating variable value map");

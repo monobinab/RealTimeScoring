@@ -19,8 +19,6 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
-import com.mongodb.BasicDBObject;
-
 /**
  * 
  * @author dnairsy Bolt to find the models affected by a list of variables,
@@ -80,12 +78,9 @@ public class StrategyScoringBolt extends BaseRichBolt {
 		Set<Integer> modelIdList = ScoringSingleton.getInstance().getModelIdList(newChangesVarValueMap);
 
 		// 4) Find all variables for models
-		
-		// Create query
-		BasicDBObject variableFilterDBO = ScoringSingleton.getInstance().createVariableFilterQuery(modelIdList);
 
 		// 5) Create a map of variable values, fetched from from memberVariables
-		Map<String, Object> memberVariablesMap = ScoringSingleton.getInstance().createVariableValueMap(lId, variableFilterDBO);
+		Map<String, Object> memberVariablesMap = ScoringSingleton.getInstance().createVariableValueMap(lId, modelIdList);
 		if(memberVariablesMap==null){
 			LOGGER.warn("Unable to find member variables");
 			this.outputCollector.fail(input);

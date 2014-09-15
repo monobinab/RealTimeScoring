@@ -1,6 +1,5 @@
 package analytics.bolt;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -10,15 +9,15 @@ import java.util.Map;
 import javax.jms.JMSException;
 import javax.jms.TextMessage;
 
-import org.apache.commons.configuration.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import shc.npos.segments.Segment;
 import shc.npos.util.SegmentUtils;
-import analytics.util.DBConnection;
 import analytics.util.JsonUtils;
 import analytics.util.SecurityUtils;
+import analytics.util.dao.DivLnItmDao;
+import analytics.util.dao.DivLnVariableDao;
 import analytics.util.objects.TransactionLineItem;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -28,11 +27,6 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
 import com.ibm.jms.JMSMessage;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
 
 
 public class ParsingBoltPOS extends BaseRichBolt {
@@ -44,24 +38,11 @@ public class ParsingBoltPOS extends BaseRichBolt {
 			.getLogger(ParsingBoltPOS.class);
 	private static final long serialVersionUID = 1L;
     private OutputCollector outputCollector;
-
-    DB db;
-    DBCollection memberCollection;
-    DBCollection divLnItmCollection;
-    DBCollection divLnVariableCollection;
-
-    private Map<String,Collection<String>> divLnVariablesMap;
+    
+    private Map<String, List<String>> divLnVariablesMap;
 
     public void setOutputCollector(OutputCollector outputCollector) {
         this.outputCollector = outputCollector;
-    }
-
-    public void setMemberCollection(DBCollection memberCollection) {
-        this.memberCollection = memberCollection;
-    }
-
-    public void setDivLnItmCollection(DBCollection divLnItmCollection) {
-        this.divLnItmCollection = divLnItmCollection;
     }
 
     /*
@@ -82,33 +63,8 @@ public class ParsingBoltPOS extends BaseRichBolt {
 	 */
 
         //System.out.println("PREPARING PARSING POS BOLT");
-        try {
-			db = DBConnection.getDBConnection();
-		} catch (ConfigurationException e) {
-			logger.error("Unable to obtain DB connection", e);
-		}
-
-	    memberCollection = db.getCollection("memberVariables");
-        divLnItmCollection = db.getCollection("divLnItm");
-        divLnVariableCollection = db.getCollection("divLnVariable");
-
         // populate divLnVariablesMap
-        divLnVariablesMap = new HashMap<String, Collection<String>>();
-        DBCursor divLnVarCursor = divLnVariableCollection.find();
-        for(DBObject divLnDBObject: divLnVarCursor) {
-            if (divLnVariablesMap.get(divLnDBObject.get("d")) == null)
-            {
-                Collection<String> varColl = new ArrayList<String>();
-                varColl.add(divLnDBObject.get("v").toString());
-                divLnVariablesMap.put(divLnDBObject.get("d").toString(), varColl);
-            }
-            else
-            {
-                Collection<String> varColl = divLnVariablesMap.get(divLnDBObject.get("d").toString());
-                varColl.add(divLnDBObject.get("v").toString().toUpperCase());
-                divLnVariablesMap.put(divLnDBObject.get("d").toString(), varColl);
-            }
-        }
+        divLnVariablesMap = new DivLnVariableDao().getDivLnVariable();
     }
 
 
@@ -192,9 +148,8 @@ public class ParsingBoltPOS extends BaseRichBolt {
             String amount = segment.getSegmentBody().get("Selling Amount").trim();
             //System.out.println(" division: " + div + " item: " + item + " amount: " + amount);
             
-            String line = getLineFromCollection(div,item);
+            String line = new DivLnItmDao().getLnFromDivItem(div,item);
 
-            
             if(line==null) {
             	continue;
             }
@@ -278,26 +233,5 @@ public class ParsingBoltPOS extends BaseRichBolt {
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		declarer.declare(new Fields("l_id","lineItemAsJsonString","source"));
 	}
-
-	
-	public String getLineFromCollection(String div, String item) {
-		//System.out.println("searching for line");
-		
-		BasicDBObject queryLine = new BasicDBObject();
-		queryLine.put("d", div);
-		queryLine.put("i", item);
-		
-		//System.out.println("query: " + queryLine);
-		DBObject divLnItm = divLnItmCollection.findOne(queryLine);
-		//System.out.println("line: " + divLnItm);
-		
-		if(divLnItm==null || divLnItm.keySet()==null || divLnItm.keySet().isEmpty()) {
-			return null;
-		}
-		String line = divLnItm.get("l").toString();
-		//System.out.println("  found line: " + line);
-		return line;
-	}
-	
 
 }

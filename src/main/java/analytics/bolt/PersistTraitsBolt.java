@@ -4,11 +4,10 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.configuration.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.util.DBConnection;
+import analytics.util.dao.MemberTraitsDao;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -19,26 +18,15 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
 
 public class PersistTraitsBolt extends BaseRichBolt {
 	static final Logger logger = LoggerFactory
 			.getLogger(PersistTraitsBolt.class);
-	 DB db;
-	 DBCollection memberTraitsCollection;
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
-			OutputCollector collector) {
-		try {
-			db = DBConnection.getDBConnection();
-		} catch (ConfigurationException e) {
-			logger.error("Unable to obtain DB connection",e);
-		}
-		memberTraitsCollection = db.getCollection("memberTraits");
-		
+			OutputCollector collector) {		
 	}
 
 	@Override
@@ -64,10 +52,7 @@ public class PersistTraitsBolt extends BaseRichBolt {
 			for(String date : dateTrait.keySet()){
 				dateTraitList.add(new BasicDBObject("d", date).append("t", dateTrait.get(date)));
 			}
-			DBObject objectToInsert = new BasicDBObject();
-			objectToInsert.put("l_id", l_id);
-			objectToInsert.put("date", dateTraitList);
-			memberTraitsCollection.insert(objectToInsert);
+			new MemberTraitsDao().addDateTrait(l_id, dateTraitList);
 			break;//all trait names have same map
 		}
 		

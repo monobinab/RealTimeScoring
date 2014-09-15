@@ -4,13 +4,13 @@
 package analytics.bolt;
 
 import analytics.util.DBConnection;
+import analytics.util.dao.MemberScoreDao;
+import analytics.util.dao.MemberZipDao;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
-
-import com.mongodb.*;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang3.ObjectUtils;
@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 
 import redis.clients.jedis.Jedis;
 
-import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,12 +36,6 @@ public class RankPublishBolt extends BaseRichBolt {
     final String host;
     final int port;
     final String pattern;
-
-
-    DB db;
-    DBCollection memberZipCollection;
-    DBCollection memberScoreCollection;
-
 
     private Map<String,Collection<Integer>> variableModelsMap;
     private Map<String, String> variableVidToNameMap;
@@ -71,17 +64,7 @@ public class RankPublishBolt extends BaseRichBolt {
         this.outputCollector = collector;
 
 
-        //prepare mongo
-
-        try {
-			db = DBConnection.getDBConnection();
-		} catch (ConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        memberZipCollection = db.getCollection("memberZip");
-        memberScoreCollection = db.getCollection("memberScore");
-        
+        //prepare mongo       
         modelIdToModelNameMap = new HashMap<String,String>();
         modelIdToModelNameMap.put("34", "S_SCR_HA_ALL");
         modelIdToModelNameMap.put("35", "S_SCR_HA_COOK");
@@ -302,8 +285,8 @@ public class RankPublishBolt extends BaseRichBolt {
 		logger.info("The time it enters inside Score Publish Bolt execute method"+System.currentTimeMillis());
         //System.out.println(" %%% scorepublishbolt :" + input);
         String l_id = input.getStringByField("l_id");
-        DBObject row = memberZipCollection.findOne(new BasicDBObject("l_id", l_id));
-        DBObject oldScoreResult = memberScoreCollection.findOne(new BasicDBObject("l_id", l_id));
+        String zipcode = new MemberZipDao().getMemberZip(l_id);
+        Map<String,String> oldScoreResult = new MemberScoreDao().getMemberScores(l_id);
         String modelName = modelIdToModelNameMap.get(input.getStringByField("model"));
         String oldScore = new String();
         
@@ -380,18 +363,18 @@ public class RankPublishBolt extends BaseRichBolt {
         else {
         	dataSource = "Web Browse";
         }
-        Object zip = row==null?"00000":row.get("z");
+        zipcode = zipcode==null?"00000":zipcode;
         //System.out.println(" %%% zip zip :" + ObjectUtils.toString(zip));
         //System.out.println(" %%% old score: " + oldScore + "  new score: " + input.getDoubleByField("newScore"));
 
-        if (row != null && StringUtils.isNotEmpty(ObjectUtils.toString(zip)))
+        if (StringUtils.isNotEmpty(ObjectUtils.toString(zipcode)))
             {
                 String message = new StringBuffer(l_id).append(",")
                         .append(String.valueOf(oldRank)).append(",")
                         .append(String.valueOf(newRank)).append(",")
                         .append(modelDescription).append(",")
                         .append(dataSource).append(",")
-                        .append(zip.toString()).toString();
+                        .append(zipcode).toString();
                 //System.out.println(" %%% message : " + message);
 
                 jedis.publish(pattern, message);

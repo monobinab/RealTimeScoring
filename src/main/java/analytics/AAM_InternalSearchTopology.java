@@ -3,20 +3,17 @@ package analytics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import analytics.bolt.ParsingBoltAAM_InternalSearch;
+import analytics.bolt.StrategyScoringBolt;
+import analytics.spout.AAMRedisPubSubSpout;
+import analytics.util.RedisConnection;
+import analytics.util.TopicConstants;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
 import backtype.storm.generated.AlreadyAliveException;
 import backtype.storm.generated.InvalidTopologyException;
-import backtype.storm.topology.BoltDeclarer;
 import backtype.storm.topology.TopologyBuilder;
-import analytics.bolt.ParsingBoltAAM_ATC;
-import analytics.bolt.ParsingBoltAAM_InternalSearch;
-import analytics.bolt.ScoringBolt;
-import analytics.bolt.StrategyBolt;
-import analytics.spout.AAMRedisPubSubSpout;
-import analytics.util.RedisConnection;
-import analytics.util.TopicConstants;
 
 public class AAM_InternalSearchTopology {
 
@@ -46,10 +43,8 @@ public class AAM_InternalSearchTopology {
 				.shuffleGrouping("AAM_CDF_InternalSearch2")
 				.shuffleGrouping("AAM_CDF_InternalSearch3");
 
-		topologyBuilder.setBolt("strategy_bolt", new StrategyBolt(), 1)
+		topologyBuilder.setBolt("strategy_bolt", new StrategyScoringBolt(), 1)
 				.shuffleGrouping("ParsingBoltAAM_InternalSearch");
-		topologyBuilder.setBolt("scoring_bolt", new ScoringBolt(), 1)
-				.shuffleGrouping("strategy_bolt");
 		Config conf = new Config();
 
 		if (args.length > 0) {

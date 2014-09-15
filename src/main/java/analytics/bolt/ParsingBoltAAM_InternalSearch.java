@@ -1,16 +1,8 @@
 package analytics.bolt;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
-import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -18,10 +10,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -29,34 +17,22 @@ import org.codehaus.jettison.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
+import analytics.util.dao.DivLnVariableDao;
+import analytics.util.dao.PidDivLnDao;
+import backtype.storm.task.OutputCollector;
+import backtype.storm.task.TopologyContext;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
-
-import backtype.storm.task.OutputCollector;
-import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
-import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Tuple;
 
 public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
 	/**
 	 * Created by Rock Wasserman 6/24/2014
 	 */
 
-	DBCollection pidDivLnCollection;
-    DBCollection divLnVariableCollection;
-
-    private Map<String,Collection<String>> divLnVariablesMap;
+    private Map<String, List<String>> divLnVariablesMap;
     
 
     /*
@@ -76,27 +52,10 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
 	 */
 
 		sourceTopic = "InternalSearch";
-        pidDivLnCollection = db.getCollection("pidDivLn");
-        divLnVariableCollection = db.getCollection("divLnVariable");
 
-        
         // populate divLnVariablesMap
-        divLnVariablesMap = new HashMap<String, Collection<String>>();
-        DBCursor divLnVarCursor = divLnVariableCollection.find();
-        for(DBObject divLnDBObject: divLnVarCursor) {
-            if (divLnVariablesMap.get(divLnDBObject.get("d")) == null)
-            {
-                Collection<String> varColl = new ArrayList<String>();
-                varColl.add(divLnDBObject.get("v").toString());
-                divLnVariablesMap.put(divLnDBObject.get("d").toString(), varColl);
-            }
-            else
-            {
-                Collection<String> varColl = divLnVariablesMap.get(divLnDBObject.get("d").toString());
-                varColl.add(divLnDBObject.get("v").toString().toUpperCase());
-                divLnVariablesMap.put(divLnDBObject.get("d").toString(), varColl);
-            }
-        }
+        divLnVariablesMap = new DivLnVariableDao().getDivLnVariable();
+        
     }
 
 
@@ -238,11 +197,10 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
     	Map<String,String> variableValueMap = new HashMap<String,String>();
     	
     	for(String pid: pidSet) {
-    		//System.out.println(pid);
-    		DBObject divLnDBO = pidDivLnCollection.findOne(new BasicDBObject().append("pid", pid));
-    		if(divLnDBO != null) {
-	    		String div = divLnDBO.get("d").toString();
-	    		String divLn = divLnDBO.get("l").toString();
+    		PidDivLnDao.DivLn divLnObj = new PidDivLnDao().getVariableFromTopic(pid);
+    		if(divLnObj != null) {
+	    		String div = divLnObj.getDiv();
+	    		String divLn = divLnObj.getLn();
 	    		Collection<String> var = new ArrayList<String>();
 	    		if(divLnVariablesMap.containsKey(div)) {
 	    			var = divLnVariablesMap.get(div);

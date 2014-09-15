@@ -2,8 +2,7 @@ package analytics;
 
 import analytics.bolt.ParsingBoltSYW;
 import analytics.bolt.ProcessSYWInteractions;
-import analytics.bolt.ScoringBolt;
-import analytics.bolt.StrategyBolt;
+import analytics.bolt.StrategyScoringBolt;
 import analytics.spout.SYWRedisSpout;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
@@ -28,8 +27,7 @@ public class SYWEventsTopology {
     builder.setBolt("ParseEventsBolt", new ParsingBoltSYW(),1).shuffleGrouping("SYWEventsSpout");
     //Get the div line and boost variable 
     builder.setBolt("ProcessSYWEvents" , new ProcessSYWInteractions(), 1).shuffleGrouping("ParseEventsBolt");
-    builder.setBolt("strategy_bolt", new StrategyBolt(),1).shuffleGrouping("ProcessSYWEvents");
-    builder.setBolt("scoring_bolt", new ScoringBolt(),1).shuffleGrouping("strategy_bolt");
+    builder.setBolt("strategy_bolt", new StrategyScoringBolt(),1).shuffleGrouping("ProcessSYWEvents");
      
     Config conf = new Config();
 

@@ -9,12 +9,6 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
 
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-
-
-
-
 import redis.clients.jedis.Jedis;
 
 import java.util.Map;
@@ -34,11 +28,6 @@ public class ScorePublishBolt extends BaseRichBolt {
     final String host;
     final int port;
     final String pattern;
-
-
-    DB db;
-    DBCollection memberZipCollection;
-    DBCollection memberScoreCollection;
 
     private Jedis jedis;
 

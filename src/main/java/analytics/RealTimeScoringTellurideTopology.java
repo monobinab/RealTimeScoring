@@ -4,7 +4,9 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.bolt.*;
+import analytics.bolt.ScorePublishBolt;
+import analytics.bolt.StrategyScoringBolt;
+import analytics.bolt.TellurideParsingBoltPOS;
 import analytics.spout.WebsphereMQSpout;
 import analytics.util.MQConnectionConfig;
 import analytics.util.RedisConnection;

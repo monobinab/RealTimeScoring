@@ -4,6 +4,38 @@ public class MongoNameConstants {
 	
 	public static final String ID="_id";
 	public static final String L_ID= "l_id";
+	
+	//FB id collection
+	public static final String FB_ID = "u";
+	
+	//FB keyword mapping
+	public static final String FB_KEYWORD="k";
+	public static final String FB_VARIABLE="v";
+	
+	//Model variables collection
+	public static final String MODELV_VARIABLE="variable";
+	public static final String MODELV_NAME="name";
+	
+	//Member UUID collection
+	public static final String MUUID_UUID="u";
+	
+	//Member zip
+	public static final String ZIP="z";
+	
+	//Pid div ln collection
+	public static final String PDL_PID="pid";
+	public static final String PDL_D="d";
+	public static final String PDL_L="l";
+	
+	//Div ln var
+	public static final String DLV_DIV="d";
+	public static final String DLV_VAR="v";
+	
+	//Div ln item
+	public static final String DLI_DIV="d";
+	public static final String DLI_LN="l";
+	public static final String DLI_ITEM="i";
+	
 	//Model variables collection
 	public static final String MODEL_ID = "modelId";
 	public static final String MONTH = "month";

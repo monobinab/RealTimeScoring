@@ -1,16 +1,13 @@
 package analytics.bolt;
 
 import java.lang.reflect.Type;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.configuration.ConfigurationException;
-
-import analytics.util.DBConnection;
 import analytics.util.SYWAPICalls;
+import analytics.util.dao.PidDivLnDao;
 import analytics.util.objects.SYWEntity;
 import analytics.util.objects.SYWInteraction;
 import backtype.storm.task.OutputCollector;
@@ -24,16 +21,10 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
 
 public class ProcessSYWInteractions extends BaseRichBolt {
 
 	private List<String> entityTypes;
-	private DB db;
-    private DBCollection pidVarCollection;
     private OutputCollector outputCollector;
     
 	@Override
@@ -46,15 +37,6 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 		 * Ignore Story,Image,Video TODO: Might even make sense to ignore these
 		 * right at the parsing bolt level
 		 */	
-
-		 try {
-				db = DBConnection.getDBConnection();
-			} catch (ConfigurationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-      pidVarCollection = db.getCollection("pidDivLn");
 	}
 
 	@Override
@@ -83,8 +65,8 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 						continue;
 					}
 					else{
-						DBObject obj1 = pidVarCollection.findOne(new BasicDBObject("pid", productId));
-						if(obj1 != null)
+						PidDivLnDao.DivLn divLnObj = new PidDivLnDao().getVariableFromTopic(productId);
+						if(divLnObj != null)
 						{
 							String variable = "BOOST_HA_WH_SYW";
 							//MongoUtils.getBoostVariable((String)obj1.get("d"), (String)obj1.get("l"));

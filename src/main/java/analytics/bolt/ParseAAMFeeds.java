@@ -9,15 +9,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
-
-import analytics.util.DBConnection;
 import analytics.util.JsonUtils;
+import analytics.util.dao.MemberUUIDDao;
+import analytics.util.dao.ModelVariablesDao;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -34,13 +28,6 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 	 */
 	private static final long serialVersionUID = 1L;
 	protected OutputCollector outputCollector;
-    
-
-	protected DB db;
-	protected DBCollection memberVariablesCollection;
-    protected DBCollection memberUUIDCollection;
-    protected DBCollection modelVariablesCollection;
-
 
     protected List<String> modelVariablesList;
     protected Map<String,Collection<String>> l_idToValueCollectionMap; // USED TO MAP BETWEEN l_id AND THE TRAITS OR PID OR SearchKeyword ASSOCIATED WITH THAT ID UNTIL A NEW UUID IS FOUND
@@ -62,10 +49,6 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
     public void setOutputCollector(OutputCollector outputCollector) {
         this.outputCollector = outputCollector;
     }
-
-    public void setMemberCollection(DBCollection memberCollection) {
-        this.memberVariablesCollection = memberCollection;
-    }
     
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
@@ -77,16 +60,6 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 	 * @see backtype.storm.task.IBolt#prepare(java.util.Map,
 	 * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
 	 */
-
-        try {
-			db = DBConnection.getDBConnection();
-		} catch (Exception e) {
-			logger.error("Unable to get Db connection",e);
-		}
-        
-        memberVariablesCollection = db.getCollection("memberVariables");
-        memberUUIDCollection = db.getCollection("memberUUID");
-        modelVariablesCollection = db.getCollection("modelVariables");
         modelVariablesList = new ArrayList<String>();
         
         this.currentUUID=null;
@@ -94,15 +67,7 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
         
 
 		//POPULATE MODEL VARIABLES LIST
-		DBCursor modelVariablesCursor = modelVariablesCollection.find();
-		for(DBObject modelDBO:modelVariablesCursor) {
-			BasicDBList variablesDBList = (BasicDBList) modelDBO.get("variable");
-			for(Object var:variablesDBList) {
-				if(!modelVariablesList.contains(var.toString())) {
-					modelVariablesList.add(((BasicDBObject) var).get("name").toString());
-				}
-			}
-		}
+        modelVariablesList = new ModelVariablesDao().getVariableList();
 //		System.out.println(" *** PARSING BOLT MODEL VARIABLE LIST: ");
     }
 
@@ -183,8 +148,8 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
         
 		// 4) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN SET CURRENT UUID FROM RECORD, SET CURRENT l_id TO NULL AND RETURN
         //		If l_id is null and the next UUID is the same the current, then the next record will not be processed
-        DBCursor uuidCursor = memberUUIDCollection.find(new BasicDBObject("u",splitRecArray[0]));
-        if(uuidCursor == null) {
+        List<String> l_ids = new MemberUUIDDao().getLoyaltyIdsFromUUID(splitRecArray[0]);
+        if(l_ids == null) {
             this.currentUUID=splitRecArray[0];
             logger.info(" *** COULD NOT FIND UUID: " + this.currentUUID);
         	this.l_idToValueCollectionMap=new HashMap<String, Collection<String>>();
@@ -192,18 +157,18 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
         }
         
         // set current uuid and l_id from mongoDB query results
-        for(DBObject uuidDbo:uuidCursor) {
+        for(String l_id:l_ids) {
         	if(this.currentUUID == null) {
-        		this.currentUUID = uuidDbo.get("u").toString();
+        		this.currentUUID = l_id;
         	}
         	try{
-        	l_idToValueCollectionMap.put(uuidDbo.get("l_id").toString(), new ArrayList<String>());
+        	l_idToValueCollectionMap.put(l_id, new ArrayList<String>());
         	}catch(NullPointerException e){
         		logger.error("l_id to value collection is null", e);
         		System.exit(0);
         	}
     		for(int i=1;i<splitRecArray.length;i++){
-    			l_idToValueCollectionMap.get(uuidDbo.get("l_id")).add(splitRecArray[i].trim());
+    			l_idToValueCollectionMap.get(l_id).add(splitRecArray[i].trim());
     		}
         	
         }
