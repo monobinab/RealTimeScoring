@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import analytics.util.DBConnection;
 import analytics.util.MongoNameConstants;
 
@@ -13,15 +16,18 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
 public class DivLnBoostDao {
-	DB db;
+	static final Logger LOGGER = LoggerFactory
+			.getLogger(DivLnBoostDao.class);
+	static DB db;
     DBCollection divLnBoostCollection;
-    {
+    static {
 		try {
 			db = DBConnection.getDBConnection();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error("Unable to get DB connection", e);
 		}
+    }
+    public DivLnBoostDao(){
 		divLnBoostCollection = db.getCollection("divLnBoost");
     }
     public HashMap<String, List<String>> getDivLnBoost(String sourceTopic){

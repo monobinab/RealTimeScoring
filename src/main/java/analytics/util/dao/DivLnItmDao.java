@@ -1,5 +1,8 @@
 package analytics.util.dao;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import analytics.util.DBConnection;
 import analytics.util.MongoNameConstants;
 
@@ -9,15 +12,18 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 
 public class DivLnItmDao {
-	DB db;
+	static final Logger LOGGER = LoggerFactory
+			.getLogger(DivLnItmDao.class);
+	static DB db;
     DBCollection divLnItemCollection;
-    {
+    static {
 		try {
 			db = DBConnection.getDBConnection();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error("Unable to get DB connection", e);
 		}
+    }
+    public DivLnItmDao(){
 		divLnItemCollection = db.getCollection("divLnItm");
     }
     

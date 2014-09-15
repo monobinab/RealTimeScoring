@@ -10,20 +10,17 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
-import org.apache.commons.configuration.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
-
+import analytics.util.dao.ChangedMemberScoresDao;
+import analytics.util.dao.ChangedVariablesDao;
+import analytics.util.dao.MemberVariablesDao;
+import analytics.util.dao.ModelVariablesDao;
+import analytics.util.dao.VariableDao;
 import analytics.util.objects.Change;
 import analytics.util.objects.Model;
 import analytics.util.objects.RealTimeScoringContext;
@@ -31,15 +28,15 @@ import analytics.util.objects.StrategyMapper;
 import analytics.util.objects.Variable;
 import analytics.util.strategies.Strategy;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
+
 public class ScoringSingleton {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ScoringSingleton.class);
-	private DB db;
-	private DBCollection modelVariablesCollection;
-	private DBCollection memberVariablesCollection;
-	private DBCollection variablesCollection;
+
 	private DBCollection changedVariablesCollection;
-	private DBCollection changedMemberScoresCollection;
 	private Map<String, List<Integer>> variableModelsMap;
 	private Map<Integer, Map<Integer, Model>> modelsMap;
 	private Map<String, String> variableVidToNameMap;
@@ -59,34 +56,17 @@ public class ScoringSingleton {
 	}
 	private ScoringSingleton() {
 		//Get DB connection
-		try {
-			db = DBConnection.getDBConnection();
-		} catch (ConfigurationException e) {
-			LOGGER.error("Unable to contain DB connection", e);
-		}
-		modelVariablesCollection = db.getCollection("modelVariables");
-		memberVariablesCollection = db.getCollection("memberVariables");
-		variablesCollection = db.getCollection("Variables");
-		changedVariablesCollection = db.getCollection("changedMemberVariables");
-		changedMemberScoresCollection = db.getCollection("changedMemberScores");
-
 		LOGGER.debug("Populate variable vid map");
 		// populate the variableVidToNameMap
 		variableNameToStrategyMap = new HashMap<String, String>();
 		variableVidToNameMap = new HashMap<String, String>();
 		variableNameToVidMap = new HashMap<String, String>();
-		
-		DBCursor vCursor = variablesCollection.find();
-		for (DBObject variable : vCursor) {
-			String variableName = ((DBObject) variable).get(MongoNameConstants.V_NAME).toString()
-					.toUpperCase();
-			String vid = ((DBObject) variable).get(MongoNameConstants.V_ID).toString();
-			String strategy = ((DBObject) variable).get(MongoNameConstants.V_STRATEGY).toString();
-			if (variableName != null && vid != null) {
-				variableVidToNameMap.put(vid, variableName.toUpperCase());
-				variableNameToVidMap.put(variableName.toUpperCase(), vid);
-				variableNameToStrategyMap.put(variableName.toUpperCase(),
-						strategy);
+		List<Variable> variables = new VariableDao().getVariables();
+		for(Variable variable:variables){
+			if (variable.getName() != null && variable.getId() != null) {
+				variableVidToNameMap.put(variable.getVid(), variable.getName());
+				variableNameToVidMap.put(variable.getName(), variable.getVid());
+				variableNameToStrategyMap.put(variable.getName(),variable.getStrategy());
 			}
 		}
 		
@@ -95,52 +75,10 @@ public class ScoringSingleton {
 		variableModelsMap = new HashMap<String, List<Integer>>();
 		// populate the variableModelsMap and modelsMap
 		modelsMap = new HashMap<Integer, Map<Integer, Model>>();
+		//Populate both maps
+		//TODO: Refactor this so that it is a simple DAO method. Variable models map can be populated later
+		new ModelVariablesDao().populateModelVariables(modelsMap, variableModelsMap);
 
-		DBCursor models = modelVariablesCollection.find();
-		for (DBObject model : models) {
-			int modelId = Integer.valueOf(model.get(MongoNameConstants.MODEL_ID).toString());
-			int month = Integer.valueOf(model.get(MongoNameConstants.MONTH).toString());
-			double constant = Double.valueOf(model.get(MongoNameConstants.CONSTANT).toString());
-
-			Map<String, Variable> variablesMap = populateVariableModelsMap(
-					model, modelId);
-			
-			if (!modelsMap.containsKey(modelId)) {
-				Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
-				monthModelMap.put(month, new Model(modelId, month, constant,
-						variablesMap));
-				modelsMap.put(modelId, monthModelMap);
-			} else {
-				modelsMap.get(modelId).put(month,
-						new Model(modelId, month, constant, variablesMap));
-			}
-		}
-
-	}
-	private Map<String, Variable> populateVariableModelsMap(DBObject model,
-			int modelId) {
-		BasicDBList modelVariables = (BasicDBList) model.get(MongoNameConstants.VARIABLE);
-		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
-		for (Object modelVariable : modelVariables) {
-			String variableName = ((DBObject) modelVariable).get(MongoNameConstants.VAR_NAME)
-					.toString().toUpperCase();
-			Double coefficient = Double.valueOf(((DBObject) modelVariable)
-					.get(MongoNameConstants.COEFFICIENT).toString());
-			variablesMap.put(variableName, new Variable(variableName,
-					variableNameToVidMap.get(variableName), coefficient));
-
-			if (!variableModelsMap.containsKey(variableName)) {
-				List<Integer> modelIds = new ArrayList<Integer>();
-				variableModelsMap.put(variableName.toUpperCase(), modelIds);
-				variableModelsMap.get(variableName.toUpperCase()).add(modelId);
-			} else {
-				if (!variableModelsMap.get(variableName).contains(modelId)) {
-					variableModelsMap.get(variableName.toUpperCase())
-							.add(modelId);
-				}
-			}
-		}
-		return variablesMap;
 	}
 	
 	//TODO: Replace this method. Its for backward compatibility. Bad coding
@@ -150,6 +88,7 @@ public class ScoringSingleton {
 		for(String model: modelIdArrayList){
 			modelIdList.add(Integer.parseInt(model));
 		}
+		//Contains a VID to object mapping, not var name
 		Map<String, Object> memberVariablesMap = ScoringSingleton.getInstance().createVariableValueMap(loyaltyId, modelIdList);
 		if(memberVariablesMap==null){
 			LOGGER.warn("Unable to find member variables");
@@ -172,6 +111,26 @@ public class ScoringSingleton {
 		return modelIdStringScoreMap;
 	}
 	
+	public Map<String, Object> createVariableValueMap(String loyaltyId,
+			Set<Integer> modelIdList) {
+		Map<String,Integer> variableFilter = new HashMap<String, Integer>();
+    	for (Integer modId : modelIdList) {
+			int month;
+			if (modelsMap.get(modId).containsKey(0)) {
+				month = 0;
+			} else {
+				month = Calendar.getInstance().get(Calendar.MONTH) + 1;
+			}
+
+			for (String var : modelsMap.get(modId).get(month).getVariables()
+					.keySet()) {
+				variableFilter.put(variableNameToVidMap.get(var), 1);
+			}
+		}
+		Map<String, Object> memberVariablesMap = new MemberVariablesDao().getMemberVariablesFiltered(loyaltyId, variableFilter);
+		return memberVariablesMap;
+	}
+	
 	public Set<Integer> getModelIdList(Map<String, String> newChangesVarValueMap){
 		Set<Integer> modelIdList = new HashSet<Integer>();
 		for (String changedVariable : newChangesVarValueMap.keySet()) {
@@ -183,43 +142,6 @@ public class ScoringSingleton {
 		return modelIdList;
 	}
 	
-	public Map<String, Object> createVariableValueMap(String lId,Set<Integer> modelIdList ) {
-		BasicDBObject variableFilterDBO = new BasicDBObject(MongoNameConstants.ID, 0);
-		for (Integer modId : modelIdList) {
-			int month;
-			if (modelsMap.get(modId).containsKey(0)) {
-				month = 0;
-			} else {
-				month = Calendar.getInstance().get(Calendar.MONTH) + 1;
-			}
-
-			for (String var : modelsMap.get(modId).get(month).getVariables()
-					.keySet()) {
-				variableFilterDBO.append(variableNameToVidMap.get(var), 1);
-			}
-		}
-		
-		DBObject mbrVariables = memberVariablesCollection.findOne(
-				new BasicDBObject("l_id", lId), variableFilterDBO);
-		LOGGER.debug(" Creating variable value map");
-		if (mbrVariables == null) {
-			LOGGER.info("Bolt could not find member variables for " + lId);
-			return null;
-		}
-
-		// CREATE MAP FROM VARIABLES TO VALUE (OBJECT)
-		Map<String, Object> memberVariablesMap = new HashMap<String, Object>();
-		Iterator<String> mbrVariablesIter = mbrVariables.keySet().iterator();
-		while (mbrVariablesIter.hasNext()) {
-			String key = mbrVariablesIter.next();
-			if (!key.equals(MongoNameConstants.L_ID) && !key.equals(MongoNameConstants.ID)) {
-				memberVariablesMap.put(variableVidToNameMap.get(key)
-						.toUpperCase(), mbrVariables.get(key));
-
-			}
-		}
-		return memberVariablesMap;
-	}
 	public Map<String, Change> createChangedVariablesMap(String lId) {
 		DBObject changedMbrVariables = changedVariablesCollection
 				.findOne(new BasicDBObject(MongoNameConstants.L_ID, lId));
@@ -296,9 +218,9 @@ public class ScoringSingleton {
 				}
 				// else get it from memberVariablesMap
 				else {
-					if (memberVariablesMap.get(variableName) != null) {
+					if (memberVariablesMap.get(variableNameToVidMap.get(variableName)) != null) {
 						context.setPreviousValue(memberVariablesMap
-								.get(variableName));
+								.get(variableNameToVidMap.get(variableName)));
 					}
 				}
 				LOGGER.debug(" ~~~ STRATEGY BOLT CHANGES - context: " + context);
@@ -499,12 +421,10 @@ public class ScoringSingleton {
 							.append(MongoNameConstants.CMS_EFFECTIVE_DATE, simpleDateFormat.format(new Date())));
 		}
 		if (updateRec != null) {
-			changedMemberScoresCollection.update(new BasicDBObject(MongoNameConstants.L_ID,
-					lId), new BasicDBObject("$set", updateRec), true,
-					false);
-
+			new ChangedMemberScoresDao().upsertUpdateChangedScores(lId,updateRec);
 		}	
 	}
+
 	public void updateChangedVariables(String lId, Integer modelId,
 			Map<String, Change> allChanges) {
 		// 11) Write changedMemberVariables with expiry
@@ -533,17 +453,12 @@ public class ScoringSingleton {
 
 			}
 
-			BasicDBObject searchQuery = new BasicDBObject().append(MongoNameConstants.L_ID,
-					lId);
-
 			LOGGER.trace(" ~~~ DOCUMENT TO INSERT:");
 			LOGGER.debug(newDocument.toString());
 			LOGGER.trace(" ~~~ END DOCUMENT");
 
 			// upsert document
-			changedVariablesCollection.update(searchQuery,
-					new BasicDBObject("$set", newDocument), true, false);
-
+			new ChangedVariablesDao().upsertUpdateChangedScores(lId, newDocument);
 		}
 				
 		

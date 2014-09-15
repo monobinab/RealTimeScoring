@@ -22,6 +22,11 @@ public class MongoNameConstants {
 	//Member zip
 	public static final String ZIP="z";
 	
+	//div cat ksn collection
+	public static final String DCK_K="k";
+	public static final String DCK_C="c";
+	public static final String DCK_D="d";
+	
 	//Pid div ln collection
 	public static final String PDL_PID="pid";
 	public static final String PDL_D="d";
@@ -35,6 +40,11 @@ public class MongoNameConstants {
 	public static final String DLI_DIV="d";
 	public static final String DLI_LN="l";
 	public static final String DLI_ITEM="i";
+	
+	//Trait variables
+	public static final String TV_TRAIT="t";
+	public static final String TV_VARIABLES="v";
+	
 	
 	//Model variables collection
 	public static final String MODEL_ID = "modelId";

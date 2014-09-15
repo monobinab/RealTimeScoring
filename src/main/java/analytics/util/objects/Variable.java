@@ -1,7 +1,5 @@
 package analytics.util.objects;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 
 import java.io.Serializable;
@@ -16,49 +14,25 @@ public class Variable implements Serializable
 	private String name;
 	private String vid;
 	private double coefficient;
+	private String strategy;
 	 
-
-	public Variable() {}
-	 
-	public Variable( String nm, String id, double coefficnt)
+	public Variable( String nm, double coefficnt)
+	{
+		this.name   = nm;
+		this.coefficient = coefficnt;
+	}
+	
+	public Variable( String nm, String id, String strategy)
 	{
 		this.name   = nm;
 		this.vid   = id;
-		this.coefficient = coefficnt;
+		this.strategy = strategy;
 	}
 	 
 	public ObjectId getId() { return this._id; }
-	public void setId( ObjectId _id ) { this._id = _id; }
-	public void generateId() { if( this._id == null ) this._id = new ObjectId(); }
-	 
+	public void generateId() { if( this._id == null ) this._id = new ObjectId(); } 
 	public String getName() { return this.name; }
-	public void setName( String name ) { this.name = name; }
-
 	public String getVid() { return this.vid; }
-	public void setVid( String id ) { this.vid = id; }
-	
-	 
-	 
-	public double getCoefficient() { return this.coefficient; }
-	public void setCoefficient( double coefficient ) { this.coefficient = coefficient; }
-	 
-	public DBObject bsonFromPojo()
-	{
-		BasicDBObject document = new BasicDBObject();
-		 
-		document.put( "_id",    this._id );
-		document.put( "name",   this.name );
-		document.put( "coefficient",  this.coefficient );
-		 
-		return document;
-	}
-	 
-	public void makePojoFromBson( DBObject bson )
-	{
-		BasicDBObject b = ( BasicDBObject ) bson;
-		 
-		this._id    	= ( ObjectId ) b.get( "_id" );
-		this.name   	= ( String )   b.get( "name" );
-		this.coefficient= ( Double )   b.get( "coefficient" );
-	}
+	public double getCoefficient() { return this.coefficient; } 
+	public String getStrategy() { return this.strategy;}
 }

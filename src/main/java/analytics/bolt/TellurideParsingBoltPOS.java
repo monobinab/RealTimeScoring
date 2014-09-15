@@ -15,10 +15,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.util.DBConnection;
 import analytics.util.JsonUtils;
 import analytics.util.SecurityUtils;
 import analytics.util.XMLParser;
+import analytics.util.dao.DivCatKsnDao;
+import analytics.util.dao.DivCatVariableDao;
+import analytics.util.dao.DivLnItmDao;
+import analytics.util.dao.DivLnVariableDao;
 import analytics.util.objects.LineItem;
 import analytics.util.objects.ProcessTransaction;
 import analytics.util.objects.TransactionLineItem;
@@ -30,11 +33,6 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
 import com.ibm.jms.JMSMessage;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
 
 public class TellurideParsingBoltPOS extends BaseRichBolt {
 
@@ -45,27 +43,15 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 	 */
 	private static final long serialVersionUID = 1L;
 	private OutputCollector outputCollector;
-	
-	private DB db;
-	private DBCollection divLnItmCollection;
-	private DBCollection ksndivcatCollection;
-	private DBCollection divLnVariableCollection;
-	private DBCollection divCatVariableCollection; 
-	private Map<String, Collection<String>> divLnVariablesMap;
-	private Map<String, Collection<String>> divCatVariablesMap;
+
+	private Map<String, List<String>> divLnVariablesMap;
+	private Map<String, List<String>> divCatVariablesMap;
 	private String requestorID = "";
 
 	public void setOutputCollector(OutputCollector outputCollector) {
 		this.outputCollector = outputCollector;
 	}
 
-	public void setDb(DB db) {
-		this.db = db;
-	}
-
-	public void setDivLnItmCollection(DBCollection divLnItmCollection) {
-		this.divLnItmCollection = divLnItmCollection;
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -80,55 +66,14 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 
 		logger.info("Preparing telluride parsing bolt");
 
-		try {
-			db = DBConnection.getDBConnection();
-		} catch (Exception e) {
-			logger.error("Unable to obtain DB connection", e);
-		}
-
 		logger.debug("Getting mongo collections");
-		divLnItmCollection = db.getCollection("divLnItm");
-		divLnVariableCollection = db.getCollection("divLnVariable");
-		ksndivcatCollection = db.getCollection("divCatKsn");
-		divCatVariableCollection = db.getCollection("divCatVariable");
-
 		logger.trace("Populate div line variables map");
 		// populate divLnVariablesMap
-		divLnVariablesMap = new HashMap<String, Collection<String>>();
-		DBCursor divLnVarCursor = divLnVariableCollection.find();
-		for (DBObject divLnDBObject : divLnVarCursor) {
-			if (divLnVariablesMap.get(divLnDBObject.get("d")) == null) {
-				Collection<String> varColl = new ArrayList<String>();
-				varColl.add(divLnDBObject.get("v").toString());
-				divLnVariablesMap.put(divLnDBObject.get("d").toString(),
-						varColl);
-			} else {
-				Collection<String> varColl = divLnVariablesMap
-						.get(divLnDBObject.get("d").toString());
-				varColl.add(divLnDBObject.get("v").toString().toUpperCase());
-				divLnVariablesMap.put(divLnDBObject.get("d").toString(),
-						varColl);
-			}
-		}
+		divLnVariablesMap = new DivLnVariableDao().getDivLnVariable();
 
 		logger.trace("Populate div cat variables map");
 		//populate divCatVariablesMap
-		divCatVariablesMap = new HashMap<String, Collection<String>>();
-		DBCursor divVarCursor = divCatVariableCollection.find();
-		for (DBObject divDBObject : divVarCursor) {
-			if (divCatVariablesMap.get(divDBObject.get("d").toString().trim()) == null) {
-				Collection<String> varColl = new ArrayList<String>();
-				varColl.add(divDBObject.get("v").toString());
-				divCatVariablesMap.put(divDBObject.get("d").toString(),
-						varColl);
-			} else {
-				Collection<String> varColl = divCatVariablesMap
-						.get(divDBObject.get("d").toString().trim());
-				varColl.add(divDBObject.get("v").toString().toUpperCase());
-				divCatVariablesMap.put(divDBObject.get("d").toString(),
-						varColl);
-			}
-		}
+		divCatVariablesMap = new DivCatVariableDao().getDivCatVariable();
 	}
 
 	/*
@@ -303,7 +248,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 							}
                             String div = lineItem.getDivision();
 
-                            String line = getLineFromCollection(div, item);
+                    		String line = new DivLnItmDao().getLnFromDivItem(div, item);
 							if (line == null) {
 								/*logger.info("Line is null");*/
 								continue;
@@ -411,45 +356,11 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 		declarer.declare(new Fields("l_id", "lineItemAsJsonString", "source","messageID"));
 	}
 
-	//TODO: Move this to util
-	private final String getLineFromCollection(String div, String item) {
-		logger.debug("searching for line");
-
-		BasicDBObject queryLine = new BasicDBObject();
-		queryLine.put("d", div);
-		queryLine.put("i", item);
-
-		/*logger.info("query: " + queryLine);*/
-		DBObject divLnItm = divLnItmCollection.findOne(queryLine);
-		logger.trace("line: " + divLnItm);
-
-		if (divLnItm == null || divLnItm.keySet() == null
-				|| divLnItm.keySet().isEmpty()) {
-			logger.trace("Everything is null");
-			return null;
-		}
-		String line = divLnItm.get("l").toString();
-		logger.debug("  found line: " + line);
-		return line;
-	}
-
 	private final String getDivCategoryFromCollection(String item) {
 		logger.debug("searching for category");
-
-		BasicDBObject queryLine = new BasicDBObject();
-		queryLine.put("k", item);
-
-		logger.trace("query: " + queryLine);
-		DBObject ksndivcat = ksndivcatCollection.findOne(queryLine);
-		//logger.info("category: " + ksndivcat);
-
-		if (ksndivcat == null || ksndivcat.keySet() == null
-				|| ksndivcat.keySet().isEmpty()) {
-			//logger.info("Ksndivcat is null");
-			return null;
-		}
-		String category = ksndivcat.get("c").toString();
-        String div = ksndivcat.get("d").toString();
+		DivCatKsnDao.DivCat divCat = new DivCatKsnDao().getVariableFromTopic(item);
+		String category = divCat.getCat();
+        String div = divCat.getDiv();
 
         /*logger.info("  found category: " + category);
         logger.info("  found division: " + div);*/

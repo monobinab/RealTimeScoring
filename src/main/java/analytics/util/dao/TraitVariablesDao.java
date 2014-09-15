@@ -6,7 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import analytics.util.DBConnection;
+import analytics.util.MongoNameConstants;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.DB;
@@ -15,15 +19,18 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
 public class TraitVariablesDao {
-	DB db;
+	static final Logger LOGGER = LoggerFactory
+			.getLogger(TraitVariablesDao.class);
+	static DB db;
     DBCollection traitVariablesCollection;
-    {
+    static {
 		try {
 			db = DBConnection.getDBConnection();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error("Unable to get DB connection", e);
 		}
+    }
+    public TraitVariablesDao(){
 		traitVariablesCollection = db.getCollection("traitVariables");
     }
     public HashMap<String, List<String>> getTraitVariableList(){
@@ -31,18 +38,18 @@ public class TraitVariablesDao {
     	DBCursor traitVarCursor = traitVariablesCollection.find();
 
     	for(DBObject traitVariablesDBO: traitVarCursor) {
-    		BasicDBList variables = (BasicDBList) traitVariablesDBO.get("v");
+    		BasicDBList variables = (BasicDBList) traitVariablesDBO.get(MongoNameConstants.TV_VARIABLES);
     		for(Object v:variables) {
     			String variable = v.toString().toUpperCase();
-    			if(traitVariablesMap.containsKey(traitVariablesDBO.get("t"))) {
-    				if(!traitVariablesMap.get(traitVariablesDBO.get("t")).contains(variable)) {
-    					traitVariablesMap.get(traitVariablesDBO.get("t")).add(variable);
+    			if(traitVariablesMap.containsKey(traitVariablesDBO.get(MongoNameConstants.TV_TRAIT))) {
+    				if(!traitVariablesMap.get(traitVariablesDBO.get(MongoNameConstants.TV_TRAIT)).contains(variable)) {
+    					traitVariablesMap.get(traitVariablesDBO.get(MongoNameConstants.TV_TRAIT)).add(variable);
     				}
     			}
     			else {
     				List<String> newTraitVariable = new ArrayList<String>();
-    				traitVariablesMap.put(traitVariablesDBO.get("t").toString(), newTraitVariable);
-    				traitVariablesMap.get(traitVariablesDBO.get("t")).add(variable);
+    				traitVariablesMap.put(traitVariablesDBO.get(MongoNameConstants.TV_TRAIT).toString(), newTraitVariable);
+    				traitVariablesMap.get(traitVariablesDBO.get(MongoNameConstants.TV_TRAIT)).add(variable);
     			}
     		}
     	}
@@ -54,18 +61,18 @@ public class TraitVariablesDao {
     	DBCursor traitVarCursor = traitVariablesCollection.find();
 
     	for(DBObject traitVariablesDBO: traitVarCursor) {
-    		BasicDBList variables = (BasicDBList) traitVariablesDBO.get("v");
+    		BasicDBList variables = (BasicDBList) traitVariablesDBO.get(MongoNameConstants.TV_VARIABLES);
     		for(Object v:variables) {
     			String variable = v.toString().toUpperCase();
     			if(variableTraitsMap.containsKey(variable)) {
-    				if(!variableTraitsMap.get(variable).contains(traitVariablesDBO.get("t"))) {
-    					variableTraitsMap.get(variable).add(traitVariablesDBO.get("t").toString());
+    				if(!variableTraitsMap.get(variable).contains(traitVariablesDBO.get(MongoNameConstants.TV_TRAIT))) {
+    					variableTraitsMap.get(variable).add(traitVariablesDBO.get(MongoNameConstants.TV_TRAIT).toString());
     				}
     			}
     			else {
     				List<String> newVariableTraits = new ArrayList<String>();
     				variableTraitsMap.put(variable, newVariableTraits);
-    				variableTraitsMap.get(variable).add(traitVariablesDBO.get("t").toString());
+    				variableTraitsMap.get(variable).add(traitVariablesDBO.get(MongoNameConstants.TV_TRAIT).toString());
     			}
     		}
     	}

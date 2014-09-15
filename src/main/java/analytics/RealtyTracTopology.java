@@ -57,6 +57,7 @@ public class RealtyTracTopology {
 
   public static void main(String[] args) throws Exception {
 
+	//TODO: Requires python libraries installed, mongo collection does not exist currently. Mongo objects should be changed to DAO
     TopologyBuilder builder = new TopologyBuilder();
 
     builder.setSpout("spout", new JavaRealtyTracSpout("RealtyTracSpoutForSold.py"), 1);

@@ -1,5 +1,8 @@
 package analytics.util.dao;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import analytics.util.DBConnection;
 import analytics.util.MongoNameConstants;
 
@@ -10,18 +13,18 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
 public class FbVariableDao {
-//DBObject fbVar = fbVariableCollection.findOne(new BasicDBObject("k",topic));
-	//fbVar.get("v"
-	
-	DB db;
+	static final Logger LOGGER = LoggerFactory
+			.getLogger(FbVariableDao.class);
+	static DB db;
     DBCollection fbVariableCollection;
-    {
+    static {
 		try {
 			db = DBConnection.getDBConnection();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error("Unable to get DB connection", e);
 		}
+    }
+    public FbVariableDao(){
 		fbVariableCollection = db.getCollection("fbVariable");
     }
 
