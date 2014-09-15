@@ -69,11 +69,15 @@ public class MemberTraitsDao {
 	}
 
 
-	public void addDateTrait(String l_id, BasicDBList dateTraitList) {
+	public void addDateTrait(String l_id, Map<String,List<String>> dateTraitMap) {
+		BasicDBList dateTraitList = new BasicDBList();
+		for(String date : dateTraitMap.keySet()){
+			dateTraitList.add(new BasicDBObject("d", date).append("t", dateTraitMap.get(date)));
+		}		
 		DBObject objectToInsert = new BasicDBObject();
 		objectToInsert.put("l_id", l_id);
 		objectToInsert.put("date", dateTraitList);
-		memberTraitsCollection.insert(objectToInsert);
+		memberTraitsCollection.update(new BasicDBObject("l_id", l_id), objectToInsert, true, false);
 	}
 }
 
