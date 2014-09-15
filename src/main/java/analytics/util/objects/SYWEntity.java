@@ -1,8 +1,5 @@
 package analytics.util.objects;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-
 public class SYWEntity {
 private int Id;
 private String EntityType;
