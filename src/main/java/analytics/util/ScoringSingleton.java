@@ -29,16 +29,10 @@ import analytics.util.objects.Variable;
 import analytics.util.strategies.Strategy;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
 
 public class ScoringSingleton {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ScoringSingleton.class);
-	DB db;
-
-	private DBCollection changedVariablesCollection;
 	private Map<String, List<Integer>> variableModelsMap;
 	private Map<Integer, Map<Integer, Model>> modelsMap;
 	private Map<String, String> variableVidToNameMap;
@@ -57,12 +51,6 @@ public class ScoringSingleton {
 		return instance;
 	}
 	private ScoringSingleton() {
-		try {
-			db = DBConnection.getDBConnection();
-		} catch (Exception e) {
-			LOGGER.error("Unable to get DB connection", e);
-		}
-		changedVariablesCollection = db.getCollection("changedMemberVariables");
 		//Get DB connection
 		LOGGER.debug("Populate variable vid map");
 		// populate the variableVidToNameMap
@@ -151,49 +139,18 @@ public class ScoringSingleton {
 	}
 	
 	public Map<String, Change> createChangedVariablesMap(String lId) {
-		DBObject changedMbrVariables = changedVariablesCollection
-				.findOne(new BasicDBObject(MongoNameConstants.L_ID, lId));
+		Map<String, Change> changedMbrVariables = new ChangedVariablesDao().getMemberVariables(lId);
 
 		Map<String, Change> allChanges = new HashMap<String, Change>();
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		if (changedMbrVariables != null && changedMbrVariables.keySet() != null) {
 			for (String key : changedMbrVariables.keySet()) {
+				//key is VID
 				// skip expired changes
-				if (MongoNameConstants.L_ID.equals(key) || MongoNameConstants.ID.equals(key)) {
-					continue;
-				}
-				try {
-					// v = VID : e = expiration date : f = effective date
-					if (((DBObject) changedMbrVariables.get(key)).get(MongoNameConstants.MV_EXPIRY_DATE) != null
-							&& ((DBObject) changedMbrVariables.get(key))
-									.get(MongoNameConstants.MV_EFFECTIVE_DATE) != null
-							&& ((DBObject) changedMbrVariables.get(key))
-									.get(MongoNameConstants.MV_VID) != null
-							&& !simpleDateFormat.parse(
-									((DBObject) changedMbrVariables.get(key))
-											.get(MongoNameConstants.MV_EXPIRY_DATE).toString()).after(
-									new Date())) {
-						allChanges
-								.put(variableVidToNameMap.get(key),
-										new Change(
-												key.toUpperCase(),
-												((DBObject) changedMbrVariables
-														.get(key)).get(MongoNameConstants.MV_VID),
-												simpleDateFormat
-														.parse(((DBObject) changedMbrVariables
-																.get(key)).get(
-																		MongoNameConstants.MV_EXPIRY_DATE).toString()),
-												simpleDateFormat
-														.parse(((DBObject) changedMbrVariables
-																.get(key)).get(
-																		MongoNameConstants.MV_EFFECTIVE_DATE).toString())));
-					} else {
-						LOGGER.debug("Got a null value for "
-								+ changedMbrVariables.get(key));
-					}
-				} catch (ParseException e) {
-					LOGGER.error(e.getMessage(), e);
-					return allChanges;
+				if (changedMbrVariables.get(key).getExpirationDate().after(new Date())){
+						allChanges.put(variableVidToNameMap.get(key), changedMbrVariables.get(key));
+				} else {
+					LOGGER.debug("Got an expired value for "
+							+ changedMbrVariables.get(key));
 				}
 			}
 		}
@@ -445,7 +402,7 @@ public class ScoringSingleton {
 						.next();
 				String varVid = variableNameToVidMap.get(pairsVarValue
 						.getKey().toString().toUpperCase());
-				Object val = pairsVarValue.getValue().value;
+				Object val = pairsVarValue.getValue().getValue();
 				newDocument
 						.append(varVid,
 								new BasicDBObject()

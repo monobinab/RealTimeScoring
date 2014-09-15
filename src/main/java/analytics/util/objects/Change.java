@@ -4,24 +4,24 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Change {
-	public String variableName;
-	public Object value;
-	public Date expirationDate;
-	public Date effectivDate;
+	private String vid;
+	private Object value;
+	private Date expirationDate;
+	private Date effectivDate;
 	
 	public Change() {}
 	
 	private static SimpleDateFormat dtFormat = new SimpleDateFormat("yyyy-MM-dd");
 	
-	public Change(String varName, Object val, Date expDate, Date effDate) {
-		this.variableName = varName;
+	public Change(String vid, Object val, Date expDate, Date effDate) {
+		this.vid = vid;
 		this.value = val;
 		this.expirationDate = expDate;
 		this.effectivDate = effDate;
 	}
 	
-	public Change(String varName, Object val, Date expDate) {
-		this.variableName = varName;
+	public Change(String vid, Object val, Date expDate) {
+		this.vid = vid;
 		this.value = val;
 		this.expirationDate = expDate;
 		this.effectivDate = new Date();
@@ -33,11 +33,11 @@ public class Change {
 	}
 	
 	public void setChangeVariable(String varNm) {
-		this.variableName = varNm;
+		this.vid = varNm;
 	}
 	
 	public String getChangeVariable() {
-		return this.variableName;
+		return this.vid;
 	}
 	
 	public void setValue(Object val) {
