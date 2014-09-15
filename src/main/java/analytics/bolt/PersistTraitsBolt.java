@@ -1,9 +1,15 @@
 package analytics.bolt;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,10 +22,6 @@ import backtype.storm.tuple.Tuple;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import com.mongodb.util.JSON;
 
 public class PersistTraitsBolt extends BaseRichBolt {
 	static final Logger logger = LoggerFactory
@@ -43,20 +45,30 @@ public class PersistTraitsBolt extends BaseRichBolt {
 		//We need the values from any trait, since the data is replicated across them
 		//This would also contain past data, so we can replace the content in mongo
 		//Get the map from wire
-		DBObject traitDateMap = (DBObject) JSON.parse(input.getString(1));
 
-		//Read a key from the map
-		for(String traitName: traitDateMap.keySet()){
-			DBObject dateTrait = (DBObject) JSON.parse(traitDateMap.get(traitName).toString());
-			BasicDBList dateTraitList = new BasicDBList();
-			for(String date : dateTrait.keySet()){
-				dateTraitList.add(new BasicDBObject("d", date).append("t", dateTrait.get(date)));
+		try {
+			JSONObject obj = new JSONObject(input.getString(1));
+			Map<String, List<String>> dateTraitMap = new HashMap<String, List<String>>();
+			if(obj.keys().hasNext()){//we need only 1 trait, so no need to loop
+				String traitDateString = obj.get(obj.keys().next().toString()).toString();
+				JSONObject dateTraitObj = new JSONObject(traitDateString);
+				Iterator<Object> keys = dateTraitObj.keys();
+				while(keys.hasNext()){
+					String date = keys.next().toString();
+					//JSONObject traits = new JSONObject(dateTraitObj.get(date).toString());
+					JSONArray traitArray = new JSONArray(dateTraitObj.get(date).toString());
+					List<String> list = new ArrayList<String>();
+					for (int i=0; i<traitArray.length(); i++) {
+					    list.add( traitArray.getString(i) );
+					}
+					dateTraitMap.put(date, list);
+				}
 			}
-			new MemberTraitsDao().addDateTrait(l_id, dateTraitList);
-			break;//all trait names have same map
+			new MemberTraitsDao().addDateTrait(l_id, dateTraitMap);
+			
+		} catch (JSONException e) {
+			System.out.println("CHANGEEEE");
 		}
-		
-
 	}
 
 	@Override

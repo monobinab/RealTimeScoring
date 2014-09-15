@@ -34,15 +34,13 @@ public class DivLnBoostDao {
     	HashMap<String, List<String>> divLnBoostVariblesMap = new HashMap<String, List<String>>();
     	DBCursor divLnBoostVarCursor = divLnBoostCollection.find();
     	for (DBObject divLnBoostDBObject : divLnBoostVarCursor) {
-
-			@SuppressWarnings("unchecked")
-			List<HashMap> hashMaps = (List<HashMap>) divLnBoostDBObject
+			List<HashMap<String,String>> hashMaps = (List<HashMap<String,String>>) divLnBoostDBObject
 					.get(MongoNameConstants.DLV_VAR);
 			List<String> varibles = new ArrayList<String>();
 
-			for (HashMap hashMap : hashMaps) {
+			for (HashMap<String,String> hashMap : hashMaps) {
 				if (hashMap.containsKey(sourceTopic)) {
-					varibles.add((String) hashMap.get(sourceTopic));
+					varibles.add(hashMap.get(sourceTopic));
 				}
 			}
 			if (varibles.size() > 0
