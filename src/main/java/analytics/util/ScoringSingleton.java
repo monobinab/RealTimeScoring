@@ -29,12 +29,14 @@ import analytics.util.objects.Variable;
 import analytics.util.strategies.Strategy;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 
 public class ScoringSingleton {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ScoringSingleton.class);
+	DB db;
 
 	private DBCollection changedVariablesCollection;
 	private Map<String, List<Integer>> variableModelsMap;
@@ -55,6 +57,12 @@ public class ScoringSingleton {
 		return instance;
 	}
 	private ScoringSingleton() {
+		try {
+			db = DBConnection.getDBConnection();
+		} catch (Exception e) {
+			LOGGER.error("Unable to get DB connection", e);
+		}
+		changedVariablesCollection = db.getCollection("changedMemberVariables");
 		//Get DB connection
 		LOGGER.debug("Populate variable vid map");
 		// populate the variableVidToNameMap
@@ -63,7 +71,7 @@ public class ScoringSingleton {
 		variableNameToVidMap = new HashMap<String, String>();
 		List<Variable> variables = new VariableDao().getVariables();
 		for(Variable variable:variables){
-			if (variable.getName() != null && variable.getId() != null) {
+			if (variable.getName() != null && variable.getVid()!= null) {
 				variableVidToNameMap.put(variable.getVid(), variable.getName());
 				variableNameToVidMap.put(variable.getName(), variable.getVid());
 				variableNameToStrategyMap.put(variable.getName(),variable.getStrategy());
