@@ -22,6 +22,7 @@ import analytics.util.dao.MemberVariablesDao;
 import analytics.util.dao.ModelVariablesDao;
 import analytics.util.dao.VariableDao;
 import analytics.util.objects.Change;
+import analytics.util.objects.ChangedMemberScore;
 import analytics.util.objects.Model;
 import analytics.util.objects.RealTimeScoringContext;
 import analytics.util.objects.StrategyMapper;
@@ -327,7 +328,7 @@ public class ScoringSingleton {
 	}
 	
 	public void updateChangedMemberScore(String lId, Set<Integer> modelIdList, Map<String, Change> allChanges, Map<Integer,Double> modelIdScoreMap) {
-		BasicDBObject updateRec = new BasicDBObject();
+		Map<Integer, ChangedMemberScore> updatedScores = new HashMap<Integer, ChangedMemberScore>();
 		for(Integer modelId: modelIdList){
 		// FIND THE MIN AND MAX EXPIRATION DATE OF ALL VARIABLE CHANGES FOR
 			// CHANGED MODEL SCORE TO WRITE TO SCORE CHANGES COLLECTION
@@ -373,20 +374,13 @@ public class ScoringSingleton {
 			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 			// APPEND CHANGED SCORE AND MIN/MAX EXPIRATION DATES TO DOCUMENT FOR
 			// UPDATE
-			updateRec.append(
-					modelId.toString(),
-					new BasicDBObject()
-							.append(MongoNameConstants.CMS_SCORE, modelIdScoreMap.get(modelId))
-							.append(MongoNameConstants.CMS_MIN_EXPIRY_DATE,
-									minDate != null ? simpleDateFormat
-											.format(minDate) : null)
-							.append(MongoNameConstants.CMS_MAX_EXPIRY_DATE,
-									maxDate != null ? simpleDateFormat
-											.format(maxDate) : null)
-							.append(MongoNameConstants.CMS_EFFECTIVE_DATE, simpleDateFormat.format(new Date())));
+			updatedScores.put(modelId, new ChangedMemberScore(modelIdScoreMap.get(modelId),
+					minDate != null ? simpleDateFormat.format(minDate) : null, 
+					maxDate != null ? simpleDateFormat.format(maxDate) : null, 
+					simpleDateFormat.format(new Date())));
 		}
-		if (updateRec != null) {
-			new ChangedMemberScoresDao().upsertUpdateChangedScores(lId,updateRec);
+		if (updatedScores != null) {
+			new ChangedMemberScoresDao().upsertUpdateChangedScores(lId,updatedScores);
 		}	
 	}
 
@@ -394,36 +388,8 @@ public class ScoringSingleton {
 			Map<String, Change> allChanges) {
 		// 11) Write changedMemberVariables with expiry
 		if (!allChanges.isEmpty()) {
-			Iterator<Entry<String, Change>> newChangesIter = allChanges
-					.entrySet().iterator();
-			BasicDBObject newDocument = new BasicDBObject();
-			while (newChangesIter.hasNext()) {
-				Map.Entry<String, Change> pairsVarValue = (Map.Entry<String, Change>) newChangesIter
-						.next();
-				String varVid = variableNameToVidMap.get(pairsVarValue
-						.getKey().toString().toUpperCase());
-				Object val = pairsVarValue.getValue().getValue();
-				newDocument
-						.append(varVid,
-								new BasicDBObject()
-										.append(MongoNameConstants.MV_VID, val)
-										.append(MongoNameConstants.MV_EXPIRY_DATE,
-												pairsVarValue
-														.getValue()
-														.getExpirationDateAsString())
-										.append(MongoNameConstants.MV_EFFECTIVE_DATE,
-												pairsVarValue
-														.getValue()
-														.getEffectiveDateAsString()));
-
-			}
-
-			LOGGER.trace(" ~~~ DOCUMENT TO INSERT:");
-			LOGGER.debug(newDocument.toString());
-			LOGGER.trace(" ~~~ END DOCUMENT");
-
 			// upsert document
-			new ChangedVariablesDao().upsertUpdateChangedScores(lId, newDocument);
+			new ChangedVariablesDao().upsertUpdateChangedScores(lId, allChanges, variableNameToVidMap);
 		}
 				
 		

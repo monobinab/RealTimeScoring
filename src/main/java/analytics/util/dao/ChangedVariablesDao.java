@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +34,18 @@ public class ChangedVariablesDao {
     public ChangedVariablesDao(){
 		changedMemberVariablesCollection = db.getCollection("changedMemberVariables");
     }
-	public void upsertUpdateChangedScores(String lId, BasicDBObject newDocument) {
+	public void upsertUpdateChangedScores(String lId, Map<String, Change> allChanges, Map<String, String> variableNameToVidMap) {
+		BasicDBObject newDocument = new BasicDBObject();
+		for(String varName:allChanges.keySet()){
+			String varVid = variableNameToVidMap.get(varName.toUpperCase());
+			Change varObj = allChanges.get(varName);
+			newDocument.append(varVid, new BasicDBObject().append(MongoNameConstants.MV_VID, varObj.getValue())
+														.append(MongoNameConstants.MV_EXPIRY_DATE, varObj.getExpirationDateAsString())
+														.append(MongoNameConstants.MV_EFFECTIVE_DATE, varObj.getEffectiveDateAsString()));
+		}
+		LOGGER.trace(" ~~~ DOCUMENT TO INSERT:");
+		LOGGER.debug(newDocument.toString());
+		LOGGER.trace(" ~~~ END DOCUMENT");
 		BasicDBObject searchQuery = new BasicDBObject().append(MongoNameConstants.L_ID,
 				lId);
 		changedMemberVariablesCollection.update(searchQuery,
@@ -48,7 +60,6 @@ public class ChangedVariablesDao {
 		if (changedMbrVariables == null) {
 			return null;
 		}
-
 		// CREATE MAP FROM VARIABLES TO VALUE (OBJECT)
 		Map<String, Change> memberVariablesMap = new HashMap<String, Change>();
 		Iterator<String> mbrVariablesIter = changedMbrVariables.keySet().iterator();
