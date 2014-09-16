@@ -4,6 +4,7 @@
 package analytics.bolt;
 
 import analytics.util.ScoringSingleton;
+import analytics.util.dao.MemberScoreDao;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -62,10 +63,12 @@ public class ScorePublishBolt extends BaseRichBolt {
         String l_id = input.getStringByField("l_id");
         String modelId = input.getStringByField("model");
         String modelName = ScoringSingleton.getInstance().getModelName(Integer.parseInt(modelId));
+        String oldScore = new MemberScoreDao().getMemberScores(l_id).get(modelId);
         String message = new StringBuffer(l_id).append(",")
             .append(modelName).append(",")
             .append(input.getStringByField("source")).append(",")
-            .append(input.getDoubleByField("newScore")).toString();
+            .append(input.getDoubleByField("newScore")).append(",")
+            .append(oldScore).toString();
         //System.out.println(" %%% message : " + message);       
         
         int retryCount=0;
