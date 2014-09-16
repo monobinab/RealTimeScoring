@@ -191,6 +191,11 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 							item = lineItem.getItemNumber();
 							//logger.info("Item is..."+item);
 							String divCategory = getDivCategoryFromCollection(item);
+							if(divCategory==null||divCategory.length()==0)
+							{
+								logger.error("Unable to find div cat information for" + item);
+								continue;
+							}
 							//logger.info("division and category are ...." + divCategory);
                             String div = StringUtils.substring(divCategory, 0, 3);//Picks up start, end-1
                             String cat = StringUtils.substring(divCategory, 3, 7);
@@ -359,6 +364,8 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 	private final String getDivCategoryFromCollection(String item) {
 		logger.debug("searching for category");
 		DivCatKsnDao.DivCat divCat = new DivCatKsnDao().getVariableFromTopic(item);
+		if(divCat==null)
+			return null;
 		String category = divCat.getCat();
         String div = divCat.getDiv();
 
