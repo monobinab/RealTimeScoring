@@ -1,7 +1,5 @@
 package analytics.util;
 
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.log4j.BasicConfigurator;
 
 public interface TopicConstants {
 
@@ -10,5 +8,7 @@ public interface TopicConstants {
 	public static final String AAM_CDF_INTERNALSEARCH = "AAM_CDF_InternalSearch" ;
 	public static final String AAM_CDF_TRAITS = "AAM_CDF_Traits" ;
 	public static final String PRODUCTS = "Products" ;
+	public static final String FB = "FB" ;
+	public static final String SYW = "Message" ;
 	public static final int PORT = 6379 ;
 }

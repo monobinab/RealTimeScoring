@@ -28,7 +28,7 @@ public class SYWEventsTopology {
 
 		TopologyBuilder toplologyBuilder = new TopologyBuilder();
 		String[] servers = RedisConnection.getServers();
-		String topic = TopicConstants.SOCIAL;
+		String topic = TopicConstants.SYW;
 
 		toplologyBuilder.setSpout("SYWEventsSpout", new SYWRedisSpout(
 				servers[0], TopicConstants.PORT, topic), 1);
