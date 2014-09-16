@@ -1,8 +1,13 @@
 package analytics;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import analytics.bolt.FacebookBolt;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.spout.FacebookRedisSpout;
+import analytics.util.RedisConnection;
+import analytics.util.TopicConstants;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
@@ -11,27 +16,39 @@ import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.topology.TopologyBuilder;
 
 public class SocialTopology {
-public static void main(String[] args) throws AlreadyAliveException, InvalidTopologyException, InterruptedException {
-	TopologyBuilder builder = new TopologyBuilder();
-	 String[] servers = new String[]{"rtsapp301p.qa.ch3.s.com"/*,"rtsapp302p.qa.ch3.s.com","rtsapp303p.qa.ch3.s.com"*/};
 
-	builder.setSpout("facebookSpout", new FacebookRedisSpout(servers[0], 6379, "FB"), 1);
-	builder.setBolt("facebookBolt", new FacebookBolt()).shuffleGrouping("facebookSpout");
-	builder.setBolt("strategyBolt", new StrategyScoringBolt(),1).shuffleGrouping("facebookBolt");
-	Config conf = new Config();
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(SocialTopology.class);
 
-    if (args != null && args.length > 0) {
-      conf.setNumWorkers(3);
+	public static void main(String[] args) throws AlreadyAliveException,
+			InvalidTopologyException, InterruptedException {
 
-      StormSubmitter.submitTopology(args[0], conf, builder.createTopology());
-    }
-    else {
-        conf.setDebug(false);
-      conf.setMaxTaskParallelism(3);
-      LocalCluster cluster = new LocalCluster();
-      cluster.submitTopology("social", conf, builder.createTopology());
-      Thread.sleep(10000000);
-      cluster.shutdown();
-    }
-}
+		LOGGER.info("Starting social topology ");
+		String topic = TopicConstants.FB;
+		TopologyBuilder topologyBuilder = new TopologyBuilder();
+		String[] servers = RedisConnection.getServers();
+
+		topologyBuilder.setSpout("facebookSpout", new FacebookRedisSpout(
+				servers[0], TopicConstants.PORT, topic), 1);
+		topologyBuilder.setBolt("facebookBolt", new FacebookBolt())
+				.shuffleGrouping("facebookSpout");
+		topologyBuilder.setBolt("strategyBolt", new StrategyScoringBolt(), 1)
+				.shuffleGrouping("facebookBolt");
+		Config conf = new Config();
+
+		if (args != null && args.length > 0) {
+			conf.setNumWorkers(3);
+
+			StormSubmitter.submitTopology(args[0], conf,
+					topologyBuilder.createTopology());
+		} else {
+			conf.setDebug(false);
+			conf.setMaxTaskParallelism(3);
+			LocalCluster cluster = new LocalCluster();
+			cluster.submitTopology("social_topology", conf,
+					topologyBuilder.createTopology());
+			Thread.sleep(10000000);
+			cluster.shutdown();
+		}
+	}
 }
