@@ -3,12 +3,12 @@
  */
 package analytics.bolt;
 
+import analytics.util.ScoringSingleton;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
-
 import redis.clients.jedis.Jedis;
 
 import java.util.Map;
@@ -60,14 +60,14 @@ public class ScorePublishBolt extends BaseRichBolt {
 		logger.debug("The time it enters inside Score Publish Bolt execute method "+System.currentTimeMillis());
         //System.out.println(" %%% scorepublishbolt :" + input);
         String l_id = input.getStringByField("l_id");
-        String modelName = input.getStringByField("model");
-
+        String modelId = input.getStringByField("model");
+        String modelName = ScoringSingleton.getInstance().getModelName(Integer.parseInt(modelId));
         String message = new StringBuffer(l_id).append(",")
             .append(modelName).append(",")
             .append(input.getStringByField("source")).append(",")
             .append(input.getDoubleByField("newScore")).toString();
-        //System.out.println(" %%% message : " + message);
-
+        //System.out.println(" %%% message : " + message);       
+        
         int retryCount=0;
         while(retryCount<5)
         try{

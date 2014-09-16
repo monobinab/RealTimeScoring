@@ -394,4 +394,15 @@ public class ScoringSingleton {
 				
 		
 	}
+	
+	public String getModelName(int modelId){
+		int month;
+		if (modelsMap.get(modelId).containsKey(0)) {
+			month = 0;
+		} else {
+			month = Calendar.getInstance().get(Calendar.MONTH) + 1;
+		}
+
+		return modelsMap.get(modelId).get(month).getModelName();
+	}
 }

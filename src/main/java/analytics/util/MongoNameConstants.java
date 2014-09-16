@@ -48,6 +48,7 @@ public class MongoNameConstants {
 	
 	//Model variables collection
 	public static final String MODEL_ID = "modelId";
+	public static final String MODEL_NAME="modelName";
 	public static final String MONTH = "month";
 	public static final String CONSTANT = "constant";
 	public static final String VARIABLE = "variable";

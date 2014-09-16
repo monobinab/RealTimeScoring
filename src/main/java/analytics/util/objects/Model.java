@@ -5,19 +5,22 @@ import java.util.Map;
 public class Model {
 
 	int modelId;
+	String modelName;
 	int month;
 	double constant;
 	Map<String, Variable> variables;
 	
 	public Model() {}
 	
-	public Model(int modId, int mth, double cnst) {
+	public Model(int modId, String modelName, int mth, double cnst) {
+		this.modelName = modelName;
 		this.modelId = modId;
 		this.month = mth;
 		this.constant = cnst;
 	}
 	
-	public Model(int modId, int mth, double cnst, Map<String, Variable> vars) {
+	public Model(int modId, String modelName, int mth, double cnst, Map<String, Variable> vars) {
+		this.modelName = modelName;
 		this.modelId = modId;
 		this.month = mth;
 		this.constant = cnst;
@@ -38,6 +41,10 @@ public class Model {
 
 	public Map<String, Variable> getVariables() {
 		return this.variables;
+	}
+	
+	public String getModelName() {
+		return this.modelName;
 	}
 
 }

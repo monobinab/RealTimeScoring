@@ -55,6 +55,7 @@ public class ModelVariablesDao {
 		DBCursor models = modelVariablesCollection.find();
 		for (DBObject model : models) {
 			int modelId = Integer.valueOf(model.get(MongoNameConstants.MODEL_ID).toString());
+			String modelName = model.get(MongoNameConstants.MODEL_NAME).toString();
 			int month = Integer.valueOf(model.get(MongoNameConstants.MONTH).toString());
 			double constant = Double.valueOf(model.get(MongoNameConstants.CONSTANT).toString());
 	
@@ -63,12 +64,12 @@ public class ModelVariablesDao {
 			
 			if (!modelsMap.containsKey(modelId)) {
 				Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
-				monthModelMap.put(month, new Model(modelId, month, constant,
+				monthModelMap.put(month, new Model(modelId, modelName, month, constant,
 						variablesMap));
 				modelsMap.put(modelId, monthModelMap);
 			} else {
 				modelsMap.get(modelId).put(month,
-						new Model(modelId, month, constant, variablesMap));
+						new Model(modelId, modelName, month, constant, variablesMap));
 			}
 		}
     }

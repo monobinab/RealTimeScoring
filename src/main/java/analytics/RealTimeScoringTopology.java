@@ -8,9 +8,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.bolt.ParsingBoltPOS;
+import analytics.bolt.ScorePublishBolt;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.spout.WebsphereMQSpout;
 import analytics.util.MQConnectionConfig;
+import analytics.util.RedisConnection;
 import analytics.util.WebsphereMQCredential;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
@@ -51,7 +53,7 @@ public class RealTimeScoringTopology {
 				.shuffleGrouping("npos1").shuffleGrouping("npos2");
 		topologyBuilder.setBolt("strategy_bolt", new StrategyScoringBolt())
 				.shuffleGrouping("parsing_bolt");
-
+		topologyBuilder.setBolt("score_publish_bolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 2).shuffleGrouping("strategy_bolt");
 		Config conf = new Config();
 		conf.setDebug(false);
 
