@@ -5,12 +5,12 @@ public class MongoNameConstants {
 	public static final String ID="_id";
 	public static final String L_ID= "l_id";
 	
-	//FB id collection
-	public static final String FB_ID = "u";
+	//FB id , TW id collection
+	public static final String SOCIAL_ID = "u";
 	
 	//FB keyword mapping
-	public static final String FB_KEYWORD="k";
-	public static final String FB_VARIABLE="v";
+	public static final String SOCIAL_KEYWORD="k";
+	public static final String SOCIAL_VARIABLE="v";
 	
 	//Model variables collection
 	public static final String MODELV_VARIABLE="variable";

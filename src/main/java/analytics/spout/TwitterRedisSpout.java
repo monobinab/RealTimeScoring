@@ -7,8 +7,8 @@ import java.util.concurrent.TimeUnit;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 
-public class FacebookRedisSpout extends RedisPubSubSpout {
-	public FacebookRedisSpout(String host, int port, String pattern) {
+public class TwitterRedisSpout extends RedisPubSubSpout {
+	public TwitterRedisSpout(String host, int port, String pattern) {
 		super(host, port, pattern);
 	}
 
@@ -27,7 +27,7 @@ public class FacebookRedisSpout extends RedisPubSubSpout {
 			e.printStackTrace();
 		}
 		if (ret != null) {
-			_collector.emit(tuple("facebook",ret));
+			_collector.emit(tuple("twitter",ret));
 		}
 	}
 

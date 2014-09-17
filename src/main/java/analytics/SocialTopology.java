@@ -3,9 +3,11 @@ package analytics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.bolt.FacebookBolt;
+import analytics.bolt.SocialBolt;
 import analytics.bolt.StrategyScoringBolt;
+import analytics.spout.AAMRedisPubSubSpout;
 import analytics.spout.FacebookRedisSpout;
+import analytics.spout.TwitterRedisSpout;
 import analytics.util.RedisConnection;
 import analytics.util.TopicConstants;
 import backtype.storm.Config;
@@ -24,16 +26,32 @@ public class SocialTopology {
 			InvalidTopologyException, InterruptedException {
 
 		LOGGER.info("Starting social topology ");
-		String topic = TopicConstants.FB;
+		String facebookTopic = TopicConstants.FB;
+		String twitterTopic = TopicConstants.TW;
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 		String[] servers = RedisConnection.getServers();
 
-		topologyBuilder.setSpout("facebookSpout", new FacebookRedisSpout(
-				servers[0], TopicConstants.PORT, topic), 1);
-		topologyBuilder.setBolt("facebookBolt", new FacebookBolt())
-				.shuffleGrouping("facebookSpout");
+		topologyBuilder.setSpout("facebookSpout1", new FacebookRedisSpout(
+				servers[0], TopicConstants.PORT, facebookTopic), 1);
+		topologyBuilder.setSpout("facebookSpout2", new FacebookRedisSpout(
+				servers[1], TopicConstants.PORT, facebookTopic), 1);
+		topologyBuilder.setSpout("facebookSpout3", new FacebookRedisSpout(
+				servers[2], TopicConstants.PORT, facebookTopic), 1);
+		topologyBuilder.setSpout("twitterSpout1", new TwitterRedisSpout(
+				servers[0], TopicConstants.PORT, twitterTopic), 1);
+		topologyBuilder.setSpout("twitterSpout2", new TwitterRedisSpout(
+				servers[1], TopicConstants.PORT, twitterTopic), 1);
+		topologyBuilder.setSpout("twitterSpout3", new TwitterRedisSpout(
+				servers[2], TopicConstants.PORT, twitterTopic), 1);
+		topologyBuilder.setBolt("socialBolt", new SocialBolt())
+				.shuffleGrouping("facebookSpout1")
+				.shuffleGrouping("facebookSpout2")
+				.shuffleGrouping("facebookSpout3")
+				.shuffleGrouping("twitterSpout1")
+				.shuffleGrouping("twitterSpout2")
+				.shuffleGrouping("twitterSpout3");
 		topologyBuilder.setBolt("strategyBolt", new StrategyScoringBolt(), 1)
-				.shuffleGrouping("facebookBolt");
+				.shuffleGrouping("socialBolt");
 		Config conf = new Config();
 
 		if (args != null && args.length > 0) {

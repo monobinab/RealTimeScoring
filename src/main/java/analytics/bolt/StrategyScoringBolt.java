@@ -76,7 +76,11 @@ public class StrategyScoringBolt extends BaseRichBolt {
 
 		// 3) Find all models affected by the changes
 		Set<Integer> modelIdList = ScoringSingleton.getInstance().getModelIdList(newChangesVarValueMap);
-
+		if(modelIdList==null){
+			LOGGER.info("No models affected");
+			this.outputCollector.ack(input);
+			return;
+		}
 		// 4) Find all variables for models
 
 		// 5) Create a map of variable values, fetched from from memberVariables

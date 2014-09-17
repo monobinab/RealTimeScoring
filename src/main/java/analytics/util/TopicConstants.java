@@ -9,6 +9,7 @@ public interface TopicConstants {
 	public static final String AAM_CDF_TRAITS = "AAM_CDF_Traits" ;
 	public static final String PRODUCTS = "Products" ;
 	public static final String FB = "FB" ;
+	public static final String TW = "TW" ;
 	public static final String SYW = "Message" ;
 	public static final int PORT = 6379 ;
 }
