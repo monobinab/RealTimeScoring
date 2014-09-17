@@ -69,7 +69,7 @@ public class ScoringSingletonTest {
 		newChangesVarValueMap.put("S_HOME_6M_IND", "value");
 		Set<Integer> modelIdList = testTarget.getModelIdList(newChangesVarValueMap);
 		Map<String, Object> map = testTarget.createVariableValueMap("", modelIdList);
-		System.out.println(map.toString());
+		assertEquals(map, null);//invalid l_id
 	}
 	
 	@Test
