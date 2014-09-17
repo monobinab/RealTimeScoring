@@ -130,10 +130,12 @@ public class ScoringSingleton {
 	
 	public Set<Integer> getModelIdList(Map<String, String> newChangesVarValueMap){
 		Set<Integer> modelIdList = new HashSet<Integer>();
+		if(newChangesVarValueMap==null)
+			return modelIdList;
 		for (String changedVariable : newChangesVarValueMap.keySet()) {
 			List<Integer> models = variableModelsMap.get(changedVariable);
 			if(models==null)
-				return null;
+				return modelIdList;
 			for (Integer modelId : models) {
 				modelIdList.add(modelId);
 			}
