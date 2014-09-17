@@ -60,16 +60,13 @@ public class MqSender {
             MQQueueSender sender2 = (MQQueueSender) session2.createSender(queue2);
             
 			
-			MQQueueReceiver receiver = (MQQueueReceiver)session2.createReceiver(queue);
             
-			javax.jms.TemporaryQueue temporaryQueue = session2.createTemporaryQueue();
 			// Listen to the temporary reply queue for messages returned by the scoring service
-			javax.jms.MessageConsumer consumer = session2.createConsumer(temporaryQueue);
 
 			String sCurrentLine;
-			BufferedReader br = null; 
-			Charset charset = Charset.forName("UTF-8");
-			br = new BufferedReader(new FileReader("resources/PROCTRAN3.txt"));
+			BufferedReader br = null;
+			FileReader fr = new FileReader("resources/PROCTRAN3.txt");
+			br = new BufferedReader(fr);
 			while ((sCurrentLine = br.readLine()) != null && counter<=1) {
 				BytesMessage message = (BytesMessage)session.createBytesMessage();
 				message.writeBytes(sCurrentLine.getBytes("UTF-8"));
@@ -104,6 +101,8 @@ public class MqSender {
 			sender.close();
 
 			// Cleanup
+			fr.close();
+			br.close();
 			session.close();
 			session2.close();
 			connection.stop();

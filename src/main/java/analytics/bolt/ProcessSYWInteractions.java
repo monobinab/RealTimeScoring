@@ -6,6 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import analytics.util.SYWAPICalls;
 import analytics.util.dao.PidDivLnDao;
 import analytics.util.objects.SYWEntity;
@@ -20,10 +23,10 @@ import backtype.storm.tuple.Tuple;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class ProcessSYWInteractions extends BaseRichBolt {
-
+	static final Logger LOGGER = LoggerFactory
+			.getLogger(ProcessSYWInteractions.class);
 	private List<String> entityTypes;
     private OutputCollector outputCollector;
     
@@ -42,7 +45,6 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 	@Override
 	public void execute(Tuple input) {
 		//Get l_id", "message", "InteractionType" from parsing bolt
-		JsonParser parser = new JsonParser();
 		JsonObject interactionObject = (JsonObject) input.getValueByField("message");
 
 		//Create a SYW Interaction object
@@ -54,7 +56,8 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 		if(obj!=null && obj.getEntities()!=null){
 			
 			for(SYWEntity currentEntity : obj.getEntities()){
-				System.out.println(currentEntity.getType());
+				if(currentEntity != null)
+					LOGGER.debug(currentEntity.getType());
 				//if(entityTypes.contains(entityTypes)){ 
 				//TODO: If more types handle in a more robust manner. If we expect only Products, this makes sense
 				if(currentEntity!=null && currentEntity.getType().equals("Product")){

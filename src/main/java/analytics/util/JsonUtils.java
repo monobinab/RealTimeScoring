@@ -2,7 +2,6 @@ package analytics.util;
 
 import java.lang.reflect.Type;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,25 +34,19 @@ public class JsonUtils {
 	
 	public static Map<String, Collection<String>> restoreDateTraitsMapFromJson(String json)
     {
-		Map<String, Collection<String>> dateTraitsMap = new HashMap<String, Collection<String>>();
         Type dateTraitType = new TypeToken<Map<String, Collection<String>>>() {
 			private static final long serialVersionUID = 1L;
 		}.getType();
 
-		dateTraitsMap = new Gson().fromJson(json, dateTraitType);
-//        System.out.println(" JSON string: " + json);
-//        System.out.println(" Map: " + dateTraitsMap);
-        return dateTraitsMap;
+		return new Gson().fromJson(json, dateTraitType);
     }
 	
 	public static Map<String, String> restoreVariableListFromJson(String json)
     {
-		Map<String, String> varList = new HashMap<String, String>();
         Type varListType = new TypeToken<Map<String, String>>() {
 			private static final long serialVersionUID = 1L;}.getType();
 
-        varList = new Gson().fromJson(json, varListType);
-        return varList;
+		return new Gson().fromJson(json, varListType);
     }
 	
 

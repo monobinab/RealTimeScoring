@@ -17,15 +17,15 @@ import backtype.storm.topology.TopologyBuilder;
 
 public class AAM_InternalSearchTopology {
 
-	static final Logger logger = LoggerFactory
+	private static final Logger logger = LoggerFactory
 			.getLogger(AAM_InternalSearchTopology.class);
 
 	public static void main(String[] args) {
 		String topic = TopicConstants.AAM_CDF_INTERNALSEARCH;
 		int port = TopicConstants.PORT;
 
-		RedisConnection redisConnection = new RedisConnection();
-		String[] servers = redisConnection.getServers();
+		//RedisConnection redisConnection = new RedisConnection();
+		String[] servers = RedisConnection.getServers();
 
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 
