@@ -6,14 +6,14 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import analytics.bolt.SocialBolt;
 import backtype.storm.tuple.Tuple;
-import analytics.bolt.FacebookBolt;
 
 public class FBBoltMockTest {
 	@Test
 	public void basicFBTest() {
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
-        FacebookBolt boltUnderTest = new FacebookBolt();
+        SocialBolt boltUnderTest = new SocialBolt();
        
         boltUnderTest.prepare(null, null, outputCollector);
         String input = "8/1/2014 7:07,1123404212,[0.0],[0.0],dishwasher";
