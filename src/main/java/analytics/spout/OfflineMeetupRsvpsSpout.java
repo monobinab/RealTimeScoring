@@ -49,6 +49,8 @@ public class OfflineMeetupRsvpsSpout extends BaseRichSpout {
                 list.add(line);
                 line = bufferedReader.readLine();
             }
+            fileReader.close();
+            bufferedReader.close();
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.

@@ -118,7 +118,8 @@ public class XMLParser {
                     elementName = xmlStreamReader.getLocalName().replace("tns:","");
 
                     if (elementName.equals("LineItem")) {
-						lineItemList.add(lineItem);
+                    	if(!("000000000".equals(lineItem.getItemNumber())))
+                    			lineItemList.add(lineItem);
 					}
 					processTransaction.setLineItemList(lineItemList);
 					break;

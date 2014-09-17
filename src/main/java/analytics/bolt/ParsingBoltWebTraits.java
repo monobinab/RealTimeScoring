@@ -126,7 +126,9 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
     protected String[] splitRec(String webRec) {
     	logger.debug("Parsing trait record");
     	//TODO: Do not use regex. Have a better way. This is temp
-    	webRec = webRec.replaceAll("['\\[\\]\"]",""); 
+    	if(webRec==null)
+    		return null;
+    	webRec = webRec.replaceAll("['\\[\\]\" ]",""); 
         String split[]=StringUtils.split(webRec,",");
         
         if(split !=null && split.length>0) {

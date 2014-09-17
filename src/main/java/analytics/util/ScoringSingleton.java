@@ -102,8 +102,8 @@ public class ScoringSingleton {
 		updateChangedMemberScore(loyaltyId, modelIdList, allChanges, modelIdScoreMap);
 		//TODO: This is a very bad way of defining, but a very temp fix before fixing other topologies
 		HashMap<String, Double> modelIdStringScoreMap = new HashMap<String, Double>();
-		for(Integer modelId: modelIdScoreMap.keySet()){
-			modelIdStringScoreMap.put(modelId.toString(), modelIdScoreMap.get(modelId));
+		for(Map.Entry<Integer, Double> entry : modelIdScoreMap.entrySet()){
+			modelIdStringScoreMap.put(entry.getKey().toString(), entry.getValue());
 		}
 		return modelIdStringScoreMap;
 	}
@@ -130,10 +130,12 @@ public class ScoringSingleton {
 	
 	public Set<Integer> getModelIdList(Map<String, String> newChangesVarValueMap){
 		Set<Integer> modelIdList = new HashSet<Integer>();
+		if(newChangesVarValueMap==null)
+			return modelIdList;
 		for (String changedVariable : newChangesVarValueMap.keySet()) {
 			List<Integer> models = variableModelsMap.get(changedVariable);
 			if(models==null)
-				return null;
+				return modelIdList;
 			for (Integer modelId : models) {
 				modelIdList.add(modelId);
 			}
@@ -146,14 +148,16 @@ public class ScoringSingleton {
 
 		Map<String, Change> allChanges = new HashMap<String, Change>();
 		if (changedMbrVariables != null && changedMbrVariables.keySet() != null) {
-			for (String key : changedMbrVariables.keySet()) {
+			for (Map.Entry<String, Change> entry : changedMbrVariables.entrySet()){
+				String key = entry.getKey();
+				Change value = entry.getValue();
 				//key is VID
 				// skip expired changes
-				if (changedMbrVariables.get(key).getExpirationDate().after(new Date())){
-						allChanges.put(variableVidToNameMap.get(key), changedMbrVariables.get(key));
+				if (value.getExpirationDate().after(new Date())){
+						allChanges.put(variableVidToNameMap.get(key), value);
 				} else {
 					LOGGER.debug("Got an expired value for "
-							+ changedMbrVariables.get(key));
+							+ value);
 				}
 			}
 		}
@@ -205,18 +209,20 @@ public class ScoringSingleton {
 
 	public double getBoostScore(Map<String, Change> allChanges, Integer modelId) {
 		double boosts = 0;
-		for(String ch:allChanges.keySet()) {
+		for(Map.Entry<String, Change> entry : allChanges.entrySet()){
+			String ch = entry.getKey();
+			Change value = entry.getValue();
 			if(ch.substring(0,5).toUpperCase().equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
 				if(modelsMap.get(modelId).containsKey(0)) {
 					if(modelsMap.get(modelId).get(0).getVariables().containsKey(ch)){
 						boosts = boosts 
-								+ Double.valueOf(allChanges.get(ch).getValue().toString()) 
+								+ Double.valueOf(value.getValue().toString()) 
 								* modelsMap.get(modelId).get(0).getVariables().get(ch).getCoefficient();
 					}
 				} else {
 					if(modelsMap.get(modelId).containsKey(Calendar.getInstance().get(Calendar.MONTH) + 1)) {
 						boosts = boosts 
-								+ Double.valueOf(allChanges.get(ch).getValue().toString()) 
+								+ Double.valueOf(value.getValue().toString()) 
 								* modelsMap.get(modelId).get(Calendar.getInstance().get(Calendar.MONTH) + 1).getVariables().get(ch).getCoefficient();
 					}
 				}
@@ -336,21 +342,24 @@ public class ScoringSingleton {
 			// CHANGED MODEL SCORE TO WRITE TO SCORE CHANGES COLLECTION
 			Date minDate = null;
 			Date maxDate = null;
-
-			for (String key : allChanges.keySet()) {
+			for(Map.Entry<String, Change> entry : allChanges.entrySet()){
+				String key = entry.getKey();
+				Change value = entry.getValue();
+				
 				// variable models map
 				if (variableModelsMap.get(key).contains(modelId)) {
+					Date exprDate = value.getExpirationDate();
 					if (minDate == null) {
-						minDate = allChanges.get(key).getExpirationDate();
-						maxDate = allChanges.get(key).getExpirationDate();
+						minDate = exprDate;
+						maxDate = exprDate;
 					} else {
-						if (allChanges.get(key).getExpirationDate()
+						if (exprDate
 								.before(minDate)) {
-							minDate = allChanges.get(key).getExpirationDate();
+							minDate = exprDate;
 						}
-						if (allChanges.get(key).getExpirationDate()
+						if (exprDate
 								.after(maxDate)) {
-							maxDate = allChanges.get(key).getExpirationDate();
+							maxDate = exprDate;
 						}
 					}
 				}

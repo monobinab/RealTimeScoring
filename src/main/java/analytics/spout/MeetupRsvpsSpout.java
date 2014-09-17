@@ -59,6 +59,8 @@ public class MeetupRsvpsSpout extends BaseRichSpout{
                         LOG.error("Error parsing message from meetup",e);
                     }
                 }
+                inputStream.close();
+                reader.close();
             }
         } catch (IOException e) {
             LOG.error("Error in communication with meetup api ["+get.getURI().toString()+"]");

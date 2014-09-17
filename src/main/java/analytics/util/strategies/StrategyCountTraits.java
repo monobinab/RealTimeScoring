@@ -34,10 +34,12 @@ public class StrategyCountTraits implements Strategy {
     	int traitCount = 0;
     			
     	//FOR EACH TRAIT FOUND FROM AAM DATA FIND THE VARIABLES THAT ARE IMPACTED
-    	for(String date: dateTraitsMap.keySet()) {
+    	for(Map.Entry<String, Collection<String>> entry : dateTraitsMap.entrySet()){
+    		String date = entry.getKey();
+    		Collection<String> traits = entry.getValue();
     		try {
 				if(simpleDateFormat.parse(date).after(new Date(new Date().getTime() + (-7 * 1000 * 60 * 60 * 24)))) {
-					for(String trait: dateTraitsMap.get(date)) {
+					for(String trait: traits) {
 						if(traitSet.add(trait)) {
 							traitCount++;
 						}

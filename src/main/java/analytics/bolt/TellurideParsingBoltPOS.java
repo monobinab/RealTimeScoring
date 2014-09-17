@@ -171,8 +171,12 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 			//logger.info("nposTransaction XML is" + transactionXmlAsString.toString());
 
 			List<LineItem> lineItems = processTransaction.getLineItemList();
-			logger.trace("Line Items are .."+ lineItems.toString());
-
+			if(logger.isTraceEnabled()){
+				String lineItems_toString = null;
+				if(lineItems != null)
+					lineItems_toString = lineItems.toString();
+				logger.trace("Line Items are .."+ lineItems_toString);
+			}
 			if (lineItems != null && lineItems.size() != 0) {
 				for (LineItem lineItem : lineItems) {
 

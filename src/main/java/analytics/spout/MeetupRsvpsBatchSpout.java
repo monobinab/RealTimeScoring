@@ -51,7 +51,8 @@ public class MeetupRsvpsBatchSpout implements IBatchSpout {
             StatusLine status = response.getStatusLine();
             if(status.getStatusCode() == 200){
                 InputStream inputStream = response.getEntity().getContent();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                InputStreamReader isr = new InputStreamReader(inputStream);
+                BufferedReader reader = new BufferedReader(isr);
                 String in;
                 //Read line by line
                 int count = 0;
@@ -65,7 +66,8 @@ public class MeetupRsvpsBatchSpout implements IBatchSpout {
                         LOG.error("Error parsing message from meetup",e);
                     }
                 }
-
+                isr.close();
+                reader.close();
             }
         } catch (IOException e) {
             LOG.error("Error in communication with meetup api ["+get.getURI().toString()+"]");

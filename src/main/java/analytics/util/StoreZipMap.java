@@ -31,15 +31,18 @@ public class StoreZipMap {
             instance.map = new HashMap<Integer, Integer>(3000);
 
             try {
-                BufferedReader br = new BufferedReader(new InputStreamReader(StoreZipMap
+            	InputStreamReader isr = new InputStreamReader(StoreZipMap
                         .class.getClassLoader()
-                        .getResourceAsStream("mainstoreZips.csv")));
+                        .getResourceAsStream("mainstoreZips.csv"));
+                BufferedReader br = new BufferedReader(isr);
                 String record = br.readLine();
                 while (record != null) {
                     String[] storeZip = record.split(",");
                     instance.map.put(Integer.valueOf(storeZip[0]), Integer.valueOf(storeZip[1]));
                     record = br.readLine();
                 }
+                isr.close();
+                br.close();
             } catch (IOException e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }

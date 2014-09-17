@@ -92,19 +92,12 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
         String interactionRec = input.getString(1);
         String splitRecArray[] = splitRec(interactionRec);
         
-        //does nothing but print out split string
-        String splitRec = new String();
-        for(int i=0;i<splitRecArray.length;i++) {
-        	if(i==0) splitRec = splitRecArray[i];
-        	else splitRec = splitRec + "  " + splitRecArray[i];
-        }
-//        System.out.println("  split string: " + splitRec);
-		
-        
-        //2014-03-08 10:56:17,00000388763646853831116694914086674166,743651,US,Sears
         if(splitRecArray == null || splitRecArray.length==0) {
         	return;
         }
+        
+        //2014-03-08 10:56:17,00000388763646853831116694914086674166,743651,US,Sears
+        
         
         
 		// 2) IF THE CURRENT RECORD HAS THE SAME UUID AS PREVIOUS RECORD(S) THEN ADD TRAIT TO LIST AND RETURN

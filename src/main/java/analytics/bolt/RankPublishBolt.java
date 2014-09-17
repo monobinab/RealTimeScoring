@@ -288,7 +288,7 @@ public class RankPublishBolt extends BaseRichBolt {
         String zipcode = new MemberZipDao().getMemberZip(l_id);
         Map<String,String> oldScoreResult = new MemberScoreDao().getMemberScores(l_id);
         String modelName = modelIdToModelNameMap.get(input.getStringByField("model"));
-        String oldScore = new String();
+        String oldScore;
         
         if(oldScoreResult != null && modelName != null) {
         	oldScore = oldScoreResult.get(modelName).toString();
@@ -300,7 +300,7 @@ public class RankPublishBolt extends BaseRichBolt {
         int oldRank = 0;
         int newRank = 0;
         String modelDescription = new String();
-        if(modelName.equals("S_SCR_HA_ALL")) {
+        if(modelName != null && modelName.equals("S_SCR_HA_ALL")) {
         	modelDescription="HOME APPLIANCE";
         	if(Double.valueOf(oldScore)==0) {
         		oldRank=1;

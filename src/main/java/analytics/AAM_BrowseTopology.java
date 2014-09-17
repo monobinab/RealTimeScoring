@@ -18,18 +18,18 @@ import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
 
 public class AAM_BrowseTopology {
-	static final Logger logger = LoggerFactory
+	private static final Logger LOGGER = LoggerFactory
 			.getLogger(AAM_BrowseTopology.class);
 
 	public static void main(String[] args) throws Exception {
-		logger.info("Starting web feed topology from browse source");
+		LOGGER.info("Starting web feed topology from browse source");
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 
 		String topic = TopicConstants.AAM_BROWSE_PRODUCTS;
 		int port = TopicConstants.PORT;
 
-		RedisConnection redisConnection = new RedisConnection();
-		String[] servers = redisConnection.getServers();
+		//RedisConnection redisConnection = new RedisConnection();
+		String[] servers = RedisConnection.getServers();
 
 		for (String server : servers) {
 			topologyBuilder.setSpout(topic + server, new AAMRedisPubSubSpout(
@@ -51,9 +51,9 @@ public class AAM_BrowseTopology {
 				StormSubmitter.submitTopology(args[0], conf,
 						topologyBuilder.createTopology());
 			} catch (AlreadyAliveException e) {
-				logger.error(e.getClass() + ": " + e.getMessage(), e);
+				LOGGER.error(e.getClass() + ": " + e.getMessage(), e);
 			} catch (InvalidTopologyException e) {
-				logger.error(e.getClass() + ": " + e.getMessage(), e);
+				LOGGER.error(e.getClass() + ": " + e.getMessage(), e);
 			}
 		} else {
 			conf.setDebug(false);
@@ -64,7 +64,7 @@ public class AAM_BrowseTopology {
 			try {
 				Thread.sleep(10000000);
 			} catch (InterruptedException e) {
-				logger.error(e.getClass() + ": " + e.getMessage(), e);
+				LOGGER.error(e.getClass() + ": " + e.getMessage(), e);
 			}
 			cluster.shutdown();
 
