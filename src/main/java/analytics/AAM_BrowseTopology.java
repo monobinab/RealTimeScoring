@@ -18,7 +18,7 @@ import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
 
 public class AAM_BrowseTopology {
-	static final Logger LOGGER = LoggerFactory
+	private static final Logger LOGGER = LoggerFactory
 			.getLogger(AAM_BrowseTopology.class);
 
 	public static void main(String[] args) throws Exception {

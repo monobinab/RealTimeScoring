@@ -19,10 +19,10 @@ import backtype.storm.topology.TopologyBuilder;
 
 public class AAMTopology {
 
-	static final Logger logger = LoggerFactory
+	private static final Logger LOGGER = LoggerFactory
 			.getLogger(AAMTopology.class);
 	public static void main(String[] args){
-		logger.info("Starting aam traits topology");
+		LOGGER.info("Starting aam traits topology");
 		String topic = TopicConstants.AAM_CDF_TRAITS; 
 		int port = TopicConstants.PORT;
 		TopologyBuilder builder = new TopologyBuilder();
@@ -46,9 +46,9 @@ public class AAMTopology {
 				StormSubmitter.submitTopology(args[0], conf,
 						builder.createTopology());
 			} catch (AlreadyAliveException e) {
-				logger.error(e.getClass() + ": " +  e.getMessage(), e);
+				LOGGER.error(e.getClass() + ": " +  e.getMessage(), e);
 			} catch (InvalidTopologyException e) {
-				logger.error(e.getClass() + ": " +  e.getMessage(), e);
+				LOGGER.error(e.getClass() + ": " +  e.getMessage(), e);
 			}
 		} else {
 			conf.setDebug(false);
@@ -59,7 +59,7 @@ public class AAMTopology {
 			try {
 				Thread.sleep(10000000);
 			} catch (InterruptedException e) {
-				logger.debug("Unable to wait for topology", e);
+				LOGGER.debug("Unable to wait for topology", e);
 			}
 			cluster.shutdown();
 

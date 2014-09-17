@@ -17,7 +17,7 @@ import backtype.storm.topology.TopologyBuilder;
 
 public class AAM_InternalSearchTopology {
 
-	private static final Logger logger = LoggerFactory
+	private static final Logger LOGGER = LoggerFactory
 			.getLogger(AAM_InternalSearchTopology.class);
 
 	public static void main(String[] args) {
@@ -52,9 +52,9 @@ public class AAM_InternalSearchTopology {
 				StormSubmitter.submitTopology(args[0], conf,
 						topologyBuilder.createTopology());
 			} catch (AlreadyAliveException e) {
-				logger.error(e.getClass() + ": " + e.getMessage(), e);
+				LOGGER.error(e.getClass() + ": " + e.getMessage(), e);
 			} catch (InvalidTopologyException e) {
-				logger.error(e.getClass() + ": " + e.getMessage(), e);
+				LOGGER.error(e.getClass() + ": " + e.getMessage(), e);
 			}
 		} else {
 			conf.setDebug(false);
@@ -65,7 +65,7 @@ public class AAM_InternalSearchTopology {
 			try {
 				Thread.sleep(10000000);
 			} catch (InterruptedException e) {
-				logger.error(e.getClass() + ": " + e.getMessage(), e);
+				LOGGER.error(e.getClass() + ": " + e.getMessage(), e);
 			}
 			cluster.shutdown();
 
