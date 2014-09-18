@@ -107,7 +107,19 @@ public class ParsingBoltAAM_ATC extends ParseAAMFeeds {
 						}
 					}
 				}
-
+				if (divLnBoostVariblesMap.containsKey(divLn)) {
+					var = divLnBoostVariblesMap.get(divLn);
+					for (String v : var) {
+						if (variableValueMap.containsKey(var)) {
+							int value = 1 + Integer.valueOf(variableValueMap
+									.get(v));
+							variableValueMap.remove(v);
+							variableValueMap.put(v, String.valueOf(value));
+						} else {
+							variableValueMap.put(v, "1");
+						}
+					}
+				}
 			}
 		}
 		return variableValueMap;
