@@ -16,7 +16,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 
 public class MemberVariablesDao extends AbstractDao {
-	static final Logger LOGGER = LoggerFactory
+	private static final Logger LOGGER = LoggerFactory
 			.getLogger(MemberVariablesDao.class);
     DBCollection memberVariablesCollection;
     public MemberVariablesDao(){

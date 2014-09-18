@@ -10,8 +10,9 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
+
 public class TwitterLoyaltyIdDao extends AbstractDao{
-	static final Logger LOGGER = LoggerFactory
+	private static final Logger LOGGER = LoggerFactory
 			.getLogger(TwitterLoyaltyIdDao.class);
     DBCollection twLoyaltyCollection;
     public TwitterLoyaltyIdDao(){

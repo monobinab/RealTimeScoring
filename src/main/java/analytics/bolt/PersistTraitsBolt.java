@@ -24,7 +24,7 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 
 public class PersistTraitsBolt extends BaseRichBolt {
-	static final Logger logger = LoggerFactory
+	private static final Logger LOGGER = LoggerFactory
 			.getLogger(PersistTraitsBolt.class);
     private MemberTraitsDao memberTraitsDao;
 	@Override
@@ -35,7 +35,7 @@ public class PersistTraitsBolt extends BaseRichBolt {
 
 	@Override
 	public void execute(Tuple input) {
-		logger.debug("Persisting trait date map in mongo");
+		LOGGER.debug("Persisting trait date map in mongo");
 		//Get the encrypted loyalty id
 		String l_id = input.getString(0);
 		//The data comes as below
@@ -87,8 +87,8 @@ public class PersistTraitsBolt extends BaseRichBolt {
 			private static final long serialVersionUID = 1L;}.getType();
 
         varList = new Gson().fromJson(json, varListType);
-        logger.debug(" JSON string: " + json);
-        logger.debug(" Map: " + varList);
+        LOGGER.debug(" JSON string: " + json);
+        LOGGER.debug(" Map: " + varList);
         return varList;
     }
 

@@ -17,7 +17,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 
 public class ChangedVariablesDao extends AbstractDao{
-	static final Logger LOGGER = LoggerFactory
+	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ChangedVariablesDao.class);
 	
     DBCollection changedMemberVariablesCollection;

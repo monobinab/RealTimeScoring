@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 // driver and the db
 class MongoSpoutTask implements Callable<Boolean>, Runnable, Serializable {
   private static final long serialVersionUID = 4440209304544126477L;
-  static Logger LOG = LoggerFactory.getLogger(MongoSpoutTask.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(MongoSpoutTask.class);
 
   private LinkedBlockingQueue<DBObject> queue;
   private Mongo mongo;
@@ -51,7 +51,7 @@ class MongoSpoutTask implements Callable<Boolean>, Runnable, Serializable {
       }
     } catch (UnknownHostException e) {
       // Log the error
-      LOG.error("Unknown host for Mongo DB", e);
+      LOGGER.error("Unknown host for Mongo DB", e);
       // Die fast
       throw new RuntimeException(e);
     }
@@ -80,7 +80,7 @@ class MongoSpoutTask implements Callable<Boolean>, Runnable, Serializable {
       try {
         // Check if we have a next item in the collection
         if (this.cursor.hasNext()) {
-          if (LOG.isInfoEnabled()) LOG.info("Fetching a new item from MongoDB cursor");
+          if (LOGGER.isInfoEnabled()) LOGGER.info("Fetching a new item from MongoDB cursor");
           // Fetch the next object and push it on the queue
             DBObject next = this.cursor.next();
             System.out.println(" in the task: " + next);
@@ -121,7 +121,7 @@ class MongoSpoutTask implements Callable<Boolean>, Runnable, Serializable {
     try {
       call();
     } catch (Exception e) {
-      LOG.debug(e.toString());
+      LOGGER.debug(e.toString());
     }
   }
 }

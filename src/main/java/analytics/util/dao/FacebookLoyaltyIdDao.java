@@ -11,7 +11,7 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
 public class FacebookLoyaltyIdDao extends AbstractDao{
-	static final Logger LOGGER = LoggerFactory
+	private static final Logger LOGGER = LoggerFactory
 			.getLogger(FacebookLoyaltyIdDao.class);
     DBCollection fbLoyaltyCollection;
     public FacebookLoyaltyIdDao(){

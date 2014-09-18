@@ -25,7 +25,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 public class ProcessSYWInteractions extends BaseRichBolt {
-	static final Logger LOGGER = LoggerFactory
+	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ProcessSYWInteractions.class);
 	private List<String> entityTypes;
     private OutputCollector outputCollector;
@@ -61,10 +61,10 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 					LOGGER.debug(currentEntity.getType());
 				//if(entityTypes.contains(entityTypes)){ 
 				//TODO: If more types handle in a more robust manner. If we expect only Products, this makes sense
-				if(currentEntity!=null && currentEntity.getType().equals("Product")){
+				if(currentEntity!=null && "Product".equals(currentEntity.getType())){
 					String productId = SYWAPICalls.getCatalogIds(currentEntity.getId());
 					/* Product does not exist? */
-					if(productId.equals("UNKNOWN")){
+					if("UNKNOWN".equals(productId)){
 						System.out.println("Unable to find the product id");
 						continue;
 					}

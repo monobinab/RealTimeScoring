@@ -10,20 +10,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class RedisConnection {
-	static final Logger logger = LoggerFactory.getLogger(RedisConnection.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(RedisConnection.class);
 	public static String[] getServers(){
 		Properties prop = new Properties();
 		PropertiesConfiguration properties = null;
 		String isProd = System.getProperty("rtseprod");
 		try {
 		    //load a properties file from class path, inside static method
-			if(isProd!=null && isProd.equals("true")){
+			if(isProd!=null && "true".equals(isProd)){
 				prop.load(RedisConnection.class.getClassLoader().getResourceAsStream("resources/redis_server_prod.properties"));
-				logger.info("Using production properties");
+				LOGGER.info("Using production properties");
 			}
 			else{
 				prop.load(RedisConnection.class.getClassLoader().getResourceAsStream("resources/redis_server.properties"));
-				logger.info("Using test properties");	
+				LOGGER.info("Using test properties");	
 			}	
 			
 		    List<String> servers= new ArrayList<String>();

@@ -18,7 +18,7 @@ public class AAMRedisPubSubSpout extends RedisPubSubSpout {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	static Logger logger = LoggerFactory.getLogger(AAMRedisPubSubSpout.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(AAMRedisPubSubSpout.class);
 
 
 
@@ -28,11 +28,11 @@ public class AAMRedisPubSubSpout extends RedisPubSubSpout {
 
     @Override
     protected void emit(String ret) {
-    	logger.debug("Reading message from Redis");
+    	LOGGER.debug("Reading message from Redis");
     	try {
 			TimeUnit.MILLISECONDS.sleep(2);
 		} catch (InterruptedException e) {
-			logger.error(e.getClass() + ": " +  e.getMessage(), e);
+			LOGGER.error(e.getClass() + ": " +  e.getMessage(), e);
 		}
     	if (ret != null )
         {

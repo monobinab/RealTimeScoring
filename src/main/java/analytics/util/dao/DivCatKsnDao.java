@@ -24,7 +24,7 @@ public class DivCatKsnDao extends AbstractDao {
 			return cat;
 		}
 	}
-	static final Logger LOGGER = LoggerFactory
+	private static final Logger LOGGER = LoggerFactory
 			.getLogger(DivCatKsnDao.class);
     DBCollection divCatKsnCollection;
     public DivCatKsnDao(){

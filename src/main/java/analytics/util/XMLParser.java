@@ -22,7 +22,7 @@ import java.util.List;
  * 
  */
 public class XMLParser {
-	private static final Logger logger = LoggerFactory
+	private static final Logger LOGGER = LoggerFactory
 			.getLogger(XMLParser.class);
 
 	public static ProcessTransaction parseXMLProcessTransaction(String fileName) {
@@ -56,32 +56,32 @@ public class XMLParser {
                     QName qname = xmlStreamReader.getName();
 					if (elementName.contains("MemberNumber")) {
 						bMemberNumber = true;
-					} else if (elementName.equals(
-                            "RequestorID")) {
+					} else if ("RequestorID".equals(
+							elementName)) {
 						bRequestorID = true;
 					}
-					if (elementName.equals("LineItem")) {
+					if ("LineItem".equals(elementName)) {
 						lineItem = new LineItem();
 						bLineItem = true;
-					} else if (elementName
-							.equals("Division")) {
+					} else if ("Division"
+							.equals(elementName)) {
 						bDivision = true;
-					} else if (elementName.equals(
-                            "ItemNumber")) {
+					} else if ("ItemNumber".equals(
+							elementName)) {
 						bItemNumber = true;
 					}
 
-					if (elementName.equals("LineItem")) {
+					if ("LineItem".equals(elementName)) {
 						lineItem = new LineItem();
 						bLineItem = true;
-					} else if (elementName
-							.equals("Division")) {
+					} else if ("Division"
+							.equals(elementName)) {
 						bDivision = true;
-					} else if (elementName.equals(
-                            "ItemNumber")) {
+					} else if ("ItemNumber".equals(
+							elementName)) {
 						bItemNumber = true;
-					} else if (elementName.equals(
-                            "DollarValuePostDisc")) {
+					} else if ("DollarValuePostDisc".equals(
+							elementName)) {
 						bDollarValuePostDisc = true;
 					}
 					break;
@@ -94,7 +94,7 @@ public class XMLParser {
 					} else if (bRequestorID) {
 						processTransaction.setRequestorID(xmlStreamReader
 								.getText());
-						logger.debug("Requestor Id is..."
+						LOGGER.debug("Requestor Id is..."
 								+ processTransaction.getRequestorID());
 						bRequestorID = false;
 					} else if (bLineItem) {
@@ -117,7 +117,7 @@ public class XMLParser {
 				case XMLStreamConstants.END_ELEMENT:
                     elementName = xmlStreamReader.getLocalName().replace("tns:","");
 
-                    if (elementName.equals("LineItem")) {
+                    if ("LineItem".equals(elementName)) {
                     	if(!("000000000".equals(lineItem.getItemNumber())))
                     			lineItemList.add(lineItem);
 					}
@@ -131,7 +131,7 @@ public class XMLParser {
 			}
 
 		} catch (XMLStreamException e) {
-			logger.error(e.getClass() + ": " +  e.getMessage(), e);
+			LOGGER.error(e.getClass() + ": " +  e.getMessage(), e);
 		}
 		return processTransaction;
 

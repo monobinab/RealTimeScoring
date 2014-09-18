@@ -25,12 +25,12 @@ import backtype.storm.topology.TopologyBuilder;
  */
 public class RealTimeScoringTellurideTopology {
 
-	static final Logger logger = LoggerFactory
+	private static final Logger LOGGER = LoggerFactory
 			.getLogger(RealTimeScoringTellurideTopology.class);
 	
 	
 	public static void main(String[] args) throws ConfigurationException {
-		logger.info("Starting telluride real time scoring topology");
+		LOGGER.info("Starting telluride real time scoring topology");
 		// Configure logger
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 
@@ -75,9 +75,9 @@ public class RealTimeScoringTellurideTopology {
 				StormSubmitter.submitTopology(args[0], conf,
 						topologyBuilder.createTopology());
 			} catch (AlreadyAliveException e) {
-				logger.error(e.getClass() + ": " +  e.getMessage(), e);
+				LOGGER.error(e.getClass() + ": " +  e.getMessage(), e);
 			} catch (InvalidTopologyException e) {
-				logger.error(e.getClass() + ": " +  e.getMessage(), e);
+				LOGGER.error(e.getClass() + ": " +  e.getMessage(), e);
 			}
 		} else {
 			conf.setDebug(false);
@@ -88,7 +88,7 @@ public class RealTimeScoringTellurideTopology {
 			try {
 				Thread.sleep(10000000);
 			} catch (InterruptedException e) {
-				logger.error(e.getClass() + ": " +  e.getMessage(), e);
+				LOGGER.error(e.getClass() + ": " +  e.getMessage(), e);
 			}
 			cluster.shutdown();
 

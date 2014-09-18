@@ -16,7 +16,7 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
 public class TraitVariablesDao extends AbstractDao{
-	static final Logger LOGGER = LoggerFactory
+	private static final Logger LOGGER = LoggerFactory
 			.getLogger(TraitVariablesDao.class);
 	static DB db;
     DBCollection traitVariablesCollection;

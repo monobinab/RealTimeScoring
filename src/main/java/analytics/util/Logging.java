@@ -31,7 +31,7 @@ public class Logging {
 		fileAppender.activateOptions();
 
 		// configures the root logger
-		Logger rootLogger = Logger.getRootLogger();
+		final Logger rootLogger = Logger.getRootLogger();
 		rootLogger.setLevel(Level.INFO);
 		rootLogger.addAppender(consoleAppender);
 		rootLogger.addAppender(fileAppender);

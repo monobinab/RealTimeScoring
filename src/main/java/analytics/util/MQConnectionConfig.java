@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 public class MQConnectionConfig {
 	
-	static final Logger logger = LoggerFactory.getLogger(MQConnectionConfig.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(MQConnectionConfig.class);
 	
 	public WebsphereMQCredential getWebsphereMQCredential() throws ConfigurationException{
 	
@@ -46,7 +46,7 @@ public class MQConnectionConfig {
 		websphereMQCredential.setQueueRts2Name(properties.getString("queueRts2.name"));
 		
 		
-		logger.debug("websphereMQCredential configured" + websphereMQCredential.getHostOneName()+ "," + websphereMQCredential.getHostTwoName()+ ":" + websphereMQCredential.getPort());
+		LOGGER.debug("websphereMQCredential configured" + websphereMQCredential.getHostOneName()+ "," + websphereMQCredential.getHostTwoName()+ ":" + websphereMQCredential.getPort());
 		
 		return websphereMQCredential;
 	}

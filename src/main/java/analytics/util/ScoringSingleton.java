@@ -133,8 +133,8 @@ public class ScoringSingleton {
 				variableFilter.put(variableNameToVidMap.get(var), 1);
 			}
 		}
-		Map<String, Object> memberVariablesMap = memberVariablesDao.getMemberVariablesFiltered(loyaltyId, variableFilter);
-		return memberVariablesMap;
+		return memberVariablesDao.getMemberVariablesFiltered(loyaltyId, variableFilter);
+
 	}
 	
 	public Set<Integer> getModelIdList(Map<String, String> newChangesVarValueMap){
@@ -186,7 +186,7 @@ public class ScoringSingleton {
 				context.setValue(newChangesVarValueMap.get(variableName));
 				context.setPreviousValue(0);
 
-				if (variableNameToStrategyMap.get(variableName).equals("NONE")) {
+				if ("NONE".equals(variableNameToStrategyMap.get(variableName))) {
 					continue;
 				}
 
@@ -331,7 +331,7 @@ public class ScoringSingleton {
 					changedValue = 0;
 				}
 			} else {
-				if (dataType.equals("Integer")) {
+				if ("Integer".equals(dataType)) {
 					changedValue = (int) Math.round(Double.valueOf(changedValue
 							.toString()));
 				} else {

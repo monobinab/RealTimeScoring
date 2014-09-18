@@ -37,7 +37,7 @@ public class WebsphereMQSpout extends BaseRichSpout {
 	private String queueName;
 
 	private static final long serialVersionUID = 1L;
-	private static final Logger logger = LoggerFactory.getLogger(WebsphereMQSpout.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(WebsphereMQSpout.class);
 
 	/**
 	 * Constructor
@@ -64,7 +64,7 @@ public class WebsphereMQSpout extends BaseRichSpout {
 
 	@Override
 	public void open(@SuppressWarnings("rawtypes") final Map conf, final TopologyContext context, final SpoutOutputCollector collector) {
-		logger.info("Spout connecting to MQ queue");
+		LOGGER.info("Spout connecting to MQ queue");
 		try {
 			this.collector = collector;
 			MQQueueConnectionFactory cf = new MQQueueConnectionFactory();
@@ -80,23 +80,23 @@ public class WebsphereMQSpout extends BaseRichSpout {
 			receiver = (MQQueueReceiver) queueSession.createReceiver(queue);
 			queueConnection.start();
 		} catch (JMSException e) {
-			logger.error("Exception occurred while establishing queue connection", e);
+			LOGGER.error("Exception occurred while establishing queue connection", e);
 		}
 	}
 
 	@Override
 	public void nextTuple() {
-		logger.debug("Fetching a message from MQ");
+		LOGGER.debug("Fetching a message from MQ");
 		try {
 			JMSMessage receivedMessage = (JMSMessage) receiver.receive();
 			String messageID = receivedMessage.getJMSMessageID();
 			long timeStamp = receivedMessage.getJMSTimestamp();
-			if(logger.isDebugEnabled())
-				logger.debug("The time it enters with next message with it " +
+			if(LOGGER.isDebugEnabled())
+				LOGGER.debug("The time it enters with next message with it " +
 					"id" +messageID+ " and its time stamp" +timeStamp + "Start Time in millisecond "+System.currentTimeMillis());
 			collector.emit(new Values(receivedMessage), receivedMessage);
 		} catch (JMSException e) {
-			logger.error("Exception occurred while receiving message from queue ", e);
+			LOGGER.error("Exception occurred while receiving message from queue ", e);
 		}
 	}
 
@@ -133,17 +133,17 @@ public class WebsphereMQSpout extends BaseRichSpout {
 		try {
 			session.close();
 		} catch (JMSException e) {
-			logger.error("Exception occured while closing MQ session", e);
+			LOGGER.error("Exception occured while closing MQ session", e);
 		}
 		try {
 			receiver.close();
 		} catch (JMSException e) {
-			logger.error("Exception occured while closing MQ receiver", e);
+			LOGGER.error("Exception occured while closing MQ receiver", e);
 		}
 		try {
 			connection.close();
 		} catch (JMSException e) {
-			logger.error("Exception occured while closing MQ connection", e);
+			LOGGER.error("Exception occured while closing MQ connection", e);
 		}
 	}
 }

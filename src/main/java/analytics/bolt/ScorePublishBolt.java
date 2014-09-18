@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 
 public class ScorePublishBolt extends BaseRichBolt {
 
-	static final Logger logger = LoggerFactory
+	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ScorePublishBolt.class);
 	/**
 	 *
@@ -59,7 +59,7 @@ public class ScorePublishBolt extends BaseRichBolt {
 	 */
 	@Override
 	public void execute(Tuple input) {
-		logger.debug("The time it enters inside Score Publish Bolt execute method "+System.currentTimeMillis());
+		LOGGER.debug("The time it enters inside Score Publish Bolt execute method "+System.currentTimeMillis());
         //System.out.println(" %%% scorepublishbolt :" + input);
         String l_id = input.getStringByField("l_id");
         String modelId = input.getStringByField("model");
@@ -79,11 +79,11 @@ public class ScorePublishBolt extends BaseRichBolt {
         	break;
         }
         catch(Exception e){
-        	logger.error(e.getMessage(),e);
+        	LOGGER.error(e.getMessage(),e);
         	try {
 				Thread.sleep(200);
 			} catch (InterruptedException e1) {
-	        	logger.error(e.getMessage(),e);
+	        	LOGGER.error(e.getMessage(),e);
 	        	outputCollector.fail(input);
 			}
         	jedis.publish(pattern, message);

@@ -14,7 +14,7 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
 public class MemberUUIDDao extends AbstractDao{
-	static final Logger LOGGER = LoggerFactory
+	private static final Logger LOGGER = LoggerFactory
 			.getLogger(MemberUUIDDao.class);
     DBCollection memberUuidCollection;
     public MemberUUIDDao(){

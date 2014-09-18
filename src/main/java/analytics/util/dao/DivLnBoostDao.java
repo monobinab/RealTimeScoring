@@ -14,7 +14,7 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
 public class DivLnBoostDao extends AbstractDao{
-	static final Logger LOGGER = LoggerFactory
+	private static final Logger LOGGER = LoggerFactory
 			.getLogger(DivLnBoostDao.class);
     DBCollection divLnBoostCollection;
     public DivLnBoostDao(){
