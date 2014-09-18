@@ -25,6 +25,7 @@ public class ChangedMemberScoresDao extends AbstractDao{
 		BasicDBObject updateRec = new BasicDBObject();
 		for(Integer modelId: updatedScores.keySet()){
 			ChangedMemberScore scoreObj = updatedScores.get(modelId);
+			if(scoreObj!=null){
 			updateRec.append(
 					modelId.toString(),
 					new BasicDBObject()
@@ -32,7 +33,7 @@ public class ChangedMemberScoresDao extends AbstractDao{
 							.append(MongoNameConstants.CMS_MIN_EXPIRY_DATE,scoreObj.getMinDate())
 							.append(MongoNameConstants.CMS_MAX_EXPIRY_DATE,scoreObj.getMaxDate())
 							.append(MongoNameConstants.CMS_EFFECTIVE_DATE, scoreObj.getEffDate()));
-		}
+		}}
 
 		changedMemberScoresCollection.update(new BasicDBObject(MongoNameConstants.L_ID,
 				lId), new BasicDBObject("$set", updateRec), true,
