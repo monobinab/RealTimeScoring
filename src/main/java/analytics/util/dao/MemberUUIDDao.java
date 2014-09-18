@@ -27,7 +27,7 @@ public class MemberUUIDDao extends AbstractDao{
 		BasicDBObject query = new BasicDBObject();
 		query.put(MongoNameConstants.MUUID_UUID, uuid);
 		DBCursor cursor = memberUuidCollection.find(query);
-		if (cursor.hasNext()) {
+		while (cursor.hasNext()) {
 			DBObject obj = cursor.next();
 		    loyaltyIds.add(obj.get(MongoNameConstants.L_ID).toString());
 		}
