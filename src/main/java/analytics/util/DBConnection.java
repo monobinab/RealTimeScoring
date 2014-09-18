@@ -7,6 +7,7 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.fakemongo.Fongo;
 import com.mongodb.DB;
 import com.mongodb.MongoClient;
 
@@ -24,6 +25,12 @@ public class DBConnection {
 		DB conn = null;
 		PropertiesConfiguration properties = null;
 		String isProd = System.getProperty("rtseprod");
+		//If test, return only a test fake mongo connection
+		if(isProd!=null && isProd.equals("test")){
+			Fongo fongo = new Fongo("test server");
+			conn = fongo.getDB("test");
+			return conn;
+		}
 		if(isProd!=null &&isProd.equals("true")){
 			properties=  new PropertiesConfiguration("resources/connection_config_prod.properties");
 			logger.info("Using production properties");
