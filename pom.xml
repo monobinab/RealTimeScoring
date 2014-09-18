@@ -213,10 +213,10 @@
             </exclusions>
         </dependency>
         <dependency>
+        <!-- This is not just a test dependency. DBConnection needs it -->
   			<groupId>com.github.fakemongo</groupId>
   			<artifactId>fongo</artifactId>
   		  	<version>1.4.0</version>
-  			<scope>test</scope>
 		</dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
