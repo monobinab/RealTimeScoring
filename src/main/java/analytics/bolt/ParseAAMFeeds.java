@@ -35,6 +35,8 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
     
     protected String topic;
 	protected String sourceTopic;
+	protected MemberUUIDDao memberDao;
+	protected ModelVariablesDao modelVariablesDao;
 
     public ParseAAMFeeds() {
 
@@ -53,13 +55,15 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         this.outputCollector = collector;
-
+        
 	/*
 	 * (non-Javadoc)
 	 *
 	 * @see backtype.storm.task.IBolt#prepare(java.util.Map,
 	 * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
 	 */
+        memberDao = new MemberUUIDDao();
+        modelVariablesDao =  new ModelVariablesDao(); 
         modelVariablesList = new ArrayList<String>();
         
         this.currentUUID=null;
@@ -67,7 +71,7 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
         
 
 		//POPULATE MODEL VARIABLES LIST
-        modelVariablesList = new ModelVariablesDao().getVariableList();
+        modelVariablesList =modelVariablesDao.getVariableList();
 //		System.out.println(" *** PARSING BOLT MODEL VARIABLE LIST: ");
     }
 
@@ -141,7 +145,7 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
         
 		// 4) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN SET CURRENT UUID FROM RECORD, SET CURRENT l_id TO NULL AND RETURN
         //		If l_id is null and the next UUID is the same the current, then the next record will not be processed
-        List<String> l_ids = new MemberUUIDDao().getLoyaltyIdsFromUUID(splitRecArray[0]);
+        List<String> l_ids = memberDao.getLoyaltyIdsFromUUID(splitRecArray[0]);
         if(l_ids == null) {
             this.currentUUID=splitRecArray[0];
             logger.info(" *** COULD NOT FIND UUID: " + this.currentUUID);

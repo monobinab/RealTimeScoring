@@ -12,27 +12,17 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.util.DBConnection;
-
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 
-public class MemberTraitsDao {
+public class MemberTraitsDao extends AbstractDao{
 	static final Logger LOGGER = LoggerFactory
 			.getLogger(MemberTraitsDao.class);
-	static DB db;
     DBCollection memberTraitsCollection;
-    static {
-		try {
-			db = DBConnection.getDBConnection();
-		} catch (Exception e) {
-			LOGGER.error("Unable to get DB connection", e);
-		}
-    }
     public MemberTraitsDao(){
+    	super();
 		memberTraitsCollection = db.getCollection("memberTraits");
     }
     

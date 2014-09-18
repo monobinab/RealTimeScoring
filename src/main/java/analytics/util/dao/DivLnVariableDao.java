@@ -20,19 +20,12 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
-public class DivLnVariableDao {
+public class DivLnVariableDao extends AbstractDao{
 	static final Logger LOGGER = LoggerFactory
 			.getLogger(DivLnVariableDao.class);
-	static DB db;
     DBCollection divLnVariableCollection;
-    static {
-		try {
-			db = DBConnection.getDBConnection();
-		} catch (Exception e) {
-			LOGGER.error("Unable to get DB connection", e);
-		}
-    }
     public DivLnVariableDao(){
+    	super();
 		divLnVariableCollection = db.getCollection("divLnVariable");
     }
     public HashMap<String, List<String>> getDivLnVariable(){

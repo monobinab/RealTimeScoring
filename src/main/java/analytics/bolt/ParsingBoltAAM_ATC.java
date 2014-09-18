@@ -18,7 +18,8 @@ public class ParsingBoltAAM_ATC extends ParseAAMFeeds {
 	/**
 	 * Created by Rock Wasserman 6/19/2014
 	 */
-
+	private DivLnBoostDao divLnBoostDao;
+	private PidDivLnDao pidDivLnDao;
 	private HashMap<String, List<String>> divLnBoostVariblesMap;
 	
 	public ParsingBoltAAM_ATC() {
@@ -46,9 +47,10 @@ public class ParsingBoltAAM_ATC extends ParseAAMFeeds {
 		} else if (topic.equalsIgnoreCase("AAM_CDF_Products")) {
 			sourceTopic = "BROWSE";
 		}
-
+		divLnBoostDao = new DivLnBoostDao();
+		pidDivLnDao = new PidDivLnDao();
 		// //populate divLnBoostvariablesMap
-		divLnBoostVariblesMap = new DivLnBoostDao().getDivLnBoost(sourceTopic);
+		divLnBoostVariblesMap = divLnBoostDao.getDivLnBoost(sourceTopic);
 	}
 
 
@@ -84,7 +86,7 @@ public class ParsingBoltAAM_ATC extends ParseAAMFeeds {
 
 		for (String pid : l_idToValueCollectionMap.get(current_l_id)) {
 			// query MongoDB for division and line associated with the pid
-			PidDivLnDao.DivLn divLnObj = new PidDivLnDao().getVariableFromTopic(pid);
+			PidDivLnDao.DivLn divLnObj = pidDivLnDao.getVariableFromTopic(pid);
 			
 			if (divLnObj != null) {
 				// get division and division/line concatenation from query

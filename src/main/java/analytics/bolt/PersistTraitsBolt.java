@@ -26,9 +26,11 @@ import com.google.gson.Gson;
 public class PersistTraitsBolt extends BaseRichBolt {
 	static final Logger logger = LoggerFactory
 			.getLogger(PersistTraitsBolt.class);
+    private MemberTraitsDao memberTraitsDao;
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
-			OutputCollector collector) {		
+			OutputCollector collector) {	
+		memberTraitsDao = new MemberTraitsDao();
 	}
 
 	@Override
@@ -64,7 +66,7 @@ public class PersistTraitsBolt extends BaseRichBolt {
 					dateTraitMap.put(date, list);
 				}
 			}
-			new MemberTraitsDao().addDateTrait(l_id, dateTraitMap);
+			memberTraitsDao.addDateTrait(l_id, dateTraitMap);
 			
 		} catch (JSONException e) {
 			System.out.println("CHANGEEEE");

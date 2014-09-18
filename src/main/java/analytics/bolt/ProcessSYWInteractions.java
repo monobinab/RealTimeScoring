@@ -29,11 +29,12 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 			.getLogger(ProcessSYWInteractions.class);
 	private List<String> entityTypes;
     private OutputCollector outputCollector;
-    
+    private PidDivLnDao pidDivLnDao;
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
 		this.outputCollector = collector;
+		pidDivLnDao = new PidDivLnDao();
 		entityTypes = new ArrayList<String>();
 		entityTypes.add("Product");
 		/**
@@ -68,7 +69,7 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 						continue;
 					}
 					else{
-						PidDivLnDao.DivLn divLnObj = new PidDivLnDao().getVariableFromTopic(productId);
+						PidDivLnDao.DivLn divLnObj = pidDivLnDao.getVariableFromTopic(productId);
 						if(divLnObj != null)
 						{
 							String variable = "BOOST_HA_WH_SYW";

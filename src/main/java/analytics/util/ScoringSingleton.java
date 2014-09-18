@@ -39,7 +39,11 @@ public class ScoringSingleton {
 	private Map<String, String> variableVidToNameMap;
 	private Map<String, String> variableNameToVidMap;
 	private Map<String, String> variableNameToStrategyMap;
-	
+	private MemberVariablesDao memberVariablesDao;
+	private ChangedMemberScoresDao changedMemberScoresDao;
+	private ChangedVariablesDao changedVariablesDao;
+	private VariableDao variableDao;
+	private ModelVariablesDao modelVariablesDao;
 	private static ScoringSingleton instance=null;
 	
 	public static ScoringSingleton getInstance() {
@@ -54,11 +58,16 @@ public class ScoringSingleton {
 	private ScoringSingleton() {
 		//Get DB connection
 		LOGGER.debug("Populate variable vid map");
+		variableDao = new VariableDao();
+		modelVariablesDao = new ModelVariablesDao();
+		changedVariablesDao = new ChangedVariablesDao();
+		memberVariablesDao = new MemberVariablesDao();
+		changedMemberScoresDao = new ChangedMemberScoresDao(); 
 		// populate the variableVidToNameMap
 		variableNameToStrategyMap = new HashMap<String, String>();
 		variableVidToNameMap = new HashMap<String, String>();
 		variableNameToVidMap = new HashMap<String, String>();
-		List<Variable> variables = new VariableDao().getVariables();
+		List<Variable> variables = variableDao.getVariables();
 		for(Variable variable:variables){
 			if (variable.getName() != null && variable.getVid()!= null) {
 				variableVidToNameMap.put(variable.getVid(), variable.getName());
@@ -74,7 +83,7 @@ public class ScoringSingleton {
 		modelsMap = new HashMap<Integer, Map<Integer, Model>>();
 		//Populate both maps
 		//TODO: Refactor this so that it is a simple DAO method. Variable models map can be populated later
-		new ModelVariablesDao().populateModelVariables(modelsMap, variableModelsMap);
+		modelVariablesDao.populateModelVariables(modelsMap, variableModelsMap);
 
 	}
 	
@@ -124,7 +133,7 @@ public class ScoringSingleton {
 				variableFilter.put(variableNameToVidMap.get(var), 1);
 			}
 		}
-		Map<String, Object> memberVariablesMap = new MemberVariablesDao().getMemberVariablesFiltered(loyaltyId, variableFilter);
+		Map<String, Object> memberVariablesMap = memberVariablesDao.getMemberVariablesFiltered(loyaltyId, variableFilter);
 		return memberVariablesMap;
 	}
 	
@@ -144,7 +153,7 @@ public class ScoringSingleton {
 	}
 	
 	public Map<String, Change> createChangedVariablesMap(String lId) {
-		Map<String, Change> changedMbrVariables = new ChangedVariablesDao().getMemberVariables(lId);
+		Map<String, Change> changedMbrVariables = changedVariablesDao.getMemberVariables(lId);
 
 		Map<String, Change> allChanges = new HashMap<String, Change>();
 		if (changedMbrVariables != null && changedMbrVariables.keySet() != null) {
@@ -391,7 +400,7 @@ public class ScoringSingleton {
 					simpleDateFormat.format(new Date())));
 		}
 		if (updatedScores != null) {
-			new ChangedMemberScoresDao().upsertUpdateChangedScores(lId,updatedScores);
+			changedMemberScoresDao.upsertUpdateChangedScores(lId,updatedScores);
 		}	
 	}
 
@@ -400,7 +409,7 @@ public class ScoringSingleton {
 		// 11) Write changedMemberVariables with expiry
 		if (!allChanges.isEmpty()) {
 			// upsert document
-			new ChangedVariablesDao().upsertUpdateChangedScores(lId, allChanges, variableNameToVidMap);
+			changedVariablesDao.upsertUpdateChangedScores(lId, allChanges, variableNameToVidMap);
 		}
 				
 		

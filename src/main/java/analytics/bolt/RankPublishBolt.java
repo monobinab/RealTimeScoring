@@ -32,13 +32,12 @@ public class RankPublishBolt extends BaseRichBolt {
 	 *
 	 */
 	private static final long serialVersionUID = 1L;
-    private OutputCollector outputCollector;
+	private MemberZipDao memberZipDao;
+	private MemberScoreDao memberScoreDao;
     final String host;
     final int port;
     final String pattern;
 
-    private Map<String,Collection<Integer>> variableModelsMap;
-    private Map<String, String> variableVidToNameMap;
     private Map<String,String> modelIdToModelNameMap;
     private Map<Integer,Double> haAllRankToScoreMap;
     private Map<Integer,Double> haCookRankToScoreMap;
@@ -60,10 +59,9 @@ public class RankPublishBolt extends BaseRichBolt {
          */
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
+		memberZipDao = new MemberZipDao();
+		memberScoreDao = new MemberScoreDao();
         jedis = new Jedis(host, port);
-        this.outputCollector = collector;
-
-
         //prepare mongo       
         modelIdToModelNameMap = new HashMap<String,String>();
         modelIdToModelNameMap.put("34", "S_SCR_HA_ALL");
@@ -285,8 +283,8 @@ public class RankPublishBolt extends BaseRichBolt {
 		logger.info("The time it enters inside Score Publish Bolt execute method"+System.currentTimeMillis());
         //System.out.println(" %%% scorepublishbolt :" + input);
         String l_id = input.getStringByField("l_id");
-        String zipcode = new MemberZipDao().getMemberZip(l_id);
-        Map<String,String> oldScoreResult = new MemberScoreDao().getMemberScores(l_id);
+        String zipcode = memberZipDao.getMemberZip(l_id);
+        Map<String,String> oldScoreResult = memberScoreDao.getMemberScores(l_id);
         String modelName = modelIdToModelNameMap.get(input.getStringByField("model"));
         String oldScore;
         

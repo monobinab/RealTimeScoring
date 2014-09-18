@@ -6,27 +6,18 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.util.DBConnection;
 import analytics.util.MongoNameConstants;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 
-public class MemberScoreDao {
+public class MemberScoreDao extends AbstractDao {
 	static final Logger LOGGER = LoggerFactory
 			.getLogger(MemberScoreDao.class);
-	static DB db;
     DBCollection memberScoreCollection;
-    static {
-		try {
-			db = DBConnection.getDBConnection();
-		} catch (Exception e) {
-			LOGGER.error("Unable to get DB connection", e);
-		}
-    }
     public MemberScoreDao(){
+    	super();
 		memberScoreCollection = db.getCollection("memberScore");
     }
     

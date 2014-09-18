@@ -17,6 +17,7 @@ import org.codehaus.jettison.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import analytics.util.dao.DivLnBoostDao;
 import analytics.util.dao.DivLnVariableDao;
 import analytics.util.dao.PidDivLnDao;
 import backtype.storm.task.OutputCollector;
@@ -33,7 +34,8 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
 	 */
 
     private Map<String, List<String>> divLnVariablesMap;
-    
+	private DivLnVariableDao divLnVariableDao;
+	private PidDivLnDao pidDivLnDao;
 
     /*
          * (non-Javadoc)
@@ -50,11 +52,12 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
 	 * @see backtype.storm.task.IBolt#prepare(java.util.Map,
 	 * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
 	 */
-
+		divLnVariableDao = new DivLnVariableDao();
+		pidDivLnDao = new PidDivLnDao();
 		sourceTopic = "InternalSearch";
 
         // populate divLnVariablesMap
-        divLnVariablesMap = new DivLnVariableDao().getDivLnVariable();
+        divLnVariablesMap = divLnVariableDao.getDivLnVariable();
         
     }
 
@@ -200,7 +203,7 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
     	Map<String,String> variableValueMap = new HashMap<String,String>();
     	
     	for(String pid: pidSet) {
-    		PidDivLnDao.DivLn divLnObj = new PidDivLnDao().getVariableFromTopic(pid);
+    		PidDivLnDao.DivLn divLnObj = pidDivLnDao.getVariableFromTopic(pid);
     		if(divLnObj != null) {
 	    		String div = divLnObj.getDiv();
 	    		String divLn = divLnObj.getLn();

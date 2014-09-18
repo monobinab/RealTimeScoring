@@ -38,7 +38,8 @@ public class ParsingBoltPOS extends BaseRichBolt {
 			.getLogger(ParsingBoltPOS.class);
 	private static final long serialVersionUID = 1L;
     private OutputCollector outputCollector;
-    
+    private DivLnVariableDao divLnVariableDao;
+    private DivLnItmDao divLnItmDao;
     private Map<String, List<String>> divLnVariablesMap;
 
     public void setOutputCollector(OutputCollector outputCollector) {
@@ -64,7 +65,9 @@ public class ParsingBoltPOS extends BaseRichBolt {
 
         //System.out.println("PREPARING PARSING POS BOLT");
         // populate divLnVariablesMap
-        divLnVariablesMap = new DivLnVariableDao().getDivLnVariable();
+        divLnVariableDao = new DivLnVariableDao(); 
+        divLnItmDao = new DivLnItmDao();
+        divLnVariablesMap = divLnVariableDao.getDivLnVariable();
     }
 
 
@@ -148,7 +151,7 @@ public class ParsingBoltPOS extends BaseRichBolt {
             String amount = segment.getSegmentBody().get("Selling Amount").trim();
             //System.out.println(" division: " + div + " item: " + item + " amount: " + amount);
             
-            String line = new DivLnItmDao().getLnFromDivItem(div,item);
+            String line = divLnItmDao.getLnFromDivItem(div,item);
 
             if(line==null) {
             	continue;

@@ -31,11 +31,16 @@ public class SocialBolt extends BaseRichBolt {
 	 */
 	private static final long serialVersionUID = 1L;
 	private OutputCollector collector;
-
+	private FacebookLoyaltyIdDao facebookLoyaltyIdDao;
+	private TwitterLoyaltyIdDao twitterLoyaltyIdDao;
+	private SocialVariableDao socialVariableDao;
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
 		this.collector = collector;
+		twitterLoyaltyIdDao = new TwitterLoyaltyIdDao();
+		facebookLoyaltyIdDao = new FacebookLoyaltyIdDao();
+		socialVariableDao = new SocialVariableDao();
 	}
 
 	@Override
@@ -54,9 +59,9 @@ public class SocialBolt extends BaseRichBolt {
 
 		String lId = null;
 		if("facebook".equals(source))
-			lId = new FacebookLoyaltyIdDao().getLoyaltyIdFromID(id);
+			lId = facebookLoyaltyIdDao.getLoyaltyIdFromID(id);
 		else
-			lId = new TwitterLoyaltyIdDao().getLoyaltyIdFromID(id);
+			lId = twitterLoyaltyIdDao.getLoyaltyIdFromID(id);
 		if (lId != null) {
 			LOGGER.debug("Received " + score + " for " + lId);
 			// Find the list of variables that are affected by the model
@@ -66,7 +71,7 @@ public class SocialBolt extends BaseRichBolt {
 			Gson gson = new Gson();
 			Map<String, String> variableValueMap = new HashMap<String, String>();
 			variableValueMap.put(
-					new SocialVariableDao().getVariableFromTopic(topic),
+					socialVariableDao.getVariableFromTopic(topic),
 					score.toString());
 			Type varValueType = new TypeToken<Map<String, String>>() {
 			}.getType();

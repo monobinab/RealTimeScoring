@@ -31,7 +31,7 @@ public class ScorePublishBolt extends BaseRichBolt {
     final String pattern;
 
     private Jedis jedis;
-
+    private MemberScoreDao memberScoreDao;
 
     public ScorePublishBolt(String host, int port, String pattern) {
         this.host = host;
@@ -48,6 +48,7 @@ public class ScorePublishBolt extends BaseRichBolt {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         jedis = new Jedis(host, port);
+        memberScoreDao = new MemberScoreDao();
         this.outputCollector = collector;
     }
 
@@ -63,7 +64,7 @@ public class ScorePublishBolt extends BaseRichBolt {
         String l_id = input.getStringByField("l_id");
         String modelId = input.getStringByField("model");
         String modelName = ScoringSingleton.getInstance().getModelName(Integer.parseInt(modelId));
-        String oldScore = new MemberScoreDao().getMemberScores(l_id).get(modelId);
+        String oldScore = memberScoreDao.getMemberScores(l_id).get(modelId);
         String message = new StringBuffer(l_id).append(",")
             .append(modelName).append(",")
             .append(input.getStringByField("source")).append(",")

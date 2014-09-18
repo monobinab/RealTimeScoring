@@ -43,7 +43,10 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 	 */
 	private static final long serialVersionUID = 1L;
 	private OutputCollector outputCollector;
-
+    private DivLnVariableDao divLnVariableDao;
+    private DivLnItmDao divLnItmDao;
+    private DivCatVariableDao divCatVariableDao;
+    private DivCatKsnDao divCatKsnDao;
 	private Map<String, List<String>> divLnVariablesMap;
 	private Map<String, List<String>> divCatVariablesMap;
 	private String requestorID = "";
@@ -68,12 +71,17 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 
 		logger.debug("Getting mongo collections");
 		logger.trace("Populate div line variables map");
+		divLnItmDao = new DivLnItmDao();
+		divCatKsnDao = new DivCatKsnDao();
+		divLnVariableDao = new DivLnVariableDao();
+		divCatVariableDao = new DivCatVariableDao();
+		
 		// populate divLnVariablesMap
-		divLnVariablesMap = new DivLnVariableDao().getDivLnVariable();
+		divLnVariablesMap = divLnVariableDao.getDivLnVariable();
 
 		logger.trace("Populate div cat variables map");
 		//populate divCatVariablesMap
-		divCatVariablesMap = new DivCatVariableDao().getDivCatVariable();
+		divCatVariablesMap = divCatVariableDao.getDivCatVariable();
 	}
 
 	/*
@@ -257,7 +265,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 							}
                             String div = lineItem.getDivision();
 
-                    		String line = new DivLnItmDao().getLnFromDivItem(div, item);
+                    		String line = divLnItmDao.getLnFromDivItem(div, item);
 							if (line == null) {
 								/*logger.info("Line is null");*/
 								continue;
@@ -367,7 +375,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 
 	private final String getDivCategoryFromCollection(String item) {
 		logger.debug("searching for category");
-		DivCatKsnDao.DivCat divCat = new DivCatKsnDao().getVariableFromTopic(item);
+		DivCatKsnDao.DivCat divCat = divCatKsnDao.getVariableFromTopic(item);
 		if(divCat==null)
 			return null;
 		String category = divCat.getCat();

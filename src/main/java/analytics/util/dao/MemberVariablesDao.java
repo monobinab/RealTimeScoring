@@ -15,20 +15,13 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 
-public class MemberVariablesDao {
+public class MemberVariablesDao extends AbstractDao {
 	static final Logger LOGGER = LoggerFactory
 			.getLogger(MemberVariablesDao.class);
-	static DB db;
     DBCollection memberVariablesCollection;
-    static {
-		try {
-			db = DBConnection.getDBConnection();
-		} catch (Exception e) {
-			LOGGER.error("Unable to get DB connection", e);
-		}
-    }
     public MemberVariablesDao(){
-			memberVariablesCollection = db.getCollection("memberVariables");
+    	super();
+		memberVariablesCollection = db.getCollection("memberVariables");
     }
    
     public Map<String,Object> getMemberVariablesFiltered(String l_id, Map<String, Integer> variableFilter){

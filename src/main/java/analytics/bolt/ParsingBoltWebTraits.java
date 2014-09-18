@@ -26,8 +26,11 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
 	 * Created by Rock Wasserman 4/18/2014
 	 */
 
-    protected Map<String,List<String>> traitVariablesMap;
-    protected Map<String,List<String>> variableTraitsMap;
+    private Map<String,List<String>> traitVariablesMap;
+    private Map<String,List<String>> variableTraitsMap;
+    private MemberTraitsDao memberTraitsDao;
+    private TraitVariablesDao traitVariablesDao;
+    
     /*
          * (non-Javadoc)
          *
@@ -38,11 +41,12 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
 		sourceTopic="WebTraits";
-        
+		traitVariablesDao = new TraitVariablesDao();
+		memberTraitsDao = new MemberTraitsDao();
         logger.info("PREPARING PARSING BOLT FOR WEB TRAITS");
         // POPULATE THE TRAIT TO VARIABLES MAP AND THE VARIABLE TO TRAITS MAP
-        traitVariablesMap = new TraitVariablesDao().getTraitVariableList();
-        variableTraitsMap = new TraitVariablesDao().getVariableTraitList();		
+        traitVariablesMap = traitVariablesDao.getTraitVariableList();
+        variableTraitsMap = traitVariablesDao.getVariableTraitList();		
     }
 
     
@@ -62,7 +66,7 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
     	for(String trait: l_idToValueCollectionMap.get(current_l_id)) {
     		if(traitVariablesMap.containsKey(trait) && JsonUtils.hasModelVariable(modelVariablesList,traitVariablesMap.get(trait))) {
     			if(firstTrait) {
-    				dateTraitsMap = new MemberTraitsDao().getDateTraits(current_l_id);
+    				dateTraitsMap = memberTraitsDao.getDateTraits(current_l_id);
     				firstTrait = false;
     			}
     			
