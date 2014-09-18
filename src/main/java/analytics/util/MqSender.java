@@ -14,7 +14,7 @@ import java.io.FileReader;
 import java.nio.charset.Charset;
 
 public class MqSender {
-	static final Logger logger = LoggerFactory.getLogger(MqSender.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(MqSender.class);
 
 	static int counter = 0;
 	public static void initJMS() {
@@ -70,12 +70,12 @@ public class MqSender {
 			while ((sCurrentLine = br.readLine()) != null && counter<=1) {
 				BytesMessage message = (BytesMessage)session.createBytesMessage();
 				message.writeBytes(sCurrentLine.getBytes("UTF-8"));
-				logger.info(sCurrentLine);
+				LOGGER.info(sCurrentLine);
 				sender.send(message);
 				sender2.send(message);
 				counter++;
 			}
-			logger.info("SUCCESS");
+			LOGGER.info("SUCCESS");
 			// Receive the reply message.
 			// NOTE: This method blocks until a message is received.
 			
@@ -109,11 +109,11 @@ public class MqSender {
 			
 			
 		} catch (JMSException jmsex) {
-			logger.debug(jmsex.toString());
-			logger.info("FAILURE");
+			LOGGER.debug(jmsex.toString());
+			LOGGER.info("FAILURE");
 		} catch (Exception ex) {
-			logger.info(ex.toString());
-			logger.info("FAILURE");
+			LOGGER.info(ex.toString());
+			LOGGER.info("FAILURE");
 		}
 
 	}

@@ -26,7 +26,7 @@ import java.util.Map;
 
 public class RankPublishBolt extends BaseRichBolt {
 
-	static final Logger logger = LoggerFactory
+	private static final Logger LOGGER = LoggerFactory
 			.getLogger(RankPublishBolt.class);
 	/**
 	 *
@@ -280,7 +280,7 @@ public class RankPublishBolt extends BaseRichBolt {
 	 */
 	@Override
 	public void execute(Tuple input) {
-		logger.info("The time it enters inside Score Publish Bolt execute method"+System.currentTimeMillis());
+		LOGGER.info("The time it enters inside Score Publish Bolt execute method"+System.currentTimeMillis());
         //System.out.println(" %%% scorepublishbolt :" + input);
         String l_id = input.getStringByField("l_id");
         String zipcode = memberZipDao.getMemberZip(l_id);
@@ -298,7 +298,7 @@ public class RankPublishBolt extends BaseRichBolt {
         int oldRank = 0;
         int newRank = 0;
         String modelDescription = new String();
-        if(modelName != null && modelName.equals("S_SCR_HA_ALL")) {
+        if(modelName != null && "S_SCR_HA_ALL".equals(modelName)) {
         	modelDescription="HOME APPLIANCE";
         	if(Double.valueOf(oldScore)==0) {
         		oldRank=1;
@@ -324,7 +324,7 @@ public class RankPublishBolt extends BaseRichBolt {
         	}
         	if(newRank==0) newRank=1;
         }
-        else if (modelName.equals("S_SCR_HA_COOK")) {
+        else if ("S_SCR_HA_COOK".equals(modelName)) {
         	modelDescription="COOK TOPS";
         	if(Double.valueOf(oldScore)==0) {
         		oldRank=1;
@@ -355,7 +355,7 @@ public class RankPublishBolt extends BaseRichBolt {
         }
         
         String dataSource = new String();
-        if(input.getStringByField("source").equals("NPOS")) {
+        if("NPOS".equals(input.getStringByField("source"))) {
         	dataSource = "In-store Sales";
         }
         else {

@@ -34,7 +34,7 @@ public class ParsingBoltPOS extends BaseRichBolt {
 	 * Created by Rock Wasserman 4/18/2014
 	 */
 	
-	static final Logger logger = LoggerFactory
+	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ParsingBoltPOS.class);
 	private static final long serialVersionUID = 1L;
     private OutputCollector outputCollector;
@@ -101,7 +101,7 @@ public class ParsingBoltPOS extends BaseRichBolt {
 		try {
 			nposTransaction = ((TextMessage) document).getText();
 		} catch (JMSException e) {
-			logger.info("JMS exception",e);
+			LOGGER.info("JMS exception",e);
 		}
 		if(nposTransaction == null) {
 			return;
@@ -215,7 +215,7 @@ public class ParsingBoltPOS extends BaseRichBolt {
 	        listToEmit.add(JsonUtils.createJsonFromStringStringMap(varAmountMap));
 	        listToEmit.add("NPOS");
 
-	        logger.debug(" *** PARSING BOLT EMITTING: " + listToEmit.toString());
+	        LOGGER.debug(" *** PARSING BOLT EMITTING: " + listToEmit.toString());
 	        
 			// 9) EMIT VARIABLES TO VALUES MAP IN GSON DOCUMENT
 	        if(listToEmit!=null && !listToEmit.isEmpty()) {

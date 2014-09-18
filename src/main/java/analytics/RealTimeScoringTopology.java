@@ -23,7 +23,7 @@ import backtype.storm.topology.TopologyBuilder;
 
 public class RealTimeScoringTopology {
 
-	static final Logger logger = LoggerFactory
+	private static final Logger LOGGER = LoggerFactory
 			.getLogger(RealTimeScoringTopology.class);
 
 	public static void main(String[] args) throws ConfigurationException {
@@ -62,9 +62,9 @@ public class RealTimeScoringTopology {
 				StormSubmitter.submitTopology(args[0], conf,
 						topologyBuilder.createTopology());
 			} catch (AlreadyAliveException e) {
-				logger.error(e.getClass() + ": " + e.getMessage(), e);
+				LOGGER.error(e.getClass() + ": " + e.getMessage(), e);
 			} catch (InvalidTopologyException e) {
-				logger.error(e.getClass() + ": " + e.getMessage(), e);
+				LOGGER.error(e.getClass() + ": " + e.getMessage(), e);
 			}
 		} else {
 			conf.setDebug(false);
@@ -75,7 +75,7 @@ public class RealTimeScoringTopology {
 			try {
 				Thread.sleep(10000000);
 			} catch (InterruptedException e) {
-				logger.error(e.getClass() + ": " + e.getMessage(), e);
+				LOGGER.error(e.getClass() + ": " + e.getMessage(), e);
 			}
 			cluster.shutdown();
 

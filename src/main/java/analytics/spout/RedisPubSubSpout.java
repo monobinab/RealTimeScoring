@@ -22,7 +22,7 @@ import static backtype.storm.utils.Utils.tuple;
 
 public class RedisPubSubSpout extends BaseRichSpout {
 
-    static Logger LOG = LoggerFactory.getLogger(RedisPubSubSpout.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(RedisPubSubSpout.class);
 
     SpoutOutputCollector _collector;
     final String host;

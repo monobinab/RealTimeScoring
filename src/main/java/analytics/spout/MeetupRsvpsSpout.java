@@ -29,7 +29,7 @@ public class MeetupRsvpsSpout extends BaseRichSpout{
     private DefaultHttpClient client;
     private SpoutOutputCollector collector;
 
-    static Logger LOG = LoggerFactory.getLogger(MeetupRsvpsSpout.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MeetupRsvpsSpout.class);
     static JSONParser jsonParser = new JSONParser();
 
     @Override
@@ -56,14 +56,14 @@ public class MeetupRsvpsSpout extends BaseRichSpout{
                         Object json = jsonParser.parse(in);
                         collector.emit(new Values(json));
                     }catch (Exception e) {
-                        LOG.error("Error parsing message from meetup",e);
+                        LOGGER.error("Error parsing message from meetup",e);
                     }
                 }
                 inputStream.close();
                 reader.close();
             }
         } catch (IOException e) {
-            LOG.error("Error in communication with meetup api ["+get.getURI().toString()+"]");
+            LOGGER.error("Error in communication with meetup api ["+get.getURI().toString()+"]");
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException e1) {

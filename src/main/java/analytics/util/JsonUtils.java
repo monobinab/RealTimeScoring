@@ -28,8 +28,7 @@ public class JsonUtils {
 			private static final long serialVersionUID = 1L;
 		}.getType();
 		
-    	String varValueString = gson.toJson(variableValuesMap, varValueType);
-		return varValueString;
+    	return gson.toJson(variableValuesMap, varValueType);
 	}
 	
 	public static Map<String, Collection<String>> restoreDateTraitsMapFromJson(String json)

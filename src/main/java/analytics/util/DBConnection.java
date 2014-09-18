@@ -12,7 +12,7 @@ import com.mongodb.MongoClient;
 
 public class DBConnection {
 
-	static final Logger logger = LoggerFactory.getLogger(DBConnection.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(DBConnection.class);
 	private static MongoClient mongoClient;
 	private static String sServerName = "";
 	private static int sPort = 0;
@@ -24,13 +24,13 @@ public class DBConnection {
 		DB conn = null;
 		PropertiesConfiguration properties = null;
 		String isProd = System.getProperty("rtseprod");
-		if(isProd!=null &&isProd.equals("true")){
+		if(isProd!=null &&"true".equals(isProd)){
 			properties=  new PropertiesConfiguration("resources/connection_config_prod.properties");
-			logger.info("Using production properties");
+			LOGGER.info("Using production properties");
 		}
 		else{
 			properties=  new PropertiesConfiguration("resources/connection_config.properties");
-			logger.info("Using test properties");	
+			LOGGER.info("Using test properties");	
 		}		
 
 		sServerName = properties.getString("server.name");
@@ -46,7 +46,7 @@ public class DBConnection {
 		}
 
 		conn = mongoClient.getDB(sDatabaseName);
-		logger.info("Connection is established...."+conn.getName());
+		LOGGER.info("Connection is established...."+conn.getName());
 		conn.authenticate(sUserName, sPassword.toCharArray());
 		return conn;
 	}

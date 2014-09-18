@@ -36,7 +36,7 @@ import com.ibm.jms.JMSMessage;
 
 public class TellurideParsingBoltPOS extends BaseRichBolt {
 
-	static final Logger logger = LoggerFactory
+	private static final Logger LOGGER = LoggerFactory
 			.getLogger(TellurideParsingBoltPOS.class);
 	/**
 	 * Created by Devarshi Das 8/27/2014
@@ -67,10 +67,10 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 			OutputCollector collector) {
 		this.outputCollector = collector;
 
-		logger.info("Preparing telluride parsing bolt");
+		LOGGER.info("Preparing telluride parsing bolt");
 
-		logger.debug("Getting mongo collections");
-		logger.trace("Populate div line variables map");
+		LOGGER.debug("Getting mongo collections");
+		LOGGER.trace("Populate div line variables map");
 		divLnItmDao = new DivLnItmDao();
 		divCatKsnDao = new DivCatKsnDao();
 		divLnVariableDao = new DivLnVariableDao();
@@ -79,7 +79,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 		// populate divLnVariablesMap
 		divLnVariablesMap = divLnVariableDao.getDivLnVariable();
 
-		logger.trace("Populate div cat variables map");
+		LOGGER.trace("Populate div cat variables map");
 		//populate divCatVariablesMap
 		divCatVariablesMap = divCatVariableDao.getDivCatVariable();
 	}
@@ -91,8 +91,8 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 	 */
 	@Override
 	public void execute(Tuple input) {
-		if(logger.isDebugEnabled())
-			logger.debug("The time it enters inside Telluride parsing bolt execute method"+System.currentTimeMillis()+" and the message ID is ..."+input.getMessageId());
+		if(LOGGER.isDebugEnabled())
+			LOGGER.debug("The time it enters inside Telluride parsing bolt execute method"+System.currentTimeMillis()+" and the message ID is ..."+input.getMessageId());
 		String lyl_id_no = "";
 		ProcessTransaction processTransaction = null;
 
@@ -103,17 +103,17 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 		try {
 			transactionXmlAsString = convertStreamToString(documentNPOS);
 		} catch (JMSException e) {
-			logger.error("Unable to read message from MQ",e);
+			LOGGER.error("Unable to read message from MQ",e);
 			outputCollector.fail(input);
 		} catch (Exception e) {
-			logger.error("Unable to read message from MQ",e);
+			LOGGER.error("Unable to read message from MQ",e);
 			outputCollector.fail(input);
 		}
 		if ( StringUtils.isEmpty(transactionXmlAsString)) {
 			return;
 		}
 
-		logger.debug("Parsing MQ message XML");
+		LOGGER.debug("Parsing MQ message XML");
 		if (transactionXmlAsString.contains("xmlns:soapenv")) {
 
 			//logger.info("Processing Soap Envelop xml String...");
@@ -149,9 +149,9 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 
 		if (processTransaction != null) {
 			requestorID = processTransaction.getRequestorID();
-			logger.debug("Requestor ID is..." + requestorID);
+			LOGGER.debug("Requestor ID is..." + requestorID);
 		} else {
-			logger.debug("Requestor ID is null....");
+			LOGGER.debug("Requestor ID is null....");
 		}
 		/*
 		 * if (requestorID == null) { return; }
@@ -179,11 +179,11 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 			//logger.info("nposTransaction XML is" + transactionXmlAsString.toString());
 
 			List<LineItem> lineItems = processTransaction.getLineItemList();
-			if(logger.isTraceEnabled()){
+			if(LOGGER.isTraceEnabled()){
 				String lineItems_toString = null;
 				if(lineItems != null)
 					lineItems_toString = lineItems.toString();
-				logger.trace("Line Items are .."+ lineItems_toString);
+				LOGGER.trace("Line Items are .."+ lineItems_toString);
 			}
 			if (lineItems != null && lineItems.size() != 0) {
 				for (LineItem lineItem : lineItems) {
@@ -193,11 +193,11 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 					/*logger.info("Item is...." + item + "...Amount is...."
 							+ amount);*/
 					if (amount.contains("-")) {
-						logger.debug("amount_contains -");
+						LOGGER.debug("amount_contains -");
 						continue;
 					} else {
 						// KPOS and KCOM
-						logger.debug("KPOS or KCOM transaction processing");
+						LOGGER.debug("KPOS or KCOM transaction processing");
 						if ("KPOS".equalsIgnoreCase(requestorID)
 								|| "KCOM".equalsIgnoreCase(requestorID)) {
 							item = lineItem.getItemNumber();
@@ -205,7 +205,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 							String divCategory = getDivCategoryFromCollection(item);
 							if(divCategory==null||divCategory.length()==0)
 							{
-								logger.error("Unable to find div cat information for" + item);
+								LOGGER.error("Unable to find div cat information for" + item);
 								continue;
 							}
 							//logger.info("division and category are ...." + divCategory);
@@ -254,7 +254,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 										+ lineItemList.size());*/
 							}
 						} else {
-							logger.debug("Sears transaction processing");
+							LOGGER.debug("Sears transaction processing");
 							if (lineItem.getItemNumber().length() >= 6) {
 
 								item = lineItem.getItemNumber().substring(
@@ -349,8 +349,8 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 					listToEmit.add(JsonUtils.createJsonFromStringStringMap(varAmountMap));
 					listToEmit.add(requestorID);
 					listToEmit.add(input.getMessageId().toString());
-					logger.debug(requestorID + " Point of SALE is touched...");
-					logger.debug(" *** telluride parsing bolt emitting: "
+					LOGGER.debug(requestorID + " Point of SALE is touched...");
+					LOGGER.debug(" *** telluride parsing bolt emitting: "
 						+ listToEmit.toString());
 
 				// 9) EMIT VARIABLES TO VALUES MAP IN JSON DOCUMENT
@@ -374,8 +374,9 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 	}
 
 	private final String getDivCategoryFromCollection(String item) {
-		logger.debug("searching for category");
+		LOGGER.debug("searching for category");
 		DivCatKsnDao.DivCat divCat = divCatKsnDao.getVariableFromTopic(item);
+
 		if(divCat==null)
 			return null;
 		String category = divCat.getCat();

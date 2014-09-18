@@ -15,7 +15,7 @@ public class MongoCappedCollectionSpout extends MongoSpoutBase implements Serial
 
   private static final long serialVersionUID = 1221725440580018348L;
 
-  static Logger LOG = LoggerFactory.getLogger(MongoCappedCollectionSpout.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(MongoCappedCollectionSpout.class);
 
   public MongoCappedCollectionSpout(String url, String collectionName) {
     super(url, null, new String[]{collectionName}, null, null);

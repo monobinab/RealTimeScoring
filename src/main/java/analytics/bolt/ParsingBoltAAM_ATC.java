@@ -42,9 +42,9 @@ public class ParsingBoltAAM_ATC extends ParseAAMFeeds {
 
 		// topic is chosen to populate divLnBoostVariblesMap with source
 		// specific variables
-		if (topic.equalsIgnoreCase("AAM_CDF_ATCProducts")) {
+		if ("AAM_CDF_ATCProducts".equalsIgnoreCase(topic)) {
 			sourceTopic = "ATC";
-		} else if (topic.equalsIgnoreCase("AAM_CDF_Products")) {
+		} else if ("AAM_CDF_Products".equalsIgnoreCase(topic)) {
 			sourceTopic = "BROWSE";
 		}
 		divLnBoostDao = new DivLnBoostDao();
@@ -133,8 +133,7 @@ public class ParsingBoltAAM_ATC extends ParseAAMFeeds {
 	        String split[]=StringUtils.split(webRec,",");
 	       
 	        if(split !=null && split.length>0) {
-	            String[] returnArray = { split[1], split[2] };
-				return returnArray;
+	            return new String [] { split[1], split[2] };
 			}
 			else {
 				return null;

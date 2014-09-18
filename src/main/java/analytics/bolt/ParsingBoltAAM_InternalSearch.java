@@ -91,24 +91,6 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
         }
     }
         	
-	private boolean isNumbers(String s) {
-		for(int i=0;i<s.length();i++) {
-			if(!s.substring(i, i+1).equals("0")
-					&& !s.substring(i, i+1).equals("1")
-					&& !s.substring(i, i+1).equals("2")
-					&& !s.substring(i, i+1).equals("3")
-					&& !s.substring(i, i+1).equals("4")
-					&& !s.substring(i, i+1).equals("5")
-					&& !s.substring(i, i+1).equals("6")
-					&& !s.substring(i, i+1).equals("7")
-					&& !s.substring(i, i+1).equals("8")
-					&& !s.substring(i, i+1).equals("9")
-			) return false;
-		}
-		return true;
-	}
-
-
 	/*
      * (non-Javadoc)
      *
@@ -157,12 +139,12 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
 					try {
 						TimeUnit.MILLISECONDS.sleep(100);
 					} catch (InterruptedException e) {
-						logger.debug("Unable to wait",e);
+						LOGGER.debug("Unable to wait",e);
 					}
 					long t1 = System.currentTimeMillis();
 					Document doc = Jsoup.connect(query).get();
 					long t2 = System.currentTimeMillis() - t1;
-					logger.debug(" @@@ Query time: " + t2);
+					LOGGER.debug(" @@@ Query time: " + t2);
 					doc.body().wrap("<pre></pre>");
 					String text = doc.text();
 					// Converting nbsp entities
@@ -170,10 +152,10 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
 					
 					queryResultsDoc = text;
 				} catch (IOException e) {
-					logger.debug("Unable to process keywords",e);
+					LOGGER.debug("Unable to process keywords",e);
 				}
 				if(queryResultsDoc==null) {
-					logger.debug("query results null");
+					LOGGER.debug("query results null");
 				}
 				
 				else {
@@ -247,8 +229,7 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
 	        String split[]=StringUtils.split(webRec,",");
 	       
 	        if(split !=null && split.length>0) {
-	            String[] returnArray = { split[1], split[2] };
-				return returnArray;
+	            return new String [] { split[1], split[2] };
 			}
 			else {
 				return null;

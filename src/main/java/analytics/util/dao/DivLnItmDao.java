@@ -10,7 +10,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 
 public class DivLnItmDao extends AbstractDao {
-	static final Logger LOGGER = LoggerFactory
+	private static final Logger LOGGER = LoggerFactory
 			.getLogger(DivLnItmDao.class);
     DBCollection divLnItemCollection;
     public DivLnItmDao(){
@@ -32,8 +32,7 @@ public class DivLnItmDao extends AbstractDao {
 		if(divLnItm==null || divLnItm.keySet()==null || divLnItm.keySet().isEmpty()) {
 			return null;
 		}
-		String line = divLnItm.get(MongoNameConstants.DLI_LN).toString();
+		return divLnItm.get(MongoNameConstants.DLI_LN).toString();
 		//System.out.println("  found line: " + line);
-		return line;
 	}
 }

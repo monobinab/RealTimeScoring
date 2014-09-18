@@ -11,8 +11,9 @@ import analytics.util.objects.ChangedMemberScore;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 
+
 public class ChangedMemberScoresDao extends AbstractDao{
-	static final Logger LOGGER = LoggerFactory
+	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ChangedMemberScoresDao.class);
 
     DBCollection changedMemberScoresCollection;
