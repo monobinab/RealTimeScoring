@@ -8,8 +8,8 @@ import junit.framework.Assert;
 import org.apache.commons.configuration.ConfigurationException;
 import org.junit.Test;
 
+import com.github.fakemongo.Fongo;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
 import com.mongodb.DBCollection;
 
 import analytics.MockOutputCollector;
@@ -25,6 +25,11 @@ public class SocialBoltMockTest {
 	@Test
 	public void setVariablesAfterBoltInitialization() throws ConfigurationException, IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
 		System.setProperty("rtseprod", "test");
+		//TODO:Since we have a get DB connection, do not need to use reflection to set the values unlike before, 
+		//so rewrite to just set the collection values. Refer to the integration test for a sample
+		
+		//Below line ensures an empty DB rather than reusing a DB with values in it
+		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
         SocialBolt boltUnderTest = new SocialBolt();
        

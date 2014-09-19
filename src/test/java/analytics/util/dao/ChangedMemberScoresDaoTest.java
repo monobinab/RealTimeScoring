@@ -10,9 +10,11 @@ import junit.framework.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import analytics.util.FakeMongo;
 import analytics.util.MongoNameConstants;
 import analytics.util.objects.ChangedMemberScore;
 
+import com.github.fakemongo.Fongo;
 import com.mongodb.DBObject;
 
 public class ChangedMemberScoresDaoTest {
@@ -21,6 +23,8 @@ public class ChangedMemberScoresDaoTest {
 	public static void initialize() {
 		// DO NOT REMOVE BELOW LINE
 		System.setProperty("rtseprod", "test");
+		//Ensure we have an empty DB
+		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));
 	}
 	
 	@Test
