@@ -24,8 +24,7 @@ public class MemberUUIDDaoTest {
 	public static void initialize() {
 		// DO NOT REMOVE BELOW LINE
 		System.setProperty("rtseprod", "test");
-		//Ensure we have an empty DB
-		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));
+
 		
 		seedDataLIds = new ArrayList<String>();
 		seedDataUuids = new ArrayList<String>();
@@ -53,7 +52,8 @@ public class MemberUUIDDaoTest {
 
 	@Before
 	public void setupTest() {
-		// Can use static collection here since there are no writes
+		//Ensure we have an empty DB
+		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));
 	}
 
 	@Test

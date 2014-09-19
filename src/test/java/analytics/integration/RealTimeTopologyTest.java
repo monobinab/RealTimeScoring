@@ -29,7 +29,7 @@ public class RealTimeTopologyTest {
 	}
 	
 	@Test(timeout=10000)
-	public void testWithValidRecord(){
+	public void testWithValidRecord() throws InterruptedException{
 		TestHelper.initializeDBForTests();
 		Map<String,Object> expected = new HashMap<String, Object>();
 		expected.put("l_id","1hGa3VmrRXWbAcwTcw0qw6BfzS4=");
@@ -52,6 +52,7 @@ public class RealTimeTopologyTest {
 				topologyBuilder.createTopology());
 		while(!testComplete){
 			//do nothing
+			Thread.sleep(1000);
 		}
 		System.out.println("complete.....");
 	}
