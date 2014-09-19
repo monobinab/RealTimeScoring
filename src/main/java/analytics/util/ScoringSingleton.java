@@ -29,8 +29,6 @@ import analytics.util.objects.StrategyMapper;
 import analytics.util.objects.Variable;
 import analytics.util.strategies.Strategy;
 
-import com.mongodb.BasicDBObject;
-
 public class ScoringSingleton {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ScoringSingleton.class);
@@ -127,10 +125,14 @@ public class ScoringSingleton {
 			} else {
 				month = Calendar.getInstance().get(Calendar.MONTH) + 1;
 			}
-
+			if(modelsMap.get(modId).get(month)!= null && modelsMap.get(modId).get(month).getVariables()!=null){
 			for (String var : modelsMap.get(modId).get(month).getVariables()
 					.keySet()) {
 				variableFilter.put(variableNameToVidMap.get(var), 1);
+			}
+			}
+			else{
+				LOGGER.error("Unable to find the model for " + modId);
 			}
 		}
 		return memberVariablesDao.getMemberVariablesFiltered(loyaltyId, variableFilter);
@@ -144,7 +146,7 @@ public class ScoringSingleton {
 		for (String changedVariable : newChangesVarValueMap.keySet()) {
 			List<Integer> models = variableModelsMap.get(changedVariable);
 			if(models==null)
-				return modelIdList;
+				continue;//next var
 			for (Integer modelId : models) {
 				modelIdList.add(modelId);
 			}
