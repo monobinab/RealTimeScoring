@@ -7,12 +7,13 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.fakemongo.Fongo;
 import com.mongodb.DB;
 import com.mongodb.MongoClient;
 
 public class DBConnection {
 
-	static final Logger logger = LoggerFactory.getLogger(DBConnection.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(DBConnection.class);
 	private static MongoClient mongoClient;
 	private static String sServerName = "";
 	private static int sPort = 0;
@@ -24,13 +25,19 @@ public class DBConnection {
 		DB conn = null;
 		PropertiesConfiguration properties = null;
 		String isProd = System.getProperty("rtseprod");
-		if(isProd!=null &&isProd.equals("true")){
+		//If test, return only a test fake mongo connection
+		if(isProd!=null && "test".equals(isProd)){
+			Fongo fongo = new Fongo("test server");
+			conn = fongo.getDB("test");
+			return conn;
+		}
+		if(isProd!=null &&"true".equals(isProd)){
 			properties=  new PropertiesConfiguration("resources/connection_config_prod.properties");
-			logger.info("Using production properties");
+			LOGGER.info("Using production properties");
 		}
 		else{
 			properties=  new PropertiesConfiguration("resources/connection_config.properties");
-			logger.info("Using test properties");	
+			LOGGER.info("Using test properties");	
 		}		
 
 		sServerName = properties.getString("server.name");
@@ -46,80 +53,8 @@ public class DBConnection {
 		}
 
 		conn = mongoClient.getDB(sDatabaseName);
-		logger.info("Connection is established...."+conn.getName());
+		LOGGER.info("Connection is established...."+conn.getName());
 		conn.authenticate(sUserName, sPassword.toCharArray());
 		return conn;
 	}
-
-	/*public DB getDBConnectionWithoutCredentials() throws Exception {
-		DB conn = null;
-
-		PropertiesConfiguration properties = new PropertiesConfiguration("./src/main/resources/connection_config.properties");
-						
-		sServerName = properties.getString("server.name");
-		sPort = Integer.parseInt( properties.getString("port.no"));
-		sDatabaseName = properties.getString("database.name");
-		sUserName = properties.getString("user.name");
-		sPassword = properties.getString("user.password");
-		
-		try {
-			mongoClient = new MongoClient(sServerName, sPort);
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
-
-		conn = mongoClient.getDB(sDatabaseName);
-		logger.info("Connection is established...."+conn.getName());
-		//conn.authenticate(sUserName, sPassword.toCharArray());
-		return conn;
-	}*/
-
-	public MongoClient getMongoClient() {
-		return mongoClient;
-	}
-
-	public void setMongoClient(MongoClient mongoClient) {
-		this.mongoClient = mongoClient;
-	}
-
-	public String getsServerName() {
-		return sServerName;
-	}
-
-	public void setsServerName(String sServerName) {
-		this.sServerName = sServerName;
-	}
-
-	public int getsPort() {
-		return sPort;
-	}
-
-	public void setsPort(int sPort) {
-		this.sPort = sPort;
-	}
-
-	public String getsDatabaseName() {
-		return sDatabaseName;
-	}
-
-	public void setsDatabaseName(String sDatabaseName) {
-		this.sDatabaseName = sDatabaseName;
-	}
-
-	public String getsUserName() {
-		return sUserName;
-	}
-
-	public void setsUserName(String sUserName) {
-		this.sUserName = sUserName;
-	}
-
-	public String getsPassword() {
-		return sPassword;
-	}
-
-	public void setsPassword(String sPassword) {
-		this.sPassword = sPassword;
-	}
-
 }

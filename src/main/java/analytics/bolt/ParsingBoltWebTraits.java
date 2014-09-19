@@ -26,8 +26,11 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
 	 * Created by Rock Wasserman 4/18/2014
 	 */
 
-    protected Map<String,List<String>> traitVariablesMap;
-    protected Map<String,List<String>> variableTraitsMap;
+    private Map<String,List<String>> traitVariablesMap;
+    private Map<String,List<String>> variableTraitsMap;
+    private MemberTraitsDao memberTraitsDao;
+    private TraitVariablesDao traitVariablesDao;
+    
     /*
          * (non-Javadoc)
          *
@@ -38,11 +41,14 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
 		sourceTopic="WebTraits";
-        
-        logger.info("PREPARING PARSING BOLT FOR WEB TRAITS");
+
+		traitVariablesDao = new TraitVariablesDao();
+		memberTraitsDao = new MemberTraitsDao();
+        LOGGER.info("PREPARING PARSING BOLT FOR WEB TRAITS");
+
         // POPULATE THE TRAIT TO VARIABLES MAP AND THE VARIABLE TO TRAITS MAP
-        traitVariablesMap = new TraitVariablesDao().getTraitVariableList();
-        variableTraitsMap = new TraitVariablesDao().getVariableTraitList();		
+        traitVariablesMap = traitVariablesDao.getTraitVariableList();
+        variableTraitsMap = traitVariablesDao.getVariableTraitList();		
     }
 
     
@@ -50,7 +56,7 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
 	//Generalize with parsing bolt aam atc - processPidList
 	//[2014-29-08]:{Trait1,Trait2}, [2014-28-08]:{Trait3,Trait2}
     protected Map<String,String> processList(String current_l_id) {
-    	logger.debug("Processing list of traits");
+    	LOGGER.debug("Processing list of traits");
     	Map<String, List<String>> dateTraitsMap = null; // MAP BETWEEN DATES AND SET OF TRAITS - HISTORICAL AND CURRENT TRAITS
 		List<String> variableList = new ArrayList<String>();
     	boolean firstTrait = true; //flag to indicate if the AMM trait found is the first for that member - if true then populate the memberTraitsMap
@@ -58,11 +64,11 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
     	int variableCount = 0;
     	
     	//FOR EACH TRAIT FOUND FROM AAM DATA FIND THE VARIABLES THAT ARE IMPACTED
-    	logger.debug("Finding list of variables for each trait");
+    	LOGGER.debug("Finding list of variables for each trait");
     	for(String trait: l_idToValueCollectionMap.get(current_l_id)) {
     		if(traitVariablesMap.containsKey(trait) && JsonUtils.hasModelVariable(modelVariablesList,traitVariablesMap.get(trait))) {
     			if(firstTrait) {
-    				dateTraitsMap = new MemberTraitsDao().getDateTraits(current_l_id);
+    				dateTraitsMap = memberTraitsDao.getDateTraits(current_l_id);
     				firstTrait = false;
     			}
     			
@@ -77,7 +83,7 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
 	    		}
     		}
     	}
-		logger.debug(" traits found: " + traitCount + " ... variables found: " + variableCount);
+		LOGGER.debug(" traits found: " + traitCount + " ... variables found: " + variableCount);
 		Map<String,String> variableDateTraitMap = new HashMap<String, String>();
     	if(dateTraitsMap != null && !dateTraitsMap.isEmpty() && !variableList.isEmpty()) {
     		for(String v : variableList) {
@@ -92,31 +98,30 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
     }
     
     private String createJsonFromDateTraitsMap(Map<String, List<String>> stringCollectionMap) {
-    	logger.debug("dateTraitMap: " + stringCollectionMap);
+    	LOGGER.debug("dateTraitMap: " + stringCollectionMap);
 		// Create string in JSON format to emit
     	Gson gson = new Gson();
     	Type dateTraitValueType = new TypeToken<Map<String, Collection<String>>>() {
 			private static final long serialVersionUID = 1L;
 		}.getType();
 		
-		String dateTraitString = gson.toJson(stringCollectionMap, dateTraitValueType);
-		return dateTraitString;
+		return gson.toJson(stringCollectionMap, dateTraitValueType);
 	}
 	
 
 	private boolean addTraitToDateTraitMap(String trait, Map<String, List<String>> dateTraitsMap) {
-		logger.debug("add trait to date trait map");
+		LOGGER.debug("add trait to date trait map");
 		boolean addedTrait = false;
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		if(!dateTraitsMap.containsKey(simpleDateFormat.format(new Date()))) {
 			dateTraitsMap.put(simpleDateFormat.format(new Date()), new ArrayList<String>());
 			dateTraitsMap.get(simpleDateFormat.format(new Date())).add(trait);
-			logger.trace(" added trait: " + trait);
+			LOGGER.trace(" added trait: " + trait);
 			addedTrait=true;
 		}
 		else if(!dateTraitsMap.get(simpleDateFormat.format(new Date())).contains(trait)) {
 			dateTraitsMap.get(simpleDateFormat.format(new Date())).add(trait);
-			logger.trace(" added trait: " + trait);
+			LOGGER.trace(" added trait: " + trait);
 			addedTrait=true;
 		}
 		return addedTrait;
@@ -124,7 +129,7 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
     
     @Override
     protected String[] splitRec(String webRec) {
-    	logger.debug("Parsing trait record");
+    	LOGGER.debug("Parsing trait record");
     	//TODO: Do not use regex. Have a better way. This is temp
     	if(webRec==null)
     		return null;

@@ -28,7 +28,7 @@ public class MeetupRsvpsBatchSpout implements IBatchSpout {
 
     private DefaultHttpClient client;
 
-    static Logger LOG = LoggerFactory.getLogger(MeetupRsvpsBatchSpout.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MeetupRsvpsBatchSpout.class);
     static JSONParser jsonParser = new JSONParser();
 
 
@@ -63,14 +63,14 @@ public class MeetupRsvpsBatchSpout implements IBatchSpout {
                         Object json = jsonParser.parse(in);
                         collector.emit(Arrays.asList(new Object[]{json}));
                     }catch (Exception e) {
-                        LOG.error("Error parsing message from meetup",e);
+                        LOGGER.error("Error parsing message from meetup",e);
                     }
                 }
                 isr.close();
                 reader.close();
             }
         } catch (IOException e) {
-            LOG.error("Error in communication with meetup api ["+get.getURI().toString()+"]");
+            LOGGER.error("Error in communication with meetup api ["+get.getURI().toString()+"]");
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException e1) {

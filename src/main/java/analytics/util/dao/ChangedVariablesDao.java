@@ -5,33 +5,24 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.util.DBConnection;
 import analytics.util.MongoNameConstants;
 import analytics.util.objects.Change;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 
-public class ChangedVariablesDao {
-	static final Logger LOGGER = LoggerFactory
+public class ChangedVariablesDao extends AbstractDao{
+	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ChangedVariablesDao.class);
-	static DB db;
+	
     DBCollection changedMemberVariablesCollection;
-    static {
-		try {
-			db = DBConnection.getDBConnection();
-		} catch (Exception e) {
-			LOGGER.error("Unable to get DB connection", e);
-		}
-    }
     public ChangedVariablesDao(){
+    	super();
 		changedMemberVariablesCollection = db.getCollection("changedMemberVariables");
     }
 	public void upsertUpdateChangedScores(String lId, Map<String, Change> allChanges, Map<String, String> variableNameToVidMap) {

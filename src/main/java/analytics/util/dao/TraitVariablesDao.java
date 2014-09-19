@@ -1,15 +1,12 @@
 package analytics.util.dao;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.util.DBConnection;
 import analytics.util.MongoNameConstants;
 
 import com.mongodb.BasicDBList;
@@ -18,19 +15,13 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
-public class TraitVariablesDao {
-	static final Logger LOGGER = LoggerFactory
+public class TraitVariablesDao extends AbstractDao{
+	private static final Logger LOGGER = LoggerFactory
 			.getLogger(TraitVariablesDao.class);
 	static DB db;
     DBCollection traitVariablesCollection;
-    static {
-		try {
-			db = DBConnection.getDBConnection();
-		} catch (Exception e) {
-			LOGGER.error("Unable to get DB connection", e);
-		}
-    }
     public TraitVariablesDao(){
+    	super();
 		traitVariablesCollection = db.getCollection("traitVariables");
     }
     public HashMap<String, List<String>> getTraitVariableList(){

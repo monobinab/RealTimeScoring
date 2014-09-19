@@ -45,6 +45,10 @@ public class MongoNameConstants {
 	public static final String TV_TRAIT="t";
 	public static final String TV_VARIABLES="v";
 	
+	//Member traits
+	public static final String MT_TRAIT="t";
+	public static final String MT_DATES_ARR="date";
+	public static final String MT_DATE="d";
 	
 	//Model variables collection
 	public static final String MODEL_ID = "modelId";

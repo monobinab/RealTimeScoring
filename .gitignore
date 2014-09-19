@@ -1,4 +1,8 @@
 /target/
+<<<<<<< HEAD
+=======
+/bin/
+>>>>>>> 30f0b2d3524f3221c4daf02a960f5ae3eafa335d
 .classpath
 .project
 .settings/

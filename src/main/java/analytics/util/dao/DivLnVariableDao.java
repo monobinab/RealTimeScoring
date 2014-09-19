@@ -1,38 +1,24 @@
 package analytics.util.dao;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.util.DBConnection;
 import analytics.util.MongoNameConstants;
 
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
-public class DivLnVariableDao {
-	static final Logger LOGGER = LoggerFactory
+public class DivLnVariableDao extends AbstractDao{
+	private static final Logger LOGGER = LoggerFactory
 			.getLogger(DivLnVariableDao.class);
-	static DB db;
     DBCollection divLnVariableCollection;
-    static {
-		try {
-			db = DBConnection.getDBConnection();
-		} catch (Exception e) {
-			LOGGER.error("Unable to get DB connection", e);
-		}
-    }
     public DivLnVariableDao(){
+    	super();
 		divLnVariableCollection = db.getCollection("divLnVariable");
     }
     public HashMap<String, List<String>> getDivLnVariable(){

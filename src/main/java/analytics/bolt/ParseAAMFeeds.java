@@ -21,7 +21,7 @@ import backtype.storm.tuple.Tuple;
 
 public abstract class ParseAAMFeeds  extends BaseRichBolt {
 
-	static final Logger logger = LoggerFactory
+	static final Logger LOGGER = LoggerFactory
 			.getLogger(ParseAAMFeeds.class);
 	/**
 	 * 
@@ -35,6 +35,8 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
     
     protected String topic;
 	protected String sourceTopic;
+	protected MemberUUIDDao memberDao;
+	protected ModelVariablesDao modelVariablesDao;
 
     public ParseAAMFeeds() {
 
@@ -53,13 +55,15 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         this.outputCollector = collector;
-
+        
 	/*
 	 * (non-Javadoc)
 	 *
 	 * @see backtype.storm.task.IBolt#prepare(java.util.Map,
 	 * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
 	 */
+        memberDao = new MemberUUIDDao();
+        modelVariablesDao =  new ModelVariablesDao(); 
         modelVariablesList = new ArrayList<String>();
         
         this.currentUUID=null;
@@ -67,7 +71,7 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
         
 
 		//POPULATE MODEL VARIABLES LIST
-        modelVariablesList = new ModelVariablesDao().getVariableList();
+        modelVariablesList =modelVariablesDao.getVariableList();
 //		System.out.println(" *** PARSING BOLT MODEL VARIABLE LIST: ");
     }
 
@@ -85,7 +89,7 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 		// 4) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN SET CURRENT UUID FROM RECORD, SET CURRENT l_id TO NULL AND RETURN
 		// 5) POPULATE TRAITS COLLECTION WITH THE FIRST TRAIT
 		
-		logger.debug("PARSING DOCUMENT -- WEB TRAIT RECORD " + input.getString(0));
+		LOGGER.debug("PARSING DOCUMENT -- WEB TRAIT RECORD " + input.getString(0));
 		
 		// 1) SPLIT INPUT STRING
 		
@@ -117,7 +121,7 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
         
 		// 3) IF THE CURRENT RECORD HAS A DIFFERENT UUID THEN PROCESS THE CURRENT VALUES(TRAIT/PID/Keyword) LIST AND EMIT VARIABLES
         if(l_idToValueCollectionMap != null && !l_idToValueCollectionMap.isEmpty()) {
-            logger.debug("processing found traits...");
+            LOGGER.debug("processing found traits...");
             
             for(String current_l_id : l_idToValueCollectionMap.keySet()) {
 	        	
@@ -129,10 +133,10 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 		        	listToEmit.add(variableValueJSON);
 		        	listToEmit.add(sourceTopic);
 		        	this.outputCollector.emit(listToEmit);
-		        	logger.debug(" *** PARSING BOLT EMITTING: " + listToEmit);
+		        	LOGGER.debug(" *** PARSING BOLT EMITTING: " + listToEmit);
 	        	}
 	        	else {
-	        		logger.debug(" *** NO VARIABLES FOUND - NOTHING TO EMIT");
+	        		LOGGER.debug(" *** NO VARIABLES FOUND - NOTHING TO EMIT");
 	        	}
             }
             this.currentUUID=null;
@@ -141,10 +145,10 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
         
 		// 4) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN SET CURRENT UUID FROM RECORD, SET CURRENT l_id TO NULL AND RETURN
         //		If l_id is null and the next UUID is the same the current, then the next record will not be processed
-        List<String> l_ids = new MemberUUIDDao().getLoyaltyIdsFromUUID(splitRecArray[0]);
+        List<String> l_ids = memberDao.getLoyaltyIdsFromUUID(splitRecArray[0]);
         if(l_ids == null) {
             this.currentUUID=splitRecArray[0];
-            logger.info(" *** COULD NOT FIND UUID: " + this.currentUUID);
+            LOGGER.info(" *** COULD NOT FIND UUID: " + this.currentUUID);
         	this.l_idToValueCollectionMap=new HashMap<String, Collection<String>>();
         	return;
         }
@@ -157,7 +161,7 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
         	try{
         	l_idToValueCollectionMap.put(l_id, new ArrayList<String>());
         	}catch(NullPointerException e){
-        		logger.error("l_id to value collection is null", e);
+        		LOGGER.error("l_id to value collection is null", e);
         		System.exit(0);
         	}
     		for(int i=1;i<splitRecArray.length;i++){

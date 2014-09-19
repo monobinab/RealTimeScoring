@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class MongoSpoutBase extends BaseRichSpout {
-  static Logger LOG = LoggerFactory.getLogger(MongoSpoutBase.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(MongoSpoutBase.class);
 
   protected static MongoObjectGrabber wholeDocumentMapper = null;
 

@@ -7,27 +7,18 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.util.DBConnection;
 import analytics.util.MongoNameConstants;
 
-import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
-public class DivCatVariableDao {
-	static final Logger LOGGER = LoggerFactory
+public class DivCatVariableDao extends AbstractDao{
+	private static final Logger LOGGER = LoggerFactory
 			.getLogger(DivCatVariableDao.class);
-	static DB db;
     DBCollection divCatVariableCollection;
-    static {
-		try {
-			db = DBConnection.getDBConnection();
-		} catch (Exception e) {
-			LOGGER.error("Unable to get DB connection", e);
-		}
-    }
     public DivCatVariableDao(){
+    	super();
 		divCatVariableCollection = db.getCollection("divCatVariable");
     }
     public HashMap<String, List<String>> getDivCatVariable(){

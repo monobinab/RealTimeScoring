@@ -34,11 +34,12 @@ public class ParsingBoltPOS extends BaseRichBolt {
 	 * Created by Rock Wasserman 4/18/2014
 	 */
 	
-	static final Logger logger = LoggerFactory
+	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ParsingBoltPOS.class);
 	private static final long serialVersionUID = 1L;
     private OutputCollector outputCollector;
-    
+    private DivLnVariableDao divLnVariableDao;
+    private DivLnItmDao divLnItmDao;
     private Map<String, List<String>> divLnVariablesMap;
 
     public void setOutputCollector(OutputCollector outputCollector) {
@@ -64,7 +65,9 @@ public class ParsingBoltPOS extends BaseRichBolt {
 
         //System.out.println("PREPARING PARSING POS BOLT");
         // populate divLnVariablesMap
-        divLnVariablesMap = new DivLnVariableDao().getDivLnVariable();
+        divLnVariableDao = new DivLnVariableDao(); 
+        divLnItmDao = new DivLnItmDao();
+        divLnVariablesMap = divLnVariableDao.getDivLnVariable();
     }
 
 
@@ -98,7 +101,7 @@ public class ParsingBoltPOS extends BaseRichBolt {
 		try {
 			nposTransaction = ((TextMessage) document).getText();
 		} catch (JMSException e) {
-			logger.info("JMS exception",e);
+			LOGGER.info("JMS exception",e);
 		}
 		if(nposTransaction == null) {
 			return;
@@ -148,7 +151,7 @@ public class ParsingBoltPOS extends BaseRichBolt {
             String amount = segment.getSegmentBody().get("Selling Amount").trim();
             //System.out.println(" division: " + div + " item: " + item + " amount: " + amount);
             
-            String line = new DivLnItmDao().getLnFromDivItem(div,item);
+            String line = divLnItmDao.getLnFromDivItem(div,item);
 
             if(line==null) {
             	continue;
@@ -212,7 +215,7 @@ public class ParsingBoltPOS extends BaseRichBolt {
 	        listToEmit.add(JsonUtils.createJsonFromStringStringMap(varAmountMap));
 	        listToEmit.add("NPOS");
 
-	        logger.debug(" *** PARSING BOLT EMITTING: " + listToEmit.toString());
+	        LOGGER.debug(" *** PARSING BOLT EMITTING: " + listToEmit.toString());
 	        
 			// 9) EMIT VARIABLES TO VALUES MAP IN GSON DOCUMENT
 	        if(listToEmit!=null && !listToEmit.isEmpty()) {

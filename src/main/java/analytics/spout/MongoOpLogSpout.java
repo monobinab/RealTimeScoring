@@ -14,7 +14,7 @@ import java.util.List;
 public class MongoOpLogSpout extends MongoSpoutBase implements Serializable {
 
   private static final long serialVersionUID = 5498284114575395939L;
-  static Logger LOG = LoggerFactory.getLogger(MongoOpLogSpout.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(MongoOpLogSpout.class);
 
   private static String[] collectionNames = {"oplog.$main", "oplog.rs"};
   private String filterByNamespace;
@@ -62,8 +62,8 @@ public class MongoOpLogSpout extends MongoSpoutBase implements Serializable {
     if (object != null) {
       String operation = object.get("op").toString();
       // Check if it's a i/d/u operation and push the data
-      if (operation.equals("i") || operation.equals("d") || operation.equals("u")) {
-        if (LOG.isInfoEnabled()) LOG.info(object.toString());
+      if ("i".equals(operation) || "d".equals(operation) || "u".equals(operation)) {
+        if (LOGGER.isInfoEnabled()) LOGGER.info(object.toString());
 
         // Verify if it's the correct namespace
         if (this.filterByNamespace != null && !this.filterByNamespace.equals(object.get("ns").toString())) {
@@ -76,13 +76,13 @@ public class MongoOpLogSpout extends MongoSpoutBase implements Serializable {
         // Contains the objectID
         String objectId = null;
         // Extract the ObjectID
-        if (operation.equals("i") || operation.equals("d")) {
+        if ("i".equals(operation) || "d".equals(operation)) {
           if (object.get("o") != null && ((BSONObject) object.get("o")).get("_id") != null) {
             objectId = ((BSONObject) object.get("o")).get("_id").toString();
             // Emit the tuple collection
             this.collector.emit(tuples, objectId);
           }
-        } else if (operation.equals("u")) {
+        } else if ("u".equals(operation)) {
           if (object.get("o2") != null && ((BSONObject) object.get("o2")).get("_id") != null) {
             objectId = ((BSONObject) object.get("o2")).get("_id").toString();
             // Emit the tuple collection

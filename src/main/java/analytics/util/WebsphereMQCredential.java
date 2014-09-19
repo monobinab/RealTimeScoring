@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class WebsphereMQCredential {
-	public static final Logger logger = LoggerFactory.getLogger(WebsphereMQCredential.class);
+	public static final Logger LOGGER = LoggerFactory.getLogger(WebsphereMQCredential.class);
 	
 	private String hostOneName;
 	private String hostTwoName;

@@ -8,31 +8,23 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.util.DBConnection;
 import analytics.util.MongoNameConstants;
 import analytics.util.objects.Model;
 import analytics.util.objects.Variable;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
-public class ModelVariablesDao {
-	static final Logger LOGGER = LoggerFactory
+
+public class ModelVariablesDao extends AbstractDao{
+	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ModelVariablesDao.class);
-	static DB db;
     DBCollection modelVariablesCollection;
-    static {
-		try {
-			db = DBConnection.getDBConnection();
-		} catch (Exception e) {
-			LOGGER.error("Unable to get DB connection", e);
-		}
-    }
     public ModelVariablesDao(){
+    	super();
 		modelVariablesCollection = db.getCollection("modelVariables");
     }
     public List<String> getVariableList(){
