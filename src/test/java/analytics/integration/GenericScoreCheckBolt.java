@@ -30,6 +30,7 @@ public class GenericScoreCheckBolt extends BaseRichBolt{
 			else
 				Assert.assertEquals(expected.get(key), input.getStringByField(key));
 		}
+		RealTimeTopologyTest.shutDown();
 	}
 
 	@Override

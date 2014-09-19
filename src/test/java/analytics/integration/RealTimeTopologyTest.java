@@ -2,6 +2,9 @@ package analytics.integration;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import analytics.bolt.ParsingBoltPOS;
@@ -11,7 +14,21 @@ import backtype.storm.LocalCluster;
 import backtype.storm.topology.TopologyBuilder;
 
 public class RealTimeTopologyTest {
-	@Test
+	static LocalCluster cluster; 
+	static boolean testComplete;
+	@BeforeClass
+	public static void initializeCluster(){
+		cluster = new LocalCluster();
+		testComplete=false;
+	}
+	
+	public static void shutDown(){
+		//Windows cluster shutdown wont work, manually kill the test
+		cluster.shutdown();
+		testComplete=true;
+	}
+	
+	@Test(timeout=10000)
 	public void testWithValidRecord(){
 		TestHelper.initializeDBForTests();
 		Map<String,Object> expected = new HashMap<String, Object>();
@@ -31,14 +48,11 @@ public class RealTimeTopologyTest {
 		Config conf = new Config();
 		conf.setDebug(false);
 		conf.setMaxTaskParallelism(3);
-		LocalCluster cluster = new LocalCluster();
 		cluster.submitTopology("realtimescoring_topology", conf,
 				topologyBuilder.createTopology());
-		try {
-			Thread.sleep(10000);
-		} catch (InterruptedException e) {
-			System.out.println(e.getClass() + ": " + e.getMessage());
+		while(!testComplete){
+			//do nothing
 		}
-		cluster.shutdown();//This fails on windows. Known issue
+		System.out.println("complete.....");
 	}
 }
