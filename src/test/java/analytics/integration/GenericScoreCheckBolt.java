@@ -3,7 +3,6 @@ package analytics.integration;
 import java.util.Map;
 
 import junit.framework.Assert;
-import analytics.util.ScoringSingleton;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -30,7 +29,6 @@ public class GenericScoreCheckBolt extends BaseRichBolt{
 			else
 				Assert.assertEquals(expected.get(key), input.getStringByField(key));
 		}
-		RealTimeTopologyTest.shutDown();
 	}
 
 	@Override
