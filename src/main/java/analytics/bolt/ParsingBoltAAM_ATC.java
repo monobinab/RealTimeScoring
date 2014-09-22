@@ -12,6 +12,7 @@ import org.apache.commons.lang.StringUtils;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 
+import analytics.util.dao.BoostDao;
 import analytics.util.dao.DivLnBoostDao;
 import analytics.util.dao.MemberBoostsDao;
 import analytics.util.dao.PidDivLnDao;

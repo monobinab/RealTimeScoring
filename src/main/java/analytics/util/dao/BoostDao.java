@@ -1,4 +1,4 @@
-package analytics.bolt;
+package analytics.util.dao;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,7 +14,6 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
 import analytics.util.MongoNameConstants;
-import analytics.util.dao.AbstractDao;
 import analytics.util.objects.Variable;
 
 public class BoostDao extends AbstractDao {

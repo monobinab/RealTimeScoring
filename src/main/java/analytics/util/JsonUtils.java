@@ -31,7 +31,7 @@ public class JsonUtils {
     	return gson.toJson(variableValuesMap, varValueType);
 	}
 	
-	public static Map<String, Collection<String>> restoreDateTraitsMapFromJson(String json)
+	public static Map<String, List<String>> restoreDateTraitsMapFromJson(String json)
     {
         Type dateTraitType = new TypeToken<Map<String, Collection<String>>>() {
 			private static final long serialVersionUID = 1L;
@@ -47,6 +47,5 @@ public class JsonUtils {
 
 		return new Gson().fromJson(json, varListType);
     }
-	
-
+		
 }

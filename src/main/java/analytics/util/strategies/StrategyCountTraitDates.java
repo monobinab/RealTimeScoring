@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,7 +27,7 @@ public class StrategyCountTraitDates implements Strategy {
     @Override
     public Change execute(RealTimeScoringContext context) {
 		
-    	Map<String,Collection<String>> dateTraitsMap = JsonUtils.restoreDateTraitsMapFromJson((String) context.getValue());
+    	Map<String,List<String>> dateTraitsMap = JsonUtils.restoreDateTraitsMapFromJson((String) context.getValue());
     	SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
     	int dateCount = 0;
     			
