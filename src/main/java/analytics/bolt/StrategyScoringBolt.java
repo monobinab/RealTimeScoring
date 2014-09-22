@@ -45,7 +45,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 	@Override
 	public void execute(Tuple input) {
 		if(LOGGER.isDebugEnabled()){
-		LOGGER.debug("The time it enters inside Strategy Bolt execute method"
+		LOGGER.debug("The time it enters inside Strategy Bolt execute method "
 				+ System.currentTimeMillis());
 		}
 		// 1) PULL OUT HASHED LOYALTY ID FROM THE FIRST RECORD IN lineItemList
