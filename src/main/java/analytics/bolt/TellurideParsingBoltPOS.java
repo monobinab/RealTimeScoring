@@ -218,8 +218,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 									+ transactionLineItem);*/
 
 							// find all variables affected by div-line
-							List<String> foundVariablesList = null;
-							foundVariablesList = new ArrayList<String>();
+							List<String> foundVariablesList = new ArrayList<String>();
 							if (divCatVariablesMap
 									.containsKey(transactionLineItem.getDiv()
 											+ transactionLineItem.getLineOrCategory())
