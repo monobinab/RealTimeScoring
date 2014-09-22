@@ -7,10 +7,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -29,7 +27,6 @@ import analytics.util.objects.StrategyMapper;
 import analytics.util.objects.Variable;
 import analytics.util.strategies.Strategy;
 
-import com.mongodb.BasicDBObject;
 
 public class ScoringSingleton {
 	private static final Logger LOGGER = LoggerFactory

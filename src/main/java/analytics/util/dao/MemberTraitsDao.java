@@ -39,8 +39,8 @@ public class MemberTraitsDao extends AbstractDao{
 			
 			BasicDBList dates = (BasicDBList) memberTraitsDBO.get(MongoNameConstants.MT_DATES_ARR);
 			
-			for( Iterator<Object> dateIterator = dates.iterator(); dateIterator.hasNext(); ) {
-				BasicDBObject dateDBO = (BasicDBObject) dateIterator.next();
+			for(Object date: dates) {
+				BasicDBObject dateDBO = (BasicDBObject) date;
 				try {
 					if(simpleDateFormat.parse(dateDBO.get(MongoNameConstants.MT_DATE).toString()).after(new Date(new Date().getTime() + (-7 * 1000 * 60 * 60 * 24)))) {
 						List<String> newTraitsCollection = new ArrayList<String>();
