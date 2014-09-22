@@ -9,8 +9,10 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import analytics.util.FakeMongo;
 import analytics.util.MongoNameConstants;
 
+import com.github.fakemongo.Fongo;
 import com.mongodb.BasicDBObject;
 
 public class MemberUUIDDaoTest {
@@ -22,6 +24,8 @@ public class MemberUUIDDaoTest {
 	public static void initialize() {
 		// DO NOT REMOVE BELOW LINE
 		System.setProperty("rtseprod", "test");
+
+		
 		seedDataLIds = new ArrayList<String>();
 		seedDataUuids = new ArrayList<String>();
 		seedDataLIds.add("oI8ko3pdaHrhdlI3MJIXMPgSCX=");
@@ -48,7 +52,8 @@ public class MemberUUIDDaoTest {
 
 	@Before
 	public void setupTest() {
-		// Can use static collection here since there are no writes
+		//Ensure we have an empty DB
+		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));
 	}
 
 	@Test
