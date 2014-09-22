@@ -155,8 +155,10 @@ public class ScoringSingleton {
 	}
 	
 	public Map<String, Change> createChangedVariablesMap(String lId) {
+		//This map is VID->Change
 		Map<String, Change> changedMbrVariables = changedVariablesDao.getMemberVariables(lId);
-
+		
+		//Create a map from VName->Change
 		Map<String, Change> allChanges = new HashMap<String, Change>();
 		if (changedMbrVariables != null && changedMbrVariables.keySet() != null) {
 			for (Map.Entry<String, Change> entry : changedMbrVariables.entrySet()){
@@ -174,6 +176,17 @@ public class ScoringSingleton {
 		}
 		return allChanges;
 	}
+	
+	/**
+	 * 
+	 * @param allChanges
+	 * Varname -> Change
+	 * @param newChangesVarValueMap
+	 * VarName -> Value
+	 * @param memberVariablesMap
+	 * L_id -> Variables
+	 * @return
+	 */
 	public Map<String, Change> executeStrategy(Map<String, Change> allChanges,
 			Map<String, String> newChangesVarValueMap, Map<String, Object> memberVariablesMap) {
 		for (String variableName : newChangesVarValueMap.keySet()) {
