@@ -23,13 +23,17 @@ public class PidDivLnDao extends AbstractDao{
 		public String getLn(){
 			return ln;
 		}
+		public String getDivLn(){
+			return div + ln;
+		}
+
 	}
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(PidDivLnDao.class);
     DBCollection pidDivLnCollection;
     public PidDivLnDao(){
     	super();
-		pidDivLnCollection = db.getCollection("pidDivLn");
+		pidDivLnCollection = db.getCollection(MongoNameConstants.PID_DIV_LN_COLLECTION);
     }
     public DivLn getVariableFromTopic(String pid){
 		BasicDBObject query = new BasicDBObject();

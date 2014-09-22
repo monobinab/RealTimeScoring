@@ -28,6 +28,7 @@ public class MongoNameConstants {
 	public static final String DCK_D="d";
 	
 	//Pid div ln collection
+	public static final String PID_DIV_LN_COLLECTION = "pidDivLn";
 	public static final String PDL_PID="pid";
 	public static final String PDL_D="d";
 	public static final String PDL_L="l";
@@ -75,5 +76,11 @@ public class MongoNameConstants {
 	public static final String CMS_EFFECTIVE_DATE = "f";
 	public static final String CMS_SCORE = "s";
 	
+	//Member boosts
 	public static final String BOOST_VAR_PREFIX="BOOST";
+	public static final String FEED_TO_BOOST_COLLECTION="feedBoosts";
+	public static final String MBR_BOOSTS_COLLECTION="memberBoosts";
+	public static final String BOOSTS_ARRAY="boosts";
+	
+	
 }
