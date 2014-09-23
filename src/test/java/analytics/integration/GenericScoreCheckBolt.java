@@ -1,5 +1,6 @@
 package analytics.integration;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import junit.framework.Assert;
@@ -11,8 +12,10 @@ import backtype.storm.tuple.Tuple;
 
 public class GenericScoreCheckBolt extends BaseRichBolt{
 	Map<String,Object> expected;
-	public GenericScoreCheckBolt(Map<String,Object> values) {
-		expected=values;
+	static Map<String,Object>  actual = new HashMap<String, Object>();
+	
+	public GenericScoreCheckBolt(Map<String,Object> expected) {
+		this.expected = expected;
 	}
 	
 	@Override
@@ -22,18 +25,21 @@ public class GenericScoreCheckBolt extends BaseRichBolt{
 
 	@Override
 	public void execute(Tuple input) {
-		System.out.println(input);
 		for(String key:expected.keySet()){
-			if(expected.get(key) instanceof Double)
-				Assert.assertEquals(expected.get(key), input.getDoubleByField(key));
+			if(expected.get(key) instanceof Double){
+				actual.put(key,  input.getDoubleByField(key));
+			}
 			else
-				Assert.assertEquals(expected.get(key), input.getStringByField(key));
+				actual.put(key, input.getStringByField(key));
 		}
 	}
 
 	@Override
-	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		// TODO Auto-generated method stub
+	public void declareOutputFields(OutputFieldsDeclarer declarer) {		
+	}
+
+	public static Map<String,Object> getActualResults(){
+		return actual;
 		
 	}
 
