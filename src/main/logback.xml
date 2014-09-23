@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d %-7p [%t] %c{1}:%L - %m%n</pattern>
+    </encoder>
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>WARN</level>
+    </filter>
+  </appender>
+  <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <!--See also http://logback.qos.ch/manual/appenders.html#RollingFileAppender-->
+    <File>topology.log</File>
+    <Append>true</Append>
+    <encoder>
+      <pattern>%d %-7p [%t] %c{1}:%L - %m%n</pattern>
+    </encoder>
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>INFO</level>
+    </filter>
+    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <maxIndex>5</maxIndex>
+      <FileNamePattern>logfile.log.%i</FileNamePattern>
+    </rollingPolicy>
+    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <maxFileSize>100KB</maxFileSize>
+    </triggeringPolicy>
+  </appender>
+  <logger name="org.springframework" level="WARN"/>
+  <logger name="clojure.contrib" level="WARN"/>
+  <logger name="me.prettyprint" level="WARN"/>
+  <logger name="org.apache.zookeeper" level="WARN"/>
+  <logger name="clojure.tools" level="WARN"/>
+  <logger name="backtype.storm" level="WARN"/>
+  <root level="INFO">
+    <appender-ref ref="console"/>
+    <appender-ref ref="file"/>
+  </root>
+</configuration>
