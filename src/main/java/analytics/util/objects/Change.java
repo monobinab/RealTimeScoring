@@ -9,10 +9,11 @@ public class Change {
 	private Date expirationDate;
 	private Date effectivDate;
 	
-	public Change() {}
-	
 	private static SimpleDateFormat dtFormat = new SimpleDateFormat("yyyy-MM-dd");
 	
+	public Change(){
+		
+	}
 	public Change(String vid, Object val, Date expDate, Date effDate) {
 		this.vid = vid;
 		this.value = val;

@@ -25,13 +25,15 @@ public class SecurityUtils {
 			e.printStackTrace();
 		}
 
-	}	
+	}
 
 	public static String hashLoyaltyId(String l_id) {
 		String hashed = new String();
-		if(mac!=null){
+		synchronized (mac) {
+			if (mac != null) {
 				byte[] rawHmac = mac.doFinal(l_id.getBytes());
-				hashed = new String(Base64.encodeBase64(rawHmac));	
+				hashed = new String(Base64.encodeBase64(rawHmac));
+			}
 		}
 		return hashed;
 	}
