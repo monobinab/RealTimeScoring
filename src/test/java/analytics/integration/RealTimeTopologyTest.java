@@ -44,6 +44,7 @@ public class RealTimeTopologyTest {
 		for(String key:expected.keySet()){
 			Assert.assertEquals(expected.get(key), actual.get(key));
 		}
-		cluster.shutdown();//This fails on windows. Known issue
+		if(!System.getProperty("os.name").startsWith("Windows"))
+			cluster.shutdown();//This fails on windows. Known issue
 	}
 }
