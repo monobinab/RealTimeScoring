@@ -188,7 +188,7 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
     		PidDivLnDao.DivLn divLnObj = pidDivLnDao.getVariableFromTopic(pid);
     		if(divLnObj != null) {
 	    		String div = divLnObj.getDiv();
-	    		String divLn = divLnObj.getLn();
+	    		String divLn = divLnObj.getDivLn();
 	    		Collection<String> var = new ArrayList<String>();
 	    		if(divLnVariablesMap.containsKey(div)) {
 	    			var = divLnVariablesMap.get(div);
