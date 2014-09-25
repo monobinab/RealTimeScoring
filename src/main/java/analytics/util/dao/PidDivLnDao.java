@@ -20,11 +20,8 @@ public class PidDivLnDao extends AbstractDao{
 		public String getDiv(){
 			return div;
 		}
-		public String getLn(){
-			return ln;
-		}
 		public String getDivLn(){
-			return div + ln;
+			return ln;
 		}
 
 	}
