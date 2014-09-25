@@ -11,7 +11,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import analytics.util.SYWAPICalls;
+import analytics.util.SywApiCalls;
 import analytics.util.SecurityUtils;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;

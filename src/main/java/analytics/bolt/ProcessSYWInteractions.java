@@ -62,7 +62,7 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 				//if(entityTypes.contains(entityTypes)){ 
 				//TODO: If more types handle in a more robust manner. If we expect only Products, this makes sense
 				if(currentEntity!=null && "Product".equals(currentEntity.getType())){
-					String productId = SYWAPICalls.getCatalogIds(currentEntity.getId());
+					String productId = SywApiCalls.getCatalogIds(currentEntity.getId());
 					/* Product does not exist? */
 					if("UNKNOWN".equals(productId)){
 						System.out.println("Unable to find the product id");
