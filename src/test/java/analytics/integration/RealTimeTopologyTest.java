@@ -2,6 +2,8 @@ package analytics.integration;
 import java.util.HashMap;
 import java.util.Map;
 
+import junit.framework.Assert;
+
 import org.junit.Test;
 
 import analytics.bolt.ParsingBoltPOS;
@@ -23,11 +25,10 @@ public class RealTimeTopologyTest {
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 
 		topologyBuilder.setSpout("test_spout", new MockRealTimePOSSpout());
-
 		// create definition of main spout for queue 1
 		topologyBuilder.setBolt("parsing_bolt", new ParsingBoltPOS()).shuffleGrouping("test_spout");
         topologyBuilder.setBolt("strategy_scoring_bolt", new StrategyScoringBolt(), 4).shuffleGrouping("parsing_bolt");
-        topologyBuilder.setBolt("score_check_test", new GenericScoreCheckBolt(expected), 4).shuffleGrouping("strategy_scoring_bolt");
+        topologyBuilder.setBolt("score_check_test",new GenericScoreCheckBolt(expected), 4).shuffleGrouping("strategy_scoring_bolt");
 		Config conf = new Config();
 		conf.setDebug(false);
 		conf.setMaxTaskParallelism(3);
@@ -39,6 +40,11 @@ public class RealTimeTopologyTest {
 		} catch (InterruptedException e) {
 			System.out.println(e.getClass() + ": " + e.getMessage());
 		}
-		cluster.shutdown();//This fails on windows. Known issue
+		Map<String,Object> actual = GenericScoreCheckBolt.getActualResults();
+		for(String key:expected.keySet()){
+			Assert.assertEquals(expected.get(key), actual.get(key));
+		}
+		if(!System.getProperty("os.name").startsWith("Windows"))
+			cluster.shutdown();//This fails on windows. Known issue
 	}
 }

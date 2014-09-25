@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.util.dao.ChangedMemberScoresDao;
-import analytics.util.dao.ChangedVariablesDao;
+import analytics.util.dao.ChangedMemberVariablesDao;
 import analytics.util.dao.MemberVariablesDao;
 import analytics.util.dao.ModelVariablesDao;
 import analytics.util.dao.VariableDao;
@@ -37,7 +37,7 @@ public class ScoringSingleton {
 	private Map<String, String> variableNameToStrategyMap;
 	private MemberVariablesDao memberVariablesDao;
 	private ChangedMemberScoresDao changedMemberScoresDao;
-	private ChangedVariablesDao changedVariablesDao;
+	private ChangedMemberVariablesDao changedVariablesDao;
 	private VariableDao variableDao;
 	private ModelVariablesDao modelVariablesDao;
 	private static ScoringSingleton instance=null;
@@ -56,7 +56,7 @@ public class ScoringSingleton {
 		LOGGER.debug("Populate variable vid map");
 		variableDao = new VariableDao();
 		modelVariablesDao = new ModelVariablesDao();
-		changedVariablesDao = new ChangedVariablesDao();
+		changedVariablesDao = new ChangedMemberVariablesDao();
 		memberVariablesDao = new MemberVariablesDao();
 		changedMemberScoresDao = new ChangedMemberScoresDao(); 
 		// populate the variableVidToNameMap
