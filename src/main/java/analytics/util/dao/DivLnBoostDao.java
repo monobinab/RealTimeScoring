@@ -21,34 +21,23 @@ public class DivLnBoostDao extends AbstractDao{
     	super();
 		divLnBoostCollection = db.getCollection("divLnBoost");
     }
-    public HashMap<String, List<String>> getDivLnBoost(String sourceTopic){
-    	HashMap<String, List<String>> divLnBoostVariblesMap = new HashMap<String, List<String>>();
-    	DBCursor divLnBoostVarCursor = divLnBoostCollection.find();
-    	for (DBObject divLnBoostDBObject : divLnBoostVarCursor) {
-			List<HashMap<String,String>> hashMaps = (List<HashMap<String,String>>) divLnBoostDBObject
-					.get(MongoNameConstants.DLV_VAR);
-			List<String> varibles = new ArrayList<String>();
-
-			for (HashMap<String,String> hashMap : hashMaps) {
-				if (hashMap.containsKey(sourceTopic)) {
-					varibles.add(hashMap.get(sourceTopic));
-				}
-			}
-			if (varibles.size() > 0
-					&& !(divLnBoostVariblesMap.containsKey(divLnBoostDBObject
-							.get(MongoNameConstants.DLV_DIV)))) {
-
-				divLnBoostVariblesMap.put((String) divLnBoostDBObject.get(MongoNameConstants.DLV_DIV),
-						varibles);
-			} else if (varibles.size() > 0) {
-				List<String> variblevalues = divLnBoostVariblesMap
-						.get(divLnBoostDBObject.get(MongoNameConstants.DLV_DIV));
-				varibles.addAll(variblevalues);
-				divLnBoostVariblesMap.put((String) divLnBoostDBObject.get(MongoNameConstants.DLV_DIV),
-						varibles);
-			}
-    	}
-
-    	return divLnBoostVariblesMap;
+    public HashMap<String, List<String>> getDivLnBoost(){
+    	HashMap<String, List<String>> divLnBoostMap = new HashMap<String, List<String>>();
+    	DBCursor divLnVarCursor = divLnBoostCollection.find();
+    	for(DBObject divLnDBObject: divLnVarCursor) {
+            if (divLnBoostMap.get(divLnDBObject.get(MongoNameConstants.DLB_DIV)) == null)
+            {
+                List<String> varColl = new ArrayList<String>();
+                varColl.add(divLnDBObject.get(MongoNameConstants.DLB_BOOST).toString());
+                divLnBoostMap.put(divLnDBObject.get(MongoNameConstants.DLB_DIV).toString(), varColl);
+            }
+            else
+            {
+                List<String> varColl = divLnBoostMap.get(divLnDBObject.get(MongoNameConstants.DLB_DIV).toString());
+                varColl.add(divLnDBObject.get(MongoNameConstants.DLB_BOOST).toString().toUpperCase());
+                divLnBoostMap.put(divLnDBObject.get(MongoNameConstants.DLB_DIV).toString(), varColl);
+            }
+        }
+    	return divLnBoostMap;
     }
 }
