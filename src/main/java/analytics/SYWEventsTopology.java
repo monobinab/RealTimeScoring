@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import analytics.bolt.ParsingBoltSYW;
 import analytics.bolt.ProcessSYWInteractions;
 import analytics.bolt.StrategyScoringBolt;
+import analytics.bolt.SywScoringBolt;
 import analytics.spout.SYWRedisSpout;
 import analytics.util.RedisConnection;
 import analytics.util.TopicConstants;
@@ -29,9 +30,13 @@ public class SYWEventsTopology {
 		TopologyBuilder toplologyBuilder = new TopologyBuilder();
 		String[] servers = RedisConnection.getServers();
 		String topic = TopicConstants.SYW;
-
+/*
+ * server1=rtsapp401p.prod.ch4.s.com
+server2=rtsapp402p.prod.ch4.s.com
+server3=rtsapp403p.prod.ch4.s.com
+ */
 		toplologyBuilder.setSpout("SYWEventsSpout", new SYWRedisSpout(
-				servers[0], TopicConstants.PORT, topic), 1);
+				"rtsapp401p.prod.ch4.s.com", TopicConstants.PORT, "SYW_Interactions"), 1);
 		// Parse the JSON
 		toplologyBuilder.setBolt("ParseEventsBolt", new ParsingBoltSYW(), 1)
 				.shuffleGrouping("SYWEventsSpout");
@@ -39,7 +44,7 @@ public class SYWEventsTopology {
 		toplologyBuilder.setBolt("ProcessSYWEvents",
 				new ProcessSYWInteractions(), 1).shuffleGrouping(
 				"ParseEventsBolt");
-		toplologyBuilder.setBolt("strategy_bolt", new StrategyScoringBolt(), 1)
+		toplologyBuilder.setBolt("strategy_bolt", new SywScoringBolt(), 1)
 				.shuffleGrouping("ProcessSYWEvents");
 
 		Config conf = new Config();
