@@ -35,6 +35,9 @@ public class SywScoringBolt  extends BaseRichBolt{
 
 	@Override
 	public void execute(Tuple input) {
+		//l_id="jgjh" , source="SYW_LIKE/OWN/WANT
+		//newChangesVarValueMap - similar to strategy bolt
+		//current-pid, 2014-09-25-[6],...
 		String lId = input.getStringByField("l_id");
 		if(lId.equals("dxo0b7SN1eER9shCSj0DX+eSGag=")){
 			System.out.println("ME");
@@ -79,6 +82,9 @@ public class SywScoringBolt  extends BaseRichBolt{
 		}
 		//boost_syw... hand_tools_tcount
 		//boost_syw... tools_tcount
+		//var to Count map - 
+		//varname, totalcount across all days
+		
 		Map<Integer,String> modelIdToScore = new HashMap<Integer, String>();
 		Map<String,String> memberScores = memberScoreDao.getMemberScores(lId);
 		//Also read and keep changedMemberScores
