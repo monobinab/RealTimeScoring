@@ -79,15 +79,23 @@ public class SywScoringBolt  extends BaseRichBolt{
 		}
 		//boost_syw... hand_tools_tcount
 		//boost_syw... tools_tcount
-		List<Integer> modelIds = new ArrayList<Integer>();
+		Map<Integer,String> modelIdToScore = new HashMap<Integer, String>();
+		Map<String,String> memberScores = memberScoreDao.getMemberScores(lId);
+		//Also read and keep changedMemberScores
 		for(String variableName:varToCountMap.keySet()){
 			//Change dao to take in multiple variable names and return list of modelIds
 			Integer modelId = modelBoostDao.getModelId(variableName);
-			modelIds.add(modelId);
+			//TODO: First check changed memberScore 
 			//Get changed member score for this modelId
 			//If this is null/expired, get the memberScore
-			
+			String score = memberScores.get(modelId.toString());
+			modelIdToScore.put(modelId,score);
 		}
+		
+		//TODO: Loop through the modelIdToScore map
+		//Add scoring logic here
+		//varToCount map has the total count for each variable
+		
 		System.out.println("rescored all models in modelIds list");
 	}
 

@@ -2,9 +2,11 @@ package analytics.bolt;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +45,7 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 	private VariableDao variableDao;
 	private BoostDao boostDao;
 	private MemberBoostsDao memberBoostsDao;
+	Map<String,List<String>> boostListMap;
 
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
@@ -58,14 +61,19 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 		entityTypes = new ArrayList<String>();
 		entityTypes.add("Product");
 		divLnBoostVariblesMap = divLnBoostDao.getDivLnBoost();// TODO: Should we pass the source topic?
-		List<String> boostList = boostDao.getBoosts("SYW");//Feed prefix
-		List<Variable> variableList = variableDao.getVariables();
+		List<String> feeds = new ArrayList<String>();
+		feeds.add("SYW_LIKE");
+		feeds.add("SYW_OWN");
+		feeds.add("SYW_WANT");
+		boostListMap = boostDao.getBoostsMap(feeds);//Feed prefix
+		/*List<Variable> variableList = variableDao.getVariables();
 		boostMap = new HashMap<String, Variable>();
 		for (Variable v : variableList) {
-			if (boostList.contains(v.getName())) {
+			for(Entry<String, List<String>> feed:boostListMap.entrySet())
+			if (feed.getValue().contains(v.getName())) {
 				boostMap.put(v.getName(), v);
 			}
-		}
+		}*/
 
 		/**
 		 * Ignore Story,Image,Video TODO: Might even make sense to ignore these
@@ -103,11 +111,11 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 						String catalogType = sywApiCalls.getCatalogType(currentEntity.getId());
 						System.out.println(catalogType);
 						if(catalogType.equals("Own"))
-							feedType = "Own";
+							feedType = "SYW_OWN";
 						else if(catalogType.equals("Like"))
-							feedType = "Like";
+							feedType = "SYW_LIKE";
 						else if(catalogType.equals("Want"))
-							feedType = "Want";
+							feedType = "SYW_WANT";
 						
 					}
 				}
@@ -116,6 +124,7 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 		if(feedType==null){
 			LOGGER.info("We process only own, like and want catalogs & SYW Likes");
 			outputCollector.fail(input);
+			return;
 		}
 		// Variable map stores the vars to send to Strategy Bolt
 		Map<String, String> variableValueMap = new HashMap<String, String>();
@@ -150,18 +159,22 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 							// Get the boost variable
 							if(divLnBoostVariblesMap.containsKey(div)) {
 								for(String b: divLnBoostVariblesMap.get(div)) {
-									if(!boostValuesMap.containsKey(b)) {
-										boostValuesMap.put(b, new ArrayList<String>());
+									if(boostListMap.get(feedType).contains(b)){//If it belongs to current feed
+										if(!boostValuesMap.containsKey(b)) {
+											boostValuesMap.put(b, new ArrayList<String>());
+										}
+										boostValuesMap.get(b).add(productId);
 									}
-									boostValuesMap.get(b).add(productId);
 								}
 							}
 							if(divLnBoostVariblesMap.containsKey(divLn)) {
 								for(String b: divLnBoostVariblesMap.get(divLn)) {
-									if(!boostValuesMap.containsKey(b)) {
-										boostValuesMap.put(b, new ArrayList<String>());
+									if(boostListMap.get(feedType).contains(b)){//If it belongs to current feed
+										if(!boostValuesMap.containsKey(b)) {
+											boostValuesMap.put(b, new ArrayList<String>());
+										}
+										boostValuesMap.get(b).add(productId);
 									}
-									boostValuesMap.get(b).add(productId);
 								}
 							}
 						}
