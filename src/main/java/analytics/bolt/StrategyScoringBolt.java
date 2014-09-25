@@ -140,12 +140,11 @@ public class StrategyScoringBolt extends BaseRichBolt {
 		this.outputCollector.ack(input);
 
 		// 10) Write changedMemberScores with expiry
-		ScoringSingleton.getInstance().updateChangedMemberScore(lId, modelIdList, allChanges, modelIdScoreMap);
-					
 		for (Integer modelId : modelIdList) {
 			ScoringSingleton.getInstance().updateChangedVariables(lId, modelId, allChanges);
-			
 		}
+		ScoringSingleton.getInstance().updateChangedMemberScore(lId, modelIdList, allChanges, modelIdScoreMap);
+					
 
 	}
 
