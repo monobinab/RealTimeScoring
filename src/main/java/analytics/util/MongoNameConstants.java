@@ -37,6 +37,10 @@ public class MongoNameConstants {
 	public static final String DLV_DIV="d";
 	public static final String DLV_VAR="v";
 	
+	//div ln boost
+	public static final String DLB_DIV="d";
+	public static final String DLB_BOOST="b";
+	
 	//Div ln item
 	public static final String DLI_DIV="d";
 	public static final String DLI_LN="l";
@@ -78,9 +82,13 @@ public class MongoNameConstants {
 	
 	//Member boosts
 	public static final String BOOST_VAR_PREFIX="BOOST";
-	public static final String FEED_TO_BOOST_COLLECTION="feedBoosts";
 	public static final String MBR_BOOSTS_COLLECTION="memberBoosts";
 	public static final String BOOSTS_ARRAY="boosts";
+	
+	//Feed boosts
+	public static final String FEED_TO_BOOST_COLLECTION="feedBoosts";
+	public static final String FB_BOOSTS="b";
+	public static final String FB_FEED="f";
 	
 	
 }
