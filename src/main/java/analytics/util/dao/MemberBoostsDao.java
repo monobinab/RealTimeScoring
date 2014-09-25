@@ -1,3 +1,4 @@
+
 package analytics.util.dao;
 
 import java.text.SimpleDateFormat;
@@ -78,4 +79,11 @@ public class MemberBoostsDao extends AbstractDao {
 		}
 		return mapToReturn;
 	}
+	
+	public void writeMemberBoostValues(String l_id, Map<String, Map<String, List<String>>> memberBoostValuesMap) {
+		for(String boost: memberBoostValuesMap.keySet()) {
+			
+		}
+	}
 }
+

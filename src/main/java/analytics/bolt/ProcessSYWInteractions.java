@@ -125,7 +125,6 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 			for (SYWEntity currentEntity : obj.getEntities()) {
 				if (currentEntity != null)
 					LOGGER.debug(currentEntity.getType());
-
 				// TODO: If more types handle in a more robust manner. If we
 				// expect only Products, this makes sense
 				if (currentEntity != null
