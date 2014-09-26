@@ -88,9 +88,8 @@ public class PersistBoostsBolt extends BaseRichBolt {
     	int totalPidCount = 0;
     	
     	if(dateValuesMap != null && dateValuesMap.containsKey("current")) {
-	    	for(String val: dateValuesMap.get("current")) {
-	    		totalPidCount++;
-	    	}
+    		totalPidCount+=dateValuesMap.get("current").size();
+	    	dateValuesMap.remove("current");
 	    	if(dateValuesMap.containsKey(simpleDateFormat.format(new Date()))) {
 				for(String v: dateValuesMap.get(simpleDateFormat.format(new Date()))) {
 					totalPidCount+=Integer.valueOf(v);
