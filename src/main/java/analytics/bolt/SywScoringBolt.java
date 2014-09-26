@@ -129,7 +129,7 @@ public class SywScoringBolt  extends BaseRichBolt{
 		//varToCount map has the total count for each variable
 		
 		for(String v: varToCountMap.keySet()) {
-
+			
 			int boostPercetages = 0;
 			int modelId = boostModelMap.get(v);
 			if(modelIdToScore==null||modelIdToScore.get(modelId)==null){
@@ -144,13 +144,14 @@ public class SywScoringBolt  extends BaseRichBolt{
 			}
 			
 			Double maxScore = modelPercentileMap.get(modelId).get(90 + boostPercetages);
+			String oldScore = modelIdToScore.get(modelId);
 			if(Double.valueOf(modelIdToScore.get(modelId)) < maxScore) {
-				modelIdToScore.put(modelId, maxScore.toString());
 				
+				modelIdToScore.put(modelId, maxScore.toString());
 			}
 			List<Object> listToEmit = new ArrayList<Object>();
 			listToEmit.add(lId);
-			listToEmit.add("0.0");
+			listToEmit.add(oldScore);
 			listToEmit.add(Double.parseDouble(modelIdToScore.get(modelId)));
 			listToEmit.add(String.valueOf(modelId));
 			listToEmit.add(source);

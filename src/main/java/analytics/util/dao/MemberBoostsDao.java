@@ -24,9 +24,9 @@ public class MemberBoostsDao extends AbstractDao {
 		Map<String, Map<String, List<String>>> memberBoostValuesMap = new HashMap<String, Map<String, List<String>>>();
 		String var1 = "BOOST_SYW_LIKE_ALL_APP_TCOUNT";
 		String var2 = "BOOST_SYW_LIKE_AU_BATTERY_TCOUNT";
-		//String var3 = "BOOST_SYW_LIKE_AU_TIRE_TCOUNT";
-		//String var4 = "BOOST_SYW_LIKE_AUTO_TCOUNT";
-		String date = "2014-09-23";
+//		String var3 = "BOOST_SYW_LIKE_AU_TIRE_TCOUNT";
+//		String var4 = "BOOST_SYW_LIKE_AUTO_TCOUNT";
+		String date = "2014-09-21";
 
 		
 		memberBoostValuesMap.put(var1, new HashMap<String, List<String>>());
@@ -69,19 +69,19 @@ public class MemberBoostsDao extends AbstractDao {
 		if(mbrBoostList == null)
 			return null;
 		for(String boost:mbrBoostList.keySet()){
-				if (!mapToReturn.containsKey(boost)&&boostSet.contains(boost)) {
-					mapToReturn.put((String) boost,	new HashMap<String, List<String>>());
-					BasicDBObject dateDBList = (BasicDBObject) mbrBoostList.get(boost);
-						for (String date : dateDBList.keySet()) {
-							if (!mapToReturn.get(boost).containsKey(date)) {
-								mapToReturn.get(boost).put(date,new ArrayList<String>());
-							}
-							BasicDBList valuesDBList = (BasicDBList) dateDBList.get(date);
-							for (Object value : valuesDBList) {
-								mapToReturn.get(boost).get(date).add(value.toString());
-							}
-						}
+			if (!mapToReturn.containsKey(boost)&&boostSet.contains(boost)) {
+				mapToReturn.put((String) boost,	new HashMap<String, List<String>>());
+				BasicDBObject dateDBList = (BasicDBObject) mbrBoostList.get(boost);
+				for (String date : dateDBList.keySet()) {
+					if (!mapToReturn.get(boost).containsKey(date)) {
+						mapToReturn.get(boost).put(date,new ArrayList<String>());
+					}
+					BasicDBList valuesDBList = (BasicDBList) dateDBList.get(date);
+					for (Object value : valuesDBList) {
+						mapToReturn.get(boost).get(date).add(value.toString());
+					}
 				}
+			}
 		}
 		return mapToReturn;
 	}
@@ -103,18 +103,18 @@ public class MemberBoostsDao extends AbstractDao {
 			return null;
 		for(String boost:mbrBoostList.keySet()){
 				if (!mapToReturn.containsKey(boost)) {
-					mapToReturn.put((String) boost,	new HashMap<String, List<String>>());
-					BasicDBObject dateDBList = (BasicDBObject) mbrBoostList.get(boost);
-						for (String date : dateDBList.keySet()) {
-							if (!mapToReturn.get(boost).containsKey(date)) {
-								mapToReturn.get(boost).put(date,new ArrayList<String>());
-							}
-							BasicDBList valuesDBList = (BasicDBList) dateDBList.get(date);
-							for (Object value : valuesDBList) {
-								mapToReturn.get(boost).get(date).add(value.toString());
-							}
-						}
+				mapToReturn.put((String) boost,	new HashMap<String, List<String>>());
+				BasicDBObject dateDBList = (BasicDBObject) mbrBoostList.get(boost);
+				for (String date : dateDBList.keySet()) {
+					if (!mapToReturn.get(boost).containsKey(date)) {
+						mapToReturn.get(boost).put(date,new ArrayList<String>());
+					}
+					BasicDBList valuesDBList = (BasicDBList) dateDBList.get(date);
+					for (Object value : valuesDBList) {
+						mapToReturn.get(boost).get(date).add(value.toString());
+					}
 				}
+			}
 		}
 		return mapToReturn;
 	}
@@ -140,19 +140,19 @@ public class MemberBoostsDao extends AbstractDao {
 		Map<String, Map<String, List<String>>> previousBoosts = getAllMemberBoostValues(l_id);
 		if(previousBoosts != null && !previousBoosts.isEmpty()) {
 			for(String boost: previousBoosts.keySet()) {
-				for(String date: memberBoostValuesMap.get(boost).keySet()) {
+				for(String date: previousBoosts.get(boost).keySet()) {
 					if(memberBoostValuesMap.containsKey(boost) && !memberBoostValuesMap.get(boost).containsKey(date)) {
 						BasicDBList valuesList = new BasicDBList();
 						for(String value: previousBoosts.get(boost).get(date)) {
 							valuesList.add(value);
 						}
-						boostDateValues.put(boost, new BasicDBObject(date, valuesList));
+						((BasicDBObject) boostDateValues.get(boost)).append(date, valuesList);
 					} else if(!memberBoostValuesMap.containsKey(boost)) {
 						BasicDBList valuesList = new BasicDBList();
 						for(String value: previousBoosts.get(boost).get(date)) {
 							valuesList.add(value);
 						}
-						boostDateValues.put(boost, new BasicDBObject(date, valuesList));
+						((BasicDBObject) boostDateValues.get(boost)).append(date, valuesList);
 					}
 				}
 			}
