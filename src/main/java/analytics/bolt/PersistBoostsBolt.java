@@ -1,6 +1,5 @@
 package analytics.bolt;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -8,16 +7,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.util.JsonUtils;
 import analytics.util.MongoNameConstants;
 import analytics.util.dao.MemberBoostsDao;
-import analytics.util.dao.MemberTraitsDao;
 import analytics.util.dao.VariableDao;
-import analytics.util.objects.Change;
 import analytics.util.objects.Variable;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -32,10 +28,12 @@ public class PersistBoostsBolt extends BaseRichBolt {
     private MemberBoostsDao memberBoostsDao;
     private VariableDao variableDao;
     private Map<String, String> variablesStrategyMap;
-
+    Map<String, Map<String, List<String>>> memberBoostValuesMap;
+    
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
+		memberBoostValuesMap = new HashMap<String, Map<String, List<String>>>();
 		memberBoostsDao = new MemberBoostsDao();
 		variableDao = new VariableDao();
 		variablesStrategyMap = new HashMap<String, String>();
@@ -62,15 +60,25 @@ public class PersistBoostsBolt extends BaseRichBolt {
 		for(String b: newChangesVarValueMap.keySet()) {
 	    	Map<String, List<String>> dateValuesMap = JsonUtils.restoreDateTraitsMapFromJson(newChangesVarValueMap.get(b));
 	    	List<String> persistValuesList = new ArrayList<String>();
-	    	
+	    
 	    	if(variablesStrategyMap.get(b).equals("StrategyBoostProductTotalCount")) {
 	    		persistValuesList = getTotalCount(dateValuesMap);
 	    		if(persistValuesList!= null && !persistValuesList.isEmpty()) {
 	    			dateValuesMap.put(simpleDateFormat.format(new Date()), persistValuesList);
 	    		}
 	    	}
+	    	//
+	    	if(variablesStrategyMap.get(b).equals("StrategySywTotalCounts")) {
+	    		persistValuesList = getTotalCount(dateValuesMap);
+	    		if(persistValuesList!= null && !persistValuesList.isEmpty()) {
+	    			dateValuesMap.put(simpleDateFormat.format(new Date()), persistValuesList);
+	    		}
+	    	}
 	    	
+	    	memberBoostValuesMap.put(b,dateValuesMap);
+	    	//addDateTrait
 		}
+		new MemberBoostsDao().writeMemberBoostValues(l_id, memberBoostValuesMap);
 	}
 
 	private List<String> getTotalCount(Map<String, List<String>> dateValuesMap) {

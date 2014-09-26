@@ -141,6 +141,7 @@ public class MemberBoostsDao extends AbstractDao {
 		if(previousBoosts != null && !previousBoosts.isEmpty()) {
 			for(String boost: previousBoosts.keySet()) {
 				for(String date: previousBoosts.get(boost).keySet()) {
+					if((BasicDBObject) boostDateValues.get(boost)!=null){
 					if(memberBoostValuesMap.containsKey(boost) && !memberBoostValuesMap.get(boost).containsKey(date)) {
 						BasicDBList valuesList = new BasicDBList();
 						for(String value: previousBoosts.get(boost).get(date)) {
@@ -153,7 +154,7 @@ public class MemberBoostsDao extends AbstractDao {
 							valuesList.add(value);
 						}
 						((BasicDBObject) boostDateValues.get(boost)).append(date, valuesList);
-					}
+					}}
 				}
 			}
 		}
