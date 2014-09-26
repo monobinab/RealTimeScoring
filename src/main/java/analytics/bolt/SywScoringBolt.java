@@ -3,20 +3,24 @@ package analytics.bolt;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.util.JsonUtils;
+import analytics.util.ScoringSingleton;
 import analytics.util.dao.ChangedMemberScoresDao;
 import analytics.util.dao.MemberScoreDao;
 import analytics.util.dao.ModelPercentileDao;
 import analytics.util.dao.ModelSywBoostDao;
+import analytics.util.objects.Change;
 import analytics.util.objects.ChangedMemberScore;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -37,6 +41,7 @@ public class SywScoringBolt  extends BaseRichBolt{
 	private Map<Integer, Map<Integer, Double>> modelPercentileMap;
 	private SimpleDateFormat simpleDateFormat;
 	private OutputCollector outputCollector;
+	private List<Integer> monthlyModelsMap;
 	
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
@@ -49,6 +54,12 @@ public class SywScoringBolt  extends BaseRichBolt{
 		boostModelMap = buildBoostModelMap();
 		modelPercentileMap = modelPercentileDao.getModelPercentiles();
 		simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		//TODO: Dont hard code this
+		monthlyModelsMap = new ArrayList<Integer>();
+		monthlyModelsMap.add(20);
+		monthlyModelsMap.add(27);
+		monthlyModelsMap.add(30);
+		monthlyModelsMap.add(59);
 	}
 
 	@Override
@@ -159,12 +170,61 @@ public class SywScoringBolt  extends BaseRichBolt{
 			outputCollector.emit(listToEmit);
 		}
 		outputCollector.ack(input);
+		
+		
+		
+		updateChangedMemberScore(lId, modelIdToScore);
 	}
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		declarer.declare(new Fields("l_id", "oldScore", "newScore", "model",
 				"source", "messageID"));
+	}
+
+	public void updateChangedMemberScore(String lId, Map<Integer, String> modelIdToScore) {
+		Map<Integer, ChangedMemberScore> updatedScores = new HashMap<Integer, ChangedMemberScore>();
+		for(Integer modelId: modelIdToScore.keySet()){
+		// FIND THE MIN AND MAX EXPIRATION DATE OF ALL VARIABLE CHANGES FOR
+			// CHANGED MODEL SCORE TO WRITE TO SCORE CHANGES COLLECTION
+			if(modelIdToScore==null||modelIdToScore.get(modelId)==null){
+				//Getting next model since current one does not have score
+				continue;
+			}
+			Calendar cal = Calendar.getInstance();
+	        cal.setTime(new Date());
+	        cal.add(Calendar.DATE, 7); //a week from today
+	        Date oneWeekFromNow = cal.getTime();
+			
+			Date minDate = oneWeekFromNow;
+			Date maxDate = oneWeekFromNow;
+			
+			// IF THE MODEL IS MONTH SPECIFIC AND THE MIN/MAX DATE IS AFTER THE
+			// END OF THE MONTH SET TO THE LAST DAY OF THIS MONTH
+			if (monthlyModelsMap.contains(modelId)) {
+				Calendar calendar = Calendar.getInstance();
+				calendar.set(Calendar.DATE,
+						calendar.getActualMaximum(Calendar.DATE));
+				Date lastDayOfMonth = calendar.getTime();
+
+				if (minDate!=null && minDate.after(lastDayOfMonth)) {
+					minDate = lastDayOfMonth;
+					maxDate = lastDayOfMonth;
+				} else if (maxDate !=  null && maxDate.after(lastDayOfMonth)) {
+					maxDate = lastDayOfMonth;
+				}
+			}
+			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			// APPEND CHANGED SCORE AND MIN/MAX EXPIRATION DATES TO DOCUMENT FOR
+			// UPDATE
+			updatedScores.put(modelId, new ChangedMemberScore(Double.parseDouble(modelIdToScore.get(modelId)),
+					minDate != null ? simpleDateFormat.format(minDate) : null, 
+					maxDate != null ? simpleDateFormat.format(maxDate) : null, 
+					simpleDateFormat.format(new Date())));
+		}
+		if (updatedScores != null && !updatedScores.isEmpty()) {
+			changedMemberScoresDao.upsertUpdateChangedScores(lId,updatedScores);
+		}	
 	}
 
 	private Map<String, Integer> buildBoostModelMap() {
