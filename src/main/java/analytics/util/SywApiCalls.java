@@ -46,16 +46,16 @@ public class SywApiCalls {
 	private static final String BASEURI_HTTPS = "https://platform.shopyourway.com";
 	private static final Long APPID = (long) 	11875 ;
 	private static final Long USERID = (long)6875997;
-	
+
 	public static final String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss";
 	public static final String TOKEN_REQUEST_PATTERN = "/auth/get-token?userId=%d&appId=%d&signature=%s&timestamp=%s";
-	
+
 	private String token;
 	private String hash;
 	public static void main(String[] args) throws Exception {
 		SywApiCalls sywApiCalls = new SywApiCalls();
 		sywApiCalls.getAuthState();
-		
+
 	}
 	/**
 	 * Set the token, hash
@@ -73,7 +73,7 @@ public class SywApiCalls {
 			LOGGER.warn("Unable to get SYW offline token and hash", e);
 		}
 	}
-	
+
 	/**
 	 * 
 	 * @param userId
@@ -92,7 +92,7 @@ public class SywApiCalls {
 	    md.reset();
 	    return String.format("%0"+(hash.length*2)+"x", new BigInteger(1,hash));
 	}
-	
+
 	/**
 	 * Get Offline token
 	 * @return token
@@ -103,11 +103,11 @@ public class SywApiCalls {
 	public String getOfflineToken() throws NoSuchAlgorithmException, UnsupportedEncodingException {
 	    SimpleDateFormat formatter = new SimpleDateFormat(DATE_PATTERN);
 	    formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
-	 
+
 	    Date now = new Date();
 	    String dateString = formatter.format(now);
 	    long timestamp = (now.getTime() / 1000);
-	 
+
 	    String signature = getSignature(USERID, APPID, timestamp, APPSECRET);
 	    //concat your URL - starting with your platform URL, and afterwards The request pattern for getting an offline token.
 	    String requestURL = String.format(BASEURI_HTTPS + TOKEN_REQUEST_PATTERN,USERID,APPID,signature,dateString);
@@ -116,7 +116,7 @@ public class SywApiCalls {
 	    Gson gson = new Gson();
 	    return gson.fromJson(responseBody, String.class);
 	}
-	
+
 	/**
 	 * Get the app offline hash
 	 * @param sessionToken
@@ -163,7 +163,7 @@ public class SywApiCalls {
 			return null;
 		return element;
 	}
-	
+
 	/**
 	 * Get a PID - Sears/Kmart from SYW Product ID 
 	 * @param Shopyourway product Id
@@ -186,7 +186,7 @@ public class SywApiCalls {
 		return pid.getAsString();
 		/*sourceProductId":"05771769000P","numberOfBuyingOptions":0,"itemId":"05771769000"*/
 	}
-	
+
 	public String getCatalogType(int i){
 		String requestURL = BASEURI + "/catalogs/get?ids="+i;
 		JsonElement element = makeGetRequestToSywAPI(requestURL);
@@ -222,7 +222,7 @@ public class SywApiCalls {
 			return null;
 		return loyaltyId.getAsString();
 	}
-	
+
 	/**
 	 * This method does not work currently. follow up with SYW to see why
 	 */
@@ -232,5 +232,5 @@ public class SywApiCalls {
 		JsonElement element = gson.fromJson (HttpRequest.get(requestURL).body(), JsonElement.class);
 		System.out.println(element);
 	}
-	
+
 }
