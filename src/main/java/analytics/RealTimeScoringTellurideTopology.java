@@ -56,11 +56,11 @@ public class RealTimeScoringTellurideTopology {
 										.getQueueName()), 2);
 
 		// create definition of main spout for queue 1
-		topologyBuilder.setBolt("parsing_bolt", new TellurideParsingBoltPOS(), 4)
+		topologyBuilder.setBolt("parsing_bolt", new TellurideParsingBoltPOS(), 8)
 				.shuffleGrouping("telluride1").shuffleGrouping("telluride2");
-        topologyBuilder.setBolt("strategy_scoring_bolt", new StrategyScoringBolt(), 4).shuffleGrouping("parsing_bolt");
+        topologyBuilder.setBolt("strategy_scoring_bolt", new StrategyScoringBolt(), 8).shuffleGrouping("parsing_bolt");
         //Redis publish to server 1
-        topologyBuilder.setBolt("score_publish_bolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 2).shuffleGrouping("strategy_scoring_bolt");
+        topologyBuilder.setBolt("score_publish_bolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 4).shuffleGrouping("strategy_scoring_bolt");
 
 
 		Config conf = new Config();
@@ -71,7 +71,7 @@ public class RealTimeScoringTellurideTopology {
                 conf.setNumAckers(5);
                 conf.setMessageTimeoutSecs(300);
                 conf.setStatsSampleRate(1.0);
-                conf.setNumWorkers(5);
+                conf.setNumWorkers(27);
 				StormSubmitter.submitTopology(args[0], conf,
 						topologyBuilder.createTopology());
 			} catch (AlreadyAliveException e) {

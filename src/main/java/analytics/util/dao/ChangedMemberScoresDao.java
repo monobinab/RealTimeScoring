@@ -1,5 +1,6 @@
 package analytics.util.dao;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -10,6 +11,7 @@ import analytics.util.objects.ChangedMemberScore;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
 
 
 public class ChangedMemberScoresDao extends AbstractDao{
@@ -40,5 +42,31 @@ public class ChangedMemberScoresDao extends AbstractDao{
 				lId), new BasicDBObject("$set", updateRec), true,
 				false);
 		
+	}
+	
+	public Map<String,ChangedMemberScore> getChangedMemberScores(String l_id){
+    	Map<String,ChangedMemberScore> memberScores = new HashMap<String, ChangedMemberScore>();
+		BasicDBObject query = new BasicDBObject();
+		query.put(MongoNameConstants.L_ID, l_id);
+		DBObject dbObj = changedMemberScoresCollection.findOne(query);
+
+		if (dbObj != null && dbObj.keySet() != null) {
+			for (String key : dbObj.keySet()) {
+				// skip expired changes
+				if (MongoNameConstants.L_ID.equals(key) || MongoNameConstants.ID.equals(key)) {
+					continue;
+				}
+				else{
+					DBObject scoreObj = (DBObject) dbObj.get(key);
+					if(scoreObj!=null && scoreObj.get(MongoNameConstants.CMS_MIN_EXPIRY_DATE)!=null && 
+							scoreObj.get(MongoNameConstants.CMS_MAX_EXPIRY_DATE)!=null){
+						ChangedMemberScore score = new ChangedMemberScore((Double)scoreObj.get("s"), (String)scoreObj.get("minEx"), (String)scoreObj.get("maxEx"), (String)scoreObj.get("f"));
+						memberScores.put(key, score);
+					}
+				}
+			}
+		}
+		return memberScores;
+				
 	}
 }
