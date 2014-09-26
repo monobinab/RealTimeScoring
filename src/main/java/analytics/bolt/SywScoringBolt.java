@@ -14,7 +14,9 @@ import analytics.util.JsonUtils;
 import analytics.util.dao.BoostDao;
 import analytics.util.dao.ChangedMemberScoresDao;
 import analytics.util.dao.MemberScoreDao;
+import analytics.util.dao.ModelSywBoostDao;
 import analytics.util.objects.Change;
+import analytics.util.objects.ChangedMemberScore;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -25,17 +27,19 @@ public class SywScoringBolt  extends BaseRichBolt{
 	private BoostDao boostDao;
 	private ChangedMemberScoresDao changedMemberScoresDao;
 	private MemberScoreDao memberScoreDao;
+	private ModelSywBoostDao modelBoostDao;
 	
 	private Map<String,Integer> boostModelMap;
-	
+	SimpleDateFormat simpleDateFormat;
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
 		boostDao = new BoostDao();
 		memberScoreDao = new MemberScoreDao();
 		changedMemberScoresDao = new ChangedMemberScoresDao();
-		
+		modelBoostDao = new ModelSywBoostDao();
 		boostModelMap = buildBoostModelMap();
+		simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	}
 
 	@Override
@@ -58,7 +62,8 @@ public class SywScoringBolt  extends BaseRichBolt{
 
 		Map<String, String> newChangesVarValueMap = JsonUtils
 				.restoreVariableListFromJson(input.getString(1));
-		Map<String,Integer> varToCountMap = new HashMap<String, Integer>();
+		Map<String,Integer> varToCountMap = new HashMap<String, Integer>();		
+		
 		for (String variableName : newChangesVarValueMap.keySet()) {
 	    	Map<String, List<String>> dateValuesMap = JsonUtils.restoreDateTraitsMapFromJson(newChangesVarValueMap.get(variableName));
 	    	int totalPidCount = 0;
@@ -92,17 +97,25 @@ public class SywScoringBolt  extends BaseRichBolt{
 		
 		Map<Integer,String> modelIdToScore = new HashMap<Integer, String>();
 		Map<String,String> memberScores = memberScoreDao.getMemberScores(lId);
+		Map<String,ChangedMemberScore> changedMemberScores = changedMemberScoresDao.getChangedMemberScores(lId);
 		//Also read and keep changedMemberScores
 		for(String variableName:varToCountMap.keySet()){
 			//Change dao to take in multiple variable names and return list of modelIds
 			Integer modelId = boostModelMap.get(variableName);
-			
-			
-			//TODO: First check changed memberScore 
-			//Get changed member score for this modelId
-			//If this is null/expired, get the memberScore
-			String score = memberScores.get(modelId.toString());
-			modelIdToScore.put(modelId,score);
+			ChangedMemberScore cs = changedMemberScores.get(modelId.toString());
+			if(cs!=null){
+				Date expiry;
+				try {
+					expiry = simpleDateFormat.parse(cs.getMinDate());
+					if(expiry.after(new Date())){
+						modelIdToScore.put(modelId, String.valueOf(cs.getScore()));
+					} 
+				} catch (ParseException e) {
+					//TODO: Log exception
+				}
+			}
+			if(!modelIdToScore.containsKey(modelId))
+				modelIdToScore.put(modelId, memberScores.get(modelId.toString()));
 		}
 		
 		//TODO: Loop through the modelIdToScore map
@@ -120,150 +133,7 @@ public class SywScoringBolt  extends BaseRichBolt{
 
 	private Map<String, Integer> buildBoostModelMap() {
 		
-		Map<String, Integer> boostModelMap = new HashMap<String, Integer>();
-		
-		boostModelMap.put("BOOST_SYW_LIKE_ALL_APP_TCOUNT",21);
-		boostModelMap.put("BOOST_SYW_LIKE_AU_BATTERY_TCOUNT",22);
-		boostModelMap.put("BOOST_SYW_LIKE_AU_TIRE_TCOUNT",24);
-		boostModelMap.put("BOOST_SYW_LIKE_AUTO_TCOUNT",25);
-		boostModelMap.put("BOOST_SYW_LIKE_BABY_TCOUNT",26);
-		boostModelMap.put("BOOST_SYW_LIKE_CE_TCOUNT",27);
-		boostModelMap.put("BOOST_SYW_LIKE_CE_CAMERA_TCOUNT",28);
-		boostModelMap.put("BOOST_SYW_LIKE_CE_LAPTOP_TCOUNT",29);
-		boostModelMap.put("BOOST_SYW_LIKE_FIT_EQUIP_TCOUNT",30);
-		boostModelMap.put("BOOST_SYW_LIKE_FITNESS_TCOUNT",31);
-		boostModelMap.put("BOOST_SYW_LIKE_FNJL_TCOUNT",32);
-		boostModelMap.put("BOOST_SYW_LIKE_FOOTWEAR_TCOUNT",33);
-		boostModelMap.put("BOOST_SYW_LIKE_HA_ALL_TCOUNT",34);
-		boostModelMap.put("BOOST_SYW_LIKE_HA_COOK_TCOUNT",35);
-		boostModelMap.put("BOOST_SYW_LIKE_HA_DISH_TCOUNT",36);
-		boostModelMap.put("BOOST_SYW_LIKE_HA_VAC_TCOUNT",37);
-		boostModelMap.put("BOOST_SYW_LIKE_HA_WH_TCOUNT",38);
-		boostModelMap.put("BOOST_SYW_LIKE_HAND_TOOLS_TCOUNT",39);
-		boostModelMap.put("BOOST_SYW_LIKE_HE_FS_TCOUNT",40);
-		boostModelMap.put("BOOST_SYW_LIKE_HF_TCOUNT",41);
-		boostModelMap.put("BOOST_SYW_LIKE_HG_HL_TCOUNT",42);
-		boostModelMap.put("BOOST_SYW_LIKE_HOME_TCOUNT",43);
-		boostModelMap.put("BOOST_SYW_LIKE_KAPP_TCOUNT",44);
-		boostModelMap.put("BOOST_SYW_LIKE_LE_TCOUNT",46);
-		boostModelMap.put("BOOST_SYW_LIKE_LG_ADAS_TCOUNT",47);
-		boostModelMap.put("BOOST_SYW_LIKE_LG_MOWER_TCOUNT",48);
-		boostModelMap.put("BOOST_SYW_LIKE_LG_PATIO_TCOUNT",49);
-		boostModelMap.put("BOOST_SYW_LIKE_LG_TRACTOR_TCOUNT",50);
-		boostModelMap.put("BOOST_SYW_LIKE_LG_TRIM_EDG_TCOUNT",51);
-		boostModelMap.put("BOOST_SYW_LIKE_MAPP_TCOUNT",52);
-		boostModelMap.put("BOOST_SYW_LIKE_MATTRESS_TCOUNT",53);
-		boostModelMap.put("BOOST_SYW_LIKE_OD_GRILL_TCOUNT",54);
-		boostModelMap.put("BOOST_SYW_LIKE_ODL_TCOUNT",55);
-		boostModelMap.put("BOOST_SYW_LIKE_POWER_TOOLS_TCOUNT",56);
-		boostModelMap.put("BOOST_SYW_LIKE_REGRIG_TCOUNT",57);
-		boostModelMap.put("BOOST_SYW_LIKE_TOOL_STRG_TCOUNT",58);
-		boostModelMap.put("BOOST_SYW_LIKE_TOOLS_TCOUNT",59);
-		boostModelMap.put("BOOST_SYW_LIKE_TOYS_TCOUNT",60);
-		boostModelMap.put("BOOST_SYW_LIKE_TV_TCOUNT",61);
-		boostModelMap.put("BOOST_SYW_LIKE_WAPP_TCOUNT",62);
-		boostModelMap.put("BOOST_SYW_LIKE_WASH_DRY_TCOUNT",63);
-		boostModelMap.put("BOOST_SYW_LIKE_AC_TCOUNT",72);
-		boostModelMap.put("BOOST_SYW_LIKE_LG_SM_OTH_TCOUNT",73);
-		boostModelMap.put("BOOST_SYW_LIKE_GAME_ROOM_TCOUNT",74);
-		boostModelMap.put("BOOST_SYW_LIKE_CHRISTMAS_TCOUNT",75);
-		boostModelMap.put("BOOST_SYW_LIKE_LG_SNOW_BLOWER_TCOUNT",76);
-		boostModelMap.put("BOOST_SYW_LIKE_GAMER_TCOUNT",77);
-		boostModelMap.put("BOOST_SYW_WANT_ALL_APP_TCOUNT",21);
-		boostModelMap.put("BOOST_SYW_WANT_AU_BATTERY_TCOUNT",22);
-		boostModelMap.put("BOOST_SYW_WANT_AU_TIRE_TCOUNT",24);
-		boostModelMap.put("BOOST_SYW_WANT_AUTO_TCOUNT",25);
-		boostModelMap.put("BOOST_SYW_WANT_BABY_TCOUNT",26);
-		boostModelMap.put("BOOST_SYW_WANT_CE_TCOUNT",27);
-		boostModelMap.put("BOOST_SYW_WANT_CE_CAMERA_TCOUNT",28);
-		boostModelMap.put("BOOST_SYW_WANT_CE_LAPTOP_TCOUNT",29);
-		boostModelMap.put("BOOST_SYW_WANT_FIT_EQUIP_TCOUNT",30);
-		boostModelMap.put("BOOST_SYW_WANT_FITNESS_TCOUNT",31);
-		boostModelMap.put("BOOST_SYW_WANT_FNJL_TCOUNT",32);
-		boostModelMap.put("BOOST_SYW_WANT_FOOTWEAR_TCOUNT",33);
-		boostModelMap.put("BOOST_SYW_WANT_HA_ALL_TCOUNT",34);
-		boostModelMap.put("BOOST_SYW_WANT_HA_COOK_TCOUNT",35);
-		boostModelMap.put("BOOST_SYW_WANT_HA_DISH_TCOUNT",36);
-		boostModelMap.put("BOOST_SYW_WANT_HA_VAC_TCOUNT",37);
-		boostModelMap.put("BOOST_SYW_WANT_HA_WH_TCOUNT",38);
-		boostModelMap.put("BOOST_SYW_WANT_HAND_TOOLS_TCOUNT",39);
-		boostModelMap.put("BOOST_SYW_WANT_HE_FS_TCOUNT",40);
-		boostModelMap.put("BOOST_SYW_WANT_HF_TCOUNT",41);
-		boostModelMap.put("BOOST_SYW_WANT_HG_HL_TCOUNT",42);
-		boostModelMap.put("BOOST_SYW_WANT_HOME_TCOUNT",43);
-		boostModelMap.put("BOOST_SYW_WANT_KAPP_TCOUNT",44);
-		boostModelMap.put("BOOST_SYW_WANT_LE_TCOUNT",46);
-		boostModelMap.put("BOOST_SYW_WANT_LG_ADAS_TCOUNT",47);
-		boostModelMap.put("BOOST_SYW_WANT_LG_MOWER_TCOUNT",48);
-		boostModelMap.put("BOOST_SYW_WANT_LG_PATIO_TCOUNT",49);
-		boostModelMap.put("BOOST_SYW_WANT_LG_TRACTOR_TCOUNT",50);
-		boostModelMap.put("BOOST_SYW_WANT_LG_TRIM_EDG_TCOUNT",51);
-		boostModelMap.put("BOOST_SYW_WANT_MAPP_TCOUNT",52);
-		boostModelMap.put("BOOST_SYW_WANT_MATTRESS_TCOUNT",53);
-		boostModelMap.put("BOOST_SYW_WANT_OD_GRILL_TCOUNT",54);
-		boostModelMap.put("BOOST_SYW_WANT_ODL_TCOUNT",55);
-		boostModelMap.put("BOOST_SYW_WANT_POWER_TOOLS_TCOUNT",56);
-		boostModelMap.put("BOOST_SYW_WANT_REGRIG_TCOUNT",57);
-		boostModelMap.put("BOOST_SYW_WANT_TOOL_STRG_TCOUNT",58);
-		boostModelMap.put("BOOST_SYW_WANT_TOOLS_TCOUNT",59);
-		boostModelMap.put("BOOST_SYW_WANT_TOYS_TCOUNT",60);
-		boostModelMap.put("BOOST_SYW_WANT_TV_TCOUNT",61);
-		boostModelMap.put("BOOST_SYW_WANT_WAPP_TCOUNT",62);
-		boostModelMap.put("BOOST_SYW_WANT_WASH_DRY_TCOUNT",63);
-		boostModelMap.put("BOOST_SYW_WANT_AC_TCOUNT",72);
-		boostModelMap.put("BOOST_SYW_WANT_LG_SM_OTH_TCOUNT",73);
-		boostModelMap.put("BOOST_SYW_WANT_GAME_ROOM_TCOUNT",74);
-		boostModelMap.put("BOOST_SYW_WANT_CHRISTMAS_TCOUNT",75);
-		boostModelMap.put("BOOST_SYW_WANT_LG_SNOW_BLOWER_TCOUNT",76);
-		boostModelMap.put("BOOST_SYW_WANT_GAMER_TCOUNT",77);
-		boostModelMap.put("BOOST_SYW_OWN_ALL_APP_TCOUNT",21);
-		boostModelMap.put("BOOST_SYW_OWN_AU_BATTERY_TCOUNT",22);
-		boostModelMap.put("BOOST_SYW_OWN_AU_TIRE_TCOUNT",24);
-		boostModelMap.put("BOOST_SYW_OWN_AUTO_TCOUNT",25);
-		boostModelMap.put("BOOST_SYW_OWN_BABY_TCOUNT",26);
-		boostModelMap.put("BOOST_SYW_OWN_CE_TCOUNT",27);
-		boostModelMap.put("BOOST_SYW_OWN_CE_CAMERA_TCOUNT",28);
-		boostModelMap.put("BOOST_SYW_OWN_CE_LAPTOP_TCOUNT",29);
-		boostModelMap.put("BOOST_SYW_OWN_FIT_EQUIP_TCOUNT",30);
-		boostModelMap.put("BOOST_SYW_OWN_FITNESS_TCOUNT",31);
-		boostModelMap.put("BOOST_SYW_OWN_FNJL_TCOUNT",32);
-		boostModelMap.put("BOOST_SYW_OWN_FOOTWEAR_TCOUNT",33);
-		boostModelMap.put("BOOST_SYW_OWN_HA_ALL_TCOUNT",34);
-		boostModelMap.put("BOOST_SYW_OWN_HA_COOK_TCOUNT",35);
-		boostModelMap.put("BOOST_SYW_OWN_HA_DISH_TCOUNT",36);
-		boostModelMap.put("BOOST_SYW_OWN_HA_VAC_TCOUNT",37);
-		boostModelMap.put("BOOST_SYW_OWN_HA_WH_TCOUNT",38);
-		boostModelMap.put("BOOST_SYW_OWN_HAND_TOOLS_TCOUNT",39);
-		boostModelMap.put("BOOST_SYW_OWN_HE_FS_TCOUNT",40);
-		boostModelMap.put("BOOST_SYW_OWN_HF_TCOUNT",41);
-		boostModelMap.put("BOOST_SYW_OWN_HG_HL_TCOUNT",42);
-		boostModelMap.put("BOOST_SYW_OWN_HOME_TCOUNT",43);
-		boostModelMap.put("BOOST_SYW_OWN_KAPP_TCOUNT",44);
-		boostModelMap.put("BOOST_SYW_OWN_LE_TCOUNT",46);
-		boostModelMap.put("BOOST_SYW_OWN_LG_ADAS_TCOUNT",47);
-		boostModelMap.put("BOOST_SYW_OWN_LG_MOWER_TCOUNT",48);
-		boostModelMap.put("BOOST_SYW_OWN_LG_PATIO_TCOUNT",49);
-		boostModelMap.put("BOOST_SYW_OWN_LG_TRACTOR_TCOUNT",50);
-		boostModelMap.put("BOOST_SYW_OWN_LG_TRIM_EDG_TCOUNT",51);
-		boostModelMap.put("BOOST_SYW_OWN_MAPP_TCOUNT",52);
-		boostModelMap.put("BOOST_SYW_OWN_MATTRESS_TCOUNT",53);
-		boostModelMap.put("BOOST_SYW_OWN_OD_GRILL_TCOUNT",54);
-		boostModelMap.put("BOOST_SYW_OWN_ODL_TCOUNT",55);
-		boostModelMap.put("BOOST_SYW_OWN_POWER_TOOLS_TCOUNT",56);
-		boostModelMap.put("BOOST_SYW_OWN_REGRIG_TCOUNT",57);
-		boostModelMap.put("BOOST_SYW_OWN_TOOL_STRG_TCOUNT",58);
-		boostModelMap.put("BOOST_SYW_OWN_TOOLS_TCOUNT",59);
-		boostModelMap.put("BOOST_SYW_OWN_TOYS_TCOUNT",60);
-		boostModelMap.put("BOOST_SYW_OWN_TV_TCOUNT",61);
-		boostModelMap.put("BOOST_SYW_OWN_WAPP_TCOUNT",62);
-		boostModelMap.put("BOOST_SYW_OWN_WASH_DRY_TCOUNT",63);
-		boostModelMap.put("BOOST_SYW_OWN_AC_TCOUNT",72);
-		boostModelMap.put("BOOST_SYW_OWN_LG_SM_OTH_TCOUNT",73);
-		boostModelMap.put("BOOST_SYW_OWN_GAME_ROOM_TCOUNT",74);
-		boostModelMap.put("BOOST_SYW_OWN_CHRISTMAS_TCOUNT",75);
-		boostModelMap.put("BOOST_SYW_OWN_LG_SNOW_BLOWER_TCOUNT",76);
-		boostModelMap.put("BOOST_SYW_OWN_GAMER_TCOUNT",77);
-
+		Map<String, Integer> boostModelMap = modelBoostDao.getVarModelMap();
 		return boostModelMap;
 		
 	}
