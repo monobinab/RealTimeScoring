@@ -21,12 +21,28 @@ import com.mongodb.DBObject;
 
 public class MemberBoostsDao extends AbstractDao {
 	public static void main(String[] args) {
-		MemberBoostsDao dao = new MemberBoostsDao();
-		Set<String> boostSet = new HashSet<String>();
-		boostSet.add("BOOST_SYW_CE_LIKETCOUNT");
-		boostSet.add("BOOST_SYW_XX_LIKETCOUNT");
-		boostSet.add("BOOST_SYW_HA_LIKETCOUNT");
-		dao.getMemberBoostsValues("dxo0b7SN1eER9shCSj0DX+eSGag=", boostSet);
+		Map<String, Map<String, List<String>>> memberBoostValuesMap = new HashMap<String, Map<String, List<String>>>();
+		String var1 = "BOOST_SYW_LIKE_ALL_APP_TCOUNT";
+		String var2 = "BOOST_SYW_LIKE_AU_BATTERY_TCOUNT";
+		String var3 = "BOOST_SYW_LIKE_AU_TIRE_TCOUNT";
+		String var4 = "BOOST_SYW_LIKE_AUTO_TCOUNT";
+		String date = "2014-09-18";
+
+		
+		memberBoostValuesMap.put(var1, new HashMap<String, List<String>>());
+		memberBoostValuesMap.get(var1).put(date,new ArrayList<String>());
+		memberBoostValuesMap.get(var1).get(date).add("4");
+		memberBoostValuesMap.put(var2, new HashMap<String, List<String>>());
+		memberBoostValuesMap.get(var2).put(date,new ArrayList<String>());
+		memberBoostValuesMap.get(var2).get(date).add("5");
+		memberBoostValuesMap.put(var3, new HashMap<String, List<String>>());
+		memberBoostValuesMap.get(var3).put(date,new ArrayList<String>());
+		memberBoostValuesMap.get(var3).get(date).add("6");
+		memberBoostValuesMap.put(var4, new HashMap<String, List<String>>());
+		memberBoostValuesMap.get(var4).put(date,new ArrayList<String>());
+		memberBoostValuesMap.get(var4).get(date).add("7");
+		
+		new MemberBoostsDao().writeMemberBoostValues("Axo0b7SN1eER9shCSj0DX+eSGag=", memberBoostValuesMap);
 	}
 
 	private static final Logger LOGGER = LoggerFactory
@@ -81,9 +97,23 @@ public class MemberBoostsDao extends AbstractDao {
 	}
 	
 	public void writeMemberBoostValues(String l_id, Map<String, Map<String, List<String>>> memberBoostValuesMap) {
+		BasicDBObject objectToUpsert = new BasicDBObject(MongoNameConstants.L_ID, l_id);
+		BasicDBObject boostDateValues = new BasicDBObject();
+		BasicDBObject searchQuery = new BasicDBObject(MongoNameConstants.L_ID, l_id);
+		
+		
 		for(String boost: memberBoostValuesMap.keySet()) {
-			
+			for(String date: memberBoostValuesMap.get(boost).keySet()) {
+				BasicDBList valuesList = new BasicDBList();
+				for(String value: memberBoostValuesMap.get(boost).get(date)) {
+					valuesList.add(value);
+				}
+				boostDateValues.put(boost, new BasicDBObject(date, valuesList));
+			}
 		}
+		objectToUpsert.append(MongoNameConstants.BOOSTS_ARRAY, boostDateValues);
+		memberBoostsCollection.update(searchQuery,
+				new BasicDBObject("$set", objectToUpsert), true, false);
 	}
 }
 

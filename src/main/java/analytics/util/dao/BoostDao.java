@@ -28,10 +28,9 @@ public class BoostDao extends AbstractDao {
     	super();
     	feedBoostsCollection = db.getCollection(MongoNameConstants.FEED_TO_BOOST_COLLECTION);
     }
-	public List<String> getBoosts(String feedPrefix) {
-		Pattern prefix = Pattern.compile("^"+feedPrefix+".*");
+	public List<String> getBoosts(String feed) {
 		List<String> boostList = new ArrayList<String>();
-		DBCursor feedCursor = feedBoostsCollection.find(new BasicDBObject(MongoNameConstants.FB_FEED,prefix));
+		DBCursor feedCursor = feedBoostsCollection.find(new BasicDBObject(MongoNameConstants.FB_FEED,feed));
 		while(feedCursor.hasNext()){
 			DBObject feedObject = feedCursor.next();
 			BasicDBList boosts = (BasicDBList) feedObject.get(MongoNameConstants.FB_BOOSTS);
@@ -39,5 +38,21 @@ public class BoostDao extends AbstractDao {
 				boostList.add(it.next().toString());
 		}
 		return boostList;
+	}
+	
+	public Map<String, List<String>> getBoostsMap(List<String> feeds) {
+		Map<String,List<String>> boostMap = new HashMap<String, List<String>>();
+		for(String feed:feeds){
+			List<String> boostList = new ArrayList<String>();
+			DBCursor feedCursor = feedBoostsCollection.find(new BasicDBObject(MongoNameConstants.FB_FEED,feed));
+			while(feedCursor.hasNext()){
+				DBObject feedObject = feedCursor.next();
+				BasicDBList boosts = (BasicDBList) feedObject.get(MongoNameConstants.FB_BOOSTS);
+				for( Iterator<Object> it = boosts.iterator(); it.hasNext(); )
+					boostList.add(it.next().toString());
+			}
+			boostMap.put(feed, boostList);
+		}
+		return boostMap;
 	}
 }
