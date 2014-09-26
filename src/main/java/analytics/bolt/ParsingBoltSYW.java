@@ -1,7 +1,6 @@
 package analytics.bolt;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -64,12 +63,7 @@ public class ParsingBoltSYW extends BaseRichBolt {
 				outputCollector.fail(input);
 				//could not process record
 				return;
-			} else {
-				//TODO: Remove this once testing is complete
-				if(l_id.equals("7081057588230760")){
-				//if(l_id.equals("7081257366894445")){
-					System.out.println("FOUND me..");
-				}
+			} else {		
 				// RTS only wants encrypted loyalty ids
 				l_id = SecurityUtils.hashLoyaltyId(l_id);
 			}

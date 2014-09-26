@@ -9,23 +9,25 @@ import java.util.List;
 import java.util.Map;
 
 import org.joda.time.LocalDate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import analytics.util.JsonUtils;
-import analytics.util.dao.BoostDao;
 import analytics.util.dao.ChangedMemberScoresDao;
 import analytics.util.dao.MemberScoreDao;
 import analytics.util.dao.ModelPercentileDao;
 import analytics.util.dao.ModelSywBoostDao;
-import analytics.util.objects.Change;
 import analytics.util.objects.ChangedMemberScore;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
 public class SywScoringBolt  extends BaseRichBolt{
-	private BoostDao boostDao;
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(SywScoringBolt.class);
 	private ChangedMemberScoresDao changedMemberScoresDao;
 	private MemberScoreDao memberScoreDao;
 	private ModelSywBoostDao modelBoostDao;
@@ -33,12 +35,13 @@ public class SywScoringBolt  extends BaseRichBolt{
 	
 	private Map<String,Integer> boostModelMap;
 	private Map<Integer, Map<Integer, Double>> modelPercentileMap;
-	SimpleDateFormat simpleDateFormat;
+	private SimpleDateFormat simpleDateFormat;
+	private OutputCollector outputCollector;
 	
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
-		boostDao = new BoostDao();
+		outputCollector = collector;
 		modelPercentileDao = new ModelPercentileDao();
 		memberScoreDao = new MemberScoreDao();
 		changedMemberScoresDao = new ChangedMemberScoresDao();
@@ -53,18 +56,17 @@ public class SywScoringBolt  extends BaseRichBolt{
 		//l_id="jgjh" , source="SYW_LIKE/OWN/WANT
 		//newChangesVarValueMap - similar to strategy bolt
 		//current-pid, 2014-09-25-[6],...
+		
 		String lId = input.getStringByField("l_id");
-		if(lId.equals("dxo0b7SN1eER9shCSj0DX+eSGag=")){
-			System.out.println("ME");
-		}
 		String source = input.getStringByField("source");
 		String messageID = "";
 		if (input.contains("messageID")) {
 			messageID = input.getStringByField("messageID");
 		}
-
+		
+		//TODO: Reuse this as a function. AAM ATC uses a very similar piece of code
 		// 2) Create map of new changes from the input
-    	SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    	simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
 		Map<String, String> newChangesVarValueMap = JsonUtils
 				.restoreVariableListFromJson(input.getString(1));
@@ -75,9 +77,7 @@ public class SywScoringBolt  extends BaseRichBolt{
 	    	int totalPidCount = 0;
 	    	
 	    	if(dateValuesMap != null && dateValuesMap.containsKey("current")) {
-		    	for(String v: dateValuesMap.get("current")) {
-		    		totalPidCount++;
-		    	}
+	    		totalPidCount+=dateValuesMap.get("current").size();
 		    	dateValuesMap.remove("current");
 		    	if(!dateValuesMap.isEmpty()) {
 		    		for(String key: dateValuesMap.keySet()) {
@@ -87,9 +87,9 @@ public class SywScoringBolt  extends BaseRichBolt{
 								totalPidCount+=Integer.valueOf(v);
 							}
 						} catch (NumberFormatException e) {
-							e.printStackTrace();
+							LOGGER.warn(e.getMessage(),e);
 						} catch (ParseException e) {
-							e.printStackTrace();
+							LOGGER.warn(e.getMessage(),e);
 						}
 		    		}
 		    	}
@@ -117,7 +117,7 @@ public class SywScoringBolt  extends BaseRichBolt{
 						modelIdToScore.put(modelId, String.valueOf(cs.getScore()));
 					} 
 				} catch (ParseException e) {
-					//TODO: Log exception
+					LOGGER.error("Unable to parse date", e);
 				}
 			}
 			if(!modelIdToScore.containsKey(modelId))
@@ -129,8 +129,13 @@ public class SywScoringBolt  extends BaseRichBolt{
 		//varToCount map has the total count for each variable
 		
 		for(String v: varToCountMap.keySet()) {
+
 			int boostPercetages = 0;
 			int modelId = boostModelMap.get(v);
+			if(modelIdToScore==null||modelIdToScore.get(modelId)==null){
+				//Getting next model since current one does not have score
+				continue;
+			}
 			
 			if(varToCountMap.get(v)<=10){
 				boostPercetages += ((int) Math.ceil(varToCountMap.get(v) / 2.0))-1;
@@ -141,18 +146,24 @@ public class SywScoringBolt  extends BaseRichBolt{
 			Double maxScore = modelPercentileMap.get(modelId).get(90 + boostPercetages);
 			if(Double.valueOf(modelIdToScore.get(modelId)) < maxScore) {
 				modelIdToScore.put(modelId, maxScore.toString());
+				
 			}
+			List<Object> listToEmit = new ArrayList<Object>();
+			listToEmit.add(lId);
+			listToEmit.add("0.0");
+			listToEmit.add(Double.parseDouble(modelIdToScore.get(modelId)));
+			listToEmit.add(String.valueOf(modelId));
+			listToEmit.add(source);
+			listToEmit.add(messageID);
+			outputCollector.emit(listToEmit);
 		}
-		
-		
-		
-		System.out.println("rescored all models in modelIds list");
+		outputCollector.ack(input);
 	}
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		// TODO Auto-generated method stub
-		
+		declarer.declare(new Fields("l_id", "oldScore", "newScore", "model",
+				"source", "messageID"));
 	}
 
 	private Map<String, Integer> buildBoostModelMap() {

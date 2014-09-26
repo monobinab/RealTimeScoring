@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import analytics.util.strategies.Strategy;
+import analytics.util.strategies.StrategyBoostProductTotalCount;
 import analytics.util.strategies.StrategyCountTraitDates;
 import analytics.util.strategies.StrategyCountTraits;
 import analytics.util.strategies.StrategyCountTransactions;
@@ -46,7 +47,8 @@ public class StrategyMapper {
 		strategyMap.put("StrategyDaysSinceLast", new StrategyDaysSinceLast()); 
 		strategyMap.put("StrategySumSales", new StrategySumSales()); 
 		strategyMap.put("StrategyTurnOffFlag", new StrategyTurnOffFlag()); 
-		strategyMap.put("StrategyTurnOnFlag", new StrategyTurnOnFlag()); 
+		strategyMap.put("StrategyTurnOnFlag", new StrategyTurnOnFlag());
+		strategyMap.put("StrategyBoostProductTotalCount", new StrategyBoostProductTotalCount());
     }
     
 }
