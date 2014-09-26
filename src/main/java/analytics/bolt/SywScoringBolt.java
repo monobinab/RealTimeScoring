@@ -27,6 +27,7 @@ public class SywScoringBolt  extends BaseRichBolt{
 	private MemberScoreDao memberScoreDao;
 	
 	private Map<String,Integer> boostModelMap;
+	private Map<Integer, Map<Integer, Double>> modelPercentileMap;
 	
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
@@ -36,6 +37,7 @@ public class SywScoringBolt  extends BaseRichBolt{
 		changedMemberScoresDao = new ChangedMemberScoresDao();
 		
 		boostModelMap = buildBoostModelMap();
+		modelPercentileMap = new HashMap<Integer, Map<Integer, Double>>();
 	}
 
 	@Override
@@ -108,6 +110,24 @@ public class SywScoringBolt  extends BaseRichBolt{
 		//TODO: Loop through the modelIdToScore map
 		//Add scoring logic here
 		//varToCount map has the total count for each variable
+		
+		for(String v: varToCountMap.keySet()) {
+			int boostPercetages = 0;
+			int modelId = boostModelMap.get(v);
+			
+			if(varToCountMap.get(v)<=10){
+				boostPercetages += ((int) Math.ceil(varToCountMap.get(v) / 2.0))-1;
+			} else {
+				boostPercetages = 5;
+			}
+			
+			Double maxScore = modelPercentileMap.get(modelId).get(90 + boostPercetages);
+			if(Double.valueOf(modelIdToScore.get(modelId)) < maxScore) {
+				modelIdToScore.put(modelId, maxScore.toString());
+			}
+		}
+		
+		
 		
 		System.out.println("rescored all models in modelIds list");
 	}
