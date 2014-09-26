@@ -26,7 +26,7 @@ public class MemberBoostsDao extends AbstractDao {
 		String var2 = "BOOST_SYW_LIKE_AU_BATTERY_TCOUNT";
 		String var3 = "BOOST_SYW_LIKE_AU_TIRE_TCOUNT";
 		String var4 = "BOOST_SYW_LIKE_AUTO_TCOUNT";
-		String date = "2014-09-18";
+		String date = "2014-09-22";
 
 		
 		memberBoostValuesMap.put(var1, new HashMap<String, List<String>>());
@@ -112,8 +112,7 @@ public class MemberBoostsDao extends AbstractDao {
 			}
 		}
 		objectToUpsert.append(MongoNameConstants.BOOSTS_ARRAY, boostDateValues);
-		memberBoostsCollection.update(searchQuery,
-				new BasicDBObject("$set", objectToUpsert), true, false);
+		memberBoostsCollection.update(searchQuery, new BasicDBObject("$set", objectToUpsert), true, false);
 	}
 }
 
