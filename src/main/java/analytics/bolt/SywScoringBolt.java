@@ -14,6 +14,7 @@ import analytics.util.JsonUtils;
 import analytics.util.dao.BoostDao;
 import analytics.util.dao.ChangedMemberScoresDao;
 import analytics.util.dao.MemberScoreDao;
+import analytics.util.dao.ModelPercentileDao;
 import analytics.util.dao.ModelSywBoostDao;
 import analytics.util.objects.Change;
 import analytics.util.objects.ChangedMemberScore;
@@ -28,17 +29,21 @@ public class SywScoringBolt  extends BaseRichBolt{
 	private ChangedMemberScoresDao changedMemberScoresDao;
 	private MemberScoreDao memberScoreDao;
 	private ModelSywBoostDao modelBoostDao;
+	private ModelPercentileDao modelPercentileDao;
 	
 	private Map<String,Integer> boostModelMap;
 	SimpleDateFormat simpleDateFormat;
+	private Map<Integer, Map<Integer, Double>> modelPercentileMap;
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
 		boostDao = new BoostDao();
+		modelPercentileDao = new ModelPercentileDao();
 		memberScoreDao = new MemberScoreDao();
 		changedMemberScoresDao = new ChangedMemberScoresDao();
 		modelBoostDao = new ModelSywBoostDao();
 		boostModelMap = buildBoostModelMap();
+		modelPercentileMap = modelPercentileDao.getModelPercentiles();
 		simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	}
 
