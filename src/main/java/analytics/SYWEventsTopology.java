@@ -4,7 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.bolt.ParsingBoltSYW;
+import analytics.bolt.PersistBoostsBolt;
 import analytics.bolt.ProcessSYWInteractions;
+import analytics.bolt.ScorePublishBolt;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.bolt.SywScoringBolt;
 import analytics.spout.SYWRedisSpout;
@@ -44,9 +46,12 @@ server3=rtsapp403p.prod.ch4.s.com
 		toplologyBuilder.setBolt("ProcessSYWEvents",
 				new ProcessSYWInteractions(), 1).shuffleGrouping(
 				"ParseEventsBolt");
-		toplologyBuilder.setBolt("strategy_bolt", new SywScoringBolt(), 1)
+		toplologyBuilder.setBolt("scoringBolt", new SywScoringBolt(), 1)
 				.shuffleGrouping("ProcessSYWEvents");
-
+		//TODO: Persist is still being fixed
+		toplologyBuilder.setBolt("persistBolt", new PersistBoostsBolt(), 1)
+		.shuffleGrouping("ProcessSYWEvents");
+		toplologyBuilder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 2).shuffleGrouping("scoringBolt");
 		Config conf = new Config();
 
 		if (args != null && args.length > 0) {
