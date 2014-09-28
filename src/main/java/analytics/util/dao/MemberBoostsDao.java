@@ -23,18 +23,18 @@ public class MemberBoostsDao extends AbstractDao {
 	public static void main(String[] args) {
 		Map<String, Map<String, List<String>>> memberBoostValuesMap = new HashMap<String, Map<String, List<String>>>();
 		String var1 = "BOOST_SYW_LIKE_ALL_APP_TCOUNT";
-		String var2 = "BOOST_SYW_LIKE_AU_BATTERY_TCOUNT";
+		String var2 = "BOOST_SYW_LIKE_MAPP_TCOUNT";
 //		String var3 = "BOOST_SYW_LIKE_AU_TIRE_TCOUNT";
 //		String var4 = "BOOST_SYW_LIKE_AUTO_TCOUNT";
-		String date = "2014-09-21";
+		String date = "2014-09-28";
 
 		
 		memberBoostValuesMap.put(var1, new HashMap<String, List<String>>());
 		memberBoostValuesMap.get(var1).put(date,new ArrayList<String>());
-		memberBoostValuesMap.get(var1).get(date).add("4");
+		memberBoostValuesMap.get(var1).get(date).add("1");
 		memberBoostValuesMap.put(var2, new HashMap<String, List<String>>());
 		memberBoostValuesMap.get(var2).put(date,new ArrayList<String>());
-		memberBoostValuesMap.get(var2).get(date).add("5");
+		memberBoostValuesMap.get(var2).get(date).add("1");
 //		memberBoostValuesMap.put(var3, new HashMap<String, List<String>>());
 //		memberBoostValuesMap.get(var3).put(date,new ArrayList<String>());
 //		memberBoostValuesMap.get(var3).get(date).add("6");
@@ -42,7 +42,7 @@ public class MemberBoostsDao extends AbstractDao {
 //		memberBoostValuesMap.get(var4).put(date,new ArrayList<String>());
 //		memberBoostValuesMap.get(var4).get(date).add("7");
 		
-		new MemberBoostsDao().writeMemberBoostValues("Axo0b7SN1eER9shCSj0DX+eSGag=", memberBoostValuesMap);
+		new MemberBoostsDao().writeMemberBoostValues("c9J4/8ilIN3iOf+h6LVfL9D6fR8=", memberBoostValuesMap);
 	}
 
 	private static final Logger LOGGER = LoggerFactory
@@ -102,7 +102,7 @@ public class MemberBoostsDao extends AbstractDao {
 		if(mbrBoostList == null)
 			return null;
 		for(String boost:mbrBoostList.keySet()){
-				if (!mapToReturn.containsKey(boost)) {
+			if (!mapToReturn.containsKey(boost)) {
 				mapToReturn.put((String) boost,	new HashMap<String, List<String>>());
 				BasicDBObject dateDBList = (BasicDBObject) mbrBoostList.get(boost);
 				for (String date : dateDBList.keySet()) {
@@ -141,7 +141,6 @@ public class MemberBoostsDao extends AbstractDao {
 		if(previousBoosts != null && !previousBoosts.isEmpty()) {
 			for(String boost: previousBoosts.keySet()) {
 				for(String date: previousBoosts.get(boost).keySet()) {
-					if((BasicDBObject) boostDateValues.get(boost)!=null){
 					if(memberBoostValuesMap.containsKey(boost) && !memberBoostValuesMap.get(boost).containsKey(date)) {
 						BasicDBList valuesList = new BasicDBList();
 						for(String value: previousBoosts.get(boost).get(date)) {
@@ -153,8 +152,9 @@ public class MemberBoostsDao extends AbstractDao {
 						for(String value: previousBoosts.get(boost).get(date)) {
 							valuesList.add(value);
 						}
+						boostDateValues.append(boost, new BasicDBObject());
 						((BasicDBObject) boostDateValues.get(boost)).append(date, valuesList);
-					}}
+					}
 				}
 			}
 		}
