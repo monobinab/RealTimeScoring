@@ -20,30 +20,6 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 
 public class MemberBoostsDao extends AbstractDao {
-	public static void main(String[] args) {
-		Map<String, Map<String, List<String>>> memberBoostValuesMap = new HashMap<String, Map<String, List<String>>>();
-		String var1 = "BOOST_SYW_LIKE_ALL_APP_TCOUNT";
-		String var2 = "BOOST_SYW_LIKE_MAPP_TCOUNT";
-//		String var3 = "BOOST_SYW_LIKE_AU_TIRE_TCOUNT";
-//		String var4 = "BOOST_SYW_LIKE_AUTO_TCOUNT";
-		String date = "2014-09-28";
-
-		
-		memberBoostValuesMap.put(var1, new HashMap<String, List<String>>());
-		memberBoostValuesMap.get(var1).put(date,new ArrayList<String>());
-		memberBoostValuesMap.get(var1).get(date).add("1");
-		memberBoostValuesMap.put(var2, new HashMap<String, List<String>>());
-		memberBoostValuesMap.get(var2).put(date,new ArrayList<String>());
-		memberBoostValuesMap.get(var2).get(date).add("1");
-//		memberBoostValuesMap.put(var3, new HashMap<String, List<String>>());
-//		memberBoostValuesMap.get(var3).put(date,new ArrayList<String>());
-//		memberBoostValuesMap.get(var3).get(date).add("6");
-//		memberBoostValuesMap.put(var4, new HashMap<String, List<String>>());
-//		memberBoostValuesMap.get(var4).put(date,new ArrayList<String>());
-//		memberBoostValuesMap.get(var4).get(date).add("7");
-		
-		new MemberBoostsDao().writeMemberBoostValues("c9J4/8ilIN3iOf+h6LVfL9D6fR8=", memberBoostValuesMap);
-	}
 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(MemberVariablesDao.class);
