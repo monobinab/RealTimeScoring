@@ -163,12 +163,12 @@ public class SywScoringBolt  extends BaseRichBolt{
 					modelIdToScore.put(modelId, maxScore.toString());
 				}
 			} else if(source.equals("SYW_WANT")) {
-				if(varToCountMap.get(v)<=10){
+				if(varToCountMap.get(v)<=8){
 					boostPercetages += ((int) Math.ceil(varToCountMap.get(v) / 2.0))-1;
 				} else {
-					boostPercetages = 5;
+					boostPercetages = 4;
 				}
-				Double maxScore = modelPercentileMap.get(modelId).get(95 + boostPercetages);
+				Double maxScore = modelPercentileMap.get(modelId).get(96 + boostPercetages);
 				oldScore = modelIdToScore.get(modelId);
 				if(Double.valueOf(modelIdToScore.get(modelId)) < maxScore) {
 					modelIdToScore.put(modelId, maxScore.toString());
