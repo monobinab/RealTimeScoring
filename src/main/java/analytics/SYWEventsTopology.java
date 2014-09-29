@@ -44,18 +44,18 @@ server3=rtsapp403p.prod.ch4.s.com
 				.shuffleGrouping("SYWEventsSpout");
 		// Get the div line and boost variable
 		toplologyBuilder.setBolt("ProcessSYWEvents",
-				new ProcessSYWInteractions(), 1).shuffleGrouping(
+				new ProcessSYWInteractions(), 4).shuffleGrouping(
 				"ParseEventsBolt");
 		toplologyBuilder.setBolt("scoringBolt", new SywScoringBolt(), 1)
 				.shuffleGrouping("ProcessSYWEvents");
 		//TODO: Persist is still being fixed
 		toplologyBuilder.setBolt("persistBolt", new PersistBoostsBolt(), 1)
 		.shuffleGrouping("ProcessSYWEvents");
-		toplologyBuilder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 2).shuffleGrouping("scoringBolt");
+		toplologyBuilder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 1).shuffleGrouping("scoringBolt");
 		Config conf = new Config();
 
 		if (args != null && args.length > 0) {
-			conf.setNumWorkers(3);
+			conf.setNumWorkers(6);
 			StormSubmitter.submitTopology(args[0], conf,
 					toplologyBuilder.createTopology());
 		} else {
