@@ -1,6 +1,12 @@
 package analytics.util.objects;
 
-public class SYWEntity {
+import java.io.Serializable;
+
+public class SYWEntity implements Serializable{
+/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 private int Id;
 private String EntityType;
 private String OwnerId;
