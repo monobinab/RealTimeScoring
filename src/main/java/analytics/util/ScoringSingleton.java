@@ -378,7 +378,7 @@ public class ScoringSingleton {
 
 		//TODO: update
 		Map<String, Map<String, List<String>>> mbrBoostsMap = memberBoostsDao.getAllMemberBoostValues(l_id);
-		if(!mbrBoostsMap.isEmpty()) {
+		if(mbrBoostsMap!=null && !mbrBoostsMap.isEmpty()) {
 			for(String boost: mbrBoostsMap.keySet()) {
 				modelIdList.remove(modelSywBoostDao.getModelId(boost));
 			}
