@@ -13,9 +13,12 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,14 +65,16 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 	public void execute(Tuple input) {
 		String feedType = null;
 		// Get l_id", "message", "InteractionType" from parsing bolt
-		JsonObject interactionObject = (JsonObject) input
-				.getValueByField("message");
+		/*SYWInteraction obj = (SYWInteraction) input
+				.getValueByField("message");*/
 		String lId = input.getStringByField("l_id");
-
-		// Create a SYW Interaction object
+		JsonParser parser = new JsonParser();
+		JsonObject interactionObject = parser.parse(input.getStringByField("message")).getAsJsonObject();
+		/*JsonObject interactionObject = (JsonObject) input
+				.getValueByField("message");*/
+		
 		Gson gson = new Gson();
-		SYWInteraction obj = gson.fromJson(interactionObject,
-				SYWInteraction.class);
+		SYWInteraction obj = gson.fromJson(interactionObject,SYWInteraction.class);
 
 		/* Ignore interactions that we dont want. */
 		/*
@@ -193,6 +198,7 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 		}
 		if (variableValueMap != null && !variableValueMap.isEmpty()) {
 			Type varValueType = new TypeToken<Map<String, String>>() {
+				private static final long serialVersionUID = 1L;
 			}.getType();
 			String varValueString = gson.toJson(variableValueMap, varValueType);
 			List<Object> listToEmit = new ArrayList<Object>();

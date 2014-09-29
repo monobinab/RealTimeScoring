@@ -8,10 +8,12 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,7 +71,8 @@ public class ParsingBoltSYW extends BaseRichBolt {
 			/*Ignore interactions that we dont want. We can do further refinements if needed*/
 			String interactionTypeString = interactionType.getAsString();
 			if (listOfInteractionsForRTS.contains(interactionTypeString)) {
-				outputCollector.emit(tuple(l_id, interactionObject,	interactionType));
+				// Create a SYW Interaction object
+					outputCollector.emit(tuple(l_id, interactionObject.toString(),interactionTypeString));
 			} else {
 				//We should look into either processing this request type or not subscribing to it
 				LOGGER.info("Ignore interaction type" + interactionType.getAsString());
