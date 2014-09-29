@@ -1,27 +1,25 @@
 package analytics.bolt;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import static backtype.storm.utils.Utils.tuple;
-
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
-import analytics.util.SywApiCalls;
 import analytics.util.SecurityUtils;
+import analytics.util.SywApiCalls;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import static backtype.storm.utils.Utils.tuple;
 
 public class ParsingBoltSYW extends BaseRichBolt {
 	private static final Logger LOGGER = LoggerFactory
@@ -59,7 +57,7 @@ public class ParsingBoltSYW extends BaseRichBolt {
 			*/
 
 			if (l_id == null) {
-				LOGGER.warn("Unable to get member information" + input);
+				//LOGGER.warn("Unable to get member information" + input);
 				outputCollector.fail(input);
 				//could not process record
 				return;

@@ -1,15 +1,5 @@
 package analytics.bolt;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import analytics.util.JsonUtils;
 import analytics.util.MongoNameConstants;
 import analytics.util.dao.MemberBoostsDao;
@@ -20,20 +10,23 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class PersistBoostsBolt extends BaseRichBolt {
 	
 	private static final Logger LOGGER = LoggerFactory
-			.getLogger(PersistTraitsBolt.class);
+			.getLogger(PersistBoostsBolt.class);
     private MemberBoostsDao memberBoostsDao;
     private VariableDao variableDao;
     private Map<String, String> variablesStrategyMap;
-    Map<String, Map<String, List<String>>> memberBoostValuesMap;
-    
+
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
-		memberBoostValuesMap = new HashMap<String, Map<String, List<String>>>();
 		memberBoostsDao = new MemberBoostsDao();
 		variableDao = new VariableDao();
 		variablesStrategyMap = new HashMap<String, String>();
@@ -49,36 +42,55 @@ public class PersistBoostsBolt extends BaseRichBolt {
 	@Override
 	public void execute(Tuple input) {
 
-		LOGGER.debug("Persisting boost + values in mongo");
+
+        Map<String, Map<String, List<String>>> memberBoostValuesMap = new HashMap<String, Map<String, List<String>>>();
+
+        LOGGER.debug("Persisting boost + values in mongo");
 		//Get the encrypted loyalty id
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		String l_id = input.getString(0);
 		
 		Map<String, String> newChangesVarValueMap = JsonUtils
 				.restoreVariableListFromJson(input.getString(1));
-		
-		for(String b: newChangesVarValueMap.keySet()) {
+
+        LOGGER.trace(" this is what gets sent to Persist Bolt " + newChangesVarValueMap + " lid: " + l_id);
+
+
+        for(String b: newChangesVarValueMap.keySet()) {
 	    	Map<String, List<String>> dateValuesMap = JsonUtils.restoreDateTraitsMapFromJson(newChangesVarValueMap.get(b));
-	    	List<String> persistValuesList = new ArrayList<String>();
+            LOGGER.trace(" dateValuesMap beginning for " +b +" : " + dateValuesMap + " lid: " + l_id);
+
+            List<String> persistValuesList = new ArrayList<String>();
 	    
 	    	if(variablesStrategyMap.get(b).equals("StrategyBoostProductTotalCount")) {
 	    		persistValuesList = getTotalCount(dateValuesMap);
 	    		if(persistValuesList!= null && !persistValuesList.isEmpty()) {
 	    			dateValuesMap.put(simpleDateFormat.format(new Date()), persistValuesList);
-	    		}
+                    LOGGER.trace(" dateValuesMap  for " +b +" in StrategyBoostProductTotalCount : " + dateValuesMap + " lid: " + l_id);
+
+                }
 	    	}
+
+
 	    	//
 	    	if(variablesStrategyMap.get(b).equals("StrategySywTotalCounts")) {
 	    		persistValuesList = getTotalCount(dateValuesMap);
 	    		if(persistValuesList!= null && !persistValuesList.isEmpty()) {
 	    			dateValuesMap.put(simpleDateFormat.format(new Date()), persistValuesList);
-	    		}
+                    LOGGER.trace(" dateValuesMap  for " +b +" in StrategySywTotalCounts : " + dateValuesMap + " lid: " + l_id);
+
+                }
 	    	}
-	    	
-	    	memberBoostValuesMap.put(b,dateValuesMap);
+            LOGGER.trace(" dateValuesMap end for " +b +" : " + dateValuesMap + " lid: " + l_id);
+
+            memberBoostValuesMap.put(b,dateValuesMap);
 	    	//addDateTrait
 		}
-		new MemberBoostsDao().writeMemberBoostValues(l_id, memberBoostValuesMap);
+
+        LOGGER.trace(" this is what gets sent to DAO " + memberBoostValuesMap + " lid: " + l_id);
+
+
+        new MemberBoostsDao().writeMemberBoostValues(l_id, memberBoostValuesMap);
 	}
 
 	private List<String> getTotalCount(Map<String, List<String>> dateValuesMap) {

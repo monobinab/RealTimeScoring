@@ -332,7 +332,7 @@
                         <!-- automatically creates the classpath using all project dependencies,
                              also adding the project build directory -->
                         <classpath/>
-                        <argument>analytics.RealTimeScoringTellurideTopology</argument>
+                        <argument>analytics.SYWEventsTopology</argument>
                     </arguments>
                 </configuration>
 

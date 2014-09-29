@@ -1,26 +1,10 @@
 package analytics.bolt;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.joda.time.LocalDate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import analytics.util.JsonUtils;
-import analytics.util.ScoringSingleton;
 import analytics.util.dao.ChangedMemberScoresDao;
 import analytics.util.dao.MemberScoreDao;
 import analytics.util.dao.ModelPercentileDao;
 import analytics.util.dao.ModelSywBoostDao;
-import analytics.util.objects.Change;
 import analytics.util.objects.ChangedMemberScore;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -28,6 +12,13 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+import org.joda.time.LocalDate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class SywScoringBolt  extends BaseRichBolt{
 	private static final Logger LOGGER = LoggerFactory
@@ -107,6 +98,7 @@ public class SywScoringBolt  extends BaseRichBolt{
 	    	}
 	    	varToCountMap.put(variableName, totalPidCount);
 		}
+        LOGGER.trace(" varToCountMap: " + varToCountMap + " lid: " + lId);
 		//boost_syw... hand_tools_tcount
 		//boost_syw... tools_tcount
 		//var to Count map - 
@@ -134,8 +126,11 @@ public class SywScoringBolt  extends BaseRichBolt{
 			if(!modelIdToScore.containsKey(modelId))
 				modelIdToScore.put(modelId, memberScores.get(modelId.toString()));
 		}
-		
-		//TODO: Loop through the modelIdToScore map
+
+        LOGGER.trace(" modelIdToScore map first: " + modelIdToScore+ " lid: " + lId);
+
+
+        //TODO: Loop through the modelIdToScore map
 		//Add scoring logic here
 		//varToCount map has the total count for each variable
 		
@@ -150,7 +145,7 @@ public class SywScoringBolt  extends BaseRichBolt{
 				continue;
 			}
 			
-			if(source=="SYW_HAVE") {
+			if(source=="SYW_OWN") {
 				Double maxScore = modelPercentileMap.get(modelId).get(50);
 				oldScore = modelIdToScore.get(modelId);
 				if(Double.valueOf(modelIdToScore.get(modelId)) > maxScore) {
@@ -179,10 +174,12 @@ public class SywScoringBolt  extends BaseRichBolt{
 			outputCollector.emit(listToEmit);
 		}
 		outputCollector.ack(input);
-		
-		
-		
-		updateChangedMemberScore(lId, modelIdToScore);
+
+        LOGGER.trace(" modelIdToScore map second: " + modelIdToScore+ " lid: " + lId);
+
+
+
+        updateChangedMemberScore(lId, modelIdToScore);
 	}
 
 	@Override

@@ -1,14 +1,5 @@
 package analytics.bolt;
 
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import analytics.util.SywApiCalls;
 import analytics.util.dao.BoostDao;
 import analytics.util.dao.DivLnBoostDao;
@@ -22,10 +13,17 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ProcessSYWInteractions extends BaseRichBolt {
 	private static final Logger LOGGER = LoggerFactory
@@ -119,7 +117,7 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 					/* Product does not exist? */
 					if (productId == null) {
 						LOGGER.info("Unable to get product id for "
-								+ currentEntity.getId());
+                                + currentEntity.getId());
 						// Get the next entity
 						continue;
 					} else {
@@ -127,6 +125,7 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 						// case it would be divLnItm???
 						PidDivLnDao.DivLn divLnObj = pidDivLnDao
 								.getVariableFromTopic(productId);
+                        LOGGER.trace(" div line for " + productId + " are " + divLnObj+ " lid: " + lId);
 						if (divLnObj != null) {
 							String div = divLnObj.getDiv();
 							String divLn = divLnObj.getDivLn();
@@ -168,7 +167,8 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 						// Eg - BOOST_SYW_APP_LIKETCOUNT
 						// divLnBoost -
 						// d:004 , b:BOOST_SYW_APP_LIKETCOUNT
-						// 004 , BOOST_ATC_APP_TCOUNT
+						// 004                        
+                        LOGGER.trace(" boost value map :" + boostValuesMap+ " lid: " + lId);
 					}
 
 				}
@@ -199,7 +199,7 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 			listToEmit.add(input.getValueByField("l_id"));
 			listToEmit.add(varValueString);
 			listToEmit.add(feedType);
-			LOGGER.debug(" @@@ SYW PARSING BOLT EMITTING: " + listToEmit);
+			LOGGER.debug(" @@@ SYW PARSING BOLT EMITTING: " + listToEmit+ " lid: " + lId);
 			this.outputCollector.emit(listToEmit);
 		}
 		this.outputCollector.ack(input);
@@ -211,7 +211,7 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 	}
 
 	private String createJsonDoc(Map<String, List<String>> dateValuesMap) {
-		LOGGER.debug("dateValuesMap: " + dateValuesMap);
+		LOGGER.trace("dateValuesMap: " + dateValuesMap);
 		// Create string in JSON format to emit
 		Gson gson = new Gson();
 		Type boostValueType = new TypeToken<Map<String, List<String>>>() {
