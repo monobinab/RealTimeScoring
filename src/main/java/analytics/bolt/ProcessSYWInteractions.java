@@ -29,6 +29,10 @@ import java.util.List;
 import java.util.Map;
 
 public class ProcessSYWInteractions extends BaseRichBolt {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ProcessSYWInteractions.class);
 	private List<String> entityTypes;

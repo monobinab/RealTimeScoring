@@ -57,7 +57,6 @@ public class MockOutputCollector extends OutputCollector {
 
 	@Override
 	public void ack(Tuple input) {
-		System.out.println("tuple " + input.getValue(0));
 		// TODO Auto-generated method stub
 		Iterator<IBoltListener> iterator = TestCaseListeners.iterator();
 		while (iterator.hasNext()) {
