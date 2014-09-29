@@ -30,6 +30,7 @@ public class DBConnection {
 		}
 		//TODO: Hard coding prod
 		//isProd = "true";
+
 		if(isProd!=null &&"true".equals(isProd)){
 			properties=  new PropertiesConfiguration("resources/connection_config_prod.properties");
 			LOGGER.info("Using production properties");
