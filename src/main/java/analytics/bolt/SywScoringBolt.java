@@ -145,7 +145,7 @@ public class SywScoringBolt  extends BaseRichBolt{
 				continue;
 			}
 			
-			if(source=="SYW_OWN") {
+			if(source.equals("SYW_OWN")) {
 				Double maxScore = modelPercentileMap.get(modelId).get(50);
 				oldScore = modelIdToScore.get(modelId);
 				if(Double.valueOf(modelIdToScore.get(modelId)) > maxScore) {
