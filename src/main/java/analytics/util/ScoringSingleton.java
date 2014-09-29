@@ -17,6 +17,10 @@ import org.slf4j.LoggerFactory;
 import analytics.util.dao.ChangedMemberScoresDao;
 import analytics.util.dao.ChangedMemberVariablesDao;
 import analytics.util.dao.MemberVariablesDao;
+//TODO: update
+import analytics.util.dao.MemberBoostsDao;
+import analytics.util.dao.ModelSywBoostDao;
+//TODO: end update
 import analytics.util.dao.ModelVariablesDao;
 import analytics.util.dao.VariableDao;
 import analytics.util.objects.Change;
@@ -41,6 +45,12 @@ public class ScoringSingleton {
 	private VariableDao variableDao;
 	private ModelVariablesDao modelVariablesDao;
 	private static ScoringSingleton instance=null;
+	
+	//TODO: update
+	ModelSywBoostDao modelSywBoostDao;
+	MemberBoostsDao memberBoostsDao;
+	//TODO: end update
+	
 	
 	public static ScoringSingleton getInstance() {
 		if(instance == null) {
@@ -81,6 +91,12 @@ public class ScoringSingleton {
 		//TODO: Refactor this so that it is a simple DAO method. Variable models map can be populated later
 		modelVariablesDao.populateModelVariables(modelsMap, variableModelsMap);
 
+		//TODO: update
+		modelSywBoostDao = new ModelSywBoostDao();
+		memberBoostsDao = new MemberBoostsDao();
+		//TODO: end update
+		
+		
 	}
 	
 	//TODO: Replace this method. Its for backward compatibility. Bad coding
@@ -357,8 +373,18 @@ public class ScoringSingleton {
 		return changedValue;
 	}
 	
-	public void updateChangedMemberScore(String lId, Set<Integer> modelIdList, Map<String, Change> allChanges, Map<Integer,Double> modelIdScoreMap) {
+	public void updateChangedMemberScore(String l_id, Set<Integer> modelIdList, Map<String, Change> allChanges, Map<Integer,Double> modelIdScoreMap) {
 		Map<Integer, ChangedMemberScore> updatedScores = new HashMap<Integer, ChangedMemberScore>();
+
+		//TODO: update
+		Map<String, Map<String, List<String>>> mbrBoostsMap = memberBoostsDao.getAllMemberBoostValues(l_id);
+		if(!mbrBoostsMap.isEmpty()) {
+			for(String boost: mbrBoostsMap.keySet()) {
+				modelIdList.remove(modelSywBoostDao.getModelId(boost));
+			}
+		}
+		//TODO: end update
+		
 		for(Integer modelId: modelIdList){
 		// FIND THE MIN AND MAX EXPIRATION DATE OF ALL VARIABLE CHANGES FOR
 			// CHANGED MODEL SCORE TO WRITE TO SCORE CHANGES COLLECTION
@@ -413,7 +439,7 @@ public class ScoringSingleton {
 					simpleDateFormat.format(new Date())));
 		}
 		if (updatedScores != null) {
-			changedMemberScoresDao.upsertUpdateChangedScores(lId,updatedScores);
+			changedMemberScoresDao.upsertUpdateChangedScores(l_id,updatedScores);
 		}	
 	}
 
