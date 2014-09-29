@@ -28,7 +28,6 @@ public class DBConnection {
 		if(isProd!=null && "test".equals(isProd)){
 			return FakeMongo.getTestDB();
 		}
-		isProd = "true";
 		if(isProd!=null &&"true".equals(isProd)){
 			properties=  new PropertiesConfiguration("resources/connection_config_prod.properties");
 			LOGGER.info("Using production properties");

@@ -53,7 +53,7 @@ public class PersistBoostsBolt extends BaseRichBolt {
 		Map<String, String> newChangesVarValueMap = JsonUtils
 				.restoreVariableListFromJson(input.getString(1));
 
-        LOGGER.trace(" this is what gets sent to Persist Bolt " + newChangesVarValueMap + " lid: " + l_id);
+        LOGGER.trace("Sent to Persist Bolt " + newChangesVarValueMap + " lid: " + l_id);
 
 
         for(String b: newChangesVarValueMap.keySet()) {
@@ -87,7 +87,7 @@ public class PersistBoostsBolt extends BaseRichBolt {
 	    	//addDateTrait
 		}
 
-        LOGGER.trace(" this is what gets sent to DAO " + memberBoostValuesMap + " lid: " + l_id);
+        LOGGER.trace("Sent to DAO " + memberBoostValuesMap + " lid: " + l_id);
 
 
         new MemberBoostsDao().writeMemberBoostValues(l_id, memberBoostValuesMap);
