@@ -1405,12 +1405,6 @@
     }, {
       "name" : "MONTH11",
       "coefficient" : 0.124073901183156
-    }, {
-      "coefficient" : 0.1,
-      "name" : "BOOST_DISHWASHER_SOCIAL"
-    }, {
-      "coefficient" : 0.1,
-      "name" : "BOOST_REFRIGERATOR_SOCIAL"
     }]
 }
 
@@ -1549,9 +1543,6 @@
     }, {
       "coefficient" : -0.00103,
       "name" : "S_DSL_HL_TRS"
-    }, {
-      "coefficient" : 0.1,
-      "name" : "BOOST_HA_WH_SYW"
     }]
 }
 
@@ -4416,12 +4407,6 @@
     }, {
       "coefficient" : 1.0915,
       "name" : "MONTH8"
-    }, {
-      "coefficient" : 0.3,
-      "name" : "BOOST_ODL_ATC"
-    }, {
-      "coefficient" : 0.3,
-      "name" : "BOOST_ODL_BROWSE"
     }]
 }
 {
@@ -4978,8 +4963,5 @@
     }, {
       "coefficient" : -0.000130519,
       "name" : "M_HA_APPL_COOKING_DSL"
-    }, {
-      "coefficient" : 0.1,
-      "name" : "BOOST_DISHWASHER_SOCIAL"
     }]
 }
