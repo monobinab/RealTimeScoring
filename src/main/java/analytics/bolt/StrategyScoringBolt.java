@@ -135,27 +135,28 @@ public class StrategyScoringBolt extends BaseRichBolt {
 			LOGGER.debug("The time spent for creating scores..... "
 					+ System.currentTimeMillis() + " and the message ID is ..."
 					+ messageID);
-			this.outputCollector.emit(listToEmit);
+			this.outputCollector.emit("score_stream",listToEmit);
 		}
-		this.outputCollector.ack(input);
+
 
 		// 10) Write changedMemberScores with expiry
 		for (Integer modelId : modelIdList) {
 			ScoringSingleton.getInstance().updateChangedVariables(lId, modelId, allChanges);
 		}
 		ScoringSingleton.getInstance().updateChangedMemberScore(lId, modelIdList, allChanges, modelIdScoreMap);
-					
+		List<Object> listToEmit = new ArrayList<Object>();
+		listToEmit.add(lId);
+		listToEmit.add(source);
+		this.outputCollector.emit("member_stream", listToEmit);
+		this.outputCollector.ack(input);
 
 	}
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("l_id", "oldScore", "newScore", "model",
-				"source", "messageID"));
+		declarer.declareStream("score_stream",new Fields("l_id", "oldScore", "newScore", "model","source", "messageID"));
+		declarer.declareStream("member_stream", new Fields("l_id", "source"));
 
 	}
-
-	// TODO: THese methods will not be in bolt
-	
 
 }
