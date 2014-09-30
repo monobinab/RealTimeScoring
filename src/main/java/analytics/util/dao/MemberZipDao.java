@@ -25,7 +25,9 @@ public class MemberZipDao extends AbstractDao{
 		DBCursor cursor = memberZipCollection.find(query);
 		if (cursor.hasNext()) {
 			DBObject obj = cursor.next();
-		    return obj.get(MongoNameConstants.ZIP).toString();
+			Object zip = obj.get(MongoNameConstants.ZIP);
+			if(zip!=null)					
+				return zip.toString();
 		}
 		return null;
 	}
