@@ -1,0 +1,4985 @@
+{
+  "modelId" : 27,
+  "modelDescription" : "Consumer Electronics",
+  "constant" : -6.8797,
+  "modelName" : "S_SCR_CE",
+  "month" : 6,
+  "variable" : [{
+      "coefficient" : -0.0004,
+      "name" : "S_DSL_APP_INT_ACC_FTWR_TRS"
+    }, {
+      "coefficient" : 0.4856,
+      "name" : "S_SRS_6M_IND"
+    }, {
+      "coefficient" : 0.5769,
+      "name" : "S_HL_24M_IND"
+    }, {
+      "coefficient" : 0.1431,
+      "name" : "S_NUM_CAT_TRANSACTED_12M"
+    }, {
+      "coefficient" : 0.2297,
+      "name" : "S_CE_TRS_3M"
+    }, {
+      "coefficient" : 0.4614,
+      "name" : "M_CREDIT_CARD_HOLDER"
+    }, {
+      "coefficient" : -0.0197,
+      "name" : "M_CNT_EMAIL_CAMPAIGNS_6_MTH"
+    }, {
+      "coefficient" : 0.4928,
+      "name" : "M_WEB_DAY_TV_0_7"
+    }, {
+      "coefficient" : 0.0517,
+      "name" : "S_CE_TRS_24M"
+    }, {
+      "coefficient" : 0.8108,
+      "name" : "S_CE_24M_IND"
+    }, {
+      "coefficient" : 0.4583,
+      "name" : "M_HS_ELECTRONICS_5Y"
+    }, {
+      "coefficient" : 0.804,
+      "name" : "S_CE_3M_IND"
+    }, {
+      "coefficient" : 0.9834,
+      "name" : "S_CE_1M"
+    }]
+}
+
+{
+  "modelId" : 26,
+  "modelDescription" : "Baby",
+  "constant" : -4.16694275,
+  "modelName" : "S_SCR_BABY",
+  "month" : 0,
+  "variable" : [{
+      "coefficient" : -0.80558676,
+      "name" : "S_HL_TXN_PCT_24M"
+    }, {
+      "coefficient" : -0.18578296,
+      "name" : "K_CONS_SPR_SLS_24M_IND"
+    }, {
+      "coefficient" : 0.01415581,
+      "name" : "S_SRS_TRS_3M"
+    }, {
+      "coefficient" : 0.17634284,
+      "name" : "ADL_FEM_25_34_FL"
+    }, {
+      "coefficient" : 0.10958715,
+      "name" : "S_KIDS_FTWR_24M_IND"
+    }, {
+      "coefficient" : -0.59637171,
+      "name" : "MONTH10"
+    }, {
+      "coefficient" : -0.00192553,
+      "name" : "S_DSL_SRS_TRS"
+    }, {
+      "coefficient" : -0.36570605,
+      "name" : "MONTH11"
+    }, {
+      "coefficient" : 0.26144151,
+      "name" : "S_K_APP_TODDLERS_SESNL_IND"
+    }, {
+      "coefficient" : -0.00086149,
+      "name" : "K_DSL_BABY_TRS"
+    }, {
+      "coefficient" : 0.18574508,
+      "name" : "S_BABY_ITEM_TRS_12M"
+    }, {
+      "coefficient" : 0.0030784,
+      "name" : "S_BABY_ITEM_SAL_TRS_24"
+    }, {
+      "coefficient" : 0.21333458,
+      "name" : "S_W_APP_24M_IND"
+    }, {
+      "coefficient" : -0.26979979,
+      "name" : "ADL_MAL_75_PLS_FL"
+    }, {
+      "coefficient" : -0.45222518,
+      "name" : "S_BABY_ITEM_CP_TR_P24M"
+    }, {
+      "coefficient" : 0.40711524,
+      "name" : "S_KIDS_APP_CP_TR_P24M"
+    }, {
+      "coefficient" : 0.00809038,
+      "name" : "K_K_INF_TODL_TRS_24M"
+    }, {
+      "coefficient" : -0.00825348,
+      "name" : "S_SRS_CPN_TRS_24M"
+    }, {
+      "coefficient" : 0.0980773,
+      "name" : "S_NUM_CAT_TRANSACTED_24M"
+    }, {
+      "coefficient" : -0.7840849,
+      "name" : "MONTH5"
+    }, {
+      "coefficient" : -0.66154224,
+      "name" : "MONTH4"
+    }, {
+      "coefficient" : -0.82283952,
+      "name" : "MONTH7"
+    }, {
+      "coefficient" : 1.19775814,
+      "name" : "S_BABY_ITEM_24M_IND"
+    }, {
+      "coefficient" : -0.90384935,
+      "name" : "MONTH6"
+    }, {
+      "coefficient" : -1.08337594,
+      "name" : "MONTH1"
+    }, {
+      "coefficient" : -0.4291623,
+      "name" : "MONTH3"
+    }, {
+      "coefficient" : -0.86997973,
+      "name" : "MONTH2"
+    }, {
+      "coefficient" : -0.66134965,
+      "name" : "MONTH9"
+    }, {
+      "coefficient" : -0.53443897,
+      "name" : "MONTH8"
+    }, {
+      "coefficient" : 0.2750118,
+      "name" : "S_SL_3M_IND"
+    }]
+}
+
+{
+  "modelId" : 40,
+  "modelDescription" : "Home Environment Floor Care",
+  "constant" : -5.9706,
+  "modelName" : "S_SCR_HE_FS",
+  "month" : 0,
+  "variable" : [{
+      "coefficient" : 0.1232,
+      "name" : "HME_OWN_CD"
+    }, {
+      "coefficient" : 0.2719,
+      "name" : "S_HE_FS_TRS_24M"
+    }, {
+      "coefficient" : 0.3596,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 1.2613,
+      "name" : "S_HE_FS_24M_IND"
+    }, {
+      "coefficient" : -0.0625,
+      "name" : "MONTH10"
+    }, {
+      "coefficient" : 0.2352,
+      "name" : "MONTH12"
+    }, {
+      "coefficient" : 0.2579,
+      "name" : "MONTH11"
+    }, {
+      "coefficient" : 0.3639,
+      "name" : "S_HA_2M"
+    }, {
+      "coefficient" : 0.2559,
+      "name" : "S_SRS_SESNL_IND"
+    }, {
+      "coefficient" : -0.112,
+      "name" : "MONTH5"
+    }, {
+      "coefficient" : -0.1663,
+      "name" : "MONTH4"
+    }, {
+      "coefficient" : -0.0393,
+      "name" : "MONTH7"
+    }, {
+      "coefficient" : -0.1556,
+      "name" : "MONTH6"
+    }, {
+      "coefficient" : -0.0459,
+      "name" : "MONTH3"
+    }, {
+      "coefficient" : -0.163,
+      "name" : "MONTH2"
+    }, {
+      "coefficient" : 0.2336,
+      "name" : "S_HF_24M_IND"
+    }, {
+      "coefficient" : 0.4801,
+      "name" : "CRD_CRD_FL"
+    }, {
+      "coefficient" : -0.1693,
+      "name" : "MONTH9"
+    }, {
+      "coefficient" : -0.0018,
+      "name" : "S_DSL_HL_TRS"
+    }, {
+      "coefficient" : -0.128,
+      "name" : "MONTH8"
+    }]
+}
+
+{
+  "modelId" : 41,
+  "modelDescription" : "Home Fashion",
+  "constant" : -6.572,
+  "modelName" : "S_SCR_HF",
+  "month" : 0,
+  "variable" : [{
+      "coefficient" : -0.1951,
+      "name" : "MONTH10"
+    }, {
+      "coefficient" : 0.8964,
+      "name" : "S_SRS_3M_IND"
+    }, {
+      "coefficient" : 0.1353,
+      "name" : "S_HOME_TRS_12M"
+    }, {
+      "coefficient" : 0.9076,
+      "name" : "MONTH12"
+    }, {
+      "coefficient" : 0.3503,
+      "name" : "S_BABY_ITEM_12M_IND"
+    }, {
+      "coefficient" : 0.5294,
+      "name" : "MONTH11"
+    }, {
+      "coefficient" : 0.3019,
+      "name" : "S_HF_3M_IND"
+    }, {
+      "coefficient" : -0.0664,
+      "name" : "MONTH5"
+    }, {
+      "coefficient" : -0.141,
+      "name" : "MONTH4"
+    }, {
+      "coefficient" : 0.4246,
+      "name" : "S_SL_SESNL2_IND"
+    }, {
+      "coefficient" : -0.1231,
+      "name" : "MONTH7"
+    }, {
+      "coefficient" : 0.5582,
+      "name" : "S_APP_INT_ACC_FTWR_CP_TR_P24M"
+    }, {
+      "coefficient" : -0.2107,
+      "name" : "MONTH6"
+    }, {
+      "coefficient" : -0.0711,
+      "name" : "MONTH3"
+    }, {
+      "coefficient" : 0.2573,
+      "name" : "S_ALL_HA_24M_IND"
+    }, {
+      "coefficient" : -0.2113,
+      "name" : "MONTH2"
+    }, {
+      "coefficient" : 1.0089,
+      "name" : "S_HF_24M_IND"
+    }, {
+      "coefficient" : 0.0772,
+      "name" : "S_W_APP_ACC_INT_TRS_3M"
+    }, {
+      "coefficient" : 0.348,
+      "name" : "CRD_CRD_FL"
+    }, {
+      "coefficient" : -0.1663,
+      "name" : "MONTH9"
+    }, {
+      "coefficient" : 0.428,
+      "name" : "S_FTWR_12M_IND"
+    }, {
+      "coefficient" : -0.0603,
+      "name" : "MONTH8"
+    }]
+}
+
+{
+  "modelId" : 27,
+  "modelDescription" : "Consumer Electronics",
+  "constant" : -7.4461,
+  "modelName" : "S_SCR_CE",
+  "month" : 1,
+  "variable" : [{
+      "coefficient" : 41.1042,
+      "name" : "M_ZIP_PENE_CE_TV"
+    }, {
+      "coefficient" : 0.6694,
+      "name" : "S_SRS_6M_IND"
+    }, {
+      "coefficient" : 0.6498,
+      "name" : "S_HL_24M_IND"
+    }, {
+      "coefficient" : 0.1571,
+      "name" : "S_NUM_CAT_TRANSACTED_12M"
+    }, {
+      "coefficient" : 0.2336,
+      "name" : "S_CE_TRS_3M"
+    }, {
+      "coefficient" : 0.3045,
+      "name" : "M_CREDIT_CARD_HOLDER"
+    }, {
+      "coefficient" : 0.5167,
+      "name" : "M_WEB_DAY_TV_0_7"
+    }, {
+      "coefficient" : 0.0659,
+      "name" : "S_CE_TRS_24M"
+    }, {
+      "coefficient" : 0.7289,
+      "name" : "S_CE_24M_IND"
+    }, {
+      "coefficient" : 0.414,
+      "name" : "M_HS_ELECTRONICS_5Y"
+    }, {
+      "coefficient" : 0.1503,
+      "name" : "CRD_CRD_FL"
+    }, {
+      "coefficient" : 0.7226,
+      "name" : "S_CE_3M_IND"
+    }, {
+      "coefficient" : 0.1872,
+      "name" : "S_HOME_GT_12M_IND"
+    }]
+}
+
+{
+  "modelId" : 22,
+  "modelDescription" : "Auto - battery",
+  "constant" : -8.0951,
+  "modelName" : "S_SCR_AU_BATTERY",
+  "month" : 0,
+  "variable" : [{
+      "coefficient" : 0.5473,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : -0.0921,
+      "name" : "MONTH10"
+    }, {
+      "coefficient" : -0.00123,
+      "name" : "S_DSL_SRS_TRS"
+    }, {
+      "coefficient" : -0.0959,
+      "name" : "MONTH12"
+    }, {
+      "coefficient" : 0.00648,
+      "name" : "MONTH11"
+    }, {
+      "coefficient" : 0.5823,
+      "name" : "S_HL_REV_PCT_24M"
+    }, {
+      "coefficient" : 0.1769,
+      "name" : "S_SRS_SESNL_IND"
+    }, {
+      "coefficient" : -0.1463,
+      "name" : "MONTH5"
+    }, {
+      "coefficient" : -0.1706,
+      "name" : "MONTH4"
+    }, {
+      "coefficient" : -0.0957,
+      "name" : "MONTH7"
+    }, {
+      "coefficient" : -0.1968,
+      "name" : "MONTH6"
+    }, {
+      "coefficient" : 0.1735,
+      "name" : "ADL_MAL_55_64_FL"
+    }, {
+      "coefficient" : -0.3549,
+      "name" : "MONTH3"
+    }, {
+      "coefficient" : -0.3188,
+      "name" : "MONTH2"
+    }, {
+      "coefficient" : 1.709,
+      "name" : "S_AUTO_24M_IND"
+    }, {
+      "coefficient" : 0.2323,
+      "name" : "S_MEN_APP_12M_IND"
+    }, {
+      "coefficient" : 0.079,
+      "name" : "S_AUTO_TRS_6M"
+    }, {
+      "coefficient" : 0.6954,
+      "name" : "CRD_CRD_FL"
+    }, {
+      "coefficient" : -0.0515,
+      "name" : "MONTH9"
+    }, {
+      "coefficient" : -0.0369,
+      "name" : "MONTH8"
+    }, {
+      "coefficient" : 0.000283,
+      "name" : "S_AUTO_TIRE_SAL_24M"
+    }]
+}
+
+{
+  "modelId" : 23,
+  "modelDescription" : "Auto - service",
+  "constant" : -7.6441,
+  "modelName" : "S_SCR_AU_SERV_ACQ",
+  "month" : 0,
+  "variable" : [{
+      "coefficient" : 0.2235,
+      "name" : "M_WEB_TRAIT_TIRE_0_7"
+    }, {
+      "coefficient" : 0.5711,
+      "name" : "M_LOW_HA_ALL_ZIP"
+    }, {
+      "coefficient" : 1.04,
+      "name" : "M_DWELLING_SINGLE"
+    }, {
+      "coefficient" : -0.2312,
+      "name" : "MONTH10"
+    }, {
+      "coefficient" : -0.00049,
+      "name" : "S_DSL_SRS_TRS"
+    }, {
+      "coefficient" : 0.0896,
+      "name" : "MONTH11"
+    }, {
+      "coefficient" : 1.3121,
+      "name" : "M_DWELLING_MULTI"
+    }, {
+      "coefficient" : 0.4191,
+      "name" : "M_USED_SEARS_CARD_FL"
+    }, {
+      "coefficient" : 0.1517,
+      "name" : "M_MOWERS_HISTORY_FLG"
+    }, {
+      "coefficient" : 0.2169,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.054,
+      "name" : "S_HL_24M_IND"
+    }, {
+      "coefficient" : 0.11,
+      "name" : "M_SRS_SEARS_CARD_AMT_IND"
+    }, {
+      "coefficient" : 0.0791,
+      "name" : "S_NUM_CAT_TRANSACTED_24M"
+    }, {
+      "coefficient" : 0.021,
+      "name" : "M_CNT_RESPONSE_CLICK_12_MTH"
+    }, {
+      "coefficient" : -0.1802,
+      "name" : "MONTH5"
+    }, {
+      "coefficient" : -0.3095,
+      "name" : "MONTH4"
+    }, {
+      "coefficient" : -0.1836,
+      "name" : "MONTH7"
+    }, {
+      "coefficient" : -0.2297,
+      "name" : "MONTH6"
+    }, {
+      "coefficient" : 0.1151,
+      "name" : "M_WEB_TRAIT_TIRE_15_30"
+    }, {
+      "coefficient" : -0.1353,
+      "name" : "MONTH1"
+    }, {
+      "coefficient" : -0.2382,
+      "name" : "MONTH3"
+    }, {
+      "coefficient" : 0.1839,
+      "name" : "M_CREDIT_CARD_HOLDER"
+    }, {
+      "coefficient" : -0.1164,
+      "name" : "MONTH2"
+    }, {
+      "coefficient" : -0.0543,
+      "name" : "M_EARNED_POINTS_24M_CD"
+    }, {
+      "coefficient" : -0.3982,
+      "name" : "M_LOW_BATTERY_ZIP"
+    }, {
+      "coefficient" : 0.00913,
+      "name" : "S_SRS_TRS_12M"
+    }, {
+      "coefficient" : -0.2169,
+      "name" : "MONTH9"
+    }, {
+      "coefficient" : -0.2914,
+      "name" : "MONTH8"
+    }]
+}
+
+{
+  "modelId" : 24,
+  "modelDescription" : "Auto - tire",
+  "constant" : -8.5724,
+  "modelName" : "S_SCR_AU_TIRE",
+  "month" : 0,
+  "variable" : [{
+      "coefficient" : 0.1742,
+      "name" : "M_WEB_TRAIT_TIRE_0_7"
+    }, {
+      "coefficient" : 0.1487,
+      "name" : "indic_svcorder"
+    }, {
+      "coefficient" : 0.2385,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.1217,
+      "name" : "MONTH10"
+    }, {
+      "coefficient" : 0.2739,
+      "name" : "MONTH12"
+    }, {
+      "coefficient" : 0.349,
+      "name" : "MONTH11"
+    }, {
+      "coefficient" : 0.7743,
+      "name" : "S_HL_REV_PCT_24M"
+    }, {
+      "coefficient" : 0.0873,
+      "name" : "S_K_APP_TODDLERS_24M_IND"
+    }, {
+      "coefficient" : 1.4129,
+      "name" : "S_AU_1M"
+    }, {
+      "coefficient" : 0.117,
+      "name" : "MONTH5"
+    }, {
+      "coefficient" : 0.0027,
+      "name" : "MONTH4"
+    }, {
+      "coefficient" : 0.066,
+      "name" : "MONTH7"
+    }, {
+      "coefficient" : -0.00035,
+      "name" : "MONTH6"
+    }, {
+      "coefficient" : 0.1213,
+      "name" : "S_NUM_CAT_TRANSACTED_12M"
+    }, {
+      "coefficient" : 0.0801,
+      "name" : "MONTH3"
+    }, {
+      "coefficient" : 0.7171,
+      "name" : "M_CREDIT_CARD_HOLDER"
+    }, {
+      "coefficient" : -0.0162,
+      "name" : "MONTH2"
+    }, {
+      "coefficient" : 2.055,
+      "name" : "S_AUTO_24M_IND"
+    }, {
+      "coefficient" : 0.046,
+      "name" : "MONTH9"
+    }, {
+      "coefficient" : 0.0803,
+      "name" : "MONTH8"
+    }]
+}
+
+{
+  "modelId" : 28,
+  "modelDescription" : "Consumer Electronics - camera",
+  "constant" : -10.548,
+  "modelName" : "S_SCR_CE_CAMERA",
+  "month" : 0,
+  "variable" : [{
+      "coefficient" : 0.0838,
+      "name" : "S_CE_OFFICE_TRS_12M"
+    }, {
+      "coefficient" : 0.0655,
+      "name" : "MONTH10"
+    }, {
+      "coefficient" : 0.3162,
+      "name" : "S_NUM_CAT_TRANSACTED_24M"
+    }, {
+      "coefficient" : 1.9862,
+      "name" : "MONTH12"
+    }, {
+      "coefficient" : 1.9314,
+      "name" : "MONTH11"
+    }, {
+      "coefficient" : 0.3652,
+      "name" : "M_WEB_DAY_CE_0_7"
+    }, {
+      "coefficient" : 0.833,
+      "name" : "S_CE_2M"
+    }, {
+      "coefficient" : 0.9029,
+      "name" : "S_CE_ELEC_3M_IND"
+    }, {
+      "coefficient" : 0.4277,
+      "name" : "K_CE_HE_24M_SESNL_IND"
+    }, {
+      "coefficient" : 0.719,
+      "name" : "MONTH5"
+    }, {
+      "coefficient" : 0.5456,
+      "name" : "S_CE_SESNL_IND"
+    }, {
+      "coefficient" : 0.1973,
+      "name" : "MONTH4"
+    }, {
+      "coefficient" : 0.3814,
+      "name" : "MONTH7"
+    }, {
+      "coefficient" : 0.6578,
+      "name" : "MONTH6"
+    }, {
+      "coefficient" : 0.1507,
+      "name" : "MONTH1"
+    }, {
+      "coefficient" : 0.4574,
+      "name" : "MONTH3"
+    }, {
+      "coefficient" : 0.1193,
+      "name" : "MONTH2"
+    }, {
+      "coefficient" : 0.2567,
+      "name" : "MONTH8"
+    }]
+}
+
+{
+  "modelId" : 29,
+  "modelDescription" : "Consumer Electronics - laptop",
+  "constant" : -9.2504,
+  "modelName" : "S_SCR_CE_LAPTOP",
+  "month" : 0,
+  "variable" : [{
+      "coefficient" : 0.0119,
+      "name" : "S_CE_TRS_12M"
+    }, {
+      "coefficient" : 0.00148,
+      "name" : "S_CE_OFFICE_SAL_TRS_12"
+    }, {
+      "coefficient" : 0.2297,
+      "name" : "M_DWELLING_SINGLE"
+    }, {
+      "coefficient" : -0.00077,
+      "name" : "S_DSL_K_APP_BOYS_GIRLS_TRS"
+    }, {
+      "coefficient" : 0.5475,
+      "name" : "MONTH10"
+    }, {
+      "coefficient" : 0.4077,
+      "name" : "S_SRS_3M_IND"
+    }, {
+      "coefficient" : 1.6141,
+      "name" : "MONTH12"
+    }, {
+      "coefficient" : 1.8562,
+      "name" : "MONTH11"
+    }, {
+      "coefficient" : 0.4985,
+      "name" : "S_HL_REV_PCT_24M"
+    }, {
+      "coefficient" : -0.3857,
+      "name" : "ADL_MAL_65_74_FL"
+    }, {
+      "coefficient" : 1.2726,
+      "name" : "S_CE_OFFICE_3M_IND"
+    }, {
+      "coefficient" : 1.0898,
+      "name" : "S_CE_2M"
+    }, {
+      "coefficient" : 0.479,
+      "name" : "M_DWELLING_MULTI"
+    }, {
+      "coefficient" : 0.5081,
+      "name" : "M_USED_SEARS_CARD_FL"
+    }, {
+      "coefficient" : 0.306,
+      "name" : "S_MEN_APP_SESNL2_IND"
+    }, {
+      "coefficient" : -0.4691,
+      "name" : "ADL_MAL_75_PLS_FL"
+    }, {
+      "coefficient" : 1.3097,
+      "name" : "S_CE_12M_IND"
+    }, {
+      "coefficient" : -0.00108,
+      "name" : "S_DSL_SL_TRS"
+    }, {
+      "coefficient" : -0.4069,
+      "name" : "MO_BYR_WMN_FSH_FL"
+    }, {
+      "coefficient" : 0.4077,
+      "name" : "M_WEB_DAY_DISHWASHER_0_7"
+    }, {
+      "coefficient" : 0.2553,
+      "name" : "MONTH5"
+    }, {
+      "coefficient" : 0.7638,
+      "name" : "S_CE_GT_12M_IND"
+    }, {
+      "coefficient" : 0.2411,
+      "name" : "MONTH7"
+    }, {
+      "coefficient" : 0.00254,
+      "name" : "K_TOYS_SLS_TRS_12M"
+    }, {
+      "coefficient" : 0.3919,
+      "name" : "MONTH6"
+    }, {
+      "coefficient" : 0.2649,
+      "name" : "MONTH1"
+    }, {
+      "coefficient" : 0.3539,
+      "name" : "S_HG_H_L_SESNL_IND"
+    }, {
+      "coefficient" : 0.1854,
+      "name" : "MONTH3"
+    }, {
+      "coefficient" : 0.4197,
+      "name" : "MONTH2"
+    }, {
+      "coefficient" : 0.372,
+      "name" : "K_CE_HE_SPR_SLS_24M_IND"
+    }, {
+      "coefficient" : 0.000252,
+      "name" : "M_SRS_LAYAWAY_AMT"
+    }, {
+      "coefficient" : 0.3536,
+      "name" : "MONTH9"
+    }, {
+      "coefficient" : 0.499,
+      "name" : "MONTH8"
+    }, {
+      "coefficient" : 0.2857,
+      "name" : "K_KIDS_APP_SPR_SLS_12M_IND"
+    }]
+}
+
+{
+  "modelId" : 27,
+  "modelDescription" : "Consumer Electronics",
+  "constant" : -7.4772,
+  "modelName" : "S_SCR_CE",
+  "month" : 4,
+  "variable" : [{
+      "coefficient" : -0.00032,
+      "name" : "S_DSL_APP_INT_ACC_FTWR_TRS"
+    }, {
+      "coefficient" : 0.5934,
+      "name" : "S_HL_24M_IND"
+    }, {
+      "coefficient" : 0.4722,
+      "name" : "S_SRS_6M_IND"
+    }, {
+      "coefficient" : 5.9916,
+      "name" : "M_ZIP_PENE_AP_JEWELRY"
+    }, {
+      "coefficient" : 0.1825,
+      "name" : "S_CE_TRS_3M"
+    }, {
+      "coefficient" : 0.8929,
+      "name" : "S_CE_24M_IND"
+    }, {
+      "coefficient" : 0.0535,
+      "name" : "S_CE_TRS_24M"
+    }, {
+      "coefficient" : 0.3445,
+      "name" : "M_HS_ELECTRONICS_5Y"
+    }, {
+      "coefficient" : 1.2742,
+      "name" : "S_CE_1M"
+    }, {
+      "coefficient" : 0.1636,
+      "name" : "S_SRS_SESNL_IND"
+    }, {
+      "coefficient" : 0.1421,
+      "name" : "S_NUM_CAT_TRANSACTED_12M"
+    }, {
+      "coefficient" : 0.3377,
+      "name" : "M_CREDIT_CARD_HOLDER"
+    }, {
+      "coefficient" : -0.0231,
+      "name" : "M_CNT_EMAIL_CAMPAIGNS_6_MTH"
+    }, {
+      "coefficient" : 0.5737,
+      "name" : "M_WEB_DAY_TV_0_7"
+    }, {
+      "coefficient" : 0.8386,
+      "name" : "S_CE_3M_IND"
+    }, {
+      "coefficient" : 0.1018,
+      "name" : "M_CNT_RESPONSE_CLICK_1_MTH"
+    }]
+}
+
+{
+  "modelId" : 27,
+  "modelDescription" : "Consumer Electronics",
+  "constant" : -7.1542,
+  "modelName" : "S_SCR_CE",
+  "month" : 8,
+  "variable" : [{
+      "coefficient" : 82.5271,
+      "name" : "M_ZIP_PENE_CE_TV"
+    }, {
+      "coefficient" : -0.00033,
+      "name" : "S_DSL_APP_INT_ACC_FTWR_TRS"
+    }, {
+      "coefficient" : 0.4812,
+      "name" : "S_SRS_6M_IND"
+    }, {
+      "coefficient" : 0.5692,
+      "name" : "S_HL_24M_IND"
+    }, {
+      "coefficient" : 0.147,
+      "name" : "S_NUM_CAT_TRANSACTED_12M"
+    }, {
+      "coefficient" : 0.2348,
+      "name" : "S_CE_TRS_3M"
+    }, {
+      "coefficient" : 0.37,
+      "name" : "M_CREDIT_CARD_HOLDER"
+    }, {
+      "coefficient" : 0.5623,
+      "name" : "M_WEB_DAY_TV_0_7"
+    }, {
+      "coefficient" : 0.0859,
+      "name" : "S_CE_TRS_24M"
+    }, {
+      "coefficient" : 0.7202,
+      "name" : "S_CE_24M_IND"
+    }, {
+      "coefficient" : 0.3915,
+      "name" : "M_HS_ELECTRONICS_5Y"
+    }, {
+      "coefficient" : 0.6889,
+      "name" : "S_CE_3M_IND"
+    }, {
+      "coefficient" : 0.8388,
+      "name" : "S_CE_1M"
+    }, {
+      "coefficient" : 0.2266,
+      "name" : "S_HOME_GT_12M_IND"
+    }, {
+      "coefficient" : 0.1948,
+      "name" : "S_SRS_SESNL_IND"
+    }]
+}
+
+{
+  "modelId" : 27,
+  "modelDescription" : "Consumer Electronics",
+  "constant" : -5.9151,
+  "modelName" : "S_SCR_CE",
+  "month" : 12,
+  "variable" : [{
+      "coefficient" : 42.1011,
+      "name" : "M_ZIP_PENE_CE_TV"
+    }, {
+      "coefficient" : -0.00054,
+      "name" : "S_DSL_APP_INT_ACC_FTWR_TRS"
+    }, {
+      "coefficient" : 0.5467,
+      "name" : "S_HL_24M_IND"
+    }, {
+      "coefficient" : 0.45,
+      "name" : "S_SRS_6M_IND"
+    }, {
+      "coefficient" : -0.0802,
+      "name" : "M_ZIPTREND_SRS_TOOLS_AMT"
+    }, {
+      "coefficient" : 0.2271,
+      "name" : "S_CE_TRS_3M"
+    }, {
+      "coefficient" : 0.00148,
+      "name" : "K_HARDLN_SLS_TRS_12M"
+    }, {
+      "coefficient" : 0.6315,
+      "name" : "S_CE_24M_IND"
+    }, {
+      "coefficient" : 0.0643,
+      "name" : "S_CE_TRS_24M"
+    }, {
+      "coefficient" : 0.2216,
+      "name" : "M_HS_ELECTRONICS_5Y"
+    }, {
+      "coefficient" : 0.2159,
+      "name" : "S_SRS_SESNL2_IND"
+    }, {
+      "coefficient" : 0.5803,
+      "name" : "S_CE_1M"
+    }, {
+      "coefficient" : 0.245,
+      "name" : "S_SRS_SESNL_IND"
+    }, {
+      "coefficient" : 0.1224,
+      "name" : "S_NUM_CAT_TRANSACTED_12M"
+    }, {
+      "coefficient" : 0.2543,
+      "name" : "M_CREDIT_CARD_HOLDER"
+    }, {
+      "coefficient" : 0.0308,
+      "name" : "M_CNT_EMAIL_CAMPAIGNS_6_MTH"
+    }, {
+      "coefficient" : 0.4902,
+      "name" : "M_WEB_DAY_TV_0_7"
+    }, {
+      "coefficient" : 0.1814,
+      "name" : "K_TOYS_12M_SESNL_IND"
+    }, {
+      "coefficient" : 0.2051,
+      "name" : "CRD_CRD_FL"
+    }, {
+      "coefficient" : 0.5532,
+      "name" : "S_CE_3M_IND"
+    }]
+}
+
+{
+  "modelId" : 27,
+  "modelDescription" : "Consumer Electronics",
+  "constant" : -7.1947,
+  "modelName" : "S_SCR_CE",
+  "month" : 2,
+  "variable" : [{
+      "coefficient" : 36.5254,
+      "name" : "M_ZIP_PENE_CE_TV"
+    }, {
+      "coefficient" : -0.00025,
+      "name" : "S_DSL_APP_INT_ACC_FTWR_TRS"
+    }, {
+      "coefficient" : 0.5797,
+      "name" : "S_SRS_6M_IND"
+    }, {
+      "coefficient" : 0.5403,
+      "name" : "S_HL_24M_IND"
+    }, {
+      "coefficient" : 0.1244,
+      "name" : "S_NUM_CAT_TRANSACTED_12M"
+    }, {
+      "coefficient" : 0.1642,
+      "name" : "S_CE_TRS_3M"
+    }, {
+      "coefficient" : 0.2108,
+      "name" : "M_CREDIT_CARD_HOLDER"
+    }, {
+      "coefficient" : 0.00148,
+      "name" : "K_HARDLN_SLS_TRS_12M"
+    }, {
+      "coefficient" : 0.6113,
+      "name" : "M_WEB_DAY_TV_0_7"
+    }, {
+      "coefficient" : 0.0739,
+      "name" : "S_CE_TRS_24M"
+    }, {
+      "coefficient" : 0.8245,
+      "name" : "S_CE_24M_IND"
+    }, {
+      "coefficient" : 0.1716,
+      "name" : "S_SRS_SESNL2_IND"
+    }, {
+      "coefficient" : 0.4952,
+      "name" : "S_CE_3M_IND"
+    }, {
+      "coefficient" : 0.8571,
+      "name" : "S_CE_1M"
+    }, {
+      "coefficient" : 0.0971,
+      "name" : "M_CNT_RESPONSE_CLICK_1_MTH"
+    }, {
+      "coefficient" : 0.1719,
+      "name" : "S_SRS_SESNL_IND"
+    }]
+}
+
+{
+  "modelId" : 27,
+  "modelDescription" : "Consumer Electronics",
+  "constant" : -7.0928,
+  "modelName" : "S_SCR_CE",
+  "month" : 7,
+  "variable" : [{
+      "coefficient" : -0.00046,
+      "name" : "S_DSL_APP_INT_ACC_FTWR_TRS"
+    }, {
+      "coefficient" : 0.6155,
+      "name" : "S_HL_24M_IND"
+    }, {
+      "coefficient" : 0.4169,
+      "name" : "S_SRS_6M_IND"
+    }, {
+      "coefficient" : 4.0407,
+      "name" : "M_ZIP_PENE_AP_JEWELRY"
+    }, {
+      "coefficient" : 0.2994,
+      "name" : "S_CE_TRS_3M"
+    }, {
+      "coefficient" : 0.7233,
+      "name" : "S_CE_24M_IND"
+    }, {
+      "coefficient" : 0.0819,
+      "name" : "S_CE_TRS_24M"
+    }, {
+      "coefficient" : 0.342,
+      "name" : "M_HS_ELECTRONICS_5Y"
+    }, {
+      "coefficient" : 1.024,
+      "name" : "S_CE_1M"
+    }, {
+      "coefficient" : 0.1472,
+      "name" : "S_NUM_CAT_TRANSACTED_12M"
+    }, {
+      "coefficient" : 0.4228,
+      "name" : "M_CREDIT_CARD_HOLDER"
+    }, {
+      "coefficient" : -0.0269,
+      "name" : "M_CNT_EMAIL_CAMPAIGNS_6_MTH"
+    }, {
+      "coefficient" : 0.4449,
+      "name" : "M_WEB_DAY_TV_0_7"
+    }, {
+      "coefficient" : 0.6702,
+      "name" : "S_CE_3M_IND"
+    }, {
+      "coefficient" : 0.1166,
+      "name" : "M_CNT_RESPONSE_CLICK_1_MTH"
+    }]
+}
+
+{
+  "modelId" : 27,
+  "modelDescription" : "Consumer Electronics",
+  "constant" : -7.2635,
+  "modelName" : "S_SCR_CE",
+  "month" : 5,
+  "variable" : [{
+      "coefficient" : 77.5269,
+      "name" : "M_ZIP_PENE_CE_TV"
+    }, {
+      "coefficient" : -0.00029,
+      "name" : "S_DSL_APP_INT_ACC_FTWR_TRS"
+    }, {
+      "coefficient" : 0.5266,
+      "name" : "S_HL_24M_IND"
+    }, {
+      "coefficient" : 0.4951,
+      "name" : "S_SRS_6M_IND"
+    }, {
+      "coefficient" : 0.2455,
+      "name" : "S_CE_TRS_3M"
+    }, {
+      "coefficient" : 0.00127,
+      "name" : "K_HARDLN_SLS_TRS_12M"
+    }, {
+      "coefficient" : 0.7993,
+      "name" : "S_CE_24M_IND"
+    }, {
+      "coefficient" : 0.0664,
+      "name" : "S_CE_TRS_24M"
+    }, {
+      "coefficient" : 0.4504,
+      "name" : "M_HS_ELECTRONICS_5Y"
+    }, {
+      "coefficient" : 0.2142,
+      "name" : "S_SRS_SESNL2_IND"
+    }, {
+      "coefficient" : 1.0618,
+      "name" : "S_CE_1M"
+    }, {
+      "coefficient" : 0.15,
+      "name" : "S_NUM_CAT_TRANSACTED_12M"
+    }, {
+      "coefficient" : 0.3744,
+      "name" : "M_CREDIT_CARD_HOLDER"
+    }, {
+      "coefficient" : -0.0272,
+      "name" : "M_CNT_EMAIL_CAMPAIGNS_6_MTH"
+    }, {
+      "coefficient" : 0.5551,
+      "name" : "M_WEB_DAY_TV_0_7"
+    }, {
+      "coefficient" : 0.7255,
+      "name" : "S_CE_3M_IND"
+    }, {
+      "coefficient" : 0.0906,
+      "name" : "M_CNT_RESPONSE_CLICK_1_MTH"
+    }]
+}
+
+{
+  "modelId" : 59,
+  "modelDescription" : "Tools",
+  "constant" : -3.1164,
+  "modelName" : "S_SCR_TOOLS",
+  "month" : 4,
+  "variable" : [{
+      "coefficient" : 0.3154,
+      "name" : "S_TOOLS_TL_TRS_3M"
+    }, {
+      "coefficient" : 0.1871,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.458,
+      "name" : "S_TOOLS_SESNL2_IND"
+    }, {
+      "coefficient" : 0.1907,
+      "name" : "M_DWELLING_SINGLE"
+    }, {
+      "coefficient" : -0.00267,
+      "name" : "S_DSL_TOOLS_TL_TRS"
+    }, {
+      "coefficient" : 0.0275,
+      "name" : "S_SRS_TRS_6M"
+    }, {
+      "coefficient" : 0.3636,
+      "name" : "S_TOOLS_TL_GT_12M_IND"
+    }, {
+      "coefficient" : 0.1394,
+      "name" : "HBB_AUM_MCN_FL"
+    }, {
+      "coefficient" : 0.7644,
+      "name" : "S_HL_REV_PCT_24M"
+    }, {
+      "coefficient" : 0.1328,
+      "name" : "ADL_MAL_45_54_FL"
+    }, {
+      "coefficient" : 0.3015,
+      "name" : "S_MEN_APP_24M_IND"
+    }, {
+      "coefficient" : 0.4144,
+      "name" : "M_WEB_DAY_HAND_TOOL_0_7"
+    }, {
+      "coefficient" : -0.00471,
+      "name" : "TRU_OWN_FL"
+    }, {
+      "coefficient" : -0.00045,
+      "name" : "DS_ENRLMNT"
+    }, {
+      "coefficient" : 0.3412,
+      "name" : "S_SRS_SESNL_IND"
+    }, {
+      "coefficient" : 0.1133,
+      "name" : "M_CLUB_MEMBER_CRAFTSMAN"
+    }, {
+      "coefficient" : 0.0998,
+      "name" : "ADL_MAL_55_64_FL"
+    }, {
+      "coefficient" : 0.1733,
+      "name" : "S_HL_SESNL2_IND"
+    }, {
+      "coefficient" : -0.00075,
+      "name" : "S_DSL_LG_TRS"
+    }, {
+      "coefficient" : 0.0918,
+      "name" : "K_DIY_TOOL_TRS_3M"
+    }, {
+      "coefficient" : -0.2466,
+      "name" : "M_LOW_TOOLS_ZIP"
+    }, {
+      "coefficient" : 1.314,
+      "name" : "M_ZIP_PENE_SRS_TOOLS"
+    }]
+}
+
+{
+  "modelId" : 59,
+  "modelDescription" : "Tools",
+  "constant" : -3.0729,
+  "modelName" : "S_SCR_TOOLS",
+  "month" : 8,
+  "variable" : [{
+      "coefficient" : 0.2451,
+      "name" : "S_TOOLS_TL_TRS_3M"
+    }, {
+      "coefficient" : 0.2085,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.482,
+      "name" : "S_TOOLS_SESNL2_IND"
+    }, {
+      "coefficient" : 0.1515,
+      "name" : "M_DWELLING_SINGLE"
+    }, {
+      "coefficient" : -0.00278,
+      "name" : "S_DSL_TOOLS_TL_TRS"
+    }, {
+      "coefficient" : 0.0259,
+      "name" : "S_SRS_TRS_6M"
+    }, {
+      "coefficient" : 0.3889,
+      "name" : "S_TOOLS_TL_GT_12M_IND"
+    }, {
+      "coefficient" : 0.1311,
+      "name" : "HBB_AUM_MCN_FL"
+    }, {
+      "coefficient" : 0.6997,
+      "name" : "S_HL_REV_PCT_24M"
+    }, {
+      "coefficient" : 0.1251,
+      "name" : "ADL_MAL_45_54_FL"
+    }, {
+      "coefficient" : 0.3431,
+      "name" : "S_MEN_APP_24M_IND"
+    }, {
+      "coefficient" : 0.5573,
+      "name" : "M_WEB_DAY_HAND_TOOL_0_7"
+    }, {
+      "coefficient" : 0.0668,
+      "name" : "TRU_OWN_FL"
+    }, {
+      "coefficient" : -0.00043,
+      "name" : "DS_ENRLMNT"
+    }, {
+      "coefficient" : 0.3388,
+      "name" : "S_SRS_SESNL_IND"
+    }, {
+      "coefficient" : 0.1146,
+      "name" : "M_CLUB_MEMBER_CRAFTSMAN"
+    }, {
+      "coefficient" : 0.1137,
+      "name" : "ADL_MAL_55_64_FL"
+    }, {
+      "coefficient" : 0.1463,
+      "name" : "S_HL_SESNL2_IND"
+    }, {
+      "coefficient" : -0.00077,
+      "name" : "S_DSL_LG_TRS"
+    }, {
+      "coefficient" : 0.0585,
+      "name" : "K_DIY_TOOL_TRS_3M"
+    }, {
+      "coefficient" : -0.2422,
+      "name" : "M_LOW_TOOLS_ZIP"
+    }, {
+      "coefficient" : 1.9292,
+      "name" : "M_ZIP_PENE_SRS_TOOLS"
+    }]
+}
+
+{
+  "modelId" : 27,
+  "modelDescription" : "Consumer Electronics",
+  "constant" : -5.7825,
+  "modelName" : "S_SCR_CE",
+  "month" : 11,
+  "variable" : [{
+      "coefficient" : -0.00059,
+      "name" : "S_DSL_APP_INT_ACC_FTWR_TRS"
+    }, {
+      "coefficient" : 0.5771,
+      "name" : "S_HL_24M_IND"
+    }, {
+      "coefficient" : 0.3764,
+      "name" : "S_SRS_6M_IND"
+    }, {
+      "coefficient" : 0.2088,
+      "name" : "S_CE_TRS_3M"
+    }, {
+      "coefficient" : 0.00164,
+      "name" : "K_HARDLN_SLS_TRS_12M"
+    }, {
+      "coefficient" : 0.5528,
+      "name" : "S_CE_24M_IND"
+    }, {
+      "coefficient" : 0.0671,
+      "name" : "S_CE_TRS_24M"
+    }, {
+      "coefficient" : 0.3685,
+      "name" : "M_HS_ELECTRONICS_5Y"
+    }, {
+      "coefficient" : 0.2919,
+      "name" : "S_SRS_SESNL2_IND"
+    }, {
+      "coefficient" : 0.8093,
+      "name" : "S_CE_1M"
+    }, {
+      "coefficient" : 0.2633,
+      "name" : "S_SRS_SESNL_IND"
+    }, {
+      "coefficient" : 0.1204,
+      "name" : "S_NUM_CAT_TRANSACTED_12M"
+    }, {
+      "coefficient" : 0.2426,
+      "name" : "M_CREDIT_CARD_HOLDER"
+    }, {
+      "coefficient" : 0.0652,
+      "name" : "M_CNT_EMAIL_CAMPAIGNS_6_MTH"
+    }, {
+      "coefficient" : 0.5646,
+      "name" : "M_WEB_DAY_TV_0_7"
+    }, {
+      "coefficient" : 0.281,
+      "name" : "K_TOYS_12M_SESNL_IND"
+    }, {
+      "coefficient" : 0.1936,
+      "name" : "CRD_CRD_FL"
+    }, {
+      "coefficient" : 0.4218,
+      "name" : "S_CE_3M_IND"
+    }, {
+      "coefficient" : 0.0942,
+      "name" : "M_CNT_RESPONSE_CLICK_1_MTH"
+    }]
+}
+
+{
+  "modelId" : 34,
+  "modelName" : "S_SCR_HA_ALL",
+  "modelDescription" : "Home Appliance ~ Refrigerators Cooking Washer/Dryer Dishwasher",
+  "constant" : -4.612724344,
+  "month" : 0,
+  "variable" : [{
+      "name" : "S_HA_TRS_24M",
+      "coefficient" : 0.173668002218486
+    }, {
+      "name" : "M_CREDIT_CARD_HOLDER",
+      "coefficient" : 0.368947070065993
+    }, {
+      "name" : "S_HE_FS_TRS_24M",
+      "coefficient" : 0.23339798699489
+    }, {
+      "name" : "S_DSL_HL_TRS",
+      "coefficient" : -0.000941607987932463
+    }, {
+      "name" : "M_DWELLING_SINGLE",
+      "coefficient" : 0.576085498259214
+    }, {
+      "name" : "M_WEB_DAY_REFRIG_0_7",
+      "coefficient" : 0.635667231101265
+    }, {
+      "name" : "M_HA_APPL_FRIDGE_ANYTIME",
+      "coefficient" : 0.343241830532214
+    }, {
+      "name" : "S_DSL_SRS_TRS",
+      "coefficient" : -0.000600046947827888
+    }, {
+      "name" : "M_FLOORCARE_36M_FLG",
+      "coefficient" : 0.463307504854971
+    }, {
+      "name" : "S_DSL_HA_TRS",
+      "coefficient" : -0.000588256761683438
+    }, {
+      "name" : "S_NUM_CAT_TRANSACTED_24M",
+      "coefficient" : 0.0395093360668007
+    }, {
+      "name" : "M_HA_APPL_OTHER_ANYTIME",
+      "coefficient" : 0.249382047313548
+    }, {
+      "name" : "S_HA_1M",
+      "coefficient" : 0.613458767590724
+    }, {
+      "name" : "CAREER_FL",
+      "coefficient" : 0.624830343023366
+    }, {
+      "name" : "S_ALL_HA_SAL_24M",
+      "coefficient" : -9.85254422227783E-05
+    }, {
+      "name" : "M_CNT_DM_CAMPAIGNS_12_MTH",
+      "coefficient" : -0.0125158155995934
+    }, {
+      "name" : "S_ALL_HA_SAL_3M",
+      "coefficient" : 0.000116286715480137
+    }, {
+      "name" : "S_HL_SAL_TRS_24",
+      "coefficient" : 0.000264548276901304
+    }, {
+      "name" : "MONTH1",
+      "coefficient" : -0.184949760858811
+    }, {
+      "name" : "MONTH2",
+      "coefficient" : -0.248762172635524
+    }, {
+      "name" : "MONTH3",
+      "coefficient" : -0.12046302983542
+    }, {
+      "name" : "MONTH4",
+      "coefficient" : -0.188044467599295
+    }, {
+      "name" : "MONTH5",
+      "coefficient" : -0.0651285408562063
+    }, {
+      "name" : "MONTH6",
+      "coefficient" : -0.0884112421865491
+    }, {
+      "name" : "MONTH7",
+      "coefficient" : 0.0317488946987332
+    }, {
+      "name" : "MONTH8",
+      "coefficient" : -0.0730376363549319
+    }, {
+      "name" : "MONTH9",
+      "coefficient" : -0.101766443030937
+    }, {
+      "name" : "MONTH10",
+      "coefficient" : -0.148025872018032
+    }, {
+      "name" : "MONTH11",
+      "coefficient" : 0.124073901183156
+    }, {
+      "coefficient" : 0.1,
+      "name" : "BOOST_DISHWASHER_SOCIAL"
+    }, {
+      "coefficient" : 0.1,
+      "name" : "BOOST_REFRIGERATOR_SOCIAL"
+    }]
+}
+
+{
+  "modelId" : 35,
+  "modelName" : "S_SCR_HA_COOK",
+  "modelDescription" : "Home Appliance ~ cooking appliances",
+  "constant" : -5.3647,
+  "month" : 0,
+  "variable" : [{
+      "name" : "S_HA_TRS_12M",
+      "coefficient" : 0.0895
+    }, {
+      "name" : "S_DSL_HA_TRS",
+      "coefficient" : -0.00021
+    }, {
+      "name" : "M_CREDIT_CARD_HOLDER",
+      "coefficient" : 0.6076
+    }, {
+      "name" : "M_WEB_TRAIT_COOKING_0_7",
+      "coefficient" : 0.066
+    }, {
+      "name" : "M_DWELLING_SINGLE",
+      "coefficient" : 0.7401
+    }, {
+      "name" : "DS_ENRLMNT",
+      "coefficient" : -0.00099
+    }, {
+      "name" : "M_HA_APPL_COOKING_ANYTIME",
+      "coefficient" : 0.3768
+    }, {
+      "name" : "S_HA_KITCHEN_SAL_3M",
+      "coefficient" : 0.000254
+    }, {
+      "name" : "S_HL_REV_PCT_24M",
+      "coefficient" : 0.5228
+    }, {
+      "name" : "S_NUM_CAT_TRANSACTED_6M",
+      "coefficient" : 0.0991
+    }, {
+      "name" : "S_HA_2M",
+      "coefficient" : 0.7802
+    }, {
+      "name" : "RE_INE_FL",
+      "coefficient" : 0.3574
+    }, {
+      "name" : "S_TOOLS_TRS_24M",
+      "coefficient" : -0.0037
+    }, {
+      "name" : "M_HA_APP_LAUNDRY_5Y",
+      "coefficient" : 0.4135
+    }, {
+      "name" : "M_HA_APPL_OTHER_DSL",
+      "coefficient" : -0.0001
+    }, {
+      "name" : "CRD_CRD_FL",
+      "coefficient" : 0.4461
+    }, {
+      "name" : "M_WEEK_SINCE_RECAP_1_FLG",
+      "coefficient" : 1.6258
+    }, {
+      "name" : "S_DSL_HA_KITCHEN_TRS",
+      "coefficient" : -0.00071
+    }, {
+      "name" : "M_HA_TRIGGER_WASHERDRYER",
+      "coefficient" : 0.2885
+    }, {
+      "name" : "M_WEB_DAY_REFRIG_0_7",
+      "coefficient" : 0.4781
+    }, {
+      "name" : "M_CNT_DM_CAMP_12_MTH_IND",
+      "coefficient" : -0.0556
+    }, {
+      "name" : "M_HA_APPL_FRIDGE_5Y",
+      "coefficient" : 0.1979
+    }, {
+      "name" : "K_EASTER_TI_TRS_3M",
+      "coefficient" : 1.6765
+    }, {
+      "name" : "M_WEB_TRAIT_DISHWASH_15_30",
+      "coefficient" : 0.0368
+    }, {
+      "name" : "M_SRS_LAYAWAY_AMT",
+      "coefficient" : 0.000212
+    }]
+}
+
+{
+  "modelId" : 38,
+  "modelDescription" : "Home Appliances ~ Water Heater",
+  "constant" : -9.24535,
+  "modelName" : "S_SCR_HA_WH",
+  "month" : 0,
+  "variable" : [{
+      "coefficient" : 0.325,
+      "name" : "HME_OWN_CD"
+    }, {
+      "coefficient" : 0.3602,
+      "name" : "indic_svcorder"
+    }, {
+      "coefficient" : 0.5839,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.5715,
+      "name" : "M_DWELLING_SINGLE"
+    }, {
+      "coefficient" : 0.9485,
+      "name" : "S_HA_1M"
+    }, {
+      "coefficient" : 0.3999,
+      "name" : "S_AUTO_TIRE_24M_IND"
+    }, {
+      "coefficient" : 0.6292,
+      "name" : "M_HA_APPL_OTHER_ANYTIME"
+    }, {
+      "coefficient" : 0.0219,
+      "name" : "M_NUM_YR_RSD"
+    }, {
+      "coefficient" : 0.2915,
+      "name" : "M_USED_SEARS_CARD_FL"
+    }, {
+      "coefficient" : 0.2446,
+      "name" : "S_LG_24M_IND"
+    }, {
+      "coefficient" : -0.00034,
+      "name" : "M_HS_WATER_DSL"
+    }, {
+      "coefficient" : 0.3798,
+      "name" : "M_CREDIT_CARD_HOLDER"
+    }, {
+      "coefficient" : 0.4513,
+      "name" : "S_HA_24M_IND"
+    }, {
+      "coefficient" : 0.1788,
+      "name" : "M_WEB_TRAIT_WATER_APPL_0_7"
+    }, {
+      "coefficient" : -0.00103,
+      "name" : "S_DSL_HL_TRS"
+    }, {
+      "coefficient" : 0.1,
+      "name" : "BOOST_HA_WH_SYW"
+    }]
+}
+
+{
+  "modelId" : 1,
+  "modelDescription" : "Kmart Auto",
+  "constant" : -4.7242,
+  "modelName" : "K_SCR_AUTO",
+  "month" : 0,
+  "variable" : [{
+      "coefficient" : -0.00095,
+      "name" : "K_DSL_M_APP_TRS"
+    }, {
+      "coefficient" : -0.00073,
+      "name" : "S_DSL_TOOLS_TL_TRS"
+    }, {
+      "coefficient" : 0.2231,
+      "name" : "MONTH10"
+    }, {
+      "coefficient" : -0.00072,
+      "name" : "K_DSL_DIY_TOOL_TRS"
+    }, {
+      "coefficient" : 0.2181,
+      "name" : "K_CE_12M_SESNL_IND"
+    }, {
+      "coefficient" : 1.0383,
+      "name" : "MONTH12"
+    }, {
+      "coefficient" : 0.2591,
+      "name" : "HBB_AUM_MCN_FL"
+    }, {
+      "coefficient" : 0.7925,
+      "name" : "MONTH11"
+    }, {
+      "coefficient" : -0.00052,
+      "name" : "K_DSL_CE_HME_OFF_TRS"
+    }, {
+      "coefficient" : 0.2529,
+      "name" : "MONTH5"
+    }, {
+      "coefficient" : 0.3507,
+      "name" : "MONTH4"
+    }, {
+      "coefficient" : 0.2298,
+      "name" : "MONTH7"
+    }, {
+      "coefficient" : 0.045,
+      "name" : "K_AUTO_SERVICES_TRS_24M"
+    }, {
+      "coefficient" : 0.00362,
+      "name" : "K_AUTO_SLS_6M"
+    }, {
+      "coefficient" : 0.3307,
+      "name" : "MONTH6"
+    }, {
+      "coefficient" : 0.1522,
+      "name" : "M_BONUS_MEMBER"
+    }, {
+      "coefficient" : 0.2103,
+      "name" : "MONTH1"
+    }, {
+      "coefficient" : 0.427,
+      "name" : "MONTH3"
+    }, {
+      "coefficient" : 0.1488,
+      "name" : "MONTH2"
+    }, {
+      "coefficient" : -0.00347,
+      "name" : "K_DSL_HARDLN_TRS"
+    }, {
+      "coefficient" : -0.00056,
+      "name" : "K_DSL_FSG_SPRTNG_GDS_TRS"
+    }, {
+      "coefficient" : 0.2071,
+      "name" : "MONTH8"
+    }, {
+      "coefficient" : 0.4959,
+      "name" : "K_AUTO_ITEM_TRS_24M"
+    }, {
+      "coefficient" : -0.00042,
+      "name" : "K_DSL_FTWR_ATHLETICS_TRS"
+    }]
+}
+
+{
+  "modelId" : 30,
+  "modelDescription" : "Fitness Equipment",
+  "constant" : -3.6006,
+  "modelName" : "S_SCR_FIT_EQUIP",
+  "month" : 4,
+  "variable" : [{
+      "coefficient" : 2.0868,
+      "name" : "S_SP_1M"
+    }, {
+      "coefficient" : 0.5051,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.6366,
+      "name" : "M_DWELLING_SINGLE"
+    }, {
+      "coefficient" : 0.3873,
+      "name" : "M_CREDIT_CARD_HOLDER"
+    }, {
+      "coefficient" : 1.0484,
+      "name" : "M_WEB_DAY_EXERCISE_0_7"
+    }, {
+      "coefficient" : 0.0869,
+      "name" : "S_NUM_CAT_TRANSACTED_24M"
+    }, {
+      "coefficient" : -0.00109,
+      "name" : "S_DSL_HL_TRS"
+    }, {
+      "coefficient" : -0.0025,
+      "name" : "S_DSL_SG_EQUIP_TRS"
+    }]
+}
+
+{
+  "modelId" : 30,
+  "modelDescription" : "Fitness Equipment",
+  "constant" : -3.6006,
+  "modelName" : "S_SCR_FIT_EQUIP",
+  "month" : 5,
+  "variable" : [{
+      "coefficient" : 2.0868,
+      "name" : "S_SP_1M"
+    }, {
+      "coefficient" : 0.5051,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.6366,
+      "name" : "M_DWELLING_SINGLE"
+    }, {
+      "coefficient" : 0.3873,
+      "name" : "M_CREDIT_CARD_HOLDER"
+    }, {
+      "coefficient" : 1.0484,
+      "name" : "M_WEB_DAY_EXERCISE_0_7"
+    }, {
+      "coefficient" : 0.0869,
+      "name" : "S_NUM_CAT_TRANSACTED_24M"
+    }, {
+      "coefficient" : -0.00109,
+      "name" : "S_DSL_HL_TRS"
+    }, {
+      "coefficient" : -0.0025,
+      "name" : "S_DSL_SG_EQUIP_TRS"
+    }]
+}
+
+{
+  "modelId" : 30,
+  "modelDescription" : "Fitness Equipment",
+  "constant" : -3.6006,
+  "modelName" : "S_SCR_FIT_EQUIP",
+  "month" : 6,
+  "variable" : [{
+      "coefficient" : 2.0868,
+      "name" : "S_SP_1M"
+    }, {
+      "coefficient" : 0.5051,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.6366,
+      "name" : "M_DWELLING_SINGLE"
+    }, {
+      "coefficient" : 0.3873,
+      "name" : "M_CREDIT_CARD_HOLDER"
+    }, {
+      "coefficient" : 1.0484,
+      "name" : "M_WEB_DAY_EXERCISE_0_7"
+    }, {
+      "coefficient" : 0.0869,
+      "name" : "S_NUM_CAT_TRANSACTED_24M"
+    }, {
+      "coefficient" : -0.00109,
+      "name" : "S_DSL_HL_TRS"
+    }, {
+      "coefficient" : -0.0025,
+      "name" : "S_DSL_SG_EQUIP_TRS"
+    }]
+}
+
+{
+  "modelId" : 30,
+  "modelDescription" : "Fitness Equipment",
+  "constant" : -3.6006,
+  "modelName" : "S_SCR_FIT_EQUIP",
+  "month" : 7,
+  "variable" : [{
+      "coefficient" : 2.0868,
+      "name" : "S_SP_1M"
+    }, {
+      "coefficient" : 0.5051,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.6366,
+      "name" : "M_DWELLING_SINGLE"
+    }, {
+      "coefficient" : 0.3873,
+      "name" : "M_CREDIT_CARD_HOLDER"
+    }, {
+      "coefficient" : 1.0484,
+      "name" : "M_WEB_DAY_EXERCISE_0_7"
+    }, {
+      "coefficient" : 0.0869,
+      "name" : "S_NUM_CAT_TRANSACTED_24M"
+    }, {
+      "coefficient" : -0.00109,
+      "name" : "S_DSL_HL_TRS"
+    }, {
+      "coefficient" : -0.0025,
+      "name" : "S_DSL_SG_EQUIP_TRS"
+    }]
+}
+
+{
+  "modelId" : 30,
+  "modelDescription" : "Fitness Equipment",
+  "constant" : -3.6006,
+  "modelName" : "S_SCR_FIT_EQUIP",
+  "month" : 8,
+  "variable" : [{
+      "coefficient" : 2.0868,
+      "name" : "S_SP_1M"
+    }, {
+      "coefficient" : 0.5051,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.6366,
+      "name" : "M_DWELLING_SINGLE"
+    }, {
+      "coefficient" : 0.3873,
+      "name" : "M_CREDIT_CARD_HOLDER"
+    }, {
+      "coefficient" : 1.0484,
+      "name" : "M_WEB_DAY_EXERCISE_0_7"
+    }, {
+      "coefficient" : 0.0869,
+      "name" : "S_NUM_CAT_TRANSACTED_24M"
+    }, {
+      "coefficient" : -0.00109,
+      "name" : "S_DSL_HL_TRS"
+    }, {
+      "coefficient" : -0.0025,
+      "name" : "S_DSL_SG_EQUIP_TRS"
+    }]
+}
+
+{
+  "modelId" : 30,
+  "modelDescription" : "Fitness Equipment",
+  "constant" : -3.6006,
+  "modelName" : "S_SCR_FIT_EQUIP",
+  "month" : 9,
+  "variable" : [{
+      "coefficient" : 2.0868,
+      "name" : "S_SP_1M"
+    }, {
+      "coefficient" : 0.5051,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.6366,
+      "name" : "M_DWELLING_SINGLE"
+    }, {
+      "coefficient" : 0.3873,
+      "name" : "M_CREDIT_CARD_HOLDER"
+    }, {
+      "coefficient" : 1.0484,
+      "name" : "M_WEB_DAY_EXERCISE_0_7"
+    }, {
+      "coefficient" : 0.0869,
+      "name" : "S_NUM_CAT_TRANSACTED_24M"
+    }, {
+      "coefficient" : -0.00109,
+      "name" : "S_DSL_HL_TRS"
+    }, {
+      "coefficient" : -0.0025,
+      "name" : "S_DSL_SG_EQUIP_TRS"
+    }]
+}
+
+{
+  "modelId" : 30,
+  "modelDescription" : "Fitness Equipment",
+  "constant" : -3.6006,
+  "modelName" : "S_SCR_FIT_EQUIP",
+  "month" : 3,
+  "variable" : [{
+      "coefficient" : 2.0868,
+      "name" : "S_SP_1M"
+    }, {
+      "coefficient" : 0.5051,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.6366,
+      "name" : "M_DWELLING_SINGLE"
+    }, {
+      "coefficient" : 0.3873,
+      "name" : "M_CREDIT_CARD_HOLDER"
+    }, {
+      "coefficient" : 1.0484,
+      "name" : "M_WEB_DAY_EXERCISE_0_7"
+    }, {
+      "coefficient" : 0.0869,
+      "name" : "S_NUM_CAT_TRANSACTED_24M"
+    }, {
+      "coefficient" : -0.00109,
+      "name" : "S_DSL_HL_TRS"
+    }, {
+      "coefficient" : -0.0025,
+      "name" : "S_DSL_SG_EQUIP_TRS"
+    }]
+}
+
+{
+  "modelId" : 30,
+  "modelDescription" : "Fitness Equipment",
+  "constant" : -3.6006,
+  "modelName" : "S_SCR_FIT_EQUIP",
+  "month" : 10,
+  "variable" : [{
+      "coefficient" : 2.0868,
+      "name" : "S_SP_1M"
+    }, {
+      "coefficient" : 0.5051,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.6366,
+      "name" : "M_DWELLING_SINGLE"
+    }, {
+      "coefficient" : 0.3873,
+      "name" : "M_CREDIT_CARD_HOLDER"
+    }, {
+      "coefficient" : 1.0484,
+      "name" : "M_WEB_DAY_EXERCISE_0_7"
+    }, {
+      "coefficient" : 0.0869,
+      "name" : "S_NUM_CAT_TRANSACTED_24M"
+    }, {
+      "coefficient" : -0.00109,
+      "name" : "S_DSL_HL_TRS"
+    }, {
+      "coefficient" : -0.0025,
+      "name" : "S_DSL_SG_EQUIP_TRS"
+    }]
+}
+
+{
+  "modelId" : 30,
+  "modelDescription" : "Fitness Equipment",
+  "constant" : -3.6006,
+  "modelName" : "S_SCR_FIT_EQUIP",
+  "month" : 11,
+  "variable" : [{
+      "coefficient" : 2.0868,
+      "name" : "S_SP_1M"
+    }, {
+      "coefficient" : 0.5051,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.6366,
+      "name" : "M_DWELLING_SINGLE"
+    }, {
+      "coefficient" : 0.3873,
+      "name" : "M_CREDIT_CARD_HOLDER"
+    }, {
+      "coefficient" : 1.0484,
+      "name" : "M_WEB_DAY_EXERCISE_0_7"
+    }, {
+      "coefficient" : 0.0869,
+      "name" : "S_NUM_CAT_TRANSACTED_24M"
+    }, {
+      "coefficient" : -0.00109,
+      "name" : "S_DSL_HL_TRS"
+    }, {
+      "coefficient" : -0.0025,
+      "name" : "S_DSL_SG_EQUIP_TRS"
+    }]
+}
+
+{
+  "modelId" : 30,
+  "modelDescription" : "Fitness Equipment",
+  "constant" : -3.6006,
+  "modelName" : "S_SCR_FIT_EQUIP",
+  "month" : 12,
+  "variable" : [{
+      "coefficient" : 2.0868,
+      "name" : "S_SP_1M"
+    }, {
+      "coefficient" : 0.5051,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.6366,
+      "name" : "M_DWELLING_SINGLE"
+    }, {
+      "coefficient" : 0.3873,
+      "name" : "M_CREDIT_CARD_HOLDER"
+    }, {
+      "coefficient" : 1.0484,
+      "name" : "M_WEB_DAY_EXERCISE_0_7"
+    }, {
+      "coefficient" : 0.0869,
+      "name" : "S_NUM_CAT_TRANSACTED_24M"
+    }, {
+      "coefficient" : -0.00109,
+      "name" : "S_DSL_HL_TRS"
+    }, {
+      "coefficient" : -0.0025,
+      "name" : "S_DSL_SG_EQUIP_TRS"
+    }]
+}
+
+{
+  "modelId" : 30,
+  "modelDescription" : "Fitness Equipment",
+  "constant" : -4.0734,
+  "modelName" : "S_SCR_FIT_EQUIP",
+  "month" : 2,
+  "variable" : [{
+      "coefficient" : 0.2605,
+      "name" : "M_WEB_TRAIT_EXERCISE_0_7"
+    }, {
+      "coefficient" : 0.2796,
+      "name" : "S_MISC_BUS_12M_IND"
+    }, {
+      "coefficient" : 0.5274,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.6405,
+      "name" : "M_DWELLING_SINGLE"
+    }, {
+      "coefficient" : -0.00146,
+      "name" : "K_DSL_FSG_EXER_TRS"
+    }, {
+      "coefficient" : 0.5665,
+      "name" : "S_SPRTS_GD_GT_12M_IND"
+    }, {
+      "coefficient" : 0.2567,
+      "name" : "CPU_ITE_ONL_SVC_FL"
+    }, {
+      "coefficient" : -0.00121,
+      "name" : "S_DSL_SG_EQUIP_TRS"
+    }, {
+      "coefficient" : 0.0477,
+      "name" : "M_WEB_TRAIT_EXERCISE_31_60"
+    }, {
+      "coefficient" : 1.2828,
+      "name" : "S_SP_1M"
+    }, {
+      "coefficient" : 0.5265,
+      "name" : "S_SPRTS_GD_3M_IND"
+    }, {
+      "coefficient" : 0.000556,
+      "name" : "K_DSL_FTWR_WOMEN_TRS"
+    }, {
+      "coefficient" : 0.4152,
+      "name" : "S_OL_24M_IND"
+    }, {
+      "coefficient" : 0.413,
+      "name" : "M_CREDIT_CARD_HOLDER"
+    }, {
+      "coefficient" : 0.00122,
+      "name" : "S_TOOLS_TL_SAL_TRS_24"
+    }, {
+      "coefficient" : -0.3981,
+      "name" : "ADL_MAL_75_PLS_FL"
+    }, {
+      "coefficient" : -0.379,
+      "name" : "FAM_GCH_FL"
+    }, {
+      "coefficient" : -0.00111,
+      "name" : "S_DSL_HL_TRS"
+    }, {
+      "coefficient" : 0.000449,
+      "name" : "S_CE_ELEC_SAL_TRS_24"
+    }, {
+      "coefficient" : 0.000602,
+      "name" : "S_SG_EQUIP_SAL_6M"
+    }, {
+      "coefficient" : 43.3744,
+      "name" : "M_ZIP_PENE_HA_WASHDRY"
+    }]
+}
+
+{
+  "modelId" : 30,
+  "modelDescription" : "Fitness Equipment",
+  "constant" : -4.0734,
+  "modelName" : "S_SCR_FIT_EQUIP",
+  "month" : 1,
+  "variable" : [{
+      "coefficient" : 0.2605,
+      "name" : "M_WEB_TRAIT_EXERCISE_0_7"
+    }, {
+      "coefficient" : 0.2796,
+      "name" : "S_MISC_BUS_12M_IND"
+    }, {
+      "coefficient" : 0.5274,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.6405,
+      "name" : "M_DWELLING_SINGLE"
+    }, {
+      "coefficient" : -0.00146,
+      "name" : "K_DSL_FSG_EXER_TRS"
+    }, {
+      "coefficient" : 0.5665,
+      "name" : "S_SPRTS_GD_GT_12M_IND"
+    }, {
+      "coefficient" : 0.2567,
+      "name" : "CPU_ITE_ONL_SVC_FL"
+    }, {
+      "coefficient" : -0.00121,
+      "name" : "S_DSL_SG_EQUIP_TRS"
+    }, {
+      "coefficient" : 0.0477,
+      "name" : "M_WEB_TRAIT_EXERCISE_31_60"
+    }, {
+      "coefficient" : 1.2828,
+      "name" : "S_SP_1M"
+    }, {
+      "coefficient" : 0.5265,
+      "name" : "S_SPRTS_GD_3M_IND"
+    }, {
+      "coefficient" : 0.000556,
+      "name" : "K_DSL_FTWR_WOMEN_TRS"
+    }, {
+      "coefficient" : 0.4152,
+      "name" : "S_OL_24M_IND"
+    }, {
+      "coefficient" : 0.413,
+      "name" : "M_CREDIT_CARD_HOLDER"
+    }, {
+      "coefficient" : 0.00122,
+      "name" : "S_TOOLS_TL_SAL_TRS_24"
+    }, {
+      "coefficient" : -0.3981,
+      "name" : "ADL_MAL_75_PLS_FL"
+    }, {
+      "coefficient" : -0.379,
+      "name" : "FAM_GCH_FL"
+    }, {
+      "coefficient" : -0.00111,
+      "name" : "S_DSL_HL_TRS"
+    }, {
+      "coefficient" : 0.000449,
+      "name" : "S_CE_ELEC_SAL_TRS_24"
+    }, {
+      "coefficient" : 0.000602,
+      "name" : "S_SG_EQUIP_SAL_6M"
+    }, {
+      "coefficient" : 43.3744,
+      "name" : "M_ZIP_PENE_HA_WASHDRY"
+    }]
+}
+
+{
+  "modelId" : 20,
+  "modelDescription" : "Air Conditioner",
+  "constant" : -8.231530653,
+  "modelName" : "S_SCR_AC",
+  "month" : 4,
+  "variable" : [{
+      "coefficient" : 0.614,
+      "name" : "M_USED_SEARS_CARD_FL"
+    }, {
+      "coefficient" : 0.7356,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.4861,
+      "name" : "S_CE_ELEC_24M_IND"
+    }, {
+      "coefficient" : 0.8155,
+      "name" : "S_SRS_24M_IND"
+    }, {
+      "coefficient" : -0.00059,
+      "name" : "M_DSL_AIR_COND_HMS"
+    }, {
+      "coefficient" : 0.1989,
+      "name" : "M_SERVICE_LAST_12_MTH"
+    }, {
+      "coefficient" : 0.8126,
+      "name" : "S_LG_3M_IND"
+    }, {
+      "coefficient" : -0.00104,
+      "name" : "S_DSL_ALL_HA_TRS"
+    }, {
+      "coefficient" : 0.2749,
+      "name" : "S_HOME_24M_IND"
+    }, {
+      "coefficient" : 0.3707,
+      "name" : "M_DWELLING_MULTI"
+    }]
+}
+
+{
+  "modelId" : 20,
+  "modelDescription" : "Air Conditioner",
+  "constant" : -8.231530653,
+  "modelName" : "S_SCR_AC",
+  "month" : 8,
+  "variable" : [{
+      "coefficient" : 0.614,
+      "name" : "M_USED_SEARS_CARD_FL"
+    }, {
+      "coefficient" : 0.7356,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.4861,
+      "name" : "S_CE_ELEC_24M_IND"
+    }, {
+      "coefficient" : 0.8155,
+      "name" : "S_SRS_24M_IND"
+    }, {
+      "coefficient" : -0.00059,
+      "name" : "M_DSL_AIR_COND_HMS"
+    }, {
+      "coefficient" : 0.1989,
+      "name" : "M_SERVICE_LAST_12_MTH"
+    }, {
+      "coefficient" : 0.8126,
+      "name" : "S_LG_3M_IND"
+    }, {
+      "coefficient" : -0.00104,
+      "name" : "S_DSL_ALL_HA_TRS"
+    }, {
+      "coefficient" : 0.2749,
+      "name" : "S_HOME_24M_IND"
+    }, {
+      "coefficient" : 0.3707,
+      "name" : "M_DWELLING_MULTI"
+    }]
+}
+
+{
+  "modelId" : 20,
+  "modelDescription" : "Air Conditioner",
+  "constant" : -8.231530653,
+  "modelName" : "S_SCR_AC",
+  "month" : 12,
+  "variable" : [{
+      "coefficient" : 0.614,
+      "name" : "M_USED_SEARS_CARD_FL"
+    }, {
+      "coefficient" : 0.7356,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.4861,
+      "name" : "S_CE_ELEC_24M_IND"
+    }, {
+      "coefficient" : 0.8155,
+      "name" : "S_SRS_24M_IND"
+    }, {
+      "coefficient" : -0.00059,
+      "name" : "M_DSL_AIR_COND_HMS"
+    }, {
+      "coefficient" : 0.1989,
+      "name" : "M_SERVICE_LAST_12_MTH"
+    }, {
+      "coefficient" : 0.8126,
+      "name" : "S_LG_3M_IND"
+    }, {
+      "coefficient" : -0.00104,
+      "name" : "S_DSL_ALL_HA_TRS"
+    }, {
+      "coefficient" : 0.2749,
+      "name" : "S_HOME_24M_IND"
+    }, {
+      "coefficient" : 0.3707,
+      "name" : "M_DWELLING_MULTI"
+    }]
+}
+
+{
+  "modelId" : 20,
+  "modelDescription" : "Air Conditioner",
+  "constant" : -8.231530653,
+  "modelName" : "S_SCR_AC",
+  "month" : 2,
+  "variable" : [{
+      "coefficient" : 0.614,
+      "name" : "M_USED_SEARS_CARD_FL"
+    }, {
+      "coefficient" : 0.7356,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.4861,
+      "name" : "S_CE_ELEC_24M_IND"
+    }, {
+      "coefficient" : 0.8155,
+      "name" : "S_SRS_24M_IND"
+    }, {
+      "coefficient" : -0.00059,
+      "name" : "M_DSL_AIR_COND_HMS"
+    }, {
+      "coefficient" : 0.1989,
+      "name" : "M_SERVICE_LAST_12_MTH"
+    }, {
+      "coefficient" : 0.8126,
+      "name" : "S_LG_3M_IND"
+    }, {
+      "coefficient" : -0.00104,
+      "name" : "S_DSL_ALL_HA_TRS"
+    }, {
+      "coefficient" : 0.2749,
+      "name" : "S_HOME_24M_IND"
+    }, {
+      "coefficient" : 0.3707,
+      "name" : "M_DWELLING_MULTI"
+    }]
+}
+
+{
+  "modelId" : 20,
+  "modelDescription" : "Air Conditioner",
+  "constant" : -8.231530653,
+  "modelName" : "S_SCR_AC",
+  "month" : 1,
+  "variable" : [{
+      "coefficient" : 0.614,
+      "name" : "M_USED_SEARS_CARD_FL"
+    }, {
+      "coefficient" : 0.7356,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.4861,
+      "name" : "S_CE_ELEC_24M_IND"
+    }, {
+      "coefficient" : 0.8155,
+      "name" : "S_SRS_24M_IND"
+    }, {
+      "coefficient" : -0.00059,
+      "name" : "M_DSL_AIR_COND_HMS"
+    }, {
+      "coefficient" : 0.1989,
+      "name" : "M_SERVICE_LAST_12_MTH"
+    }, {
+      "coefficient" : 0.8126,
+      "name" : "S_LG_3M_IND"
+    }, {
+      "coefficient" : -0.00104,
+      "name" : "S_DSL_ALL_HA_TRS"
+    }, {
+      "coefficient" : 0.2749,
+      "name" : "S_HOME_24M_IND"
+    }, {
+      "coefficient" : 0.3707,
+      "name" : "M_DWELLING_MULTI"
+    }]
+}
+
+{
+  "modelId" : 20,
+  "modelDescription" : "Air Conditioner",
+  "constant" : -8.231530653,
+  "modelName" : "S_SCR_AC",
+  "month" : 3,
+  "variable" : [{
+      "coefficient" : 0.614,
+      "name" : "M_USED_SEARS_CARD_FL"
+    }, {
+      "coefficient" : 0.7356,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.4861,
+      "name" : "S_CE_ELEC_24M_IND"
+    }, {
+      "coefficient" : 0.8155,
+      "name" : "S_SRS_24M_IND"
+    }, {
+      "coefficient" : -0.00059,
+      "name" : "M_DSL_AIR_COND_HMS"
+    }, {
+      "coefficient" : 0.1989,
+      "name" : "M_SERVICE_LAST_12_MTH"
+    }, {
+      "coefficient" : 0.8126,
+      "name" : "S_LG_3M_IND"
+    }, {
+      "coefficient" : -0.00104,
+      "name" : "S_DSL_ALL_HA_TRS"
+    }, {
+      "coefficient" : 0.2749,
+      "name" : "S_HOME_24M_IND"
+    }, {
+      "coefficient" : 0.3707,
+      "name" : "M_DWELLING_MULTI"
+    }]
+}
+
+{
+  "modelId" : 20,
+  "modelDescription" : "Air Conditioner",
+  "constant" : -8.231530653,
+  "modelName" : "S_SCR_AC",
+  "month" : 11,
+  "variable" : [{
+      "coefficient" : 0.614,
+      "name" : "M_USED_SEARS_CARD_FL"
+    }, {
+      "coefficient" : 0.7356,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.4861,
+      "name" : "S_CE_ELEC_24M_IND"
+    }, {
+      "coefficient" : 0.8155,
+      "name" : "S_SRS_24M_IND"
+    }, {
+      "coefficient" : -0.00059,
+      "name" : "M_DSL_AIR_COND_HMS"
+    }, {
+      "coefficient" : 0.1989,
+      "name" : "M_SERVICE_LAST_12_MTH"
+    }, {
+      "coefficient" : 0.8126,
+      "name" : "S_LG_3M_IND"
+    }, {
+      "coefficient" : -0.00104,
+      "name" : "S_DSL_ALL_HA_TRS"
+    }, {
+      "coefficient" : 0.2749,
+      "name" : "S_HOME_24M_IND"
+    }, {
+      "coefficient" : 0.3707,
+      "name" : "M_DWELLING_MULTI"
+    }]
+}
+
+{
+  "modelId" : 20,
+  "modelDescription" : "Air Conditioner",
+  "constant" : -8.231530653,
+  "modelName" : "S_SCR_AC",
+  "month" : 10,
+  "variable" : [{
+      "coefficient" : 0.614,
+      "name" : "M_USED_SEARS_CARD_FL"
+    }, {
+      "coefficient" : 0.7356,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.4861,
+      "name" : "S_CE_ELEC_24M_IND"
+    }, {
+      "coefficient" : 0.8155,
+      "name" : "S_SRS_24M_IND"
+    }, {
+      "coefficient" : -0.00059,
+      "name" : "M_DSL_AIR_COND_HMS"
+    }, {
+      "coefficient" : 0.1989,
+      "name" : "M_SERVICE_LAST_12_MTH"
+    }, {
+      "coefficient" : 0.8126,
+      "name" : "S_LG_3M_IND"
+    }, {
+      "coefficient" : -0.00104,
+      "name" : "S_DSL_ALL_HA_TRS"
+    }, {
+      "coefficient" : 0.2749,
+      "name" : "S_HOME_24M_IND"
+    }, {
+      "coefficient" : 0.3707,
+      "name" : "M_DWELLING_MULTI"
+    }]
+}
+
+{
+  "modelId" : 20,
+  "modelDescription" : "Air Conditioner",
+  "constant" : -8.231530653,
+  "modelName" : "S_SCR_AC",
+  "month" : 9,
+  "variable" : [{
+      "coefficient" : 0.614,
+      "name" : "M_USED_SEARS_CARD_FL"
+    }, {
+      "coefficient" : 0.7356,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.4861,
+      "name" : "S_CE_ELEC_24M_IND"
+    }, {
+      "coefficient" : 0.8155,
+      "name" : "S_SRS_24M_IND"
+    }, {
+      "coefficient" : -0.00059,
+      "name" : "M_DSL_AIR_COND_HMS"
+    }, {
+      "coefficient" : 0.1989,
+      "name" : "M_SERVICE_LAST_12_MTH"
+    }, {
+      "coefficient" : 0.8126,
+      "name" : "S_LG_3M_IND"
+    }, {
+      "coefficient" : -0.00104,
+      "name" : "S_DSL_ALL_HA_TRS"
+    }, {
+      "coefficient" : 0.2749,
+      "name" : "S_HOME_24M_IND"
+    }, {
+      "coefficient" : 0.3707,
+      "name" : "M_DWELLING_MULTI"
+    }]
+}
+
+{
+  "modelId" : 20,
+  "modelDescription" : "Air Conditioner",
+  "constant" : -3.659,
+  "modelName" : "S_SCR_AC",
+  "month" : 7,
+  "variable" : [{
+      "coefficient" : 0.4207,
+      "name" : "S_HL_12M_IND"
+    }, {
+      "coefficient" : 0.6791,
+      "name" : "M_USED_SEARS_CARD_FL"
+    }, {
+      "coefficient" : 0.3296,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.6192,
+      "name" : "S_SRS_24M_IND"
+    }, {
+      "coefficient" : -0.00059,
+      "name" : "M_DSL_AIR_COND_HMS"
+    }, {
+      "coefficient" : 0.4998,
+      "name" : "CRD_CRD_FL"
+    }, {
+      "coefficient" : 0.8476,
+      "name" : "S_HA_2M"
+    }, {
+      "coefficient" : -0.00072,
+      "name" : "S_DSL_ALL_HA_TRS"
+    }, {
+      "coefficient" : 0.4017,
+      "name" : "M_HA_APPL_OTHER_ANYTIME"
+    }, {
+      "coefficient" : 0.1975,
+      "name" : "M_FLOORCARE_36M_FLG"
+    }, {
+      "coefficient" : 0.2787,
+      "name" : "S_HOME_24M_IND"
+    }, {
+      "coefficient" : 0.4755,
+      "name" : "M_DWELLING_MULTI"
+    }]
+}
+
+{
+  "modelId" : 20,
+  "modelDescription" : "Air Conditioner",
+  "constant" : -3.659,
+  "modelName" : "S_SCR_AC",
+  "month" : 6,
+  "variable" : [{
+      "coefficient" : 0.4207,
+      "name" : "S_HL_12M_IND"
+    }, {
+      "coefficient" : 0.6791,
+      "name" : "M_USED_SEARS_CARD_FL"
+    }, {
+      "coefficient" : 0.3296,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.6192,
+      "name" : "S_SRS_24M_IND"
+    }, {
+      "coefficient" : -0.00059,
+      "name" : "M_DSL_AIR_COND_HMS"
+    }, {
+      "coefficient" : 0.4998,
+      "name" : "CRD_CRD_FL"
+    }, {
+      "coefficient" : 0.8476,
+      "name" : "S_HA_2M"
+    }, {
+      "coefficient" : -0.00072,
+      "name" : "S_DSL_ALL_HA_TRS"
+    }, {
+      "coefficient" : 0.4017,
+      "name" : "M_HA_APPL_OTHER_ANYTIME"
+    }, {
+      "coefficient" : 0.1975,
+      "name" : "M_FLOORCARE_36M_FLG"
+    }, {
+      "coefficient" : 0.2787,
+      "name" : "S_HOME_24M_IND"
+    }, {
+      "coefficient" : 0.4755,
+      "name" : "M_DWELLING_MULTI"
+    }]
+}
+
+{
+  "modelId" : 20,
+  "modelDescription" : "Air Conditioner",
+  "constant" : -3.659,
+  "modelName" : "S_SCR_AC",
+  "month" : 5,
+  "variable" : [{
+      "coefficient" : 0.4207,
+      "name" : "S_HL_12M_IND"
+    }, {
+      "coefficient" : 0.6791,
+      "name" : "M_USED_SEARS_CARD_FL"
+    }, {
+      "coefficient" : 0.3296,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.6192,
+      "name" : "S_SRS_24M_IND"
+    }, {
+      "coefficient" : -0.00059,
+      "name" : "M_DSL_AIR_COND_HMS"
+    }, {
+      "coefficient" : 0.4998,
+      "name" : "CRD_CRD_FL"
+    }, {
+      "coefficient" : 0.8476,
+      "name" : "S_HA_2M"
+    }, {
+      "coefficient" : -0.00072,
+      "name" : "S_DSL_ALL_HA_TRS"
+    }, {
+      "coefficient" : 0.4017,
+      "name" : "M_HA_APPL_OTHER_ANYTIME"
+    }, {
+      "coefficient" : 0.1975,
+      "name" : "M_FLOORCARE_36M_FLG"
+    }, {
+      "coefficient" : 0.2787,
+      "name" : "S_HOME_24M_IND"
+    }, {
+      "coefficient" : 0.4755,
+      "name" : "M_DWELLING_MULTI"
+    }]
+}
+
+{
+  "modelId" : 27,
+  "modelDescription" : "Consumer Electronics",
+  "constant" : -7.0632,
+  "modelName" : "S_SCR_CE",
+  "month" : 10,
+  "variable" : [{
+      "coefficient" : -0.00028,
+      "name" : "S_DSL_APP_INT_ACC_FTWR_TRS"
+    }, {
+      "coefficient" : 0.5226,
+      "name" : "S_HL_24M_IND"
+    }, {
+      "coefficient" : 0.4111,
+      "name" : "S_SRS_6M_IND"
+    }, {
+      "coefficient" : 0.1782,
+      "name" : "S_CE_TRS_3M"
+    }, {
+      "coefficient" : 0.7911,
+      "name" : "S_CE_24M_IND"
+    }, {
+      "coefficient" : 0.0558,
+      "name" : "S_CE_TRS_24M"
+    }, {
+      "coefficient" : 0.4122,
+      "name" : "M_HS_ELECTRONICS_5Y"
+    }, {
+      "coefficient" : 0.1573,
+      "name" : "S_SRS_SESNL2_IND"
+    }, {
+      "coefficient" : 0.9725,
+      "name" : "S_CE_1M"
+    }, {
+      "coefficient" : 0.1595,
+      "name" : "S_NUM_CAT_TRANSACTED_12M"
+    }, {
+      "coefficient" : 0.3096,
+      "name" : "M_CREDIT_CARD_HOLDER"
+    }, {
+      "coefficient" : 0.8221,
+      "name" : "M_WEB_DAY_TV_0_7"
+    }, {
+      "coefficient" : 0.154,
+      "name" : "CRD_CRD_FL"
+    }, {
+      "coefficient" : 0.9038,
+      "name" : "S_CE_3M_IND"
+    }]
+}
+
+{
+  "modelId" : 27,
+  "modelDescription" : "Consumer Electronics",
+  "constant" : -7.1776,
+  "modelName" : "S_SCR_CE",
+  "month" : 3,
+  "variable" : [{
+      "coefficient" : -0.00035,
+      "name" : "S_DSL_APP_INT_ACC_FTWR_TRS"
+    }, {
+      "coefficient" : 0.5224,
+      "name" : "S_HL_24M_IND"
+    }, {
+      "coefficient" : 0.5491,
+      "name" : "S_SRS_6M_IND"
+    }, {
+      "coefficient" : 2.716,
+      "name" : "M_ZIP_PENE_AP_JEWELRY"
+    }, {
+      "coefficient" : 0.1954,
+      "name" : "S_CE_TRS_3M"
+    }, {
+      "coefficient" : 0.0012,
+      "name" : "K_HARDLN_SLS_TRS_12M"
+    }, {
+      "coefficient" : 0.761,
+      "name" : "S_CE_24M_IND"
+    }, {
+      "coefficient" : 0.0742,
+      "name" : "S_CE_TRS_24M"
+    }, {
+      "coefficient" : 0.3227,
+      "name" : "M_HS_ELECTRONICS_5Y"
+    }, {
+      "coefficient" : 0.1664,
+      "name" : "S_SRS_SESNL2_IND"
+    }, {
+      "coefficient" : 0.719,
+      "name" : "S_CE_1M"
+    }, {
+      "coefficient" : 0.1478,
+      "name" : "S_NUM_CAT_TRANSACTED_12M"
+    }, {
+      "coefficient" : 0.2181,
+      "name" : "M_CREDIT_CARD_HOLDER"
+    }, {
+      "coefficient" : 0.4007,
+      "name" : "M_WEB_DAY_TV_0_7"
+    }, {
+      "coefficient" : 0.549,
+      "name" : "S_CE_3M_IND"
+    }]
+}
+
+{
+  "modelId" : 27,
+  "modelDescription" : "Consumer Electronics",
+  "constant" : -6.9282,
+  "modelName" : "S_SCR_CE",
+  "month" : 9,
+  "variable" : [{
+      "coefficient" : -0.00035,
+      "name" : "S_DSL_APP_INT_ACC_FTWR_TRS"
+    }, {
+      "coefficient" : 0.5988,
+      "name" : "S_HL_24M_IND"
+    }, {
+      "coefficient" : 0.4946,
+      "name" : "S_SRS_6M_IND"
+    }, {
+      "coefficient" : 0.1645,
+      "name" : "S_CE_TRS_3M"
+    }, {
+      "coefficient" : 0.7983,
+      "name" : "S_CE_24M_IND"
+    }, {
+      "coefficient" : 0.0624,
+      "name" : "S_CE_TRS_24M"
+    }, {
+      "coefficient" : 0.4185,
+      "name" : "M_HS_ELECTRONICS_5Y"
+    }, {
+      "coefficient" : 0.8066,
+      "name" : "S_CE_1M"
+    }, {
+      "coefficient" : 0.147,
+      "name" : "S_NUM_CAT_TRANSACTED_12M"
+    }, {
+      "coefficient" : 0.396,
+      "name" : "M_CREDIT_CARD_HOLDER"
+    }, {
+      "coefficient" : -0.0297,
+      "name" : "M_CNT_EMAIL_CAMPAIGNS_6_MTH"
+    }, {
+      "coefficient" : 0.7482,
+      "name" : "M_WEB_DAY_TV_0_7"
+    }, {
+      "coefficient" : 0.9608,
+      "name" : "S_CE_3M_IND"
+    }, {
+      "coefficient" : 0.0851,
+      "name" : "M_CNT_RESPONSE_CLICK_1_MTH"
+    }]
+}
+
+{
+  "modelId" : 59,
+  "modelDescription" : "Tools",
+  "constant" : -2.8385,
+  "modelName" : "S_SCR_TOOLS",
+  "month" : 12,
+  "variable" : [{
+      "coefficient" : 0.1667,
+      "name" : "S_TOOLS_TL_TRS_3M"
+    }, {
+      "coefficient" : 0.191,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.5612,
+      "name" : "S_TOOLS_SESNL2_IND"
+    }, {
+      "coefficient" : 0.2926,
+      "name" : "M_DWELLING_SINGLE"
+    }, {
+      "coefficient" : -0.00222,
+      "name" : "S_DSL_TOOLS_TL_TRS"
+    }, {
+      "coefficient" : 0.033,
+      "name" : "S_SRS_TRS_6M"
+    }, {
+      "coefficient" : 0.2809,
+      "name" : "S_TOOLS_TL_GT_12M_IND"
+    }, {
+      "coefficient" : 0.2513,
+      "name" : "HBB_AUM_MCN_FL"
+    }, {
+      "coefficient" : 0.5814,
+      "name" : "S_HL_REV_PCT_24M"
+    }, {
+      "coefficient" : 0.1817,
+      "name" : "ADL_MAL_45_54_FL"
+    }, {
+      "coefficient" : 0.3524,
+      "name" : "S_MEN_APP_24M_IND"
+    }, {
+      "coefficient" : 0.6209,
+      "name" : "M_WEB_DAY_HAND_TOOL_0_7"
+    }, {
+      "coefficient" : 0.1726,
+      "name" : "TRU_OWN_FL"
+    }, {
+      "coefficient" : -0.00024,
+      "name" : "DS_ENRLMNT"
+    }, {
+      "coefficient" : 0.5132,
+      "name" : "S_SRS_SESNL_IND"
+    }, {
+      "coefficient" : 0.2033,
+      "name" : "M_CLUB_MEMBER_CRAFTSMAN"
+    }, {
+      "coefficient" : 0.1739,
+      "name" : "ADL_MAL_55_64_FL"
+    }, {
+      "coefficient" : 0.203,
+      "name" : "S_HL_SESNL2_IND"
+    }, {
+      "coefficient" : -0.00042,
+      "name" : "S_DSL_LG_TRS"
+    }, {
+      "coefficient" : 0.1724,
+      "name" : "K_DIY_TOOL_TRS_3M"
+    }, {
+      "coefficient" : -0.2905,
+      "name" : "M_LOW_TOOLS_ZIP"
+    }, {
+      "coefficient" : 1.1363,
+      "name" : "M_ZIP_PENE_SRS_TOOLS"
+    }]
+}
+
+{
+  "modelId" : 59,
+  "modelDescription" : "Tools",
+  "constant" : -3.2761,
+  "modelName" : "S_SCR_TOOLS",
+  "month" : 2,
+  "variable" : [{
+      "coefficient" : 0.1802,
+      "name" : "S_TOOLS_TL_TRS_3M"
+    }, {
+      "coefficient" : 0.1634,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.6523,
+      "name" : "S_TOOLS_SESNL2_IND"
+    }, {
+      "coefficient" : 0.1696,
+      "name" : "M_DWELLING_SINGLE"
+    }, {
+      "coefficient" : -0.00266,
+      "name" : "S_DSL_TOOLS_TL_TRS"
+    }, {
+      "coefficient" : 0.0306,
+      "name" : "S_SRS_TRS_6M"
+    }, {
+      "coefficient" : 0.3523,
+      "name" : "S_TOOLS_TL_GT_12M_IND"
+    }, {
+      "coefficient" : 0.1322,
+      "name" : "HBB_AUM_MCN_FL"
+    }, {
+      "coefficient" : 0.7846,
+      "name" : "S_HL_REV_PCT_24M"
+    }, {
+      "coefficient" : 0.0873,
+      "name" : "ADL_MAL_45_54_FL"
+    }, {
+      "coefficient" : 0.2753,
+      "name" : "S_MEN_APP_24M_IND"
+    }, {
+      "coefficient" : 0.6754,
+      "name" : "M_WEB_DAY_HAND_TOOL_0_7"
+    }, {
+      "coefficient" : 0.0039,
+      "name" : "TRU_OWN_FL"
+    }, {
+      "coefficient" : -0.00052,
+      "name" : "DS_ENRLMNT"
+    }, {
+      "coefficient" : 0.4337,
+      "name" : "S_SRS_SESNL_IND"
+    }, {
+      "coefficient" : 0.1545,
+      "name" : "M_CLUB_MEMBER_CRAFTSMAN"
+    }, {
+      "coefficient" : 0.0778,
+      "name" : "ADL_MAL_55_64_FL"
+    }, {
+      "coefficient" : 0.0993,
+      "name" : "S_HL_SESNL2_IND"
+    }, {
+      "coefficient" : -0.00071,
+      "name" : "S_DSL_LG_TRS"
+    }, {
+      "coefficient" : 0.1012,
+      "name" : "K_DIY_TOOL_TRS_3M"
+    }, {
+      "coefficient" : -0.1865,
+      "name" : "M_LOW_TOOLS_ZIP"
+    }, {
+      "coefficient" : 0.9713,
+      "name" : "M_ZIP_PENE_SRS_TOOLS"
+    }]
+}
+
+{
+  "modelId" : 59,
+  "modelDescription" : "Tools",
+  "constant" : -3.496,
+  "modelName" : "S_SCR_TOOLS",
+  "month" : 1,
+  "variable" : [{
+      "coefficient" : 0.2188,
+      "name" : "S_TOOLS_TL_TRS_3M"
+    }, {
+      "coefficient" : 0.1748,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.5726,
+      "name" : "S_TOOLS_SESNL2_IND"
+    }, {
+      "coefficient" : 0.1669,
+      "name" : "M_DWELLING_SINGLE"
+    }, {
+      "coefficient" : -0.0026,
+      "name" : "S_DSL_TOOLS_TL_TRS"
+    }, {
+      "coefficient" : 0.0283,
+      "name" : "S_SRS_TRS_6M"
+    }, {
+      "coefficient" : 0.2612,
+      "name" : "S_TOOLS_TL_GT_12M_IND"
+    }, {
+      "coefficient" : 0.1476,
+      "name" : "HBB_AUM_MCN_FL"
+    }, {
+      "coefficient" : 0.8588,
+      "name" : "S_HL_REV_PCT_24M"
+    }, {
+      "coefficient" : 0.1166,
+      "name" : "ADL_MAL_45_54_FL"
+    }, {
+      "coefficient" : 0.3363,
+      "name" : "S_MEN_APP_24M_IND"
+    }, {
+      "coefficient" : 0.4414,
+      "name" : "M_WEB_DAY_HAND_TOOL_0_7"
+    }, {
+      "coefficient" : 0.0254,
+      "name" : "TRU_OWN_FL"
+    }, {
+      "coefficient" : -0.00032,
+      "name" : "DS_ENRLMNT"
+    }, {
+      "coefficient" : 0.3597,
+      "name" : "S_SRS_SESNL_IND"
+    }, {
+      "coefficient" : 0.1655,
+      "name" : "M_CLUB_MEMBER_CRAFTSMAN"
+    }, {
+      "coefficient" : 0.0846,
+      "name" : "ADL_MAL_55_64_FL"
+    }, {
+      "coefficient" : 0.1138,
+      "name" : "S_HL_SESNL2_IND"
+    }, {
+      "coefficient" : -0.00064,
+      "name" : "S_DSL_LG_TRS"
+    }, {
+      "coefficient" : 0.037,
+      "name" : "K_DIY_TOOL_TRS_3M"
+    }, {
+      "coefficient" : -0.2477,
+      "name" : "M_LOW_TOOLS_ZIP"
+    }, {
+      "coefficient" : 0.986,
+      "name" : "M_ZIP_PENE_SRS_TOOLS"
+    }]
+}
+
+{
+  "modelId" : 59,
+  "modelDescription" : "Tools",
+  "constant" : -3.211,
+  "modelName" : "S_SCR_TOOLS",
+  "month" : 7,
+  "variable" : [{
+      "coefficient" : 0.2175,
+      "name" : "S_TOOLS_TL_TRS_3M"
+    }, {
+      "coefficient" : 0.2064,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.4606,
+      "name" : "S_TOOLS_SESNL2_IND"
+    }, {
+      "coefficient" : 0.1844,
+      "name" : "M_DWELLING_SINGLE"
+    }, {
+      "coefficient" : -0.00278,
+      "name" : "S_DSL_TOOLS_TL_TRS"
+    }, {
+      "coefficient" : 0.03,
+      "name" : "S_SRS_TRS_6M"
+    }, {
+      "coefficient" : 0.3534,
+      "name" : "S_TOOLS_TL_GT_12M_IND"
+    }, {
+      "coefficient" : 0.1346,
+      "name" : "HBB_AUM_MCN_FL"
+    }, {
+      "coefficient" : 0.7421,
+      "name" : "S_HL_REV_PCT_24M"
+    }, {
+      "coefficient" : 0.1026,
+      "name" : "ADL_MAL_45_54_FL"
+    }, {
+      "coefficient" : 0.3541,
+      "name" : "S_MEN_APP_24M_IND"
+    }, {
+      "coefficient" : 0.5579,
+      "name" : "M_WEB_DAY_HAND_TOOL_0_7"
+    }, {
+      "coefficient" : -0.00252,
+      "name" : "TRU_OWN_FL"
+    }, {
+      "coefficient" : -0.00042,
+      "name" : "DS_ENRLMNT"
+    }, {
+      "coefficient" : 0.3498,
+      "name" : "S_SRS_SESNL_IND"
+    }, {
+      "coefficient" : 0.1169,
+      "name" : "M_CLUB_MEMBER_CRAFTSMAN"
+    }, {
+      "coefficient" : 0.1304,
+      "name" : "ADL_MAL_55_64_FL"
+    }, {
+      "coefficient" : 0.1592,
+      "name" : "S_HL_SESNL2_IND"
+    }, {
+      "coefficient" : -0.00068,
+      "name" : "S_DSL_LG_TRS"
+    }, {
+      "coefficient" : 0.0896,
+      "name" : "K_DIY_TOOL_TRS_3M"
+    }, {
+      "coefficient" : -0.2302,
+      "name" : "M_LOW_TOOLS_ZIP"
+    }, {
+      "coefficient" : 1.7851,
+      "name" : "M_ZIP_PENE_SRS_TOOLS"
+    }]
+}
+
+{
+  "modelId" : 59,
+  "modelDescription" : "Tools",
+  "constant" : -3.0703,
+  "modelName" : "S_SCR_TOOLS",
+  "month" : 6,
+  "variable" : [{
+      "coefficient" : 0.2458,
+      "name" : "S_TOOLS_TL_TRS_3M"
+    }, {
+      "coefficient" : 0.2179,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.4516,
+      "name" : "S_TOOLS_SESNL2_IND"
+    }, {
+      "coefficient" : 0.2082,
+      "name" : "M_DWELLING_SINGLE"
+    }, {
+      "coefficient" : -0.00261,
+      "name" : "S_DSL_TOOLS_TL_TRS"
+    }, {
+      "coefficient" : 0.0299,
+      "name" : "S_SRS_TRS_6M"
+    }, {
+      "coefficient" : 0.3459,
+      "name" : "S_TOOLS_TL_GT_12M_IND"
+    }, {
+      "coefficient" : 0.1511,
+      "name" : "HBB_AUM_MCN_FL"
+    }, {
+      "coefficient" : 0.6996,
+      "name" : "S_HL_REV_PCT_24M"
+    }, {
+      "coefficient" : 0.1261,
+      "name" : "ADL_MAL_45_54_FL"
+    }, {
+      "coefficient" : 0.3468,
+      "name" : "S_MEN_APP_24M_IND"
+    }, {
+      "coefficient" : 0.6293,
+      "name" : "M_WEB_DAY_HAND_TOOL_0_7"
+    }, {
+      "coefficient" : 0.0516,
+      "name" : "TRU_OWN_FL"
+    }, {
+      "coefficient" : -0.00043,
+      "name" : "DS_ENRLMNT"
+    }, {
+      "coefficient" : 0.3736,
+      "name" : "S_SRS_SESNL_IND"
+    }, {
+      "coefficient" : 0.0936,
+      "name" : "M_CLUB_MEMBER_CRAFTSMAN"
+    }, {
+      "coefficient" : 0.1087,
+      "name" : "ADL_MAL_55_64_FL"
+    }, {
+      "coefficient" : 0.1523,
+      "name" : "S_HL_SESNL2_IND"
+    }, {
+      "coefficient" : -0.00072,
+      "name" : "S_DSL_LG_TRS"
+    }, {
+      "coefficient" : 0.108,
+      "name" : "K_DIY_TOOL_TRS_3M"
+    }, {
+      "coefficient" : -0.2012,
+      "name" : "M_LOW_TOOLS_ZIP"
+    }, {
+      "coefficient" : 1.8195,
+      "name" : "M_ZIP_PENE_SRS_TOOLS"
+    }]
+}
+
+{
+  "modelId" : 59,
+  "modelDescription" : "Tools",
+  "constant" : -2.9961,
+  "modelName" : "S_SCR_TOOLS",
+  "month" : 3,
+  "variable" : [{
+      "coefficient" : 0.198,
+      "name" : "S_TOOLS_TL_TRS_3M"
+    }, {
+      "coefficient" : 0.1724,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.639,
+      "name" : "S_TOOLS_SESNL2_IND"
+    }, {
+      "coefficient" : 0.1655,
+      "name" : "M_DWELLING_SINGLE"
+    }, {
+      "coefficient" : -0.00266,
+      "name" : "S_DSL_TOOLS_TL_TRS"
+    }, {
+      "coefficient" : 0.0338,
+      "name" : "S_SRS_TRS_6M"
+    }, {
+      "coefficient" : 0.3242,
+      "name" : "S_TOOLS_TL_GT_12M_IND"
+    }, {
+      "coefficient" : 0.1307,
+      "name" : "HBB_AUM_MCN_FL"
+    }, {
+      "coefficient" : 0.7485,
+      "name" : "S_HL_REV_PCT_24M"
+    }, {
+      "coefficient" : 0.1138,
+      "name" : "ADL_MAL_45_54_FL"
+    }, {
+      "coefficient" : 0.3074,
+      "name" : "S_MEN_APP_24M_IND"
+    }, {
+      "coefficient" : 0.4902,
+      "name" : "M_WEB_DAY_HAND_TOOL_0_7"
+    }, {
+      "coefficient" : 0.0456,
+      "name" : "TRU_OWN_FL"
+    }, {
+      "coefficient" : -0.00051,
+      "name" : "DS_ENRLMNT"
+    }, {
+      "coefficient" : 0.3376,
+      "name" : "S_SRS_SESNL_IND"
+    }, {
+      "coefficient" : 0.1194,
+      "name" : "M_CLUB_MEMBER_CRAFTSMAN"
+    }, {
+      "coefficient" : 0.0583,
+      "name" : "ADL_MAL_55_64_FL"
+    }, {
+      "coefficient" : 0.0848,
+      "name" : "S_HL_SESNL2_IND"
+    }, {
+      "coefficient" : -0.00071,
+      "name" : "S_DSL_LG_TRS"
+    }, {
+      "coefficient" : 0.1082,
+      "name" : "K_DIY_TOOL_TRS_3M"
+    }, {
+      "coefficient" : -0.1785,
+      "name" : "M_LOW_TOOLS_ZIP"
+    }, {
+      "coefficient" : 0.5667,
+      "name" : "M_ZIP_PENE_SRS_TOOLS"
+    }]
+}
+
+{
+  "modelId" : 59,
+  "modelDescription" : "Tools",
+  "constant" : -3.1085,
+  "modelName" : "S_SCR_TOOLS",
+  "month" : 5,
+  "variable" : [{
+      "coefficient" : 0.2566,
+      "name" : "S_TOOLS_TL_TRS_3M"
+    }, {
+      "coefficient" : 0.2231,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.5771,
+      "name" : "S_TOOLS_SESNL2_IND"
+    }, {
+      "coefficient" : 0.1882,
+      "name" : "M_DWELLING_SINGLE"
+    }, {
+      "coefficient" : -0.00265,
+      "name" : "S_DSL_TOOLS_TL_TRS"
+    }, {
+      "coefficient" : 0.03,
+      "name" : "S_SRS_TRS_6M"
+    }, {
+      "coefficient" : 0.3311,
+      "name" : "S_TOOLS_TL_GT_12M_IND"
+    }, {
+      "coefficient" : 0.1625,
+      "name" : "HBB_AUM_MCN_FL"
+    }, {
+      "coefficient" : 0.7325,
+      "name" : "S_HL_REV_PCT_24M"
+    }, {
+      "coefficient" : 0.0996,
+      "name" : "ADL_MAL_45_54_FL"
+    }, {
+      "coefficient" : 0.303,
+      "name" : "S_MEN_APP_24M_IND"
+    }, {
+      "coefficient" : 0.4297,
+      "name" : "M_WEB_DAY_HAND_TOOL_0_7"
+    }, {
+      "coefficient" : 0.0602,
+      "name" : "TRU_OWN_FL"
+    }, {
+      "coefficient" : -0.00043,
+      "name" : "DS_ENRLMNT"
+    }, {
+      "coefficient" : 0.3556,
+      "name" : "S_SRS_SESNL_IND"
+    }, {
+      "coefficient" : 0.1094,
+      "name" : "M_CLUB_MEMBER_CRAFTSMAN"
+    }, {
+      "coefficient" : 0.1029,
+      "name" : "ADL_MAL_55_64_FL"
+    }, {
+      "coefficient" : 0.0891,
+      "name" : "S_HL_SESNL2_IND"
+    }, {
+      "coefficient" : -0.00085,
+      "name" : "S_DSL_LG_TRS"
+    }, {
+      "coefficient" : 0.0726,
+      "name" : "K_DIY_TOOL_TRS_3M"
+    }, {
+      "coefficient" : -0.2457,
+      "name" : "M_LOW_TOOLS_ZIP"
+    }, {
+      "coefficient" : 1.8153,
+      "name" : "M_ZIP_PENE_SRS_TOOLS"
+    }]
+}
+
+{
+  "modelId" : 59,
+  "modelDescription" : "Tools",
+  "constant" : -2.8694,
+  "modelName" : "S_SCR_TOOLS",
+  "month" : 11,
+  "variable" : [{
+      "coefficient" : 0.1757,
+      "name" : "S_TOOLS_TL_TRS_3M"
+    }, {
+      "coefficient" : 0.2174,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.5516,
+      "name" : "S_TOOLS_SESNL2_IND"
+    }, {
+      "coefficient" : 0.2941,
+      "name" : "M_DWELLING_SINGLE"
+    }, {
+      "coefficient" : -0.0025,
+      "name" : "S_DSL_TOOLS_TL_TRS"
+    }, {
+      "coefficient" : 0.0344,
+      "name" : "S_SRS_TRS_6M"
+    }, {
+      "coefficient" : 0.3412,
+      "name" : "S_TOOLS_TL_GT_12M_IND"
+    }, {
+      "coefficient" : 0.1668,
+      "name" : "HBB_AUM_MCN_FL"
+    }, {
+      "coefficient" : 0.6861,
+      "name" : "S_HL_REV_PCT_24M"
+    }, {
+      "coefficient" : 0.1204,
+      "name" : "ADL_MAL_45_54_FL"
+    }, {
+      "coefficient" : 0.396,
+      "name" : "S_MEN_APP_24M_IND"
+    }, {
+      "coefficient" : 0.6711,
+      "name" : "M_WEB_DAY_HAND_TOOL_0_7"
+    }, {
+      "coefficient" : 0.1254,
+      "name" : "TRU_OWN_FL"
+    }, {
+      "coefficient" : -0.00025,
+      "name" : "DS_ENRLMNT"
+    }, {
+      "coefficient" : 0.4755,
+      "name" : "S_SRS_SESNL_IND"
+    }, {
+      "coefficient" : 0.2127,
+      "name" : "M_CLUB_MEMBER_CRAFTSMAN"
+    }, {
+      "coefficient" : 0.1244,
+      "name" : "ADL_MAL_55_64_FL"
+    }, {
+      "coefficient" : 0.1939,
+      "name" : "S_HL_SESNL2_IND"
+    }, {
+      "coefficient" : -0.00055,
+      "name" : "S_DSL_LG_TRS"
+    }, {
+      "coefficient" : 0.1488,
+      "name" : "K_DIY_TOOL_TRS_3M"
+    }, {
+      "coefficient" : -0.2772,
+      "name" : "M_LOW_TOOLS_ZIP"
+    }, {
+      "coefficient" : 0.1056,
+      "name" : "M_ZIP_PENE_SRS_TOOLS"
+    }]
+}
+
+{
+  "modelId" : 59,
+  "modelDescription" : "Tools",
+  "constant" : -2.6336,
+  "modelName" : "S_SCR_TOOLS",
+  "month" : 10,
+  "variable" : [{
+      "coefficient" : 0.252,
+      "name" : "S_TOOLS_TL_TRS_3M"
+    }, {
+      "coefficient" : 0.2022,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.567,
+      "name" : "S_TOOLS_SESNL2_IND"
+    }, {
+      "coefficient" : 0.1634,
+      "name" : "M_DWELLING_SINGLE"
+    }, {
+      "coefficient" : -0.00288,
+      "name" : "S_DSL_TOOLS_TL_TRS"
+    }, {
+      "coefficient" : 0.0258,
+      "name" : "S_SRS_TRS_6M"
+    }, {
+      "coefficient" : 0.4044,
+      "name" : "S_TOOLS_TL_GT_12M_IND"
+    }, {
+      "coefficient" : 0.1681,
+      "name" : "HBB_AUM_MCN_FL"
+    }, {
+      "coefficient" : 0.7133,
+      "name" : "S_HL_REV_PCT_24M"
+    }, {
+      "coefficient" : 0.1032,
+      "name" : "ADL_MAL_45_54_FL"
+    }, {
+      "coefficient" : 0.3446,
+      "name" : "S_MEN_APP_24M_IND"
+    }, {
+      "coefficient" : 0.7598,
+      "name" : "M_WEB_DAY_HAND_TOOL_0_7"
+    }, {
+      "coefficient" : 0.1177,
+      "name" : "TRU_OWN_FL"
+    }, {
+      "coefficient" : -0.00044,
+      "name" : "DS_ENRLMNT"
+    }, {
+      "coefficient" : 0.4333,
+      "name" : "S_SRS_SESNL_IND"
+    }, {
+      "coefficient" : 0.0943,
+      "name" : "M_CLUB_MEMBER_CRAFTSMAN"
+    }, {
+      "coefficient" : 0.1436,
+      "name" : "ADL_MAL_55_64_FL"
+    }, {
+      "coefficient" : 0.0996,
+      "name" : "S_HL_SESNL2_IND"
+    }, {
+      "coefficient" : -0.0006,
+      "name" : "S_DSL_LG_TRS"
+    }, {
+      "coefficient" : 0.1016,
+      "name" : "K_DIY_TOOL_TRS_3M"
+    }, {
+      "coefficient" : -0.2461,
+      "name" : "M_LOW_TOOLS_ZIP"
+    }, {
+      "coefficient" : -2.1738,
+      "name" : "M_ZIP_PENE_SRS_TOOLS"
+    }]
+}
+
+{
+  "modelId" : 59,
+  "modelDescription" : "Tools",
+  "constant" : -3.1901,
+  "modelName" : "S_SCR_TOOLS",
+  "month" : 9,
+  "variable" : [{
+      "coefficient" : 0.2323,
+      "name" : "S_TOOLS_TL_TRS_3M"
+    }, {
+      "coefficient" : 0.1767,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.4988,
+      "name" : "S_TOOLS_SESNL2_IND"
+    }, {
+      "coefficient" : 0.1634,
+      "name" : "M_DWELLING_SINGLE"
+    }, {
+      "coefficient" : -0.0028,
+      "name" : "S_DSL_TOOLS_TL_TRS"
+    }, {
+      "coefficient" : 0.0282,
+      "name" : "S_SRS_TRS_6M"
+    }, {
+      "coefficient" : 0.4147,
+      "name" : "S_TOOLS_TL_GT_12M_IND"
+    }, {
+      "coefficient" : 0.1395,
+      "name" : "HBB_AUM_MCN_FL"
+    }, {
+      "coefficient" : 0.7548,
+      "name" : "S_HL_REV_PCT_24M"
+    }, {
+      "coefficient" : 0.1344,
+      "name" : "ADL_MAL_45_54_FL"
+    }, {
+      "coefficient" : 0.3485,
+      "name" : "S_MEN_APP_24M_IND"
+    }, {
+      "coefficient" : 0.8051,
+      "name" : "M_WEB_DAY_HAND_TOOL_0_7"
+    }, {
+      "coefficient" : 0.0563,
+      "name" : "TRU_OWN_FL"
+    }, {
+      "coefficient" : -0.00038,
+      "name" : "DS_ENRLMNT"
+    }, {
+      "coefficient" : 0.3731,
+      "name" : "S_SRS_SESNL_IND"
+    }, {
+      "coefficient" : 0.1094,
+      "name" : "M_CLUB_MEMBER_CRAFTSMAN"
+    }, {
+      "coefficient" : 0.0828,
+      "name" : "ADL_MAL_55_64_FL"
+    }, {
+      "coefficient" : 0.1575,
+      "name" : "S_HL_SESNL2_IND"
+    }, {
+      "coefficient" : -0.00066,
+      "name" : "S_DSL_LG_TRS"
+    }, {
+      "coefficient" : 0.0425,
+      "name" : "K_DIY_TOOL_TRS_3M"
+    }, {
+      "coefficient" : -0.2259,
+      "name" : "M_LOW_TOOLS_ZIP"
+    }, {
+      "coefficient" : 1.7174,
+      "name" : "M_ZIP_PENE_SRS_TOOLS"
+    }]
+}
+
+{
+  "modelId" : 60,
+  "modelDescription" : "Toys",
+  "constant" : -6.335,
+  "modelName" : "S_SCR_TOYS",
+  "month" : 0,
+  "variable" : [{
+      "coefficient" : 0.3357,
+      "name" : "S_APP_INT_ACC_FTWR_24M_IND"
+    }, {
+      "coefficient" : 0.1919,
+      "name" : "ADL_FEM_25_34_FL"
+    }, {
+      "coefficient" : 0.5233,
+      "name" : "S_SRS_6M_IND"
+    }, {
+      "coefficient" : -0.00165,
+      "name" : "S_DSL_KIDS_APP_TRS"
+    }, {
+      "coefficient" : 0.2431,
+      "name" : "S_BABY_ITEM_SESNL_IND"
+    }, {
+      "coefficient" : 0.2253,
+      "name" : "MONTH10"
+    }, {
+      "coefficient" : 0.1298,
+      "name" : "S_NUM_CAT_TRANSACTED_24M"
+    }, {
+      "coefficient" : 1.3051,
+      "name" : "MONTH12"
+    }, {
+      "coefficient" : 0.7793,
+      "name" : "MONTH11"
+    }, {
+      "coefficient" : 0.00672,
+      "name" : "S_K_APP_TODDLERS_SAL_TRS_24"
+    }, {
+      "coefficient" : 0.1546,
+      "name" : "S_SRS_SESNL_IND"
+    }, {
+      "coefficient" : 0.422,
+      "name" : "S_KIDS_FTWR_6M_IND"
+    }, {
+      "coefficient" : 0.4277,
+      "name" : "MONTH5"
+    }, {
+      "coefficient" : 0.2994,
+      "name" : "MONTH4"
+    }, {
+      "coefficient" : 0.419,
+      "name" : "MONTH7"
+    }, {
+      "coefficient" : 0.437,
+      "name" : "MONTH6"
+    }, {
+      "coefficient" : -0.00053,
+      "name" : "K_DSL_BABY_TRS"
+    }, {
+      "coefficient" : 0.5042,
+      "name" : "MONTH3"
+    }, {
+      "coefficient" : 0.1198,
+      "name" : "MONTH2"
+    }, {
+      "coefficient" : 0.203,
+      "name" : "S_TOYS_TRS_12M"
+    }, {
+      "coefficient" : -0.00252,
+      "name" : "S_DSL_TOYS_TRS"
+    }, {
+      "coefficient" : 0.2243,
+      "name" : "MONTH9"
+    }, {
+      "coefficient" : 0.4046,
+      "name" : "MONTH8"
+    }, {
+      "coefficient" : 0.3409,
+      "name" : "K_TOYS_CHILDRN_SPR_SLS_24M_IND"
+    }]
+}
+{
+  "modelId" : 43,
+  "modelDescription" : "Home",
+  "constant" : -3.3722,
+  "modelName" : "S_SCR_HOME",
+  "month" : 0,
+  "variable" : [{
+      "coefficient" : -0.00165,
+      "name" : "S_DSL_APP_INT_ACC_FTWR_TRS"
+    }, {
+      "coefficient" : 0.000329,
+      "name" : "S_HOME_SAL_3M"
+    }, {
+      "coefficient" : -0.00143,
+      "name" : "S_DSL_HOME_TRS"
+    }, {
+      "coefficient" : -0.0803,
+      "name" : "MONTH10"
+    }, {
+      "coefficient" : 1.0923,
+      "name" : "MONTH12"
+    }, {
+      "coefficient" : 0.7031,
+      "name" : "MONTH11"
+    }, {
+      "coefficient" : 0.1925,
+      "name" : "S_MEN_APP_24M_IND"
+    }, {
+      "coefficient" : 0.0734,
+      "name" : "S_SRS_ONLINE_TXN_PCT_6_IND"
+    }, {
+      "coefficient" : -0.0184,
+      "name" : "MONTH5"
+    }, {
+      "coefficient" : -0.1239,
+      "name" : "MONTH4"
+    }, {
+      "coefficient" : -0.0228,
+      "name" : "MONTH7"
+    }, {
+      "coefficient" : 0.0825,
+      "name" : "S_HOME_TRS_24M"
+    }, {
+      "coefficient" : 0.1864,
+      "name" : "S_BABY_ITEM_24M_IND"
+    }, {
+      "coefficient" : -0.1126,
+      "name" : "MONTH6"
+    }, {
+      "coefficient" : 0.00877,
+      "name" : "MONTH3"
+    }, {
+      "coefficient" : 0.1821,
+      "name" : "S_ALL_HA_24M_IND"
+    }, {
+      "coefficient" : -0.0953,
+      "name" : "MONTH2"
+    }, {
+      "coefficient" : 0.0237,
+      "name" : "S_ALL_APP_TRS_12M"
+    }, {
+      "coefficient" : 0.301,
+      "name" : "CRD_CRD_FL"
+    }, {
+      "coefficient" : -0.0816,
+      "name" : "MONTH9"
+    }, {
+      "coefficient" : -0.00105,
+      "name" : "S_DSL_HL_TRS"
+    }, {
+      "coefficient" : -0.00862,
+      "name" : "MONTH8"
+    }]
+}
+{
+  "modelId" : 33,
+  "modelDescription" : "Footwear",
+  "constant" : -5.5103,
+  "modelName" : "S_SCR_FOOTWEAR",
+  "month" : 0,
+  "variable" : [{
+      "coefficient" : -0.00061,
+      "name" : "S_DSL_KIDS_APP_TRS"
+    }, {
+      "coefficient" : 0.3917,
+      "name" : "MONTH10"
+    }, {
+      "coefficient" : 0.8863,
+      "name" : "S_SL_TXN_PCT_6M"
+    }, {
+      "coefficient" : 0.8715,
+      "name" : "MONTH12"
+    }, {
+      "coefficient" : 0.6991,
+      "name" : "MONTH11"
+    }, {
+      "coefficient" : 0.4502,
+      "name" : "MONTH5"
+    }, {
+      "coefficient" : 0.2539,
+      "name" : "M_USED_SEARS_CARD_FL"
+    }, {
+      "coefficient" : 0.3758,
+      "name" : "MONTH4"
+    }, {
+      "coefficient" : 0.3526,
+      "name" : "MONTH7"
+    }, {
+      "coefficient" : 0.3649,
+      "name" : "MONTH6"
+    }, {
+      "coefficient" : 0.133,
+      "name" : "S_FTWR_TRS_24M"
+    }, {
+      "coefficient" : 0.0198,
+      "name" : "K_FTWR_WOMEN_TRS_24M"
+    }, {
+      "coefficient" : 0.1737,
+      "name" : "S_NUM_CAT_TRANSACTED_12M"
+    }, {
+      "coefficient" : 0.5209,
+      "name" : "MONTH3"
+    }, {
+      "coefficient" : 0.0155,
+      "name" : "MONTH2"
+    }, {
+      "coefficient" : 0.0213,
+      "name" : "M_EARNED_POINTS_24M_CD"
+    }, {
+      "coefficient" : 0.5148,
+      "name" : "S_W_APP_24M_IND"
+    }, {
+      "coefficient" : 0.6029,
+      "name" : "S_FW_1M"
+    }, {
+      "coefficient" : 0.2303,
+      "name" : "MONTH9"
+    }, {
+      "coefficient" : 0.5305,
+      "name" : "MONTH8"
+    }]
+}
+{
+  "modelId" : 32,
+  "modelDescription" : "fine jewellery",
+  "constant" : -4.8172,
+  "modelName" : "S_SCR_FNJL",
+  "month" : 0,
+  "variable" : [{
+      "coefficient" : 0.000862,
+      "name" : "S_FNJL_SAL_TRS_24"
+    }, {
+      "coefficient" : 0.0059,
+      "name" : "S_JW_2M_CNT"
+    }, {
+      "coefficient" : 0.9232,
+      "name" : "S_FNJL_SESNL2_IND"
+    }, {
+      "coefficient" : 0.3345,
+      "name" : "S_FNJL_TRS_3M"
+    }, {
+      "coefficient" : 0.058,
+      "name" : "MONTH10"
+    }, {
+      "coefficient" : 0.4976,
+      "name" : "S_APP_ACC_24M_IND"
+    }, {
+      "coefficient" : -0.00216,
+      "name" : "S_DSL_SRS_TRS"
+    }, {
+      "coefficient" : 1.5175,
+      "name" : "MONTH12"
+    }, {
+      "coefficient" : 0.6934,
+      "name" : "MONTH11"
+    }, {
+      "coefficient" : 0.4407,
+      "name" : "S_SL_SESNL_IND"
+    }, {
+      "coefficient" : 0.3379,
+      "name" : "S_HOME_24M_IND"
+    }, {
+      "coefficient" : 0.4861,
+      "name" : "MONTH5"
+    }, {
+      "coefficient" : 0.0591,
+      "name" : "MONTH4"
+    }, {
+      "coefficient" : 0.0959,
+      "name" : "MONTH7"
+    }, {
+      "coefficient" : 0.2368,
+      "name" : "MONTH6"
+    }, {
+      "coefficient" : 0.0978,
+      "name" : "MONTH3"
+    }, {
+      "coefficient" : 0.3053,
+      "name" : "MONTH2"
+    }, {
+      "coefficient" : 0.4451,
+      "name" : "S_W_APP_24M_IND"
+    }, {
+      "coefficient" : 0.1528,
+      "name" : "CRD_CRD_FL"
+    }, {
+      "coefficient" : 0.00465,
+      "name" : "MONTH9"
+    }, {
+      "coefficient" : 0.1731,
+      "name" : "MONTH8"
+    }, {
+      "coefficient" : -0.00245,
+      "name" : "S_DSL_FNJL_TRS"
+    }]
+}
+{
+  "modelId" : 21,
+  "modelDescription" : "All Apparel",
+  "constant" : -3.8524,
+  "modelName" : "S_SCR_ALL_APP",
+  "month" : 0,
+  "variable" : [{
+      "coefficient" : 0.0546,
+      "name" : "S_ALL_APP_TRS_24M"
+    }, {
+      "coefficient" : 0.2652,
+      "name" : "MONTH10"
+    }, {
+      "coefficient" : 0.1837,
+      "name" : "S_NUM_CAT_TRANSACTED_24M"
+    }, {
+      "coefficient" : 0.9829,
+      "name" : "S_SL_TXN_PCT_6M"
+    }, {
+      "coefficient" : 1.0961,
+      "name" : "MONTH12"
+    }, {
+      "coefficient" : 0.5379,
+      "name" : "MONTH11"
+    }, {
+      "coefficient" : -0.00093,
+      "name" : "S_DSL_W_APP_TRS"
+    }, {
+      "coefficient" : 0.2701,
+      "name" : "MONTH5"
+    }, {
+      "coefficient" : 0.0129,
+      "name" : "M_NUM_YR_RSD"
+    }, {
+      "coefficient" : 0.2426,
+      "name" : "MONTH4"
+    }, {
+      "coefficient" : 0.1391,
+      "name" : "MONTH7"
+    }, {
+      "coefficient" : 0.2001,
+      "name" : "MONTH6"
+    }, {
+      "coefficient" : -0.0003,
+      "name" : "K_DSL_ALL_APP_TRS"
+    }, {
+      "coefficient" : 0.4089,
+      "name" : "MONTH3"
+    }, {
+      "coefficient" : 0.0109,
+      "name" : "MONTH2"
+    }, {
+      "coefficient" : 0.1867,
+      "name" : "MONTH9"
+    }, {
+      "coefficient" : 0.3,
+      "name" : "MONTH8"
+    }]
+}
+{
+  "modelId" : 31,
+  "modelDescription" : "All fitness and sporting goods",
+  "constant" : -7.2189,
+  "modelName" : "S_SCR_FITNESS",
+  "month" : 0,
+  "variable" : [{
+      "coefficient" : -0.1565,
+      "name" : "ADL_FEM_55_64_FL"
+    }, {
+      "coefficient" : 0.4404,
+      "name" : "S_HL_TXN_PCT_24M"
+    }, {
+      "coefficient" : 0.0112,
+      "name" : "S_SRS_TRS_3M"
+    }, {
+      "coefficient" : 0.2788,
+      "name" : "S_HL_6M_IND"
+    }, {
+      "coefficient" : 0.1802,
+      "name" : "M_DWELLING_SINGLE"
+    }, {
+      "coefficient" : -0.9097,
+      "name" : "MONTH10"
+    }, {
+      "coefficient" : 0.3833,
+      "name" : "S_SRS_3M_IND"
+    }, {
+      "coefficient" : -0.2344,
+      "name" : "MONTH11"
+    }, {
+      "coefficient" : -0.4035,
+      "name" : "ADL_FEM_75_PLS_FL"
+    }, {
+      "coefficient" : 0.1751,
+      "name" : "S_HL_SESNL_IND"
+    }, {
+      "coefficient" : 0.6415,
+      "name" : "S_SPRTS_GD_3M_IND"
+    }, {
+      "coefficient" : -0.3349,
+      "name" : "ADL_FEM_65_74_FL"
+    }, {
+      "coefficient" : 0.8889,
+      "name" : "S_SP_2M"
+    }, {
+      "coefficient" : -0.00503,
+      "name" : "PRS_CLU_CD"
+    }, {
+      "coefficient" : 52.9119,
+      "name" : "M_ZIP_PENE_CE_TV"
+    }, {
+      "coefficient" : 0.2147,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.2135,
+      "name" : "S_SL_TXN_PCT_24M"
+    }, {
+      "coefficient" : 0.1645,
+      "name" : "S_NUM_CAT_TRANSACTED_24M"
+    }, {
+      "coefficient" : 0.6103,
+      "name" : "M_WEB_DAY_EXERCISE_0_7"
+    }, {
+      "coefficient" : 0.6448,
+      "name" : "S_SPRTS_GD_24M_IND"
+    }, {
+      "coefficient" : -0.8228,
+      "name" : "MONTH5"
+    }, {
+      "coefficient" : -0.8029,
+      "name" : "MONTH4"
+    }, {
+      "coefficient" : 0.1476,
+      "name" : "ADL_MAL_35_44_FL"
+    }, {
+      "coefficient" : -0.7125,
+      "name" : "MONTH7"
+    }, {
+      "coefficient" : -0.7468,
+      "name" : "MONTH6"
+    }, {
+      "coefficient" : -0.7252,
+      "name" : "MONTH1"
+    }, {
+      "coefficient" : -0.6466,
+      "name" : "MONTH3"
+    }, {
+      "coefficient" : 0.2033,
+      "name" : "M_CREDIT_CARD_HOLDER"
+    }, {
+      "coefficient" : -0.9896,
+      "name" : "MONTH2"
+    }, {
+      "coefficient" : 0.1974,
+      "name" : "S_SPRTS_GD_TRS_12M"
+    }, {
+      "coefficient" : -0.8293,
+      "name" : "MONTH9"
+    }, {
+      "coefficient" : -0.8103,
+      "name" : "MONTH8"
+    }]
+}
+{
+  "modelId" : 37,
+  "modelDescription" : "Home Appliances ~ Vacuum",
+  "constant" : -5.4657,
+  "modelName" : "S_SCR_HA_VAC",
+  "month" : 0,
+  "variable" : [{
+      "coefficient" : 0.402,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.1022,
+      "name" : "S_HE_FS_TRS_24M"
+    }, {
+      "coefficient" : 0.3765,
+      "name" : "S_LANDS_END_24M_IND"
+    }, {
+      "coefficient" : 0.3495,
+      "name" : "S_SRS_3M_IND"
+    }, {
+      "coefficient" : 0.0936,
+      "name" : "S_NUM_CAT_TRANSACTED_24M"
+    }, {
+      "coefficient" : 0.7077,
+      "name" : "S_HL_REV_PCT_24M"
+    }, {
+      "coefficient" : -0.00011,
+      "name" : "M_DSL_VACUUM_CLEANER_HMS"
+    }, {
+      "coefficient" : 0.00158,
+      "name" : "S_HE_FS_SAL_3M"
+    }, {
+      "coefficient" : 0.201,
+      "name" : "M_WEB_TRAIT_VACUUM_15_30"
+    }, {
+      "coefficient" : 0.6944,
+      "name" : "M_FLOORCARE_36M_FLG"
+    }, {
+      "coefficient" : 0.00343,
+      "name" : "S_MEN_APP_SAL_TRS_12"
+    }, {
+      "coefficient" : 0.2162,
+      "name" : "S_SRS_SESNL_IND"
+    }, {
+      "coefficient" : -0.00038,
+      "name" : "DS_ENRLMNT"
+    }, {
+      "coefficient" : 0.1828,
+      "name" : "M_DWELLING_MULTI"
+    }, {
+      "coefficient" : -0.00025,
+      "name" : "M_HS_FLOORCARE_DSL"
+    }, {
+      "coefficient" : 0.4325,
+      "name" : "M_CREDIT_CARD_HOLDER"
+    }, {
+      "coefficient" : 0.6044,
+      "name" : "CRD_CRD_FL"
+    }, {
+      "coefficient" : 0.242,
+      "name" : "M_WEB_TRAIT_VACUUM_0_7"
+    }, {
+      "coefficient" : 0.1956,
+      "name" : "M_WEB_TRAIT_VACUUM_8_14"
+    }, {
+      "coefficient" : -0.2773,
+      "name" : "M_WEB_TRAIT_TRACTOR_15_30"
+    }]
+}
+{
+  "modelId" : 47,
+  "modelDescription" : "Lawn and Garden ~ All",
+  "constant" : -6.9385,
+  "modelName" : "S_SCR_LG_ADAS",
+  "month" : 0,
+  "variable" : [{
+      "coefficient" : 0.2053,
+      "name" : "S_TOOLS_SESNL2_IND"
+    }, {
+      "coefficient" : 0.4107,
+      "name" : "S_LG_1M"
+    }, {
+      "coefficient" : 0.8775,
+      "name" : "MONTH10"
+    }, {
+      "coefficient" : -0.00164,
+      "name" : "S_DSL_SRS_TRS"
+    }, {
+      "coefficient" : 0.6894,
+      "name" : "MONTH12"
+    }, {
+      "coefficient" : 0.2255,
+      "name" : "S_XMAS_6M_IND"
+    }, {
+      "coefficient" : 0.8226,
+      "name" : "MONTH11"
+    }, {
+      "coefficient" : 0.4519,
+      "name" : "S_HL_REV_PCT_24M"
+    }, {
+      "coefficient" : 0.19,
+      "name" : "S_HL_SESNL_IND"
+    }, {
+      "coefficient" : 0.2748,
+      "name" : "M_USED_SEARS_CARD_FL"
+    }, {
+      "coefficient" : 0.2367,
+      "name" : "S_OL_12M_IND"
+    }, {
+      "coefficient" : 0.3954,
+      "name" : "M_TRIMMERS_EDGERS_HISTORY_FLG"
+    }, {
+      "coefficient" : 0.1669,
+      "name" : "S_HE_FS_12M_IND"
+    }, {
+      "coefficient" : 0.3256,
+      "name" : "M_MOWERS_HISTORY_FLG"
+    }, {
+      "coefficient" : 0.3215,
+      "name" : "S_LG_2M"
+    }, {
+      "coefficient" : 0.4512,
+      "name" : "S_TOOLS_24M_IND"
+    }, {
+      "coefficient" : 0.0676,
+      "name" : "S_HL_TRS_3M"
+    }, {
+      "coefficient" : 0.3943,
+      "name" : "M_WEB_DAY_SNOW_BLOWER_0_7"
+    }, {
+      "coefficient" : 0.386,
+      "name" : "M_TRACTORS_HISTORY_FLG"
+    }, {
+      "coefficient" : 0.4072,
+      "name" : "S_LG_3M_IND"
+    }, {
+      "coefficient" : 0.6291,
+      "name" : "M_WEATHER_PREC_IN_LAST14D"
+    }, {
+      "coefficient" : 0.1698,
+      "name" : "K_ODL_SPR_SLS_12M_IND"
+    }, {
+      "coefficient" : 1.8771,
+      "name" : "MONTH5"
+    }, {
+      "coefficient" : 1.6993,
+      "name" : "MONTH4"
+    }, {
+      "coefficient" : 1.425,
+      "name" : "MONTH7"
+    }, {
+      "coefficient" : 1.6136,
+      "name" : "MONTH6"
+    }, {
+      "coefficient" : 1.103,
+      "name" : "S_LG_24M_IND"
+    }, {
+      "coefficient" : 0.2324,
+      "name" : "M_HS_LAWNCARE_5Y"
+    }, {
+      "coefficient" : 0.8786,
+      "name" : "MONTH3"
+    }, {
+      "coefficient" : 0.3243,
+      "name" : "MONTH2"
+    }, {
+      "coefficient" : 0.3238,
+      "name" : "S_LG_SESNL_IND"
+    }, {
+      "coefficient" : 1.0695,
+      "name" : "MONTH9"
+    }, {
+      "coefficient" : 1.286,
+      "name" : "MONTH8"
+    }, {
+      "coefficient" : 0.37,
+      "name" : "S_LG_SESNL2_IND"
+    }]
+}
+{
+  "modelId" : 50,
+  "modelDescription" : "Lawn and Garden ~ Tractor",
+  "constant" : -5.3659,
+  "modelName" : "S_SCR_LG_TRACTOR",
+  "month" : 0,
+  "variable" : [{
+      "coefficient" : 1.1276,
+      "name" : "M_WEB_DAY_BATTERY_0_14"
+    }, {
+      "coefficient" : 0.0779,
+      "name" : "M_WEB_TRAIT_MOWER_15_30"
+    }, {
+      "coefficient" : 0.4187,
+      "name" : "S_HL_TXN_PCT_12M"
+    }, {
+      "coefficient" : 0.2925,
+      "name" : "TRU_OWN_FL"
+    }, {
+      "coefficient" : -0.00132,
+      "name" : "S_DSL_LG_TRS"
+    }, {
+      "coefficient" : 7.4E-05,
+      "name" : "S_HL_SAL_3M"
+    }, {
+      "coefficient" : 2.4827,
+      "name" : "M_LG_NSNTHR_RECAP_FLG"
+    }, {
+      "coefficient" : 0.5548,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : -0.2589,
+      "name" : "S_SL_TXN_PCT_24M"
+    }, {
+      "coefficient" : 0.5925,
+      "name" : "M_SRS_SEARS_CARD_AMT_IND"
+    }, {
+      "coefficient" : -106.8,
+      "name" : "MONTH8"
+    }, {
+      "coefficient" : 0.5214,
+      "name" : "MONTH7"
+    }, {
+      "coefficient" : -0.2515,
+      "name" : "MONTH6"
+    }, {
+      "coefficient" : 1.1542,
+      "name" : "M_TRACTORS_HISTORY_FLG"
+    }, {
+      "coefficient" : -0.1724,
+      "name" : "MONTH5"
+    }, {
+      "coefficient" : 1.0174,
+      "name" : "MONTH4"
+    }, {
+      "coefficient" : 0.2493,
+      "name" : "ADL_MAL_55_plus_fl"
+    }, {
+      "coefficient" : 1.5197,
+      "name" : "M_WEATHER_PREC_IN_LAST14D"
+    }, {
+      "coefficient" : -0.00015,
+      "name" : "M_HS_LAWNCARE_DSL"
+    }, {
+      "coefficient" : -0.00014,
+      "name" : "M_HA_LAWN_OTHER_DSL"
+    }, {
+      "coefficient" : -0.2918,
+      "name" : "M_HS_ANY_5Y"
+    }, {
+      "coefficient" : 0.4093,
+      "name" : "indic_parts"
+    }, {
+      "coefficient" : -0.0272,
+      "name" : "M_EARNED_POINTS_24M_CD"
+    }, {
+      "coefficient" : 0.000424,
+      "name" : "M_SRS_LAYAWAY_AMT"
+    }, {
+      "coefficient" : 0.7657,
+      "name" : "CRD_CRD_FL"
+    }, {
+      "coefficient" : -0.2261,
+      "name" : "M_HA_LAWN_MOWER_5Y"
+    }, {
+      "coefficient" : 0.5024,
+      "name" : "HME_IPV_DIY_FL"
+    }]
+}
+{
+  "modelId" : 53,
+  "modelDescription" : "Mattress",
+  "constant" : -6.250802885,
+  "modelName" : "S_SCR_MATTRESS",
+  "month" : 0,
+  "variable" : [{
+      "coefficient" : 0.629091972,
+      "name" : "M_DWELLING_SINGLE"
+    }, {
+      "coefficient" : 0.1246,
+      "name" : "MONTH10"
+    }, {
+      "coefficient" : -0.001012349,
+      "name" : "S_DSL_SRS_TRS"
+    }, {
+      "coefficient" : 0.2442,
+      "name" : "MONTH11"
+    }, {
+      "coefficient" : 0.871296448,
+      "name" : "M_DWELLING_MULTI"
+    }, {
+      "coefficient" : 1.047161739,
+      "name" : "M_WEB_VIEW_DEALS_0_7"
+    }, {
+      "coefficient" : 0.227199108,
+      "name" : "M_USED_SEARS_CARD_FL"
+    }, {
+      "coefficient" : 0.207497249,
+      "name" : "M_LOW_SNOW_ZIP"
+    }, {
+      "coefficient" : 1.576013835,
+      "name" : "M_WEEK_SINCE_RECAP_1_FLG"
+    }, {
+      "coefficient" : 2.019777941,
+      "name" : "S_HM_1M"
+    }, {
+      "coefficient" : -0.00146356,
+      "name" : "S_DSL_HG_H_L_TRS"
+    }, {
+      "coefficient" : 0.026535201,
+      "name" : "M_WEB_TRAIT_MATTRESS_31_60"
+    }, {
+      "coefficient" : 0.000783089,
+      "name" : "S_HG_H_L_SAL_TRS_24"
+    }, {
+      "coefficient" : -0.000684418,
+      "name" : "S_DSL_ALL_HA_TRS"
+    }, {
+      "coefficient" : 0.000299492,
+      "name" : "S_CE_ELEC_SAL_TRS_24"
+    }, {
+      "coefficient" : -0.007889871,
+      "name" : "PRS_CLU_CD"
+    }, {
+      "coefficient" : -0.194898103,
+      "name" : "K_ALL_APP_SPR_SLS_24M_IND"
+    }, {
+      "coefficient" : 0.000444749,
+      "name" : "S_HOME_SAL_3M"
+    }, {
+      "coefficient" : 0.314752407,
+      "name" : "M_HA_APP_LAUNDRY_ANYTIME"
+    }, {
+      "coefficient" : 0.212607645,
+      "name" : "S_HA_GT_12M_IND"
+    }, {
+      "coefficient" : 27.14176272,
+      "name" : "M_ZIP_PENE_AIR_CONDITIONER"
+    }, {
+      "coefficient" : -0.000703743,
+      "name" : "S_DSL_SG_EQUIP_TRS"
+    }, {
+      "coefficient" : 0.4836,
+      "name" : "MONTH5"
+    }, {
+      "coefficient" : -0.0287,
+      "name" : "MONTH4"
+    }, {
+      "coefficient" : -0.014531748,
+      "name" : "M_NUM_YR_RSD"
+    }, {
+      "coefficient" : 0.4026,
+      "name" : "MONTH7"
+    }, {
+      "coefficient" : 0.0275,
+      "name" : "MONTH6"
+    }, {
+      "coefficient" : 0.00473,
+      "name" : "MONTH1"
+    }, {
+      "coefficient" : 0.0841,
+      "name" : "MONTH3"
+    }, {
+      "coefficient" : 0.1366,
+      "name" : "MONTH2"
+    }, {
+      "coefficient" : 0.518421752,
+      "name" : "M_CREDIT_CARD_HOLDER"
+    }, {
+      "coefficient" : -0.000391603,
+      "name" : "S_DSL_MISC_BUS_TRS"
+    }, {
+      "coefficient" : 0.3209,
+      "name" : "MONTH9"
+    }, {
+      "coefficient" : 0.1931,
+      "name" : "MONTH8"
+    }, {
+      "coefficient" : 0.076715617,
+      "name" : "M_WEB_TRAIT_MATTRESS_8_14"
+    }, {
+      "coefficient" : 0.489855566,
+      "name" : "HME_IPV_DIY_FL"
+    }]
+}
+{
+  "modelId" : 55,
+  "modelDescription" : "Outdoor Living - all",
+  "constant" : -8.5635,
+  "modelName" : "S_SCR_ODL",
+  "month" : 0,
+  "variable" : [{
+      "coefficient" : 0.2658,
+      "name" : "HME_OWN_CD"
+    }, {
+      "coefficient" : 0.6311,
+      "name" : "S_HL_REV_PCT_12M"
+    }, {
+      "coefficient" : 0.768,
+      "name" : "MONTH10"
+    }, {
+      "coefficient" : 0.9392,
+      "name" : "MONTH12"
+    }, {
+      "coefficient" : 0.4031,
+      "name" : "S_OL_TRS_12M"
+    }, {
+      "coefficient" : 0.5389,
+      "name" : "MONTH11"
+    }, {
+      "coefficient" : 1.8188,
+      "name" : "MONTH5"
+    }, {
+      "coefficient" : 1.4131,
+      "name" : "MONTH4"
+    }, {
+      "coefficient" : 0.455,
+      "name" : "M_HA_APPL_COOKING_ANYTIME"
+    }, {
+      "coefficient" : 0.000307,
+      "name" : "S_HL_SAL_TRS_24"
+    }, {
+      "coefficient" : 1.3846,
+      "name" : "MONTH7"
+    }, {
+      "coefficient" : 1.6559,
+      "name" : "MONTH6"
+    }, {
+      "coefficient" : 0.9782,
+      "name" : "MONTH3"
+    }, {
+      "coefficient" : 0.2129,
+      "name" : "S_NUM_CAT_TRANSACTED_12M"
+    }, {
+      "coefficient" : 1.7421,
+      "name" : "S_OD_1M"
+    }, {
+      "coefficient" : 0.2944,
+      "name" : "MONTH2"
+    }, {
+      "coefficient" : -0.00071,
+      "name" : "S_DSL_LG_TRS"
+    }, {
+      "coefficient" : 0.1444,
+      "name" : "S_HA_24M_IND"
+    }, {
+      "coefficient" : 0.5141,
+      "name" : "CRD_CRD_FL"
+    }, {
+      "coefficient" : 1.1044,
+      "name" : "MONTH9"
+    }, {
+      "coefficient" : -0.00072000000000000015,
+      "name" : "S_DSL_TOOLS_TRS"
+    }, {
+      "coefficient" : 1.0915,
+      "name" : "MONTH8"
+    }, {
+      "coefficient" : 0.3,
+      "name" : "BOOST_ODL_ATC"
+    }, {
+      "coefficient" : 0.3,
+      "name" : "BOOST_ODL_BROWSE"
+    }]
+}
+{
+  "modelId" : 25,
+  "modelDescription" : "Auto",
+  "constant" : -3.7076,
+  "modelName" : "S_SCR_AUTO",
+  "month" : 0,
+  "variable" : [{
+      "coefficient" : -0.00011,
+      "name" : "K_DSL_KMT_TRS"
+    }, {
+      "coefficient" : 0.4416,
+      "name" : "M_DWELLING_SINGLE"
+    }, {
+      "coefficient" : 0.0308,
+      "name" : "MONTH10"
+    }, {
+      "coefficient" : 0.6095,
+      "name" : "S_AUTO_ACC_CP_TR_P24M"
+    }, {
+      "coefficient" : -0.0018,
+      "name" : "S_DSL_SRS_TRS"
+    }, {
+      "coefficient" : 0.8067,
+      "name" : "S_AU_1M"
+    }, {
+      "coefficient" : 0.5356,
+      "name" : "M_DWELLING_MULTI"
+    }, {
+      "coefficient" : 1.488E-06,
+      "name" : "M_EST_ICM_VAL"
+    }, {
+      "coefficient" : 0.0344,
+      "name" : "S_MEN_APP_12M_IND"
+    }, {
+      "coefficient" : 0.3089,
+      "name" : "S_TL_2M"
+    }, {
+      "coefficient" : -0.00304,
+      "name" : "S_DSL_AUTO_TRS"
+    }, {
+      "coefficient" : 0.1591,
+      "name" : "S_AUTO_TRS_24M"
+    }, {
+      "coefficient" : 0.252,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.1687,
+      "name" : "S_SRS_SESNL2_IND"
+    }, {
+      "coefficient" : -0.1712,
+      "name" : "K_WAPP_SPR_SLS_24M_IND"
+    }, {
+      "coefficient" : 0.1408,
+      "name" : "S_SRS_SESNL_IND"
+    }, {
+      "coefficient" : -0.0473,
+      "name" : "MONTH5"
+    }, {
+      "coefficient" : -0.1667,
+      "name" : "MONTH4"
+    }, {
+      "coefficient" : 0.0144,
+      "name" : "MONTH7"
+    }, {
+      "coefficient" : -0.04,
+      "name" : "MONTH6"
+    }, {
+      "coefficient" : 0.3138,
+      "name" : "MONTH1"
+    }, {
+      "coefficient" : -0.0724,
+      "name" : "MONTH3"
+    }, {
+      "coefficient" : 0.2477,
+      "name" : "M_CREDIT_CARD_HOLDER"
+    }, {
+      "coefficient" : 0.3897,
+      "name" : "MONTH2"
+    }, {
+      "coefficient" : 0.1886,
+      "name" : "S_TOOLS_SESNL_IND"
+    }, {
+      "coefficient" : -0.0645,
+      "name" : "MONTH12"
+    }, {
+      "coefficient" : -0.0645,
+      "name" : "MONTH11"
+    }, {
+      "coefficient" : 0.00756,
+      "name" : "MONTH9"
+    }, {
+      "coefficient" : -0.0487,
+      "name" : "MONTH8"
+    }]
+}
+{
+  "modelId" : 56,
+  "modelName" : "S_SCR_POWER_TOOLS",
+  "modelDescription" : "Tools ~ power tools",
+  "constant" : -5.8471,
+  "month" : 0,
+  "variable" : [{
+      "name" : "S_TOOLS_TL_SESNL_IND",
+      "coefficient" : 0.5013
+    }, {
+      "name" : "S_TOOLS_TL_SESNL2_IND",
+      "coefficient" : 0.6371
+    }, {
+      "name" : "M_WEB_TRAIT_POWER_TOOL_0_7",
+      "coefficient" : 0.0585
+    }, {
+      "name" : "S_DSL_TOOLS_TL_TRS",
+      "coefficient" : -0.00231
+    }, {
+      "name" : "M_WEB_TRAIT_POWER_TOOL_8_14",
+      "coefficient" : 0.0537
+    }, {
+      "name" : "HBB_WWK_FL",
+      "coefficient" : 0.2381
+    }, {
+      "name" : "S_DSL_LG_TRS",
+      "coefficient" : -0.00043
+    }, {
+      "name" : "S_SL_24M_IND",
+      "coefficient" : 0.3013
+    }, {
+      "name" : "ADL_MAL_65_74_FL",
+      "coefficient" : 0.1549
+    }, {
+      "name" : "S_SRS_ONLINE_TXN_PCT_24_IND",
+      "coefficient" : 0.1823
+    }, {
+      "name" : "M_CNT_RESPONSE_CLICK_1_MTH",
+      "coefficient" : 0.076
+    }, {
+      "name" : "S_HL_TXN_PCT_24M",
+      "coefficient" : 0.9585
+    }, {
+      "name" : "S_TOOLS_SAL_TRS_24",
+      "coefficient" : 0.00112
+    }, {
+      "name" : "ADL_MAL_55_64_FL",
+      "coefficient" : 0.1159
+    }, {
+      "name" : "TRU_OWN_FL",
+      "coefficient" : 0.1516
+    }, {
+      "name" : "S_NUM_CAT_TRANSACTED_12M",
+      "coefficient" : 0.0724
+    }, {
+      "name" : "M_CLUB_MEMBER_CRAFTSMAN",
+      "coefficient" : 0.1711
+    }, {
+      "name" : "M_DWELLING_SINGLE",
+      "coefficient" : 0.1734
+    }, {
+      "name" : "M_HA_LAWN_OTHER_ANYTIME",
+      "coefficient" : 0.3297
+    }, {
+      "name" : "M_CREDIT_CARD_HOLDER",
+      "coefficient" : 0.1911
+    }, {
+      "name" : "S_DSL_MEN_FTWR_TRS",
+      "coefficient" : -0.00036
+    }, {
+      "name" : "M_LOW_POWER_ZIP",
+      "coefficient" : -0.197
+    }, {
+      "name" : "ADL_FEM_75_PLS_FL",
+      "coefficient" : -0.163
+    }, {
+      "name" : "S_TL_2M",
+      "coefficient" : 0.5612
+    }, {
+      "name" : "MONTH1",
+      "coefficient" : 0.0368
+    }, {
+      "name" : "MONTH2",
+      "coefficient" : 0.5579
+    }, {
+      "name" : "MONTH3",
+      "coefficient" : 0.1218
+    }, {
+      "name" : "MONTH4",
+      "coefficient" : 0.6077
+    }, {
+      "name" : "MONTH5",
+      "coefficient" : 0.0848
+    }, {
+      "name" : "MONTH6",
+      "coefficient" : 0.4635
+    }, {
+      "name" : "MONTH7",
+      "coefficient" : 0.00493
+    }, {
+      "name" : "MONTH8",
+      "coefficient" : 0.00942
+    }, {
+      "name" : "MONTH10",
+      "coefficient" : 0.0471
+    }, {
+      "name" : "MONTH11",
+      "coefficient" : 1.0465
+    }, {
+      "name" : "MONTH12",
+      "coefficient" : 1.2445
+    }]
+}
+{
+  "modelId" : 39,
+  "modelName" : "S_SCR_HAND_TOOLS",
+  "modelDescription" : "Tools ~ hand tools",
+  "constant" : -3.9964,
+  "month" : 0,
+  "variable" : [{
+      "name" : "S_DSL_TOOLS_TL_TRS",
+      "coefficient" : -0.00305
+    }, {
+      "name" : "S_TOOLS_TL_SESNL2_IND",
+      "coefficient" : 0.7091
+    }, {
+      "name" : "M_CLUB_MEMBER_CRAFTSMAN",
+      "coefficient" : 0.1928
+    }, {
+      "name" : "HBB_AUM_MCN_FL",
+      "coefficient" : 0.1613
+    }, {
+      "name" : "K_CHRISTMAS_12M_SESNL_IND",
+      "coefficient" : 0.2156
+    }, {
+      "name" : "S_TOOLS_ELECTRICAL_24M_IND",
+      "coefficient" : 0.4073
+    }, {
+      "name" : "PARTS_S_TRANS",
+      "coefficient" : 0.00745
+    }, {
+      "name" : "M_DWELLING_SINGLE",
+      "coefficient" : 0.144
+    }, {
+      "name" : "ADL_MAL_45_54_FL",
+      "coefficient" : 0.1654
+    }, {
+      "name" : "ADL_MAL_25_34_FL",
+      "coefficient" : 0.1734
+    }, {
+      "name" : "S_TL_1M",
+      "coefficient" : 0.43
+    }, {
+      "name" : "S_MEN_APP_24M_IND",
+      "coefficient" : 0.1953
+    }, {
+      "name" : "S_TOOLS_TL_TRS_3M",
+      "coefficient" : 0.2046
+    }, {
+      "name" : "S_TOOLS_TL_PCT_SAL_12",
+      "coefficient" : 0.6429
+    }, {
+      "name" : "M_WEB_DAY_HAND_TOOL_0_7",
+      "coefficient" : 0.3885
+    }, {
+      "name" : "M_OCC_CD_CRAFTSMAN",
+      "coefficient" : 0.1112
+    }, {
+      "name" : "K_DSL_FSG_SPRTNG_GDS_TRS",
+      "coefficient" : -0.00021
+    }, {
+      "name" : "ADL_MAL_75_PLS_FL",
+      "coefficient" : -0.1648
+    }, {
+      "name" : "M_CNT_RESPONSE_CLICK_1_MTH",
+      "coefficient" : 0.0572
+    }, {
+      "name" : "M_HA_LAWN_OTHER_ANYTIME",
+      "coefficient" : 0.1792
+    }, {
+      "name" : "ADL_MAL_35_44_FL",
+      "coefficient" : 0.0989
+    }, {
+      "name" : "ADL_FEM_75_PLS_FL",
+      "coefficient" : -0.1946
+    }, {
+      "name" : "TRU_OWN_FL",
+      "coefficient" : 0.0871
+    }, {
+      "name" : "M_LOW_HAND_ZIP",
+      "coefficient" : -0.1699
+    }, {
+      "name" : "S_MEN_FTWR_SAL_TRS_24",
+      "coefficient" : 0.00388
+    }, {
+      "name" : "S_NUM_CAT_TRANSACTED_12M",
+      "coefficient" : 0.0679
+    }, {
+      "name" : "PTP_SOR_MCY_FL",
+      "coefficient" : 0.1595
+    }, {
+      "name" : "MONTH2",
+      "coefficient" : 0.0715
+    }, {
+      "name" : "MONTH3",
+      "coefficient" : 0.3275
+    }, {
+      "name" : "MONTH4",
+      "coefficient" : 0.2628
+    }, {
+      "name" : "MONTH5",
+      "coefficient" : 0.3042
+    }, {
+      "name" : "MONTH6",
+      "coefficient" : 0.43
+    }, {
+      "name" : "MONTH7",
+      "coefficient" : 0.188
+    }, {
+      "name" : "MONTH8",
+      "coefficient" : 0.2287
+    }, {
+      "name" : "MONTH9",
+      "coefficient" : 0.2345
+    }, {
+      "name" : "MONTH10",
+      "coefficient" : 0.3181
+    }, {
+      "name" : "MONTH11",
+      "coefficient" : 0.837
+    }, {
+      "name" : "MONTH12",
+      "coefficient" : 1.2979
+    }]
+}
+{
+  "modelId" : 48,
+  "modelDescription" : "Lawn and Garden ~ Lawn Mower",
+  "constant" : -8.3655,
+  "modelName" : "S_SCR_LG_MOWER",
+  "month" : 0,
+  "variable" : [{
+      "coefficient" : 0.2192,
+      "name" : "M_LOW_POWER_ZIP"
+    }, {
+      "coefficient" : 0.2598,
+      "name" : "S_HOME_6M_IND"
+    }, {
+      "coefficient" : 0.4392,
+      "name" : "K_LG_GT_12M_IND"
+    }, {
+      "coefficient" : 0.8395,
+      "name" : "M_DWELLING_SINGLE"
+    }, {
+      "coefficient" : -0.167,
+      "name" : "HBB_CRF_FL"
+    }, {
+      "coefficient" : 3.8506,
+      "name" : "M_ZIP_PENE_AP_JEWELRY"
+    }, {
+      "coefficient" : 0.0,
+      "name" : "M_ZIPTREND_AU_BATTERY_AMT"
+    }, {
+      "coefficient" : 0.0,
+      "name" : "M_ZIPTREND_OL_GRILL_AMT"
+    }, {
+      "coefficient" : 0.154,
+      "name" : "M_WEB_TRAIT_MOWER_0_7"
+    }, {
+      "coefficient" : -0.00137,
+      "name" : "S_DSL_LG_TRS"
+    }, {
+      "coefficient" : -0.00139,
+      "name" : "S_DSL_HL_TRS"
+    }, {
+      "coefficient" : 0.3068,
+      "name" : "K_FSG_SPRTNG_GDS_SLS_24M_IND"
+    }, {
+      "coefficient" : 0.607,
+      "name" : "M_MOWERS_HISTORY_FLG"
+    }, {
+      "coefficient" : -0.5069,
+      "name" : "MONTH10"
+    }, {
+      "coefficient" : 0.7075,
+      "name" : "S_LG_2M"
+    }, {
+      "coefficient" : 2.4189,
+      "name" : "M_HIGH_EXERCISE_ZIP"
+    }, {
+      "coefficient" : 0.4591,
+      "name" : "M_HA_ANY_ANYTIME"
+    }, {
+      "coefficient" : 0.2635,
+      "name" : "MONTH8"
+    }, {
+      "coefficient" : 0.4076,
+      "name" : "MONTH7"
+    }, {
+      "coefficient" : 0.9883,
+      "name" : "MONTH6"
+    }, {
+      "coefficient" : 1.6521,
+      "name" : "MONTH5"
+    }, {
+      "coefficient" : 0.0,
+      "name" : "M_ZIPTREND_HA_WASHDRY_AMT"
+    }, {
+      "coefficient" : 1.2087,
+      "name" : "MONTH4"
+    }, {
+      "coefficient" : 0.0808,
+      "name" : "MONTH3"
+    }, {
+      "coefficient" : -0.7038,
+      "name" : "MONTH2"
+    }, {
+      "coefficient" : 1.1307,
+      "name" : "M_WEATHER_PREC_IN_LAST14D"
+    }, {
+      "coefficient" : -1.6222,
+      "name" : "MONTH1"
+    }, {
+      "coefficient" : -0.9597,
+      "name" : "MONTH12"
+    }, {
+      "coefficient" : -1.0666,
+      "name" : "MONTH11"
+    }, {
+      "coefficient" : 0.2057,
+      "name" : "M_HA_LAWN_OTHER_ANYTIME"
+    }, {
+      "coefficient" : 0.5766,
+      "name" : "M_CREDIT_CARD_HOLDER"
+    }, {
+      "coefficient" : 0.000211,
+      "name" : "M_SRS_LAYAWAY_AMT"
+    }, {
+      "coefficient" : 0.0,
+      "name" : "M_ZIPTREND_HA_COOK_AMT"
+    }, {
+      "coefficient" : 1.2839,
+      "name" : "CAREER_FL"
+    }, {
+      "coefficient" : 0.00388,
+      "name" : "K_FSG_SPRTNG_GDS_SLS_6M"
+    }]
+}
+{
+  "modelId" : 36,
+  "modelDescription" : "Home Appliances ~ DishWasher",
+  "constant" : -6.96080554,
+  "modelName" : "S_SCR_HA_DISH",
+  "month" : 0,
+  "variable" : [{
+      "coefficient" : 0.254856771,
+      "name" : "RE_INE_FL"
+    }, {
+      "coefficient" : 0.000249138,
+      "name" : "S_SRS_SAL_TRS_12"
+    }, {
+      "coefficient" : 0.682018745,
+      "name" : "M_DWELLING_SINGLE"
+    }, {
+      "coefficient" : -0.045384351,
+      "name" : "MONTH10"
+    }, {
+      "coefficient" : 0.351056154,
+      "name" : "S_SRS_3M_IND"
+    }, {
+      "coefficient" : 0.149223631,
+      "name" : "MONTH11"
+    }, {
+      "coefficient" : 0.755849506,
+      "name" : "S_HA_2M"
+    }, {
+      "coefficient" : -0.001245018,
+      "name" : "S_DSL_HA_KITCHEN_TRS"
+    }, {
+      "coefficient" : 0.007519395,
+      "name" : "M_WEB_TRAIT_DISHWASHER_15_30"
+    }, {
+      "coefficient" : -0.18659122,
+      "name" : "M_CNT_EMAL_CAMP_12M_IND"
+    }, {
+      "coefficient" : -0.011128623,
+      "name" : "PRS_CLU_CD"
+    }, {
+      "coefficient" : -0.347390707,
+      "name" : "S_SL_TXN_PCT_24M"
+    }, {
+      "coefficient" : 0.349857151,
+      "name" : "LFT_GRO_HME_IPV_FL"
+    }, {
+      "coefficient" : 0.441502763,
+      "name" : "M_HA_APP_LAUNDRY_ANYTIME"
+    }, {
+      "coefficient" : 0.261824483,
+      "name" : "S_SRS_ONLINE_TXN_PCT_24_IND"
+    }, {
+      "coefficient" : -0.24318434,
+      "name" : "M_LOW_DISH_ZIP"
+    }, {
+      "coefficient" : 0.221594759,
+      "name" : "M_HA_APPL_OTHER_ANYTIME"
+    }, {
+      "coefficient" : 0.030830804,
+      "name" : "M_WEB_TRAIT_DISHWASHER_8_14"
+    }, {
+      "coefficient" : 0,
+      "name" : "M_ZIPTREND_WATER_HEATER_AMT"
+    }, {
+      "coefficient" : 0.065408369,
+      "name" : "MONTH5"
+    }, {
+      "coefficient" : -0.030784694,
+      "name" : "MONTH4"
+    }, {
+      "coefficient" : 0.063863551,
+      "name" : "MONTH7"
+    }, {
+      "coefficient" : -0.237145389,
+      "name" : "MONTH6"
+    }, {
+      "coefficient" : 0.000147129,
+      "name" : "S_HA_KITCHEN_SAL_3M"
+    }, {
+      "coefficient" : 0.40872861,
+      "name" : "M_WEB_DAY_REFRIG_0_7"
+    }, {
+      "coefficient" : -0.143243079,
+      "name" : "MONTH1"
+    }, {
+      "coefficient" : 0.050489833,
+      "name" : "M_WEB_TRAIT_DISHWASHER_0_7"
+    }, {
+      "coefficient" : 0.010326539,
+      "name" : "MONTH3"
+    }, {
+      "coefficient" : -0.198503384,
+      "name" : "MONTH2"
+    }, {
+      "coefficient" : 0.261684896,
+      "name" : "M_HA_APPL_FRIDGE_ANYTIME"
+    }, {
+      "coefficient" : 0.412684914,
+      "name" : "M_CREDIT_CARD_HOLDER"
+    }, {
+      "coefficient" : 1.15E-06,
+      "name" : "M_EST_HGH_ICM_VAL"
+    }, {
+      "coefficient" : 0.057347399,
+      "name" : "MONTH9"
+    }, {
+      "coefficient" : -0.043854072,
+      "name" : "MONTH8"
+    }, {
+      "coefficient" : -0.000130519,
+      "name" : "M_HA_APPL_COOKING_DSL"
+    }, {
+      "coefficient" : 0.1,
+      "name" : "BOOST_DISHWASHER_SOCIAL"
+    }]
+}

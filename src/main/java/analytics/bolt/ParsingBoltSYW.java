@@ -1,27 +1,27 @@
 package analytics.bolt;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import static backtype.storm.utils.Utils.tuple;
-
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
-import analytics.util.SywApiCalls;
 import analytics.util.SecurityUtils;
+import analytics.util.SywApiCalls;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import static backtype.storm.utils.Utils.tuple;
 
 public class ParsingBoltSYW extends BaseRichBolt {
 	private static final Logger LOGGER = LoggerFactory
@@ -59,7 +59,7 @@ public class ParsingBoltSYW extends BaseRichBolt {
 			*/
 
 			if (l_id == null) {
-				LOGGER.warn("Unable to get member information" + input);
+				//LOGGER.warn("Unable to get member information" + input);
 				outputCollector.fail(input);
 				//could not process record
 				return;
@@ -71,7 +71,8 @@ public class ParsingBoltSYW extends BaseRichBolt {
 			/*Ignore interactions that we dont want. We can do further refinements if needed*/
 			String interactionTypeString = interactionType.getAsString();
 			if (listOfInteractionsForRTS.contains(interactionTypeString)) {
-				outputCollector.emit(tuple(l_id, interactionObject,	interactionType));
+				// Create a SYW Interaction object
+					outputCollector.emit(tuple(l_id, interactionObject.toString(),interactionTypeString));
 			} else {
 				//We should look into either processing this request type or not subscribing to it
 				LOGGER.info("Ignore interaction type" + interactionType.getAsString());

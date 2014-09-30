@@ -1,26 +1,10 @@
 package analytics.bolt;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.joda.time.LocalDate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import analytics.util.JsonUtils;
-import analytics.util.ScoringSingleton;
 import analytics.util.dao.ChangedMemberScoresDao;
 import analytics.util.dao.MemberScoreDao;
 import analytics.util.dao.ModelPercentileDao;
 import analytics.util.dao.ModelSywBoostDao;
-import analytics.util.objects.Change;
 import analytics.util.objects.ChangedMemberScore;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -28,6 +12,13 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+import org.joda.time.LocalDate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class SywScoringBolt  extends BaseRichBolt{
 	private static final Logger LOGGER = LoggerFactory
@@ -107,6 +98,7 @@ public class SywScoringBolt  extends BaseRichBolt{
 	    	}
 	    	varToCountMap.put(variableName, totalPidCount);
 		}
+        LOGGER.trace(" varToCountMap: " + varToCountMap + " lid: " + lId);
 		//boost_syw... hand_tools_tcount
 		//boost_syw... tools_tcount
 		//var to Count map - 
@@ -134,11 +126,16 @@ public class SywScoringBolt  extends BaseRichBolt{
 			if(!modelIdToScore.containsKey(modelId))
 				modelIdToScore.put(modelId, memberScores.get(modelId.toString()));
 		}
-		
-		//TODO: Loop through the modelIdToScore map
+
+        LOGGER.trace(" modelIdToScore map first: " + modelIdToScore+ " lid: " + lId);
+
+
+        //TODO: Loop through the modelIdToScore map
 		//Add scoring logic here
 		//varToCount map has the total count for each variable
 		
+		
+		String oldScore = new String();
 		for(String v: varToCountMap.keySet()) {
 			
 			int boostPercetages = 0;
@@ -148,18 +145,36 @@ public class SywScoringBolt  extends BaseRichBolt{
 				continue;
 			}
 			
-			if(varToCountMap.get(v)<=10){
-				boostPercetages += ((int) Math.ceil(varToCountMap.get(v) / 2.0))-1;
-			} else {
-				boostPercetages = 5;
+			if(source.equals("SYW_OWN")) {
+				Double maxScore = modelPercentileMap.get(modelId).get(50);
+				oldScore = modelIdToScore.get(modelId);
+				if(Double.valueOf(modelIdToScore.get(modelId)) > maxScore) {
+					modelIdToScore.put(modelId, maxScore.toString());
+				}
+			} else if(source.equals("SYW_LIKE")) {
+				if(varToCountMap.get(v)<=10){
+					boostPercetages += ((int) Math.ceil(varToCountMap.get(v) / 2.0))-1;
+				} else {
+					boostPercetages = 5;
+				}
+				Double maxScore = modelPercentileMap.get(modelId).get(90 + boostPercetages);
+				oldScore = modelIdToScore.get(modelId);
+				if(Double.valueOf(modelIdToScore.get(modelId)) < maxScore) {
+					modelIdToScore.put(modelId, maxScore.toString());
+				}
+			} else if(source.equals("SYW_WANT")) {
+				if(varToCountMap.get(v)<=8){
+					boostPercetages += ((int) Math.ceil(varToCountMap.get(v) / 2.0))-1;
+				} else {
+					boostPercetages = 4;
+				}
+				Double maxScore = modelPercentileMap.get(modelId).get(96 + boostPercetages);
+				oldScore = modelIdToScore.get(modelId);
+				if(Double.valueOf(modelIdToScore.get(modelId)) < maxScore) {
+					modelIdToScore.put(modelId, maxScore.toString());
+				}
 			}
 			
-			Double maxScore = modelPercentileMap.get(modelId).get(90 + boostPercetages);
-			String oldScore = modelIdToScore.get(modelId);
-			if(Double.valueOf(modelIdToScore.get(modelId)) < maxScore) {
-				
-				modelIdToScore.put(modelId, maxScore.toString());
-			}
 			List<Object> listToEmit = new ArrayList<Object>();
 			listToEmit.add(lId);
 			listToEmit.add(oldScore);
@@ -170,10 +185,12 @@ public class SywScoringBolt  extends BaseRichBolt{
 			outputCollector.emit(listToEmit);
 		}
 		outputCollector.ack(input);
-		
-		
-		
-		updateChangedMemberScore(lId, modelIdToScore);
+
+        LOGGER.trace(" modelIdToScore map second: " + modelIdToScore+ " lid: " + lId);
+
+
+
+        updateChangedMemberScore(lId, modelIdToScore);
 	}
 
 	@Override

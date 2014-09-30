@@ -1,14 +1,5 @@
 package analytics.bolt;
 
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import analytics.util.SywApiCalls;
 import analytics.util.dao.BoostDao;
 import analytics.util.dao.DivLnBoostDao;
@@ -26,8 +17,22 @@ import backtype.storm.tuple.Tuple;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ProcessSYWInteractions extends BaseRichBolt {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ProcessSYWInteractions.class);
 	private List<String> entityTypes;
@@ -64,14 +69,16 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 	public void execute(Tuple input) {
 		String feedType = null;
 		// Get l_id", "message", "InteractionType" from parsing bolt
-		JsonObject interactionObject = (JsonObject) input
-				.getValueByField("message");
+		/*SYWInteraction obj = (SYWInteraction) input
+				.getValueByField("message");*/
 		String lId = input.getStringByField("l_id");
-
-		// Create a SYW Interaction object
+		JsonParser parser = new JsonParser();
+		JsonObject interactionObject = parser.parse(input.getStringByField("message")).getAsJsonObject();
+		/*JsonObject interactionObject = (JsonObject) input
+				.getValueByField("message");*/
+		
 		Gson gson = new Gson();
-		SYWInteraction obj = gson.fromJson(interactionObject,
-				SYWInteraction.class);
+		SYWInteraction obj = gson.fromJson(interactionObject,SYWInteraction.class);
 
 		/* Ignore interactions that we dont want. */
 		/*
@@ -119,7 +126,7 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 					/* Product does not exist? */
 					if (productId == null) {
 						LOGGER.info("Unable to get product id for "
-								+ currentEntity.getId());
+                                + currentEntity.getId());
 						// Get the next entity
 						continue;
 					} else {
@@ -127,6 +134,7 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 						// case it would be divLnItm???
 						PidDivLnDao.DivLn divLnObj = pidDivLnDao
 								.getVariableFromTopic(productId);
+                        LOGGER.trace(" div line for " + productId + " are " + divLnObj+ " lid: " + lId);
 						if (divLnObj != null) {
 							String div = divLnObj.getDiv();
 							String divLn = divLnObj.getDivLn();
@@ -168,7 +176,8 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 						// Eg - BOOST_SYW_APP_LIKETCOUNT
 						// divLnBoost -
 						// d:004 , b:BOOST_SYW_APP_LIKETCOUNT
-						// 004 , BOOST_ATC_APP_TCOUNT
+						// 004                        
+                        LOGGER.trace(" boost value map :" + boostValuesMap+ " lid: " + lId);
 					}
 
 				}
@@ -193,13 +202,14 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 		}
 		if (variableValueMap != null && !variableValueMap.isEmpty()) {
 			Type varValueType = new TypeToken<Map<String, String>>() {
+				private static final long serialVersionUID = 1L;
 			}.getType();
 			String varValueString = gson.toJson(variableValueMap, varValueType);
 			List<Object> listToEmit = new ArrayList<Object>();
 			listToEmit.add(input.getValueByField("l_id"));
 			listToEmit.add(varValueString);
 			listToEmit.add(feedType);
-			LOGGER.debug(" @@@ SYW PARSING BOLT EMITTING: " + listToEmit);
+			LOGGER.debug(" @@@ SYW PARSING BOLT EMITTING: " + listToEmit+ " lid: " + lId);
 			this.outputCollector.emit(listToEmit);
 		}
 		this.outputCollector.ack(input);
@@ -211,7 +221,7 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 	}
 
 	private String createJsonDoc(Map<String, List<String>> dateValuesMap) {
-		LOGGER.debug("dateValuesMap: " + dateValuesMap);
+		LOGGER.trace("dateValuesMap: " + dateValuesMap);
 		// Create string in JSON format to emit
 		Gson gson = new Gson();
 		Type boostValueType = new TypeToken<Map<String, List<String>>>() {

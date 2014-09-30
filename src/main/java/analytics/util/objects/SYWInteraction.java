@@ -1,8 +1,13 @@
 package analytics.util.objects;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class SYWInteraction {
+public class SYWInteraction implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	//Below variable names do not follow conventional lowerCase start 
 	//because the json does not and Gson fails to convert to object if the cases are different
 	private String InteractionId;
@@ -12,7 +17,7 @@ public class SYWInteraction {
 	private String InteractionType;
 	private String Time;
 	private String Client;
-	private Object AdditionalData;
+	//private Object AdditionalData;
 	public String getInteractionId() {
 		return InteractionId;
 	}
@@ -55,16 +60,16 @@ public class SYWInteraction {
 	public void setClient(String client) {
 		this.Client = client;
 	}
-	public Object getAdditionalData() {
+	/*public Object getAdditionalData() {
 		return AdditionalData;
 	}
 	public void setAdditionalData(Object additionalData) {
 		this.AdditionalData = additionalData;
-	}
+	}*/
 	@Override
 	public String toString() {
 	   return "SYWInteraction [InteractionId=" + InteractionId + ", UserId=" + UserId + ", UserSearsId="+ UserSearsId + ", Entities=" + Entities +
-			   ", InteractionType=" + InteractionType + ", Time=" + Time + ", Client=" + Client + ", AdditionalData=" + AdditionalData  + "]";
+			   ", InteractionType=" + InteractionType + ", Time=" + Time + ", Client=" + Client + "]";
 
 	}
 

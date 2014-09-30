@@ -24,6 +24,11 @@ public class PidDivLnDao extends AbstractDao{
 			return ln;
 		}
 
+        public String toString()
+        {
+            return " div = "+ div + ", ln = "+ln;
+        }
+
 	}
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(PidDivLnDao.class);
