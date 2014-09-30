@@ -142,6 +142,9 @@ public class ScoringSingleton {
 			if(modelsMap.get(modId).get(month)!= null && modelsMap.get(modId).get(month).getVariables()!=null){
 			for (String var : modelsMap.get(modId).get(month).getVariables()
 					.keySet()) {
+				if(variableNameToVidMap.get(var)==null){
+					LOGGER.error("VID is null for variable " + var);
+				}
 				variableFilter.put(variableNameToVidMap.get(var), 1);
 			}
 			}
