@@ -13,8 +13,7 @@ public class RedisConnection {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RedisConnection.class);
 	public static String[] getServers(){
 		Properties prop = new Properties();
-		PropertiesConfiguration properties = null;
-		String isProd = System.getProperty("rtseprod");
+		String isProd = System.getProperty(MongoNameConstants.IS_PROD);
 		try {
 		    //load a properties file from class path, inside static method
 			if(isProd!=null && "true".equals(isProd)){

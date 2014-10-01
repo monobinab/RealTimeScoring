@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.util.JsonUtils;
+import analytics.util.MongoNameConstants;
 import analytics.util.SecurityUtils;
 import analytics.util.XMLParser;
 import analytics.util.dao.DivCatKsnDao;
@@ -66,7 +67,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
 		this.outputCollector = collector;
-
+        System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
 		LOGGER.info("Preparing telluride parsing bolt");
 
 		LOGGER.debug("Getting mongo collections");

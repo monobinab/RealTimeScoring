@@ -1,6 +1,7 @@
 package analytics.bolt;
 
 import analytics.util.JsonUtils;
+import analytics.util.MongoNameConstants;
 import analytics.util.dao.ChangedMemberScoresDao;
 import analytics.util.dao.MemberScoreDao;
 import analytics.util.dao.ModelPercentileDao;
@@ -12,6 +13,7 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +39,7 @@ public class SywScoringBolt  extends BaseRichBolt{
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
+        System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
 		outputCollector = collector;
 		modelPercentileDao = new ModelPercentileDao();
 		memberScoreDao = new MemberScoreDao();

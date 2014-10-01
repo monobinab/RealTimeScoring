@@ -3,13 +3,14 @@ package analytics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import analytics.bolt.MemberPublishBolt;
 import analytics.bolt.ParsingBoltSYW;
 import analytics.bolt.PersistBoostsBolt;
 import analytics.bolt.ProcessSYWInteractions;
 import analytics.bolt.ScorePublishBolt;
-import analytics.bolt.StrategyScoringBolt;
 import analytics.bolt.SywScoringBolt;
 import analytics.spout.SYWRedisSpout;
+import analytics.util.MongoNameConstants;
 import analytics.util.RedisConnection;
 import analytics.util.TopicConstants;
 import backtype.storm.Config;
@@ -28,7 +29,10 @@ public class SYWEventsTopology {
 
 	public static void main(String[] args) throws Exception {
 		LOGGER.info("starting syw events topology");
-
+		System.clearProperty(MongoNameConstants.IS_PROD);
+		if (args.length > 0) {
+			System.setProperty(MongoNameConstants.IS_PROD, "true");
+		}
 		TopologyBuilder toplologyBuilder = new TopologyBuilder();
 		String[] servers = RedisConnection.getServers();
 		String topic = TopicConstants.SYW;
@@ -52,8 +56,9 @@ server3=rtsapp403p.prod.ch4.s.com
 		toplologyBuilder.setBolt("persistBolt", new PersistBoostsBolt(), 1)
 		.shuffleGrouping("ProcessSYWEvents");
 		toplologyBuilder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 1).shuffleGrouping("scoringBolt");
+		toplologyBuilder.setBolt("member_publish_bolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 2).shuffleGrouping("scoringBolt", "member_stream");
 		Config conf = new Config();
-
+		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
 		if (args != null && args.length > 0) {
 			conf.setNumWorkers(6);
 			StormSubmitter.submitTopology(args[0], conf,

@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.util.JsonUtils;
+import analytics.util.MongoNameConstants;
 import analytics.util.dao.MemberUUIDDao;
 import analytics.util.dao.ModelVariablesDao;
 import backtype.storm.task.OutputCollector;
@@ -55,6 +56,7 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         this.outputCollector = collector;
+        System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
         
 	/*
 	 * (non-Javadoc)

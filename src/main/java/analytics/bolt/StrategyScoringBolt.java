@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.util.JsonUtils;
+import analytics.util.MongoNameConstants;
 import analytics.util.ScoringSingleton;
 import analytics.util.objects.Change;
 import backtype.storm.task.OutputCollector;
@@ -39,6 +40,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
 		LOGGER.info("PREPARING STRATEGY SCORING BOLT");	
+        System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
 		this.outputCollector = collector;
 	}
 

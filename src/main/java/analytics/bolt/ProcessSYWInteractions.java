@@ -1,5 +1,6 @@
 package analytics.bolt;
 
+import analytics.util.MongoNameConstants;
 import analytics.util.SywApiCalls;
 import analytics.util.dao.BoostDao;
 import analytics.util.dao.DivLnBoostDao;
@@ -48,6 +49,7 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
+        System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
 		this.outputCollector = collector;
 		sywApiCalls = new SywApiCalls();
 

@@ -6,8 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import redis.clients.jedis.Jedis;
-import analytics.util.ScoringSingleton;
-import analytics.util.dao.MemberScoreDao;
+import analytics.util.MongoNameConstants;
 import analytics.util.dao.MemberZipDao;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -39,6 +38,7 @@ public class MemberPublishBolt extends BaseRichBolt{
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
+        System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
 		jedis = new Jedis(host, port);
 		memberZipDao = new MemberZipDao();
 		this.outputCollector = collector;

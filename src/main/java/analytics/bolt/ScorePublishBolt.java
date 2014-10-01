@@ -3,6 +3,7 @@
  */
 package analytics.bolt;
 
+import analytics.util.MongoNameConstants;
 import analytics.util.ScoringSingleton;
 import analytics.util.dao.MemberScoreDao;
 import backtype.storm.task.OutputCollector;
@@ -48,6 +49,7 @@ public class ScorePublishBolt extends BaseRichBolt {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
+        System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
 		jedis = new Jedis(host, port);
 		memberScoreDao = new MemberScoreDao();
 		this.outputCollector = collector;

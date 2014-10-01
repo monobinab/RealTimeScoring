@@ -23,7 +23,7 @@ public class DBConnection {
 	public static DB getDBConnection() throws ConfigurationException {
 		DB conn = null;
 		PropertiesConfiguration properties = null;
-		String isProd = System.getProperty("rtseprod");
+		String isProd = System.getProperty(MongoNameConstants.IS_PROD);
 		//If test, return only a test fake mongo connection
 		if(isProd!=null && "test".equals(isProd)){
 			return FakeMongo.getTestDB();

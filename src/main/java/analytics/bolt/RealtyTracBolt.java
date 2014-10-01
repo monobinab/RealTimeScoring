@@ -4,6 +4,7 @@
 package analytics.bolt;
 
 import analytics.util.DBConnection;
+import analytics.util.MongoNameConstants;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -12,7 +13,6 @@ import backtype.storm.tuple.Tuple;
 
 import com.mongodb.*;
 
-import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
@@ -55,6 +55,7 @@ public class RealtyTracBolt extends BaseRichBolt {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         this.outputCollector = collector;
+        System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
 
 	/*
 	 * (non-Javadoc)

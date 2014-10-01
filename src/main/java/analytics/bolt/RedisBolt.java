@@ -8,7 +8,10 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
+
 import com.ibm.jms.JMSMessage;
+
+import analytics.util.MongoNameConstants;
 import analytics.util.StoreZipMap;
 import redis.clients.jedis.Jedis;
 import shc.npos.segments.Segment;
@@ -16,6 +19,7 @@ import shc.npos.util.SegmentUtils;
 
 import javax.jms.JMSException;
 import javax.jms.TextMessage;
+
 import java.util.Collection;
 import java.util.Map;
 
@@ -46,6 +50,7 @@ public class RedisBolt extends BaseRichBolt {
          */
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
+        System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
         jedis = new Jedis(host, port);
         this.outputCollector = collector;
     }

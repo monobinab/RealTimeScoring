@@ -13,6 +13,7 @@ import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import analytics.util.MongoNameConstants;
 import analytics.util.dao.MemberTraitsDao;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -30,6 +31,7 @@ public class PersistTraitsBolt extends BaseRichBolt {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {	
+        System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
 		memberTraitsDao = new MemberTraitsDao();
 	}
 
