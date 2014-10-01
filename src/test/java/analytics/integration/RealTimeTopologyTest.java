@@ -7,7 +7,9 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import analytics.bolt.ParsingBoltPOS;
+import analytics.bolt.ScorePublishBolt;
 import analytics.bolt.StrategyScoringBolt;
+import analytics.util.MongoNameConstants;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.topology.TopologyBuilder;
@@ -28,10 +30,11 @@ public class RealTimeTopologyTest {
 		// create definition of main spout for queue 1
 		topologyBuilder.setBolt("parsing_bolt", new ParsingBoltPOS()).shuffleGrouping("test_spout");
         topologyBuilder.setBolt("strategy_scoring_bolt", new StrategyScoringBolt(), 4).shuffleGrouping("parsing_bolt");
-        topologyBuilder.setBolt("score_check_test",new GenericScoreCheckBolt(expected), 4).shuffleGrouping("strategy_scoring_bolt");
+        topologyBuilder.setBolt("score_check_test",new GenericScoreCheckBolt(expected), 4).shuffleGrouping("strategy_scoring_bolt", "score_stream");
 		Config conf = new Config();
 		conf.setDebug(false);
 		conf.setMaxTaskParallelism(3);
+		conf.put(MongoNameConstants.IS_PROD, "test");
 		LocalCluster cluster = new LocalCluster();
 		cluster.submitTopology("realtimescoring_topology", conf,
 				topologyBuilder.createTopology());

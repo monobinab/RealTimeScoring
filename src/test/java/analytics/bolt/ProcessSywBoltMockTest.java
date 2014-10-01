@@ -1,6 +1,8 @@
 package analytics.bolt;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import junit.framework.Assert;
 
@@ -25,19 +27,22 @@ public class ProcessSywBoltMockTest {
 	/**
 	 * WE ARE NOT STUBBING OUT SYWAPICALLS
 	 */
+	static Map<String,String> conf;
 	@BeforeClass
 	public static void initializeFakeMongo(){
-		System.setProperty("rtseprod", "test");	
+		System.setProperty("rtseprod", "test");
+		conf = new HashMap<String, String>();
+        conf.put("rtseprod", "test");
 		//Below line ensures an empty DB rather than reusing a DB with values in it
-		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));			
+		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));		
 	}
 	@Test
 	public void onlyCertainCatalogTypesAreProcessed(){		
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
         ProcessSYWInteractions boltUnderTest = new ProcessSYWInteractions();
        
-        boltUnderTest.prepare(null, null, outputCollector);
-        String lId = "dxo0b7SN1eER9shCSj0DX+eSGag=";
+        boltUnderTest.prepare(conf, null, outputCollector);
+        String lId = "xo0b7SN1eER9shCSj0DX+eSGag=";
 		String interactionType = "AddToCatalog";
 		String interactionString = "{\"InteractionId\":\"b7556eb8-e9ca-4e31-accc-4b56b69fcfad\",\"UserId\":6875997,\"UserSearsId\":6875997,\"Entities\":"
         		+ "[{\"Id\":184008680,\"EntityType\":\"Product\"},{\"Id\":8353466,\"EntityType\":\"Catalog\",\"OwnerId\":6875997}],\"InteractionType\":\"AddToCatalog\","
@@ -84,8 +89,8 @@ public class ProcessSywBoltMockTest {
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
         ProcessSYWInteractions boltUnderTest = new ProcessSYWInteractions();
        
-        boltUnderTest.prepare(null, null, outputCollector);
-        String lId = "dxo0b7SN1eER9shCSj0DX+eSGag=";
+        boltUnderTest.prepare(conf, null, outputCollector);
+        String lId = "do0b7SN1eER9shCSj0DX+eSGag=";
 		String interactionType = "AddToCatalog";
 		String interactionString = "{\"InteractionId\":\"b7556eb8-e9ca-4e31-accc-4b56b69fcfad\",\"UserId\":6875997,\"UserSearsId\":6875997,\"Entities\":"
         		+ "[{\"Id\":280987671,\"EntityType\":\"Product\"},{\"Id\":15009844,\"EntityType\":\"Catalog\",\"OwnerId\":6875997}],\"InteractionType\":\"AddToCatalog\","

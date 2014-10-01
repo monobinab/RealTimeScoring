@@ -1,10 +1,13 @@
 package analytics.bolt;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import junit.framework.Assert;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import analytics.MockOutputCollector;
@@ -20,23 +23,26 @@ import com.mongodb.DBCollection;
 
 public class SocialBoltMockTest {
 
+	static Map<String,String> conf;
+	@BeforeClass
+	public static void initializeFakeMongo(){
+		System.setProperty("rtseprod", "test");
+		conf = new HashMap<String, String>();
+        conf.put("rtseprod", "test");
+		//Below line ensures an empty DB rather than reusing a DB with values in it
+		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));		
+	}
 	
 	@Test
 	public void setVariablesAfterBoltInitialization() throws ConfigurationException, IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
-		System.setProperty("rtseprod", "test");
-		//TODO:Since we have a get DB connection, do not need to use reflection to set the values unlike before, 
-		//so rewrite to just set the collection values. Refer to the integration test for a sample
-		
-		//Below line ensures an empty DB rather than reusing a DB with values in it
-		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));	
 		DB conn = FakeMongo.getTestDB();
 				
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
         SocialBolt boltUnderTest = new SocialBolt();
        
-        boltUnderTest.prepare(null, null, outputCollector);
+        boltUnderTest.prepare(conf, null, outputCollector);
         String input = "8/1/2014 7:07,1123404212,[0.0],[0.0],dishwasher";
-        String expectedLid = "y2gpsDmSmaKudbyxsGUbpDeTU1Q=";
+        String expectedLid = "2gpsDmSmaKudbyxsGUbpDeTU1Q=";
         String expectedBoostVar = "{\"BOOST_DISHWASHER_SOCIAL\":\"0.0\"}";//postive score is only considered here
         String source = "facebook";
         //source: facebookSpout:3, stream: default, id: {}, [8/1/2014 7:07,1123404212,[0.0],[0.0],dishwasher]

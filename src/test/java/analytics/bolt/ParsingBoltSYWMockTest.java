@@ -1,6 +1,8 @@
 package analytics.bolt;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import junit.framework.Assert;
 
@@ -18,9 +20,12 @@ public class ParsingBoltSYWMockTest {
 	/**
 	 * WE ARE NOT STUBBING OUT SYWAPICALL FOR USERID
 	 */
+	static Map<String,String> conf;
 	@BeforeClass
 	public static void initializeFakeMongo(){
-		System.setProperty("rtseprod", "test");	
+		System.setProperty("rtseprod", "test");
+		conf = new HashMap<String, String>();
+        conf.put("rtseprod", "test");
 		//Below line ensures an empty DB rather than reusing a DB with values in it
 		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));			
 	}
@@ -28,8 +33,8 @@ public class ParsingBoltSYWMockTest {
 	public void invalidInteractionTypeIsIgnored(){		
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
         ParsingBoltSYW boltUnderTest = new ParsingBoltSYW();
-       
-        boltUnderTest.prepare(null, null, outputCollector);
+           
+        boltUnderTest.prepare(conf, null, outputCollector);
         String input = "[{\"InteractionId\":\"b7556eb8-e9ca-4e31-accc-4b56b69fcfad\",\"UserId\":6875997,\"UserSearsId\":6875997,\"Entities\":"
         		+ "[{\"Id\":1221863,\"EntityType\":\"Topic\"},{\"IsTaggedItem\":true,\"Id\":373541114,\"EntityType\":\"Product\"}],\"InteractionType\":\"TagItem\","
         		+ "\"Time\":\"2014-09-24T13:27:45.3874132Z\",\"Client\":\"Web\"}]";
@@ -52,7 +57,7 @@ public class ParsingBoltSYWMockTest {
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
         ParsingBoltSYW boltUnderTest = new ParsingBoltSYW();
        
-        boltUnderTest.prepare(null, null, outputCollector);
+        boltUnderTest.prepare(conf, null, outputCollector);
         String input = "[{\"InteractionId\":\"b7556eb8-e9ca-4e31-accc-4b56b69fcfad\",\"UserId\":6875997,\"UserSearsId\":6875997,\"Entities\":"
         		+ "[{\"Id\":184008680,\"EntityType\":\"Product\"},{\"Id\":8353466,\"EntityType\":\"Catalog\",\"OwnerId\":6875997}],\"InteractionType\":\"AddToCatalog\","
         		+ "\"Time\":\"2014-09-24T13:27:45.3874132Z\",\"Client\":\"Web\"}]";

@@ -2,7 +2,9 @@ package analytics.util;
 
 import static org.junit.Assert.*;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -27,18 +29,20 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 
 public class ScoringSingletonTest {
+	private static ScoringSingleton scoringSingletonObj;
 	@BeforeClass
-	public static void initializeFakeMongo(){
+	public static void initializeFakeMongo() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
 		System.setProperty("rtseprod", "test");	
 		//Below line ensures an empty DB rather than reusing a DB with values in it
-		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));			
+		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));
+		//We do not need instance of scoring singleton created by previous tests. If different methods need different instances, move this to @Before rather than before class
+		Constructor<ScoringSingleton> constructor= (Constructor<ScoringSingleton>) ScoringSingleton.class.getDeclaredConstructors()[0];
+		constructor.setAccessible(true); 
+		scoringSingletonObj = constructor.newInstance(); 
 	}
-	
-	ScoringSingleton testTarget;
+
 	@Before
-	public void setUp() throws Exception {
-		testTarget = ScoringSingleton.getInstance();
-		
+	public void setUp() throws Exception {		
 	}
 
 	@After
@@ -58,9 +62,9 @@ public class ScoringSingletonTest {
 		varIdToNameMapContents.put("2270","MY_VAR_NAME");
 		Field varIdToNameMap = ScoringSingleton.class.getDeclaredField("variableVidToNameMap");
 		varIdToNameMap.setAccessible(true);
-		varIdToNameMap.set(ScoringSingleton.getInstance(), varIdToNameMapContents);
+		varIdToNameMap.set(scoringSingletonObj, varIdToNameMapContents);
         
-		Map<String,Change> changedVars = ScoringSingleton.getInstance().createChangedVariablesMap(l_id);
+		Map<String,Change> changedVars = scoringSingletonObj.createChangedVariablesMap(l_id);
 		Assert.assertTrue(changedVars.containsKey("MY_VAR_NAME"));
 		Change actual = changedVars.get("MY_VAR_NAME");
 		Assert.assertEquals(expected.getValue(), actual.getValue());
@@ -74,7 +78,7 @@ public class ScoringSingletonTest {
 	public void getModelIdListTestNull1() {
 		Map<String, String> newChangesVarValueMap = null;
 		
-		Set<Integer> modelList=  testTarget.getModelIdList(newChangesVarValueMap);
+		Set<Integer> modelList=  scoringSingletonObj.getModelIdList(newChangesVarValueMap);
 		assertTrue(modelList.isEmpty());
 	}
 	
@@ -84,7 +88,7 @@ public class ScoringSingletonTest {
 		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
 		newChangesVarValueMap.put("key", "value");
 		//testTarget.setVariableModelsMap(null);
-		Set<Integer> modelList=  testTarget.getModelIdList(newChangesVarValueMap);
+		Set<Integer> modelList=  scoringSingletonObj.getModelIdList(newChangesVarValueMap);
 		assertTrue(modelList.isEmpty());
 	
 	}
@@ -95,7 +99,7 @@ public class ScoringSingletonTest {
 		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
 		newChangesVarValueMap.put("S_HOME_6M_IND", "value");
 		//Map<String, List<Integer>> data = new HashMap("S_HOME_6M_IND",)
-		Set<Integer> modelList = testTarget.getModelIdList(newChangesVarValueMap);
+		Set<Integer> modelList = scoringSingletonObj.getModelIdList(newChangesVarValueMap);
 		Set<Integer> result = new HashSet<Integer>();
 		result.add(48);
 		//System.out.println(modelList.toString());
@@ -110,8 +114,8 @@ public class ScoringSingletonTest {
 		//insert into memberVariablesMap
 		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
 		newChangesVarValueMap.put("S_HOME_6M_IND", "value");
-		Set<Integer> modelIdList = testTarget.getModelIdList(newChangesVarValueMap);
-		Map<String, Object> map = testTarget.createVariableValueMap("", modelIdList);
+		Set<Integer> modelIdList = scoringSingletonObj.getModelIdList(newChangesVarValueMap);
+		Map<String, Object> map = scoringSingletonObj.createVariableValueMap("", modelIdList);
 		assertEquals(map, null);//invalid l_id
 	}
 	
