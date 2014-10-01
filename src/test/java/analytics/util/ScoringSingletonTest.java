@@ -2,25 +2,41 @@ package analytics.util;
 
 import static org.junit.Assert.*;
 
+import java.lang.reflect.Field;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import junit.framework.Assert;
+
+import org.apache.commons.configuration.ConfigurationException;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import analytics.util.objects.Change;
 
 import com.github.fakemongo.Fongo;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
+import com.mongodb.DBCollection;
 
 public class ScoringSingletonTest {
+	@BeforeClass
+	public static void initializeFakeMongo(){
+		System.setProperty("rtseprod", "test");	
+		//Below line ensures an empty DB rather than reusing a DB with values in it
+		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));			
+	}
+	
 	ScoringSingleton testTarget;
 	@Before
 	public void setUp() throws Exception {
-		//Fongo mockMongo = new Fongo("sample");
 		testTarget = ScoringSingleton.getInstance();
 		
 	}
@@ -28,6 +44,31 @@ public class ScoringSingletonTest {
 	@After
 	public void tearDown() throws Exception {
 	}
+	
+	@Test
+	public void testCreateChangedVariablesMap() throws ConfigurationException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, ParseException{
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Change expected = new Change("2270",12,simpleDateFormat.parse("2999-10-21"),simpleDateFormat.parse("2014-10-01"));
+		DB conn = DBConnection.getDBConnection();
+		DBCollection changedMemberVar = conn.getCollection("changedMemberVariables");
+		String l_id = "6RpGnW1XhFFBoJV+T9cT9ok=";
+		changedMemberVar.insert(new BasicDBObject("l_id", l_id).append("2270", new BasicDBObject("v",expected.getValue()).append("e", expected.getExpirationDateAsString()).append("f", expected.getEffectiveDateAsString())));
+		
+		Map<String,String> varIdToNameMapContents = new HashMap<String, String>();
+		varIdToNameMapContents.put("2270","MY_VAR_NAME");
+		Field varIdToNameMap = ScoringSingleton.class.getDeclaredField("variableVidToNameMap");
+		varIdToNameMap.setAccessible(true);
+		varIdToNameMap.set(ScoringSingleton.getInstance(), varIdToNameMapContents);
+        
+		Map<String,Change> changedVars = ScoringSingleton.getInstance().createChangedVariablesMap(l_id);
+		Assert.assertTrue(changedVars.containsKey("MY_VAR_NAME"));
+		Change actual = changedVars.get("MY_VAR_NAME");
+		Assert.assertEquals(expected.getValue(), actual.getValue());
+		Assert.assertEquals(expected.getEffectiveDateAsString(), actual.getEffectiveDateAsString());
+		Assert.assertEquals(expected.getExpirationDate(), actual.getExpirationDate());
+		Assert.assertEquals(expected.getChangeVariable(), actual.getChangeVariable());
+	}
+
 
 	@Test
 	public void getModelIdListTestNull1() {
