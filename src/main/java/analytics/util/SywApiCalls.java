@@ -230,7 +230,6 @@ public class SywApiCalls {
 		String requestURL = String.format(BASEURI + "/auth/state" + "&token=" + token + "&hash=" + hash);
 		Gson gson = new Gson();
 		JsonElement element = gson.fromJson (HttpRequest.get(requestURL).body(), JsonElement.class);
-		System.out.println(element);
 	}
 	
 }

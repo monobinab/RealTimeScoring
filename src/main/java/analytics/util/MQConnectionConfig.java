@@ -26,7 +26,7 @@ public class MQConnectionConfig {
         		properties = new PropertiesConfiguration("resources/POS_MQ_config.properties");
         }
         if(properties==null){
-        	LOGGER.warn("Unable to find feed");
+        	LOGGER.warn("Unable to find feed or property file for given feed");
         	return null;
         }
 

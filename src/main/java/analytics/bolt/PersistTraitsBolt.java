@@ -71,7 +71,7 @@ public class PersistTraitsBolt extends BaseRichBolt {
 			memberTraitsDao.addDateTrait(l_id, dateTraitMap);
 			
 		} catch (JSONException e) {
-			System.out.println("CHANGEEEE");
+			LOGGER.error("unable to persist trait",e);
 		}
 	}
 

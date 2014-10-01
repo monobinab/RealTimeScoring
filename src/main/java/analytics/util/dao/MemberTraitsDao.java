@@ -54,7 +54,7 @@ public class MemberTraitsDao extends AbstractDao{
 						}
 					}
 				} catch (ParseException e) {
-					e.printStackTrace();
+					LOGGER.warn("Unable to parse date",e);
 				}
 			}
 		}

@@ -12,8 +12,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.joda.time.LocalDate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import analytics.util.JsonUtils;
+import analytics.util.dao.VariableDao;
 import analytics.util.objects.Change;
 import analytics.util.objects.RealTimeScoringContext;
 
@@ -22,7 +25,8 @@ import com.google.gson.Gson;
 
 public class StrategyCountTraitDates implements Strategy {
 	private int daysToExpiration = 1;
-	
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(StrategyCountTraitDates.class);
 
     @Override
     public Change execute(RealTimeScoringContext context) {
@@ -40,7 +44,7 @@ public class StrategyCountTraitDates implements Strategy {
 					}
 				}
 			} catch (ParseException e) {
-				e.printStackTrace();
+				LOGGER.warn("Unable to parse date",e);
 			}
     	}
     	

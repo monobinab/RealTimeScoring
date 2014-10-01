@@ -4,6 +4,9 @@ import static backtype.storm.utils.Utils.tuple;
 
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 
@@ -11,7 +14,8 @@ public class TwitterRedisSpout extends RedisPubSubSpout {
 	public TwitterRedisSpout(String host, int port, String pattern) {
 		super(host, port, pattern);
 	}
-
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(TwitterRedisSpout.class);
 	private static final long serialVersionUID = 1L;
 
 	/*
@@ -24,7 +28,7 @@ public class TwitterRedisSpout extends RedisPubSubSpout {
 		try {
 			TimeUnit.MILLISECONDS.sleep(2);
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			LOGGER.error("Thread can not be interrupted",e);
 		}
 		if (ret != null) {
 			_collector.emit(tuple("twitter",ret));

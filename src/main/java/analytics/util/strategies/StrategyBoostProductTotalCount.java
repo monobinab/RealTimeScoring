@@ -11,14 +11,18 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.joda.time.LocalDate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import analytics.util.dao.VariableDao;
 import analytics.util.objects.Change;
 import analytics.util.objects.RealTimeScoringContext;
 import analytics.util.JsonUtils;
 
 public class StrategyBoostProductTotalCount implements Strategy {
 	protected final int daysToExpiration = 7;
-
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(StrategyBoostProductTotalCount.class);
 	@Override
 	public Change execute(RealTimeScoringContext context) {
 		
@@ -39,9 +43,9 @@ public class StrategyBoostProductTotalCount implements Strategy {
 							totalPidCount+=Integer.valueOf(v);
 						}
 					} catch (NumberFormatException e) {
-						e.printStackTrace();
+						LOGGER.warn("Unable to parse date",e);
 					} catch (ParseException e) {
-						e.printStackTrace();
+						LOGGER.warn("Unable to parse date",e);
 					}
 	    		}
 	    	}

@@ -200,7 +200,6 @@ public class ParsingBoltAAM_ATC extends ParseAAMFeeds {
 	@Override
 	protected String[] splitRec(String webRec) {
 		//TODO: See if other fields in the record are relevant. It was anyway not being used, so made this change
-	        //System.out.println("WEB RECORD: " + webRec)
     	webRec = webRec.replaceAll("[']",""); 
 	        String split[]=StringUtils.split(webRec,",");
 	       

@@ -49,7 +49,7 @@ public class DBConnection {
 		try {
 			mongoClient = new MongoClient(sServerName, sPort);
 		} catch (UnknownHostException e) {
-			e.printStackTrace();
+			LOGGER.error("Mongo host unknown",e);
 		}
 
 		conn = mongoClient.getDB(sDatabaseName);

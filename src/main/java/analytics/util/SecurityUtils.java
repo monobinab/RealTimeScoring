@@ -7,8 +7,14 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import analytics.util.dao.VariableDao;
 
 public class SecurityUtils {
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(SecurityUtils.class);
 	static SecretKeySpec signingKey;
 	static Mac mac;
 	static {
@@ -17,12 +23,12 @@ public class SecurityUtils {
 		try {
 			mac = Mac.getInstance("HmacSHA1");
 		} catch (NoSuchAlgorithmException e1) {
-			e1.printStackTrace();
+			LOGGER.error("Unable to create encryption key",e1);
 		}
 		try {
 			mac.init(signingKey);
 		} catch (InvalidKeyException e) {
-			e.printStackTrace();
+			LOGGER.error("Unable to init encryption key",e);
 		}
 
 	}

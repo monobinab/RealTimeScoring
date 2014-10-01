@@ -6,6 +6,11 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import analytics.util.dao.VariableDao;
+
 /**
  * Created with IntelliJ IDEA.
  * User: syermalk
@@ -14,7 +19,8 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  */
 public class StoreZipMap {
-
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(StoreZipMap.class);
     private Map<Integer,Integer> map;
 
     private static StoreZipMap instance;
@@ -44,7 +50,7 @@ public class StoreZipMap {
                 isr.close();
                 br.close();
             } catch (IOException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                LOGGER.warn("Unable to read store zip mappings",e);
             }
         }
         return  instance;

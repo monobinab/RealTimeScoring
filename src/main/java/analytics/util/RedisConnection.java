@@ -34,7 +34,7 @@ public class RedisConnection {
 		    return servers.toArray(new String[i-1]);
 		} 
 		catch (IOException ex) {
-		    ex.printStackTrace();
+		    LOGGER.error("Unable to get server names",ex);
 		    return null;
 		}
 	}

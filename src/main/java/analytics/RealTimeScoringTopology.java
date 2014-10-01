@@ -58,7 +58,6 @@ public class RealTimeScoringTopology {
 								.getQueueChannel(), mqCredential
 								.getQueueName()), 2);
 
-		System.out.println(mqCredential.getHostOneName() + mqCredential.getPort());
 		topologyBuilder.setBolt("parsing_bolt", new ParsingBoltPOS())
 				.shuffleGrouping("npos1").shuffleGrouping("npos2");
 		topologyBuilder.setBolt("strategy_bolt", new StrategyScoringBolt())

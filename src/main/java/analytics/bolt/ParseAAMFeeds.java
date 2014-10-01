@@ -74,7 +74,6 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 
 		//POPULATE MODEL VARIABLES LIST
         modelVariablesList =modelVariablesDao.getVariableList();
-//		System.out.println(" *** PARSING BOLT MODEL VARIABLE LIST: ");
     }
 
 	/*

@@ -4,6 +4,10 @@ import static backtype.storm.utils.Utils.tuple;
 
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import analytics.AAM_ATCTopology;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 
@@ -13,7 +17,8 @@ public class FacebookRedisSpout extends RedisPubSubSpout {
 	}
 
 	private static final long serialVersionUID = 1L;
-
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(FacebookRedisSpout.class);
 	/*
 	 * Read the redis lines for SYW events (non-Javadoc)
 	 * 
@@ -24,7 +29,7 @@ public class FacebookRedisSpout extends RedisPubSubSpout {
 		try {
 			TimeUnit.MILLISECONDS.sleep(2);
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			LOGGER.warn("Thread is unable to sleep",e);
 		}
 		if (ret != null) {
 			_collector.emit(tuple("facebook",ret));
