@@ -22,7 +22,7 @@ public class MongoNameConstants {
 	public static final String MUUID_UUID="u";
 	
 	//Member zip
-	public static final String ZIP="z";
+	public static final String ZIP="zip";
 	
 	//div cat ksn collection
 	public static final String DCK_K="k";
