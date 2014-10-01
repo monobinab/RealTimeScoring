@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import analytics.bolt.ParsingBoltAAM_ATC;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.spout.AAMRedisPubSubSpout;
+import analytics.util.MongoNameConstants;
 import analytics.util.RedisConnection;
 import analytics.util.TopicConstants;
 import backtype.storm.Config;
@@ -23,6 +24,10 @@ public class AAM_BrowseTopology {
 
 	public static void main(String[] args) throws Exception {
 		LOGGER.info("Starting web feed topology from browse source");
+		System.clearProperty(MongoNameConstants.IS_PROD);
+		if (args.length > 0) {
+			System.setProperty(MongoNameConstants.IS_PROD, "true");
+		}
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 
 		String topic = TopicConstants.AAM_BROWSE_PRODUCTS;
@@ -46,6 +51,7 @@ public class AAM_BrowseTopology {
 		}
 
 		Config conf = new Config();
+		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
 		if (args.length > 0) {
 			try {
 				StormSubmitter.submitTopology(args[0], conf,

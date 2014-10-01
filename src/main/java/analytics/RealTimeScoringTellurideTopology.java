@@ -38,13 +38,15 @@ public class RealTimeScoringTellurideTopology {
 		if (args.length > 0) {
 			System.setProperty(MongoNameConstants.IS_PROD, "true");
 		}
-		System.setProperty(MongoNameConstants.IS_PROD, "true");
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 
 		MQConnectionConfig mqConnection = new MQConnectionConfig();
 		WebsphereMQCredential mqCredential = mqConnection
-				.getWebsphereMQCredential();
-
+				.getWebsphereMQCredential("Telluride");
+		if(mqCredential==null){
+			LOGGER.error("Unable to get a MQ connections");
+			return;
+		}
 		topologyBuilder
 				.setSpout(
 						"telluride1",
@@ -73,7 +75,7 @@ public class RealTimeScoringTellurideTopology {
 
 		Config conf = new Config();
 		conf.setDebug(false);
-
+		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
 		if (args.length > 0) {
 			try {
                 conf.setNumAckers(5);

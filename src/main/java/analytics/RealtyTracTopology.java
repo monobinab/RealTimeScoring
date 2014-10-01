@@ -1,6 +1,7 @@
 package analytics;
 
 import analytics.bolt.RealtyTracBolt;
+import analytics.util.MongoNameConstants;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
@@ -56,7 +57,10 @@ public class RealtyTracTopology {
 
 
   public static void main(String[] args) throws Exception {
-
+		System.clearProperty(MongoNameConstants.IS_PROD);
+		if (args.length > 0) {
+			System.setProperty(MongoNameConstants.IS_PROD, "true");
+		}
 	//TODO: Requires python libraries installed, mongo collection does not exist currently. Mongo objects should be changed to DAO
     TopologyBuilder builder = new TopologyBuilder();
 
@@ -69,7 +73,7 @@ public class RealtyTracTopology {
 
 
     Config conf = new Config();
-
+	conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
 
 
     if (args != null && args.length > 0) {

@@ -10,15 +10,26 @@ public class MQConnectionConfig {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(MQConnectionConfig.class);
 	
-	public WebsphereMQCredential getWebsphereMQCredential() throws ConfigurationException{
-	
+	public WebsphereMQCredential getWebsphereMQCredential(String feed) throws ConfigurationException{
+		PropertiesConfiguration properties=null;
+		String isProd = System.getProperty(MongoNameConstants.IS_PROD);
     	//Configure logger
         BasicConfigurator.configure();
-        
-		//PropertiesConfiguration properties = new PropertiesConfiguration("resources/Telluride_MQ_Prod_config.properties");
-        //PropertiesConfiguration properties = new PropertiesConfiguration("resources/POS_MQ_config.properties");
-        PropertiesConfiguration properties = new PropertiesConfiguration("resources/Websphere_MQ_config.properties");
-		
+        if(feed.equals("Telluride")){
+        	if("true".equals("isProd"))
+        		properties = new PropertiesConfiguration("resources/Telluride_MQ_Prod_config.properties");
+        	else
+        		properties = new PropertiesConfiguration("resources/Telluride_MQ_config.properties");
+        }
+        else if(feed.equals("POS")){
+        	if("true".equals(isProd))
+        		properties = new PropertiesConfiguration("resources/POS_MQ_config.properties");
+        }
+        if(properties==null){
+        	LOGGER.warn("Unable to find feed");
+        	return null;
+        }
+
 		WebsphereMQCredential websphereMQCredential = new WebsphereMQCredential();
 		
 		websphereMQCredential.setHostOneName(properties.getString("hostOne.name"));

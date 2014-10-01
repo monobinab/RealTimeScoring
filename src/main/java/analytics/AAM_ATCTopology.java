@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import analytics.bolt.ParsingBoltAAM_ATC;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.spout.AAMRedisPubSubSpout;
+import analytics.util.MongoNameConstants;
 import analytics.util.RedisConnection;
 import analytics.util.TopicConstants;
 import backtype.storm.Config;
@@ -26,6 +27,10 @@ public class AAM_ATCTopology {
 	public static void main(String[] args) throws ConfigurationException {
 
 		LOGGER.info("Starting web feed topology from ATC source");
+		System.clearProperty(MongoNameConstants.IS_PROD);
+		if (args.length > 0) {
+			System.setProperty(MongoNameConstants.IS_PROD, "true");
+		}
 		String topic = TopicConstants.AAM_ATC_PRODUCTS;
 
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
@@ -46,7 +51,7 @@ public class AAM_ATCTopology {
 		}
 
 		Config conf = new Config();
-
+		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
 		if (args.length > 0) {
 			try {
 				StormSubmitter.submitTopology(args[0], conf,

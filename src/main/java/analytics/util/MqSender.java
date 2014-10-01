@@ -17,14 +17,14 @@ public class MqSender {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MqSender.class);
 
 	static int counter = 0;
-	public static void initJMS() {
+	public static void initJMS(String feed) {
 		try {
 			MQQueueConnectionFactory cf1 = new MQQueueConnectionFactory();
 			MQQueueConnectionFactory cf2 = new MQQueueConnectionFactory();
 			
 			MQConnectionConfig mqConnection = new MQConnectionConfig();
 			WebsphereMQCredential mqCredential = mqConnection
-					.getWebsphereMQCredential();
+					.getWebsphereMQCredential(feed);
 			cf1.setHostName(mqCredential.getHostOneName());
 			cf1.setPort(mqCredential.getPort());
 			cf1.setTransportType(JMSC.MQJMS_TP_CLIENT_MQ_TCPIP);

@@ -12,6 +12,7 @@ import analytics.bolt.ScorePublishBolt;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.spout.WebsphereMQSpout;
 import analytics.util.MQConnectionConfig;
+import analytics.util.MongoNameConstants;
 import analytics.util.RedisConnection;
 import analytics.util.WebsphereMQCredential;
 import backtype.storm.Config;
@@ -27,13 +28,19 @@ public class RealTimeScoringTopology {
 			.getLogger(RealTimeScoringTopology.class);
 
 	public static void main(String[] args) throws ConfigurationException {
-
+		System.clearProperty(MongoNameConstants.IS_PROD);
+		if (args.length > 0) {
+			System.setProperty(MongoNameConstants.IS_PROD, "true");
+		}
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 
 		MQConnectionConfig mqConnection = new MQConnectionConfig();
 		WebsphereMQCredential mqCredential = mqConnection
-				.getWebsphereMQCredential();
-
+				.getWebsphereMQCredential("POS");
+		if(mqCredential==null){
+			LOGGER.error("Unable to get a MQ connections");
+			return;
+		}
 		topologyBuilder
 		.setSpout(
 				"npos1",
@@ -59,7 +66,7 @@ public class RealTimeScoringTopology {
 		topologyBuilder.setBolt("score_publish_bolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 2).shuffleGrouping("strategy_bolt","score_stream");
 		Config conf = new Config();
 		conf.setDebug(false);
-
+		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
 		if (args.length > 0) {
 			try {
 				StormSubmitter.submitTopology(args[0], conf,

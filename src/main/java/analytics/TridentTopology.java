@@ -9,7 +9,10 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
 import analytics.spout.MeetupRsvpsBatchSpout;
 import analytics.trident.RedisState;
+import analytics.util.MongoNameConstants;
+
 import org.json.simple.JSONObject;
+
 import storm.trident.operation.BaseFunction;
 import storm.trident.operation.TridentCollector;
 import storm.trident.operation.builtin.Count;
@@ -28,7 +31,10 @@ import java.util.Map;
  */
 public class TridentTopology {
     public static void main(String[] args) {
-
+		System.clearProperty(MongoNameConstants.IS_PROD);
+		if (args.length > 0) {
+			System.setProperty(MongoNameConstants.IS_PROD, "true");
+		}
         StateFactory redis = RedisState.nonTransactional(new InetSocketAddress("localhost", 6379));
         MeetupRsvpsBatchSpout meetup_rsvp_spout = new MeetupRsvpsBatchSpout();
         storm.trident.TridentTopology topology = new storm.trident.TridentTopology();
@@ -42,7 +48,7 @@ public class TridentTopology {
         conf.setMaxSpoutPending(20);
 
         conf.setDebug(false);
-
+		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
         if (args.length > 0) {
             try {
                 StormSubmitter.submitTopology(args[0], conf, topology.build());
