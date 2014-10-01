@@ -50,12 +50,10 @@ server3=rtsapp403p.prod.ch4.s.com
 		toplologyBuilder.setBolt("ProcessSYWEvents",
 				new ProcessSYWInteractions(), 4).shuffleGrouping(
 				"ParseEventsBolt");
-		toplologyBuilder.setBolt("scoringBolt", new SywScoringBolt(), 1)
-				.shuffleGrouping("ProcessSYWEvents");
+		toplologyBuilder.setBolt("scoringBolt", new SywScoringBolt(), 1).shuffleGrouping("ProcessSYWEvents");
 		//TODO: Persist is still being fixed
-		toplologyBuilder.setBolt("persistBolt", new PersistBoostsBolt(), 1)
-		.shuffleGrouping("ProcessSYWEvents");
-		toplologyBuilder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 1).shuffleGrouping("scoringBolt");
+		toplologyBuilder.setBolt("persistBolt", new PersistBoostsBolt(), 1).shuffleGrouping("ProcessSYWEvents");
+		toplologyBuilder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 1).shuffleGrouping("scoringBolt", "score_stream");
 		toplologyBuilder.setBolt("member_publish_bolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 2).shuffleGrouping("scoringBolt", "member_stream");
 		Config conf = new Config();
 		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));

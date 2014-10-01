@@ -185,7 +185,7 @@ public class SywScoringBolt  extends BaseRichBolt{
 			listToEmit.add(String.valueOf(modelId));
 			listToEmit.add(source);
 			listToEmit.add(messageID);
-			outputCollector.emit(listToEmit);
+			outputCollector.emit("score_stream",listToEmit);
 		}
 		outputCollector.ack(input);
 
@@ -194,12 +194,17 @@ public class SywScoringBolt  extends BaseRichBolt{
 
 
         updateChangedMemberScore(lId, modelIdToScore);
+		List<Object> listToEmit = new ArrayList<Object>();
+		listToEmit.add(lId);
+		listToEmit.add(source);
+		this.outputCollector.emit("member_stream", listToEmit);
+		this.outputCollector.ack(input);
 	}
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("l_id", "oldScore", "newScore", "model",
-				"source", "messageID"));
+		declarer.declareStream("score_stream",new Fields("l_id", "oldScore", "newScore", "model","source", "messageID"));
+		declarer.declareStream("member_stream", new Fields("l_id", "source"));
 	}
 
 	public void updateChangedMemberScore(String lId, Map<Integer, String> modelIdToScore) {

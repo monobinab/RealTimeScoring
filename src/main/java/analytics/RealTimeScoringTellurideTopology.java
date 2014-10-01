@@ -10,6 +10,7 @@ import analytics.bolt.StrategyScoringBolt;
 import analytics.bolt.TellurideParsingBoltPOS;
 import analytics.spout.WebsphereMQSpout;
 import analytics.util.MQConnectionConfig;
+import analytics.util.MongoNameConstants;
 import analytics.util.RedisConnection;
 import analytics.util.WebsphereMQCredential;
 import backtype.storm.Config;
@@ -33,6 +34,11 @@ public class RealTimeScoringTellurideTopology {
 	public static void main(String[] args) throws ConfigurationException {
 		LOGGER.info("Starting telluride real time scoring topology");
 		// Configure logger
+		System.clearProperty(MongoNameConstants.IS_PROD);
+		if (args.length > 0) {
+			System.setProperty(MongoNameConstants.IS_PROD, "true");
+		}
+		System.setProperty(MongoNameConstants.IS_PROD, "true");
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 
 		MQConnectionConfig mqConnection = new MQConnectionConfig();

@@ -34,26 +34,29 @@ public class RealTimeScoringTopology {
 		WebsphereMQCredential mqCredential = mqConnection
 				.getWebsphereMQCredential();
 
-		topologyBuilder.setSpout(
+		topologyBuilder
+		.setSpout(
 				"npos1",
-				new WebsphereMQSpout(mqCredential.getHostRtsThreeName(),
+				new WebsphereMQSpout(mqCredential.getHostOneName(),
 						mqCredential.getPort(), mqCredential
-								.getQueueRtsThreeManager(), mqCredential
-								.getQueueRts2Channel(), mqCredential
-								.getQueueRts2Name()), 1);
-		topologyBuilder.setSpout(
+								.getQueueOneManager(), mqCredential
+								.getQueueChannel(), mqCredential
+								.getQueueName()), 2);
+		topologyBuilder
+		.setSpout(
 				"npos2",
-				new WebsphereMQSpout(mqCredential.getHostRtsFourName(),
+				new WebsphereMQSpout(mqCredential.getHostTwoName(),
 						mqCredential.getPort(), mqCredential
-								.getQueueRtsFourManager(), mqCredential
-								.getQueueRts2Channel(), mqCredential
-								.getQueueRts2Name()), 1);
+								.getQueueTwoManager(), mqCredential
+								.getQueueChannel(), mqCredential
+								.getQueueName()), 2);
 
+		System.out.println(mqCredential.getHostOneName() + mqCredential.getPort());
 		topologyBuilder.setBolt("parsing_bolt", new ParsingBoltPOS())
 				.shuffleGrouping("npos1").shuffleGrouping("npos2");
 		topologyBuilder.setBolt("strategy_bolt", new StrategyScoringBolt())
 				.shuffleGrouping("parsing_bolt");
-		topologyBuilder.setBolt("score_publish_bolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 2).shuffleGrouping("strategy_bolt");
+		topologyBuilder.setBolt("score_publish_bolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 2).shuffleGrouping("strategy_bolt","score_stream");
 		Config conf = new Config();
 		conf.setDebug(false);
 
