@@ -163,7 +163,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 
 			lyl_id_no = processTransaction.getMemberNumber();
 
-			if (StringUtils.isEmpty(lyl_id_no)) {
+			if (lyl_id_no==null || StringUtils.isEmpty(lyl_id_no)) {
 				return;
 			}
 
