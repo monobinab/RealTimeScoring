@@ -103,6 +103,7 @@ public class ScoringSingletonTest {
 				
 		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
 		newChangesVarValueMap.put("S_DSL_APP_INT_ACC_FTWR_TRS", "0.001");
+		newChangesVarValueMap.put("S_DSL_APP_INT_ACC", "0.501");
 		
 		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
 		List<Integer> modelLists = new ArrayList<Integer>();
