@@ -7,8 +7,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,9 +23,12 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import analytics.util.dao.ModelVariablesDao;
 import analytics.util.objects.Change;
 
 import com.github.fakemongo.Fongo;
+import com.ibm.disthub2.impl.gd.ARangeList;
+import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -94,15 +99,28 @@ public class ScoringSingletonTest {
 	}
 	
 	@Test
-	@Ignore("Populate fake mongo with values before expecting values")
-	public void getModelIdListTest3(){
+	public void getModelIdListTest3() throws ConfigurationException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
+				
 		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
-		newChangesVarValueMap.put("S_HOME_6M_IND", "value");
-		//Map<String, List<Integer>> data = new HashMap("S_HOME_6M_IND",)
+		newChangesVarValueMap.put("S_DSL_APP_INT_ACC_FTWR_TRS", "0.001");
+		newChangesVarValueMap.put("S_DSL_APP_INT_ACC", "0.501");
+		
+		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
+		List<Integer> modelLists = new ArrayList<Integer>();
+		modelLists.add(48);
+		modelLists.add(35);
+		variableModelsMapContents.put("S_DSL_APP_INT_ACC_FTWR_TRS",modelLists);
+		Field variableModelsMap = ScoringSingleton.class.getDeclaredField("variableModelsMap");
+		variableModelsMap.setAccessible(true);
+		variableModelsMap.set(scoringSingletonObj, variableModelsMapContents);
+		
+		//Actual modelIds from ScoringSingleton
 		Set<Integer> modelList = scoringSingletonObj.getModelIdList(newChangesVarValueMap);
+		
+		//Expected
 		Set<Integer> result = new HashSet<Integer>();
 		result.add(48);
-		//System.out.println(modelList.toString());
+		result.add(35);
 		assertEquals(modelList, result);
 	}
 	
