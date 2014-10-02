@@ -25,5 +25,11 @@ public class StormTestUtils {
 		 when(tuple.getStringByField("InteractionType")).thenReturn(interactionType);
 		 return tuple;
 	 }
+	 public static Tuple mockMemberTuple(String lId, String source){
+		 Tuple tuple = mock(Tuple.class);
+		 when(tuple.getStringByField("l_id")).thenReturn(lId);
+		 when(tuple.getStringByField("source")).thenReturn(source);
+		 return tuple;
+	 }
 	 
 }
