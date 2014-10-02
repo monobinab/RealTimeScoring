@@ -177,4 +177,153 @@ public class XMLParserTest {
             "    </soapenv:Body>\n" +
             "</soapenv:Envelope>\n";
 
+    @Test
+    public void testParsingWithNoMemberId()
+    {
+    	// 
+    	 String fileName = noMemberId;
+        ProcessTransaction processTransaction = XMLParser.parseXMLProcessTransaction(fileName);
+        assertTrue(processTransaction != null);
+        System.out.println(processTransaction.getMemberNumber());
+        assertEquals(null,processTransaction.getMemberNumber());
+        assertEquals("KCOM",processTransaction.getRequestorID());
+        assertTrue(processTransaction.getLineItemList()!=null);
+        assertEquals( 2,processTransaction.getLineItemList().size());
+        assertEquals( "082453511",processTransaction.getLineItemList().get(0).getItemNumber());
+        assertEquals( "082453512",processTransaction.getLineItemList().get(1).getItemNumber());
+       
+    }
+
+    static String noMemberId="<soapenv:Envelope xmlns:soapenv=\"http://www.w3.org/2003/05/soap-envelope\">\n" +
+            "    <soapenv:Body>\n" +
+            "        <ProcessTransaction xmlns=\"http://www.epsilon.com/webservices/\">\n" +
+            "            <MessageVersion>08</MessageVersion>\n" +
+            "            <MemberNumber/>\n" +
+            "            <RequestorID>KCOM</RequestorID>\n" +
+            "            <OrderStoreNumber>07840</OrderStoreNumber>\n" +
+            "            <TenderStoreNumber>00000</TenderStoreNumber>\n" +
+            "            <RegisterNumber>048</RegisterNumber>\n" +
+            "            <TransactionNumber>0000</TransactionNumber>\n" +
+            "            <TransactionTotal>3.67000</TransactionTotal>\n" +
+            "            <TransactionTotalTax>0.00000</TransactionTotalTax>\n" +
+            "            <TransactionDate>2014-08-07</TransactionDate>\n" +
+            "            <TransactionTime>21:43:02</TransactionTime>\n" +
+            "            <EarnFlag>T</EarnFlag>\n" +
+            "            <TimeZone>CDT</TimeZone>\n" +
+            "            <LineItems>\n" +
+            "                <LineItem>\n" +
+            "                    <LineNumber>1</LineNumber>\n" +
+            "                    <ItemType>1</ItemType>\n" +
+            "                    <ItemNumber>082453511</ItemNumber>\n" +
+            "                    <SKU>000</SKU>\n" +
+            "                    <UPC>07723100317</UPC>\n" +
+            "                    <LineItemAmountTypeCode>1</LineItemAmountTypeCode>\n" +
+            "                    <DollarValuePreDisc>3.67000</DollarValuePreDisc>\n" +
+            "                    <DollarValuePostDisc>3.67000</DollarValuePostDisc>\n" +
+            "                    <PriceMatchAmount>0</PriceMatchAmount>\n" +
+            "                    <PriceMatchBonusAmount>0</PriceMatchBonusAmount>\n" +
+            "                    <Quantity>1.0</Quantity>\n" +
+            "                    <OriginalLineNumber>1</OriginalLineNumber>\n" +
+            "                    <OriginalTransactionDate>21:43:02</OriginalTransactionDate>\n" +
+            "                    <TaxAmount>0.00000</TaxAmount>\n" +
+            "                    <PostSalesAdjustmentAmount>0</PostSalesAdjustmentAmount>\n" +
+            "                    <Coupons/>\n" +
+            "                </LineItem>\n" +
+            "					 <LineItem>\n" +
+            "                    <LineNumber>2</LineNumber>\n" +
+            "                    <ItemType>2</ItemType>\n" +
+            "                    <ItemNumber>082453512</ItemNumber>\n" +
+            "                    <SKU>000</SKU>\n" +
+            "                    <UPC>07723100317</UPC>\n" +
+            "                    <LineItemAmountTypeCode>1</LineItemAmountTypeCode>\n" +
+            "                    <DollarValuePreDisc>3.67000</DollarValuePreDisc>\n" +
+            "                    <DollarValuePostDisc>3.67000</DollarValuePostDisc>\n" +
+            "                    <PriceMatchAmount>0</PriceMatchAmount>\n" +
+            "                    <PriceMatchBonusAmount>0</PriceMatchBonusAmount>\n" +
+            "                    <Quantity>1.0</Quantity>\n" +
+            "                    <OriginalLineNumber>1</OriginalLineNumber>\n" +
+            "                    <OriginalTransactionDate>21:43:02</OriginalTransactionDate>\n" +
+            "                    <TaxAmount>0.00000</TaxAmount>\n" +
+            "                    <PostSalesAdjustmentAmount>0</PostSalesAdjustmentAmount>\n" +
+            "                    <Coupons/>\n" +
+            "                </LineItem>\n" +
+            "            </LineItems>\n" +
+            "        </ProcessTransaction>\n" +
+            "    </soapenv:Body>\n" +
+            "</soapenv:Envelope>\n";
+    
+    @Test
+    public void testParsingWithInvalidMemberId()
+    {
+    	// 
+    	 String fileName = inValidMemberId;
+        ProcessTransaction processTransaction = XMLParser.parseXMLProcessTransaction(fileName);
+        assertTrue(processTransaction != null);
+        assertEquals(null,processTransaction.getMemberNumber());
+        assertEquals("KCOM",processTransaction.getRequestorID());
+        assertTrue(processTransaction.getLineItemList()!=null);
+        assertEquals( 2,processTransaction.getLineItemList().size());
+        assertEquals( "082453511",processTransaction.getLineItemList().get(0).getItemNumber());
+        assertEquals( "082453512",processTransaction.getLineItemList().get(1).getItemNumber());
+       
+    }
+
+    static String inValidMemberId="<soapenv:Envelope xmlns:soapenv=\"http://www.w3.org/2003/05/soap-envelope\">\n" +
+            "    <soapenv:Body>\n" +
+            "        <ProcessTransaction xmlns=\"http://www.epsilon.com/webservices/\">\n" +
+            "            <MessageVersion>08</MessageVersion>\n" +
+            "            <MemberNumber>60909987676</MemberNumber>\n" +
+            "            <RequestorID>KCOM</RequestorID>\n" +
+            "            <OrderStoreNumber>07840</OrderStoreNumber>\n" +
+            "            <TenderStoreNumber>00000</TenderStoreNumber>\n" +
+            "            <RegisterNumber>048</RegisterNumber>\n" +
+            "            <TransactionNumber>0000</TransactionNumber>\n" +
+            "            <TransactionTotal>3.67000</TransactionTotal>\n" +
+            "            <TransactionTotalTax>0.00000</TransactionTotalTax>\n" +
+            "            <TransactionDate>2014-08-07</TransactionDate>\n" +
+            "            <TransactionTime>21:43:02</TransactionTime>\n" +
+            "            <EarnFlag>T</EarnFlag>\n" +
+            "            <TimeZone>CDT</TimeZone>\n" +
+            "            <LineItems>\n" +
+            "                <LineItem>\n" +
+            "                    <LineNumber>1</LineNumber>\n" +
+            "                    <ItemType>1</ItemType>\n" +
+            "                    <ItemNumber>082453511</ItemNumber>\n" +
+            "                    <SKU>000</SKU>\n" +
+            "                    <UPC>07723100317</UPC>\n" +
+            "                    <LineItemAmountTypeCode>1</LineItemAmountTypeCode>\n" +
+            "                    <DollarValuePreDisc>3.67000</DollarValuePreDisc>\n" +
+            "                    <DollarValuePostDisc>3.67000</DollarValuePostDisc>\n" +
+            "                    <PriceMatchAmount>0</PriceMatchAmount>\n" +
+            "                    <PriceMatchBonusAmount>0</PriceMatchBonusAmount>\n" +
+            "                    <Quantity>1.0</Quantity>\n" +
+            "                    <OriginalLineNumber>1</OriginalLineNumber>\n" +
+            "                    <OriginalTransactionDate>21:43:02</OriginalTransactionDate>\n" +
+            "                    <TaxAmount>0.00000</TaxAmount>\n" +
+            "                    <PostSalesAdjustmentAmount>0</PostSalesAdjustmentAmount>\n" +
+            "                    <Coupons/>\n" +
+            "                </LineItem>\n" +
+            "					 <LineItem>\n" +
+            "                    <LineNumber>2</LineNumber>\n" +
+            "                    <ItemType>2</ItemType>\n" +
+            "                    <ItemNumber>082453512</ItemNumber>\n" +
+            "                    <SKU>000</SKU>\n" +
+            "                    <UPC>07723100317</UPC>\n" +
+            "                    <LineItemAmountTypeCode>1</LineItemAmountTypeCode>\n" +
+            "                    <DollarValuePreDisc>3.67000</DollarValuePreDisc>\n" +
+            "                    <DollarValuePostDisc>3.67000</DollarValuePostDisc>\n" +
+            "                    <PriceMatchAmount>0</PriceMatchAmount>\n" +
+            "                    <PriceMatchBonusAmount>0</PriceMatchBonusAmount>\n" +
+            "                    <Quantity>1.0</Quantity>\n" +
+            "                    <OriginalLineNumber>1</OriginalLineNumber>\n" +
+            "                    <OriginalTransactionDate>21:43:02</OriginalTransactionDate>\n" +
+            "                    <TaxAmount>0.00000</TaxAmount>\n" +
+            "                    <PostSalesAdjustmentAmount>0</PostSalesAdjustmentAmount>\n" +
+            "                    <Coupons/>\n" +
+            "                </LineItem>\n" +
+            "            </LineItems>\n" +
+            "        </ProcessTransaction>\n" +
+            "    </soapenv:Body>\n" +
+            "</soapenv:Envelope>\n";
+
 }

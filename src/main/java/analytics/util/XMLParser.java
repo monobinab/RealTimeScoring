@@ -26,7 +26,9 @@ public class XMLParser {
 			.getLogger(XMLParser.class);
 
 	public static ProcessTransaction parseXMLProcessTransaction(String fileName) {
-		
+		List<String> testMembers= new ArrayList<String>();
+		testMembers.add("7081197526669586");
+		testMembers.add("7081187606915702"); 
 		ProcessTransaction processTransaction = null;
 		XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
         xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, Boolean.FALSE);
@@ -88,8 +90,13 @@ public class XMLParser {
 				case XMLStreamConstants.CHARACTERS:
 
 					if (bMemberNumber) {
-						processTransaction.setMemberNumber(xmlStreamReader
+						String memberNumber = xmlStreamReader
+								.getText();
+						if(memberNumber.startsWith("7081") && !testMembers.contains(memberNumber) && memberNumber.length()==16)
+							{
+								processTransaction.setMemberNumber(xmlStreamReader
 								.getText());
+								}
 						bMemberNumber = false;
 					} else if (bRequestorID) {
 						processTransaction.setRequestorID(xmlStreamReader
