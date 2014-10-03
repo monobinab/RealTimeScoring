@@ -250,6 +250,7 @@ public class ScoringSingleton {
 
 	public double getBoostScore(Map<String, Change> allChanges, Integer modelId) {
 		double boosts = 0;
+		if(allChanges != null && modelId != null){
 		for(Map.Entry<String, Change> entry : allChanges.entrySet()){
 			String ch = entry.getKey();
 			Change value = entry.getValue();
@@ -262,14 +263,16 @@ public class ScoringSingleton {
 					}
 				} else {
 					if(modelsMap.get(modelId).containsKey(Calendar.getInstance().get(Calendar.MONTH) + 1)) {
+						if(modelsMap.get(modelId).get(Calendar.getInstance().get(Calendar.MONTH) + 1).getVariables().containsKey(ch)){
 						boosts = boosts 
 								+ Double.valueOf(value.getValue().toString()) 
 								* modelsMap.get(modelId).get(Calendar.getInstance().get(Calendar.MONTH) + 1).getVariables().get(ch).getCoefficient();
+						}		
 					}
 				}
 			}
 		}
-
+		}
 		return boosts;
 	}
 	
@@ -294,7 +297,6 @@ public class ScoringSingleton {
 			Map<String, Change> varChangeMap, int modelId) {
 
 		Model model = null;
-
 		if (modelsMap.get(modelId) != null
 				&& modelsMap.get(modelId).containsKey(0)) {
 			model = modelsMap.get(modelId).get(0);
