@@ -6,6 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
 import analytics.util.MongoNameConstants;
 import analytics.util.dao.MemberZipDao;
 import backtype.storm.task.OutputCollector;
@@ -26,7 +28,7 @@ public class MemberPublishBolt extends BaseRichBolt{
 	final int port;
 	final String pattern;
 
-	private Jedis jedis;
+	private JedisPool jedisPool;
 	private MemberZipDao memberZipDao;
 	
 	public MemberPublishBolt(String host, int port, String pattern) {
@@ -39,8 +41,10 @@ public class MemberPublishBolt extends BaseRichBolt{
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
         System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
-		jedis = new Jedis(host, port);
-		memberZipDao = new MemberZipDao();
+        JedisPoolConfig poolConfig = new JedisPoolConfig();
+        poolConfig.setMaxActive(100);
+        jedisPool = new JedisPool(poolConfig,host, port, 100);
+        memberZipDao = new MemberZipDao();
 		this.outputCollector = collector;
 		
 	}
@@ -57,6 +61,7 @@ public class MemberPublishBolt extends BaseRichBolt{
 		int retryCount = 0;
 		while (retryCount < 5) {
 			try {
+				Jedis jedis = jedisPool.getResource();
 				jedis.publish(pattern, message);
 				break;
 			} catch (Exception e) {
