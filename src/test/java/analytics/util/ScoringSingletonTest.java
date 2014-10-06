@@ -569,7 +569,6 @@ public class ScoringSingletonTest {
 		Assert.assertEquals(0.0, boost);
 	}
 	
-
 	/*@Test
 	public void calcScoreTest() throws ParseException, SecurityException,
 			NoSuchFieldException, IllegalArgumentException,
@@ -718,15 +717,13 @@ public class ScoringSingletonTest {
 		modelIds.add(48);
 		modelIds.add(51);
 		modelIds.add(46);
-		Map<Integer, Double> modelIdScoreMap = new HashMap<Integer, Double>();
-		modelIdScoreMap.put(51, 0.09);
-		modelIdScoreMap.put(46, 0.012);
-		scoringSingletonObj.updateChangedMemberScore("Sears", modelIds, getAllChangesSywBoost(), modelIdScoreMap);
+		
+		scoringSingletonObj.updateChangedMemberScore("Sears", modelIds, getAllChangesSywBoost(), null);
 		DBObject dbObj = changedMemberScore.findOne(new BasicDBObject("l_id","Sears"));
 		HashMap<String, ChangedMemberScore> changedMemScores51 = (HashMap<String, ChangedMemberScore> ) dbObj.get("51");
 		Map<String, ChangedMemberScore> changedMemScores46 = (HashMap<String, ChangedMemberScore> ) dbObj.get("46");
-		Assert.assertEquals(0.09, changedMemScores51.get("s"));
-		Assert.assertEquals(0.012, changedMemScores46.get("s"));
+		Assert.assertEquals(0.02, changedMemScores51.get("s"));
+		Assert.assertEquals(0.102, changedMemScores46.get("s"));
 	}
 
 	@SuppressWarnings("unchecked")
