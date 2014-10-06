@@ -297,6 +297,7 @@ public class ScoringSingleton {
 			Map<String, Change> varChangeMap, int modelId) {
 
 		Model model = null;
+
 		if (modelsMap.get(modelId) != null
 				&& modelsMap.get(modelId).containsKey(0)) {
 			model = modelsMap.get(modelId).get(0);
@@ -313,7 +314,7 @@ public class ScoringSingleton {
 
 		for (String v : model.getVariables().keySet()) {
 			Variable variable = model.getVariables().get(v);
-			if (variable.getName() != null
+			if (variable.getName() != null && mbrVarMap != null
 					&& mbrVarMap.get(variable.getName().toUpperCase()) != null
 					&& !variable.getName().substring(0, 4).toUpperCase()
 							.equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
@@ -328,7 +329,7 @@ public class ScoringSingleton {
 									variable, varChangeMap, "Double") * variable
 									.getCoefficient());
 				}
-			} else if (variable.getName() != null
+			} else if (variable.getName() != null && varChangeMap != null
 					&& varChangeMap.get(variable.getName().toUpperCase()) != null) {
 				if (varChangeMap.get(variable.getName().toUpperCase())
 						.getValue() instanceof Integer) {
@@ -355,7 +356,7 @@ public class ScoringSingleton {
 			Variable var, Map<String, Change> changes, String dataType) {
 		Object changedValue = null;
 		if (var != null) {
-			if (changes.containsKey(var.getName().toUpperCase())) {
+			if (changes != null && changes.containsKey(var.getName().toUpperCase())) {
 				changedValue = changes.get(var.getName().toUpperCase())
 						.getValue();
 			}
@@ -377,6 +378,7 @@ public class ScoringSingleton {
 		}
 		return changedValue;
 	}
+
 	
 	public void updateChangedMemberScore(String l_id, Set<Integer> modelIdList, Map<String, Change> allChanges, Map<Integer,Double> modelIdScoreMap) {
 		Map<Integer, ChangedMemberScore> updatedScores = new HashMap<Integer, ChangedMemberScore>();
@@ -438,12 +440,14 @@ public class ScoringSingleton {
 			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 			// APPEND CHANGED SCORE AND MIN/MAX EXPIRATION DATES TO DOCUMENT FOR
 			// UPDATE
+			if(modelIdScoreMap != null && !modelIdScoreMap.isEmpty()){
 			updatedScores.put(modelId, new ChangedMemberScore(modelIdScoreMap.get(modelId),
 					minDate != null ? simpleDateFormat.format(minDate) : null, 
 					maxDate != null ? simpleDateFormat.format(maxDate) : null, 
 					simpleDateFormat.format(new Date())));
 		}
-		if (updatedScores != null) {
+		}
+		if (updatedScores != null && !updatedScores.isEmpty()) {
 			changedMemberScoresDao.upsertUpdateChangedScores(l_id,updatedScores);
 		}	
 	}
@@ -451,7 +455,7 @@ public class ScoringSingleton {
 	public void updateChangedVariables(String lId, Integer modelId,
 			Map<String, Change> allChanges) {
 		// 11) Write changedMemberVariables with expiry
-		if (!allChanges.isEmpty()) {
+		if ( allChanges != null && !allChanges.isEmpty() ) {
 			// upsert document
 			changedVariablesDao.upsertUpdateChangedScores(lId, allChanges, variableNameToVidMap);
 		}
