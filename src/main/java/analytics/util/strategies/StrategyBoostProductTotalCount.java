@@ -31,9 +31,7 @@ public class StrategyBoostProductTotalCount implements Strategy {
     	int totalPidCount = 0;
     	
     	if(dateValuesMap != null && dateValuesMap.containsKey("current")) {
-	    	for(String v: dateValuesMap.get("current")) {
-	    		totalPidCount++;
-	    	}
+    		totalPidCount = dateValuesMap.get("current").size();
 	    	dateValuesMap.remove("current");
 	    	if(!dateValuesMap.isEmpty()) {
 	    		for(String key: dateValuesMap.keySet()) {
