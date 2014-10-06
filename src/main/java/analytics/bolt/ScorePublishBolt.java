@@ -12,6 +12,8 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
 
 import java.util.Map;
 
@@ -31,7 +33,7 @@ public class ScorePublishBolt extends BaseRichBolt {
 	final int port;
 	final String pattern;
 
-	private Jedis jedis;
+	private JedisPool jedisPool;
 	private MemberScoreDao memberScoreDao;
 
 	public ScorePublishBolt(String host, int port, String pattern) {
@@ -50,7 +52,10 @@ public class ScorePublishBolt extends BaseRichBolt {
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
         System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
-		jedis = new Jedis(host, port);
+        JedisPoolConfig poolConfig = new JedisPoolConfig();
+        poolConfig.setMaxActive(100);
+        jedisPool = new JedisPool(poolConfig,host, port, 100);
+//		jedis = new Jedis(host, port);
 		memberScoreDao = new MemberScoreDao();
 		this.outputCollector = collector;
 	}
@@ -79,6 +84,7 @@ public class ScorePublishBolt extends BaseRichBolt {
 		int retryCount = 0;
 		while (retryCount < 5) {
 			try {
+				Jedis jedis = jedisPool.getResource();
 				jedis.publish(pattern, message);
 				break;
 			} catch (Exception e) {

@@ -12,7 +12,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <slf4j-version>1.7.2</slf4j-version>
-
+        <sonar.jdbc.url>jdbc:h2:tcp://151.149.191.231:9092/sonar</sonar.jdbc.url>
+        <sonar.host.url>http://151.149.191.231:9000</sonar.host.url>
 	</properties>
 
 	<profiles>
@@ -93,6 +94,12 @@
         
     </repositories>
     <dependencies>
+    <dependency>
+    <groupId>org.codehaus.groovy</groupId>
+    <artifactId>groovy-all</artifactId>
+    <version>1.7.2</version>
+  </dependency>
+    
         <dependency>
 			<groupId>com.github.kevinsawicki</groupId>
 			<artifactId>http-request</artifactId>
@@ -287,6 +294,24 @@
 		    this will create a jar file without the storm dependencies
 		    suitable for deployment to a cluster.
 		     -->
+		     <plugin>
+  <groupId>com.atlassian.maven.plugins</groupId> 
+  <artifactId>maven-clover2-plugin</artifactId> 
+  <version>2.6.3</version> 
+ <configuration>
+  <licenseLocation>clover.license</licenseLocation> 
+  </configuration>
+<executions>
+<execution>
+  <phase>verify</phase> 
+ <goals>
+  <goal>instrument</goal> 
+  <goal>check</goal> 
+  </goals>
+  </execution>
+  </executions>
+  </plugin>
+		     
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>

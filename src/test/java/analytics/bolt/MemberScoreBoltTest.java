@@ -9,6 +9,7 @@ import junit.framework.Assert;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import redis.clients.jedis.Jedis;
@@ -39,6 +40,8 @@ public class MemberScoreBoltTest {
 		//Below line ensures an empty DB rather than reusing a DB with values in it
         FakeMongo.setDBConn(new Fongo("test db").getDB("test"));				
 	}
+	
+	@Ignore("This is just a test of redis publish. We should ideally find an inmemory redis")
 	@Test
 	public void invalidInteractionTypeIsIgnored() throws ConfigurationException, InterruptedException{		
         String input = "nIeO76q2TF8QBTjKkchXxBoGoUY=";
