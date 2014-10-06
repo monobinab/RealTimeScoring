@@ -37,10 +37,12 @@ public class ChangedMemberScoresDao extends AbstractDao{
 							.append(MongoNameConstants.CMS_MAX_EXPIRY_DATE,scoreObj.getMaxDate())
 							.append(MongoNameConstants.CMS_EFFECTIVE_DATE, scoreObj.getEffDate()));
 		}}
-
-		changedMemberScoresCollection.update(new BasicDBObject(MongoNameConstants.L_ID,
+		if(!updateRec.isEmpty())
+		{
+			changedMemberScoresCollection.update(new BasicDBObject(MongoNameConstants.L_ID,
 				lId), new BasicDBObject("$set", updateRec), true,
 				false);
+		}
 		
 	}
 	

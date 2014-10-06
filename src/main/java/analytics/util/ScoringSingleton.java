@@ -441,7 +441,7 @@ public class ScoringSingleton {
 					maxDate != null ? simpleDateFormat.format(maxDate) : null, 
 					simpleDateFormat.format(new Date())));
 		}
-		if (updatedScores != null) {
+		if (updatedScores != null && !updatedScores.isEmpty()) {
 			changedMemberScoresDao.upsertUpdateChangedScores(l_id,updatedScores);
 		}	
 	}
