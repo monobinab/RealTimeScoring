@@ -315,7 +315,7 @@ public class ScoringSingleton {
 		for (String v : model.getVariables().keySet()) {
 			Variable variable = model.getVariables().get(v);
 			if (variable.getName() != null && mbrVarMap != null
-					&& mbrVarMap.get(variable.getName().toUpperCase()) != null
+					&& mbrVarMap.get(variable.getId()) != null
 					&& !variable.getName().substring(0, 4).toUpperCase()
 							.equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
 				if (mbrVarMap.get(variable.getName().toUpperCase()) instanceof Integer) {
@@ -330,7 +330,7 @@ public class ScoringSingleton {
 									.getCoefficient());
 				}
 			} else if (variable.getName() != null && varChangeMap != null
-					&& varChangeMap.get(variable.getName().toUpperCase()) != null) {
+					&& varChangeMap.get(variable.getId()) != null) {
 				if (varChangeMap.get(variable.getName().toUpperCase())
 						.getValue() instanceof Integer) {
 					val = val
