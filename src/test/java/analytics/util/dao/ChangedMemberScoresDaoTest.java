@@ -61,16 +61,11 @@ public class ChangedMemberScoresDaoTest {
 	
 	@Test
 	public void testEmptyScoreHasOnlyLidPresent(){
-		//Not sure if this is right, but we can check that later
 		ChangedMemberScoresDao  changedMemberScoresDao= new ChangedMemberScoresDao();
 		Map<Integer, ChangedMemberScore> myChangedScores = new HashMap<Integer, ChangedMemberScore>();
 		myChangedScores.put(1, null);
 		changedMemberScoresDao.upsertUpdateChangedScores(lId, myChangedScores);
 		DBObject obj = changedMemberScoresDao.changedMemberScoresCollection.findOne();
-		Set<String> keysPresent = new HashSet<String>();
-		keysPresent.add(MongoNameConstants.ID);
-		keysPresent.add(MongoNameConstants.L_ID);
-		Assert.assertEquals(keysPresent, obj.keySet());
-		Assert.assertEquals(lId, obj.get(MongoNameConstants.L_ID));
+		Assert.assertNull(obj);
 	}
 }
