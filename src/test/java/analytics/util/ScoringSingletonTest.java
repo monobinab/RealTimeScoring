@@ -30,6 +30,7 @@ import analytics.util.objects.Change;
 import analytics.util.objects.ChangedMemberScore;
 import analytics.util.objects.Model;
 import analytics.util.objects.Variable;
+
 import com.github.fakemongo.Fongo;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
@@ -288,6 +289,15 @@ public class ScoringSingletonTest {
 		variableModelsMapContents.put("BOOST_SYW_WANT_TOYS_TCOUNT2", modelLists3);
 		variableModelsMapContents.put("S_DSL_APP_INT_ACC_FTWR_ALL", modelLists3);
 		variableModelsMapContents.put("S_DSL_APP_INT_ACC_FTWR_MEM", modelLists);
+		variableModelsMapContents.put("S_HOME_6M_IND", modelLists);
+		variableModelsMapContents.put("S_DSL_APP_INT_ACC", modelLists);
+		variableModelsMapContents.put("S_DSL_APP_INT_ACC2", modelLists);
+		variableModelsMapContents.put("S_HOME_6M_IND_ALL", modelLists);
+		variableModelsMapContents.put("S_DSL_APP_INT_BOTH", modelLists);
+		variableModelsMapContents.put("S_HOME_ALL", modelLists);
+		variableModelsMapContents.put("BOOST_S_DSL_APP_INT_ACC", modelLists);
+		variableModelsMapContents.put("BOOST_S_DSL_APP_INT_ACC2", modelLists);
+		
 		
 		//varValueMap
 		newChangesVarValueMap = new HashMap<String, String>();
@@ -349,6 +359,10 @@ public class ScoringSingletonTest {
 		
 		Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
 		monthModelMap.put(0, new Model(35, "Model_Name", 11, 5, variablesMap));
+		Map<Integer, Model> monthModelMap4 = new HashMap<Integer, Model>();
+		monthModelMap4.put(0, new Model(48, "Model_Name2", 11, 7, variablesMap));
+		Map<Integer, Model> monthModelMap5 = new HashMap<Integer, Model>();
+		monthModelMap5.put(0, new Model(30, "Model_Name3", 11, 7, variablesMap));
 		Map<Integer, Model> monthModelMap2 = new HashMap<Integer, Model>();
 		monthModelMap2.put(Calendar.getInstance().get(Calendar.MONTH) + 1, new Model(27, "Model_Name2", 12, 3,variablesMap));
 		Map<Integer, Model> monthModelMap3 = new HashMap<Integer, Model>();
@@ -357,6 +371,8 @@ public class ScoringSingletonTest {
 		
 		modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContent.put(35, monthModelMap);
+		modelsMapContent.put(48, monthModelMap4);
+		modelsMapContent.put(30, monthModelMap5);
 		setModelsMapContent(modelsMapContent);
 		
 		modelsMapContent2 = new HashMap<Integer, Map<Integer, Model>>();
@@ -431,20 +447,29 @@ public class ScoringSingletonTest {
 		variableNameToStrategyMapContents.put("S_DSL_APP_INT_ACC_FTWR_TRS", "StrategyCountTransactions");
 		variableNameToStrategyMapContents.put("S_DSL_APP_INT_ACC_FTWR_ALL", "StrategyDaysSinceLast");
 		variableNameToStrategyMapContents.put("S_DSL_APP_INT_ACC_FTWR_MEM", "StrategyTurnOffFlag");
-		
+		variableNameToStrategyMapContents.put("S_HOME_6M_IND", "StrategyTurnOffFlag");
+		variableNameToStrategyMapContents.put("S_DSL_APP_INT_ACC", "StrategyDaysSinceLast");
+		variableNameToStrategyMapContents.put("S_DSL_APP_INT_BOTH", "StrategyTurnOffFlag");
+		variableNameToStrategyMapContents.put("S_HOME_ALL", "StrategyCountTraits");
+		variableNameToStrategyMapContents.put("S_DSL_APP_INT_ACC_FTWR", "StrategyCountTraits");
+		variableNameToStrategyMapContents.put("BOOST_S_DSL_APP_INT_ACC", "StrategyTurnOffFlag");
+		variableNameToStrategyMapContents.put("BOOST_S_DSL_APP_INT_ACC2", "StrategyDaysSinceLast");
+		variableNameToStrategyMapContents.put("BOOST_SYW_WANT_TOYS_TCOUNT", "StrategySumSales");
+		variableNameToStrategyMapContents.put("BOOST_SYW_WANT_TOYS_TCOUNT2", "StrategyTurnOffFlag");
 		
 		variableNameToVidMapContents = new HashMap<String, String>();
 		variableNameToVidMapContents.put("S_HOME_6M_IND", "2268");
 		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC", "2269");
-		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC2", "2270");
-		variableNameToVidMapContents.put("S_HOME_6M_IND_ALL", "2271");
+		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC2", "2270"); 
+		variableNameToVidMapContents.put("S_HOME_6M_IND_ALL", "2271"); 
 		variableNameToVidMapContents.put("S_DSL_APP_INT_BOTH", "2272");
 		variableNameToVidMapContents.put("S_HOME_ALL", "2276");
-		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC_FTWR_TRS", "2273");
-		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC_FTWR_ALL", "2274");
-		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC_FTWR_MEM", "2275");
+		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC_FTWR_TRS", "2273"); 
+		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC_FTWR", "2277"); 
+		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC_FTWR_ALL", "2274"); 
+		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC_FTWR_MEM", "2275"); 
 		variableNameToVidMapContents.put("BOOST_S_DSL_APP_INT_ACC", "2281");
-		variableNameToVidMapContents.put("BOOST_S_DSL_APP_INT_ACC", "2282");
+		variableNameToVidMapContents.put("BOOST_S_DSL_APP_INT_ACC2", "2282");
 		variableNameToVidMapContents.put("BOOST_SYW_WANT_TOYS_TCOUNT", "2283");
 		variableNameToVidMapContents.put("BOOST_SYW_WANT_TOYS_TCOUNT2", "2284");
 			
@@ -467,8 +492,6 @@ public class ScoringSingletonTest {
 		DBCollection changedMemberVar = conn
 				.getCollection("changedMemberVariables");
 		String l_id = "6RpGnW1XhFFBoJV+T9cT9ok=";
-		
-		
 		
 		changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
 				"2270",
@@ -537,19 +560,46 @@ public class ScoringSingletonTest {
 	}
 
 	@Test
-	public void createVariableValueMapTest() {
+	public void createVariableValueMapNullCheckTest() {
 		// TODO:
 		// in condition mbrVariables is null, assertNull
 		// variables key is not loyal_ID and is not ID(what are those
 		// constants?)
 		// insert into memberVariablesMap
-		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
-		newChangesVarValueMap.put("S_HOME_6M_IND", "value");
-		Set<Integer> modelIdList = scoringSingletonObj
-				.getModelIdList(newChangesVarValueMap);
+		Map<String, String> newChangesVarValueMap2 = new HashMap<String, String>();
+		newChangesVarValueMap2.put("S_HOME_6M_IND2", "value");
+		Set<Integer> modelIdList2 = scoringSingletonObj
+				.getModelIdList(newChangesVarValueMap2);
 		Map<String, Object> map = scoringSingletonObj.createVariableValueMap(
-				"", modelIdList);
+				"", modelIdList2);
 		assertEquals(map, null);// invalid l_id
+	}
+	
+	@Test
+	public void createVariableValueMapTest() throws ConfigurationException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+		DB db = DBConnection.getDBConnection();
+		DBCollection memberVariables = db.getCollection("memberVariables");
+		memberVariables.insert(new BasicDBObject("l_id","SearsTesting").append("2269", 1).append("2268",  0.10455).append("2270", 0.10455).append("2271",0.10455).append("2272",0.155));
+		DBObject obj = memberVariables.findOne(new BasicDBObject("l_id", "SearsTesting"));
+		Set<Integer> modelIdsList3 = new HashSet<Integer>();
+		modelIdsList3.add(35);
+		modelIdsList3.add(48);
+		modelIdsList3.add(30);
+		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
+		modelsMap.setAccessible(true);
+		modelsMap.set(scoringSingletonObj, getModelsMapContent());
+		
+		Field variableNameToVidMap = ScoringSingleton.class.getDeclaredField("variableNameToVidMap");
+		variableNameToVidMap.setAccessible(true);
+		variableNameToVidMap.set(scoringSingletonObj,getVariableNameToVidMapContents());
+		Map<String, Object> variableValueMap = scoringSingletonObj.createVariableValueMap("SearsTesting", modelIdsList3);
+		Set<String> memVarValue = new HashSet<String>(); 
+		memVarValue.add("2270");
+		memVarValue.add("2271");
+		memVarValue.add("2272");
+		memVarValue.add("2269");
+		memVarValue.add("2268");
+		Assert.assertEquals(memVarValue, variableValueMap.keySet());
 	}
 
 	@Test
@@ -897,8 +947,5 @@ public class ScoringSingletonTest {
 	Assert.assertEquals(4, dbObject.keySet().size());
 	Assert.assertNotNull(dbObj);
 	
-	
-	
 	}
-
 }
