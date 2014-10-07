@@ -9,6 +9,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -18,16 +19,17 @@ import java.util.Set;
 import junit.framework.Assert;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.joda.time.LocalDate;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import analytics.util.objects.Change;
 import analytics.util.objects.ChangedMemberScore;
 import analytics.util.objects.Model;
 import analytics.util.objects.Variable;
-
 import com.github.fakemongo.Fongo;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
@@ -58,7 +60,7 @@ public class ScoringSingletonTest {
 	Map<String, String> variableNameToVidMapContents = null;
 
 	HashMap<String, Change> allChangesSywBoost = null;
-
+	
 	static DBCollection changedMemberVar;
 	static DBCollection memberBoosts;
 	static DBCollection modelSywBoosts;
@@ -233,7 +235,7 @@ public class ScoringSingletonTest {
 				simpleDateFormat.parse("2014-09-23"),
 				simpleDateFormat.parse("2014-09-01"));
 		DB conn = DBConnection.getDBConnection();
-		System.out.println("database: " + conn);
+		//System.out.println("database: " + conn);
 		changedMemberVar = conn
 				.getCollection("changedMemberVariables");
 		changedMemberVar.remove(new BasicDBObject("l_id","Sears"));
@@ -284,17 +286,26 @@ public class ScoringSingletonTest {
 		variableModelsMapContents.put("S_DSL_APP_INT_ACC_FTWR", modelLists2);
 		variableModelsMapContents.put("BOOST_SYW_WANT_TOYS_TCOUNT", modelLists2);
 		variableModelsMapContents.put("BOOST_SYW_WANT_TOYS_TCOUNT2", modelLists3);
+		variableModelsMapContents.put("S_DSL_APP_INT_ACC_FTWR_ALL", modelLists3);
+		variableModelsMapContents.put("S_DSL_APP_INT_ACC_FTWR_MEM", modelLists);
 		
 		//varValueMap
 		newChangesVarValueMap = new HashMap<String, String>();
 		newChangesVarValueMap.put("S_DSL_APP_INT_ACC_FTWR_TRS", "0.001");
-		newChangesVarValueMap.put("S_DSL_APP_INT_ACC_FTWR_ALL", "0.002");
+		newChangesVarValueMap.put("S_DSL_APP_INT_ACC_FTWR_ALL", "1");
+		newChangesVarValueMap.put("S_DSL_APP_INT_ACC_FTWR_MEM", "1.0");
 		
 		//memberVariablesMap
 		memVariables = new HashMap<String, Object>();
-		memVariables.put("S_DSL_APP_INT_ACC", 1);
-		memVariables.put("S_HOME_6M_IND", 0.10455);
-		memVariables.put("S_DSL_APP_INT_BOTH", 0.155);
+		memVariables.put("2269", 1);
+		memVariables.put("2268", 0.10455);
+		memVariables.put("2270", 0.10455);
+		memVariables.put("2271", 0.10455);
+		memVariables.put("2272", 0.155);
+		memVariables.put("2273", 0.185);
+		memVariables.put("2274", 0.85);
+		memVariables.put("2275", 0.80);
+		
 		setMemVariables(memVariables);
 		
 		//varChangeMap
@@ -309,24 +320,32 @@ public class ScoringSingletonTest {
 		Change change3 = new Change("2272", 0.12,
 				simpleDateFormat.parse("2999-10-21"),
 				simpleDateFormat.parse("2014-10-01"));
+		Change change4 = new Change("2273", 3,
+				simpleDateFormat.parse("2999-10-21"),
+				simpleDateFormat.parse("2014-10-01"));
+		Change change5 = new Change("2274", 0.12,
+				simpleDateFormat.parse("2999-10-21"),
+				simpleDateFormat.parse("2014-10-01"));
 		allChanges = new HashMap<String, Change>();
 		allChanges.put("S_DSL_APP_INT_ACC2", change);
 		allChanges.put("S_HOME_6M_IND_ALL", change2);
 		allChanges.put("S_DSL_APP_INT_BOTH", change3);
+		allChanges.put("S_DSL_APP_INT_ACC_FTWR_ALL", change4);
+		allChanges.put("S_DSL_APP_INT_ACC_FTWR_TRS", change5);
 		setAllChanges(allChanges);
 		
 		//Variable
-		variable = new Variable("S_DSL_APP_INT_ACC",0.002);
+		variable = new Variable("S_DSL_APP_INT_ACC","2269",0.002);
 
 		//modelsMap
 		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
-		variablesMap.put("S_DSL_APP_INT_ACC", new Variable("S_DSL_APP_INT_ACC",	0.002));
-		variablesMap.put("S_HOME_6M_IND", new Variable("S_HOME_6M_IND", 0.0015));
-		variablesMap.put("S_HOME_6M_IND_ALL", new Variable("S_HOME_6M_IND_ALL",0.0915));
-		variablesMap.put("S_DSL_APP_INT_ACC2", new Variable("S_DSL_APP_INT_ACC2",0.0915));
-		variablesMap.put("S_DSL_APP_INT_BOTH", new Variable("S_DSL_APP_INT_BOTH",0.0915));
+		variablesMap.put("S_DSL_APP_INT_ACC", new Variable("S_DSL_APP_INT_ACC",	"2269", 0.002));
+		variablesMap.put("S_HOME_6M_IND", new Variable("S_HOME_6M_IND","2268", 0.0015));
+		variablesMap.put("S_HOME_6M_IND_ALL", new Variable("S_HOME_6M_IND_ALL","2271",0.0915));
+		variablesMap.put("S_DSL_APP_INT_ACC2", new Variable("S_DSL_APP_INT_ACC2","2270",0.0915));
+		variablesMap.put("S_DSL_APP_INT_BOTH", new Variable("S_DSL_APP_INT_BOTH","2272",0.0915));
 		Map<String, Variable> variablesMap2 = new HashMap<String, Variable>();
-		variablesMap2.put("S_HOME_ALL", new Variable("S_HOME_ALL", 0.075));
+		variablesMap2.put("S_HOME_ALL", new Variable("S_HOME_ALL","2276", 0.075));
 		
 		Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
 		monthModelMap.put(0, new Model(35, "Model_Name", 11, 5, variablesMap));
@@ -363,17 +382,17 @@ public class ScoringSingletonTest {
 		
 		//modelsMapForBoostVar
 		Map<String, Variable> variablesMapBoost = new HashMap<String, Variable>();
-		variablesMapBoost.put("BOOST_S_DSL_APP_INT_ACC", new Variable("S_DSL_APP_INT_ACC", 0.002));
+		variablesMapBoost.put("BOOST_S_DSL_APP_INT_ACC", new Variable("S_DSL_APP_INT_ACC", "2281",0.002));
 		Map<String, Variable> variablesMapBoost2 = new HashMap<String, Variable>();
-		variablesMapBoost2.put("S_HOME_6M_IND", new Variable("S_HOME_6M_IND", 0.0015));
+		variablesMapBoost2.put("S_HOME_6M_IND", new Variable("S_HOME_6M_IND","2268", 0.0015));
 		Map<String, Variable> variablesMapBoost3 = new HashMap<String, Variable>();
-		variablesMapBoost3.put("BOOST_S_DSL_APP_INT_ACC", new Variable("BOOST_S_DSL_APP_INT_ACC", 0.002));
+		variablesMapBoost3.put("BOOST_S_DSL_APP_INT_ACC", new Variable("BOOST_S_DSL_APP_INT_ACC","2282", 0.002));
 		Map<String, Variable> variablesMapBoost4 = new HashMap<String, Variable>();
-		variablesMapBoost4.put("S_HOME_6M_IND", new Variable("S_HOME_6M_IND", 0.0015));
+		variablesMapBoost4.put("S_HOME_6M_IND", new Variable("S_HOME_6M_IND","2268", 0.0015));
 		Map<String, Variable> variablesMapBoost5 = new HashMap<String, Variable>();
-		variablesMapBoost5.put("BOOST_SYW_WANT_TOYS_TCOUNT", new Variable("BOOST_SYW_WANT_TOYS_TCOUNT", 0.0015));
+		variablesMapBoost5.put("BOOST_SYW_WANT_TOYS_TCOUNT", new Variable("BOOST_SYW_WANT_TOYS_TCOUNT","2283", 0.0015));
 		Map<String, Variable> variablesMapBoost6 = new HashMap<String, Variable>();
-		variablesMapBoost6.put("BOOST_SYW_WANT_TOYS_TCOUNT", new Variable("BOOST_SYW_WANT_TOYS_TCOUNT2", 0.0015));
+		variablesMapBoost6.put("BOOST_SYW_WANT_TOYS_TCOUNT", new Variable("BOOST_SYW_WANT_TOYS_TCOUNT2","2284", 0.0015));
 		
 		Map<Integer, Model> monthModelMapBoost = new HashMap<Integer, Model>();
 		monthModelMapBoost.put(0, new Model(35, "Model_Name", 11, 5, variablesMapBoost));
@@ -407,8 +426,27 @@ public class ScoringSingletonTest {
 		setModelsMapContentBoost5(modelsMapContentBoost5);
 		
 		variableNameToStrategyMapContents = new HashMap<String, String>();
-		variableNameToStrategyMapContents.put("S_DSL_APP_INT_ACC2", "NONE");
-		variableNameToStrategyMapContents.put("S_HOME_6M_IND_ALL", "NONE");
+		variableNameToStrategyMapContents.put("S_DSL_APP_INT_ACC2", "StrategySumSales");
+		variableNameToStrategyMapContents.put("S_HOME_6M_IND_ALL", "StrategyCountTraits");
+		variableNameToStrategyMapContents.put("S_DSL_APP_INT_ACC_FTWR_TRS", "StrategyCountTransactions");
+		variableNameToStrategyMapContents.put("S_DSL_APP_INT_ACC_FTWR_ALL", "StrategyDaysSinceLast");
+		variableNameToStrategyMapContents.put("S_DSL_APP_INT_ACC_FTWR_MEM", "StrategyTurnOffFlag");
+		
+		
+		variableNameToVidMapContents = new HashMap<String, String>();
+		variableNameToVidMapContents.put("S_HOME_6M_IND", "2268");
+		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC", "2269");
+		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC2", "2270");
+		variableNameToVidMapContents.put("S_HOME_6M_IND_ALL", "2271");
+		variableNameToVidMapContents.put("S_DSL_APP_INT_BOTH", "2272");
+		variableNameToVidMapContents.put("S_HOME_ALL", "2276");
+		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC_FTWR_TRS", "2273");
+		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC_FTWR_ALL", "2274");
+		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC_FTWR_MEM", "2275");
+		variableNameToVidMapContents.put("BOOST_S_DSL_APP_INT_ACC", "2281");
+		variableNameToVidMapContents.put("BOOST_S_DSL_APP_INT_ACC", "2282");
+		variableNameToVidMapContents.put("BOOST_SYW_WANT_TOYS_TCOUNT", "2283");
+		variableNameToVidMapContents.put("BOOST_SYW_WANT_TOYS_TCOUNT2", "2284");
 			
 	}
 	
@@ -492,7 +530,10 @@ public class ScoringSingletonTest {
 		Set<Integer> result = new HashSet<Integer>();
 		result.add(48);
 		result.add(35);
-		assertEquals(modelList, result);
+		result.add(51);
+		result.add(30);
+		Assert.assertEquals(result, modelList);
+	
 	}
 
 	@Test
@@ -618,12 +659,12 @@ public class ScoringSingletonTest {
 			NoSuchFieldException, ParseException, IllegalArgumentException,
 			IllegalAccessException {
 	
-		//This test case is tested with null membervariables 
+		//This test case is tested with null changedmembervariables 
 		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
 		modelsMap.setAccessible(true);
 		modelsMap.set(scoringSingletonObj, getModelsMapContent());
 		double baseScore = scoringSingletonObj.calcBaseScore(getMemVariables(),null, 35);
-		Assert.assertEquals(5.016339325000001, baseScore);
+		Assert.assertEquals(5.035471975, baseScore);
 	}
 	
 	@Test
@@ -677,9 +718,10 @@ public class ScoringSingletonTest {
 		Assert.assertEquals(3.0, baseScore);
 	}
 
-
+	//If changedMemberVariables is empty in case
 	@Test
-	public void executeStrategyTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+	public void executeStrategyEmptyCheckTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, ParseException {
+				
 		Field varaibleModelsMap = ScoringSingleton.class.getDeclaredField("variableModelsMap");
 		varaibleModelsMap.setAccessible(true);
 		varaibleModelsMap.set(scoringSingletonObj,getVariableModelsMapContents());
@@ -691,9 +733,34 @@ public class ScoringSingletonTest {
 		Field variableNameToVidMap = ScoringSingleton.class.getDeclaredField("variableNameToVidMap");
 		variableNameToVidMap.setAccessible(true);
 		variableNameToVidMap.set(scoringSingletonObj,getVariableNameToVidMapContents());
+		Map<String, Change> emptyAllChangesMap = new HashMap<String, Change>();
 		
+		Map<String, Change> allChanges = scoringSingletonObj.executeStrategy(emptyAllChangesMap, getNewChangesVarValueMap(), getMemVariables());
+		Assert.assertEquals(3, allChanges.size());	
+		Assert.assertEquals(0, allChanges.get("S_DSL_APP_INT_ACC_FTWR_MEM").getValue());
+	}
+
+	@Test
+	public void executeStrategyTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, ParseException {
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		
-	//	Map<String, Change> allChanges = scoringSingletonObj.executeStrategy(allChanges, newChangesVarValueMap, memberVariablesMap)
+		Field varaibleModelsMap = ScoringSingleton.class.getDeclaredField("variableModelsMap");
+		varaibleModelsMap.setAccessible(true);
+		varaibleModelsMap.set(scoringSingletonObj,getVariableModelsMapContents());
+
+		Field variableNameToStrategyMap = ScoringSingleton.class.getDeclaredField("variableNameToStrategyMap");
+		variableNameToStrategyMap.setAccessible(true);
+		variableNameToStrategyMap.set(scoringSingletonObj,getVariableNameToStrategyMapContents());
+
+		Field variableNameToVidMap = ScoringSingleton.class.getDeclaredField("variableNameToVidMap");
+		variableNameToVidMap.setAccessible(true);
+		variableNameToVidMap.set(scoringSingletonObj,getVariableNameToVidMapContents());
+				
+		Map<String, Change> allChanges = scoringSingletonObj.executeStrategy(getAllChanges(), getNewChangesVarValueMap(), getMemVariables());
+		Assert.assertEquals(1, allChanges.get("S_DSL_APP_INT_ACC_FTWR_ALL").getValue());
+		Assert.assertEquals(1, allChanges.get("S_DSL_APP_INT_ACC_FTWR_TRS").getValue());
+		Assert.assertEquals(0, allChanges.get("S_DSL_APP_INT_ACC_FTWR_MEM").getValue());
+		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), allChanges.get("S_DSL_APP_INT_ACC_FTWR_ALL").getExpirationDateAsString());
 
 	}
 	
@@ -799,7 +866,7 @@ public class ScoringSingletonTest {
 	public void updateChangedVariablesTest() throws ConfigurationException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, ParseException {
 	SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	DBObject obj = changedMemberVar.findOne(new BasicDBObject("l_id", "Sears"));
-	System.out.println("Before update sears: " + obj);
+	//System.out.println("Before update sears: " + obj);
 	//Testing update
 	Change change = new Change("222",10, simpleDateFormat.parse("2888-11-20"), simpleDateFormat.parse("2014-10-04"));
 	Change change2 = new Change("333",10, simpleDateFormat.parse("2999-11-20"), simpleDateFormat.parse("2014-10-04"));
