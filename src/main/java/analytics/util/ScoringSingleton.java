@@ -1,6 +1,5 @@
 package analytics.util;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -314,24 +313,16 @@ public class ScoringSingleton {
 
 		for (String v : model.getVariables().keySet()) {
 			Variable variable = model.getVariables().get(v);
-			System.out.println(variable.getVid());
-			System.out.println(variable.getName());
 			if (variable.getVid() != null && mbrVarMap != null
 					&& mbrVarMap.get(variable.getVid()) != null
 					&& !variable.getName().substring(0, 4).toUpperCase()
 							.equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
 				if (mbrVarMap.get(variable.getVid().toUpperCase()) instanceof Integer) {
-					System.out.println(((Integer) calculateVariableValue(mbrVarMap,
-									variable, varChangeMap, "Integer") * variable
-									.getCoefficient()));
 					val = val
 							+ ((Integer) calculateVariableValue(mbrVarMap,
 									variable, varChangeMap, "Integer") * variable
 									.getCoefficient());
 				} else if (mbrVarMap.get(variable.getVid().toUpperCase()) instanceof Double) {
-					System.out.println(((Double) calculateVariableValue(mbrVarMap,
-									variable, varChangeMap, "Double") * variable
-									.getCoefficient()));
 					val = val
 							+ ((Double) calculateVariableValue(mbrVarMap,
 									variable, varChangeMap, "Double") * variable
