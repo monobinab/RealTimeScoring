@@ -317,12 +317,12 @@ public class ScoringSingleton {
 					&& mbrVarMap.get(variable.getVid()) != null
 					&& !variable.getName().substring(0, 4).toUpperCase()
 							.equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
-				if (mbrVarMap.get(variable.getVid().toUpperCase()) instanceof Integer) {
+				if (mbrVarMap.get(variable.getVid()) instanceof Integer) {
 					val = val
 							+ ((Integer) calculateVariableValue(mbrVarMap,
 									variable, varChangeMap, "Integer") * variable
 									.getCoefficient());
-				} else if (mbrVarMap.get(variable.getVid().toUpperCase()) instanceof Double) {
+				} else if (mbrVarMap.get(variable.getVid()) instanceof Double) {
 					val = val
 							+ ((Double) calculateVariableValue(mbrVarMap,
 									variable, varChangeMap, "Double") * variable
