@@ -314,23 +314,31 @@ public class ScoringSingleton {
 
 		for (String v : model.getVariables().keySet()) {
 			Variable variable = model.getVariables().get(v);
-			if (variable.getName() != null && mbrVarMap != null
-					&& mbrVarMap.get(variable.getId()) != null
+			System.out.println(variable.getVid());
+			System.out.println(variable.getName());
+			if (variable.getVid() != null && mbrVarMap != null
+					&& mbrVarMap.get(variable.getVid()) != null
 					&& !variable.getName().substring(0, 4).toUpperCase()
 							.equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
-				if (mbrVarMap.get(variable.getName().toUpperCase()) instanceof Integer) {
+				if (mbrVarMap.get(variable.getVid().toUpperCase()) instanceof Integer) {
+					System.out.println(((Integer) calculateVariableValue(mbrVarMap,
+									variable, varChangeMap, "Integer") * variable
+									.getCoefficient()));
 					val = val
 							+ ((Integer) calculateVariableValue(mbrVarMap,
 									variable, varChangeMap, "Integer") * variable
 									.getCoefficient());
-				} else if (mbrVarMap.get(variable.getName().toUpperCase()) instanceof Double) {
+				} else if (mbrVarMap.get(variable.getVid().toUpperCase()) instanceof Double) {
+					System.out.println(((Double) calculateVariableValue(mbrVarMap,
+									variable, varChangeMap, "Double") * variable
+									.getCoefficient()));
 					val = val
 							+ ((Double) calculateVariableValue(mbrVarMap,
 									variable, varChangeMap, "Double") * variable
 									.getCoefficient());
 				}
 			} else if (variable.getName() != null && varChangeMap != null
-					&& varChangeMap.get(variable.getId()) != null) {
+					&& varChangeMap.get(variable.getName()) != null) {
 				if (varChangeMap.get(variable.getName().toUpperCase())
 						.getValue() instanceof Integer) {
 					val = val
@@ -361,7 +369,7 @@ public class ScoringSingleton {
 						.getValue();
 			}
 			if (changedValue == null) {
-				changedValue = mbrVarMap.get(var.getName().toUpperCase());
+				changedValue = mbrVarMap.get(var.getVid().toUpperCase());
 				if (changedValue == null) {
 					changedValue = 0;
 				}
