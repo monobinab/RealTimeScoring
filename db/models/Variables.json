@@ -3,5071 +3,5071 @@
   "VID" : 1,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "ADL_FEM_35_44_FL",
   "VID" : 2,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "ADL_FEM_45_54_FL",
   "VID" : 3,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "ADL_FEM_45_64_FL",
   "VID" : 4,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "ADL_FEM_55_64_FL",
   "VID" : 5,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "ADL_FEM_65_74_FL",
   "VID" : 6,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "ADL_FEM_75_PLS_FL",
   "VID" : 7,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "ADL_MAL_25_34_FL",
   "VID" : 8,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "ADL_MAL_35_44_FL",
   "VID" : 9,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "ADL_MAL_45_54_FL",
   "VID" : 10,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "ADL_MAL_55_64_FL",
   "VID" : 11,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "ADL_MAL_55_PLUS_FL",
   "VID" : 12,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "ADL_MAL_65_74_FL",
   "VID" : 13,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "ADL_MAL_75_PLS_FL",
   "VID" : 14,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_ALL_APP_12M_IND",
   "VID" : 15,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_ALL_APP_SAL_TRS_24",
   "VID" : 16,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_ALL_APP_SESNL2_IND",
   "VID" : 17,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_ALL_HA_24M_IND",
   "VID" : 20,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_ALL_HA_SAL_24M",
   "VID" : 21,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_ALL_HA_SAL_3M",
   "VID" : 22,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_ALL_HA_SAL_TRS_12",
   "VID" : 23,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_ALL_HA_TRS_3M",
   "VID" : 24,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_APP_ACC_12M_IND",
   "VID" : 25,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_APP_ACC_24M_IND",
   "VID" : 26,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_APP_INT_ACC_FTWR_CP_TR_P24M",
   "VID" : 28,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_APP_INT_ACC_FTWR_SAL_TRS_24",
   "VID" : 29,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_AU_1M",
   "VID" : 30,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_AUTO_12M_IND",
   "VID" : 31,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_AUTO_24M_IND",
   "VID" : 32,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_AUTO_ACC_3M_IND",
   "VID" : 33,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_AUTO_ACC_CP_TR_P24M",
   "VID" : 34,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_AUTO_TIRE_24M_IND",
   "VID" : 35,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_AUTO_TIRE_SAL_24M",
   "VID" : 36,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySumSales"
-},
+}
 {
   "name" : "S_AUTO_TRS_24M",
   "VID" : 37,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTransactions"
-},
+}
 {
   "name" : "S_AUTO_TRS_6M",
   "VID" : 38,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTransactions"
-},
+}
 {
   "name" : "S_BABY_ITEM_12M_IND",
   "VID" : 39,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_BABY_ITEM_24M_IND",
   "VID" : 40,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_BABY_ITEM_6M_IND",
   "VID" : 41,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_BABY_ITEM_CP_TR_P24M",
   "VID" : 42,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_BABY_ITEM_SAL_24M",
   "VID" : 43,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_BABY_ITEM_SAL_TRS_24",
   "VID" : 44,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_BABY_ITEM_SESNL_IND",
   "VID" : 45,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "C_EMP_NES_FL",
   "VID" : 47,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "CAREER_FL",
   "VID" : 48,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_CE_12M_IND",
   "VID" : 49,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_CE_1M",
   "VID" : 50,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_CE_24M_IND",
   "VID" : 51,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_CE_2M",
   "VID" : 52,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_CE_3M_IND",
   "VID" : 53,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_CE_ELEC_3M_IND",
   "VID" : 54,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_CE_ELEC_GT_12M_IND",
   "VID" : 55,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_CE_ELEC_SAL_TRS_24",
   "VID" : 56,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_CE_ELEC_SESNL_IND",
   "VID" : 57,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_CE_ELEC_TRS_3M",
   "VID" : 58,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_CE_ENT_TRS_6M",
   "VID" : 59,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_CE_GT_12M_IND",
   "VID" : 60,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_CE_OFFICE_3M_IND",
   "VID" : 61,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_CE_OFFICE_SAL_TRS_12",
   "VID" : 62,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_CE_SAL_TRS_24",
   "VID" : 64,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_CE_SESNL_IND",
   "VID" : 65,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_CE_SESNL2_IND",
   "VID" : 66,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_CE_TRS_12M",
   "VID" : 67,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTransactions"
-},
+}
 {
   "name" : "S_CE_TRS_24M",
   "VID" : 68,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTransactions"
-},
+}
 {
   "name" : "S_CE_TRS_3M",
   "VID" : 69,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTransactions"
-},
+}
 {
   "name" : "CHL_FEM_3_5_FL",
   "VID" : 70,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "CHL_MAL_16_17_FL",
   "VID" : 71,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "CPU_ITE_ONL_SVC_FL",
   "VID" : 72,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "CPU_OWN_FL",
   "VID" : 73,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "CRD_CRD_FL",
   "VID" : 74,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "DS_ENRLMNT",
   "VID" : 75,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_DSL_ALL_HA_TRS",
   "VID" : 76,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyDaysSinceLast"
-},
+}
 {
   "name" : "S_DSL_AUTO_TRS",
   "VID" : 78,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyDaysSinceLast"
-},
+}
 {
   "name" : "S_DSL_CE_TRS",
   "VID" : 79,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_DSL_FNJL_TRS",
   "VID" : 80,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyDaysSinceLast"
-},
+}
 {
   "name" : "S_DSL_HA_TRS",
   "VID" : 82,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyDaysSinceLast"
-},
+}
 {
   "name" : "S_DSL_HG_H_L_TRS",
   "VID" : 83,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyDaysSinceLast"
-},
+}
 {
   "name" : "S_DSL_HL_TRS",
   "VID" : 84,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyDaysSinceLast"
-},
+}
 {
   "name" : "S_DSL_HOME_TRS",
   "VID" : 85,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyDaysSinceLast"
-},
+}
 {
   "name" : "S_DSL_KIDS_APP_TRS",
   "VID" : 87,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyDaysSinceLast"
-},
+}
 {
   "name" : "S_DSL_LG_TRS",
   "VID" : 88,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyDaysSinceLast"
-},
+}
 {
   "name" : "S_DSL_MEN_APP_TRS",
   "VID" : 89,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_DSL_MEN_FTWR_TRS",
   "VID" : 90,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyDaysSinceLast"
-},
+}
 {
   "name" : "S_DSL_MISC_BUS_TRS",
   "VID" : 91,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyDaysSinceLast"
-},
+}
 {
   "name" : "S_DSL_SG_EQUIP_TRS",
   "VID" : 92,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyDaysSinceLast"
-},
+}
 {
   "name" : "S_DSL_SL_TRS",
   "VID" : 93,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyDaysSinceLast"
-},
+}
 {
   "name" : "S_DSL_SPRTS_GD_TRS",
   "VID" : 94,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_DSL_SRS_TRS",
   "VID" : 95,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyDaysSinceLast"
-},
+}
 {
   "name" : "S_DSL_TOOLS_TL_TRS",
   "VID" : 96,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyDaysSinceLast"
-},
+}
 {
   "name" : "S_DSL_TOOLS_TRS",
   "VID" : 97,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyDaysSinceLast"
-},
+}
 {
   "name" : "S_DSL_TOYS_TRS",
   "VID" : 98,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyDaysSinceLast"
-},
+}
 {
   "name" : "S_DSL_W_APP_ACC_INT_TRS",
   "VID" : 99,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_DSL_W_APP_TRS",
   "VID" : 100,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyDaysSinceLast"
-},
+}
 {
   "name" : "FAM_CHL_INT_FL",
   "VID" : 101,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "FAM_GCH_FL",
   "VID" : 102,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "FAM_HSE_PTS_FL",
   "VID" : 103,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_FNJL_SAL_3M",
   "VID" : 104,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_FNJL_SAL_TRS_24",
   "VID" : 105,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_FNJL_SESNL2_IND",
   "VID" : 106,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_FNJL_TRS_3M",
   "VID" : 107,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTransactions"
-},
+}
 {
   "name" : "FOD_COK_GRM_FL",
   "VID" : 108,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_FTWR_12M_IND",
   "VID" : 109,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_FTWR_24M_IND",
   "VID" : 110,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_FTWR_TRS_24M",
   "VID" : 111,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTransactions"
-},
+}
 {
   "name" : "S_FW_1M",
   "VID" : 112,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_HA_1M",
   "VID" : 113,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_HA_24M_IND",
   "VID" : 114,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_HA_2M",
   "VID" : 115,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_HA_3M_IND",
   "VID" : 116,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_HA_GT_12M_IND",
   "VID" : 117,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_HA_KITCHEN_3M_IND",
   "VID" : 118,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_HA_KITCHEN_SAL_3M",
   "VID" : 119,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySumSales"
-},
+}
 {
   "name" : "S_HA_LAUNDRY_6M_IND",
   "VID" : 120,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_HA_LAUNDRY_SAL_TRS_24",
   "VID" : 121,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_HA_LAUNDRY_TRS_3M",
   "VID" : 122,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_HA_TRS_12M",
   "VID" : 123,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_HA_TRS_24M",
   "VID" : 124,
   "trs_lvl_fl" : 1,
   "strategy" : "StrategyCountTransactions"
-},
+}
 {
   "name" : "HBB_AUM_MCN_FL",
   "VID" : 125,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "HBB_CRF_FL",
   "VID" : 126,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "HBB_WWK_FL",
   "VID" : 127,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_HE_FS_12M_IND",
   "VID" : 128,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_HE_FS_24M_IND",
   "VID" : 129,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_HE_FS_SAL_3M",
   "VID" : 130,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySumSales"
-},
+}
 {
   "name" : "S_HE_FS_TRS_24M",
   "VID" : 131,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTransactions"
-},
+}
 {
   "name" : "S_HF_12M_IND",
   "VID" : 132,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_HF_24M_IND",
   "VID" : 133,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_HF_3M_IND",
   "VID" : 134,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_HG_H_L_3M_IND",
   "VID" : 135,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_HG_H_L_SAL_TRS_24",
   "VID" : 136,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_HG_H_L_SESNL_IND",
   "VID" : 137,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_HG_H_L_TRS_24M",
   "VID" : 138,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_HG_H_L_TRS_6M",
   "VID" : 139,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "HI_LKY_INE_FL",
   "VID" : 140,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_HL_12M_IND",
   "VID" : 141,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_HL_24M_IND",
   "VID" : 142,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_HL_6M_IND",
   "VID" : 143,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_HL_CP_TR_P24M",
   "VID" : 144,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_HL_REV_PCT_12M",
   "VID" : 145,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_HL_REV_PCT_24M",
   "VID" : 146,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_HL_REV_PCT_24M_0_IND",
   "VID" : 147,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_HL_REV_PCT_6M",
   "VID" : 148,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_HL_SAL_12M",
   "VID" : 149,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_HL_SAL_3M",
   "VID" : 150,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySumSales"
-},
+}
 {
   "name" : "S_HL_SAL_TRS_12",
   "VID" : 151,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_HL_SAL_TRS_24",
   "VID" : 152,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_HL_SESNL_IND",
   "VID" : 153,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_HL_SESNL2_IND",
   "VID" : 154,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_HL_TRS_3M",
   "VID" : 155,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTransactions"
-},
+}
 {
   "name" : "S_HL_TRS_6M",
   "VID" : 156,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_HL_TRS_SESNL",
   "VID" : 157,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_HL_TXN_PCT_12M",
   "VID" : 158,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_HL_TXN_PCT_24M",
   "VID" : 159,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_HM_1M",
   "VID" : 160,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "HME_IPV_DIY_FL",
   "VID" : 161,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "HME_IPV_GAR_FL",
   "VID" : 162,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "HME_OWN_CD",
   "VID" : 163,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_HOME_24M_IND",
   "VID" : 164,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_HOME_6M_IND",
   "VID" : 165,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_HOME_GT_12M_IND",
   "VID" : 166,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_HOME_PCT_SAL_12",
   "VID" : 167,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_HOME_SAL_3M",
   "VID" : 168,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySumSales"
-},
+}
 {
   "name" : "S_HOME_TRS_12M",
   "VID" : 169,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTransactions"
-},
+}
 {
   "name" : "S_HOME_TRS_24M",
   "VID" : 170,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTransactions"
-},
+}
 {
   "name" : "INDIC_PARTS",
   "VID" : 171,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "INDIC_SVCORDER",
   "VID" : 172,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_INT_APP_24M_IND",
   "VID" : 173,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_JW_2M_CNT",
   "VID" : 174,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTransactions"
-},
+}
 {
   "name" : "S_K_APP_BOYS_GIRLS_CPN_TRS_24M",
   "VID" : 175,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_K_APP_TODDLERS_24M_IND",
   "VID" : 176,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_K_APP_TODDLERS_SAL_TRS_24",
   "VID" : 177,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_K_APP_TODDLERS_SESNL_IND",
   "VID" : 178,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_K_APP_TODDLERS_TRS_24M",
   "VID" : 179,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_KIDS_APP_24M_IND",
   "VID" : 180,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_KIDS_APP_CP_TR_P24M",
   "VID" : 181,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_KIDS_APP_SESNL_IND",
   "VID" : 182,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_KIDS_APP_TRS_6M",
   "VID" : 183,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_KIDS_FTWR_24M_IND",
   "VID" : 184,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_KIDS_FTWR_6M_IND",
   "VID" : 185,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_KIDS_FTWR_TI_TRS_6M",
   "VID" : 186,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_LANDS_END_24M_IND",
   "VID" : 187,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "LFT_GRO_ATQ_COL_FL",
   "VID" : 188,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "LFT_GRO_ELC_CPU_FL",
   "VID" : 189,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "LFT_GRO_HME_IPV_FL",
   "VID" : 190,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "LFT_GRO_RED_FL",
   "VID" : 191,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_LG_12M_IND",
   "VID" : 192,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_LG_1M",
   "VID" : 193,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_LG_24M_IND",
   "VID" : 194,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_LG_2M",
   "VID" : 195,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_LG_3M_IND",
   "VID" : 196,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_LG_GT_12M_IND",
   "VID" : 197,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_LG_SAL_SESNL",
   "VID" : 198,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_LG_SESNL_IND",
   "VID" : 199,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_LG_SESNL2_IND",
   "VID" : 200,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_LG_TRS_24M",
   "VID" : 201,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_LG_TRS_3M",
   "VID" : 202,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_MEN_APP_12M_IND",
   "VID" : 203,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_MEN_APP_24M_IND",
   "VID" : 204,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_MEN_APP_6M_IND",
   "VID" : 205,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_MEN_APP_SAL_TRS_12",
   "VID" : 206,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_MEN_APP_SESNL_IND",
   "VID" : 207,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_MEN_APP_SESNL2_IND",
   "VID" : 208,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_MEN_APP_TRS_24M",
   "VID" : 209,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_MEN_FTWR_SAL_12M",
   "VID" : 210,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_MEN_FTWR_SAL_TRS_24",
   "VID" : 211,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_MISC_BUS_12M_IND",
   "VID" : 212,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_MISC_BUS_24M_IND",
   "VID" : 213,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "MO_BYR_HI_TCK_MDS_FL",
   "VID" : 214,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "MO_BYR_WMN_FSH_FL",
   "VID" : 215,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_NUM_CAT_TRANSACTED_12M",
   "VID" : 216,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_NUM_CAT_TRANSACTED_24M",
   "VID" : 217,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_NUM_CAT_TRANSACTED_6M",
   "VID" : 218,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_OD_1M",
   "VID" : 219,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_OD_2M",
   "VID" : 220,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "OD_BTG_FL",
   "VID" : 221,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_OL_12M_IND",
   "VID" : 222,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_OL_24M_IND",
   "VID" : 223,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_OL_SAL_12M",
   "VID" : 224,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_OL_SAL_SESNL",
   "VID" : 225,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_OL_SAL_TRS_12",
   "VID" : 226,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_OL_SESNL2_IND",
   "VID" : 227,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_OL_TRS_12M",
   "VID" : 228,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTransactions"
-},
+}
 {
   "name" : "S_OL_TRS_3M",
   "VID" : 229,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "PARTS_S_TRANS",
   "VID" : 230,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_PCT_LANDS_END_TXN_6M",
   "VID" : 231,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "POO_PSC_FL",
   "VID" : 232,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "PRS_CLU_CD",
   "VID" : 233,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "PTP_SOR_MCY_FL",
   "VID" : 234,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "PTP_SOR_SNW_SKI_FL",
   "VID" : 235,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "RE_INE_FL",
   "VID" : 236,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_SG_EQUIP_SAL_6M",
   "VID" : 237,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySumSales"
-},
+}
 {
   "name" : "S_SG_EQUIP_TRS_3M",
   "VID" : 238,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_SL_12M_IND",
   "VID" : 239,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_SL_24M_IND",
   "VID" : 240,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_SL_3M_IND",
   "VID" : 241,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_SL_REV_PCT_12M",
   "VID" : 242,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_SL_REV_PCT_24M",
   "VID" : 243,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_SL_REV_PCT_6M",
   "VID" : 244,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_SL_SAL_TRS_24",
   "VID" : 245,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_SL_SESNL_IND",
   "VID" : 246,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_SL_SESNL2_IND",
   "VID" : 247,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_SL_TXN_PCT_24M",
   "VID" : 248,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_SL_TXN_PCT_6M",
   "VID" : 249,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_SP_1M",
   "VID" : 250,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_SP_2M",
   "VID" : 251,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_SPRTS_GD_24M_IND",
   "VID" : 252,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_SPRTS_GD_3M_IND",
   "VID" : 253,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_SPRTS_GD_GT_12M_IND",
   "VID" : 254,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_SPRTS_GD_SAL_12M",
   "VID" : 255,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_SRS_12M_IND",
   "VID" : 257,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_SRS_24M_IND",
   "VID" : 258,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_SRS_3M_IND",
   "VID" : 259,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_SRS_6M_IND",
   "VID" : 260,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_SRS_CPN_TRS_24M",
   "VID" : 261,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_SRS_GT_12M_IND",
   "VID" : 262,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_SRS_ONLINE_TXN_PCT_24",
   "VID" : 263,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_SRS_SAL_TRS_12",
   "VID" : 266,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_SRS_SESNL_IND",
   "VID" : 267,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_SRS_SESNL2_IND",
   "VID" : 268,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_SRS_TRS_12M",
   "VID" : 269,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTransactions"
-},
+}
 {
   "name" : "S_SRS_TRS_3M",
   "VID" : 270,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTransactions"
-},
+}
 {
   "name" : "S_SRS_TRS_6M",
   "VID" : 271,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTransactions"
-},
+}
 {
   "name" : "S_TI_REDEM_CHANNELS_12M",
   "VID" : 272,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_TI_REDEM_CHANNELS_6M",
   "VID" : 273,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_TL_1M",
   "VID" : 274,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_TL_2M",
   "VID" : 275,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_TOOLS_24M_IND",
   "VID" : 276,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_TOOLS_ELECTRICAL_24M_IND",
   "VID" : 277,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_TOOLS_SAL_3M",
   "VID" : 278,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_TOOLS_SAL_TRS_24",
   "VID" : 279,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_TOOLS_SESNL_IND",
   "VID" : 280,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_TOOLS_SESNL2_IND",
   "VID" : 281,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_TOOLS_TL_24M_IND",
   "VID" : 282,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_TOOLS_TL_3M_IND",
   "VID" : 283,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_TOOLS_TL_GT_12M_IND",
   "VID" : 284,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_TOOLS_TL_PCT_SAL_12",
   "VID" : 285,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_TOOLS_TL_SAL_24M",
   "VID" : 286,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_TOOLS_TL_SAL_TRS_24",
   "VID" : 287,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_TOOLS_TL_SESNL_IND",
   "VID" : 288,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_TOOLS_TL_SESNL2_IND",
   "VID" : 289,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_TOOLS_TL_TRS_3M",
   "VID" : 290,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTransactions"
-},
+}
 {
   "name" : "S_TOOLS_TL_TRS_SESNL",
   "VID" : 291,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_TOOLS_TRS_24M",
   "VID" : 292,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_TOYS_TRS_12M",
   "VID" : 293,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTransactions"
-},
+}
 {
   "name" : "TRU_OWN_FL",
   "VID" : 294,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_W_APP_24M_IND",
   "VID" : 295,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_W_APP_6M_IND",
   "VID" : 296,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_W_APP_ACC_INT_6M_IND",
   "VID" : 297,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_W_APP_ACC_INT_SESNL2_IND",
   "VID" : 298,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_W_APP_ACC_INT_TRS_12M",
   "VID" : 299,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_W_APP_SESNL_IND",
   "VID" : 301,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_W_FTWR_24M_IND",
   "VID" : 302,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_XMAS_12M_IND",
   "VID" : 303,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_XMAS_6M_IND",
   "VID" : 304,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "K_ALL_APP_24M_SESNL_IND",
   "VID" : 305,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_APP_ACC_FTWR_BYR_SLS2",
   "VID" : 307,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_APP_ACC_FTWR_PCT_BUY",
   "VID" : 308,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_APP_ACC_FTWR_SPR_SLS_24M_IND",
   "VID" : 309,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_AUTO_ACC_PARTS_SLS_24M_IND",
   "VID" : 310,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_AUTO_SLS_6M",
   "VID" : 313,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySumSales"
-},
+}
 {
   "name" : "K_AUTO_SPR_SLS_12M_IND",
   "VID" : 314,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_AUTO_SPR_SLS_24M_IND",
   "VID" : 315,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_BABY_SPR_SLS_24M_IND",
   "VID" : 316,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_BABY_TRS_12M",
   "VID" : 317,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_CE_12M_SESNL_IND",
   "VID" : 318,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_CE_24M_SESNL_IND",
   "VID" : 319,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_CE_ENT_SPR_SLS_24M_IND",
   "VID" : 320,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_CE_GT_12M_IND",
   "VID" : 321,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_CE_HE_24M_SESNL_IND",
   "VID" : 322,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_CE_HE_SLS_3M",
   "VID" : 323,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_CE_HE_TRS_12M",
   "VID" : 325,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_CE_SPR_SLS_12M_IND",
   "VID" : 326,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_CE_SPR_SLS_24M_IND",
   "VID" : 327,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_CE_TRS_12M",
   "VID" : 328,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_CE_TRS_3M",
   "VID" : 329,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_CHRISTMAS_12M_SESNL_IND",
   "VID" : 330,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_CHRISTMAS_24M_SESNL_IND",
   "VID" : 331,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_CHRISTMAS_GT_12M_IND",
   "VID" : 332,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_CHRISTMAS_PCT_BUY",
   "VID" : 333,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_CHRISTMAS_SLS_TRS_24M",
   "VID" : 334,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_CHRISTMAS_SPR_SLS_12M_IND",
   "VID" : 335,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_CHRISTMAS_SPR_SLS_24M_IND",
   "VID" : 336,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_CHRISTMAS_TRS_6M",
   "VID" : 337,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_CONS_SPR_SLS_12M_IND",
   "VID" : 338,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_DIY_TOOL_AUTO_SLS_12M_IND",
   "VID" : 340,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_DIY_TOOL_AUTO_SLS_24M_IND",
   "VID" : 341,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_DIY_TOOL_AUTO_TRS_24M",
   "VID" : 342,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_DIY_TOOL_SLS_TRS_12M",
   "VID" : 343,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_DSL_ALL_APP_TRS",
   "VID" : 345,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyDaysSinceLast"
-},
+}
 {
   "name" : "K_DSL_ALL_HOME_TRS",
   "VID" : 346,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_DSL_BABY_TRS",
   "VID" : 347,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyDaysSinceLast"
-},
+}
 {
   "name" : "K_DSL_CE_HE_TRS",
   "VID" : 348,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_DSL_CE_TRS",
   "VID" : 350,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_DSL_CHRISTMAS_TRS",
   "VID" : 351,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_DSL_CONS_TRS",
   "VID" : 352,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_DSL_DIY_TOOL_AUTO_TRS",
   "VID" : 353,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_DSL_DIY_TOOL_TRS",
   "VID" : 354,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyDaysSinceLast"
-},
+}
 {
   "name" : "K_DSL_FOOD_CONS_TRS",
   "VID" : 355,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_DSL_FOOD_GROCERY_TRS",
   "VID" : 356,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_DSL_FSG_EXER_TRS",
   "VID" : 357,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyDaysSinceLast"
-},
+}
 {
   "name" : "K_DSL_FSG_GAMES_TRS",
   "VID" : 358,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_DSL_FSG_TRS",
   "VID" : 360,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_DSL_FTWR_CHILD_TRS",
   "VID" : 362,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_DSL_FTWR_TRS",
   "VID" : 363,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_DSL_HA_HE_FC_TRS",
   "VID" : 365,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_DSL_HALLOWEEN_TRS",
   "VID" : 366,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_DSL_HARDLN_TRS",
   "VID" : 367,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyDaysSinceLast"
-},
+}
 {
   "name" : "K_DSL_HBA_OTC_TRS",
   "VID" : 368,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_DSL_HBA_TRS",
   "VID" : 369,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_DSL_HF_TRS",
   "VID" : 370,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_DSL_KIDS_APP_TRS",
   "VID" : 371,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_DSL_KMT_TRS",
   "VID" : 372,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyDaysSinceLast"
-},
+}
 {
   "name" : "K_DSL_LG_TRS",
   "VID" : 373,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_DSL_M_APP_TRS",
   "VID" : 374,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyDaysSinceLast"
-},
+}
 {
   "name" : "K_DSL_ODL_TRS",
   "VID" : 375,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_DSL_OTC_TRS",
   "VID" : 376,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_DSL_SOFTLN_TRS",
   "VID" : 377,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_DSL_TOYS_CHILDRN_TRS",
   "VID" : 378,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_DSL_TOYS_TRS",
   "VID" : 379,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_DSL_VALENTINE_TRS",
   "VID" : 380,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_DSL_WAPP_INT_ACC_TRS",
   "VID" : 381,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_DSL_WAPP_INT_TRS",
   "VID" : 382,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_DSL_WAPP_TRS",
   "VID" : 383,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_EASTER_SLS_6M",
   "VID" : 384,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_EASTER_SLS_TRS_24M",
   "VID" : 385,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_EASTER_SPR_SLS_12M_IND",
   "VID" : 386,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_EASTER_SPR_SLS_24M_IND",
   "VID" : 387,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_FNJL_SPR_SLS_24M_IND",
   "VID" : 389,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_FNJL_TI_SLS_6M",
   "VID" : 390,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_FNJL_TRS_12M",
   "VID" : 391,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_FOOD_CONS_SLS_12M",
   "VID" : 392,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_FOOD_PANTRY_SPR_SLS_24M_IND",
   "VID" : 393,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_FOOD_PANTRY_TI_TRS_3M",
   "VID" : 394,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_FSG_24M_SESNL_IND",
   "VID" : 395,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_FSG_GAMES_12M_SESNL_IND",
   "VID" : 396,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_FSG_SLS_12M",
   "VID" : 397,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_FSG_SPR_SLS_24M_IND",
   "VID" : 398,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_FSG_SPRTNG_GDS_SLS_6M",
   "VID" : 399,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySumSales"
-},
+}
 {
   "name" : "K_FTWR_ATHLETICS_SLS_TRS_24M",
   "VID" : 401,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_FTWR_ATHLETICS_SLS_12M_IND",
   "VID" : 402,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_FTWR_ATHLETICS_SLS_24M_IND",
   "VID" : 403,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_FTWR_CHILD_SPR_SLS_24M_IND",
   "VID" : 404,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_FTWR_M_W_SLS_TRS_24M",
   "VID" : 405,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_FTWR_MEN_SPR_SLS_24M_IND",
   "VID" : 406,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_FTWR_TRS_24M",
   "VID" : 407,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_FTWR_WOMEN_SLS_TRS_24M",
   "VID" : 408,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_FTWR_WOMEN_SPR_SLS_24M_IND",
   "VID" : 409,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_FW_2M",
   "VID" : 411,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_GAMING_CE_CPN_TRS_24M",
   "VID" : 412,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_HA_1M",
   "VID" : 413,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_HA_HE_FC_TRS_24M",
   "VID" : 414,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_HA_SMALL_APP_SPR_SLS_24M_IND",
   "VID" : 415,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_HA_SMALL_APP_TRS_24M",
   "VID" : 416,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_HALLOWEEN_SLS_TRS_24M",
   "VID" : 417,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_HALLOWEEN_SPR_SLS_24M_IND",
   "VID" : 418,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_HALLOWEEN_TRS_6M",
   "VID" : 419,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_HARD_HME_TRS_24M",
   "VID" : 420,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_HARDLN_12M_SESNL_IND",
   "VID" : 421,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_HARDLN_CPN_TRS_3M",
   "VID" : 422,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_HARDLN_SLS_TRS_12M",
   "VID" : 423,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_HARDLN_SLS_TRS_24M",
   "VID" : 424,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_HARDLN_SPR_SLS_24M_IND",
   "VID" : 425,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_HARDLN_TRS_3M",
   "VID" : 426,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_HBA_OTC_SLS_24M",
   "VID" : 427,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_HBA_OTC_SLS_TRS_24M",
   "VID" : 428,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_HBA_SPR_SLS_12M_IND",
   "VID" : 429,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_HBA_TRS_6M",
   "VID" : 430,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_HF_12M_SESNL_IND",
   "VID" : 431,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_HF_BUYER",
   "VID" : 432,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_HF_SLS_3M",
   "VID" : 433,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_HF_SLS_TRS_12M",
   "VID" : 434,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_HF_SLS_TRS_24M",
   "VID" : 435,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_HF_TRS_24M",
   "VID" : 436,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_HF_TRS_3M",
   "VID" : 437,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_HOME_REL_24M_SESNL_IND",
   "VID" : 438,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_HOME_REL_TRS_6M",
   "VID" : 439,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_HS_2M",
   "VID" : 440,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_HW_2M",
   "VID" : 441,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_K_BOYS_GRLS_12M_SESNL_IND",
   "VID" : 442,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_KIDS_APP_12M_SESNL_IND",
   "VID" : 444,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_KIDS_APP_24M_SESNL_IND",
   "VID" : 445,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_KIDS_APP_GT_12M_IND",
   "VID" : 446,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_KIDS_APP_PCT_BUY",
   "VID" : 447,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_KIDS_APP_SLS_3M",
   "VID" : 448,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_KIDS_APP_TRS_12M",
   "VID" : 450,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_KIDS_APP_TRS_24M",
   "VID" : 451,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_KMT_12M_SESNL_IND",
   "VID" : 452,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_KMT_24M_SESNL_IND",
   "VID" : 453,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_KMT_GT_12M_IND",
   "VID" : 454,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_KMT_SLS_3M",
   "VID" : 455,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_KMT_SPR_SLS_12M_IND",
   "VID" : 456,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_KMT_SPR_SLS_24M_IND",
   "VID" : 457,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_KMT_TRS_3M",
   "VID" : 458,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_LG_12M_SESNL_IND",
   "VID" : 459,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_LG_24M_SESNL_IND",
   "VID" : 460,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_LG_GT_12M_IND",
   "VID" : 461,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_LG_SPR_SLS_12M_IND",
   "VID" : 462,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_LG_SPR_SLS_24M_IND",
   "VID" : 463,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_LG_TRS_24M",
   "VID" : 464,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_LG_TRS_3M",
   "VID" : 465,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_LG_TRS_6M",
   "VID" : 466,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_M_APP_12M_SESNL_IND",
   "VID" : 467,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_M_APP_24M_SESNL_IND",
   "VID" : 468,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_M_APP_TRS_24M",
   "VID" : 469,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_ODL_12M_SESNL_IND",
   "VID" : 470,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_ODL_SPR_SLS_12M_IND",
   "VID" : 471,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "K_ODL_SPR_SLS_24M_IND",
   "VID" : 472,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_ODL_TRS_3M",
   "VID" : 473,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_OTC_SPR_SLS_24M_IND",
   "VID" : 474,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_SOFTLN_12M_SESNL_IND",
   "VID" : 475,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_SOFTLN_24M_SESNL_IND",
   "VID" : 476,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_SOFTLN_BYR_SLS2",
   "VID" : 477,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_SOFTLN_TRS_3M",
   "VID" : 478,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_SP_1M",
   "VID" : 479,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_SPRTNG_GDS_24M_SESNL_IND",
   "VID" : 480,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_SPRTNG_GDS_SLS_24M",
   "VID" : 481,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_SPRTNG_GDS_SPR_SLS_12M_IND",
   "VID" : 482,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_TI_REDEM_CHANNELS_12M",
   "VID" : 483,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_TI_REDEM_CHANNELS_24M",
   "VID" : 484,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_TI_REDEM_CHANNELS_3M",
   "VID" : 485,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_TL_1M",
   "VID" : 486,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_TOYS_12M_SESNL_IND",
   "VID" : 487,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_TOYS_CHILDRN_12M_SESNL_IND",
   "VID" : 488,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_TOYS_CHILDRN_24M_SESNL_IND",
   "VID" : 489,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_TOYS_CHILDRN_SLS_TRS_24M",
   "VID" : 490,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_TOYS_GT_12M_IND",
   "VID" : 492,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_TOYS_PCT_BUY",
   "VID" : 493,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_TOYS_SLS_3M",
   "VID" : 494,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_TOYS_SLS_TRS_12M",
   "VID" : 495,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_TOYS_SPR_SLS_24M_IND",
   "VID" : 496,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_TOYS_TRS_12M",
   "VID" : 497,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_TOYS_TRS_3M",
   "VID" : 498,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_WAPP_ACC_12M_SESNL_IND",
   "VID" : 499,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_WAPP_ACC_PCT_BUY",
   "VID" : 500,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_WAPP_ACC_SPR_SLS_12M_IND",
   "VID" : 501,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_WAPP_ACC_SPR_SLS_24M_IND",
   "VID" : 502,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_WAPP_ACC_TRS_3M",
   "VID" : 503,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_WAPP_INT_ACC_12M_SESNL_IND",
   "VID" : 504,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_WAPP_INT_ACC_24M_SESNL_IND",
   "VID" : 505,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_WAPP_INT_ACC_SPR_SLS_24M_IND",
   "VID" : 506,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_WAPP_INT_SPR_SLS_24M_IND",
   "VID" : 507,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_WAPP_SLS_24M",
   "VID" : 508,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "K_WAPP_SPR_SLS_12M_IND",
   "VID" : 509,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_CNT_EMAIL_CAMPAIGNS_1_MTH",
   "VID" : 511,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_CNT_EMAIL_CAMPAIGNS_12_MTH",
   "VID" : 512,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_CNT_EMAIL_CAMPAIGNS_6_MTH",
   "VID" : 513,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_CNT_EMAL_CAMP_12M_IND",
   "VID" : 514,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_RESP_CLICK_3_MTH_IND",
   "VID" : 515,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "FRIDGE_DSL_MISSING",
   "VID" : 516,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_BONUS_MEMBER",
   "VID" : 517,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_CLUB_MEMBER_CRAFTSMAN",
   "VID" : 518,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_CNT_DM_CAMP_12_MTH_IND",
   "VID" : 519,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_CNT_DM_CAMPAIGNS_1_MTH",
   "VID" : 520,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_CNT_DM_CAMPAIGNS_12_MTH",
   "VID" : 521,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_CNT_DM_CAMPAIGNS_3_MTH",
   "VID" : 522,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_CNT_DM_CAMPAIGNS_6_MTH",
   "VID" : 523,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_CNT_RESPONSE_CLICK_1_MTH",
   "VID" : 524,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_CNT_RESPONSE_CLICK_12_MTH",
   "VID" : 525,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_CNT_RESPONSE_CLICK_3_MTH",
   "VID" : 526,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_CNT_RESPONSE_CLICK_6_MTH",
   "VID" : 527,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_CREDIT_CARD_HOLDER",
   "VID" : 528,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_DSL_AIR_COND_HMS",
   "VID" : 529,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_DSL_GRILL_HMS",
   "VID" : 530,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_DSL_VACUUM_CLEANER_HMS",
   "VID" : 531,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_DWELLING_MULTI",
   "VID" : 532,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_DWELLING_SINGLE",
   "VID" : 533,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_EARNED_AMOUNT_24",
   "VID" : 534,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_EARNED_POINTS_24M_CD",
   "VID" : 535,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_EST_HGH_ICM_VAL",
   "VID" : 536,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_EST_ICM_VAL",
   "VID" : 537,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_EST_ICM_VAL_GTE_125K",
   "VID" : 538,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_FLOORCARE_36M_FLG",
   "VID" : 539,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "M_HA_ANY_5Y",
   "VID" : 540,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_HA_ANY_ANYTIME",
   "VID" : 541,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_HA_ANY_DSL",
   "VID" : 542,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_HA_APP_LAUNDRY_5Y",
   "VID" : 543,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_HA_APP_LAUNDRY_ANYTIME",
   "VID" : 544,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_HA_APP_LAUNDRY_DSL",
   "VID" : 545,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_HA_APPL_COOKING_ANYTIME",
   "VID" : 546,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_HA_APPL_COOKING_DSL",
   "VID" : 547,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_HA_APPL_FRIDGE_5Y",
   "VID" : 548,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_HA_APPL_FRIDGE_ANYTIME",
   "VID" : 549,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyDaysSinceLast"
-},
+}
 {
   "name" : "M_HA_APPL_FRIDGE_DSL",
   "VID" : 550,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_HA_APPL_OTHER_ANYTIME",
   "VID" : 551,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_HA_APPL_OTHER_DSL",
   "VID" : 552,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyDaysSinceLast"
-},
+}
 {
   "name" : "M_HA_LAWN_MOWER_5Y",
   "VID" : 553,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_HA_LAWN_MOWER_ANYTIME",
   "VID" : 554,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_HA_LAWN_MOWER_DSL",
   "VID" : 555,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_HA_LAWN_OTHER_5Y",
   "VID" : 556,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_HA_LAWN_OTHER_ANYTIME",
   "VID" : 557,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_HA_LAWN_OTHER_DSL",
   "VID" : 558,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_HA_OTHER_5Y",
   "VID" : 559,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_HA_OTHER_DSL",
   "VID" : 560,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_HA_OTHER_PAST_DEC_FL",
   "VID" : 561,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_HA_TRIGGER_WASHERDRYER",
   "VID" : 562,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_HIGH_EXERCISE_ZIP",
   "VID" : 563,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_HOLIDAY_SALES_2",
   "VID" : 564,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_HS_ANY_5Y",
   "VID" : 565,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_HS_ANY_DSL",
   "VID" : 566,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_HS_ELECTRONICS_5Y",
   "VID" : 567,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_HS_FLOORCARE_DSL",
   "VID" : 568,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_HS_LAWNCARE_5Y",
   "VID" : 569,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_HS_LAWNCARE_DSL",
   "VID" : 570,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_HS_SHOP_1Y",
   "VID" : 571,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_HS_WATER_DSL",
   "VID" : 572,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_LG_NSNTHR_RECAP_FLG",
   "VID" : 573,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_LOW_AIR_COND_ZIP",
   "VID" : 574,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_LOW_BATTERY_ZIP",
   "VID" : 575,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_LOW_DISH_ZIP",
   "VID" : 576,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_LOW_HA_ALL_ZIP",
   "VID" : 577,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_LOW_HAND_ZIP",
   "VID" : 578,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_LOW_POWER_ZIP",
   "VID" : 579,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_LOW_REFRIG_ZIP",
   "VID" : 580,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_LOW_SNOW_ZIP",
   "VID" : 581,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_LOW_TOOLS_ZIP",
   "VID" : 582,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_LOW_WASHDRY_ZIP",
   "VID" : 583,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_MOWERS_HISTORY_FLG",
   "VID" : 584,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_NET_SALES_24M",
   "VID" : 585,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_NUM_YR_RSD",
   "VID" : 586,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_OCC_CD_CRAFTSMAN",
   "VID" : 587,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_PV_ODL",
   "VID" : 588,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_SERVICE_LAST_12_MTH",
   "VID" : 589,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_SR_ANY_RECORD_FLG",
   "VID" : 590,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_SR_REMODELING_FLG",
   "VID" : 591,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_SRS_LAYAWAY_AMT",
   "VID" : 592,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_SRS_SEARS_CARD_AMT_IND",
   "VID" : 593,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_TRACTORS_HISTORY_FLG",
   "VID" : 594,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_TRANS_CNT_6M",
   "VID" : 595,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_TRIMMERS_EDGERS_HISTORY_FLG",
   "VID" : 596,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_USED_SEARS_CARD_FL",
   "VID" : 597,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "M_WEATHER_PREC_IN_LAST14D",
   "VID" : 598,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_DAY_BATTERY_0_7",
   "VID" : 600,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_DAY_BATTERY_8_14",
   "VID" : 601,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_DAY_CE_0_7",
   "VID" : 602,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTraitDates"
-},
+}
 {
   "name" : "M_WEB_DAY_GRILL_0_7",
   "VID" : 605,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_DAY_HAND_TOOL_0_7",
   "VID" : 606,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTraitDates"
-},
+}
 {
   "name" : "M_WEB_DAY_JEWELRY_0_7",
   "VID" : 607,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_DAY_MOWER_0_7",
   "VID" : 608,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_DAY_PATIO_0_7",
   "VID" : 609,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_DAY_PATIO_8_14",
   "VID" : 610,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_DAY_POWER_TOOL_0_7",
   "VID" : 611,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_DAY_REFRIG_0_7",
   "VID" : 612,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTraits"
-},
+}
 {
   "name" : "M_WEB_DAY_SNOW_BLOWER_8_14",
   "VID" : 614,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_DAY_TRACTOR_0_7",
   "VID" : 615,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_DAY_TRACTOR_8_14",
   "VID" : 616,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_DAY_TV_0_7",
   "VID" : 617,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTraitDates"
-},
+}
 {
   "name" : "M_WEB_DAY_TV_8_14",
   "VID" : 618,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_DAY_VACUUM_8_14",
   "VID" : 619,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_FREQ_GRILL_15_30",
   "VID" : 620,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_TRAIT_CE_8_14",
   "VID" : 621,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_TRAIT_COOKING_0_7",
   "VID" : 622,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTraits"
-},
+}
 {
   "name" : "M_WEB_TRAIT_COOKING_8_14",
   "VID" : 623,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_TRAIT_DISHWASH_15_30",
   "VID" : 624,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_TRAIT_DISHWASHER_15_30",
   "VID" : 626,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_TRAIT_DISHWASHER_8_14",
   "VID" : 627,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_TRAIT_EXERCISE_31_60",
   "VID" : 629,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_TRAIT_EXERCISE_8_14",
   "VID" : 630,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_TRAIT_GRILL_0_7",
   "VID" : 631,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_TRAIT_HA_0_7",
   "VID" : 632,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_TRAIT_KITCHEN_ELEC_0_7",
   "VID" : 633,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_TRAIT_MATTRESS_31_60",
   "VID" : 634,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_TRAIT_MATTRESS_8_14",
   "VID" : 635,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_TRAIT_MOWER_15_30",
   "VID" : 637,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_TRAIT_PATIO_0_7",
   "VID" : 638,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_TRAIT_PATIO_15_30",
   "VID" : 639,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_TRAIT_PATIO_31_60",
   "VID" : 640,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_TRAIT_POWER_TOOL_0_7",
   "VID" : 641,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTraits"
-},
+}
 {
   "name" : "M_WEB_TRAIT_POWER_TOOL_8_14",
   "VID" : 642,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_TRAIT_TIRE_0_7",
   "VID" : 643,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTraits"
-},
+}
 {
   "name" : "M_WEB_TRAIT_TIRE_15_30",
   "VID" : 644,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_TRAIT_TOOLS_15_30",
   "VID" : 645,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_TRAIT_TRACTOR_15_30",
   "VID" : 646,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_TRAIT_TV_0_7",
   "VID" : 647,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_TRAIT_VACUUM_15_30",
   "VID" : 649,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_TRAIT_VACUUM_8_14",
   "VID" : 650,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_TRAIT_WASHER_DRYER_0_7",
   "VID" : 651,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_TRAIT_WASHER_DRYER_15_30",
   "VID" : 652,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_WEB_VIEW_DEALS_0_7",
   "VID" : 654,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "M_WEEK_SINCE_RECAP_1_FLG",
   "VID" : 655,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_ZIP_PENE_AIR_CONDITIONER",
   "VID" : 656,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_ZIP_PENE_AP_JEWELRY",
   "VID" : 657,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_ZIP_PENE_AU_BATTERY",
   "VID" : 658,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_ZIP_PENE_CE_TV",
   "VID" : 659,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_ZIP_PENE_HA_REFRIG",
   "VID" : 660,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_ZIP_PENE_HA_WASHDRY",
   "VID" : 661,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_ZIP_PENE_HG_MATTRESS",
   "VID" : 662,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_ZIP_PENE_KITCHEN_ELECTRICS",
   "VID" : 663,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_ZIP_PENE_KMT_CE",
   "VID" : 664,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_ZIP_PENE_LG_PATIO",
   "VID" : 665,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_ZIP_PENE_OL_GRILL",
   "VID" : 666,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_ZIP_PENE_SP_EXERCISE",
   "VID" : 667,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_ZIP_PENE_SRS_TOOLS",
   "VID" : 668,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_ZIP_PENE_TL_HAND",
   "VID" : 669,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_ZIP_PENE_TL_POWER",
   "VID" : 670,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_ZIP_PENE_TL_STORAGE",
   "VID" : 671,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_ZIPTREND_AIR_CONDITIONER_AMT",
   "VID" : 672,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_ZIPTREND_AU_BATTERY_AMT",
   "VID" : 673,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_ZIPTREND_HA_COOK_AMT",
   "VID" : 674,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_ZIPTREND_HA_DISH_AMT",
   "VID" : 675,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_ZIPTREND_HA_WASHDRY_AMT",
   "VID" : 676,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_ZIPTREND_KMT_CE_AMT",
   "VID" : 677,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_ZIPTREND_LG_PATIO_AMT",
   "VID" : 678,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_ZIPTREND_OL_GRILL_AMT",
   "VID" : 679,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_ZIPTREND_SP_EXERCISE_AMT",
   "VID" : 680,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_ZIPTREND_SRS_HA_AMT",
   "VID" : 681,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_ZIPTREND_SRS_TOOLS_AMT",
   "VID" : 682,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_ZIPTREND_TL_POWER_AMT",
   "VID" : 683,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_ZIPTREND_TL_STORAGE_AMT",
   "VID" : 684,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_ZIPTREND_WATER_APPLIANCE_AMT",
   "VID" : 685,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "M_ZIPTREND_WATER_HEATER_AMT",
   "VID" : 686,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "MONTH1",
   "VID" : 687,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "MONTH2",
   "VID" : 688,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "MONTH3",
   "VID" : 689,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "MONTH4",
   "VID" : 690,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "MONTH5",
   "VID" : 691,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "MONTH6",
   "VID" : 692,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "MONTH7",
   "VID" : 693,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "MONTH8",
   "VID" : 694,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "MONTH9",
   "VID" : 695,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "MONTH10",
   "VID" : 696,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "MONTH11",
   "VID" : 697,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "MONTH12",
   "VID" : 698,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_DSL_APP_INT_ACC_FTWR_TRS",
   "VID" : 77,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyDaysSinceLast"
-},
+}
 {
   "name" : "S_SRS_ONLINE_TXN_PCT_6_IND",
   "VID" : 265,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "S_ALL_APP_TRS_12M",
   "VID" : 18,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTransactions"
-},
+}
 {
   "name" : "S_ALL_APP_TRS_24M",
   "VID" : 19,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTransactions"
-},
+}
 {
   "name" : "S_CE_OFFICE_TRS_12M",
   "VID" : 63,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTransactions"
-},
+}
 {
   "name" : "S_DSL_K_APP_BOYS_GIRLS_TRS",
   "VID" : 86,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyDaysSinceLast"
-},
+}
 {
   "name" : "M_WEB_DAY_DISHWASHER_0_7",
   "VID" : 603,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTraitDates"
-},
+}
 {
   "name" : "S_SPRTS_GD_TRS_12M",
   "VID" : 256,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTransactions"
-},
+}
 {
   "name" : "M_WEB_DAY_EXERCISE_0_7",
   "VID" : 604,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTraitDates"
-},
+}
 {
   "name" : "S_DSL_HA_KITCHEN_TRS",
   "VID" : 81,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyDaysSinceLast"
-},
+}
 {
   "name" : "S_SRS_ONLINE_TXN_PCT_24_IND",
   "VID" : 264,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "M_WEB_TRAIT_DISHWASHER_0_7",
   "VID" : 625,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTraitDates"
-},
+}
 {
   "name" : "M_WEB_TRAIT_VACUUM_0_7",
   "VID" : 648,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTraits"
-},
+}
 {
   "name" : "M_WEB_TRAIT_WATER_APPL_0_7",
   "VID" : 653,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTraits"
-},
+}
 {
   "name" : "M_WEB_DAY_SNOW_BLOWER_0_7",
   "VID" : 613,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTraitDates"
-},
+}
 {
   "name" : "M_WEB_TRAIT_MOWER_0_7",
   "VID" : 636,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTraits"
-},
+}
 {
   "name" : "M_WEB_DAY_BATTERY_0_14",
   "VID" : 599,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTraitDates"
-},
+}
 {
   "name" : "S_APP_INT_ACC_FTWR_24M_IND",
   "VID" : 27,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "K_CE_HE_SPR_SLS_24M_IND",
   "VID" : 324,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "K_KIDS_APP_SPR_SLS_12M_IND",
   "VID" : 449,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "K_DIY_TOOL_TRS_3M",
   "VID" : 344,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTransactions"
-},
+}
 {
   "name" : "K_EASTER_TI_TRS_3M",
   "VID" : 388,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTransactions"
-},
+}
 {
   "name" : "K_TOYS_CHILDRN_SPR_SLS_24M_IND",
   "VID" : 491,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "K_FTWR_WOMEN_TRS_24M",
   "VID" : 410,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTransactions"
-},
+}
 {
   "name" : "K_ALL_APP_SPR_SLS_24M_IND",
   "VID" : 306,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "K_WAPP_SPR_SLS_24M_IND",
   "VID" : 510,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "K_DSL_FSG_SPRTNG_GDS_TRS",
   "VID" : 359,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyDaysSinceLast"
-},
+}
 {
   "name" : "K_FSG_SPRTNG_GDS_SLS_24M_IND",
   "VID" : 400,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "K_K_INF_TODL_TRS_24M",
   "VID" : 443,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTransactions"
-},
+}
 {
   "name" : "S_BABY_ITEM_TRS_12M",
   "VID" : 46,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTransactions"
-},
+}
 {
   "name" : "K_CONS_SPR_SLS_24M_IND",
   "VID" : 339,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "S_W_APP_ACC_INT_TRS_3M",
   "VID" : 300,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTransactions"
-},
+}
 {
   "name" : "K_AUTO_ITEM_TRS_24M",
   "VID" : 311,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTransactions"
-},
+}
 {
   "name" : "K_AUTO_SERVICES_TRS_24M",
   "VID" : 312,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTransactions"
-},
+}
 {
   "name" : "K_DSL_CE_HME_OFF_TRS",
   "VID" : 349,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyDaysSinceLast"
-},
+}
 {
   "name" : "K_DSL_FTWR_ATHLETICS_TRS",
   "VID" : 361,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyDaysSinceLast"
-},
+}
 {
   "name" : "M_WEB_TRAIT_EXERCISE_0_7",
   "VID" : 628,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyCountTraits"
-},
+}
 {
   "name" : "K_DSL_FTWR_WOMEN_TRS",
   "VID" : 364,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyDaysSinceLast"
-},
+}
 {
   "name" : "S_CE_ELEC_24M_IND",
   "VID" : 699,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategyTurnOnFlag"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_AC_TCOUNT",
   "VID" : 1100,
   "trs_lvl_fl" : 0,
   "strategy" : "NONE"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_LG_SNOW_BLOWER_TCOUNT",
   "VID" : 1134,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_LG_SNOW_BLOWER_TCOUNT",
   "VID" : 1183,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_LG_SNOW_BLOWER_TCOUNT",
   "VID" : 1232,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_CE_CAMERA_TCOUNT",
   "VID" : 1108,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_GAME_ROOM_TCOUNT",
   "VID" : 1115,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_LE_TCOUNT",
   "VID" : 1129,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_LG_ADAS_TCOUNT",
   "VID" : 1130,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_BABY_TCOUNT",
   "VID" : 1106,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_CE_TCOUNT",
   "VID" : 1107,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_HAND_TOOLS_TCOUNT",
   "VID" : 1122,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_HE_FS_TCOUNT",
   "VID" : 1123,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_HG_HL_TCOUNT",
   "VID" : 1125,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_KAPP_TCOUNT",
   "VID" : 1127,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_KIT_ELEC_TCOUNT",
   "VID" : 1128,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_LG_MOWER_TCOUNT",
   "VID" : 1131,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_LG_PATIO_TCOUNT",
   "VID" : 1132,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_ALL_APP_TCOUNT",
   "VID" : 1101,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_AU_BATTERY_TCOUNT",
   "VID" : 1102,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_AU_SERV_ACQ_TCOUNT",
   "VID" : 1103,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_AU_TIRE_TCOUNT",
   "VID" : 1104,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_AUTO_TCOUNT",
   "VID" : 1105,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_CE_LAPTOP_TCOUNT",
   "VID" : 1109,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_CHRISTMAS_TCOUNT",
   "VID" : 1110,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_FIT_EQUIP_TCOUNT",
   "VID" : 1111,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_FITNESS_TCOUNT",
   "VID" : 1112,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_FNJL_TCOUNT",
   "VID" : 1113,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_FOOTWEAR_TCOUNT",
   "VID" : 1114,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_GAMER_TCOUNT",
   "VID" : 1116,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_HA_ALL_TCOUNT",
   "VID" : 1117,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_HA_COOK_TCOUNT",
   "VID" : 1118,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_HA_DISH_TCOUNT",
   "VID" : 1119,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_HA_VAC_TCOUNT",
   "VID" : 1120,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_HA_WH_TCOUNT",
   "VID" : 1121,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_HF_TCOUNT",
   "VID" : 1124,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_HOME_TCOUNT",
   "VID" : 1126,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_LG_SM_OTH_TCOUNT",
   "VID" : 1133,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_LG_TRACTOR_TCOUNT",
   "VID" : 1135,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_LG_TRIM_EDG_TCOUNT",
   "VID" : 1136,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_MAPP_TCOUNT",
   "VID" : 1137,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_MATTRESS_TCOUNT",
   "VID" : 1138,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_OD_GRILL_TCOUNT",
   "VID" : 1139,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_ODL_TCOUNT",
   "VID" : 1140,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_POWER_TOOLS_TCOUNT",
   "VID" : 1141,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_REGRIG_TCOUNT",
   "VID" : 1142,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_TOOL_STRG_TCOUNT",
   "VID" : 1143,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_TOOLS_TCOUNT",
   "VID" : 1144,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_TOYS_TCOUNT",
   "VID" : 1145,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_TV_TCOUNT",
   "VID" : 1146,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_WAPP_TCOUNT",
   "VID" : 1147,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_LIKE_WASH_DRY_TCOUNT",
   "VID" : 1148,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_AC_TCOUNT",
   "VID" : 1149,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_ALL_APP_TCOUNT",
   "VID" : 1150,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_AU_BATTERY_TCOUNT",
   "VID" : 1151,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_AU_SERV_ACQ_TCOUNT",
   "VID" : 1152,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_AU_TIRE_TCOUNT",
   "VID" : 1153,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_AUTO_TCOUNT",
   "VID" : 1154,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_BABY_TCOUNT",
   "VID" : 1155,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_CE_TCOUNT",
   "VID" : 1156,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_CE_CAMERA_TCOUNT",
   "VID" : 1157,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_CE_LAPTOP_TCOUNT",
   "VID" : 1158,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_CHRISTMAS_TCOUNT",
   "VID" : 1159,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_FIT_EQUIP_TCOUNT",
   "VID" : 1160,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_FITNESS_TCOUNT",
   "VID" : 1161,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_FNJL_TCOUNT",
   "VID" : 1162,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_FOOTWEAR_TCOUNT",
   "VID" : 1163,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_GAME_ROOM_TCOUNT",
   "VID" : 1164,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_GAMER_TCOUNT",
   "VID" : 1165,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_HA_ALL_TCOUNT",
   "VID" : 1166,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_HA_COOK_TCOUNT",
   "VID" : 1167,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_HA_DISH_TCOUNT",
   "VID" : 1168,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_HA_VAC_TCOUNT",
   "VID" : 1169,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_HA_WH_TCOUNT",
   "VID" : 1170,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_HAND_TOOLS_TCOUNT",
   "VID" : 1171,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_HE_FS_TCOUNT",
   "VID" : 1172,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_HF_TCOUNT",
   "VID" : 1173,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_HG_HL_TCOUNT",
   "VID" : 1174,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_HOME_TCOUNT",
   "VID" : 1175,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_KAPP_TCOUNT",
   "VID" : 1176,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_KIT_ELEC_TCOUNT",
   "VID" : 1177,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_LE_TCOUNT",
   "VID" : 1178,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_LG_ADAS_TCOUNT",
   "VID" : 1179,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_LG_MOWER_TCOUNT",
   "VID" : 1180,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_LG_PATIO_TCOUNT",
   "VID" : 1181,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_LG_SM_OTH_TCOUNT",
   "VID" : 1182,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_LG_TRACTOR_TCOUNT",
   "VID" : 1184,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_LG_TRIM_EDG_TCOUNT",
   "VID" : 1185,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_MAPP_TCOUNT",
   "VID" : 1186,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_MATTRESS_TCOUNT",
   "VID" : 1187,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_OD_GRILL_TCOUNT",
   "VID" : 1188,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_ODL_TCOUNT",
   "VID" : 1189,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_POWER_TOOLS_TCOUNT",
   "VID" : 1190,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_REGRIG_TCOUNT",
   "VID" : 1191,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_TOOL_STRG_TCOUNT",
   "VID" : 1192,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_TOOLS_TCOUNT",
   "VID" : 1193,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_TOYS_TCOUNT",
   "VID" : 1194,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_TV_TCOUNT",
   "VID" : 1195,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_WAPP_TCOUNT",
   "VID" : 1196,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_WANT_WASH_DRY_TCOUNT",
   "VID" : 1197,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_AC_TCOUNT",
   "VID" : 1198,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_ALL_APP_TCOUNT",
   "VID" : 1199,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_AU_BATTERY_TCOUNT",
   "VID" : 1200,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_AU_SERV_ACQ_TCOUNT",
   "VID" : 1201,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_AU_TIRE_TCOUNT",
   "VID" : 1202,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_AUTO_TCOUNT",
   "VID" : 1203,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_BABY_TCOUNT",
   "VID" : 1204,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_CE_TCOUNT",
   "VID" : 1205,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_CE_CAMERA_TCOUNT",
   "VID" : 1206,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_CE_LAPTOP_TCOUNT",
   "VID" : 1207,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_CHRISTMAS_TCOUNT",
   "VID" : 1208,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_FIT_EQUIP_TCOUNT",
   "VID" : 1209,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_FITNESS_TCOUNT",
   "VID" : 1210,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_FNJL_TCOUNT",
   "VID" : 1211,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_FOOTWEAR_TCOUNT",
   "VID" : 1212,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_GAME_ROOM_TCOUNT",
   "VID" : 1213,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_GAMER_TCOUNT",
   "VID" : 1214,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_HA_ALL_TCOUNT",
   "VID" : 1215,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_HA_COOK_TCOUNT",
   "VID" : 1216,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_HA_DISH_TCOUNT",
   "VID" : 1217,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_HA_VAC_TCOUNT",
   "VID" : 1218,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_HA_WH_TCOUNT",
   "VID" : 1219,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_HAND_TOOLS_TCOUNT",
   "VID" : 1220,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_HE_FS_TCOUNT",
   "VID" : 1221,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_HF_TCOUNT",
   "VID" : 1222,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_HG_HL_TCOUNT",
   "VID" : 1223,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_HOME_TCOUNT",
   "VID" : 1224,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_KAPP_TCOUNT",
   "VID" : 1225,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_KIT_ELEC_TCOUNT",
   "VID" : 1226,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_LE_TCOUNT",
   "VID" : 1227,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_LG_ADAS_TCOUNT",
   "VID" : 1228,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_LG_MOWER_TCOUNT",
   "VID" : 1229,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_LG_PATIO_TCOUNT",
   "VID" : 1230,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_LG_SM_OTH_TCOUNT",
   "VID" : 1231,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_LG_TRACTOR_TCOUNT",
   "VID" : 1233,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_LG_TRIM_EDG_TCOUNT",
   "VID" : 1234,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_MAPP_TCOUNT",
   "VID" : 1235,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_MATTRESS_TCOUNT",
   "VID" : 1236,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_OD_GRILL_TCOUNT",
   "VID" : 1237,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_ODL_TCOUNT",
   "VID" : 1238,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_POWER_TOOLS_TCOUNT",
   "VID" : 1239,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_REGRIG_TCOUNT",
   "VID" : 1240,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_TOOL_STRG_TCOUNT",
   "VID" : 1241,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_TOOLS_TCOUNT",
   "VID" : 1242,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_TOYS_TCOUNT",
   "VID" : 1243,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_TV_TCOUNT",
   "VID" : 1244,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_WAPP_TCOUNT",
   "VID" : 1245,
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
-},
+}
 {
   "name" : "BOOST_SYW_OWN_WASH_DRY_TCOUNT",
   "VID" : 1246,
