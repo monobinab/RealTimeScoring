@@ -16,10 +16,11 @@ public class Variable implements Serializable
 	private double coefficient;
 	private String strategy;
 	 
-	public Variable( String nm, double coefficnt)
+	public Variable( String nm, String vid, double coefficnt)
 	{
 		this.name   = nm;
 		this.coefficient = coefficnt;
+		this.vid = vid;
 	}
 	
 	public Variable( String nm, String id, String strategy)
