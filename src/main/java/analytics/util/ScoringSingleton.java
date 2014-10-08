@@ -316,7 +316,11 @@ public class ScoringSingleton {
 			
 			//need variableNameToVidMap here before mbrVarMap is checked for its variables
 			//String vid = variableNameToVidMap.get(variable.getName());
-			if (variable.getName() != null && mbrVarMap != null && (variableNameToVidMap.get(variable.getName()) != null
+			if(mbrVarMap == null){
+				LOGGER.info("member variables is null");
+				break;
+			}
+			if (variable.getName() != null && (variableNameToVidMap.get(variable.getName()) != null
 					&& mbrVarMap.get(variableNameToVidMap.get(variable.getName())) != null
 					&& !variable.getName().substring(0, 4).toUpperCase()
 							.equals(MongoNameConstants.BOOST_VAR_PREFIX))) {
