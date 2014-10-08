@@ -278,7 +278,7 @@ public class ScoringSingleton {
 	public double calcScore(Map<String, Object> mbrVarMap,
 			Map<String, Change> varChangeMap, int modelId){
 		// recalculate score for model
-			double baseScore = ScoringSingleton.getInstance().calcBaseScore(mbrVarMap, varChangeMap,
+			double baseScore = calcBaseScore(mbrVarMap, varChangeMap,
 					modelId);
 			double newScore;
 
@@ -313,16 +313,23 @@ public class ScoringSingleton {
 
 		for (String v : model.getVariables().keySet()) {
 			Variable variable = model.getVariables().get(v);
-			if (variable.getVid() != null && mbrVarMap != null
-					&& mbrVarMap.get(variable.getVid()) != null
+			
+			//need variableNameToVidMap here before mbrVarMap is checked for its variables
+			//String vid = variableNameToVidMap.get(variable.getName());
+			if(mbrVarMap == null){
+				LOGGER.info("member variables is null");
+				break;
+			}
+			if (variable.getName() != null && (variableNameToVidMap.get(variable.getName()) != null
+					&& mbrVarMap.get(variableNameToVidMap.get(variable.getName())) != null
 					&& !variable.getName().substring(0, 4).toUpperCase()
-							.equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
-				if (mbrVarMap.get(variable.getVid()) instanceof Integer) {
+							.equals(MongoNameConstants.BOOST_VAR_PREFIX))) {
+				if (mbrVarMap.get(variableNameToVidMap.get(variable.getName())) instanceof Integer) {
 					val = val
 							+ ((Integer) calculateVariableValue(mbrVarMap,
 									variable, varChangeMap, "Integer") * variable
 									.getCoefficient());
-				} else if (mbrVarMap.get(variable.getVid()) instanceof Double) {
+				} else if (mbrVarMap.get(variableNameToVidMap.get(variable.getName())) instanceof Double) {
 					val = val
 							+ ((Double) calculateVariableValue(mbrVarMap,
 									variable, varChangeMap, "Double") * variable
@@ -354,13 +361,14 @@ public class ScoringSingleton {
 	private Object calculateVariableValue(Map<String, Object> mbrVarMap,
 			Variable var, Map<String, Change> changes, String dataType) {
 		Object changedValue = null;
+		String vid = variableNameToVidMap.get(var.getName());
 		if (var != null) {
 			if (changes != null && changes.containsKey(var.getName().toUpperCase())) {
 				changedValue = changes.get(var.getName().toUpperCase())
 						.getValue();
 			}
 			if (changedValue == null) {
-				changedValue = mbrVarMap.get(var.getVid().toUpperCase());
+				changedValue = mbrVarMap.get(vid);
 				if (changedValue == null) {
 					changedValue = 0;
 				}
