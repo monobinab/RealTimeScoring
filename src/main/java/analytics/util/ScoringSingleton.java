@@ -315,23 +315,17 @@ public class ScoringSingleton {
 			Variable variable = model.getVariables().get(v);
 			
 			//need variableNameToVidMap here before mbrVarMap is checked for its variables
-			String vid = variableNameToVidMap.get(variable.getName());
-			if (variable.getName() != null && mbrVarMap != null
-					&& mbrVarMap.get(vid) != null
+			//String vid = variableNameToVidMap.get(variable.getName());
+			if (variable.getName() != null && mbrVarMap != null && (variableNameToVidMap.get(variable.getName()) != null
+					&& mbrVarMap.get(variableNameToVidMap.get(variable.getName())) != null
 					&& !variable.getName().substring(0, 4).toUpperCase()
-							.equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
-				if (mbrVarMap.get(vid) instanceof Integer) {
-					System.out.println((Integer) calculateVariableValue(mbrVarMap,
-									variable, varChangeMap, "Integer") * variable
-									.getCoefficient());
+							.equals(MongoNameConstants.BOOST_VAR_PREFIX))) {
+				if (mbrVarMap.get(variableNameToVidMap.get(variable.getName())) instanceof Integer) {
 					val = val
 							+ ((Integer) calculateVariableValue(mbrVarMap,
 									variable, varChangeMap, "Integer") * variable
 									.getCoefficient());
-				} else if (mbrVarMap.get(vid) instanceof Double) {
-					System.out.println((Double) calculateVariableValue(mbrVarMap,
-									variable, varChangeMap, "Double") * variable
-									.getCoefficient());
+				} else if (mbrVarMap.get(variableNameToVidMap.get(variable.getName())) instanceof Double) {
 					val = val
 							+ ((Double) calculateVariableValue(mbrVarMap,
 									variable, varChangeMap, "Double") * variable
@@ -341,18 +335,12 @@ public class ScoringSingleton {
 					&& varChangeMap.get(variable.getName()) != null) {
 				if (varChangeMap.get(variable.getName().toUpperCase())
 						.getValue() instanceof Integer) {
-					System.out.println((Integer) calculateVariableValue(mbrVarMap,
-									variable, varChangeMap, "Integer") * variable
-									.getCoefficient());
 					val = val
 							+ ((Integer) calculateVariableValue(mbrVarMap,
 									variable, varChangeMap, "Integer") * variable
 									.getCoefficient());
 				} else if (varChangeMap.get(variable.getName().toUpperCase())
 						.getValue() instanceof Double) {
-					System.out.println((Double) calculateVariableValue(mbrVarMap,
-									variable, varChangeMap, "Double") * variable
-									.getCoefficient());
 					val = val
 							+ ((Double) calculateVariableValue(mbrVarMap,
 									variable, varChangeMap, "Double") * variable
