@@ -73,11 +73,11 @@ public class ModelVariablesDao extends AbstractDao{
 		for (Object modelVariable : modelVariables) {
 			String variableName = ((DBObject) modelVariable).get(MongoNameConstants.VAR_NAME)
 					.toString().toUpperCase();
-			String vid = ((DBObject) modelVariable).get(MongoNameConstants.V_ID)
-					.toString().toUpperCase();
+			//String vid = ((DBObject) modelVariable).get(MongoNameConstants.V_ID)
+				//	.toString().toUpperCase();
 			Double coefficient = Double.valueOf(((DBObject) modelVariable)
 					.get(MongoNameConstants.COEFFICIENT).toString());
-			variablesMap.put(variableName, new Variable(variableName,vid,coefficient));
+			variablesMap.put(variableName, new Variable(variableName,coefficient));
 
 			if (!variableModelsMap.containsKey(variableName)) {
 				List<Integer> modelIds = new ArrayList<Integer>();
