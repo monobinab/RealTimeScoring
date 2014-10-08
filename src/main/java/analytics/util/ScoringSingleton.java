@@ -130,7 +130,7 @@ public class ScoringSingleton {
 	
 	public Map<String, Object> createVariableValueMap(String loyaltyId,
 			Set<Integer> modelIdList) {
-		Map<String,Integer> variableFilter = new HashMap<String, Integer>();
+		List<String> variableFilter = new ArrayList<String>();
     	for (Integer modId : modelIdList) {
 			int month;
 			if (modelsMap.get(modId).containsKey(0)) {
@@ -144,7 +144,7 @@ public class ScoringSingleton {
 				if(variableNameToVidMap.get(var)==null){
 					LOGGER.error("VID is null for variable " + var);
 				}
-				variableFilter.put(variableNameToVidMap.get(var), 1);
+				variableFilter.add(variableNameToVidMap.get(var));
 			}
 			}
 			else{
