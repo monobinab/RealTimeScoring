@@ -147,7 +147,7 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 		// 4) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN SET CURRENT UUID FROM RECORD, SET CURRENT l_id TO NULL AND RETURN
         //		If l_id is null and the next UUID is the same the current, then the next record will not be processed
         List<String> l_ids = memberDao.getLoyaltyIdsFromUUID(splitRecArray[0]);
-        if(l_ids == null) {
+        if(l_ids == null || l_ids.size() == 0) {
             this.currentUUID=splitRecArray[0];
             LOGGER.info(" *** COULD NOT FIND UUID: " + this.currentUUID);
         	this.l_idToValueCollectionMap=new HashMap<String, Collection<String>>();
