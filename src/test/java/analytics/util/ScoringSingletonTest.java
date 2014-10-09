@@ -26,6 +26,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import analytics.exception.RealTimeScoringException;
 import analytics.util.objects.Change;
 import analytics.util.objects.ChangedMemberScore;
 import analytics.util.objects.Model;
@@ -234,7 +235,7 @@ public class ScoringSingletonTest {
 		//fake changedMemberVariables Collection
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Change expected = new Change("222", 12,
-				simpleDateFormat.parse("2014-09-23"),
+				simpleDateFormat.parse("2999-09-23"),
 				simpleDateFormat.parse("2014-09-01"));
 		DB conn = DBConnection.getDBConnection();
 		//System.out.println("database: " + conn);
@@ -374,9 +375,9 @@ public class ScoringSingletonTest {
 		Map<Integer, Model> monthModelMap5 = new HashMap<Integer, Model>();
 		monthModelMap5.put(0, new Model(30, "Model_Name3", 11, 7, variablesMap));
 		Map<Integer, Model> monthModelMap2 = new HashMap<Integer, Model>();
-		monthModelMap2.put(Calendar.getInstance().get(Calendar.MONTH) + 1, new Model(27, "Model_Name2", 12, 3,variablesMap));
+		monthModelMap2.put(Calendar.getInstance().get(Calendar.MONTH) + 1, new Model(27, "Model_Name4", 12, 3,variablesMap));
 		Map<Integer, Model> monthModelMap3 = new HashMap<Integer, Model>();
-		monthModelMap3.put(Calendar.getInstance().get(Calendar.MONTH) + 1, new Model(27, "Model_Name2", 12, 3,variablesMap2));
+		monthModelMap3.put(Calendar.getInstance().get(Calendar.MONTH) + 1, new Model(27, "Model_Name5", 12, 3,variablesMap2));
 
 		
 		modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
@@ -673,76 +674,72 @@ public class ScoringSingletonTest {
 	@Test
 	public void calcScoreTest() throws ParseException, SecurityException,
 			NoSuchFieldException, IllegalArgumentException,
-			IllegalAccessException, ConfigurationException {
-		// This test case is tested with variables for model Id 35
-		// neither changedvariables nor membervariables contain those model variables.
-		// so, base score will be 0 and new score will be 0.5
-		// it checks base score -- which will be zero
+			IllegalAccessException, ConfigurationException, RealTimeScoringException {
+		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
+		modelsMap.setAccessible(true);
+		modelsMap.set(scoringSingletonObj, getModelsMapContent());
 		double newScore = scoringSingletonObj.calcScore(getMemVariables(),getAllChanges(), 35);
-		Assert.assertEquals(0.5, newScore);
+		Assert.assertEquals(0.9978269254352887, newScore);
 	}
 	
-	@Test
-	@Ignore
+	@Test(expected=RealTimeScoringException.class)
+	public void calcScoreNullCheckTest() throws ParseException, SecurityException,
+			NoSuchFieldException, IllegalArgumentException,
+			IllegalAccessException, ConfigurationException, RealTimeScoringException {
+		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
+		modelsMap.setAccessible(true);
+		modelsMap.set(scoringSingletonObj, getModelsMapContent());
+		scoringSingletonObj.calcScore(null,getAllChanges(), 35);
+	}
+	
+	@Test(expected = RealTimeScoringException.class)
 	public void calcBaseScoreNullCheckTest() throws SecurityException,
 			NoSuchFieldException, ParseException, IllegalArgumentException,
-			IllegalAccessException {
-	
+			IllegalAccessException, RealTimeScoringException {
 		//This test case is tested with null membervariables 
 		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
 		modelsMap.setAccessible(true);
 		modelsMap.set(scoringSingletonObj, getModelsMapContent());
-		double baseScore = scoringSingletonObj.calcBaseScore(null,getAllChanges(), 35);
-		Assert.assertEquals(6.12728, baseScore);
+		Field varNameToVidMapContents = ScoringSingleton.class.getDeclaredField("variableNameToVidMap");
+		varNameToVidMapContents.setAccessible(true);
+		varNameToVidMapContents.set(scoringSingletonObj, getVariableNameToVidMapContents());
+		scoringSingletonObj.calcBaseScore(null,getAllChanges(), 35);
 	}
 	
-	@Test
-	@Ignore
-	public void calcBaseScoreNullCheckTest2() throws SecurityException,
-			NoSuchFieldException, ParseException, IllegalArgumentException,
-			IllegalAccessException {
-	
-		//This test case is tested with null changedmembervariables 
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, getModelsMapContent());
-		double baseScore = scoringSingletonObj.calcBaseScore(getMemVariables(),null, 35);
-		Assert.assertEquals(5.0, baseScore);
-	}
-	
-	@Test
-	@Ignore
-	public void calcBaseScoreNullCheckTest3() throws SecurityException,
-			NoSuchFieldException, ParseException, IllegalArgumentException,
-			IllegalAccessException {
+	@Test(expected=RealTimeScoringException.class)
+	public void calcBaseScoreNullCheckTest2() throws Exception, RealTimeScoringException {
 	
 		//This test case is tested with null membervariables and null changes
 		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
 		modelsMap.setAccessible(true);
 		modelsMap.set(scoringSingletonObj, getModelsMapContent());
-		double baseScore = scoringSingletonObj.calcBaseScore(null,null, 35);
-		Assert.assertEquals(5.0, baseScore);
-	}
+		Field varNameToVidMapContents = ScoringSingleton.class.getDeclaredField("variableNameToVidMap");
+		varNameToVidMapContents.setAccessible(true);
+		varNameToVidMapContents.set(scoringSingletonObj, getVariableNameToVidMapContents());
+		scoringSingletonObj.calcBaseScore(null,null, 35);
+		}
 	
 	@Test
-	@Ignore
 	public void calcBaseScoreTest() throws SecurityException,
 			NoSuchFieldException, ParseException, IllegalArgumentException,
-			IllegalAccessException {
+			IllegalAccessException, RealTimeScoringException {
 	
 		//This test case is tested with variables in membervariables or in varChanges, month is 0
 		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
 		modelsMap.setAccessible(true);
 		modelsMap.set(scoringSingletonObj, getModelsMapContent());
+		
+		Field varNameToVidMapContents = ScoringSingleton.class.getDeclaredField("variableNameToVidMap");
+		varNameToVidMapContents.setAccessible(true);
+		varNameToVidMapContents.set(scoringSingletonObj, getVariableNameToVidMapContents());
 		double baseScore = scoringSingletonObj.calcBaseScore(getMemVariables(),getAllChanges(), 35);
-		Assert.assertEquals(6.12728, baseScore);
+		Assert.assertEquals(6.129436825, baseScore);
 	}
 
 	@Test
-	@Ignore
 	public void calcBaseScoreTest2() throws SecurityException,
 			NoSuchFieldException, ParseException, IllegalArgumentException,
-			IllegalAccessException {
+			IllegalAccessException, RealTimeScoringException {
 		//This test case is tested with variables in membervariables or in varChanges, month is current
 		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
 		modelsMap.setAccessible(true);
@@ -753,14 +750,13 @@ public class ScoringSingletonTest {
 		variableNameToVidMapContents.set(scoringSingletonObj, getVariableNameToVidMapContents());
 		
 		double baseScore = scoringSingletonObj.calcBaseScore(getMemVariables(),getAllChanges(), 27);
-		Assert.assertEquals(4.12728 , baseScore);
+		Assert.assertEquals(4.129436825 , baseScore);
 	}
 
 	@Test
-	@Ignore
 	public void calcBaseScoreTest3() throws SecurityException,
 			NoSuchFieldException, ParseException, IllegalArgumentException,
-			IllegalAccessException {
+			IllegalAccessException, RealTimeScoringException {
 		//This test case is tested with modelId whose month is current month and variables NOT in both membervariables and varchanges
 		//so, it has to return the model Constant as base score
 		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
