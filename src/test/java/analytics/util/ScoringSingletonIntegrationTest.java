@@ -26,6 +26,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import analytics.exception.RealTimeScoringException;
 import analytics.util.objects.Change;
 import analytics.util.objects.ChangedMemberScore;
 import analytics.util.objects.Model;
@@ -106,43 +107,7 @@ public class ScoringSingletonIntegrationTest {
 		constructor.setAccessible(true);
 		scoringSingletonObj = constructor.newInstance();
 		
-		//Fake memberVariables collection
-		DB db = DBConnection.getDBConnection();
-		DBCollection memVarColl = db.getCollection("memberVariables");
-		memVarColl.insert(new BasicDBObject("l_id", "SearsTesting").append("2268", 1).append("2269",0.4).append("2270", 0.06).append("2273", 0.04));
-		DBObject dbObject = memVarColl.findOne(new BasicDBObject("l_id","SearsTesting"));
-		System.out.println("memvar: " + dbObject);
-		
-		
-				//fake changedMemberVariables Collection
-				DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
-				SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-				Change expected = new Change("2269", 12,
-						simpleDateFormat.parse("2014-09-23"),
-						simpleDateFormat.parse("2014-09-01"));
-				Change expected2 = new Change("2271", 12,
-						simpleDateFormat.parse("2014-10-23"),
-						simpleDateFormat.parse("2014-09-01"));
-				Change expected3 = new Change("2275", 12,
-						simpleDateFormat.parse("2014-10-23"),
-						simpleDateFormat.parse("2014-09-01"));
-				changedMemberVar = db
-						.getCollection("changedMemberVariables");
-				String l_id = "SearsTesting";
-				changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
-						"2269",
-						new BasicDBObject("v", expected.getValue()).append("e",
-								expected.getExpirationDateAsString()).append("f",
-								expected.getEffectiveDateAsString())).append(
-										"2271",
-										new BasicDBObject("v", expected2.getValue()).append("e",
-												expected2.getExpirationDateAsString()).append("f",
-												expected2.getEffectiveDateAsString())).append(
-														"2275",
-														new BasicDBObject("v", expected3.getValue()).append("e",
-																expected3.getExpirationDateAsString()).append("f",
-																expected3.getEffectiveDateAsString())));
-					
+	
 				//Fake modelVariables collection
 				/*DBCollection modelVariablesColl = db.getCollection("modelVariables");
 				
@@ -353,7 +318,6 @@ public class ScoringSingletonIntegrationTest {
 		variableNameToStrategyMapContents.put("BOOST_SYW_WANT_TOYS_TCOUNT", "StrategySumSales");
 		variableNameToStrategyMapContents.put("BOOST_SYW_WANT_TOYS_TCOUNT2", "StrategyTurnOffFlag");
 		setVariableNameToStrategyMapContents(variableNameToStrategyMapContents);
-		
 	}
 	
 	@After
@@ -361,7 +325,45 @@ public class ScoringSingletonIntegrationTest {
 	}
 
 	@Test
-	public void executeScoringSingletonTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
+	public void executeScoringSingletonTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, RealTimeScoringException, ConfigurationException, ParseException{
+		
+		//Fake memberVariables collection
+		DB db = DBConnection.getDBConnection();
+		DBCollection memVarColl = db.getCollection("memberVariables");
+		memVarColl.insert(new BasicDBObject("l_id", "SearsTesting").append("2268", 1).append("2269",0.4).append("2270", 0.06).append("2273", 0.04));
+		DBObject dbObject = memVarColl.findOne(new BasicDBObject("l_id","SearsTesting"));
+		//System.out.println("memvar: " + dbObject);
+		
+		
+				//fake changedMemberVariables Collection
+				DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
+				SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+				Change expected = new Change("2269", 12,
+						simpleDateFormat.parse("2999-09-23"),
+						simpleDateFormat.parse("2014-09-01"));
+				Change expected2 = new Change("2271", 12,
+						simpleDateFormat.parse("2999-10-23"),
+						simpleDateFormat.parse("2014-09-01"));
+				Change expected3 = new Change("2275", 12,
+						simpleDateFormat.parse("2999-10-23"),
+						simpleDateFormat.parse("2014-09-01"));
+				changedMemberVar = db
+						.getCollection("changedMemberVariables");
+				String l_id = "SearsTesting";
+				changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
+						"2269",
+						new BasicDBObject("v", expected.getValue()).append("e",
+								expected.getExpirationDateAsString()).append("f",
+								expected.getEffectiveDateAsString())).append(
+										"2271",
+										new BasicDBObject("v", expected2.getValue()).append("e",
+												expected2.getExpirationDateAsString()).append("f",
+												expected2.getEffectiveDateAsString())).append(
+														"2275",
+														new BasicDBObject("v", expected3.getValue()).append("e",
+																expected3.getExpirationDateAsString()).append("f",
+																expected3.getEffectiveDateAsString())));
+					
 		
 			Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
 		newChangesVarValueMap.put("S_DSL_APP_INT_ACC", "0.001");
@@ -394,18 +396,90 @@ public class ScoringSingletonIntegrationTest {
 		variableNameToStrategyMapContents.set(scoringSingletonObj, getVariableNameToStrategyMapContents());
 		
 		Set<Integer> modelIdsList = scoringSingletonObj.getModelIdList(newChangesVarValueMap);
-		//System.out.println(modelIdsList);
 		Map<String, Object> memberVariablesMap = scoringSingletonObj.createVariableValueMap("SearsTesting", modelIdsList);
-		//System.out.println(memberVariablesMap);
 		Map<String, Change> changedMemberVariablesMap = scoringSingletonObj.createChangedVariablesMap("SearsTesting");
-		//System.out.println(changedMemberVariablesMap);
 		Map<String, Change> changedMemVariablesStrategy = scoringSingletonObj.executeStrategy(changedMemberVariablesMap, newChangesVarValueMap, memberVariablesMap);
-		//System.out.println(changedMemVariablesStrategy.get("S_DSL_APP_INT_ACC").getValue());
-		//System.out.println(changedMemVariablesStrategy.get("S_HOME_6M_IND_ALL").getValue());
-		//System.out.println(changedMemVariablesStrategy.get("S_DSL_APP_INT_ACC_FTWR_MEM").getValue());
 		double score = scoringSingletonObj.calcScore(memberVariablesMap, changedMemVariablesStrategy, 35);
-		//System.out.println(score);
 		Assert.assertEquals(0.993943149103568, score);
+	}
+
+	@Test
+	public void executeScoringSingletonExpDateTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, RealTimeScoringException, ConfigurationException, ParseException{
+		
+		//Fake memberVariables collection
+		DB db = DBConnection.getDBConnection();
+		DBCollection memVarColl = db.getCollection("memberVariables");
+		memVarColl.insert(new BasicDBObject("l_id", "SearsTesting2").append("2268", 1).append("2269",0.4).append("2270", 0.06).append("2273", 0.04));
+				//fake changedMemberVariables Collection
+				DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
+				SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+				Change expected = new Change("2269", 12,
+						simpleDateFormat.parse("2013-09-23"),
+						simpleDateFormat.parse("2014-09-01"));
+				Change expected2 = new Change("2011", 12,
+						simpleDateFormat.parse("2011-10-23"),
+						simpleDateFormat.parse("2014-09-01"));
+				Change expected3 = new Change("2275", 12,
+						simpleDateFormat.parse("2012-10-23"),
+						simpleDateFormat.parse("2014-09-01"));
+				changedMemberVar = db
+						.getCollection("changedMemberVariables");
+				String l_id = "SearsTesting2";
+				changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
+						"2269",
+						new BasicDBObject("v", expected.getValue()).append("e",
+								expected.getExpirationDateAsString()).append("f",
+								expected.getEffectiveDateAsString())).append(
+										"2271",
+										new BasicDBObject("v", expected2.getValue()).append("e",
+												expected2.getExpirationDateAsString()).append("f",
+												expected2.getEffectiveDateAsString())).append(
+														"2275",
+														new BasicDBObject("v", expected3.getValue()).append("e",
+																expected3.getExpirationDateAsString()).append("f",
+																expected3.getEffectiveDateAsString())));
+						
+				Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
+				newChangesVarValueMap.put("S_DSL_APP_INT_ACC", "0.001");
+				newChangesVarValueMap.put("S_HOME_6M_IND_ALL", "1");
+				newChangesVarValueMap.put("S_DSL_APP_INT_ACC_FTWR_MEM", "1.0");
+				
+				Field variableModelsMapContent = ScoringSingleton.class
+						.getDeclaredField("variableModelsMap");
+				variableModelsMapContent.setAccessible(true);
+				variableModelsMapContent.set(scoringSingletonObj, getVariableModelsMapContents());
+				
+				Field modelsMapContent = ScoringSingleton.class
+						.getDeclaredField("modelsMap");
+				modelsMapContent.setAccessible(true);
+				modelsMapContent.set(scoringSingletonObj, getModelsMapContent());
+				
+				Field variableNameToVidMapContents = ScoringSingleton.class
+						.getDeclaredField("variableNameToVidMap");
+				variableNameToVidMapContents.setAccessible(true);
+				variableNameToVidMapContents.set(scoringSingletonObj, getVariableNameToVidMapContents());
+				
+				Field variableVidToNameMapContents = ScoringSingleton.class
+						.getDeclaredField("variableVidToNameMap");
+				variableVidToNameMapContents.setAccessible(true);
+				variableVidToNameMapContents.set(scoringSingletonObj, getVariableVidToNameMapContents());
+				
+				Field variableNameToStrategyMapContents = ScoringSingleton.class
+						.getDeclaredField("variableNameToStrategyMap");
+				variableNameToStrategyMapContents.setAccessible(true);
+				variableNameToStrategyMapContents.set(scoringSingletonObj, getVariableNameToStrategyMapContents());
+				
+				Set<Integer> modelIdsList = scoringSingletonObj.getModelIdList(newChangesVarValueMap);
+				Map<String, Object> memberVariablesMap = scoringSingletonObj.createVariableValueMap("SearsTesting2", modelIdsList);
+				Map<String, Change> changedMemberVariablesMap = scoringSingletonObj.createChangedVariablesMap("SearsTesting2");
+				Map<String, Change> changedMemVariablesStrategy = scoringSingletonObj.executeStrategy(changedMemberVariablesMap, newChangesVarValueMap, memberVariablesMap);
+			//	System.out.println(changedMemVariablesStrategy.keySet());
+			//	System.out.println(changedMemVariablesStrategy.get("S_DSL_APP_INT_ACC_FTWR_MEM").getEffectiveDateAsString());
+			//	System.out.println(changedMemVariablesStrategy.get("S_DSL_APP_INT_ACC").getEffectiveDateAsString());
+			//	System.out.println(changedMemVariablesStrategy.get("S_HOME_6M_IND_ALL").getEffectiveDateAsString());
+			//	double score = scoringSingletonObj.calcScore(memberVariablesMap, changedMemVariablesStrategy, 35);
+				Assert.assertEquals(3, changedMemberVariablesMap.size());
+			//	Assert.assertEquals("2014-10-09", changedMemVariablesStrategy.get("2269").getExpirationDateAsString());
 	}
 
 }
