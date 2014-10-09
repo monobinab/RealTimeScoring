@@ -878,7 +878,7 @@ public class ScoringSingletonTest {
 	scoringSingletonObj.updateChangedVariables("Sears", 35, null);
 	DBObject dbObj = changedMemberVar.findOne(new BasicDBObject("l_id","Sears"));
 	HashMap<String, Object> map = (HashMap<String, Object>) dbObj.get("222");
-	Assert.assertEquals("2014-09-23", map.get("e"));
+	Assert.assertEquals("2999-09-23", map.get("e"));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -887,7 +887,7 @@ public class ScoringSingletonTest {
 	scoringSingletonObj.updateChangedVariables("Sears2", null, null);
 	DBObject dbObj = changedMemberVar.findOne(new BasicDBObject("l_id","Sears"));
 	HashMap<String, Object> map = (HashMap<String, Object>) dbObj.get("222");
-	Assert.assertEquals("2014-09-23", map.get("e"));
+	Assert.assertEquals("2999-09-23", map.get("e"));
 	}
 
 	@SuppressWarnings("unchecked")
