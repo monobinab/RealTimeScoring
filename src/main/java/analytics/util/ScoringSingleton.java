@@ -13,6 +13,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import analytics.exception.RealTimeScoringException;
 import analytics.util.dao.ChangedMemberScoresDao;
 import analytics.util.dao.ChangedMemberVariablesDao;
 import analytics.util.dao.MemberVariablesDao;
@@ -100,7 +101,7 @@ public class ScoringSingleton {
 	
 	//TODO: Replace this method. Its for backward compatibility. Bad coding
 	public HashMap<String, Double> execute(String loyaltyId,
-			ArrayList<String> modelIdArrayList, String source) {
+			ArrayList<String> modelIdArrayList, String source) throws RealTimeScoringException {
 		Set<Integer> modelIdList = new HashSet<Integer>();
 		for(String model: modelIdArrayList){
 			modelIdList.add(Integer.parseInt(model));
@@ -130,7 +131,7 @@ public class ScoringSingleton {
 	
 	public Map<String, Object> createVariableValueMap(String loyaltyId,
 			Set<Integer> modelIdList) {
-		Map<String,Integer> variableFilter = new HashMap<String, Integer>();
+		List<String> variableFilter = new ArrayList<String>();
     	for (Integer modId : modelIdList) {
 			int month;
 			if (modelsMap.get(modId).containsKey(0)) {
@@ -144,7 +145,7 @@ public class ScoringSingleton {
 				if(variableNameToVidMap.get(var)==null){
 					LOGGER.error("VID is null for variable " + var);
 				}
-				variableFilter.put(variableNameToVidMap.get(var), 1);
+				variableFilter.add(variableNameToVidMap.get(var));
 			}
 			}
 			else{
@@ -276,7 +277,7 @@ public class ScoringSingleton {
 	}
 	
 	public double calcScore(Map<String, Object> mbrVarMap,
-			Map<String, Change> varChangeMap, int modelId){
+			Map<String, Change> varChangeMap, int modelId) throws RealTimeScoringException{
 		// recalculate score for model
 			double baseScore = calcBaseScore(mbrVarMap, varChangeMap,
 					modelId);
@@ -293,7 +294,7 @@ public class ScoringSingleton {
 	}
 	
 	public double calcBaseScore(Map<String, Object> mbrVarMap,
-			Map<String, Change> varChangeMap, int modelId) {
+			Map<String, Change> varChangeMap, int modelId) throws RealTimeScoringException{
 
 		Model model = null;
 
@@ -313,13 +314,12 @@ public class ScoringSingleton {
 
 		for (String v : model.getVariables().keySet()) {
 			Variable variable = model.getVariables().get(v);
-			
+			if(mbrVarMap == null){
+				throw new RealTimeScoringException("member variables is null");
+			}
 			//need variableNameToVidMap here before mbrVarMap is checked for its variables
 			//String vid = variableNameToVidMap.get(variable.getName());
-			if(mbrVarMap == null){
-				LOGGER.info("member variables is null");
-				break;
-			}
+			
 			if (variable.getName() != null && (variableNameToVidMap.get(variable.getName()) != null
 					&& mbrVarMap.get(variableNameToVidMap.get(variable.getName())) != null
 					&& !variable.getName().substring(0, 4).toUpperCase()
@@ -361,14 +361,14 @@ public class ScoringSingleton {
 	private Object calculateVariableValue(Map<String, Object> mbrVarMap,
 			Variable var, Map<String, Change> changes, String dataType) {
 		Object changedValue = null;
-		String vid = variableNameToVidMap.get(var.getName());
+		
 		if (var != null) {
 			if (changes != null && changes.containsKey(var.getName().toUpperCase())) {
 				changedValue = changes.get(var.getName().toUpperCase())
 						.getValue();
 			}
-			if (changedValue == null) {
-				changedValue = mbrVarMap.get(vid);
+			if (changedValue == null && variableNameToVidMap.get(var.getName()) != null) {
+				changedValue = mbrVarMap.get(variableNameToVidMap.get(var.getName()));
 				if (changedValue == null) {
 					changedValue = 0;
 				}
