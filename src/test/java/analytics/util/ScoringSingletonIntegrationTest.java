@@ -603,7 +603,7 @@ public class ScoringSingletonIntegrationTest {
 		}
 	
 	
-	//This test case is for variable S_DSL_APP_INT_ACC which is not expired in changedMemberVaribles and newchangeVarValueMap also containsit
+	//This test case is for variable S_DSL_APP_INT_ACC which is not expired in changedMemberVaribles and newchangeVarValueMap also contains it
 	//The value for that var will be set from executestrategy method 
 	@Test
 	public void executeScoringSingletonNewChangesVarTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, RealTimeScoringException, ConfigurationException, ParseException{
@@ -679,7 +679,6 @@ public class ScoringSingletonIntegrationTest {
 	
 	//This test is for variable S_DSL_APP_INT_ACC2  which is not expired and newChangesVarValueMap does not contain it
 	@Test
-	@Ignore
 	public void executeScoringSingletonNewChangesVarTest2() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, RealTimeScoringException, ConfigurationException, ParseException{
 			
 		DB db = DBConnection.getDBConnection();
@@ -691,7 +690,7 @@ public class ScoringSingletonIntegrationTest {
 				//fake changedMemberVariables Collection
 				DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
 				SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-				Change expected = new Change("2270", 12,
+				Change expected = new Change("2269", 12,
 						simpleDateFormat.parse("2999-09-23"),
 						simpleDateFormat.parse("2014-09-01"));
 				
@@ -699,7 +698,7 @@ public class ScoringSingletonIntegrationTest {
 						.getCollection("changedMemberVariables");
 				String l_id = "SearsTesting4";
 				changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
-						"2270",
+						"2269",
 						new BasicDBObject("v", expected.getValue()).append("e",
 								expected.getExpirationDateAsString()).append("f",
 								expected.getEffectiveDateAsString())));
@@ -737,6 +736,7 @@ public class ScoringSingletonIntegrationTest {
 				Map<String, Object> memberVariablesMap = scoringSingletonObj.createVariableValueMap("SearsTesting4", modelIdsList);
 				Map<String, Change> changedMemberVariablesMap = scoringSingletonObj.createChangedVariablesMap("SearsTesting4");
 				Map<String, Change> changedMemVariablesStrategy = scoringSingletonObj.executeStrategy(changedMemberVariablesMap, newChangesVarValueMap, memberVariablesMap);
+				int value = (Integer) changedMemVariablesStrategy.get("S_DSL_APP_INT_ACC").getValue();
 				List<Double> newScoreListActual = new LinkedList<Double>();
 				for(int modelId: modelIdsList){
 				double newScore = scoringSingletonObj.calcScore(memberVariablesMap, changedMemVariablesStrategy,modelId);
@@ -746,7 +746,7 @@ public class ScoringSingletonIntegrationTest {
 				newScoreListExpected.add(0.9977621514787237);
 				newScoreListExpected.add(0.9836975006285591);
 			//	Assert.assertEquals(newScoreListExpected, newScoreListActual);
-				Assert.assertEquals(0.4, memberVariablesMap.get("2270"));
+				Assert.assertEquals(12,value);
 		}
 	
 	//This test is tested for variable which is expired but newchangeVariableVaLueMap contains it
