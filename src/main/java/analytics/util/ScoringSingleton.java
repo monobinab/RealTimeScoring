@@ -225,7 +225,7 @@ public class ScoringSingleton {
 				Strategy strategy = StrategyMapper.getInstance().getStrategy(
 						variableNameToStrategyMap.get(variableName));
 				// If this member had a changed variable
-				if (allChanges.containsKey(variableName)) {
+				if (allChanges != null && allChanges.containsKey(variableName)) {
 					context.setPreviousValue(allChanges.get(variableName)
 							.getValue());
 				}
@@ -296,6 +296,9 @@ public class ScoringSingleton {
 	public double calcBaseScore(Map<String, Object> mbrVarMap,
 			Map<String, Change> varChangeMap, int modelId) throws RealTimeScoringException{
 
+		if(mbrVarMap == null){
+			throw new RealTimeScoringException("member variables is null");
+		}
 		Model model = null;
 
 		if (modelsMap.get(modelId) != null
@@ -314,9 +317,7 @@ public class ScoringSingleton {
 
 		for (String v : model.getVariables().keySet()) {
 			Variable variable = model.getVariables().get(v);
-			if(mbrVarMap == null){
-				throw new RealTimeScoringException("member variables is null");
-			}
+			
 			//need variableNameToVidMap here before mbrVarMap is checked for its variables
 			//String vid = variableNameToVidMap.get(variable.getName());
 			
