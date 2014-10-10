@@ -26,6 +26,7 @@ import analytics.util.dao.DivLnVariableDao;
 import analytics.util.objects.LineItem;
 import analytics.util.objects.ProcessTransaction;
 import analytics.util.objects.TransactionLineItem;
+import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -33,6 +34,7 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
+import com.ibm.jms.JMSBytesMessage;
 import com.ibm.jms.JMSMessage;
 
 public class TellurideParsingBoltPOS extends BaseRichBolt {
@@ -51,7 +53,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 	private Map<String, List<String>> divLnVariablesMap;
 	private Map<String, List<String>> divCatVariablesMap;
 	private String requestorID = "";
-
+	private MultiCountMetric countMetric;
 	public void setOutputCollector(OutputCollector outputCollector) {
 		this.outputCollector = outputCollector;
 	}
@@ -66,7 +68,9 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
+		
 		this.outputCollector = collector;
+	     initMetrics(context);
         System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
 		LOGGER.info("Preparing telluride parsing bolt");
 
@@ -85,6 +89,10 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 		divCatVariablesMap = divCatVariableDao.getDivCatVariable();
 	}
 
+	 void initMetrics(TopologyContext context){
+	     countMetric = new MultiCountMetric();
+	     context.registerMetric("custom_metrics", countMetric, 60);
+	    }
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -94,6 +102,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 	public void execute(Tuple input) {
 		if(LOGGER.isDebugEnabled())
 			LOGGER.debug("The time it enters inside Telluride parsing bolt execute method"+System.currentTimeMillis()+" and the message ID is ..."+input.getMessageId());
+		countMetric.scope("incoming_tuples").incr();
 		String lyl_id_no = "";
 		ProcessTransaction processTransaction = null;
 
@@ -102,15 +111,16 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 		JMSMessage documentNPOS = (JMSMessage) input.getValueByField("npos");
 
 		try {
-			transactionXmlAsString = convertStreamToString(documentNPOS);
+			if(documentNPOS instanceof JMSBytesMessage)
+				transactionXmlAsString = convertStreamToString(documentNPOS);
 		} catch (JMSException e) {
 			LOGGER.error("Unable to read message from MQ",e);
-			outputCollector.fail(input);
 		} catch (Exception e) {
 			LOGGER.error("Unable to read message from MQ",e);
-			outputCollector.fail(input);
 		}
 		if ( StringUtils.isEmpty(transactionXmlAsString)) {
+			countMetric.scope("empty_message").incr();
+			outputCollector.fail(input);
 			return;
 		}
 
@@ -164,12 +174,13 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 			lyl_id_no = processTransaction.getMemberNumber();
 
 			if (lyl_id_no==null || StringUtils.isEmpty(lyl_id_no)) {
+				countMetric.scope("empty_lid").incr();
+				outputCollector.fail(input);
 				return;
 			}
 
 			// 6) HASH LOYALTY ID
 			String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no);
-
 			// 7)FIND DIVISION #, ITEM #, AMOUNT AND
 			// FIND LINE FROM DIVISION # + ITEM #
 			// AND PUT INTO LINE ITEM CLASS CONTAINER WITH HASHED LOYALTY ID +
@@ -352,14 +363,23 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 					LOGGER.debug(requestorID + " Point of SALE is touched...");
 					LOGGER.debug(" *** telluride parsing bolt emitting: "
 						+ listToEmit.toString());
-
+					countMetric.scope("successful").incr();
+					outputCollector.ack(input);
 				// 9) EMIT VARIABLES TO VALUES MAP IN JSON DOCUMENT
 				if (listToEmit != null && !listToEmit.isEmpty()) {
 					this.outputCollector.emit(listToEmit);
 				}
 			}
+			else{
+				countMetric.scope("empty_lineitem").incr();
+				outputCollector.fail(input);
+				return;
+			}
 		}
-		outputCollector.ack(input);
+		else{
+			countMetric.scope("empty_xml").incr();
+			outputCollector.fail(input);
+		}
 	}
 	/*
 	 * (non-Javadoc)

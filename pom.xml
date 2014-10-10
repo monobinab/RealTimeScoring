@@ -94,11 +94,11 @@
         
     </repositories>
     <dependencies>
-    <dependency>
+    <!-- dependency>
     <groupId>org.codehaus.groovy</groupId>
     <artifactId>groovy-all</artifactId>
     <version>1.7.2</version>
-  </dependency>
+  </dependency-->
     
         <dependency>
 			<groupId>com.github.kevinsawicki</groupId>
@@ -322,7 +322,7 @@
 						<manifest>
 							<!--<mainClass></mainClass>-->
                             <!--mainClass>analytics.AAMTopology</mainClass-->
-                            <mainClass>analytics.RealTimeScoringTopology</mainClass>
+                            <mainClass>analytics.SYWEventsTopology</mainClass>
                             <!--mainClass>analytics.AAM_ATCTopology</mainClass-->
                             <!--mainClass>analytics.AAM_InternalSearchTopology</mainClass-->
 						</manifest>

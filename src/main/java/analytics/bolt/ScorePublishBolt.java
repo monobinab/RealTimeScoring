@@ -6,6 +6,7 @@ package analytics.bolt;
 import analytics.util.MongoNameConstants;
 import analytics.util.ScoringSingleton;
 import analytics.util.dao.MemberScoreDao;
+import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -35,7 +36,7 @@ public class ScorePublishBolt extends BaseRichBolt {
 
 	private JedisPool jedisPool;
 	private MemberScoreDao memberScoreDao;
-
+	private MultiCountMetric countMetric;
 	public ScorePublishBolt(String host, int port, String pattern) {
 		this.host = host;
 		this.port = port;
@@ -52,6 +53,7 @@ public class ScorePublishBolt extends BaseRichBolt {
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
         System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+	     initMetrics(context);
         JedisPoolConfig poolConfig = new JedisPoolConfig();
         poolConfig.setMaxActive(100);
         jedisPool = new JedisPool(poolConfig,host, port, 100);
@@ -59,6 +61,10 @@ public class ScorePublishBolt extends BaseRichBolt {
 		memberScoreDao = new MemberScoreDao();
 		this.outputCollector = collector;
 	}
+	 void initMetrics(TopologyContext context){
+	     countMetric = new MultiCountMetric();
+	     context.registerMetric("custom_metrics", countMetric, 60);
+	    }
 
 	/*
 	 * (non-Javadoc)
@@ -67,6 +73,7 @@ public class ScorePublishBolt extends BaseRichBolt {
 	 */
 	@Override
 	public void execute(Tuple input) {
+		countMetric.scope("incoming_tuples").incr();
 		LOGGER.debug("The time it enters inside Score Publish Bolt execute method "
 				+ System.currentTimeMillis());
 		// System.out.println(" %%% scorepublishbolt :" + input);
@@ -99,6 +106,7 @@ public class ScorePublishBolt extends BaseRichBolt {
 				retryCount++;
 			}
 		}
+		countMetric.scope("publish_successful").incr();
 		outputCollector.ack(input);
 	}
 

@@ -10,6 +10,7 @@ import analytics.bolt.StrategyScoringBolt;
 import analytics.bolt.TellurideParsingBoltPOS;
 import analytics.spout.WebsphereMQSpout;
 import analytics.util.MQConnectionConfig;
+import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
 import analytics.util.RedisConnection;
 import analytics.util.WebsphereMQCredential;
@@ -65,7 +66,7 @@ public class RealTimeScoringTellurideTopology {
 										.getQueueName()), 2);
 
 		// create definition of main spout for queue 1
-		topologyBuilder.setBolt("parsing_bolt", new TellurideParsingBoltPOS(), 8)
+		topologyBuilder.setBolt("parsing_bolt", new TellurideParsingBoltPOS(), 6)
 				.shuffleGrouping("telluride1").shuffleGrouping("telluride2");
         topologyBuilder.setBolt("strategy_scoring_bolt", new StrategyScoringBolt(), 8).shuffleGrouping("parsing_bolt");
         //Redis publish to server 1
@@ -74,6 +75,7 @@ public class RealTimeScoringTellurideTopology {
 
 
 		Config conf = new Config();
+		conf.registerMetricsConsumer(MetricsListener.class, 2);
 		conf.setDebug(false);
 		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
 		if (args.length > 0) {

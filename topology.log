@@ -1,0 +1,244 @@
+2014-10-10 11:52:43,445 INFO    [Thread-25-parsing_bolt] a.b.TellurideParsingBoltPOS:76 - Preparing telluride parsing bolt
+2014-10-10 11:52:43,455 INFO    [Thread-22-member_publish_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:52:43,448 INFO    [Thread-20-member_publish_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:52:43,465 INFO    [Thread-25-parsing_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:52:43,472 INFO    [Thread-27-parsing_bolt] a.b.TellurideParsingBoltPOS:76 - Preparing telluride parsing bolt
+2014-10-10 11:52:43,477 INFO    [Thread-27-parsing_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:52:43,485 INFO    [Thread-29-parsing_bolt] a.b.TellurideParsingBoltPOS:76 - Preparing telluride parsing bolt
+2014-10-10 11:52:43,490 INFO    [Thread-29-parsing_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:52:43,510 INFO    [Thread-31-score_publish_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:52:43,517 INFO    [Thread-33-score_publish_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:52:43,532 INFO    [Thread-35-score_publish_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:52:43,548 INFO    [Thread-37-strategy_scoring_bolt] a.b.StrategyScoringBolt:43 - PREPARING STRATEGY SCORING BOLT
+2014-10-10 11:52:43,559 INFO    [Thread-39-strategy_scoring_bolt] a.b.StrategyScoringBolt:43 - PREPARING STRATEGY SCORING BOLT
+2014-10-10 11:52:43,573 INFO    [Thread-41-strategy_scoring_bolt] a.b.StrategyScoringBolt:43 - PREPARING STRATEGY SCORING BOLT
+2014-10-10 11:52:43,594 INFO    [Thread-43-telluride1] a.s.WebsphereMQSpout:67 - Spout connecting to MQ queue
+2014-10-10 11:52:43,610 INFO    [Thread-45-telluride1] a.s.WebsphereMQSpout:67 - Spout connecting to MQ queue
+2014-10-10 11:52:43,637 INFO    [Thread-47-telluride2] a.s.WebsphereMQSpout:67 - Spout connecting to MQ queue
+2014-10-10 11:52:43,651 INFO    [Thread-49-telluride2] a.s.WebsphereMQSpout:67 - Spout connecting to MQ queue
+2014-10-10 11:52:43,846 INFO    [Thread-33-score_publish_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:52:43,846 INFO    [Thread-20-member_publish_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:52:43,847 INFO    [Thread-25-parsing_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:52:43,847 INFO    [Thread-35-score_publish_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:52:43,847 INFO    [Thread-29-parsing_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:52:43,847 INFO    [Thread-31-score_publish_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:52:43,849 INFO    [Thread-27-parsing_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:52:43,849 INFO    [Thread-22-member_publish_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:52:44,012 INFO    [Thread-25-parsing_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:52:44,014 INFO    [Thread-25-parsing_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:52:44,014 INFO    [Thread-27-parsing_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:52:44,015 INFO    [Thread-27-parsing_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:52:44,052 INFO    [Thread-29-parsing_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:52:44,053 INFO    [Thread-29-parsing_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:52:44,076 INFO    [Thread-27-parsing_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:52:44,077 INFO    [Thread-27-parsing_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:52:44,107 INFO    [Thread-25-parsing_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:52:44,108 INFO    [Thread-25-parsing_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:52:44,112 INFO    [Thread-29-parsing_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:52:44,113 INFO    [Thread-29-parsing_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:52:44,154 INFO    [Thread-27-parsing_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:52:44,154 INFO    [Thread-27-parsing_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:52:44,171 INFO    [Thread-25-parsing_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:52:44,174 INFO    [Thread-25-parsing_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:52:44,191 INFO    [Thread-29-parsing_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:52:44,192 INFO    [Thread-29-parsing_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:52:53,619 INFO    [Thread-37-strategy_scoring_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:52:53,628 INFO    [Thread-37-strategy_scoring_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:52:53,744 INFO    [Thread-37-strategy_scoring_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:52:53,762 INFO    [Thread-37-strategy_scoring_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:52:56,168 INFO    [Thread-37-strategy_scoring_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:52:56,180 INFO    [Thread-37-strategy_scoring_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:53:00,247 INFO    [Thread-37-strategy_scoring_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:53:00,259 INFO    [Thread-37-strategy_scoring_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:53:00,612 INFO    [Thread-37-strategy_scoring_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:53:00,622 INFO    [Thread-37-strategy_scoring_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:53:04,691 INFO    [Thread-37-strategy_scoring_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:53:04,692 INFO    [Thread-37-strategy_scoring_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:53:04,758 INFO    [Thread-37-strategy_scoring_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:53:04,759 INFO    [Thread-37-strategy_scoring_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:53:55,117 ERROR   [Thread-25-parsing_bolt] a.b.TellurideParsingBoltPOS:221 - Unable to find div cat information for005665887
+2014-10-10 11:54:30,197 ERROR   [Thread-29-parsing_bolt] a.b.TellurideParsingBoltPOS:221 - Unable to find div cat information for008776530
+2014-10-10 11:55:34,395 INFO    [main] a.RealTimeScoringTellurideTopology:36 - Starting telluride real time scoring topology
+2014-10-10 11:55:53,891 INFO    [main] a.u.RedisConnection:21 - Using production properties
+2014-10-10 11:55:53,898 INFO    [main] a.u.RedisConnection:21 - Using production properties
+2014-10-10 11:55:58,957 INFO    [main] c.n.c.f.i.CuratorFrameworkImpl:157 - Starting
+2014-10-10 11:55:59,133 INFO    [main] c.n.c.f.i.CuratorFrameworkImpl:157 - Starting
+2014-10-10 11:55:59,429 INFO    [main] c.n.c.f.i.CuratorFrameworkImpl:157 - Starting
+2014-10-10 11:55:59,520 INFO    [main] c.n.c.f.i.CuratorFrameworkImpl:157 - Starting
+2014-10-10 11:55:59,531 INFO    [main] c.n.c.f.i.CuratorFrameworkImpl:157 - Starting
+2014-10-10 11:55:59,644 INFO    [main] c.n.c.f.i.CuratorFrameworkImpl:157 - Starting
+2014-10-10 11:55:59,733 INFO    [main] c.n.c.f.i.CuratorFrameworkImpl:157 - Starting
+2014-10-10 11:55:59,866 INFO    [main] c.n.c.f.i.CuratorFrameworkImpl:157 - Starting
+2014-10-10 11:56:00,052 INFO    [main] c.n.c.f.i.CuratorFrameworkImpl:157 - Starting
+2014-10-10 11:56:00,129 INFO    [main] c.n.c.f.i.CuratorFrameworkImpl:157 - Starting
+2014-10-10 11:56:01,872 INFO    [Thread-9] c.n.c.f.i.CuratorFrameworkImpl:157 - Starting
+2014-10-10 11:56:02,002 INFO    [Thread-9] c.n.c.f.i.CuratorFrameworkImpl:157 - Starting
+2014-10-10 11:56:02,455 INFO    [Thread-25-parsing_bolt] a.b.TellurideParsingBoltPOS:76 - Preparing telluride parsing bolt
+2014-10-10 11:56:02,474 INFO    [Thread-22-member_publish_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:56:02,476 INFO    [Thread-20-member_publish_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:56:02,476 INFO    [Thread-27-parsing_bolt] a.b.TellurideParsingBoltPOS:76 - Preparing telluride parsing bolt
+2014-10-10 11:56:02,478 INFO    [Thread-25-parsing_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:56:02,491 INFO    [Thread-29-parsing_bolt] a.b.TellurideParsingBoltPOS:76 - Preparing telluride parsing bolt
+2014-10-10 11:56:02,498 INFO    [Thread-27-parsing_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:56:02,504 INFO    [Thread-29-parsing_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:56:02,522 INFO    [Thread-31-score_publish_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:56:02,537 INFO    [Thread-33-score_publish_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:56:02,547 INFO    [Thread-35-score_publish_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:56:02,552 INFO    [Thread-37-strategy_scoring_bolt] a.b.StrategyScoringBolt:43 - PREPARING STRATEGY SCORING BOLT
+2014-10-10 11:56:02,560 INFO    [Thread-39-strategy_scoring_bolt] a.b.StrategyScoringBolt:43 - PREPARING STRATEGY SCORING BOLT
+2014-10-10 11:56:02,569 INFO    [Thread-41-strategy_scoring_bolt] a.b.StrategyScoringBolt:43 - PREPARING STRATEGY SCORING BOLT
+2014-10-10 11:56:02,598 INFO    [Thread-43-telluride1] a.s.WebsphereMQSpout:67 - Spout connecting to MQ queue
+2014-10-10 11:56:02,607 INFO    [Thread-45-telluride1] a.s.WebsphereMQSpout:67 - Spout connecting to MQ queue
+2014-10-10 11:56:02,623 INFO    [Thread-47-telluride2] a.s.WebsphereMQSpout:67 - Spout connecting to MQ queue
+2014-10-10 11:56:02,638 INFO    [Thread-49-telluride2] a.s.WebsphereMQSpout:67 - Spout connecting to MQ queue
+2014-10-10 11:56:02,765 INFO    [Thread-31-score_publish_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:56:02,765 INFO    [Thread-25-parsing_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:56:02,765 INFO    [Thread-33-score_publish_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:56:02,766 INFO    [Thread-29-parsing_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:56:02,765 INFO    [Thread-35-score_publish_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:56:02,765 INFO    [Thread-27-parsing_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:56:02,766 INFO    [Thread-22-member_publish_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:56:02,766 INFO    [Thread-20-member_publish_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:56:02,933 INFO    [Thread-29-parsing_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:56:02,934 INFO    [Thread-29-parsing_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:56:02,937 INFO    [Thread-27-parsing_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:56:02,937 INFO    [Thread-25-parsing_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:56:02,938 INFO    [Thread-27-parsing_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:56:02,940 INFO    [Thread-25-parsing_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:56:02,998 INFO    [Thread-29-parsing_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:56:02,999 INFO    [Thread-29-parsing_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:56:03,016 INFO    [Thread-27-parsing_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:56:03,017 INFO    [Thread-27-parsing_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:56:03,021 INFO    [Thread-25-parsing_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:56:03,022 INFO    [Thread-25-parsing_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:56:03,061 INFO    [Thread-29-parsing_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:56:03,063 INFO    [Thread-29-parsing_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:56:03,082 INFO    [Thread-25-parsing_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:56:03,086 INFO    [Thread-25-parsing_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:56:03,092 INFO    [Thread-27-parsing_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:56:03,093 INFO    [Thread-27-parsing_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:56:05,406 ERROR   [Thread-25-parsing_bolt] a.b.TellurideParsingBoltPOS:221 - Unable to find div cat information for006208570
+2014-10-10 11:56:18,550 INFO    [Thread-41-strategy_scoring_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:56:18,552 INFO    [Thread-41-strategy_scoring_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:56:18,637 INFO    [Thread-41-strategy_scoring_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:56:18,652 INFO    [Thread-41-strategy_scoring_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:56:22,962 INFO    [Thread-41-strategy_scoring_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:56:22,964 INFO    [Thread-41-strategy_scoring_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:56:23,026 INFO    [Thread-41-strategy_scoring_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:56:23,027 INFO    [Thread-41-strategy_scoring_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:56:23,106 INFO    [Thread-41-strategy_scoring_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:56:23,110 INFO    [Thread-41-strategy_scoring_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:56:23,539 INFO    [Thread-41-strategy_scoring_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:56:23,541 INFO    [Thread-41-strategy_scoring_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:56:23,788 INFO    [Thread-41-strategy_scoring_bolt] a.u.DBConnection:36 - Using production properties
+2014-10-10 11:56:23,789 INFO    [Thread-41-strategy_scoring_bolt] a.u.DBConnection:56 - Connection is established....test
+2014-10-10 11:56:24,560 WARN    [Thread-39-strategy_scoring_bolt] a.b.StrategyScoringBolt:100 - Unable to find member variables forjJ1xCwks2XqJsyGWZv+8dqffR54=
+2014-10-10 11:56:27,305 WARN    [Thread-37-strategy_scoring_bolt] a.b.StrategyScoringBolt:100 - Unable to find member variables for4qEosTUK6HezNYnJ9uMXzii1MVk=
+2014-10-10 11:56:27,414 WARN    [Thread-37-strategy_scoring_bolt] a.b.StrategyScoringBolt:100 - Unable to find member variables forFxjYkrKh1pp2Bb2MzfOnuikAXiE=
+2014-10-10 11:56:27,955 ERROR   [Thread-27-parsing_bolt] a.b.TellurideParsingBoltPOS:221 - Unable to find div cat information for006769949
+2014-10-10 11:56:29,750 WARN    [Thread-41-strategy_scoring_bolt] a.b.StrategyScoringBolt:100 - Unable to find member variables forEREl62BtANvl+vFNIkYybJUxDR4=
+2014-10-10 11:56:32,053 WARN    [Thread-41-strategy_scoring_bolt] a.b.StrategyScoringBolt:100 - Unable to find member variables for1XSnW08cUxZ3+UQMppz7/YY6Xqw=
+2014-10-10 11:56:32,445 WARN    [Thread-41-strategy_scoring_bolt] a.b.StrategyScoringBolt:100 - Unable to find member variables forhMEmELXKhk/rDPjE04XwtvVTLnA=
+2014-10-10 11:56:32,808 ERROR   [Thread-31-score_publish_bolt] a.b.ScorePublishBolt:98 - Could not get a resource from the pool
+redis.clients.jedis.exceptions.JedisConnectionException: Could not get a resource from the pool
+	at redis.clients.util.Pool.getResource(Pool.java:22) ~[jedis-2.1.0.jar:na]
+	at analytics.bolt.ScorePublishBolt.execute(ScorePublishBolt.java:94) ~[classes/:na]
+	at backtype.storm.daemon.executor$fn__3498$tuple_action_fn__3500.invoke(executor.clj:615) [storm-core-0.9.0.1.jar:na]
+	at backtype.storm.daemon.executor$mk_task_receiver$fn__3421.invoke(executor.clj:383) [storm-core-0.9.0.1.jar:na]
+	at backtype.storm.disruptor$clojure_handler$reify__2962.onEvent(disruptor.clj:43) [storm-core-0.9.0.1.jar:na]
+	at backtype.storm.utils.DisruptorQueue.consumeBatchToCursor(DisruptorQueue.java:87) [storm-core-0.9.0.1.jar:na]
+	at backtype.storm.utils.DisruptorQueue.consumeBatchWhenAvailable(DisruptorQueue.java:61) [storm-core-0.9.0.1.jar:na]
+	at backtype.storm.disruptor$consume_batch_when_available.invoke(disruptor.clj:62) [storm-core-0.9.0.1.jar:na]
+	at backtype.storm.daemon.executor$fn__3498$fn__3510$fn__3557.invoke(executor.clj:730) [storm-core-0.9.0.1.jar:na]
+	at backtype.storm.util$async_loop$fn__444.invoke(util.clj:403) [storm-core-0.9.0.1.jar:na]
+	at clojure.lang.AFn.run(AFn.java:24) [clojure-1.4.0.jar:na]
+	at java.lang.Thread.run(Unknown Source) [na:1.7.0_65]
+Caused by: redis.clients.jedis.exceptions.JedisConnectionException: java.net.SocketTimeoutException: connect timed out
+	at redis.clients.jedis.Connection.connect(Connection.java:134) ~[jedis-2.1.0.jar:na]
+	at redis.clients.jedis.BinaryClient.connect(BinaryClient.java:69) ~[jedis-2.1.0.jar:na]
+	at redis.clients.jedis.BinaryJedis.connect(BinaryJedis.java:1665) ~[jedis-2.1.0.jar:na]
+	at redis.clients.jedis.JedisPool$JedisFactory.makeObject(JedisPool.java:72) ~[jedis-2.1.0.jar:na]
+	at org.apache.commons.pool.impl.GenericObjectPool.borrowObject(GenericObjectPool.java:1158) ~[commons-pool-1.5.5.jar:1.5.5]
+	at redis.clients.util.Pool.getResource(Pool.java:20) ~[jedis-2.1.0.jar:na]
+	... 11 common frames omitted
+Caused by: java.net.SocketTimeoutException: connect timed out
+	at java.net.DualStackPlainSocketImpl.waitForConnect(Native Method) ~[na:1.7.0_65]
+	at java.net.DualStackPlainSocketImpl.socketConnect(Unknown Source) ~[na:1.7.0_65]
+	at java.net.AbstractPlainSocketImpl.doConnect(Unknown Source) ~[na:1.7.0_65]
+	at java.net.AbstractPlainSocketImpl.connectToAddress(Unknown Source) ~[na:1.7.0_65]
+	at java.net.AbstractPlainSocketImpl.connect(Unknown Source) ~[na:1.7.0_65]
+	at java.net.PlainSocketImpl.connect(Unknown Source) ~[na:1.7.0_65]
+	at java.net.SocksSocketImpl.connect(Unknown Source) ~[na:1.7.0_65]
+	at java.net.Socket.connect(Unknown Source) ~[na:1.7.0_65]
+	at redis.clients.jedis.Connection.connect(Connection.java:129) ~[jedis-2.1.0.jar:na]
+	... 16 common frames omitted
+2014-10-10 11:56:33,269 WARN    [Thread-39-strategy_scoring_bolt] a.b.StrategyScoringBolt:100 - Unable to find member variables forsTJ6qBg9eAy0mBRt4jrxbk50tZE=
+2014-10-10 11:56:33,769 WARN    [Thread-37-strategy_scoring_bolt] a.b.StrategyScoringBolt:100 - Unable to find member variables for+EKw2QAUHTd77IdDHxO5pQd7wqo=
+2014-10-10 11:56:33,790 WARN    [Thread-37-strategy_scoring_bolt] a.b.StrategyScoringBolt:100 - Unable to find member variables forFlBJ0FxoTdEM4+9H3ukBnqNkJhU=
+2014-10-10 11:56:34,469 WARN    [Thread-37-strategy_scoring_bolt] a.b.StrategyScoringBolt:100 - Unable to find member variables forGirF68G916aQ1q0Q1tPAqAf9H18=
+2014-10-10 11:56:34,484 WARN    [Thread-41-strategy_scoring_bolt] a.b.StrategyScoringBolt:100 - Unable to find member variables forA45YFo6/Qgltqo+pCmiMUj6gV+A=
+2014-10-10 11:56:35,354 WARN    [Thread-37-strategy_scoring_bolt] a.b.StrategyScoringBolt:100 - Unable to find member variables forM6pGjn8o0ft2/AXxIOwDHQK5HCc=
+2014-10-10 11:56:36,654 WARN    [Thread-41-strategy_scoring_bolt] a.b.StrategyScoringBolt:100 - Unable to find member variables forZVHP/eylLaUHvzOW84VuOFgGQcE=
+2014-10-10 11:56:36,996 WARN    [Thread-39-strategy_scoring_bolt] a.b.StrategyScoringBolt:100 - Unable to find member variables forEA4++7QOVH0QSPxdKdKLhfePefo=
+2014-10-10 11:56:37,734 WARN    [Thread-37-strategy_scoring_bolt] a.b.StrategyScoringBolt:100 - Unable to find member variables forqc8u6elCBQQOPOu+0UuTnhStsA8=
+2014-10-10 11:56:37,870 WARN    [Thread-41-strategy_scoring_bolt] a.b.StrategyScoringBolt:100 - Unable to find member variables forJvHJuU4+3zUijLNPW3w5xLSN8/g=
+2014-10-10 11:56:37,890 WARN    [Thread-41-strategy_scoring_bolt] a.b.StrategyScoringBolt:100 - Unable to find member variables forzUYY9VqDTpeiKCxEqrGdyDzIr/g=
+2014-10-10 11:56:39,010 WARN    [Thread-37-strategy_scoring_bolt] a.b.StrategyScoringBolt:100 - Unable to find member variables for25tHYM8r7Nv4ZbOmK/aIKDred4s=
+2014-10-10 11:56:39,671 WARN    [Thread-37-strategy_scoring_bolt] a.b.StrategyScoringBolt:100 - Unable to find member variables fory8P42rW/uxpsJL3B2koSFwh6gzg=
+2014-10-10 11:56:40,935 WARN    [Thread-39-strategy_scoring_bolt] a.b.StrategyScoringBolt:100 - Unable to find member variables forZuUAZGIlnKDm0GfSy++v+OAg23o=
+2014-10-10 11:56:44,236 WARN    [Thread-39-strategy_scoring_bolt] a.b.StrategyScoringBolt:100 - Unable to find member variables for6teIhGJJbmSZS2pV7gM7jU/ijBc=
+2014-10-10 11:56:45,209 WARN    [Thread-41-strategy_scoring_bolt] a.b.StrategyScoringBolt:100 - Unable to find member variables forlAKWzbQo2dngChhhwLUo2VyVNOE=
+2014-10-10 11:56:46,743 ERROR   [Thread-29-parsing_bolt] a.b.TellurideParsingBoltPOS:221 - Unable to find div cat information for006769949
+2014-10-10 11:56:46,901 WARN    [Thread-37-strategy_scoring_bolt] a.b.StrategyScoringBolt:100 - Unable to find member variables fortgmPAvSlFGATyI5KMl2CRyZvy+w=
+2014-10-10 11:56:46,988 WARN    [Thread-41-strategy_scoring_bolt] a.b.StrategyScoringBolt:100 - Unable to find member variables forib9EuVHwma8Ma93AbOBwlBzTlRY=
+2014-10-10 11:56:47,041 WARN    [Thread-37-strategy_scoring_bolt] a.b.StrategyScoringBolt:100 - Unable to find member variables forTFEFI5qj7ECPPknUCVnRa3bzPYw=
+2014-10-10 11:56:47,868 WARN    [Thread-37-strategy_scoring_bolt] a.b.StrategyScoringBolt:100 - Unable to find member variables forq5DuNPuyL+Y849dHhR/A2gRh7OU=
+2014-10-10 11:56:48,327 WARN    [Thread-41-strategy_scoring_bolt] a.b.StrategyScoringBolt:100 - Unable to find member variables forwb/+sVXxa5pKJKyvJJZBtzbz8SU=
+2014-10-10 11:56:48,533 WARN    [Thread-41-strategy_scoring_bolt] a.b.StrategyScoringBolt:100 - Unable to find member variables for54SmShWnKMRhzDbCmmA/r/Pl7TA=
+2014-10-10 11:56:48,553 WARN    [Thread-41-strategy_scoring_bolt] a.b.StrategyScoringBolt:100 - Unable to find member variables forX8j1YAr7OWbDMIScbUb2k2/DQIg=
+2014-10-10 11:56:49,138 WARN    [Thread-37-strategy_scoring_bolt] a.b.StrategyScoringBolt:100 - Unable to find member variables forHoRNgbmvd/akySh12IX2It0Pr/8=
+2014-10-10 11:56:50,288 WARN    [Thread-37-strategy_scoring_bolt] a.b.StrategyScoringBolt:100 - Unable to find member variables for1ZQbesiYBoal2Swe0oKVDHhKDEY=
+2014-10-10 11:56:52,891 WARN    [Thread-41-strategy_scoring_bolt] a.b.StrategyScoringBolt:100 - Unable to find member variables for3jUcSY+O/A83/JxKSCydId4qNkM=
+2014-10-10 11:56:52,912 WARN    [Thread-41-strategy_scoring_bolt] a.b.StrategyScoringBolt:100 - Unable to find member variables forZIDwVTWLyArGDT0KXi+Pasfwiz0=
+2014-10-10 11:56:53,270 WARN    [Thread-39-strategy_scoring_bolt] a.b.StrategyScoringBolt:100 - Unable to find member variables forF1pvkesjAj5ixQOUxfHf2uGWUXs=
+2014-10-10 11:56:54,245 WARN    [Thread-41-strategy_scoring_bolt] a.b.StrategyScoringBolt:100 - Unable to find member variables forvyK53paizQ0PioDMyfxO2ZUD4Kk=
+2014-10-10 11:59:18,116 INFO    [main] a.b.ParsingBoltSYW:80 - Ignore interaction typeTagItem
+2014-10-10 11:59:24,369 INFO    [main] o.a.c.f.i.CuratorFrameworkImpl:223 - Starting
+2014-10-10 11:59:24,468 INFO    [main-EventThread] o.a.c.f.s.ConnectionStateManager:194 - State change: CONNECTED
+2014-10-10 11:59:24,468 WARN    [ConnectionStateManager-0] o.a.c.f.s.ConnectionStateManager:212 - There are no ConnectionStateListeners registered.
+2014-10-10 11:59:25,617 INFO    [main] o.a.c.f.i.CuratorFrameworkImpl:223 - Starting
+2014-10-10 11:59:25,664 INFO    [main-EventThread] o.a.c.f.s.ConnectionStateManager:194 - State change: CONNECTED
+2014-10-10 11:59:25,664 WARN    [ConnectionStateManager-0] o.a.c.f.s.ConnectionStateManager:212 - There are no ConnectionStateListeners registered.
+2014-10-10 11:59:26,821 INFO    [main] o.a.c.f.i.CuratorFrameworkImpl:223 - Starting
+2014-10-10 11:59:26,849 INFO    [main-EventThread] o.a.c.f.s.ConnectionStateManager:194 - State change: CONNECTED
+2014-10-10 11:59:26,850 WARN    [ConnectionStateManager-0] o.a.c.f.s.ConnectionStateManager:212 - There are no ConnectionStateListeners registered.
+2014-10-10 11:59:26,871 INFO    [main] o.a.c.f.i.CuratorFrameworkImpl:223 - Starting
+2014-10-10 11:59:26,884 INFO    [main] o.a.c.f.i.CuratorFrameworkImpl:223 - Starting
+2014-10-10 11:59:26,907 INFO    [main-EventThread] o.a.c.f.s.ConnectionStateManager:194 - State change: CONNECTED
+2014-10-10 11:59:26,908 WARN    [ConnectionStateManager-0] o.a.c.f.s.ConnectionStateManager:212 - There are no ConnectionStateListeners registered.
+2014-10-10 11:59:26,927 INFO    [main-EventThread] o.a.c.f.s.ConnectionStateManager:194 - State change: CONNECTED
+2014-10-10 11:59:26,927 WARN    [ConnectionStateManager-0] o.a.c.f.s.ConnectionStateManager:212 - There are no ConnectionStateListeners registered.
+2014-10-10 11:59:26,951 INFO    [main] o.a.c.f.i.CuratorFrameworkImpl:223 - Starting
+2014-10-10 11:59:27,017 INFO    [main-EventThread] o.a.c.f.s.ConnectionStateManager:194 - State change: CONNECTED
+2014-10-10 11:59:27,018 WARN    [ConnectionStateManager-0] o.a.c.f.s.ConnectionStateManager:212 - There are no ConnectionStateListeners registered.
+2014-10-10 11:59:27,055 INFO    [main] o.a.c.f.i.CuratorFrameworkImpl:223 - Starting
+2014-10-10 11:59:27,084 INFO    [main-EventThread] o.a.c.f.s.ConnectionStateManager:194 - State change: CONNECTED
+2014-10-10 11:59:27,084 WARN    [ConnectionStateManager-0] o.a.c.f.s.ConnectionStateManager:212 - There are no ConnectionStateListeners registered.
+2014-10-10 11:59:27,105 INFO    [main] o.a.c.f.i.CuratorFrameworkImpl:223 - Starting
+2014-10-10 11:59:27,138 INFO    [main-EventThread] o.a.c.f.s.ConnectionStateManager:194 - State change: CONNECTED
+2014-10-10 11:59:27,140 WARN    [ConnectionStateManager-0] o.a.c.f.s.ConnectionStateManager:212 - There are no ConnectionStateListeners registered.
+2014-10-10 11:59:27,240 INFO    [main] o.a.c.f.i.CuratorFrameworkImpl:223 - Starting
+2014-10-10 11:59:27,274 INFO    [main-EventThread] o.a.c.f.s.ConnectionStateManager:194 - State change: CONNECTED
+2014-10-10 11:59:27,275 WARN    [ConnectionStateManager-0] o.a.c.f.s.ConnectionStateManager:212 - There are no ConnectionStateListeners registered.
+2014-10-10 11:59:27,301 INFO    [main] o.a.c.f.i.CuratorFrameworkImpl:223 - Starting
+2014-10-10 11:59:27,344 INFO    [main-EventThread] o.a.c.f.s.ConnectionStateManager:194 - State change: CONNECTED
+2014-10-10 11:59:27,345 WARN    [ConnectionStateManager-0] o.a.c.f.s.ConnectionStateManager:212 - There are no ConnectionStateListeners registered.
+2014-10-10 11:59:28,850 INFO    [Thread-6] o.a.c.f.i.CuratorFrameworkImpl:223 - Starting
+2014-10-10 11:59:28,903 INFO    [Thread-6-EventThread] o.a.c.f.s.ConnectionStateManager:194 - State change: CONNECTED
+2014-10-10 11:59:28,904 WARN    [ConnectionStateManager-0] o.a.c.f.s.ConnectionStateManager:212 - There are no ConnectionStateListeners registered.
+2014-10-10 11:59:28,927 INFO    [Thread-6] o.a.c.f.i.CuratorFrameworkImpl:223 - Starting
+2014-10-10 11:59:28,977 INFO    [Thread-6-EventThread] o.a.c.f.s.ConnectionStateManager:194 - State change: CONNECTED
+2014-10-10 11:59:28,977 WARN    [ConnectionStateManager-0] o.a.c.f.s.ConnectionStateManager:212 - There are no ConnectionStateListeners registered.
+2014-10-10 11:59:29,381 INFO    [Thread-16-strategy_scoring_bolt] a.b.StrategyScoringBolt:43 - PREPARING STRATEGY SCORING BOLT
+2014-10-10 11:59:29,389 INFO    [Thread-18-strategy_scoring_bolt] a.b.StrategyScoringBolt:43 - PREPARING STRATEGY SCORING BOLT
+2014-10-10 11:59:29,397 INFO    [Thread-20-strategy_scoring_bolt] a.b.StrategyScoringBolt:43 - PREPARING STRATEGY SCORING BOLT
