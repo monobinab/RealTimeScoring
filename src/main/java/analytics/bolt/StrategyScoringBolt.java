@@ -9,6 +9,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import analytics.exception.RealTimeScoringException;
 import analytics.util.JsonUtils;
 import analytics.util.MongoNameConstants;
 import analytics.util.ScoringSingleton;
@@ -114,30 +115,35 @@ public class StrategyScoringBolt extends BaseRichBolt {
 		for (Integer modelId : modelIdList) {// Score and emit for all modelIds
 												// before mongo inserts
 			// recalculate score for model
-			double newScore = ScoringSingleton.getInstance().calcScore(memberVariablesMap, allChanges,
-					modelId);
+			double newScore;
+			try {
+				newScore = ScoringSingleton.getInstance().calcScore(memberVariablesMap, allChanges,
+						modelId);
+				LOGGER.debug("new score before boost var: " + newScore);
 
-			LOGGER.debug("new score before boost var: " + newScore);
+				newScore = newScore + ScoringSingleton.getInstance().getBoostScore(allChanges, modelId );
+				// 9) Emit the new score
+				double oldScore = 0;
+				// TODO: Why are we even emiting oldScore if its always 0
+				List<Object> listToEmit = new ArrayList<Object>();
+				listToEmit.add(lId);
+				listToEmit.add(oldScore);
+				listToEmit.add(newScore);
+				listToEmit.add(modelId.toString());
+				listToEmit.add(source);
+				listToEmit.add(messageID);
+				modelIdScoreMap.put(modelId, newScore);
+				LOGGER.debug(" ### SCORING BOLT EMITTING: " + listToEmit);
+				if(LOGGER.isDebugEnabled())
+				LOGGER.debug("The time spent for creating scores..... "
+						+ System.currentTimeMillis() + " and the message ID is ..."
+						+ messageID);
+				this.outputCollector.emit("score_stream",listToEmit);
+			} catch (RealTimeScoringException e) {
+				LOGGER.error(e.getErrorMessage());
+				return;
+			}
 
-			newScore = newScore + ScoringSingleton.getInstance().getBoostScore(allChanges, modelId );
-
-			// 9) Emit the new score
-			double oldScore = 0;
-			// TODO: Why are we even emiting oldScore if its always 0
-			List<Object> listToEmit = new ArrayList<Object>();
-			listToEmit.add(lId);
-			listToEmit.add(oldScore);
-			listToEmit.add(newScore);
-			listToEmit.add(modelId.toString());
-			listToEmit.add(source);
-			listToEmit.add(messageID);
-			modelIdScoreMap.put(modelId, newScore);
-			LOGGER.debug(" ### SCORING BOLT EMITTING: " + listToEmit);
-			if(LOGGER.isDebugEnabled())
-			LOGGER.debug("The time spent for creating scores..... "
-					+ System.currentTimeMillis() + " and the message ID is ..."
-					+ messageID);
-			this.outputCollector.emit("score_stream",listToEmit);
 		}
 
 
