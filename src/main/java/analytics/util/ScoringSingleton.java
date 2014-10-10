@@ -13,6 +13,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import analytics.exception.RealTimeScoringException;
 import analytics.util.dao.ChangedMemberScoresDao;
 import analytics.util.dao.ChangedMemberVariablesDao;
 import analytics.util.dao.MemberVariablesDao;
@@ -22,6 +23,7 @@ import analytics.util.dao.ModelSywBoostDao;
 //TODO: end update
 import analytics.util.dao.ModelVariablesDao;
 import analytics.util.dao.VariableDao;
+import analytics.util.objects.Boost;
 import analytics.util.objects.Change;
 import analytics.util.objects.ChangedMemberScore;
 import analytics.util.objects.Model;
@@ -100,7 +102,7 @@ public class ScoringSingleton {
 	
 	//TODO: Replace this method. Its for backward compatibility. Bad coding
 	public HashMap<String, Double> execute(String loyaltyId,
-			ArrayList<String> modelIdArrayList, String source) {
+			ArrayList<String> modelIdArrayList, String source) throws RealTimeScoringException {
 		Set<Integer> modelIdList = new HashSet<Integer>();
 		for(String model: modelIdArrayList){
 			modelIdList.add(Integer.parseInt(model));
@@ -130,7 +132,7 @@ public class ScoringSingleton {
 	
 	public Map<String, Object> createVariableValueMap(String loyaltyId,
 			Set<Integer> modelIdList) {
-		Map<String,Integer> variableFilter = new HashMap<String, Integer>();
+		List<String> variableFilter = new ArrayList<String>();
     	for (Integer modId : modelIdList) {
 			int month;
 			if (modelsMap.get(modId).containsKey(0)) {
@@ -144,7 +146,7 @@ public class ScoringSingleton {
 				if(variableNameToVidMap.get(var)==null){
 					LOGGER.error("VID is null for variable " + var);
 				}
-				variableFilter.put(variableNameToVidMap.get(var), 1);
+				variableFilter.add(variableNameToVidMap.get(var));
 			}
 			}
 			else{
@@ -224,7 +226,7 @@ public class ScoringSingleton {
 				Strategy strategy = StrategyMapper.getInstance().getStrategy(
 						variableNameToStrategyMap.get(variableName));
 				// If this member had a changed variable
-				if (allChanges.containsKey(variableName)) {
+				if (allChanges != null && allChanges.containsKey(variableName)) {
 					context.setPreviousValue(allChanges.get(variableName)
 							.getValue());
 				}
@@ -250,33 +252,43 @@ public class ScoringSingleton {
 	public double getBoostScore(Map<String, Change> allChanges, Integer modelId) {
 		double boosts = 0;
 		if(allChanges != null && modelId != null){
-		for(Map.Entry<String, Change> entry : allChanges.entrySet()){
-			String ch = entry.getKey();
-			Change value = entry.getValue();
-			if(ch.substring(0,5).toUpperCase().equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
-				if(modelsMap.get(modelId).containsKey(0)) {
-					if(modelsMap.get(modelId).get(0).getVariables().containsKey(ch)){
-						boosts = boosts 
-								+ Double.valueOf(value.getValue().toString()) 
-								* modelsMap.get(modelId).get(0).getVariables().get(ch).getCoefficient();
-					}
-				} else {
-					if(modelsMap.get(modelId).containsKey(Calendar.getInstance().get(Calendar.MONTH) + 1)) {
-						if(modelsMap.get(modelId).get(Calendar.getInstance().get(Calendar.MONTH) + 1).getVariables().containsKey(ch)){
-						boosts = boosts 
-								+ Double.valueOf(value.getValue().toString()) 
-								* modelsMap.get(modelId).get(Calendar.getInstance().get(Calendar.MONTH) + 1).getVariables().get(ch).getCoefficient();
-						}		
+			for(Map.Entry<String, Change> entry : allChanges.entrySet()){
+				String ch = entry.getKey();
+				Change value = entry.getValue();
+				if(ch.substring(0,5).toUpperCase().equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
+					if(modelsMap.get(modelId).containsKey(0)) {
+						if(modelsMap.get(modelId).get(0).getVariables().containsKey(ch)){
+							Boost boost;
+							if(modelsMap.get(modelId).get(0).getVariables().get(ch) instanceof Boost) {
+								boost = (Boost) modelsMap.get(modelId).get(0).getVariables().get(ch);
+								boosts = boosts 
+										+ boost.getIntercept()
+										+ Double.valueOf(value.getValue().toString()) 
+										* boost.getCoefficient();
+							}
+						}
+					} else {
+						if(modelsMap.get(modelId).containsKey(Calendar.getInstance().get(Calendar.MONTH) + 1)) {
+							if(modelsMap.get(modelId).get(Calendar.getInstance().get(Calendar.MONTH) + 1).getVariables().containsKey(ch)){
+								Boost boost;
+								if(modelsMap.get(modelId).get(Calendar.getInstance().get(Calendar.MONTH) + 1).getVariables().get(ch) instanceof Boost) {
+									boost = (Boost) modelsMap.get(modelId).get(Calendar.getInstance().get(Calendar.MONTH) + 1).getVariables().get(ch);
+									boosts = boosts 
+										+ boost.getIntercept()
+										+ Double.valueOf(value.getValue().toString()) 
+										* boost.getCoefficient();
+								}
+							}		
+						}
 					}
 				}
 			}
-		}
 		}
 		return boosts;
 	}
 	
 	public double calcScore(Map<String, Object> mbrVarMap,
-			Map<String, Change> varChangeMap, int modelId){
+			Map<String, Change> varChangeMap, int modelId) throws RealTimeScoringException{
 		// recalculate score for model
 			double baseScore = calcBaseScore(mbrVarMap, varChangeMap,
 					modelId);
@@ -293,8 +305,11 @@ public class ScoringSingleton {
 	}
 	
 	public double calcBaseScore(Map<String, Object> mbrVarMap,
-			Map<String, Change> varChangeMap, int modelId) {
+			Map<String, Change> varChangeMap, int modelId) throws RealTimeScoringException{
 
+		if(mbrVarMap == null){
+			throw new RealTimeScoringException("member variables is null");
+		}
 		Model model = null;
 
 		if (modelsMap.get(modelId) != null
@@ -316,10 +331,7 @@ public class ScoringSingleton {
 			
 			//need variableNameToVidMap here before mbrVarMap is checked for its variables
 			//String vid = variableNameToVidMap.get(variable.getName());
-			if(mbrVarMap == null){
-				LOGGER.info("member variables is null");
-				break;
-			}
+			
 			if (variable.getName() != null && (variableNameToVidMap.get(variable.getName()) != null
 					&& mbrVarMap.get(variableNameToVidMap.get(variable.getName())) != null
 					&& !variable.getName().substring(0, 4).toUpperCase()
@@ -361,14 +373,14 @@ public class ScoringSingleton {
 	private Object calculateVariableValue(Map<String, Object> mbrVarMap,
 			Variable var, Map<String, Change> changes, String dataType) {
 		Object changedValue = null;
-		String vid = variableNameToVidMap.get(var.getName());
+		
 		if (var != null) {
 			if (changes != null && changes.containsKey(var.getName().toUpperCase())) {
 				changedValue = changes.get(var.getName().toUpperCase())
 						.getValue();
 			}
-			if (changedValue == null) {
-				changedValue = mbrVarMap.get(vid);
+			if (changedValue == null && variableNameToVidMap.get(var.getName()) != null) {
+				changedValue = mbrVarMap.get(variableNameToVidMap.get(var.getName()));
 				if (changedValue == null) {
 					changedValue = 0;
 				}

@@ -9,6 +9,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import analytics.exception.RealTimeScoringException;
 import analytics.util.JsonUtils;
 import analytics.util.MongoNameConstants;
 import analytics.util.ScoringSingleton;
@@ -123,8 +124,10 @@ public class StrategyScoringBolt extends BaseRichBolt {
 		for (Integer modelId : modelIdList) {// Score and emit for all modelIds
 												// before mongo inserts
 			// recalculate score for model
-			double newScore = ScoringSingleton.getInstance().calcScore(memberVariablesMap, allChanges,
-					modelId);
+			double newScore;
+			try {
+				newScore = ScoringSingleton.getInstance().calcScore(memberVariablesMap, allChanges,
+						modelId);
 
 			LOGGER.debug("new score before boost var: " + newScore);
 
@@ -148,6 +151,10 @@ public class StrategyScoringBolt extends BaseRichBolt {
 					+ messageID);
 			this.outputCollector.emit("score_stream",listToEmit);
 			countMetric.scope("model_scored").incr();
+			} catch (RealTimeScoringException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
 

@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.util.MongoNameConstants;
+import analytics.util.objects.Boost;
 import analytics.util.objects.Model;
 import analytics.util.objects.Variable;
 
@@ -75,10 +76,17 @@ public class ModelVariablesDao extends AbstractDao{
 					.toString().toUpperCase();
 			//String vid = ((DBObject) modelVariable).get(MongoNameConstants.V_ID)
 				//	.toString().toUpperCase();
-			Double coefficient = Double.valueOf(((DBObject) modelVariable)
-					.get(MongoNameConstants.COEFFICIENT).toString());
-			variablesMap.put(variableName, new Variable(variableName,coefficient));
-
+			if(variableName.substring(0,5).toUpperCase().equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
+				Double coefficient = Double.valueOf(((DBObject) modelVariable)
+						.get(MongoNameConstants.COEFFICIENT).toString());
+				Double intercept = Double.valueOf(((DBObject) modelVariable)
+						.get(MongoNameConstants.INTERCEPT).toString());
+				variablesMap.put(variableName, new Boost(variableName,coefficient,intercept));
+			} else {
+				Double coefficient = Double.valueOf(((DBObject) modelVariable)
+						.get(MongoNameConstants.COEFFICIENT).toString());
+				variablesMap.put(variableName, new Variable(variableName,coefficient));
+			}
 			if (!variableModelsMap.containsKey(variableName)) {
 				List<Integer> modelIds = new ArrayList<Integer>();
 				variableModelsMap.put(variableName.toUpperCase(), modelIds);

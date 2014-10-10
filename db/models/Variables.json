@@ -5074,3 +5074,51 @@
   "trs_lvl_fl" : 0,
   "strategy" : "StrategySywTotalCounts"
 }
+{
+  "name" : "BOOST_BROWSE_CE_TCOUNT"
+  "VID" : 1247,
+  "trs_lvl_fl" : 0,
+  "strategy" : "StrategyBoostProductTotalCount"
+}
+{
+  "name" : "BOOST_BROWSE_HOME_TCOUNT"
+  "VID" : 1248,
+  "trs_lvl_fl" : 0,
+  "strategy" : "StrategyBoostProductTotalCount"
+}
+{
+  "name" : "BOOST_BROWSE_TOOLS_TCOUNT"
+  "VID" : 1249,
+  "trs_lvl_fl" : 0,
+  "strategy" : "StrategyBoostProductTotalCount"
+}
+{
+  "name" : "BOOST_BROWSE_HA_TCOUNT"
+  "VID" : 1250,
+  "trs_lvl_fl" : 0,
+  "strategy" : "StrategyBoostProductTotalCount"
+}
+{
+  "name" : "BOOST_BROWSE_FNJL_TCOUNT"
+  "VID" : 1251,
+  "trs_lvl_fl" : 0,
+  "strategy" : "StrategyBoostProductTotalCount"
+}
+{
+  "name" : "BOOST_BROWSE_APP_TCOUNT"
+  "VID" : 1252,
+  "trs_lvl_fl" : 0,
+  "strategy" : "StrategyBoostProductTotalCount"
+}
+{
+  "name" : "BOOST_BROWSE_LG_TCOUNT"
+  "VID" : 1253,
+  "trs_lvl_fl" : 0,
+  "strategy" : "StrategyBoostProductTotalCount"
+}
+{
+  "name" : "BOOST_BROWSE_AUTO_TCOUNT"
+  "VID" : 1254,
+  "trs_lvl_fl" : 0,
+  "strategy" : "StrategyBoostProductTotalCount"
+}

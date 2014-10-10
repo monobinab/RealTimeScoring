@@ -10,11 +10,11 @@ public class Variable implements Serializable
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private ObjectId _id;
-	private String name;
-	private String vid;
-	private double coefficient;
-	private String strategy;
+	protected ObjectId _id;
+	protected String name;
+	protected String vid;
+	protected double coefficient;
+	protected String strategy;
 	 
 	public Variable( String nm, double coefficnt)
 	{

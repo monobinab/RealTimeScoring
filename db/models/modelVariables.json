@@ -43,6 +43,10 @@
     }, {
       "coefficient" : 0.9834,
       "name" : "S_CE_1M"
+    }, {
+      "coefficient" : 0.010023107,
+	  "intercept" : 0.127847154,
+      "name" : "BOOST_BROWSE_CE_TCOUNT"
     }]
 }
 
@@ -286,6 +290,10 @@
     }, {
       "coefficient" : -0.0603,
       "name" : "MONTH8"
+    }, {
+      "coefficient" : 0.001934245,
+	  "intercept" : 0.075922062,
+      "name" : "BOOST_BROWSE_HOME_TCOUNT"
     }]
 }
 
@@ -334,6 +342,10 @@
     }, {
       "coefficient" : 0.1872,
       "name" : "S_HOME_GT_12M_IND"
+    }, {
+      "coefficient" : 0.010023107,
+	  "intercept" : 0.127847154,
+      "name" : "BOOST_BROWSE_CE_TCOUNT"
     }]
 }
 
@@ -799,6 +811,10 @@
     }, {
       "coefficient" : 0.1018,
       "name" : "M_CNT_RESPONSE_CLICK_1_MTH"
+    }, {
+      "coefficient" : 0.010023107,
+	  "intercept" : 0.127847154,
+      "name" : "BOOST_BROWSE_CE_TCOUNT"
     }]
 }
 
@@ -853,6 +869,10 @@
     }, {
       "coefficient" : 0.1948,
       "name" : "S_SRS_SESNL_IND"
+    }, {
+      "coefficient" : 0.010023107,
+	  "intercept" : 0.127847154,
+      "name" : "BOOST_BROWSE_CE_TCOUNT"
     }]
 }
 
@@ -922,6 +942,10 @@
     }, {
       "coefficient" : 0.5532,
       "name" : "S_CE_3M_IND"
+    }, {
+      "coefficient" : 0.010023107,
+	  "intercept" : 0.127847154,
+      "name" : "BOOST_BROWSE_CE_TCOUNT"
     }]
 }
 
@@ -979,6 +1003,10 @@
     }, {
       "coefficient" : 0.1719,
       "name" : "S_SRS_SESNL_IND"
+    }, {
+      "coefficient" : 0.010023107,
+	  "intercept" : 0.127847154,
+      "name" : "BOOST_BROWSE_CE_TCOUNT"
     }]
 }
 
@@ -1033,6 +1061,10 @@
     }, {
       "coefficient" : 0.1166,
       "name" : "M_CNT_RESPONSE_CLICK_1_MTH"
+    }, {
+      "coefficient" : 0.010023107,
+	  "intercept" : 0.127847154,
+      "name" : "BOOST_BROWSE_CE_TCOUNT"
     }]
 }
 
@@ -1093,6 +1125,10 @@
     }, {
       "coefficient" : 0.0906,
       "name" : "M_CNT_RESPONSE_CLICK_1_MTH"
+    }, {
+      "coefficient" : 0.010023107,
+	  "intercept" : 0.127847154,
+      "name" : "BOOST_BROWSE_CE_TCOUNT"
     }]
 }
 
@@ -1168,6 +1204,10 @@
     }, {
       "coefficient" : 1.314,
       "name" : "M_ZIP_PENE_SRS_TOOLS"
+    }, {
+      "coefficient" : 0.002924031,
+	  "intercept" : 0.131013535,
+      "name" : "BOOST_BROWSE_TOOLS_TCOUNT"
     }]
 }
 
@@ -1243,6 +1283,10 @@
     }, {
       "coefficient" : 1.9292,
       "name" : "M_ZIP_PENE_SRS_TOOLS"
+    }, {
+      "coefficient" : 0.002924031,
+	  "intercept" : 0.131013535,
+      "name" : "BOOST_BROWSE_TOOLS_TCOUNT"
     }]
 }
 
@@ -1309,6 +1353,10 @@
     }, {
       "coefficient" : 0.0942,
       "name" : "M_CNT_RESPONSE_CLICK_1_MTH"
+    }, {
+      "coefficient" : 0.010023107,
+	  "intercept" : 0.127847154,
+      "name" : "BOOST_BROWSE_CE_TCOUNT"
     }]
 }
 
@@ -1405,6 +1453,10 @@
     }, {
       "name" : "MONTH11",
       "coefficient" : 0.124073901183156
+    }, {
+      "coefficient" : 0.00299191,
+	  "intercept" : 0.05948411,
+      "name" : "BOOST_BROWSE_HA_TCOUNT"
     }]
 }
 
@@ -2635,6 +2687,10 @@
     }, {
       "coefficient" : 0.9038,
       "name" : "S_CE_3M_IND"
+    }, {
+      "coefficient" : 0.010023107,
+	  "intercept" : 0.127847154,
+      "name" : "BOOST_BROWSE_CE_TCOUNT"
     }]
 }
 
@@ -2689,6 +2745,10 @@
     }, {
       "coefficient" : 0.549,
       "name" : "S_CE_3M_IND"
+    }, {
+      "coefficient" : 0.010023107,
+	  "intercept" : 0.127847154,
+      "name" : "BOOST_BROWSE_CE_TCOUNT"
     }]
 }
 
@@ -2740,6 +2800,10 @@
     }, {
       "coefficient" : 0.0851,
       "name" : "M_CNT_RESPONSE_CLICK_1_MTH"
+    }, {
+      "coefficient" : 0.010023107,
+	  "intercept" : 0.127847154,
+      "name" : "BOOST_BROWSE_CE_TCOUNT"
     }]
 }
 
@@ -2815,6 +2879,10 @@
     }, {
       "coefficient" : 1.1363,
       "name" : "M_ZIP_PENE_SRS_TOOLS"
+    }, {
+      "coefficient" : 0.002924031,
+	  "intercept" : 0.131013535,
+      "name" : "BOOST_BROWSE_TOOLS_TCOUNT"
     }]
 }
 
@@ -2890,6 +2958,10 @@
     }, {
       "coefficient" : 0.9713,
       "name" : "M_ZIP_PENE_SRS_TOOLS"
+    }, {
+      "coefficient" : 0.002924031,
+	  "intercept" : 0.131013535,
+      "name" : "BOOST_BROWSE_TOOLS_TCOUNT"
     }]
 }
 
@@ -2965,6 +3037,10 @@
     }, {
       "coefficient" : 0.986,
       "name" : "M_ZIP_PENE_SRS_TOOLS"
+    }, {
+      "coefficient" : 0.002924031,
+	  "intercept" : 0.131013535,
+      "name" : "BOOST_BROWSE_TOOLS_TCOUNT"
     }]
 }
 
@@ -3040,6 +3116,10 @@
     }, {
       "coefficient" : 1.7851,
       "name" : "M_ZIP_PENE_SRS_TOOLS"
+    }, {
+      "coefficient" : 0.002924031,
+	  "intercept" : 0.131013535,
+      "name" : "BOOST_BROWSE_TOOLS_TCOUNT"
     }]
 }
 
@@ -3115,6 +3195,10 @@
     }, {
       "coefficient" : 1.8195,
       "name" : "M_ZIP_PENE_SRS_TOOLS"
+    }, {
+      "coefficient" : 0.002924031,
+	  "intercept" : 0.131013535,
+      "name" : "BOOST_BROWSE_TOOLS_TCOUNT"
     }]
 }
 
@@ -3190,6 +3274,10 @@
     }, {
       "coefficient" : 0.5667,
       "name" : "M_ZIP_PENE_SRS_TOOLS"
+    }, {
+      "coefficient" : 0.002924031,
+	  "intercept" : 0.131013535,
+      "name" : "BOOST_BROWSE_TOOLS_TCOUNT"
     }]
 }
 
@@ -3265,6 +3353,10 @@
     }, {
       "coefficient" : 1.8153,
       "name" : "M_ZIP_PENE_SRS_TOOLS"
+    }, {
+      "coefficient" : 0.002924031,
+	  "intercept" : 0.131013535,
+      "name" : "BOOST_BROWSE_TOOLS_TCOUNT"
     }]
 }
 
@@ -3340,6 +3432,10 @@
     }, {
       "coefficient" : 0.1056,
       "name" : "M_ZIP_PENE_SRS_TOOLS"
+    }, {
+      "coefficient" : 0.002924031,
+	  "intercept" : 0.131013535,
+      "name" : "BOOST_BROWSE_TOOLS_TCOUNT"
     }]
 }
 
@@ -3415,6 +3511,10 @@
     }, {
       "coefficient" : -2.1738,
       "name" : "M_ZIP_PENE_SRS_TOOLS"
+    }, {
+      "coefficient" : 0.002924031,
+	  "intercept" : 0.131013535,
+      "name" : "BOOST_BROWSE_TOOLS_TCOUNT"
     }]
 }
 
@@ -3490,6 +3590,10 @@
     }, {
       "coefficient" : 1.7174,
       "name" : "M_ZIP_PENE_SRS_TOOLS"
+    }, {
+      "coefficient" : 0.002924031,
+	  "intercept" : 0.131013535,
+      "name" : "BOOST_BROWSE_TOOLS_TCOUNT"
     }]
 }
 
@@ -3787,6 +3891,10 @@
     }, {
       "coefficient" : -0.00245,
       "name" : "S_DSL_FNJL_TRS"
+    }, {
+      "coefficient" : 0.002423132,
+	  "intercept" : 0.0611336,
+      "name" : "BOOST_BROWSE_FNJL_TCOUNT"
     }]
 }
 {
@@ -3846,6 +3954,10 @@
     }, {
       "coefficient" : 0.3,
       "name" : "MONTH8"
+    }, {
+      "coefficient" : 0.001636236,
+	  "intercept" : 0.149222067,
+      "name" : "BOOST_BROWSE_APP_TCOUNT"
     }]
 }
 {
@@ -4128,6 +4240,10 @@
     }, {
       "coefficient" : 0.37,
       "name" : "S_LG_SESNL2_IND"
+    }, {
+      "coefficient" : 0.017961793,
+	  "intercept" : 0.037229794,
+      "name" : "BOOST_BROWSE_LG_TCOUNT"
     }]
 }
 {
@@ -4502,6 +4618,10 @@
     }, {
       "coefficient" : -0.0487,
       "name" : "MONTH8"
+    }, {
+      "coefficient" : 0.006523933,
+	  "intercept" : 0.044595476,
+      "name" : "BOOST_BROWSE_AUTO_TCOUNT"
     }]
 }
 {

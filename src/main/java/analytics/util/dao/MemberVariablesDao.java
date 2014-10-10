@@ -2,6 +2,7 @@ package analytics.util.dao;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -24,10 +25,10 @@ public class MemberVariablesDao extends AbstractDao {
 		memberVariablesCollection = db.getCollection("memberVariables");
     }
    
-    public Map<String,Object> getMemberVariablesFiltered(String l_id, Map<String, Integer> variableFilter){
+    public Map<String,Object> getMemberVariablesFiltered(String l_id, List<String> variableFilter){
     	BasicDBObject variableFilterDBO = new BasicDBObject(MongoNameConstants.ID, 0);
-    	for(String var:variableFilter.keySet()){
-    		variableFilterDBO.append(var, variableFilter.get(var));
+    	for(String var:variableFilter){
+    		variableFilterDBO.append(var, 1);
     	}
     	
     	DBObject mbrVariables = memberVariablesCollection.findOne(
