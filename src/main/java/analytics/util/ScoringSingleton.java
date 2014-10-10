@@ -258,18 +258,26 @@ public class ScoringSingleton {
 				if(ch.substring(0,5).toUpperCase().equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
 					if(modelsMap.get(modelId).containsKey(0)) {
 						if(modelsMap.get(modelId).get(0).getVariables().containsKey(ch)){
-							boosts = boosts 
-									+ ((Boost) modelsMap.get(modelId).get(0).getVariables().get(ch)).getIntercept()
-									+ Double.valueOf(value.getValue().toString()) 
-									* ((Boost) modelsMap.get(modelId).get(0).getVariables().get(ch)).getCoefficient();
+							Boost boost;
+							if(modelsMap.get(modelId).get(0).getVariables().get(ch) instanceof Boost) {
+								boost = (Boost) modelsMap.get(modelId).get(0).getVariables().get(ch);
+								boosts = boosts 
+										+ boost.getIntercept()
+										+ Double.valueOf(value.getValue().toString()) 
+										* boost.getCoefficient();
+							}
 						}
 					} else {
 						if(modelsMap.get(modelId).containsKey(Calendar.getInstance().get(Calendar.MONTH) + 1)) {
 							if(modelsMap.get(modelId).get(Calendar.getInstance().get(Calendar.MONTH) + 1).getVariables().containsKey(ch)){
-							boosts = boosts 
-									+ ((Boost) modelsMap.get(modelId).get(Calendar.getInstance().get(Calendar.MONTH) + 1).getVariables().get(ch)).getIntercept()
-									+ Double.valueOf(value.getValue().toString()) 
-									* ((Boost) modelsMap.get(modelId).get(Calendar.getInstance().get(Calendar.MONTH) + 1).getVariables().get(ch)).getCoefficient();
+								Boost boost;
+								if(modelsMap.get(modelId).get(Calendar.getInstance().get(Calendar.MONTH) + 1).getVariables().get(ch) instanceof Boost) {
+									boost = (Boost) modelsMap.get(modelId).get(Calendar.getInstance().get(Calendar.MONTH) + 1).getVariables().get(ch);
+									boosts = boosts 
+										+ boost.getIntercept()
+										+ Double.valueOf(value.getValue().toString()) 
+										* boost.getCoefficient();
+								}
 							}		
 						}
 					}
