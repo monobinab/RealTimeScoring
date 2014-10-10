@@ -10,6 +10,7 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import analytics.util.MongoNameConstants;
 import analytics.util.dao.MemberZipDao;
+import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -30,7 +31,7 @@ public class MemberPublishBolt extends BaseRichBolt{
 
 	private JedisPool jedisPool;
 	private MemberZipDao memberZipDao;
-	
+	private MultiCountMetric countMetric;
 	public MemberPublishBolt(String host, int port, String pattern) {
 		this.host = host;
 		this.port = port;
@@ -41,6 +42,7 @@ public class MemberPublishBolt extends BaseRichBolt{
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
         System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+        initMetrics(context);
         JedisPoolConfig poolConfig = new JedisPoolConfig();
         poolConfig.setMaxActive(100);
         jedisPool = new JedisPool(poolConfig,host, port, 100);
@@ -48,9 +50,13 @@ public class MemberPublishBolt extends BaseRichBolt{
 		this.outputCollector = collector;
 		
 	}
-
+	 void initMetrics(TopologyContext context){
+	     countMetric = new MultiCountMetric();
+	     context.registerMetric("custom_metrics", countMetric, 60);
+	    }
 	@Override
 	public void execute(Tuple input) {
+		countMetric.scope("incoming_tuples").incr();
 		String l_id = input.getStringByField("l_id");
 		String source = input.getStringByField("source");
 		String zip = memberZipDao.getMemberZip(l_id);
@@ -76,6 +82,7 @@ public class MemberPublishBolt extends BaseRichBolt{
 				retryCount++;
 			}
 		}
+		countMetric.scope("publish_successful").incr();
 		outputCollector.ack(input);
 		
 	}

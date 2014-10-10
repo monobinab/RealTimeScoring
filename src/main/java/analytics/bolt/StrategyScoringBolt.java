@@ -13,6 +13,7 @@ import analytics.util.JsonUtils;
 import analytics.util.MongoNameConstants;
 import analytics.util.ScoringSingleton;
 import analytics.util.objects.Change;
+import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -35,14 +36,19 @@ public class StrategyScoringBolt extends BaseRichBolt {
 	 */
 	private static final long serialVersionUID = 1L;
 	private OutputCollector outputCollector;
-
+	private MultiCountMetric countMetric;
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
 		LOGGER.info("PREPARING STRATEGY SCORING BOLT");	
+	     initMetrics(context);
         System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
 		this.outputCollector = collector;
 	}
+	 void initMetrics(TopologyContext context){
+	     countMetric = new MultiCountMetric();
+	     context.registerMetric("custom_metrics", countMetric, 60);
+	    }
 
 	@Override
 	public void execute(Tuple input) {
@@ -65,6 +71,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 		// 11) Write changedMemberVariables with expiry
 
 		// 1) PULL OUT HASHED LOYALTY ID FROM THE FIRST RECORD IN lineItemList
+		countMetric.scope("incoming_tuples").incr();
 		String lId = input.getStringByField("l_id");
 		String source = input.getStringByField("source");
 		String messageID = "";
@@ -80,7 +87,8 @@ public class StrategyScoringBolt extends BaseRichBolt {
 		Set<Integer> modelIdList = ScoringSingleton.getInstance().getModelIdList(newChangesVarValueMap);
 		if(modelIdList==null||modelIdList.isEmpty()){
 			LOGGER.info("No models affected");
-			this.outputCollector.ack(input);
+			countMetric.scope("no_models_affected").incr();
+			outputCollector.fail(input);
 			return;
 		}
 		// 4) Find all variables for models
@@ -89,7 +97,8 @@ public class StrategyScoringBolt extends BaseRichBolt {
 		Map<String, Object> memberVariablesMap = ScoringSingleton.getInstance().createVariableValueMap(lId, modelIdList);
 		if(memberVariablesMap==null){
 			LOGGER.warn("Unable to find member variables for" + lId);
-			this.outputCollector.fail(input);
+			countMetric.scope("no_membervariables").incr();
+			outputCollector.fail(input);
 			return;
 		}
 		
@@ -138,6 +147,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 					+ System.currentTimeMillis() + " and the message ID is ..."
 					+ messageID);
 			this.outputCollector.emit("score_stream",listToEmit);
+			countMetric.scope("model_scored").incr();
 		}
 
 
@@ -150,6 +160,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 		listToEmit.add(lId);
 		listToEmit.add(source);
 		this.outputCollector.emit("member_stream", listToEmit);
+		countMetric.scope("member_scored_successfully").incr();
 		this.outputCollector.ack(input);
 
 	}
