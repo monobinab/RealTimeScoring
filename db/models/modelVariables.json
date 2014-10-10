@@ -290,6 +290,10 @@
     }, {
       "coefficient" : -0.0603,
       "name" : "MONTH8"
+    }, {
+      "coefficient" : 0.001934245,
+	  "intercept" : 0.075922062,
+      "name" : "BOOST_BROWSE_HOME_TCOUNT"
     }]
 }
 
