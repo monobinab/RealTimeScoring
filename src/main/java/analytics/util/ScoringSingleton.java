@@ -22,6 +22,7 @@ import analytics.util.dao.ModelSywBoostDao;
 //TODO: end update
 import analytics.util.dao.ModelVariablesDao;
 import analytics.util.dao.VariableDao;
+import analytics.util.objects.Boost;
 import analytics.util.objects.Change;
 import analytics.util.objects.ChangedMemberScore;
 import analytics.util.objects.Model;
@@ -250,27 +251,29 @@ public class ScoringSingleton {
 	public double getBoostScore(Map<String, Change> allChanges, Integer modelId) {
 		double boosts = 0;
 		if(allChanges != null && modelId != null){
-		for(Map.Entry<String, Change> entry : allChanges.entrySet()){
-			String ch = entry.getKey();
-			Change value = entry.getValue();
-			if(ch.substring(0,5).toUpperCase().equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
-				if(modelsMap.get(modelId).containsKey(0)) {
-					if(modelsMap.get(modelId).get(0).getVariables().containsKey(ch)){
-						boosts = boosts 
-								+ Double.valueOf(value.getValue().toString()) 
-								* modelsMap.get(modelId).get(0).getVariables().get(ch).getCoefficient();
-					}
-				} else {
-					if(modelsMap.get(modelId).containsKey(Calendar.getInstance().get(Calendar.MONTH) + 1)) {
-						if(modelsMap.get(modelId).get(Calendar.getInstance().get(Calendar.MONTH) + 1).getVariables().containsKey(ch)){
-						boosts = boosts 
-								+ Double.valueOf(value.getValue().toString()) 
-								* modelsMap.get(modelId).get(Calendar.getInstance().get(Calendar.MONTH) + 1).getVariables().get(ch).getCoefficient();
-						}		
+			for(Map.Entry<String, Change> entry : allChanges.entrySet()){
+				String ch = entry.getKey();
+				Change value = entry.getValue();
+				if(ch.substring(0,5).toUpperCase().equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
+					if(modelsMap.get(modelId).containsKey(0)) {
+						if(modelsMap.get(modelId).get(0).getVariables().containsKey(ch)){
+							boosts = boosts 
+									+ ((Boost) modelsMap.get(modelId).get(0).getVariables().get(ch)).getIntercept()
+									+ Double.valueOf(value.getValue().toString()) 
+									* ((Boost) modelsMap.get(modelId).get(0).getVariables().get(ch)).getCoefficient();
+						}
+					} else {
+						if(modelsMap.get(modelId).containsKey(Calendar.getInstance().get(Calendar.MONTH) + 1)) {
+							if(modelsMap.get(modelId).get(Calendar.getInstance().get(Calendar.MONTH) + 1).getVariables().containsKey(ch)){
+							boosts = boosts 
+									+ ((Boost) modelsMap.get(modelId).get(Calendar.getInstance().get(Calendar.MONTH) + 1).getVariables().get(ch)).getIntercept()
+									+ Double.valueOf(value.getValue().toString()) 
+									* ((Boost) modelsMap.get(modelId).get(Calendar.getInstance().get(Calendar.MONTH) + 1).getVariables().get(ch)).getCoefficient();
+							}		
+						}
 					}
 				}
 			}
-		}
 		}
 		return boosts;
 	}

@@ -65,6 +65,7 @@ public class MongoNameConstants {
 	public static final String VARIABLE = "variable";
 	public static final String VAR_NAME = "name";
 	public static final String COEFFICIENT = "coefficient";
+	public static final String INTERCEPT = "intercept";
 	
 	//Variables collection
 	public static final String V_ID = "VID";
@@ -91,6 +92,7 @@ public class MongoNameConstants {
 	public static final String FEED_TO_BOOST_COLLECTION="feedBoosts";
 	public static final String FB_BOOSTS="b";
 	public static final String FB_FEED="f";
+
 	
 	
 }
