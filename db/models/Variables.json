@@ -326,7 +326,7 @@
   "name" : "S_CE_ENT_TRS_6M",
   "VID" : 59,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyCountTransactions"
 }
 {
   "name" : "S_CE_GT_12M_IND",
@@ -1712,7 +1712,7 @@
   "name" : "S_W_APP_ACC_INT_6M_IND",
   "VID" : 297,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyTurnOnFlag"
 }
 {
   "name" : "S_W_APP_ACC_INT_SESNL2_IND",
@@ -1802,7 +1802,7 @@
   "name" : "K_BABY_SPR_SLS_24M_IND",
   "VID" : 316,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyTurnOnFlag"
 }
 {
   "name" : "K_BABY_TRS_12M",
@@ -1826,7 +1826,7 @@
   "name" : "K_CE_ENT_SPR_SLS_24M_IND",
   "VID" : 320,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyTurnOnFlag"
 }
 {
   "name" : "K_CE_GT_12M_IND",
@@ -1850,7 +1850,7 @@
   "name" : "K_CE_HE_TRS_12M",
   "VID" : 325,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyCountTransactions"
 }
 {
   "name" : "K_CE_SPR_SLS_12M_IND",
@@ -1862,19 +1862,19 @@
   "name" : "K_CE_SPR_SLS_24M_IND",
   "VID" : 327,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyTurnOnFlag"
 }
 {
   "name" : "K_CE_TRS_12M",
   "VID" : 328,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyCountTransactions"
 }
 {
   "name" : "K_CE_TRS_3M",
   "VID" : 329,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyCountTransactions"
 }
 {
   "name" : "K_CHRISTMAS_12M_SESNL_IND",
@@ -1910,7 +1910,7 @@
   "name" : "K_CHRISTMAS_SPR_SLS_12M_IND",
   "VID" : 335,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyTurnOnFlag"
 }
 {
   "name" : "K_CHRISTMAS_SPR_SLS_24M_IND",
@@ -1940,7 +1940,7 @@
   "name" : "K_DIY_TOOL_AUTO_SLS_24M_IND",
   "VID" : 341,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyTurnOnFlag"
 }
 {
   "name" : "K_DIY_TOOL_AUTO_TRS_24M",
@@ -1982,13 +1982,13 @@
   "name" : "K_DSL_CE_TRS",
   "VID" : 350,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyDaysSinceLast"
 }
 {
   "name" : "K_DSL_CHRISTMAS_TRS",
   "VID" : 351,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyDaysSinceLast"
 }
 {
   "name" : "K_DSL_CONS_TRS",
@@ -2000,7 +2000,7 @@
   "name" : "K_DSL_DIY_TOOL_AUTO_TRS",
   "VID" : 353,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyDaysSinceLast"
 }
 {
   "name" : "K_DSL_DIY_TOOL_TRS",
@@ -2012,13 +2012,13 @@
   "name" : "K_DSL_FOOD_CONS_TRS",
   "VID" : 355,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyDaysSinceLast"
 }
 {
   "name" : "K_DSL_FOOD_GROCERY_TRS",
   "VID" : 356,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyDaysSinceLast"
 }
 {
   "name" : "K_DSL_FSG_EXER_TRS",
@@ -2036,19 +2036,19 @@
   "name" : "K_DSL_FSG_TRS",
   "VID" : 360,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyDaysSinceLast"
 }
 {
   "name" : "K_DSL_FTWR_CHILD_TRS",
   "VID" : 362,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyDaysSinceLast"
 }
 {
   "name" : "K_DSL_FTWR_TRS",
   "VID" : 363,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyDaysSinceLast"
 }
 {
   "name" : "K_DSL_HA_HE_FC_TRS",
@@ -2084,7 +2084,7 @@
   "name" : "K_DSL_HF_TRS",
   "VID" : 370,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyDaysSinceLast"
 }
 {
   "name" : "K_DSL_KIDS_APP_TRS",
@@ -2102,7 +2102,7 @@
   "name" : "K_DSL_LG_TRS",
   "VID" : 373,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyDaysSinceLast"
 }
 {
   "name" : "K_DSL_M_APP_TRS",
@@ -2114,19 +2114,19 @@
   "name" : "K_DSL_ODL_TRS",
   "VID" : 375,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyDaysSinceLast"
 }
 {
   "name" : "K_DSL_OTC_TRS",
   "VID" : 376,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyDaysSinceLast"
 }
 {
   "name" : "K_DSL_SOFTLN_TRS",
   "VID" : 377,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyDaysSinceLast"
 }
 {
   "name" : "K_DSL_TOYS_CHILDRN_TRS",
@@ -2156,7 +2156,7 @@
   "name" : "K_DSL_WAPP_INT_TRS",
   "VID" : 382,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyDaysSinceLast"
 }
 {
   "name" : "K_DSL_WAPP_TRS",
@@ -2168,7 +2168,7 @@
   "name" : "K_EASTER_SLS_6M",
   "VID" : 384,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategySumSales"
 }
 {
   "name" : "K_EASTER_SLS_TRS_24M",
@@ -2186,13 +2186,13 @@
   "name" : "K_EASTER_SPR_SLS_24M_IND",
   "VID" : 387,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyTurnOnFlag"
 }
 {
   "name" : "K_FNJL_SPR_SLS_24M_IND",
   "VID" : 389,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyTurnOnFlag"
 }
 {
   "name" : "K_FNJL_TI_SLS_6M",
@@ -2204,13 +2204,13 @@
   "name" : "K_FNJL_TRS_12M",
   "VID" : 391,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyCountTransactions"
 }
 {
   "name" : "K_FOOD_CONS_SLS_12M",
   "VID" : 392,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategySumSales"
 }
 {
   "name" : "K_FOOD_PANTRY_SPR_SLS_24M_IND",
@@ -2222,7 +2222,7 @@
   "name" : "K_FOOD_PANTRY_TI_TRS_3M",
   "VID" : 394,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyCountTransactions"
 }
 {
   "name" : "K_FSG_24M_SESNL_IND",
@@ -2246,7 +2246,7 @@
   "name" : "K_FSG_SPR_SLS_24M_IND",
   "VID" : 398,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyTurnOnFlag"
 }
 {
   "name" : "K_FSG_SPRTNG_GDS_SLS_6M",
@@ -2270,7 +2270,7 @@
   "name" : "K_FTWR_ATHLETICS_SLS_24M_IND",
   "VID" : 403,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyTurnOnFlag"
 }
 {
   "name" : "K_FTWR_CHILD_SPR_SLS_24M_IND",
@@ -2294,7 +2294,7 @@
   "name" : "K_FTWR_TRS_24M",
   "VID" : 407,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyCountTransactions"
 }
 {
   "name" : "K_FTWR_WOMEN_SLS_TRS_24M",
@@ -2312,13 +2312,13 @@
   "name" : "K_FW_2M",
   "VID" : 411,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyTurnOnFlag"
 }
 {
   "name" : "K_GAMING_CE_CPN_TRS_24M",
   "VID" : 412,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyCountTransactions"
 }
 {
   "name" : "K_HA_1M",
@@ -2354,7 +2354,7 @@
   "name" : "K_HALLOWEEN_SPR_SLS_24M_IND",
   "VID" : 418,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyTurnOnFlag"
 }
 {
   "name" : "K_HALLOWEEN_TRS_6M",
@@ -2396,13 +2396,13 @@
   "name" : "K_HARDLN_SPR_SLS_24M_IND",
   "VID" : 425,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyTurnOnFlag"
 }
 {
   "name" : "K_HARDLN_TRS_3M",
   "VID" : 426,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyCountTransactions"
 }
 {
   "name" : "K_HBA_OTC_SLS_24M",
@@ -2420,7 +2420,7 @@
   "name" : "K_HBA_SPR_SLS_12M_IND",
   "VID" : 429,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyTurnOnFlag"
 }
 {
   "name" : "K_HBA_TRS_6M",
@@ -2564,13 +2564,13 @@
   "name" : "K_KMT_SLS_3M",
   "VID" : 455,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategySumSales"
 }
 {
   "name" : "K_KMT_SPR_SLS_12M_IND",
   "VID" : 456,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyTurnOnFlag"
 }
 {
   "name" : "K_KMT_SPR_SLS_24M_IND",
@@ -2582,7 +2582,7 @@
   "name" : "K_KMT_TRS_3M",
   "VID" : 458,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyCountTransactions"
 }
 {
   "name" : "K_LG_12M_SESNL_IND",
@@ -2618,13 +2618,13 @@
   "name" : "K_LG_TRS_24M",
   "VID" : 464,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyCountTransactions"
 }
 {
   "name" : "K_LG_TRS_3M",
   "VID" : 465,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyCountTransactions"
 }
 {
   "name" : "K_LG_TRS_6M",
@@ -2666,7 +2666,7 @@
   "name" : "K_ODL_SPR_SLS_24M_IND",
   "VID" : 472,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyTurnOnFlag"
 }
 {
   "name" : "K_ODL_TRS_3M",
@@ -2678,7 +2678,7 @@
   "name" : "K_OTC_SPR_SLS_24M_IND",
   "VID" : 474,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyTurnOnFlag"
 }
 {
   "name" : "K_SOFTLN_12M_SESNL_IND",
@@ -2702,13 +2702,13 @@
   "name" : "K_SOFTLN_TRS_3M",
   "VID" : 478,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyCountTransactions"
 }
 {
   "name" : "K_SP_1M",
   "VID" : 479,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyTurnOnFlag"
 }
 {
   "name" : "K_SPRTNG_GDS_24M_SESNL_IND",
@@ -2726,7 +2726,7 @@
   "name" : "K_SPRTNG_GDS_SPR_SLS_12M_IND",
   "VID" : 482,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyTurnOnFlag"
 }
 {
   "name" : "K_TI_REDEM_CHANNELS_12M",
@@ -2804,19 +2804,19 @@
   "name" : "K_TOYS_SPR_SLS_24M_IND",
   "VID" : 496,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyTurnOnFlag"
 }
 {
   "name" : "K_TOYS_TRS_12M",
   "VID" : 497,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyCountTransactions"
 }
 {
   "name" : "K_TOYS_TRS_3M",
   "VID" : 498,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyCountTransactions"
 }
 {
   "name" : "K_WAPP_ACC_12M_SESNL_IND",
@@ -2834,7 +2834,7 @@
   "name" : "K_WAPP_ACC_SPR_SLS_12M_IND",
   "VID" : 501,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyTurnOnFlag"
 }
 {
   "name" : "K_WAPP_ACC_SPR_SLS_24M_IND",
@@ -2846,7 +2846,7 @@
   "name" : "K_WAPP_ACC_TRS_3M",
   "VID" : 503,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyCountTransactions"
 }
 {
   "name" : "K_WAPP_INT_ACC_12M_SESNL_IND",
@@ -2864,7 +2864,7 @@
   "name" : "K_WAPP_INT_ACC_SPR_SLS_24M_IND",
   "VID" : 506,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyTurnOnFlag"
 }
 {
   "name" : "K_WAPP_INT_SPR_SLS_24M_IND",
@@ -2876,7 +2876,7 @@
   "name" : "K_WAPP_SLS_24M",
   "VID" : 508,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategySumSales"
 }
 {
   "name" : "K_WAPP_SPR_SLS_12M_IND",
@@ -3458,7 +3458,7 @@
   "name" : "M_WEB_DAY_PATIO_0_7",
   "VID" : 609,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyCountTraits"
 }
 {
   "name" : "M_WEB_DAY_PATIO_8_14",
@@ -3608,7 +3608,7 @@
   "name" : "M_WEB_TRAIT_PATIO_0_7",
   "VID" : 638,
   "trs_lvl_fl" : 0,
-  "strategy" : "NONE"
+  "strategy" : "StrategyCountTraits"
 }
 {
   "name" : "M_WEB_TRAIT_PATIO_15_30",

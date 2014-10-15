@@ -70,8 +70,7 @@ public class RealTimeScoringTellurideTopology {
 				.shuffleGrouping("telluride1").shuffleGrouping("telluride2");
         topologyBuilder.setBolt("strategy_scoring_bolt", new StrategyScoringBolt(), 8).shuffleGrouping("parsing_bolt");
         //Redis publish to server 1
-        topologyBuilder.setBolt("score_publish_bolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 4).shuffleGrouping("strategy_scoring_bolt", "score_stream");
-        topologyBuilder.setBolt("member_publish_bolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 2).shuffleGrouping("strategy_scoring_bolt", "member_stream");
+
 
 
 		Config conf = new Config();

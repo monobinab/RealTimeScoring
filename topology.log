@@ -242,3 +242,43 @@ Caused by: java.net.SocketTimeoutException: connect timed out
 2014-10-10 11:59:29,381 INFO    [Thread-16-strategy_scoring_bolt] a.b.StrategyScoringBolt:43 - PREPARING STRATEGY SCORING BOLT
 2014-10-10 11:59:29,389 INFO    [Thread-18-strategy_scoring_bolt] a.b.StrategyScoringBolt:43 - PREPARING STRATEGY SCORING BOLT
 2014-10-10 11:59:29,397 INFO    [Thread-20-strategy_scoring_bolt] a.b.StrategyScoringBolt:43 - PREPARING STRATEGY SCORING BOLT
+2014-10-15 10:11:47,976 INFO    [main] a.b.ParsingBoltSYW:80 - Ignore interaction typeTagItem
+2014-10-15 10:11:54,358 INFO    [main] o.a.c.f.i.CuratorFrameworkImpl:223 - Starting
+2014-10-15 10:11:54,693 INFO    [main-EventThread] o.a.c.f.s.ConnectionStateManager:194 - State change: CONNECTED
+2014-10-15 10:11:54,694 WARN    [ConnectionStateManager-0] o.a.c.f.s.ConnectionStateManager:212 - There are no ConnectionStateListeners registered.
+2014-10-15 10:11:55,836 INFO    [main] o.a.c.f.i.CuratorFrameworkImpl:223 - Starting
+2014-10-15 10:11:55,875 INFO    [main-EventThread] o.a.c.f.s.ConnectionStateManager:194 - State change: CONNECTED
+2014-10-15 10:11:55,875 WARN    [ConnectionStateManager-0] o.a.c.f.s.ConnectionStateManager:212 - There are no ConnectionStateListeners registered.
+2014-10-15 10:11:56,038 INFO    [main] o.a.c.f.i.CuratorFrameworkImpl:223 - Starting
+2014-10-15 10:11:56,233 INFO    [main-EventThread] o.a.c.f.s.ConnectionStateManager:194 - State change: CONNECTED
+2014-10-15 10:11:56,233 WARN    [ConnectionStateManager-0] o.a.c.f.s.ConnectionStateManager:212 - There are no ConnectionStateListeners registered.
+2014-10-15 10:11:56,408 INFO    [main] o.a.c.f.i.CuratorFrameworkImpl:223 - Starting
+2014-10-15 10:11:56,419 INFO    [main] o.a.c.f.i.CuratorFrameworkImpl:223 - Starting
+2014-10-15 10:11:56,582 INFO    [main-EventThread] o.a.c.f.s.ConnectionStateManager:194 - State change: CONNECTED
+2014-10-15 10:11:56,583 WARN    [ConnectionStateManager-0] o.a.c.f.s.ConnectionStateManager:212 - There are no ConnectionStateListeners registered.
+2014-10-15 10:11:56,670 INFO    [main-EventThread] o.a.c.f.s.ConnectionStateManager:194 - State change: CONNECTED
+2014-10-15 10:11:56,670 WARN    [ConnectionStateManager-0] o.a.c.f.s.ConnectionStateManager:212 - There are no ConnectionStateListeners registered.
+2014-10-15 10:11:56,765 INFO    [main] o.a.c.f.i.CuratorFrameworkImpl:223 - Starting
+2014-10-15 10:11:56,790 INFO    [main-EventThread] o.a.c.f.s.ConnectionStateManager:194 - State change: CONNECTED
+2014-10-15 10:11:56,790 WARN    [ConnectionStateManager-0] o.a.c.f.s.ConnectionStateManager:212 - There are no ConnectionStateListeners registered.
+2014-10-15 10:11:56,865 INFO    [main] o.a.c.f.i.CuratorFrameworkImpl:223 - Starting
+2014-10-15 10:11:56,898 INFO    [main-EventThread] o.a.c.f.s.ConnectionStateManager:194 - State change: CONNECTED
+2014-10-15 10:11:56,899 WARN    [ConnectionStateManager-0] o.a.c.f.s.ConnectionStateManager:212 - There are no ConnectionStateListeners registered.
+2014-10-15 10:11:56,932 INFO    [main] o.a.c.f.i.CuratorFrameworkImpl:223 - Starting
+2014-10-15 10:11:56,964 INFO    [main-EventThread] o.a.c.f.s.ConnectionStateManager:194 - State change: CONNECTED
+2014-10-15 10:11:56,966 WARN    [ConnectionStateManager-0] o.a.c.f.s.ConnectionStateManager:212 - There are no ConnectionStateListeners registered.
+2014-10-15 10:11:57,050 INFO    [main] o.a.c.f.i.CuratorFrameworkImpl:223 - Starting
+2014-10-15 10:11:57,087 INFO    [main-EventThread] o.a.c.f.s.ConnectionStateManager:194 - State change: CONNECTED
+2014-10-15 10:11:57,087 WARN    [ConnectionStateManager-0] o.a.c.f.s.ConnectionStateManager:212 - There are no ConnectionStateListeners registered.
+2014-10-15 10:11:57,116 INFO    [main] o.a.c.f.i.CuratorFrameworkImpl:223 - Starting
+2014-10-15 10:11:57,144 INFO    [main-EventThread] o.a.c.f.s.ConnectionStateManager:194 - State change: CONNECTED
+2014-10-15 10:11:57,145 WARN    [ConnectionStateManager-0] o.a.c.f.s.ConnectionStateManager:212 - There are no ConnectionStateListeners registered.
+2014-10-15 10:11:58,747 INFO    [Thread-6] o.a.c.f.i.CuratorFrameworkImpl:223 - Starting
+2014-10-15 10:11:58,789 INFO    [Thread-6-EventThread] o.a.c.f.s.ConnectionStateManager:194 - State change: CONNECTED
+2014-10-15 10:11:58,790 WARN    [ConnectionStateManager-0] o.a.c.f.s.ConnectionStateManager:212 - There are no ConnectionStateListeners registered.
+2014-10-15 10:11:58,817 INFO    [Thread-6] o.a.c.f.i.CuratorFrameworkImpl:223 - Starting
+2014-10-15 10:11:58,852 INFO    [Thread-6-EventThread] o.a.c.f.s.ConnectionStateManager:194 - State change: CONNECTED
+2014-10-15 10:11:58,852 WARN    [ConnectionStateManager-0] o.a.c.f.s.ConnectionStateManager:212 - There are no ConnectionStateListeners registered.
+2014-10-15 10:11:59,344 INFO    [Thread-16-strategy_scoring_bolt] a.b.StrategyScoringBolt:44 - PREPARING STRATEGY SCORING BOLT
+2014-10-15 10:11:59,352 INFO    [Thread-18-strategy_scoring_bolt] a.b.StrategyScoringBolt:44 - PREPARING STRATEGY SCORING BOLT
+2014-10-15 10:11:59,359 INFO    [Thread-20-strategy_scoring_bolt] a.b.StrategyScoringBolt:44 - PREPARING STRATEGY SCORING BOLT
