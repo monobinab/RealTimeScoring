@@ -5085,3 +5085,3828 @@
       "name" : "M_HA_APPL_COOKING_DSL"
     }]
 }
+{
+	"modelId": 2,
+	"modelDescription": "Kmart consumer electronics",
+	"constant": -3.2241,
+	"modelName": "K_SCR_CE",
+	"month": 4,
+	"variable": [{
+		"coefficient": 0.00333,
+		"name": "PRS_CLU_CD"
+	},
+	{
+		"coefficient": 0.3057,
+		"name": "K_HARDLN_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.1854,
+		"name": "K_KMT_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.0363,
+		"name": "M_BONUS_MEMBER"
+	},
+	{
+		"coefficient": 0.1824,
+		"name": "K_CE_GT_12M_IND"
+	},
+	{
+		"coefficient": -5.6E-4,
+		"name": "K_DSL_DIY_TOOL_AUTO_TRS"
+	},
+	{
+		"coefficient": -0.00305,
+		"name": "K_DSL_SOFTLN_TRS"
+	},
+	{
+		"coefficient": 0.0976,
+		"name": "K_CE_ENT_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.276,
+		"name": "K_CE_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.208,
+		"name": "K_HBA_SPR_SLS_12M_IND"
+	},
+	{
+		"coefficient": 0.2236,
+		"name": "K_CE_TRS_3M"
+	},
+	{
+		"coefficient": -0.00139,
+		"name": "K_DSL_CE_TRS"
+	},
+	{
+		"coefficient": -3.8E-4,
+		"name": "K_DSL_FSG_TRS"
+	},
+	{
+		"coefficient": 0.1065,
+		"name": "K_CE_TRS_12M"
+	},
+	{
+		"coefficient": 0.0948,
+		"name": "K_TOYS_SPR_SLS_24M_IND"
+	}]
+}{
+	"modelId": 2,
+	"modelDescription": "Kmart consumer electronics",
+	"constant": -2.974,
+	"modelName": "K_SCR_CE",
+	"month": 8,
+	"variable": [{
+		"coefficient": 0.00204,
+		"name": "PRS_CLU_CD"
+	},
+	{
+		"coefficient": 0.2962,
+		"name": "K_HARDLN_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.1738,
+		"name": "K_KMT_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.0398,
+		"name": "M_BONUS_MEMBER"
+	},
+	{
+		"coefficient": 0.2292,
+		"name": "K_CE_GT_12M_IND"
+	},
+	{
+		"coefficient": -5.4E-4,
+		"name": "K_DSL_DIY_TOOL_AUTO_TRS"
+	},
+	{
+		"coefficient": -0.00292,
+		"name": "K_DSL_SOFTLN_TRS"
+	},
+	{
+		"coefficient": 0.1057,
+		"name": "K_CE_ENT_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.2345,
+		"name": "K_CE_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.2001,
+		"name": "K_HBA_SPR_SLS_12M_IND"
+	},
+	{
+		"coefficient": 0.2029,
+		"name": "K_CE_TRS_3M"
+	},
+	{
+		"coefficient": -0.0014,
+		"name": "K_DSL_CE_TRS"
+	},
+	{
+		"coefficient": -4.9E-4,
+		"name": "K_DSL_FSG_TRS"
+	},
+	{
+		"coefficient": 0.115,
+		"name": "K_CE_TRS_12M"
+	},
+	{
+		"coefficient": 0.1553,
+		"name": "K_TOYS_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": -0.0289,
+		"name": "K_CE_HE_TRS_12M"
+	}]
+}{
+	"modelId": 2,
+	"modelDescription": "Kmart consumer electronics",
+	"constant": -3.3842,
+	"modelName": "K_SCR_CE",
+	"month": 12,
+	"variable": [{
+		"coefficient": 20.9005,
+		"name": "M_ZIP_PENE_CE_TV"
+	},
+	{
+		"coefficient": 0.00163,
+		"name": "PRS_CLU_CD"
+	},
+	{
+		"coefficient": 0.2112,
+		"name": "K_KMT_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.3561,
+		"name": "K_HARDLN_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 8.44E-4,
+		"name": "K_HARDLN_SLS_TRS_12M"
+	},
+	{
+		"coefficient": 0.2123,
+		"name": "K_CE_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.2414,
+		"name": "K_HBA_SPR_SLS_12M_IND"
+	},
+	{
+		"coefficient": 0.2182,
+		"name": "K_TOYS_PCT_BUY"
+	},
+	{
+		"coefficient": 0.1383,
+		"name": "S_CE_ENT_TRS_6M"
+	},
+	{
+		"coefficient": 0.0732,
+		"name": "M_BONUS_MEMBER"
+	},
+	{
+		"coefficient": 0.1731,
+		"name": "K_CE_GT_12M_IND"
+	},
+	{
+		"coefficient": -0.00301,
+		"name": "K_DSL_SOFTLN_TRS"
+	},
+	{
+		"coefficient": -5.6E-4,
+		"name": "K_DSL_DIY_TOOL_AUTO_TRS"
+	},
+	{
+		"coefficient": 0.0541,
+		"name": "K_CE_ENT_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": -0.0014,
+		"name": "K_DSL_CE_TRS"
+	},
+	{
+		"coefficient": 0.0945,
+		"name": "K_CE_TRS_3M"
+	},
+	{
+		"coefficient": -3.3E-4,
+		"name": "K_DSL_FSG_TRS"
+	},
+	{
+		"coefficient": 0.1339,
+		"name": "K_CE_TRS_12M"
+	},
+	{
+		"coefficient": 0.0969,
+		"name": "K_TOYS_SPR_SLS_24M_IND"
+	}]
+}{
+	"modelId": 2,
+	"modelDescription": "Kmart consumer electronics",
+	"constant": -3.4035,
+	"modelName": "K_SCR_CE",
+	"month": 2,
+	"variable": [{
+		"coefficient": 0.00563,
+		"name": "PRS_CLU_CD"
+	},
+	{
+		"coefficient": 0.2238,
+		"name": "K_KMT_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.2922,
+		"name": "K_HARDLN_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 7.52E-4,
+		"name": "K_HARDLN_SLS_TRS_12M"
+	},
+	{
+		"coefficient": 0.2786,
+		"name": "K_CE_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.1953,
+		"name": "K_HBA_SPR_SLS_12M_IND"
+	},
+	{
+		"coefficient": 0.2333,
+		"name": "K_TOYS_PCT_BUY"
+	},
+	{
+		"coefficient": 0.0792,
+		"name": "M_BONUS_MEMBER"
+	},
+	{
+		"coefficient": 0.3325,
+		"name": "K_CE_GT_12M_IND"
+	},
+	{
+		"coefficient": -0.00286,
+		"name": "K_DSL_SOFTLN_TRS"
+	},
+	{
+		"coefficient": -4.5E-4,
+		"name": "K_DSL_DIY_TOOL_AUTO_TRS"
+	},
+	{
+		"coefficient": 0.1834,
+		"name": "K_CE_ENT_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.0498,
+		"name": "K_CE_TRS_3M"
+	},
+	{
+		"coefficient": -0.0012,
+		"name": "K_DSL_CE_TRS"
+	},
+	{
+		"coefficient": -3.7E-4,
+		"name": "K_DSL_FSG_TRS"
+	},
+	{
+		"coefficient": 0.1448,
+		"name": "K_CE_TRS_12M"
+	},
+	{
+		"coefficient": 0.1472,
+		"name": "K_TOYS_SPR_SLS_24M_IND"
+	}]
+}{
+	"modelId": 2,
+	"modelDescription": "Kmart consumer electronics",
+	"constant": -3.3842,
+	"modelName": "K_SCR_CE",
+	"month": 1,
+	"variable": [{
+		"coefficient": 20.9005,
+		"name": "M_ZIP_PENE_CE_TV"
+	},
+	{
+		"coefficient": 0.00163,
+		"name": "PRS_CLU_CD"
+	},
+	{
+		"coefficient": 0.2112,
+		"name": "K_KMT_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.3561,
+		"name": "K_HARDLN_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 8.44E-4,
+		"name": "K_HARDLN_SLS_TRS_12M"
+	},
+	{
+		"coefficient": 0.2123,
+		"name": "K_CE_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.2414,
+		"name": "K_HBA_SPR_SLS_12M_IND"
+	},
+	{
+		"coefficient": 0.2182,
+		"name": "K_TOYS_PCT_BUY"
+	},
+	{
+		"coefficient": 0.1383,
+		"name": "S_CE_ENT_TRS_6M"
+	},
+	{
+		"coefficient": 0.0732,
+		"name": "M_BONUS_MEMBER"
+	},
+	{
+		"coefficient": 0.1731,
+		"name": "K_CE_GT_12M_IND"
+	},
+	{
+		"coefficient": -0.00301,
+		"name": "K_DSL_SOFTLN_TRS"
+	},
+	{
+		"coefficient": -5.6E-4,
+		"name": "K_DSL_DIY_TOOL_AUTO_TRS"
+	},
+	{
+		"coefficient": 0.0541,
+		"name": "K_CE_ENT_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": -0.0014,
+		"name": "K_DSL_CE_TRS"
+	},
+	{
+		"coefficient": 0.0945,
+		"name": "K_CE_TRS_3M"
+	},
+	{
+		"coefficient": -3.3E-4,
+		"name": "K_DSL_FSG_TRS"
+	},
+	{
+		"coefficient": 0.1339,
+		"name": "K_CE_TRS_12M"
+	},
+	{
+		"coefficient": 0.0969,
+		"name": "K_TOYS_SPR_SLS_24M_IND"
+	}]
+}{
+	"modelId": 2,
+	"modelDescription": "Kmart consumer electronics",
+	"constant": -3.1811,
+	"modelName": "K_SCR_CE",
+	"month": 7,
+	"variable": [{
+		"coefficient": 0.4174,
+		"name": "K_HARDLN_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.2028,
+		"name": "K_KMT_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.301,
+		"name": "K_CE_GT_12M_IND"
+	},
+	{
+		"coefficient": -5.6E-4,
+		"name": "K_DSL_DIY_TOOL_AUTO_TRS"
+	},
+	{
+		"coefficient": -0.00277,
+		"name": "K_DSL_SOFTLN_TRS"
+	},
+	{
+		"coefficient": 0.1212,
+		"name": "K_CE_ENT_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.2286,
+		"name": "K_CE_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.1845,
+		"name": "K_HBA_SPR_SLS_12M_IND"
+	},
+	{
+		"coefficient": 0.2471,
+		"name": "K_CE_TRS_3M"
+	},
+	{
+		"coefficient": -0.00133,
+		"name": "K_DSL_CE_TRS"
+	},
+	{
+		"coefficient": -4.0E-4,
+		"name": "K_DSL_FSG_TRS"
+	},
+	{
+		"coefficient": 0.105,
+		"name": "K_CE_TRS_12M"
+	},
+	{
+		"coefficient": 0.1041,
+		"name": "K_TOYS_SPR_SLS_24M_IND"
+	}]
+}{
+	"modelId": 2,
+	"modelDescription": "Kmart consumer electronics",
+	"constant": -3.2374,
+	"modelName": "K_SCR_CE",
+	"month": 6,
+	"variable": [{
+		"coefficient": 0.00176,
+		"name": "PRS_CLU_CD"
+	},
+	{
+		"coefficient": 0.1783,
+		"name": "K_KMT_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.3685,
+		"name": "K_HARDLN_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.0304,
+		"name": "M_BONUS_MEMBER"
+	},
+	{
+		"coefficient": 0.3209,
+		"name": "K_CE_GT_12M_IND"
+	},
+	{
+		"coefficient": -5.4E-4,
+		"name": "K_DSL_DIY_TOOL_AUTO_TRS"
+	},
+	{
+		"coefficient": -0.003,
+		"name": "K_DSL_SOFTLN_TRS"
+	},
+	{
+		"coefficient": 0.1449,
+		"name": "K_CE_ENT_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.2859,
+		"name": "K_CE_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.2176,
+		"name": "K_HBA_SPR_SLS_12M_IND"
+	},
+	{
+		"coefficient": 0.2316,
+		"name": "K_CE_TRS_3M"
+	},
+	{
+		"coefficient": -0.00122,
+		"name": "K_DSL_CE_TRS"
+	},
+	{
+		"coefficient": -4.5E-4,
+		"name": "K_DSL_FSG_TRS"
+	},
+	{
+		"coefficient": 0.1048,
+		"name": "K_CE_TRS_12M"
+	},
+	{
+		"coefficient": 0.0747,
+		"name": "K_TOYS_SPR_SLS_24M_IND"
+	}]
+}{
+	"modelId": 2,
+	"modelDescription": "Kmart consumer electronics",
+	"constant": -3.098,
+	"modelName": "K_SCR_CE",
+	"month": 3,
+	"variable": [{
+		"coefficient": 0.00372,
+		"name": "PRS_CLU_CD"
+	},
+	{
+		"coefficient": 0.2862,
+		"name": "K_HARDLN_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.1798,
+		"name": "K_KMT_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.2783,
+		"name": "K_CE_GT_12M_IND"
+	},
+	{
+		"coefficient": -4.9E-4,
+		"name": "K_DSL_DIY_TOOL_AUTO_TRS"
+	},
+	{
+		"coefficient": -0.003,
+		"name": "K_DSL_SOFTLN_TRS"
+	},
+	{
+		"coefficient": 0.2363,
+		"name": "K_CE_ENT_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.2417,
+		"name": "K_CE_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.1831,
+		"name": "K_HBA_SPR_SLS_12M_IND"
+	},
+	{
+		"coefficient": 0.1245,
+		"name": "K_CE_TRS_3M"
+	},
+	{
+		"coefficient": -0.00114,
+		"name": "K_DSL_CE_TRS"
+	},
+	{
+		"coefficient": -4.1E-4,
+		"name": "K_DSL_FSG_TRS"
+	},
+	{
+		"coefficient": 0.1337,
+		"name": "K_CE_TRS_12M"
+	},
+	{
+		"coefficient": 0.22,
+		"name": "K_TOYS_SPR_SLS_24M_IND"
+	}]
+}{
+	"modelId": 2,
+	"modelDescription": "Kmart consumer electronics",
+	"constant": -3.2423,
+	"modelName": "K_SCR_CE",
+	"month": 5,
+	"variable": [{
+		"coefficient": 0.00299,
+		"name": "PRS_CLU_CD"
+	},
+	{
+		"coefficient": 0.3377,
+		"name": "K_HARDLN_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.1911,
+		"name": "K_KMT_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.3251,
+		"name": "K_CE_GT_12M_IND"
+	},
+	{
+		"coefficient": -5.4E-4,
+		"name": "K_DSL_DIY_TOOL_AUTO_TRS"
+	},
+	{
+		"coefficient": -0.00301,
+		"name": "K_DSL_SOFTLN_TRS"
+	},
+	{
+		"coefficient": 0.0971,
+		"name": "K_CE_ENT_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.2691,
+		"name": "K_CE_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.1975,
+		"name": "K_HBA_SPR_SLS_12M_IND"
+	},
+	{
+		"coefficient": 0.1844,
+		"name": "K_CE_TRS_3M"
+	},
+	{
+		"coefficient": -0.00136,
+		"name": "K_DSL_CE_TRS"
+	},
+	{
+		"coefficient": -0.1052,
+		"name": "K_GAMING_CE_CPN_TRS_24M"
+	},
+	{
+		"coefficient": -3.7E-4,
+		"name": "K_DSL_FSG_TRS"
+	},
+	{
+		"coefficient": 0.1263,
+		"name": "K_CE_TRS_12M"
+	},
+	{
+		"coefficient": 0.1008,
+		"name": "K_TOYS_SPR_SLS_24M_IND"
+	}]
+}{
+	"modelId": 2,
+	"modelDescription": "Kmart consumer electronics",
+	"constant": -2.8321,
+	"modelName": "K_SCR_CE",
+	"month": 11,
+	"variable": [{
+		"coefficient": 0.2624,
+		"name": "K_KMT_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.3026,
+		"name": "K_HARDLN_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.00106,
+		"name": "K_HARDLN_SLS_TRS_12M"
+	},
+	{
+		"coefficient": 0.3554,
+		"name": "K_CE_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.0906,
+		"name": "K_HBA_SPR_SLS_12M_IND"
+	},
+	{
+		"coefficient": 0.0715,
+		"name": "K_GAMING_CE_CPN_TRS_24M"
+	},
+	{
+		"coefficient": 0.2443,
+		"name": "K_TOYS_PCT_BUY"
+	},
+	{
+		"coefficient": 0.182,
+		"name": "M_BONUS_MEMBER"
+	},
+	{
+		"coefficient": 0.3139,
+		"name": "K_CE_GT_12M_IND"
+	},
+	{
+		"coefficient": -3.0E-4,
+		"name": "K_DSL_DIY_TOOL_AUTO_TRS"
+	},
+	{
+		"coefficient": -0.00287,
+		"name": "K_DSL_SOFTLN_TRS"
+	},
+	{
+		"coefficient": 0.2632,
+		"name": "K_CE_ENT_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": -8.0E-4,
+		"name": "K_DSL_CE_TRS"
+	},
+	{
+		"coefficient": 0.195,
+		"name": "K_CE_TRS_3M"
+	},
+	{
+		"coefficient": -4.5E-4,
+		"name": "K_DSL_FSG_TRS"
+	},
+	{
+		"coefficient": 0.1025,
+		"name": "K_CE_TRS_12M"
+	},
+	{
+		"coefficient": 0.3331,
+		"name": "K_TOYS_SPR_SLS_24M_IND"
+	}]
+}{
+	"modelId": 2,
+	"modelDescription": "Kmart consumer electronics",
+	"constant": -3.3003,
+	"modelName": "K_SCR_CE",
+	"month": 10,
+	"variable": [{
+		"coefficient": 0.0033,
+		"name": "PRS_CLU_CD"
+	},
+	{
+		"coefficient": 0.1832,
+		"name": "K_KMT_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.3839,
+		"name": "K_HARDLN_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": -0.0763,
+		"name": "M_CNT_DM_CAMPAIGNS_3_MTH"
+	},
+	{
+		"coefficient": 9.29E-4,
+		"name": "K_HARDLN_SLS_TRS_12M"
+	},
+	{
+		"coefficient": 0.2648,
+		"name": "K_CE_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.195,
+		"name": "K_HBA_SPR_SLS_12M_IND"
+	},
+	{
+		"coefficient": 0.2535,
+		"name": "M_BONUS_MEMBER"
+	},
+	{
+		"coefficient": 0.3091,
+		"name": "K_CE_GT_12M_IND"
+	},
+	{
+		"coefficient": -0.00296,
+		"name": "K_DSL_SOFTLN_TRS"
+	},
+	{
+		"coefficient": -5.1E-4,
+		"name": "K_DSL_DIY_TOOL_AUTO_TRS"
+	},
+	{
+		"coefficient": 0.2268,
+		"name": "K_CE_ENT_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": -0.00128,
+		"name": "K_DSL_CE_TRS"
+	},
+	{
+		"coefficient": 0.2084,
+		"name": "K_CE_TRS_3M"
+	},
+	{
+		"coefficient": -3.8E-4,
+		"name": "K_DSL_FSG_TRS"
+	},
+	{
+		"coefficient": 0.1238,
+		"name": "K_CE_TRS_12M"
+	},
+	{
+		"coefficient": 0.191,
+		"name": "K_TOYS_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": -0.0537,
+		"name": "K_CE_HE_TRS_12M"
+	}]
+}{
+	"modelId": 2,
+	"modelDescription": "Kmart consumer electronics",
+	"constant": -3.2179,
+	"modelName": "K_SCR_CE",
+	"month": 9,
+	"variable": [{
+		"coefficient": 0.1818,
+		"name": "K_KMT_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.3071,
+		"name": "K_HARDLN_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.2669,
+		"name": "K_CE_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.1794,
+		"name": "K_HBA_SPR_SLS_12M_IND"
+	},
+	{
+		"coefficient": -0.0972,
+		"name": "K_GAMING_CE_CPN_TRS_24M"
+	},
+	{
+		"coefficient": 0.1309,
+		"name": "M_BONUS_MEMBER"
+	},
+	{
+		"coefficient": 0.3074,
+		"name": "K_CE_GT_12M_IND"
+	},
+	{
+		"coefficient": -0.00306,
+		"name": "K_DSL_SOFTLN_TRS"
+	},
+	{
+		"coefficient": -6.1E-4,
+		"name": "K_DSL_DIY_TOOL_AUTO_TRS"
+	},
+	{
+		"coefficient": 3.9254,
+		"name": "M_ZIP_PENE_TL_HAND"
+	},
+	{
+		"coefficient": 0.1527,
+		"name": "K_CE_ENT_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": -0.00145,
+		"name": "K_DSL_CE_TRS"
+	},
+	{
+		"coefficient": 0.1938,
+		"name": "K_CE_TRS_3M"
+	},
+	{
+		"coefficient": -4.3E-4,
+		"name": "K_DSL_FSG_TRS"
+	},
+	{
+		"coefficient": 0.1144,
+		"name": "K_CE_TRS_12M"
+	},
+	{
+		"coefficient": 0.0987,
+		"name": "K_TOYS_SPR_SLS_24M_IND"
+	}]
+}{
+	"modelId": 5,
+	"modelDescription": "Fine Jewelery Kmart",
+	"constant": -4.1566,
+	"modelName": "K_SCR_FNJL",
+	"month": 4,
+	"variable": [{
+		"coefficient": 0.4081,
+		"name": "K_KMT_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.2814,
+		"name": "K_FNJL_TRS_12M"
+	},
+	{
+		"coefficient": -0.00394,
+		"name": "K_DSL_KMT_TRS"
+	},
+	{
+		"coefficient": 0.00273,
+		"name": "K_HF_SLS_TRS_12M"
+	},
+	{
+		"coefficient": 0.2708,
+		"name": "K_KMT_GT_12M_IND"
+	},
+	{
+		"coefficient": -6.2E-4,
+		"name": "K_DSL_WAPP_INT_TRS"
+	},
+	{
+		"coefficient": 0.0151,
+		"name": "K_SOFTLN_TRS_3M"
+	},
+	{
+		"coefficient": 3.3E-4,
+		"name": "K_WAPP_SLS_24M"
+	},
+	{
+		"coefficient": 0.3578,
+		"name": "K_WAPP_ACC_SPR_SLS_12M_IND"
+	},
+	{
+		"coefficient": -6.6E-4,
+		"name": "K_DSL_FTWR_TRS"
+	},
+	{
+		"coefficient": 0.1826,
+		"name": "K_WAPP_INT_ACC_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.0947,
+		"name": "S_W_APP_ACC_INT_6M_IND"
+	}]
+}{
+	"modelId": 5,
+	"modelDescription": "Fine Jewelery Kmart",
+	"constant": -4.1566,
+	"modelName": "K_SCR_FNJL",
+	"month": 8,
+	"variable": [{
+		"coefficient": 0.4081,
+		"name": "K_KMT_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.2814,
+		"name": "K_FNJL_TRS_12M"
+	},
+	{
+		"coefficient": -0.00394,
+		"name": "K_DSL_KMT_TRS"
+	},
+	{
+		"coefficient": 0.00273,
+		"name": "K_HF_SLS_TRS_12M"
+	},
+	{
+		"coefficient": 0.2708,
+		"name": "K_KMT_GT_12M_IND"
+	},
+	{
+		"coefficient": -6.2E-4,
+		"name": "K_DSL_WAPP_INT_TRS"
+	},
+	{
+		"coefficient": 0.0151,
+		"name": "K_SOFTLN_TRS_3M"
+	},
+	{
+		"coefficient": 3.3E-4,
+		"name": "K_WAPP_SLS_24M"
+	},
+	{
+		"coefficient": 0.3578,
+		"name": "K_WAPP_ACC_SPR_SLS_12M_IND"
+	},
+	{
+		"coefficient": -6.6E-4,
+		"name": "K_DSL_FTWR_TRS"
+	},
+	{
+		"coefficient": 0.1826,
+		"name": "K_WAPP_INT_ACC_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.0947,
+		"name": "S_W_APP_ACC_INT_6M_IND"
+	}]
+}{
+	"modelId": 5,
+	"modelDescription": "Fine Jewelery Kmart",
+	"constant": -3.9465,
+	"modelName": "K_SCR_FNJL",
+	"month": 12,
+	"variable": [{
+		"coefficient": 0.1983,
+		"name": "K_FNJL_TRS_12M"
+	},
+	{
+		"coefficient": -0.00416,
+		"name": "K_DSL_KMT_TRS"
+	},
+	{
+		"coefficient": 0.0116,
+		"name": "K_FTWR_WOMEN_SLS_TRS_24M"
+	},
+	{
+		"coefficient": 0.7388,
+		"name": "K_FNJL_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.024,
+		"name": "K_SOFTLN_TRS_3M"
+	},
+	{
+		"coefficient": 0.1699,
+		"name": "K_EASTER_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.1204,
+		"name": "ADL_FEM_45_64_FL"
+	},
+	{
+		"coefficient": 0.1032,
+		"name": "M_CNT_DM_CAMPAIGNS_1_MTH"
+	},
+	{
+		"coefficient": 0.3348,
+		"name": "K_M_APP_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.00128,
+		"name": "K_SOFTLN_BYR_SLS2"
+	},
+	{
+		"coefficient": 0.3515,
+		"name": "K_WAPP_INT_ACC_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.2142,
+		"name": "K_KIDS_APP_PCT_BUY"
+	}]
+}{
+	"modelId": 5,
+	"modelDescription": "Fine Jewelery Kmart",
+	"constant": -4.1566,
+	"modelName": "K_SCR_FNJL",
+	"month": 2,
+	"variable": [{
+		"coefficient": 0.4081,
+		"name": "K_KMT_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.2814,
+		"name": "K_FNJL_TRS_12M"
+	},
+	{
+		"coefficient": -0.00394,
+		"name": "K_DSL_KMT_TRS"
+	},
+	{
+		"coefficient": 0.00273,
+		"name": "K_HF_SLS_TRS_12M"
+	},
+	{
+		"coefficient": 0.2708,
+		"name": "K_KMT_GT_12M_IND"
+	},
+	{
+		"coefficient": -6.2E-4,
+		"name": "K_DSL_WAPP_INT_TRS"
+	},
+	{
+		"coefficient": 0.0151,
+		"name": "K_SOFTLN_TRS_3M"
+	},
+	{
+		"coefficient": 3.3E-4,
+		"name": "K_WAPP_SLS_24M"
+	},
+	{
+		"coefficient": 0.3578,
+		"name": "K_WAPP_ACC_SPR_SLS_12M_IND"
+	},
+	{
+		"coefficient": -6.6E-4,
+		"name": "K_DSL_FTWR_TRS"
+	},
+	{
+		"coefficient": 0.1826,
+		"name": "K_WAPP_INT_ACC_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.0947,
+		"name": "S_W_APP_ACC_INT_6M_IND"
+	}]
+}{
+	"modelId": 5,
+	"modelDescription": "Fine Jewelery Kmart",
+	"constant": -3.9465,
+	"modelName": "K_SCR_FNJL",
+	"month": 1,
+	"variable": [{
+		"coefficient": 0.1983,
+		"name": "K_FNJL_TRS_12M"
+	},
+	{
+		"coefficient": -0.00416,
+		"name": "K_DSL_KMT_TRS"
+	},
+	{
+		"coefficient": 0.0116,
+		"name": "K_FTWR_WOMEN_SLS_TRS_24M"
+	},
+	{
+		"coefficient": 0.7388,
+		"name": "K_FNJL_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.024,
+		"name": "K_SOFTLN_TRS_3M"
+	},
+	{
+		"coefficient": 0.1699,
+		"name": "K_EASTER_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.1204,
+		"name": "ADL_FEM_45_64_FL"
+	},
+	{
+		"coefficient": 0.1032,
+		"name": "M_CNT_DM_CAMPAIGNS_1_MTH"
+	},
+	{
+		"coefficient": 0.3348,
+		"name": "K_M_APP_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.00128,
+		"name": "K_SOFTLN_BYR_SLS2"
+	},
+	{
+		"coefficient": 0.3515,
+		"name": "K_WAPP_INT_ACC_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.2142,
+		"name": "K_KIDS_APP_PCT_BUY"
+	}]
+}{
+	"modelId": 5,
+	"modelDescription": "Fine Jewelery Kmart",
+	"constant": -4.1566,
+	"modelName": "K_SCR_FNJL",
+	"month": 7,
+	"variable": [{
+		"coefficient": 0.4081,
+		"name": "K_KMT_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.2814,
+		"name": "K_FNJL_TRS_12M"
+	},
+	{
+		"coefficient": -0.00394,
+		"name": "K_DSL_KMT_TRS"
+	},
+	{
+		"coefficient": 0.00273,
+		"name": "K_HF_SLS_TRS_12M"
+	},
+	{
+		"coefficient": 0.2708,
+		"name": "K_KMT_GT_12M_IND"
+	},
+	{
+		"coefficient": -6.2E-4,
+		"name": "K_DSL_WAPP_INT_TRS"
+	},
+	{
+		"coefficient": 0.0151,
+		"name": "K_SOFTLN_TRS_3M"
+	},
+	{
+		"coefficient": 3.3E-4,
+		"name": "K_WAPP_SLS_24M"
+	},
+	{
+		"coefficient": 0.3578,
+		"name": "K_WAPP_ACC_SPR_SLS_12M_IND"
+	},
+	{
+		"coefficient": -6.6E-4,
+		"name": "K_DSL_FTWR_TRS"
+	},
+	{
+		"coefficient": 0.1826,
+		"name": "K_WAPP_INT_ACC_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.0947,
+		"name": "S_W_APP_ACC_INT_6M_IND"
+	}]
+}{
+	"modelId": 5,
+	"modelDescription": "Fine Jewelery Kmart",
+	"constant": -4.1566,
+	"modelName": "K_SCR_FNJL",
+	"month": 6,
+	"variable": [{
+		"coefficient": 0.4081,
+		"name": "K_KMT_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.2814,
+		"name": "K_FNJL_TRS_12M"
+	},
+	{
+		"coefficient": -0.00394,
+		"name": "K_DSL_KMT_TRS"
+	},
+	{
+		"coefficient": 0.00273,
+		"name": "K_HF_SLS_TRS_12M"
+	},
+	{
+		"coefficient": 0.2708,
+		"name": "K_KMT_GT_12M_IND"
+	},
+	{
+		"coefficient": -6.2E-4,
+		"name": "K_DSL_WAPP_INT_TRS"
+	},
+	{
+		"coefficient": 0.0151,
+		"name": "K_SOFTLN_TRS_3M"
+	},
+	{
+		"coefficient": 3.3E-4,
+		"name": "K_WAPP_SLS_24M"
+	},
+	{
+		"coefficient": 0.3578,
+		"name": "K_WAPP_ACC_SPR_SLS_12M_IND"
+	},
+	{
+		"coefficient": -6.6E-4,
+		"name": "K_DSL_FTWR_TRS"
+	},
+	{
+		"coefficient": 0.1826,
+		"name": "K_WAPP_INT_ACC_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.0947,
+		"name": "S_W_APP_ACC_INT_6M_IND"
+	}]
+}{
+	"modelId": 5,
+	"modelDescription": "Fine Jewelery Kmart",
+	"constant": -4.1566,
+	"modelName": "K_SCR_FNJL",
+	"month": 3,
+	"variable": [{
+		"coefficient": 0.4081,
+		"name": "K_KMT_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.2814,
+		"name": "K_FNJL_TRS_12M"
+	},
+	{
+		"coefficient": -0.00394,
+		"name": "K_DSL_KMT_TRS"
+	},
+	{
+		"coefficient": 0.00273,
+		"name": "K_HF_SLS_TRS_12M"
+	},
+	{
+		"coefficient": 0.2708,
+		"name": "K_KMT_GT_12M_IND"
+	},
+	{
+		"coefficient": -6.2E-4,
+		"name": "K_DSL_WAPP_INT_TRS"
+	},
+	{
+		"coefficient": 0.0151,
+		"name": "K_SOFTLN_TRS_3M"
+	},
+	{
+		"coefficient": 3.3E-4,
+		"name": "K_WAPP_SLS_24M"
+	},
+	{
+		"coefficient": 0.3578,
+		"name": "K_WAPP_ACC_SPR_SLS_12M_IND"
+	},
+	{
+		"coefficient": -6.6E-4,
+		"name": "K_DSL_FTWR_TRS"
+	},
+	{
+		"coefficient": 0.1826,
+		"name": "K_WAPP_INT_ACC_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.0947,
+		"name": "S_W_APP_ACC_INT_6M_IND"
+	}]
+}{
+	"modelId": 5,
+	"modelDescription": "Fine Jewelery Kmart",
+	"constant": -4.1566,
+	"modelName": "K_SCR_FNJL",
+	"month": 5,
+	"variable": [{
+		"coefficient": 0.4081,
+		"name": "K_KMT_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.2814,
+		"name": "K_FNJL_TRS_12M"
+	},
+	{
+		"coefficient": -0.00394,
+		"name": "K_DSL_KMT_TRS"
+	},
+	{
+		"coefficient": 0.00273,
+		"name": "K_HF_SLS_TRS_12M"
+	},
+	{
+		"coefficient": 0.2708,
+		"name": "K_KMT_GT_12M_IND"
+	},
+	{
+		"coefficient": -6.2E-4,
+		"name": "K_DSL_WAPP_INT_TRS"
+	},
+	{
+		"coefficient": 0.0151,
+		"name": "K_SOFTLN_TRS_3M"
+	},
+	{
+		"coefficient": 3.3E-4,
+		"name": "K_WAPP_SLS_24M"
+	},
+	{
+		"coefficient": 0.3578,
+		"name": "K_WAPP_ACC_SPR_SLS_12M_IND"
+	},
+	{
+		"coefficient": -6.6E-4,
+		"name": "K_DSL_FTWR_TRS"
+	},
+	{
+		"coefficient": 0.1826,
+		"name": "K_WAPP_INT_ACC_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.0947,
+		"name": "S_W_APP_ACC_INT_6M_IND"
+	}]
+}{
+	"modelId": 5,
+	"modelDescription": "Fine Jewelery Kmart",
+	"constant": -4.1566,
+	"modelName": "K_SCR_FNJL",
+	"month": 11,
+	"variable": [{
+		"coefficient": 0.4081,
+		"name": "K_KMT_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.2814,
+		"name": "K_FNJL_TRS_12M"
+	},
+	{
+		"coefficient": -0.00394,
+		"name": "K_DSL_KMT_TRS"
+	},
+	{
+		"coefficient": 0.00273,
+		"name": "K_HF_SLS_TRS_12M"
+	},
+	{
+		"coefficient": 0.2708,
+		"name": "K_KMT_GT_12M_IND"
+	},
+	{
+		"coefficient": -6.2E-4,
+		"name": "K_DSL_WAPP_INT_TRS"
+	},
+	{
+		"coefficient": 0.0151,
+		"name": "K_SOFTLN_TRS_3M"
+	},
+	{
+		"coefficient": 3.3E-4,
+		"name": "K_WAPP_SLS_24M"
+	},
+	{
+		"coefficient": 0.3578,
+		"name": "K_WAPP_ACC_SPR_SLS_12M_IND"
+	},
+	{
+		"coefficient": -6.6E-4,
+		"name": "K_DSL_FTWR_TRS"
+	},
+	{
+		"coefficient": 0.1826,
+		"name": "K_WAPP_INT_ACC_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.0947,
+		"name": "S_W_APP_ACC_INT_6M_IND"
+	}]
+}{
+	"modelId": 5,
+	"modelDescription": "Fine Jewelery Kmart",
+	"constant": -4.1566,
+	"modelName": "K_SCR_FNJL",
+	"month": 10,
+	"variable": [{
+		"coefficient": 0.4081,
+		"name": "K_KMT_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.2814,
+		"name": "K_FNJL_TRS_12M"
+	},
+	{
+		"coefficient": -0.00394,
+		"name": "K_DSL_KMT_TRS"
+	},
+	{
+		"coefficient": 0.00273,
+		"name": "K_HF_SLS_TRS_12M"
+	},
+	{
+		"coefficient": 0.2708,
+		"name": "K_KMT_GT_12M_IND"
+	},
+	{
+		"coefficient": -6.2E-4,
+		"name": "K_DSL_WAPP_INT_TRS"
+	},
+	{
+		"coefficient": 0.0151,
+		"name": "K_SOFTLN_TRS_3M"
+	},
+	{
+		"coefficient": 3.3E-4,
+		"name": "K_WAPP_SLS_24M"
+	},
+	{
+		"coefficient": 0.3578,
+		"name": "K_WAPP_ACC_SPR_SLS_12M_IND"
+	},
+	{
+		"coefficient": -6.6E-4,
+		"name": "K_DSL_FTWR_TRS"
+	},
+	{
+		"coefficient": 0.1826,
+		"name": "K_WAPP_INT_ACC_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.0947,
+		"name": "S_W_APP_ACC_INT_6M_IND"
+	}]
+}{
+	"modelId": 5,
+	"modelDescription": "Fine Jewelery Kmart",
+	"constant": -4.1566,
+	"modelName": "K_SCR_FNJL",
+	"month": 9,
+	"variable": [{
+		"coefficient": 0.4081,
+		"name": "K_KMT_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.2814,
+		"name": "K_FNJL_TRS_12M"
+	},
+	{
+		"coefficient": -0.00394,
+		"name": "K_DSL_KMT_TRS"
+	},
+	{
+		"coefficient": 0.00273,
+		"name": "K_HF_SLS_TRS_12M"
+	},
+	{
+		"coefficient": 0.2708,
+		"name": "K_KMT_GT_12M_IND"
+	},
+	{
+		"coefficient": -6.2E-4,
+		"name": "K_DSL_WAPP_INT_TRS"
+	},
+	{
+		"coefficient": 0.0151,
+		"name": "K_SOFTLN_TRS_3M"
+	},
+	{
+		"coefficient": 3.3E-4,
+		"name": "K_WAPP_SLS_24M"
+	},
+	{
+		"coefficient": 0.3578,
+		"name": "K_WAPP_ACC_SPR_SLS_12M_IND"
+	},
+	{
+		"coefficient": -6.6E-4,
+		"name": "K_DSL_FTWR_TRS"
+	},
+	{
+		"coefficient": 0.1826,
+		"name": "K_WAPP_INT_ACC_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.0947,
+		"name": "S_W_APP_ACC_INT_6M_IND"
+	}]
+}{
+	"modelId": 6,
+	"modelDescription": "Food and consumables",
+	"constant": -1.8669,
+	"modelName": "K_SCR_FOOD_CONS",
+	"month": 0,
+	"variable": [{
+		"coefficient": 0.3697,
+		"name": "K_DIY_TOOL_AUTO_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.3298,
+		"name": "MONTH10"
+	},
+	{
+		"coefficient": -0.00395,
+		"name": "K_DSL_FOOD_CONS_TRS"
+	},
+	{
+		"coefficient": 0.7323,
+		"name": "MONTH12"
+	},
+	{
+		"coefficient": 0.4367,
+		"name": "MONTH11"
+	},
+	{
+		"coefficient": 0.0346,
+		"name": "FOD_COK_GRM_FL"
+	},
+	{
+		"coefficient": 0.4688,
+		"name": "K_OTC_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.0056,
+		"name": "K_FOOD_CONS_SLS_12M"
+	},
+	{
+		"coefficient": 0.1519,
+		"name": "K_FOOD_PANTRY_TI_TRS_3M"
+	},
+	{
+		"coefficient": 0.265,
+		"name": "MONTH5"
+	},
+	{
+		"coefficient": 0.1825,
+		"name": "MONTH4"
+	},
+	{
+		"coefficient": 0.2671,
+		"name": "MONTH7"
+	},
+	{
+		"coefficient": 0.2833,
+		"name": "MONTH6"
+	},
+	{
+		"coefficient": 0.3454,
+		"name": "MONTH3"
+	},
+	{
+		"coefficient": 0.1069,
+		"name": "MONTH2"
+	},
+	{
+		"coefficient": 0.2113,
+		"name": "K_CE_TRS_3M"
+	},
+	{
+		"coefficient": -4.7E-4,
+		"name": "K_DSL_FSG_TRS"
+	},
+	{
+		"coefficient": 0.141,
+		"name": "MONTH9"
+	},
+	{
+		"coefficient": 0.2697,
+		"name": "MONTH8"
+	}]
+}{
+	"modelId": 7,
+	"modelDescription": "Kmart footwear",
+	"constant": -4.2082,
+	"modelName": "K_SCR_FOOTWEAR",
+	"month": 0,
+	"variable": [{
+		"coefficient": -0.00279,
+		"name": "K_DSL_FOOD_GROCERY_TRS"
+	},
+	{
+		"coefficient": 0.5794,
+		"name": "K_FW_2M"
+	},
+	{
+		"coefficient": 0.5989,
+		"name": "MONTH10"
+	},
+	{
+		"coefficient": 0.9836,
+		"name": "MONTH12"
+	},
+	{
+		"coefficient": 0.8664,
+		"name": "MONTH11"
+	},
+	{
+		"coefficient": 0.00538,
+		"name": "K_HBA_OTC_SLS_TRS_24M"
+	},
+	{
+		"coefficient": 0.208,
+		"name": "K_SPRTNG_GDS_SPR_SLS_12M_IND"
+	},
+	{
+		"coefficient": 0.1087,
+		"name": "K_WAPP_ACC_TRS_3M"
+	},
+	{
+		"coefficient": 0.9243,
+		"name": "MONTH5"
+	},
+	{
+		"coefficient": 0.7945,
+		"name": "MONTH4"
+	},
+	{
+		"coefficient": 0.8779,
+		"name": "MONTH7"
+	},
+	{
+		"coefficient": 0.8401,
+		"name": "MONTH6"
+	},
+	{
+		"coefficient": 0.7373,
+		"name": "MONTH3"
+	},
+	{
+		"coefficient": 0.2011,
+		"name": "MONTH2"
+	},
+	{
+		"coefficient": 0.3567,
+		"name": "K_CE_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.048,
+		"name": "M_EARNED_POINTS_24M_CD"
+	},
+	{
+		"coefficient": 0.0468,
+		"name": "K_TOYS_TRS_3M"
+	},
+	{
+		"coefficient": 0.1472,
+		"name": "K_FTWR_TRS_24M"
+	},
+	{
+		"coefficient": 0.4704,
+		"name": "MONTH9"
+	},
+	{
+		"coefficient": 0.3542,
+		"name": "K_FTWR_ATHLETICS_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.8531,
+		"name": "MONTH8"
+	}]
+}{
+	"modelId": 8,
+	"modelDescription": "Fitness & Sporting Goods",
+	"constant": -2.9778,
+	"modelName": "ModelName",
+	"month": 8,
+	"variable": [{
+		"coefficient": 0.1666,
+		"name": "K_KMT_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.2253,
+		"name": "K_HARDLN_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.00479,
+		"name": "K_EASTER_SLS_6M"
+	},
+	{
+		"coefficient": 0.416,
+		"name": "K_SPRTNG_GDS_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.093,
+		"name": "ADL_FEM_35_44_FL"
+	},
+	{
+		"coefficient": 0.00699,
+		"name": "K_FTWR_ATHLETICS_SLS_TRS_24M"
+	},
+	{
+		"coefficient": 0.313,
+		"name": "K_FSG_GAMES_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.1297,
+		"name": "S_HL_12M_IND"
+	},
+	{
+		"coefficient": 0.0938,
+		"name": "ADL_MAL_35_44_FL"
+	},
+	{
+		"coefficient": 0.1093,
+		"name": "M_BONUS_MEMBER"
+	},
+	{
+		"coefficient": -0.00335,
+		"name": "K_DSL_SOFTLN_TRS"
+	},
+	{
+		"coefficient": 0.0969,
+		"name": "K_HARDLN_TRS_3M"
+	},
+	{
+		"coefficient": 0.243,
+		"name": "K_HALLOWEEN_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.217,
+		"name": "K_CE_HE_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": -0.00147,
+		"name": "K_DSL_FSG_TRS"
+	},
+	{
+		"coefficient": 0.5588,
+		"name": "K_SP_1M"
+	},
+	{
+		"coefficient": 0.3881,
+		"name": "K_TOYS_CHILDRN_SPR_SLS_24M_IND"
+	}]
+}{
+	"modelId": 8,
+	"modelDescription": "Fitness & Sporting Goods",
+	"constant": -2.9778,
+	"modelName": "ModelName",
+	"month": 12,
+	"variable": [{
+		"coefficient": 0.1666,
+		"name": "K_KMT_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.2253,
+		"name": "K_HARDLN_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.00479,
+		"name": "K_EASTER_SLS_6M"
+	},
+	{
+		"coefficient": 0.416,
+		"name": "K_SPRTNG_GDS_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.093,
+		"name": "ADL_FEM_35_44_FL"
+	},
+	{
+		"coefficient": 0.00699,
+		"name": "K_FTWR_ATHLETICS_SLS_TRS_24M"
+	},
+	{
+		"coefficient": 0.313,
+		"name": "K_FSG_GAMES_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.1297,
+		"name": "S_HL_12M_IND"
+	},
+	{
+		"coefficient": 0.0938,
+		"name": "ADL_MAL_35_44_FL"
+	},
+	{
+		"coefficient": 0.1093,
+		"name": "M_BONUS_MEMBER"
+	},
+	{
+		"coefficient": -0.00335,
+		"name": "K_DSL_SOFTLN_TRS"
+	},
+	{
+		"coefficient": 0.0969,
+		"name": "K_HARDLN_TRS_3M"
+	},
+	{
+		"coefficient": 0.243,
+		"name": "K_HALLOWEEN_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.217,
+		"name": "K_CE_HE_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": -0.00147,
+		"name": "K_DSL_FSG_TRS"
+	},
+	{
+		"coefficient": 0.5588,
+		"name": "K_SP_1M"
+	},
+	{
+		"coefficient": 0.3881,
+		"name": "K_TOYS_CHILDRN_SPR_SLS_24M_IND"
+	}]
+}{
+	"modelId": 8,
+	"modelDescription": "Fitness & Sporting Goods",
+	"constant": -2.9778,
+	"modelName": "ModelName",
+	"month": 7,
+	"variable": [{
+		"coefficient": 0.1666,
+		"name": "K_KMT_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.2253,
+		"name": "K_HARDLN_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.00479,
+		"name": "K_EASTER_SLS_6M"
+	},
+	{
+		"coefficient": 0.416,
+		"name": "K_SPRTNG_GDS_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.093,
+		"name": "ADL_FEM_35_44_FL"
+	},
+	{
+		"coefficient": 0.00699,
+		"name": "K_FTWR_ATHLETICS_SLS_TRS_24M"
+	},
+	{
+		"coefficient": 0.313,
+		"name": "K_FSG_GAMES_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.1297,
+		"name": "S_HL_12M_IND"
+	},
+	{
+		"coefficient": 0.0938,
+		"name": "ADL_MAL_35_44_FL"
+	},
+	{
+		"coefficient": 0.1093,
+		"name": "M_BONUS_MEMBER"
+	},
+	{
+		"coefficient": -0.00335,
+		"name": "K_DSL_SOFTLN_TRS"
+	},
+	{
+		"coefficient": 0.0969,
+		"name": "K_HARDLN_TRS_3M"
+	},
+	{
+		"coefficient": 0.243,
+		"name": "K_HALLOWEEN_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.217,
+		"name": "K_CE_HE_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": -0.00147,
+		"name": "K_DSL_FSG_TRS"
+	},
+	{
+		"coefficient": 0.5588,
+		"name": "K_SP_1M"
+	},
+	{
+		"coefficient": 0.3881,
+		"name": "K_TOYS_CHILDRN_SPR_SLS_24M_IND"
+	}]
+}{
+	"modelId": 8,
+	"modelDescription": "Fitness & Sporting Goods",
+	"constant": -2.9778,
+	"modelName": "ModelName",
+	"month": 6,
+	"variable": [{
+		"coefficient": 0.1666,
+		"name": "K_KMT_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.2253,
+		"name": "K_HARDLN_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.00479,
+		"name": "K_EASTER_SLS_6M"
+	},
+	{
+		"coefficient": 0.416,
+		"name": "K_SPRTNG_GDS_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.093,
+		"name": "ADL_FEM_35_44_FL"
+	},
+	{
+		"coefficient": 0.00699,
+		"name": "K_FTWR_ATHLETICS_SLS_TRS_24M"
+	},
+	{
+		"coefficient": 0.313,
+		"name": "K_FSG_GAMES_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.1297,
+		"name": "S_HL_12M_IND"
+	},
+	{
+		"coefficient": 0.0938,
+		"name": "ADL_MAL_35_44_FL"
+	},
+	{
+		"coefficient": 0.1093,
+		"name": "M_BONUS_MEMBER"
+	},
+	{
+		"coefficient": -0.00335,
+		"name": "K_DSL_SOFTLN_TRS"
+	},
+	{
+		"coefficient": 0.0969,
+		"name": "K_HARDLN_TRS_3M"
+	},
+	{
+		"coefficient": 0.243,
+		"name": "K_HALLOWEEN_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.217,
+		"name": "K_CE_HE_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": -0.00147,
+		"name": "K_DSL_FSG_TRS"
+	},
+	{
+		"coefficient": 0.5588,
+		"name": "K_SP_1M"
+	},
+	{
+		"coefficient": 0.3881,
+		"name": "K_TOYS_CHILDRN_SPR_SLS_24M_IND"
+	}]
+}{
+	"modelId": 8,
+	"modelDescription": "Fitness & Sporting Goods",
+	"constant": -3.3131,
+	"modelName": "ModelName",
+	"month": 4,
+	"variable": [{
+		"coefficient": 0.2006,
+		"name": "K_KMT_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.1261,
+		"name": "M_BONUS_MEMBER"
+	},
+	{
+		"coefficient": 0.3356,
+		"name": "K_HARDLN_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.2098,
+		"name": "K_HALLOWEEN_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.0983,
+		"name": "K_HARDLN_TRS_3M"
+	},
+	{
+		"coefficient": -0.00341,
+		"name": "K_DSL_SOFTLN_TRS"
+	},
+	{
+		"coefficient": 0.2473,
+		"name": "K_CE_HE_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.00877,
+		"name": "K_EASTER_SLS_6M"
+	},
+	{
+		"coefficient": -0.00164,
+		"name": "K_DSL_FSG_TRS"
+	},
+	{
+		"coefficient": 0.5022,
+		"name": "K_SPRTNG_GDS_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.00491,
+		"name": "K_FTWR_ATHLETICS_SLS_TRS_24M"
+	},
+	{
+		"coefficient": 0.319,
+		"name": "K_TOYS_CHILDRN_SPR_SLS_24M_IND"
+	}]
+}{
+	"modelId": 8,
+	"modelDescription": "Fitness & Sporting Goods",
+	"constant": -3.3131,
+	"modelName": "ModelName",
+	"month": 2,
+	"variable": [{
+		"coefficient": 0.2006,
+		"name": "K_KMT_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.1261,
+		"name": "M_BONUS_MEMBER"
+	},
+	{
+		"coefficient": 0.3356,
+		"name": "K_HARDLN_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.2098,
+		"name": "K_HALLOWEEN_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.0983,
+		"name": "K_HARDLN_TRS_3M"
+	},
+	{
+		"coefficient": -0.00341,
+		"name": "K_DSL_SOFTLN_TRS"
+	},
+	{
+		"coefficient": 0.2473,
+		"name": "K_CE_HE_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.00877,
+		"name": "K_EASTER_SLS_6M"
+	},
+	{
+		"coefficient": -0.00164,
+		"name": "K_DSL_FSG_TRS"
+	},
+	{
+		"coefficient": 0.5022,
+		"name": "K_SPRTNG_GDS_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.00491,
+		"name": "K_FTWR_ATHLETICS_SLS_TRS_24M"
+	},
+	{
+		"coefficient": 0.319,
+		"name": "K_TOYS_CHILDRN_SPR_SLS_24M_IND"
+	}]
+}{
+	"modelId": 8,
+	"modelDescription": "Fitness & Sporting Goods",
+	"constant": -3.3131,
+	"modelName": "ModelName",
+	"month": 1,
+	"variable": [{
+		"coefficient": 0.2006,
+		"name": "K_KMT_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.1261,
+		"name": "M_BONUS_MEMBER"
+	},
+	{
+		"coefficient": 0.3356,
+		"name": "K_HARDLN_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.2098,
+		"name": "K_HALLOWEEN_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.0983,
+		"name": "K_HARDLN_TRS_3M"
+	},
+	{
+		"coefficient": -0.00341,
+		"name": "K_DSL_SOFTLN_TRS"
+	},
+	{
+		"coefficient": 0.2473,
+		"name": "K_CE_HE_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.00877,
+		"name": "K_EASTER_SLS_6M"
+	},
+	{
+		"coefficient": -0.00164,
+		"name": "K_DSL_FSG_TRS"
+	},
+	{
+		"coefficient": 0.5022,
+		"name": "K_SPRTNG_GDS_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.00491,
+		"name": "K_FTWR_ATHLETICS_SLS_TRS_24M"
+	},
+	{
+		"coefficient": 0.319,
+		"name": "K_TOYS_CHILDRN_SPR_SLS_24M_IND"
+	}]
+}{
+	"modelId": 8,
+	"modelDescription": "Fitness & Sporting Goods",
+	"constant": -3.3131,
+	"modelName": "ModelName",
+	"month": 3,
+	"variable": [{
+		"coefficient": 0.2006,
+		"name": "K_KMT_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.1261,
+		"name": "M_BONUS_MEMBER"
+	},
+	{
+		"coefficient": 0.3356,
+		"name": "K_HARDLN_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.2098,
+		"name": "K_HALLOWEEN_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.0983,
+		"name": "K_HARDLN_TRS_3M"
+	},
+	{
+		"coefficient": -0.00341,
+		"name": "K_DSL_SOFTLN_TRS"
+	},
+	{
+		"coefficient": 0.2473,
+		"name": "K_CE_HE_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.00877,
+		"name": "K_EASTER_SLS_6M"
+	},
+	{
+		"coefficient": -0.00164,
+		"name": "K_DSL_FSG_TRS"
+	},
+	{
+		"coefficient": 0.5022,
+		"name": "K_SPRTNG_GDS_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.00491,
+		"name": "K_FTWR_ATHLETICS_SLS_TRS_24M"
+	},
+	{
+		"coefficient": 0.319,
+		"name": "K_TOYS_CHILDRN_SPR_SLS_24M_IND"
+	}]
+}{
+	"modelId": 8,
+	"modelDescription": "Fitness & Sporting Goods",
+	"constant": -3.3131,
+	"modelName": "ModelName",
+	"month": 5,
+	"variable": [{
+		"coefficient": 0.2006,
+		"name": "K_KMT_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.1261,
+		"name": "M_BONUS_MEMBER"
+	},
+	{
+		"coefficient": 0.3356,
+		"name": "K_HARDLN_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.2098,
+		"name": "K_HALLOWEEN_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.0983,
+		"name": "K_HARDLN_TRS_3M"
+	},
+	{
+		"coefficient": -0.00341,
+		"name": "K_DSL_SOFTLN_TRS"
+	},
+	{
+		"coefficient": 0.2473,
+		"name": "K_CE_HE_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.00877,
+		"name": "K_EASTER_SLS_6M"
+	},
+	{
+		"coefficient": -0.00164,
+		"name": "K_DSL_FSG_TRS"
+	},
+	{
+		"coefficient": 0.5022,
+		"name": "K_SPRTNG_GDS_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.00491,
+		"name": "K_FTWR_ATHLETICS_SLS_TRS_24M"
+	},
+	{
+		"coefficient": 0.319,
+		"name": "K_TOYS_CHILDRN_SPR_SLS_24M_IND"
+	}]
+}{
+	"modelId": 8,
+	"modelDescription": "Fitness & Sporting Goods",
+	"constant": -3.3131,
+	"modelName": "ModelName",
+	"month": 11,
+	"variable": [{
+		"coefficient": 0.2006,
+		"name": "K_KMT_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.1261,
+		"name": "M_BONUS_MEMBER"
+	},
+	{
+		"coefficient": 0.3356,
+		"name": "K_HARDLN_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.2098,
+		"name": "K_HALLOWEEN_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.0983,
+		"name": "K_HARDLN_TRS_3M"
+	},
+	{
+		"coefficient": -0.00341,
+		"name": "K_DSL_SOFTLN_TRS"
+	},
+	{
+		"coefficient": 0.2473,
+		"name": "K_CE_HE_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.00877,
+		"name": "K_EASTER_SLS_6M"
+	},
+	{
+		"coefficient": -0.00164,
+		"name": "K_DSL_FSG_TRS"
+	},
+	{
+		"coefficient": 0.5022,
+		"name": "K_SPRTNG_GDS_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.00491,
+		"name": "K_FTWR_ATHLETICS_SLS_TRS_24M"
+	},
+	{
+		"coefficient": 0.319,
+		"name": "K_TOYS_CHILDRN_SPR_SLS_24M_IND"
+	}]
+}{
+	"modelId": 8,
+	"modelDescription": "Fitness & Sporting Goods",
+	"constant": -3.3131,
+	"modelName": "ModelName",
+	"month": 10,
+	"variable": [{
+		"coefficient": 0.2006,
+		"name": "K_KMT_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.1261,
+		"name": "M_BONUS_MEMBER"
+	},
+	{
+		"coefficient": 0.3356,
+		"name": "K_HARDLN_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.2098,
+		"name": "K_HALLOWEEN_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.0983,
+		"name": "K_HARDLN_TRS_3M"
+	},
+	{
+		"coefficient": -0.00341,
+		"name": "K_DSL_SOFTLN_TRS"
+	},
+	{
+		"coefficient": 0.2473,
+		"name": "K_CE_HE_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.00877,
+		"name": "K_EASTER_SLS_6M"
+	},
+	{
+		"coefficient": -0.00164,
+		"name": "K_DSL_FSG_TRS"
+	},
+	{
+		"coefficient": 0.5022,
+		"name": "K_SPRTNG_GDS_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.00491,
+		"name": "K_FTWR_ATHLETICS_SLS_TRS_24M"
+	},
+	{
+		"coefficient": 0.319,
+		"name": "K_TOYS_CHILDRN_SPR_SLS_24M_IND"
+	}]
+}{
+	"modelId": 8,
+	"modelDescription": "Fitness & Sporting Goods",
+	"constant": -3.3131,
+	"modelName": "ModelName",
+	"month": 9,
+	"variable": [{
+		"coefficient": 0.2006,
+		"name": "K_KMT_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.1261,
+		"name": "M_BONUS_MEMBER"
+	},
+	{
+		"coefficient": 0.3356,
+		"name": "K_HARDLN_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.2098,
+		"name": "K_HALLOWEEN_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.0983,
+		"name": "K_HARDLN_TRS_3M"
+	},
+	{
+		"coefficient": -0.00341,
+		"name": "K_DSL_SOFTLN_TRS"
+	},
+	{
+		"coefficient": 0.2473,
+		"name": "K_CE_HE_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.00877,
+		"name": "K_EASTER_SLS_6M"
+	},
+	{
+		"coefficient": -0.00164,
+		"name": "K_DSL_FSG_TRS"
+	},
+	{
+		"coefficient": 0.5022,
+		"name": "K_SPRTNG_GDS_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.00491,
+		"name": "K_FTWR_ATHLETICS_SLS_TRS_24M"
+	},
+	{
+		"coefficient": 0.319,
+		"name": "K_TOYS_CHILDRN_SPR_SLS_24M_IND"
+	}]
+}{
+	"modelId": 14,
+	"modelDescription": "Lawn and Garden Kmart",
+	"constant": -5.219,
+	"modelName": "K_SCR_LG",
+	"month": 4,
+	"variable": [{
+		"coefficient": 0.2762,
+		"name": "K_KMT_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 2.77E-4,
+		"name": "K_KMT_SLS_3M"
+	},
+	{
+		"coefficient": -8.9E-4,
+		"name": "K_DSL_DIY_TOOL_TRS"
+	},
+	{
+		"coefficient": -7.8E-4,
+		"name": "K_DSL_OTC_TRS"
+	},
+	{
+		"coefficient": 0.14,
+		"name": "ADL_MAL_65_74_FL"
+	},
+	{
+		"coefficient": 0.5169,
+		"name": "K_LG_TRS_3M"
+	},
+	{
+		"coefficient": 0.1008,
+		"name": "FAM_HSE_PTS_FL"
+	},
+	{
+		"coefficient": 0.0164,
+		"name": "M_ZIPTREND_TL_STORAGE_AMT"
+	},
+	{
+		"coefficient": 29.0121,
+		"name": "M_ZIP_PENE_LG_PATIO"
+	},
+	{
+		"coefficient": 0.00241,
+		"name": "M_ZIPTREND_OL_GRILL_AMT"
+	},
+	{
+		"coefficient": 0.1592,
+		"name": "M_ZIPTREND_AU_BATTERY_AMT"
+	},
+	{
+		"coefficient": -6.3E-4,
+		"name": "K_DSL_HF_TRS"
+	},
+	{
+		"coefficient": 0.00994,
+		"name": "M_CNT_RESPONSE_CLICK_6_MTH"
+	},
+	{
+		"coefficient": 0.1974,
+		"name": "ADL_MAL_75_PLS_FL"
+	},
+	{
+		"coefficient": 2.106,
+		"name": "K_KMT_SPR_SLS_12M_IND"
+	},
+	{
+		"coefficient": 0.8654,
+		"name": "K_LG_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.5753,
+		"name": "M_WEATHER_PREC_IN_LAST14D"
+	},
+	{
+		"coefficient": 0.0173,
+		"name": "M_WEB_TRAIT_PATIO_15_30"
+	},
+	{
+		"coefficient": 0.271,
+		"name": "HME_IPV_GAR_FL"
+	},
+	{
+		"coefficient": 0.00693,
+		"name": "M_NUM_YR_RSD"
+	},
+	{
+		"coefficient": -5.0E-4,
+		"name": "K_DSL_CHRISTMAS_TRS"
+	},
+	{
+		"coefficient": 0.0948,
+		"name": "M_CREDIT_CARD_HOLDER"
+	},
+	{
+		"coefficient": 0.446,
+		"name": "K_ODL_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.2146,
+		"name": "M_WEB_DAY_PATIO_0_7"
+	},
+	{
+		"coefficient": 0.0653,
+		"name": "FAM_GCH_FL"
+	},
+	{
+		"coefficient": 0.8691,
+		"name": "K_LG_24M_SESNL_IND"
+	}]
+}{
+	"modelId": 14,
+	"modelDescription": "Lawn and Garden Kmart",
+	"constant": -4.5062,
+	"modelName": "K_SCR_LG",
+	"month": 8,
+	"variable": [{
+		"coefficient": 0.3268,
+		"name": "K_KMT_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 4.57E-4,
+		"name": "M_TRANS_CNT_6M"
+	},
+	{
+		"coefficient": 1.29E-4,
+		"name": "K_KMT_SLS_3M"
+	},
+	{
+		"coefficient": -0.00104,
+		"name": "K_DSL_DIY_TOOL_TRS"
+	},
+	{
+		"coefficient": 0.0,
+		"name": "M_ZIPTREND_HA_WASHDRY_AMT"
+	},
+	{
+		"coefficient": 0.5896,
+		"name": "K_LG_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.1144,
+		"name": "ADL_MAL_65_74_FL"
+	},
+	{
+		"coefficient": 0.3112,
+		"name": "K_LG_TRS_3M"
+	},
+	{
+		"coefficient": 0.1751,
+		"name": "HME_IPV_GAR_FL"
+	},
+	{
+		"coefficient": 0.0,
+		"name": "M_ZIPTREND_LG_PATIO_AMT"
+	},
+	{
+		"coefficient": 76.2504,
+		"name": "M_ZIP_PENE_SP_EXERCISE"
+	},
+	{
+		"coefficient": 0.0107,
+		"name": "M_CNT_DM_CAMPAIGNS_6_MTH"
+	},
+	{
+		"coefficient": -5.1E-4,
+		"name": "K_DSL_CHRISTMAS_TRS"
+	},
+	{
+		"coefficient": -0.00423,
+		"name": "K_DSL_SOFTLN_TRS"
+	},
+	{
+		"coefficient": 0.1131,
+		"name": "M_CREDIT_CARD_HOLDER"
+	},
+	{
+		"coefficient": 0.0116,
+		"name": "M_CNT_RESPONSE_CLICK_6_MTH"
+	},
+	{
+		"coefficient": 0.4399,
+		"name": "K_ODL_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 20.8044,
+		"name": "M_ZIP_PENE_TL_STORAGE"
+	},
+	{
+		"coefficient": 0.1649,
+		"name": "ADL_MAL_75_PLS_FL"
+	},
+	{
+		"coefficient": 0.0,
+		"name": "M_ZIPTREND_HA_COOK_AMT"
+	},
+	{
+		"coefficient": 0.0458,
+		"name": "M_WEB_TRAIT_PATIO_0_7"
+	},
+	{
+		"coefficient": 0.5603,
+		"name": "K_LG_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.0877,
+		"name": "K_LG_TRS_24M"
+	}]
+}{
+	"modelId": 14,
+	"modelDescription": "Lawn and Garden Kmart",
+	"constant": -4.5062,
+	"modelName": "K_SCR_LG",
+	"month": 12,
+	"variable": [{
+		"coefficient": 0.3268,
+		"name": "K_KMT_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 4.57E-4,
+		"name": "M_TRANS_CNT_6M"
+	},
+	{
+		"coefficient": 1.29E-4,
+		"name": "K_KMT_SLS_3M"
+	},
+	{
+		"coefficient": -0.00104,
+		"name": "K_DSL_DIY_TOOL_TRS"
+	},
+	{
+		"coefficient": 0.0,
+		"name": "M_ZIPTREND_HA_WASHDRY_AMT"
+	},
+	{
+		"coefficient": 0.5896,
+		"name": "K_LG_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.1144,
+		"name": "ADL_MAL_65_74_FL"
+	},
+	{
+		"coefficient": 0.3112,
+		"name": "K_LG_TRS_3M"
+	},
+	{
+		"coefficient": 0.1751,
+		"name": "HME_IPV_GAR_FL"
+	},
+	{
+		"coefficient": 0.0,
+		"name": "M_ZIPTREND_LG_PATIO_AMT"
+	},
+	{
+		"coefficient": 76.2504,
+		"name": "M_ZIP_PENE_SP_EXERCISE"
+	},
+	{
+		"coefficient": 0.0107,
+		"name": "M_CNT_DM_CAMPAIGNS_6_MTH"
+	},
+	{
+		"coefficient": -5.1E-4,
+		"name": "K_DSL_CHRISTMAS_TRS"
+	},
+	{
+		"coefficient": -0.00423,
+		"name": "K_DSL_SOFTLN_TRS"
+	},
+	{
+		"coefficient": 0.1131,
+		"name": "M_CREDIT_CARD_HOLDER"
+	},
+	{
+		"coefficient": 0.0116,
+		"name": "M_CNT_RESPONSE_CLICK_6_MTH"
+	},
+	{
+		"coefficient": 0.4399,
+		"name": "K_ODL_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 20.8044,
+		"name": "M_ZIP_PENE_TL_STORAGE"
+	},
+	{
+		"coefficient": 0.1649,
+		"name": "ADL_MAL_75_PLS_FL"
+	},
+	{
+		"coefficient": 0.0,
+		"name": "M_ZIPTREND_HA_COOK_AMT"
+	},
+	{
+		"coefficient": 0.0458,
+		"name": "M_WEB_TRAIT_PATIO_0_7"
+	},
+	{
+		"coefficient": 0.5603,
+		"name": "K_LG_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.0877,
+		"name": "K_LG_TRS_24M"
+	}]
+}{
+	"modelId": 14,
+	"modelDescription": "Lawn and Garden Kmart",
+	"constant": -4.5062,
+	"modelName": "K_SCR_LG",
+	"month": 2,
+	"variable": [{
+		"coefficient": 0.3268,
+		"name": "K_KMT_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 4.57E-4,
+		"name": "M_TRANS_CNT_6M"
+	},
+	{
+		"coefficient": 1.29E-4,
+		"name": "K_KMT_SLS_3M"
+	},
+	{
+		"coefficient": -0.00104,
+		"name": "K_DSL_DIY_TOOL_TRS"
+	},
+	{
+		"coefficient": 0.0,
+		"name": "M_ZIPTREND_HA_WASHDRY_AMT"
+	},
+	{
+		"coefficient": 0.5896,
+		"name": "K_LG_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.1144,
+		"name": "ADL_MAL_65_74_FL"
+	},
+	{
+		"coefficient": 0.3112,
+		"name": "K_LG_TRS_3M"
+	},
+	{
+		"coefficient": 0.1751,
+		"name": "HME_IPV_GAR_FL"
+	},
+	{
+		"coefficient": 0.0,
+		"name": "M_ZIPTREND_LG_PATIO_AMT"
+	},
+	{
+		"coefficient": 76.2504,
+		"name": "M_ZIP_PENE_SP_EXERCISE"
+	},
+	{
+		"coefficient": 0.0107,
+		"name": "M_CNT_DM_CAMPAIGNS_6_MTH"
+	},
+	{
+		"coefficient": -5.1E-4,
+		"name": "K_DSL_CHRISTMAS_TRS"
+	},
+	{
+		"coefficient": -0.00423,
+		"name": "K_DSL_SOFTLN_TRS"
+	},
+	{
+		"coefficient": 0.1131,
+		"name": "M_CREDIT_CARD_HOLDER"
+	},
+	{
+		"coefficient": 0.0116,
+		"name": "M_CNT_RESPONSE_CLICK_6_MTH"
+	},
+	{
+		"coefficient": 0.4399,
+		"name": "K_ODL_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 20.8044,
+		"name": "M_ZIP_PENE_TL_STORAGE"
+	},
+	{
+		"coefficient": 0.1649,
+		"name": "ADL_MAL_75_PLS_FL"
+	},
+	{
+		"coefficient": 0.0,
+		"name": "M_ZIPTREND_HA_COOK_AMT"
+	},
+	{
+		"coefficient": 0.0458,
+		"name": "M_WEB_TRAIT_PATIO_0_7"
+	},
+	{
+		"coefficient": 0.5603,
+		"name": "K_LG_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.0877,
+		"name": "K_LG_TRS_24M"
+	}]
+}{
+	"modelId": 14,
+	"modelDescription": "Lawn and Garden Kmart",
+	"constant": -4.5062,
+	"modelName": "K_SCR_LG",
+	"month": 1,
+	"variable": [{
+		"coefficient": 0.3268,
+		"name": "K_KMT_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 4.57E-4,
+		"name": "M_TRANS_CNT_6M"
+	},
+	{
+		"coefficient": 1.29E-4,
+		"name": "K_KMT_SLS_3M"
+	},
+	{
+		"coefficient": -0.00104,
+		"name": "K_DSL_DIY_TOOL_TRS"
+	},
+	{
+		"coefficient": 0.0,
+		"name": "M_ZIPTREND_HA_WASHDRY_AMT"
+	},
+	{
+		"coefficient": 0.5896,
+		"name": "K_LG_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.1144,
+		"name": "ADL_MAL_65_74_FL"
+	},
+	{
+		"coefficient": 0.3112,
+		"name": "K_LG_TRS_3M"
+	},
+	{
+		"coefficient": 0.1751,
+		"name": "HME_IPV_GAR_FL"
+	},
+	{
+		"coefficient": 0.0,
+		"name": "M_ZIPTREND_LG_PATIO_AMT"
+	},
+	{
+		"coefficient": 76.2504,
+		"name": "M_ZIP_PENE_SP_EXERCISE"
+	},
+	{
+		"coefficient": 0.0107,
+		"name": "M_CNT_DM_CAMPAIGNS_6_MTH"
+	},
+	{
+		"coefficient": -5.1E-4,
+		"name": "K_DSL_CHRISTMAS_TRS"
+	},
+	{
+		"coefficient": -0.00423,
+		"name": "K_DSL_SOFTLN_TRS"
+	},
+	{
+		"coefficient": 0.1131,
+		"name": "M_CREDIT_CARD_HOLDER"
+	},
+	{
+		"coefficient": 0.0116,
+		"name": "M_CNT_RESPONSE_CLICK_6_MTH"
+	},
+	{
+		"coefficient": 0.4399,
+		"name": "K_ODL_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 20.8044,
+		"name": "M_ZIP_PENE_TL_STORAGE"
+	},
+	{
+		"coefficient": 0.1649,
+		"name": "ADL_MAL_75_PLS_FL"
+	},
+	{
+		"coefficient": 0.0,
+		"name": "M_ZIPTREND_HA_COOK_AMT"
+	},
+	{
+		"coefficient": 0.0458,
+		"name": "M_WEB_TRAIT_PATIO_0_7"
+	},
+	{
+		"coefficient": 0.5603,
+		"name": "K_LG_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.0877,
+		"name": "K_LG_TRS_24M"
+	}]
+}{
+	"modelId": 14,
+	"modelDescription": "Lawn and Garden Kmart",
+	"constant": -4.5062,
+	"modelName": "K_SCR_LG",
+	"month": 7,
+	"variable": [{
+		"coefficient": 0.3268,
+		"name": "K_KMT_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 4.57E-4,
+		"name": "M_TRANS_CNT_6M"
+	},
+	{
+		"coefficient": 1.29E-4,
+		"name": "K_KMT_SLS_3M"
+	},
+	{
+		"coefficient": -0.00104,
+		"name": "K_DSL_DIY_TOOL_TRS"
+	},
+	{
+		"coefficient": 0.0,
+		"name": "M_ZIPTREND_HA_WASHDRY_AMT"
+	},
+	{
+		"coefficient": 0.5896,
+		"name": "K_LG_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.1144,
+		"name": "ADL_MAL_65_74_FL"
+	},
+	{
+		"coefficient": 0.3112,
+		"name": "K_LG_TRS_3M"
+	},
+	{
+		"coefficient": 0.1751,
+		"name": "HME_IPV_GAR_FL"
+	},
+	{
+		"coefficient": 0.0,
+		"name": "M_ZIPTREND_LG_PATIO_AMT"
+	},
+	{
+		"coefficient": 76.2504,
+		"name": "M_ZIP_PENE_SP_EXERCISE"
+	},
+	{
+		"coefficient": 0.0107,
+		"name": "M_CNT_DM_CAMPAIGNS_6_MTH"
+	},
+	{
+		"coefficient": -5.1E-4,
+		"name": "K_DSL_CHRISTMAS_TRS"
+	},
+	{
+		"coefficient": -0.00423,
+		"name": "K_DSL_SOFTLN_TRS"
+	},
+	{
+		"coefficient": 0.1131,
+		"name": "M_CREDIT_CARD_HOLDER"
+	},
+	{
+		"coefficient": 0.0116,
+		"name": "M_CNT_RESPONSE_CLICK_6_MTH"
+	},
+	{
+		"coefficient": 0.4399,
+		"name": "K_ODL_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 20.8044,
+		"name": "M_ZIP_PENE_TL_STORAGE"
+	},
+	{
+		"coefficient": 0.1649,
+		"name": "ADL_MAL_75_PLS_FL"
+	},
+	{
+		"coefficient": 0.0,
+		"name": "M_ZIPTREND_HA_COOK_AMT"
+	},
+	{
+		"coefficient": 0.0458,
+		"name": "M_WEB_TRAIT_PATIO_0_7"
+	},
+	{
+		"coefficient": 0.5603,
+		"name": "K_LG_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.0877,
+		"name": "K_LG_TRS_24M"
+	}]
+}{
+	"modelId": 14,
+	"modelDescription": "Lawn and Garden Kmart",
+	"constant": -5.219,
+	"modelName": "K_SCR_LG",
+	"month": 6,
+	"variable": [{
+		"coefficient": 0.2762,
+		"name": "K_KMT_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 2.77E-4,
+		"name": "K_KMT_SLS_3M"
+	},
+	{
+		"coefficient": -8.9E-4,
+		"name": "K_DSL_DIY_TOOL_TRS"
+	},
+	{
+		"coefficient": -7.8E-4,
+		"name": "K_DSL_OTC_TRS"
+	},
+	{
+		"coefficient": 0.14,
+		"name": "ADL_MAL_65_74_FL"
+	},
+	{
+		"coefficient": 0.5169,
+		"name": "K_LG_TRS_3M"
+	},
+	{
+		"coefficient": 0.1008,
+		"name": "FAM_HSE_PTS_FL"
+	},
+	{
+		"coefficient": 0.0164,
+		"name": "M_ZIPTREND_TL_STORAGE_AMT"
+	},
+	{
+		"coefficient": 29.0121,
+		"name": "M_ZIP_PENE_LG_PATIO"
+	},
+	{
+		"coefficient": 0.00241,
+		"name": "M_ZIPTREND_OL_GRILL_AMT"
+	},
+	{
+		"coefficient": 0.1592,
+		"name": "M_ZIPTREND_AU_BATTERY_AMT"
+	},
+	{
+		"coefficient": -6.3E-4,
+		"name": "K_DSL_HF_TRS"
+	},
+	{
+		"coefficient": 0.00994,
+		"name": "M_CNT_RESPONSE_CLICK_6_MTH"
+	},
+	{
+		"coefficient": 0.1974,
+		"name": "ADL_MAL_75_PLS_FL"
+	},
+	{
+		"coefficient": 2.106,
+		"name": "K_KMT_SPR_SLS_12M_IND"
+	},
+	{
+		"coefficient": 0.8654,
+		"name": "K_LG_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.5753,
+		"name": "M_WEATHER_PREC_IN_LAST14D"
+	},
+	{
+		"coefficient": 0.0173,
+		"name": "M_WEB_TRAIT_PATIO_15_30"
+	},
+	{
+		"coefficient": 0.271,
+		"name": "HME_IPV_GAR_FL"
+	},
+	{
+		"coefficient": 0.00693,
+		"name": "M_NUM_YR_RSD"
+	},
+	{
+		"coefficient": -5.0E-4,
+		"name": "K_DSL_CHRISTMAS_TRS"
+	},
+	{
+		"coefficient": 0.0948,
+		"name": "M_CREDIT_CARD_HOLDER"
+	},
+	{
+		"coefficient": 0.446,
+		"name": "K_ODL_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.2146,
+		"name": "M_WEB_DAY_PATIO_0_7"
+	},
+	{
+		"coefficient": 0.0653,
+		"name": "FAM_GCH_FL"
+	},
+	{
+		"coefficient": 0.8691,
+		"name": "K_LG_24M_SESNL_IND"
+	}]
+}{
+	"modelId": 14,
+	"modelDescription": "Lawn and Garden Kmart",
+	"constant": -4.5062,
+	"modelName": "K_SCR_LG",
+	"month": 3,
+	"variable": [{
+		"coefficient": 0.3268,
+		"name": "K_KMT_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 4.57E-4,
+		"name": "M_TRANS_CNT_6M"
+	},
+	{
+		"coefficient": 1.29E-4,
+		"name": "K_KMT_SLS_3M"
+	},
+	{
+		"coefficient": -0.00104,
+		"name": "K_DSL_DIY_TOOL_TRS"
+	},
+	{
+		"coefficient": 0.0,
+		"name": "M_ZIPTREND_HA_WASHDRY_AMT"
+	},
+	{
+		"coefficient": 0.5896,
+		"name": "K_LG_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.1144,
+		"name": "ADL_MAL_65_74_FL"
+	},
+	{
+		"coefficient": 0.3112,
+		"name": "K_LG_TRS_3M"
+	},
+	{
+		"coefficient": 0.1751,
+		"name": "HME_IPV_GAR_FL"
+	},
+	{
+		"coefficient": 0.0,
+		"name": "M_ZIPTREND_LG_PATIO_AMT"
+	},
+	{
+		"coefficient": 76.2504,
+		"name": "M_ZIP_PENE_SP_EXERCISE"
+	},
+	{
+		"coefficient": 0.0107,
+		"name": "M_CNT_DM_CAMPAIGNS_6_MTH"
+	},
+	{
+		"coefficient": -5.1E-4,
+		"name": "K_DSL_CHRISTMAS_TRS"
+	},
+	{
+		"coefficient": -0.00423,
+		"name": "K_DSL_SOFTLN_TRS"
+	},
+	{
+		"coefficient": 0.1131,
+		"name": "M_CREDIT_CARD_HOLDER"
+	},
+	{
+		"coefficient": 0.0116,
+		"name": "M_CNT_RESPONSE_CLICK_6_MTH"
+	},
+	{
+		"coefficient": 0.4399,
+		"name": "K_ODL_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 20.8044,
+		"name": "M_ZIP_PENE_TL_STORAGE"
+	},
+	{
+		"coefficient": 0.1649,
+		"name": "ADL_MAL_75_PLS_FL"
+	},
+	{
+		"coefficient": 0.0,
+		"name": "M_ZIPTREND_HA_COOK_AMT"
+	},
+	{
+		"coefficient": 0.0458,
+		"name": "M_WEB_TRAIT_PATIO_0_7"
+	},
+	{
+		"coefficient": 0.5603,
+		"name": "K_LG_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.0877,
+		"name": "K_LG_TRS_24M"
+	}]
+}{
+	"modelId": 14,
+	"modelDescription": "Lawn and Garden Kmart",
+	"constant": -5.219,
+	"modelName": "K_SCR_LG",
+	"month": 5,
+	"variable": [{
+		"coefficient": 0.2762,
+		"name": "K_KMT_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 2.77E-4,
+		"name": "K_KMT_SLS_3M"
+	},
+	{
+		"coefficient": -8.9E-4,
+		"name": "K_DSL_DIY_TOOL_TRS"
+	},
+	{
+		"coefficient": -7.8E-4,
+		"name": "K_DSL_OTC_TRS"
+	},
+	{
+		"coefficient": 0.14,
+		"name": "ADL_MAL_65_74_FL"
+	},
+	{
+		"coefficient": 0.5169,
+		"name": "K_LG_TRS_3M"
+	},
+	{
+		"coefficient": 0.1008,
+		"name": "FAM_HSE_PTS_FL"
+	},
+	{
+		"coefficient": 0.0164,
+		"name": "M_ZIPTREND_TL_STORAGE_AMT"
+	},
+	{
+		"coefficient": 29.0121,
+		"name": "M_ZIP_PENE_LG_PATIO"
+	},
+	{
+		"coefficient": 0.00241,
+		"name": "M_ZIPTREND_OL_GRILL_AMT"
+	},
+	{
+		"coefficient": 0.1592,
+		"name": "M_ZIPTREND_AU_BATTERY_AMT"
+	},
+	{
+		"coefficient": -6.3E-4,
+		"name": "K_DSL_HF_TRS"
+	},
+	{
+		"coefficient": 0.00994,
+		"name": "M_CNT_RESPONSE_CLICK_6_MTH"
+	},
+	{
+		"coefficient": 0.1974,
+		"name": "ADL_MAL_75_PLS_FL"
+	},
+	{
+		"coefficient": 2.106,
+		"name": "K_KMT_SPR_SLS_12M_IND"
+	},
+	{
+		"coefficient": 0.8654,
+		"name": "K_LG_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.5753,
+		"name": "M_WEATHER_PREC_IN_LAST14D"
+	},
+	{
+		"coefficient": 0.0173,
+		"name": "M_WEB_TRAIT_PATIO_15_30"
+	},
+	{
+		"coefficient": 0.271,
+		"name": "HME_IPV_GAR_FL"
+	},
+	{
+		"coefficient": 0.00693,
+		"name": "M_NUM_YR_RSD"
+	},
+	{
+		"coefficient": -5.0E-4,
+		"name": "K_DSL_CHRISTMAS_TRS"
+	},
+	{
+		"coefficient": 0.0948,
+		"name": "M_CREDIT_CARD_HOLDER"
+	},
+	{
+		"coefficient": 0.446,
+		"name": "K_ODL_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.2146,
+		"name": "M_WEB_DAY_PATIO_0_7"
+	},
+	{
+		"coefficient": 0.0653,
+		"name": "FAM_GCH_FL"
+	},
+	{
+		"coefficient": 0.8691,
+		"name": "K_LG_24M_SESNL_IND"
+	}]
+}{
+	"modelId": 14,
+	"modelDescription": "Lawn and Garden Kmart",
+	"constant": -4.5062,
+	"modelName": "K_SCR_LG",
+	"month": 11,
+	"variable": [{
+		"coefficient": 0.3268,
+		"name": "K_KMT_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 4.57E-4,
+		"name": "M_TRANS_CNT_6M"
+	},
+	{
+		"coefficient": 1.29E-4,
+		"name": "K_KMT_SLS_3M"
+	},
+	{
+		"coefficient": -0.00104,
+		"name": "K_DSL_DIY_TOOL_TRS"
+	},
+	{
+		"coefficient": 0.0,
+		"name": "M_ZIPTREND_HA_WASHDRY_AMT"
+	},
+	{
+		"coefficient": 0.5896,
+		"name": "K_LG_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.1144,
+		"name": "ADL_MAL_65_74_FL"
+	},
+	{
+		"coefficient": 0.3112,
+		"name": "K_LG_TRS_3M"
+	},
+	{
+		"coefficient": 0.1751,
+		"name": "HME_IPV_GAR_FL"
+	},
+	{
+		"coefficient": 0.0,
+		"name": "M_ZIPTREND_LG_PATIO_AMT"
+	},
+	{
+		"coefficient": 76.2504,
+		"name": "M_ZIP_PENE_SP_EXERCISE"
+	},
+	{
+		"coefficient": 0.0107,
+		"name": "M_CNT_DM_CAMPAIGNS_6_MTH"
+	},
+	{
+		"coefficient": -5.1E-4,
+		"name": "K_DSL_CHRISTMAS_TRS"
+	},
+	{
+		"coefficient": -0.00423,
+		"name": "K_DSL_SOFTLN_TRS"
+	},
+	{
+		"coefficient": 0.1131,
+		"name": "M_CREDIT_CARD_HOLDER"
+	},
+	{
+		"coefficient": 0.0116,
+		"name": "M_CNT_RESPONSE_CLICK_6_MTH"
+	},
+	{
+		"coefficient": 0.4399,
+		"name": "K_ODL_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 20.8044,
+		"name": "M_ZIP_PENE_TL_STORAGE"
+	},
+	{
+		"coefficient": 0.1649,
+		"name": "ADL_MAL_75_PLS_FL"
+	},
+	{
+		"coefficient": 0.0,
+		"name": "M_ZIPTREND_HA_COOK_AMT"
+	},
+	{
+		"coefficient": 0.0458,
+		"name": "M_WEB_TRAIT_PATIO_0_7"
+	},
+	{
+		"coefficient": 0.5603,
+		"name": "K_LG_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.0877,
+		"name": "K_LG_TRS_24M"
+	}]
+}{
+	"modelId": 14,
+	"modelDescription": "Lawn and Garden Kmart",
+	"constant": -4.5062,
+	"modelName": "K_SCR_LG",
+	"month": 10,
+	"variable": [{
+		"coefficient": 0.3268,
+		"name": "K_KMT_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 4.57E-4,
+		"name": "M_TRANS_CNT_6M"
+	},
+	{
+		"coefficient": 1.29E-4,
+		"name": "K_KMT_SLS_3M"
+	},
+	{
+		"coefficient": -0.00104,
+		"name": "K_DSL_DIY_TOOL_TRS"
+	},
+	{
+		"coefficient": 0.0,
+		"name": "M_ZIPTREND_HA_WASHDRY_AMT"
+	},
+	{
+		"coefficient": 0.5896,
+		"name": "K_LG_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.1144,
+		"name": "ADL_MAL_65_74_FL"
+	},
+	{
+		"coefficient": 0.3112,
+		"name": "K_LG_TRS_3M"
+	},
+	{
+		"coefficient": 0.1751,
+		"name": "HME_IPV_GAR_FL"
+	},
+	{
+		"coefficient": 0.0,
+		"name": "M_ZIPTREND_LG_PATIO_AMT"
+	},
+	{
+		"coefficient": 76.2504,
+		"name": "M_ZIP_PENE_SP_EXERCISE"
+	},
+	{
+		"coefficient": 0.0107,
+		"name": "M_CNT_DM_CAMPAIGNS_6_MTH"
+	},
+	{
+		"coefficient": -5.1E-4,
+		"name": "K_DSL_CHRISTMAS_TRS"
+	},
+	{
+		"coefficient": -0.00423,
+		"name": "K_DSL_SOFTLN_TRS"
+	},
+	{
+		"coefficient": 0.1131,
+		"name": "M_CREDIT_CARD_HOLDER"
+	},
+	{
+		"coefficient": 0.0116,
+		"name": "M_CNT_RESPONSE_CLICK_6_MTH"
+	},
+	{
+		"coefficient": 0.4399,
+		"name": "K_ODL_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 20.8044,
+		"name": "M_ZIP_PENE_TL_STORAGE"
+	},
+	{
+		"coefficient": 0.1649,
+		"name": "ADL_MAL_75_PLS_FL"
+	},
+	{
+		"coefficient": 0.0,
+		"name": "M_ZIPTREND_HA_COOK_AMT"
+	},
+	{
+		"coefficient": 0.0458,
+		"name": "M_WEB_TRAIT_PATIO_0_7"
+	},
+	{
+		"coefficient": 0.5603,
+		"name": "K_LG_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.0877,
+		"name": "K_LG_TRS_24M"
+	}]
+}{
+	"modelId": 14,
+	"modelDescription": "Lawn and Garden Kmart",
+	"constant": -4.5062,
+	"modelName": "K_SCR_LG",
+	"month": 9,
+	"variable": [{
+		"coefficient": 0.3268,
+		"name": "K_KMT_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 4.57E-4,
+		"name": "M_TRANS_CNT_6M"
+	},
+	{
+		"coefficient": 1.29E-4,
+		"name": "K_KMT_SLS_3M"
+	},
+	{
+		"coefficient": -0.00104,
+		"name": "K_DSL_DIY_TOOL_TRS"
+	},
+	{
+		"coefficient": 0.0,
+		"name": "M_ZIPTREND_HA_WASHDRY_AMT"
+	},
+	{
+		"coefficient": 0.5896,
+		"name": "K_LG_12M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.1144,
+		"name": "ADL_MAL_65_74_FL"
+	},
+	{
+		"coefficient": 0.3112,
+		"name": "K_LG_TRS_3M"
+	},
+	{
+		"coefficient": 0.1751,
+		"name": "HME_IPV_GAR_FL"
+	},
+	{
+		"coefficient": 0.0,
+		"name": "M_ZIPTREND_LG_PATIO_AMT"
+	},
+	{
+		"coefficient": 76.2504,
+		"name": "M_ZIP_PENE_SP_EXERCISE"
+	},
+	{
+		"coefficient": 0.0107,
+		"name": "M_CNT_DM_CAMPAIGNS_6_MTH"
+	},
+	{
+		"coefficient": -5.1E-4,
+		"name": "K_DSL_CHRISTMAS_TRS"
+	},
+	{
+		"coefficient": -0.00423,
+		"name": "K_DSL_SOFTLN_TRS"
+	},
+	{
+		"coefficient": 0.1131,
+		"name": "M_CREDIT_CARD_HOLDER"
+	},
+	{
+		"coefficient": 0.0116,
+		"name": "M_CNT_RESPONSE_CLICK_6_MTH"
+	},
+	{
+		"coefficient": 0.4399,
+		"name": "K_ODL_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 20.8044,
+		"name": "M_ZIP_PENE_TL_STORAGE"
+	},
+	{
+		"coefficient": 0.1649,
+		"name": "ADL_MAL_75_PLS_FL"
+	},
+	{
+		"coefficient": 0.0,
+		"name": "M_ZIPTREND_HA_COOK_AMT"
+	},
+	{
+		"coefficient": 0.0458,
+		"name": "M_WEB_TRAIT_PATIO_0_7"
+	},
+	{
+		"coefficient": 0.5603,
+		"name": "K_LG_24M_SESNL_IND"
+	},
+	{
+		"coefficient": 0.0877,
+		"name": "K_LG_TRS_24M"
+	}]
+}{
+	"modelId": 16,
+	"modelDescription": "Outdoor Living - Kmart",
+	"constant": -3.2105,
+	"modelName": "K_SCR_ODL",
+	"month": 0,
+	"variable": [{
+		"coefficient": 0.1394,
+		"name": "M_HA_ANY_ANYTIME"
+	},
+	{
+		"coefficient": 0.1987,
+		"name": "LFT_GRO_HME_IPV_FL"
+	},
+	{
+		"coefficient": 2.52E-4,
+		"name": "M_HOLIDAY_SALES_2"
+	},
+	{
+		"coefficient": -0.00124,
+		"name": "K_DSL_LG_TRS"
+	},
+	{
+		"coefficient": 3.1606,
+		"name": "M_SR_REMODELING_FLG"
+	},
+	{
+		"coefficient": 0.0,
+		"name": "M_ZIPTREND_HA_WASHDRY_AMT"
+	},
+	{
+		"coefficient": 0.0,
+		"name": "M_ZIPTREND_KMT_CE_AMT"
+	},
+	{
+		"coefficient": 6.99E-4,
+		"name": "M_PV_ODL"
+	},
+	{
+		"coefficient": 0.2057,
+		"name": "OD_BTG_FL"
+	},
+	{
+		"coefficient": -0.00202,
+		"name": "K_DSL_ODL_TRS"
+	},
+	{
+		"coefficient": 0.0138,
+		"name": "K_KMT_TRS_3M"
+	},
+	{
+		"coefficient": 0.0,
+		"name": "M_ZIPTREND_TL_STORAGE_AMT"
+	},
+	{
+		"coefficient": 0.0278,
+		"name": "M_WEB_TRAIT_PATIO_31_60"
+	},
+	{
+		"coefficient": 0.0345,
+		"name": "M_CNT_DM_CAMPAIGNS_6_MTH"
+	},
+	{
+		"coefficient": -0.00372,
+		"name": "K_DSL_SOFTLN_TRS"
+	},
+	{
+		"coefficient": -9.5E-4,
+		"name": "K_DSL_CHRISTMAS_TRS"
+	},
+	{
+		"coefficient": 0.0,
+		"name": "M_ZIPTREND_AU_BATTERY_AMT"
+	},
+	{
+		"coefficient": 0.0,
+		"name": "M_ZIPTREND_OL_GRILL_AMT"
+	},
+	{
+		"coefficient": -1.0E-4,
+		"name": "M_DSL_GRILL_HMS"
+	},
+	{
+		"coefficient": 0.0272,
+		"name": "M_EARNED_POINTS_24M_CD"
+	},
+	{
+		"coefficient": 0.0,
+		"name": "M_ZIPTREND_HA_COOK_AMT"
+	},
+	{
+		"coefficient": 0.0808,
+		"name": "M_WEB_TRAIT_PATIO_0_7"
+	}]
+}{
+	"modelId": 18,
+	"modelDescription": "Toys",
+	"constant": -3.024708367,
+	"modelName": "K_SCR_TOY",
+	"month": 0,
+	"variable": [{
+		"coefficient": 0.17171358,
+		"name": "K_KMT_12M_SESNL_IND"
+	},
+	{
+		"coefficient": -0.003323496,
+		"name": "K_DSL_KMT_TRS"
+	},
+	{
+		"coefficient": -3.43161E-4,
+		"name": "K_DSL_FTWR_CHILD_TRS"
+	},
+	{
+		"coefficient": 0.129618476,
+		"name": "K_CHRISTMAS_SPR_SLS_12M_IND"
+	},
+	{
+		"coefficient": 0.374701794,
+		"name": "K_BABY_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.10734679,
+		"name": "ADL_FEM_25_34_FL"
+	},
+	{
+		"coefficient": -0.979645666,
+		"name": "MONTH10"
+	},
+	{
+		"coefficient": 0.272892643,
+		"name": "K_TOYS_GT_12M_IND"
+	},
+	{
+		"coefficient": 0.160790864,
+		"name": "K_EASTER_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.116137103,
+		"name": "K_SOFTLN_24M_SESNL_IND"
+	},
+	{
+		"coefficient": -0.412649031,
+		"name": "MONTH11"
+	},
+	{
+		"coefficient": 0.140290015,
+		"name": "K_TOYS_TRS_12M"
+	},
+	{
+		"coefficient": 0.368408575,
+		"name": "K_TOYS_PCT_BUY"
+	},
+	{
+		"coefficient": 0.160428544,
+		"name": "K_WAPP_INT_ACC_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.128460751,
+		"name": "K_TOYS_TRS_3M"
+	},
+	{
+		"coefficient": 0.609905717,
+		"name": "K_TOYS_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.200448365,
+		"name": "K_TOYS_CHILDRN_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.158950973,
+		"name": "K_FSG_SPR_SLS_24M_IND"
+	},
+	{
+		"coefficient": 0.009722599,
+		"name": "K_KMT_TRS_3M"
+	},
+	{
+		"coefficient": -1.083435241,
+		"name": "MONTH5"
+	},
+	{
+		"coefficient": -1.233201006,
+		"name": "MONTH4"
+	},
+	{
+		"coefficient": -0.945733139,
+		"name": "MONTH7"
+	},
+	{
+		"coefficient": 0.154914251,
+		"name": "S_BABY_ITEM_24M_IND"
+	},
+	{
+		"coefficient": -0.950086002,
+		"name": "MONTH6"
+	},
+	{
+		"coefficient": -1.59164614,
+		"name": "MONTH1"
+	},
+	{
+		"coefficient": -0.868269923,
+		"name": "MONTH3"
+	},
+	{
+		"coefficient": -1.383614946,
+		"name": "MONTH2"
+	},
+	{
+		"coefficient": -1.164005152,
+		"name": "MONTH9"
+	},
+	{
+		"coefficient": -1.126411161,
+		"name": "MONTH8"
+	}]
+}
