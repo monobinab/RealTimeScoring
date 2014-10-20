@@ -156,7 +156,7 @@ public class XMLParserTest {
             "                </LineItem>\n" +
             "					 <LineItem>\n" +
             "                    <LineNumber>2</LineNumber>\n" +
-            "                    <ItemType>2</ItemType>\n" +
+            "                    <ItemType>1</ItemType>\n" +
             "                    <ItemNumber>082453512</ItemNumber>\n" +
             "                    <SKU>000</SKU>\n" +
             "                    <UPC>07723100317</UPC>\n" +
@@ -231,7 +231,7 @@ public class XMLParserTest {
             "                </LineItem>\n" +
             "					 <LineItem>\n" +
             "                    <LineNumber>2</LineNumber>\n" +
-            "                    <ItemType>2</ItemType>\n" +
+            "                    <ItemType>1</ItemType>\n" +
             "                    <ItemNumber>082453512</ItemNumber>\n" +
             "                    <SKU>000</SKU>\n" +
             "                    <UPC>07723100317</UPC>\n" +
@@ -305,7 +305,7 @@ public class XMLParserTest {
             "                </LineItem>\n" +
             "					 <LineItem>\n" +
             "                    <LineNumber>2</LineNumber>\n" +
-            "                    <ItemType>2</ItemType>\n" +
+            "                    <ItemType>1</ItemType>\n" +
             "                    <ItemNumber>082453512</ItemNumber>\n" +
             "                    <SKU>000</SKU>\n" +
             "                    <UPC>07723100317</UPC>\n" +
