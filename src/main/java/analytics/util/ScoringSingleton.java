@@ -131,7 +131,7 @@ public class ScoringSingleton {
 	}
 	
 	public Map<String, Object> createVariableValueMap(String loyaltyId,
-			Set<Integer> modelIdList) {
+			Set<Integer> modelIdList) throws RealTimeScoringException {
 		List<String> variableFilter = new ArrayList<String>();
     	for (Integer modId : modelIdList) {
 			int month;
@@ -145,8 +145,11 @@ public class ScoringSingleton {
 					.keySet()) {
 				if(variableNameToVidMap.get(var)==null){
 					LOGGER.error("VID is null for variable " + var);
+					throw new RealTimeScoringException("VID is null for variable " + var);
 				}
+				else{
 				variableFilter.add(variableNameToVidMap.get(var));
+				}
 			}
 			}
 			else{
@@ -309,6 +312,10 @@ public class ScoringSingleton {
 
 		if(mbrVarMap == null){
 			throw new RealTimeScoringException("member variables is null");
+		}
+		
+		if(varChangeMap == null){
+			throw new RealTimeScoringException("changed member vairbles is null");
 		}
 		Model model = null;
 
