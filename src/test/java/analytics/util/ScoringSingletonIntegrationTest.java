@@ -101,76 +101,7 @@ public class ScoringSingletonIntegrationTest {
 		constructor.setAccessible(true);
 		scoringSingletonObj = constructor.newInstance();
 		
-	
-				//Fake modelVariables collection
-				/*DBCollection modelVariablesColl = db.getCollection("modelVariables");
-				
-				String modelVar = "{'modelId':46,'modelDescription':'All cooking Appliances','constant':7,'modelName':'model_Name2','month':0,'variable':[{'name':'S_HOME_ALL','coefficient':0.075},{'name':'BOOST_S_DSL_APP_INT_ACC','coefficient':0.75},{'name':'S_DSL_APP_INT_BOTH','coefficient':0.175}]}";
-				DBObject dbObject1 = (DBObject) JSON.parse(modelVar);
-				String modelVar2 = "{'modelId':35,'modelDescription':'All Appliances','constant':5,'modelName':'model_Name','month':10,'variable':[{'name':'S_DSL_APP_INT_ACC','coefficient':0.002},{'name':'S_HOME_6M_IND','coefficient':0.0015},{'name':'S_HOME_6M_IND_ALL','coefficient':0.0915},{'name':'S_DSL_APP_INT_ACC2','coefficient':0.0915},{'name':'S_HOME_6M_IND','coefficient':0.0015},{'name':'S_HOME_6M_IND_ALL','coefficient':0.0915},{'name':'S_DSL_APP_INT_ACC2','coefficient':0.0915},{'name':'S_DSL_APP_INT_BOTH','coefficient':0.0915}]}";
-				DBObject dbObject2 = (DBObject) JSON.parse(modelVar2);
-				String modelVar3 = "{'modelId':30,'modelDescription':'Tools','constant':5,'modelName':'model_Name3','month':11,'variable':[{'name':'S_HOME_ALL','coefficient':0.075},{'name':'BOOST_S_DSL_APP_INT_ACC','coefficient':0.75},{'name':'S_DSL_APP_INT_BOTH','coefficient':0.175}]}";
-				DBObject dbObject3 = (DBObject) JSON.parse(modelVar3);
-				String modelVar4 = "{'modelId':51,'modelDescription':'Tools','constant':3,'modelName':'model_Name4','month':10,'variable':[{'name':'S_HOME_ALL','coefficient':0.075},{'name':'BOOST_S_DSL_APP_INT_ACC','coefficient':0.75},{'name':'S_DSL_APP_INT_BOTH','coefficient':0.175}]}";
-				DBObject dbObject4 = (DBObject) JSON.parse(modelVar4);
-				String modelVar5 = "{'modelId':15,'modelDescription':'All Tools','constant':3,'modelName':'model_Name7','month':10,'variable':[{'name':'S_DSL_APP_INT_ACC2','coefficient':0.75},{'name':'S_DSL_APP_INT_ACC_FTWR_TRS','coefficient':0.075},{'name':'S_DSL_APP_INT_BOTH','coefficient':0.175}]}";
-				DBObject dbObject5 = (DBObject) JSON.parse(modelVar5);
-				String modelVar6 = "{'modelId':32,'modelDescription':'Apparel','constant':3,'modelName':'model_Name5','month':10,'variable':[{'name':'S_HOME_ALL','coefficient':0.075},{'name':'BOOST_S_DSL_APP_INT_ACC','coefficient':0.75},{'name':'S_DSL_APP_INT_BOTH','coefficient':0.175}]}";
-				DBObject dbObject6 = (DBObject) JSON.parse(modelVar6);
-				String modelVar7 = "{'modelId':04,'modelDescription':'Shoes','constant':3,'modelName':'model_Name6','month':10,'variable':[{'name':'S_DSL_APP_INT_ACC2','coefficient':0.75},{'name':'S_DSL_APP_INT_ACC_FTWR_TRS','coefficient':0.075},{'name':'S_DSL_APP_INT_BOTH','coefficient':0.175}]}";
-				DBObject dbObject7 = (DBObject) JSON.parse(modelVar7);
-				String modelVar8 = "{'modelId':48,'modelDescription':'Kids Apparel','constant':3,'modelName':'model_Name10','month':0,'variable':[{'name':'S_DSL_APP_INT_ACC','coefficient':0.002},{'name':'S_HOME_6M_IND','coefficient':0.0015},{'name':'S_HOME_6M_IND_ALL','coefficient':0.0915},{'name':'S_DSL_APP_INT_ACC2','coefficient':0.0915},{'name':'S_HOME_6M_IND','coefficient':0.0015},{'name':'S_HOME_6M_IND_ALL','coefficient':0.0915},{'name':'S_DSL_APP_INT_ACC2','coefficient':0.0915},{'name':'S_DSL_APP_INT_BOTH','coefficient':0.0915}]}";
-				DBObject dbObject8 = (DBObject) JSON.parse(modelVar8);
-				String modelVar9 = "{'modelId':25,'modelDescription':'Mens Apparel','constant':3,'modelName':'model_Name8','month':10,'variable':[{'name':'S_DSL_APP_INT_ACC2','coefficient':0.75},{'name':'S_DSL_APP_INT_ACC_FTWR_TRS','coefficient':0.075},{'name':'S_DSL_APP_INT_BOTH','coefficient':0.175}]}";
-				DBObject dbObject9 = (DBObject) JSON.parse(modelVar9);
-				String modelVar10 = "{'modelId':60,'modelDescription':'Womens Apparel','constant':3,'modelName':'model_Name9','month':10,'variable':[{'name':'S_DSL_APP_INT_ACC2','coefficient':0.75},{'name':'S_DSL_APP_INT_ACC_FTWR_TRS','coefficient':0.075},{'name':'S_DSL_APP_INT_BOTH','coefficient':0.175}]}";
-				DBObject dbObject10 = (DBObject) JSON.parse(modelVar10);
-				
-				modelVariablesColl.insert(dbObject1);
-				modelVariablesColl.insert(dbObject2);
-				modelVariablesColl.insert(dbObject3);
-				modelVariablesColl.insert(dbObject4);
-				modelVariablesColl.insert(dbObject5);
-				modelVariablesColl.insert(dbObject6);
-				modelVariablesColl.insert(dbObject7);
-				modelVariablesColl.insert(dbObject8);
-				modelVariablesColl.insert(dbObject9);
-				modelVariablesColl.insert(dbObject10);
-				
-				//Fake variables collection
-				DBCollection variablesColl = db.getCollection("Variables");
-				DBObject varObj = new BasicDBObject("name", "S_HOME_6M_IND").append("VID", 2268).append("trs_lvl_fl", 0).append("strategy", "StrategyTurnOffFlag");
-				DBObject varObj2 = new BasicDBObject("name", "S_DSL_APP_INT_ACC").append("VID", 2269).append("trs_lvl_fl", 0).append("strategy", "StrategyDaysSinceLast");
-				DBObject varObj3 = new BasicDBObject("name", "S_DSL_APP_INT_ACC2").append("VID", 2270).append("trs_lvl_fl", 0).append("strategy", "StrategySumSales");
-				DBObject varObj4 = new BasicDBObject("name", "S_HOME_6M_IND_ALL").append("VID", 2271).append("trs_lvl_fl", 0).append("strategy", "StrategyDaysSinceLast");
-				DBObject varObj5 = new BasicDBObject("name", "S_DSL_APP_INT_BOTH").append("VID", 2272).append("trs_lvl_fl", 0).append("strategy", "StrategyTurnOffFlag");
-				DBObject varObj6 = new BasicDBObject("name", "S_HOME_ALL").append("VID", 2276).append("trs_lvl_fl", 0).append("strategy", "StrategyCountTraits");
-				DBObject varObj7 = new BasicDBObject("name", "S_DSL_APP_INT_ACC_FTWR_TRS").append("VID", 2273).append("trs_lvl_fl", 0).append("strategy", "StrategyCountTransactions");
-				DBObject varObj9 = new BasicDBObject("name", "S_DSL_APP_INT_ACC_FTWR").append("VID", 2277).append("trs_lvl_fl", 0).append("strategy", "StrategyCountTraits");
-				DBObject varObj10 = new BasicDBObject("name", "S_DSL_APP_INT_ACC_FTWR_ALL").append("VID", 2274).append("trs_lvl_fl", 0).append("strategy", "StrategyDaysSinceLast");
-				DBObject varObj11 = new BasicDBObject("name", "S_DSL_APP_INT_ACC_FTWR_MEM").append("VID", 2275).append("trs_lvl_fl", 0).append("strategy", "StrategyTurnOffFlag");
-				DBObject varObj12 = new BasicDBObject("name", "BOOST_S_DSL_APP_INT_ACC").append("VID", 2281).append("trs_lvl_fl", 0).append("strategy", "StrategyTurnOffFlag");
-				DBObject varObj13 = new BasicDBObject("name", "BOOST_S_DSL_APP_INT_ACC2").append("VID", 2282).append("trs_lvl_fl", 0).append("strategy", "StrategyDaysSinceLast");
-				DBObject varObj14 = new BasicDBObject("name", "BOOST_SYW_WANT_TOYS_TCOUNT").append("VID", 2283).append("trs_lvl_fl", 0).append("strategy", "StrategySumSales");
-				DBObject varObj15 = new BasicDBObject("name", "BOOST_SYW_WANT_TOYS_TCOUNT2").append("VID", 2284).append("trs_lvl_fl", 0).append("strategy", "StrategyTurnOffFlag");
-				variablesColl.insert(varObj);
-				variablesColl.insert(varObj2);
-				variablesColl.insert(varObj3);
-				variablesColl.insert(varObj4);
-				variablesColl.insert(varObj5);
-				variablesColl.insert(varObj6);
-				variablesColl.insert(varObj7);
-				variablesColl.insert(varObj9);
-				variablesColl.insert(varObj10);
-				variablesColl.insert(varObj11);
-				variablesColl.insert(varObj12);
-				variablesColl.insert(varObj13);
-				variablesColl.insert(varObj14);
-				variablesColl.insert(varObj15);
-				
-				DBObject dbj = variablesColl.findOne(new BasicDBObject("name", "BOOST_SYW_WANT_TOYS_TCOUNT2"));
-				System.out.println(dbj);*/
-		}
+	}
 	
 	@Before
 	public void setUp() throws Exception {
@@ -236,8 +167,6 @@ public class ScoringSingletonIntegrationTest {
 						monthModelMap5.put(0, new Model(30, "Model_Name3", 0, 7, variablesMap));
 						Map<Integer, Model> monthModelMap2 = new HashMap<Integer, Model>();
 						monthModelMap2.put(Calendar.getInstance().get(Calendar.MONTH) + 1, new Model(51, "Model_Name4", Calendar.getInstance().get(Calendar.MONTH) + 1, 3,variablesMap));
-						Map<Integer, Model> monthModelMap3 = new HashMap<Integer, Model>();
-						monthModelMap3.put(Calendar.getInstance().get(Calendar.MONTH) + 1, new Model(32, "Model_Name5", Calendar.getInstance().get(Calendar.MONTH) + 1, 3,variablesMap2));
 						Map<Integer, Model> monthModelMap6 = new HashMap<Integer, Model>();
 						monthModelMap6.put(Calendar.getInstance().get(Calendar.MONTH) + 1, new Model(04, "Model_Name6", Calendar.getInstance().get(Calendar.MONTH) + 1, 3,variablesMap3));
 						Map<Integer, Model> monthModelMap7 = new HashMap<Integer, Model>();
@@ -254,7 +183,6 @@ public class ScoringSingletonIntegrationTest {
 						modelsMapContent.put(46, monthModelMap4);
 						modelsMapContent.put(30, monthModelMap5);
 						modelsMapContent.put(51, monthModelMap2);
-						modelsMapContent.put(32, monthModelMap3);
 						modelsMapContent.put(04, monthModelMap6);
 						modelsMapContent.put(15, monthModelMap7);
 						modelsMapContent.put(25, monthModelMap8);
@@ -430,7 +358,7 @@ public class ScoringSingletonIntegrationTest {
 				DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
 				SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 				Change expected = new Change("2269", 12,
-						simpleDateFormat.parse("2999-09-23"),
+						simpleDateFormat.parse("2012-09-23"),
 						simpleDateFormat.parse("2014-09-01"));
 				Change expected2 = new Change("2071", 12,
 						simpleDateFormat.parse("2012-10-23"),
@@ -502,19 +430,7 @@ public class ScoringSingletonIntegrationTest {
 				System.out.println(changedMemVariablesStrategy.get("S_DSL_APP_INT_ACC_FTWR_MEM").getValue());
 				System.out.println(changedMemVariablesStrategy.get("S_DSL_APP_INT_ACC").getValue());
 				double score = scoringSingletonObj.calcScore(memberVariablesMap, changedMemVariablesStrategy, 35);
-				//System.out.println(score);
-				/*System.out.println(changedMemberVariablesMap.size());
-				System.out.println(changedMemVariablesStrategy.size());
-				System.out.println(changedMemVariablesStrategy.keySet());
-				System.out.println(changedMemVariablesStrategy.get("S_DSL_APP_INT_ACC_FTWR_MEM").getExpirationDateAsString());
-				System.out.println(changedMemVariablesStrategy.get("S_DSL_APP_INT_ACC").getEffectiveDateAsString());
-				System.out.println(changedMemVariablesStrategy.get("S_HOME_6M_IND_ALL").getEffectiveDateAsString());
-				double score = scoringSingletonObj.calcScore(memberVariablesMap, changedMemVariablesStrategy, 35);
-				System.out.println(changedMemVariablesStrategy.get("S_HOME_6M_IND_ALL").getValue());
-				System.out.println(changedMemVariablesStrategy.get("S_DSL_APP_INT_ACC").getValue());
-				System.out.println(changedMemVariablesStrategy.get("S_DSL_APP_INT_ACC_FTWR_MEM").getValue());
-				System.out.println(changedMemberVariablesMap.size());
-				System.out.println(changedMemVariablesStrategy.size());*/
+			
 				Assert.assertEquals(3, changedMemberVariablesMap.size());
 				Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), changedMemVariablesStrategy.get("S_DSL_APP_INT_ACC").getExpirationDateAsString());
 				Assert.assertEquals(0, changedMemVariablesStrategy.get("S_DSL_APP_INT_ACC_FTWR_MEM").getValue());
@@ -524,7 +440,7 @@ public class ScoringSingletonIntegrationTest {
 		}
 	
 	//This test is checked for null newChangesVarValueMap from ParsingBolt. 
-	//no re-scoring will happen
+	//no re-scoring will happen and ideally it will no happen at all
 	@Test
 	public void executeScoringSingletonNewChangesVarNullCheckTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, RealTimeScoringException, ConfigurationException, ParseException{
 			
@@ -604,7 +520,7 @@ public class ScoringSingletonIntegrationTest {
 				for(int modelId: modelIdsList){
 				 scoringSingletonObj.calcScore(memberVariablesMap, changedMemVariablesStrategy,modelId);
 				}
-			
+			Assert.assertTrue(modelIdsList.isEmpty());
 		}
 	
 	
@@ -696,7 +612,7 @@ public class ScoringSingletonIntegrationTest {
 				//fake changedMemberVariables Collection
 				DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
 				SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-				Change expected = new Change("2269", 12,
+				Change expected = new Change("2270", 12,
 						simpleDateFormat.parse("2999-09-23"),
 						simpleDateFormat.parse("2014-09-01"));
 				
@@ -704,13 +620,13 @@ public class ScoringSingletonIntegrationTest {
 						.getCollection("changedMemberVariables");
 				String l_id = "SearsTesting4";
 				changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
-						"2269",
+						"2270",
 						new BasicDBObject("v", expected.getValue()).append("e",
 								expected.getExpirationDateAsString()).append("f",
 								expected.getEffectiveDateAsString())));
 						
 				Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
-				newChangesVarValueMap.put("S_DSL_APP_INT_ACC2", "0.001");
+				newChangesVarValueMap.put("S_DSL_APP_INT_ACC", "0.001");
 				
 				Field variableModelsMapContent = ScoringSingleton.class
 						.getDeclaredField("variableModelsMap");
@@ -742,16 +658,16 @@ public class ScoringSingletonIntegrationTest {
 				Map<String, Object> memberVariablesMap = scoringSingletonObj.createVariableValueMap("SearsTesting4", modelIdsList);
 				Map<String, Change> changedMemberVariablesMap = scoringSingletonObj.createChangedVariablesMap("SearsTesting4");
 				Map<String, Change> changedMemVariablesStrategy = scoringSingletonObj.executeStrategy(changedMemberVariablesMap, newChangesVarValueMap, memberVariablesMap);
-				int value = (Integer) changedMemVariablesStrategy.get("S_DSL_APP_INT_ACC").getValue();
+				int value = (Integer) changedMemVariablesStrategy.get("S_DSL_APP_INT_ACC2").getValue();
 				List<Double> newScoreListActual = new LinkedList<Double>();
 				for(int modelId: modelIdsList){
 				double newScore = scoringSingletonObj.calcScore(memberVariablesMap, changedMemVariablesStrategy,modelId);
 				newScoreListActual.add(newScore);
 			}
 				List<Double> newScoreListExpected = new LinkedList<Double>();
-				newScoreListExpected.add(0.9977621514787237);
+				newScoreListExpected.add(0.9977621514787237);//[0.9977621514787237, 0.9836975006285591]
 				newScoreListExpected.add(0.9836975006285591);
-			//	Assert.assertEquals(newScoreListExpected, newScoreListActual);
+				Assert.assertEquals(newScoreListExpected, newScoreListActual);
 				Assert.assertEquals(12,value);
 		}
 	
@@ -827,80 +743,4 @@ public class ScoringSingletonIntegrationTest {
 				Assert.assertEquals(1, value);
 		}
 	
-	//This test is tested for variable S_DSL_APP_INT_ACC which is expired but newchangeVariableVaLueMap contains it
-		@Test
-		public void executeScoringSingletonNewChangesVarTest4() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, RealTimeScoringException, ConfigurationException, ParseException{
-				
-			DB db = DBConnection.getDBConnection();
-			
-			//Fake memeberVariables collection
-			DBCollection memVarColl = db.getCollection("memberVariables");
-			memVarColl.insert(new BasicDBObject("l_id", "SearsTesting7").append("2269", 1).append("2270",0.4).append("2292", 0.06));
-			
-					//fake changedMemberVariables Collection
-					DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
-					SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-					Change expected = new Change("2269", 12,
-							simpleDateFormat.parse("2012-09-23"),
-							simpleDateFormat.parse("2014-09-01"));
-					
-					changedMemberVar = db
-							.getCollection("changedMemberVariables");
-					String l_id = "SearsTesting7";
-					changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
-							"2269",
-							new BasicDBObject("v", expected.getValue()).append("e",
-									expected.getExpirationDateAsString()).append("f",
-									expected.getEffectiveDateAsString())));
-							
-					Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
-					newChangesVarValueMap.put("S_DSL_APP_INT_ACC", "0.001");
-					newChangesVarValueMap.put("S_DSL_APP_INT_ACC2", "0.001");
-					
-					Field variableModelsMapContent = ScoringSingleton.class
-							.getDeclaredField("variableModelsMap");
-					variableModelsMapContent.setAccessible(true);
-					variableModelsMapContent.set(scoringSingletonObj, getVariableModelsMapContents());
-					
-					Field modelsMapContent = ScoringSingleton.class
-							.getDeclaredField("modelsMap");
-					modelsMapContent.setAccessible(true);
-					modelsMapContent.set(scoringSingletonObj, getModelsMapContent());
-					
-					Field variableNameToVidMapContents = ScoringSingleton.class
-							.getDeclaredField("variableNameToVidMap");
-					variableNameToVidMapContents.setAccessible(true);
-					variableNameToVidMapContents.set(scoringSingletonObj, getVariableNameToVidMapContents());
-					
-					Field variableVidToNameMapContents = ScoringSingleton.class
-							.getDeclaredField("variableVidToNameMap");
-					variableVidToNameMapContents.setAccessible(true);
-					variableVidToNameMapContents.set(scoringSingletonObj, getVariableVidToNameMapContents());
-					
-					Field variableNameToStrategyMapContents = ScoringSingleton.class
-							.getDeclaredField("variableNameToStrategyMap");
-					variableNameToStrategyMapContents.setAccessible(true);
-					variableNameToStrategyMapContents.set(scoringSingletonObj, getVariableNameToStrategyMapContents());
-					
-					Set<Integer> modelIdsList = scoringSingletonObj.getModelIdList(newChangesVarValueMap);
-				
-					Map<String, Object> memberVariablesMap = scoringSingletonObj.createVariableValueMap("SearsTesting7", modelIdsList);
-					Map<String, Change> changedMemberVariablesMap = scoringSingletonObj.createChangedVariablesMap("SearsTesting7");
-					Map<String, Change> changedMemVariablesStrategy = scoringSingletonObj.executeStrategy(changedMemberVariablesMap, newChangesVarValueMap, memberVariablesMap);
-					int value = (Integer) changedMemVariablesStrategy.get("S_DSL_APP_INT_ACC").getValue();
-					List<Double> newScoreListActual = new LinkedList<Double>();
-					for(int modelId: modelIdsList){
-					double newScore = scoringSingletonObj.calcScore(memberVariablesMap, changedMemVariablesStrategy,modelId);
-					newScoreListActual.add(newScore);
-				}
-					List<Double> newScoreListExpected = new LinkedList<Double>();
-					newScoreListExpected.add(0.9935595238515038);
-					newScoreListExpected.add(0.9525741268224333);
-					newScoreListExpected.add(0.954291787707128);
-					newScoreListExpected.add(0.9530462339457062);
-					Assert.assertEquals(newScoreListExpected, newScoreListActual);
-					Assert.assertEquals(1, value);
-			}
-	
-	
-	}
+		}

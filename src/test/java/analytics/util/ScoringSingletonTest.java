@@ -385,7 +385,7 @@ public class ScoringSingletonTest {
 
 	//This test is to check whether createVariableValueMap() returns null if loyaltyid is null
 	@Test
-	public void createVariableValueMapNullCheckTest() {
+	public void createVariableValueMapNullCheckTest() throws RealTimeScoringException {
 		
 		Map<String, String> newChangesVarValueMap2 = new HashMap<String, String>();
 		newChangesVarValueMap2.put("S_HOME_6M_IND2", "value");
@@ -398,7 +398,7 @@ public class ScoringSingletonTest {
 	
 	//This test is to check whether memberVariablesMap is created (positive case)
 	@Test
-	public void createVariableValueMapTest() throws ConfigurationException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+	public void createVariableValueMapTest() throws ConfigurationException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, RealTimeScoringException {
 		DB db = DBConnection.getDBConnection();
 		DBCollection memberVariables = db.getCollection("memberVariables");
 		memberVariables.insert(new BasicDBObject("l_id","SearsTesting").append("2269", 1).append("2268",  0.10455).append("2270", 0.10455).append("2271",0.10455).append("2272",0.155));
@@ -428,7 +428,7 @@ public class ScoringSingletonTest {
 	//Pls note: This was the reason for getting variableId as NULL, like null=1
 	@Test
 	@Ignore
-	public void createVariableValueMapTest2() throws ConfigurationException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+	public void createVariableValueMapTest2() throws ConfigurationException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, RealTimeScoringException {
 		DB db = DBConnection.getDBConnection();
 		DBCollection memberVariables = db.getCollection("memberVariables");
 		memberVariables.insert(new BasicDBObject("l_id","SearsTestingCheck").append("2269", 1).append("2268",  0.10455).append("2270", 0.10455).append("2271",0.10455).append("2272",0.155));
