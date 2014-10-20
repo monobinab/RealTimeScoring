@@ -64,7 +64,7 @@ public class ProcessSywBoltMockTest {
 		 */
 		DB conn = DBConnection.getDBConnection();
 		DBCollection pidDivLn = conn.getCollection("pidDivLn");
-		pidDivLn.insert(new BasicDBObject("pid","02280322000P").append("d","046").append("l","04601"));
+		pidDivLn.insert(new BasicDBObject("pid","022W006059462001P").append("d","046").append("l","04601"));
 		DBCollection divLnBoost = conn.getCollection("divLnBoost");
 		divLnBoost.insert(new BasicDBObject("d","04601").append("b", "BOOST_SYW_WANT_REGRIG_TCOUNT"));
 		divLnBoost.insert(new BasicDBObject("d","04601").append("b", "BOOST_SYW_WANT_HA_ALL_TCOUNT"));
@@ -104,8 +104,8 @@ public class ProcessSywBoltMockTest {
         /*[null, {"BOOST_SYW_OWN_HA_ALL_TCOUNT":"{\"current\":[\"02280322000P\"]}","BOOST_SYW_OWN_REGRIG_TCOUNT":"{\"current\":[\"02280322000P\"]}"}, SYW_WANT]*/
         Assert.assertEquals(lId, outputTuple.get(0));
         Assert.assertEquals("SYW_WANT", outputTuple.get(2));
-        Assert.assertEquals("{\"BOOST_SYW_OWN_HA_ALL_TCOUNT\":\"{\\\"current\\\":[\\\"02280322000P\\\"]}\","
-        		+ "\"BOOST_SYW_OWN_REGRIG_TCOUNT\":\"{\\\"current\\\":[\\\"02280322000P\\\"]}\"}",outputTuple.get(1));
+        Assert.assertEquals("{\"BOOST_SYW_OWN_HA_ALL_TCOUNT\":\"{\\\"current\\\":[\\\"022W006059462001P\\\"]}\","
+        		+ "\"BOOST_SYW_OWN_REGRIG_TCOUNT\":\"{\\\"current\\\":[\\\"022W006059462001P\\\"]}\"}",outputTuple.get(1));
      
 
 	}
