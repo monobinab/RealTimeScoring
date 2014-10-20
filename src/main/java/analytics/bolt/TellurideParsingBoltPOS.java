@@ -125,26 +125,17 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 		}
 
 		LOGGER.debug("Parsing MQ message XML");
-		if (transactionXmlAsString.contains("xmlns:soapenv")) {
+		if (transactionXmlAsString.contains("<ProcessTransaction")) {
 
 			//logger.info("Processing Soap Envelop xml String...");
-			StringUtils.substringBetween(transactionXmlAsString.toString(),
-					"<soapenv:Envelope xmlns:soapenv="
-							+ "http://www.w3.org/2003/05/soap-envelope>"
-							+ "<soapenv:Body>/",
-					"</soapenv:Body></soapenv:Envelope>");
 			processTransaction = XMLParser
 					.parseXMLProcessTransaction(transactionXmlAsString);
 			// XMLParser.parseXMLLineItems(nposTransaction);
-
+			LOGGER.error(transactionXmlAsString);
 		} else if (transactionXmlAsString.contains("tns:ProcessTransaction")) {
-			StringUtils
-					.substringBetween(
-							transactionXmlAsString.toString(),
-							"<tns:ProcessTransaction xmlns:tns=\"http://www.w3.org/2003/05/tns\">",
-							"</tns:ProcessTransaction>");
 			processTransaction = XMLParser
 					.parseXMLProcessTransaction(transactionXmlAsString);
+
 		}
 
 
@@ -173,12 +164,18 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 
 			lyl_id_no = processTransaction.getMemberNumber();
 
+
 			if (lyl_id_no==null || StringUtils.isEmpty(lyl_id_no)) {
 				countMetric.scope("empty_lid").incr();
 				outputCollector.fail(input);
 				return;
 			}
-
+			//TODO: Use this for debugging
+			/*if(lyl_id_no.equals("7081057588230760") || lyl_id_no.equals("7081400000032721")|| lyl_id_no.equals("7081187618793758") || lyl_id_no.equals("7081257366894445") 
+					|| lyl_id_no.equals("7081133318057649") || lyl_id_no.equals("7081020830587635")){
+                LOGGER.error("Received loyalty id" + lyl_id_no);
+                LOGGER.error("XML for transaction = " + transactionXmlAsString);
+          	}*/
 			// 6) HASH LOYALTY ID
 			String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no);
 			// 7)FIND DIVISION #, ITEM #, AMOUNT AND

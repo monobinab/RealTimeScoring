@@ -40,6 +40,7 @@ public class XMLParser {
 		boolean bItemNumber = false;
 		boolean bDollarValuePostDisc = false;
 		boolean bRequestorID = false;
+		boolean bItemType=false;
 		try {
 			XMLStreamReader xmlStreamReader = xmlInputFactory
 					.createXMLStreamReader(new StringReader(fileName));
@@ -71,17 +72,8 @@ public class XMLParser {
 					} else if ("ItemNumber".equals(
 							elementName)) {
 						bItemNumber = true;
-					}
-
-					if ("LineItem".equals(elementName)) {
-						lineItem = new LineItem();
-						bLineItem = true;
-					} else if ("Division"
-							.equals(elementName)) {
-						bDivision = true;
-					} else if ("ItemNumber".equals(
-							elementName)) {
-						bItemNumber = true;
+					} else if("ItemType".equals(elementName)){
+						bItemType = true;
 					} else if ("DollarValuePostDisc".equals(
 							elementName)) {
 						bDollarValuePostDisc = true;
@@ -112,6 +104,9 @@ public class XMLParser {
 					} else if (bItemNumber) {
 						lineItem.setItemNumber(xmlStreamReader.getText());
 						bItemNumber = false;
+					} else if (bItemType) {
+						lineItem.setItemType(xmlStreamReader.getText());
+						bItemType = false;
 					}
 
 					else if (bDollarValuePostDisc) {
@@ -125,7 +120,7 @@ public class XMLParser {
                     elementName = xmlStreamReader.getLocalName().replace("tns:","");
 
                     if ("LineItem".equals(elementName)) {
-                    	if(!("000000000".equals(lineItem.getItemNumber())))
+                    	if(!("000000000".equals(lineItem.getItemNumber())) && "1".equals(lineItem.getItemType()) )
                     			lineItemList.add(lineItem);
 					}
 					processTransaction.setLineItemList(lineItemList);
