@@ -95,7 +95,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 		// 4) Find all variables for models
 
 		// 5) Create a map of variable values, fetched from from memberVariables
-		Map<String, Object> memberVariablesMap = null;
+		Map<String, Object> memberVariablesMap = new HashMap<String, Object>();
 		try {
 			memberVariablesMap = ScoringSingleton.getInstance().createVariableValueMap(lId, modelIdList);
 		} catch (RealTimeScoringException e1) {
