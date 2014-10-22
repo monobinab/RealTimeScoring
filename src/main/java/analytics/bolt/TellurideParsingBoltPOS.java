@@ -134,8 +134,6 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 			//logger.info("Processing Soap Envelop xml String...");
 			processTransaction = XMLParser
 					.parseXMLProcessTransaction(transactionXmlAsString);
-			// XMLParser.parseXMLLineItems(nposTransaction);
-			LOGGER.error(transactionXmlAsString);
 		} else if (transactionXmlAsString.contains("tns:ProcessTransaction")) {
 			processTransaction = XMLParser
 					.parseXMLProcessTransaction(transactionXmlAsString);
