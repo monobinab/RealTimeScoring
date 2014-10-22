@@ -39,7 +39,6 @@ public class RealTimeScoringTellurideTopology {
 		if (args.length > 0) {
 			System.setProperty(MongoNameConstants.IS_PROD, "true");
 		}
-		System.setProperty(MongoNameConstants.IS_PROD, "true");
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 
 		MQConnectionConfig mqConnection = new MQConnectionConfig();
