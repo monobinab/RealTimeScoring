@@ -105,7 +105,11 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 		countMetric.scope("incoming_tuples").incr();
 		String lyl_id_no = "";
 		ProcessTransaction processTransaction = null;
-
+		String messageID = "";
+		if (input.contains("messageID")) {
+			messageID = input.getStringByField("messageID");
+		}
+		LOGGER.info("TIME:" + messageID + "-Entering parsing bolt-" + System.currentTimeMillis());
 		String transactionXmlAsString = "";
 		// KPOS and KCOM
 		JMSMessage documentNPOS = (JMSMessage) input.getValueByField("npos");
@@ -356,7 +360,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 					listToEmit.add(l_id);
 					listToEmit.add(JsonUtils.createJsonFromStringStringMap(varAmountMap));
 					listToEmit.add(requestorID);
-					listToEmit.add(input.getMessageId().toString());
+					listToEmit.add(messageID);
 					LOGGER.debug(requestorID + " Point of SALE is touched...");
 					LOGGER.debug(" *** telluride parsing bolt emitting: "
 						+ listToEmit.toString());
@@ -365,6 +369,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 				// 9) EMIT VARIABLES TO VALUES MAP IN JSON DOCUMENT
 				if (listToEmit != null && !listToEmit.isEmpty()) {
 					this.outputCollector.emit(listToEmit);
+					LOGGER.info("TIME:" + messageID + "-Emiting from parsing bolt-" + System.currentTimeMillis());
 				}
 			}
 			else{
@@ -376,6 +381,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 		else{
 			countMetric.scope("empty_xml").incr();
 			outputCollector.fail(input);
+			return;
 		}
 	}
 	/*

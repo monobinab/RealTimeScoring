@@ -74,8 +74,6 @@ public class ScorePublishBolt extends BaseRichBolt {
 	@Override
 	public void execute(Tuple input) {
 		countMetric.scope("incoming_tuples").incr();
-		LOGGER.debug("The time it enters inside Score Publish Bolt execute method "
-				+ System.currentTimeMillis());
 		// System.out.println(" %%% scorepublishbolt :" + input);
 		String l_id = input.getStringByField("l_id");
 		String modelId = input.getStringByField("model");
@@ -87,7 +85,11 @@ public class ScorePublishBolt extends BaseRichBolt {
 				.append(",").append(input.getDoubleByField("newScore"))
 				.append(",").append(oldScore).toString();
 		// System.out.println(" %%% message : " + message);
-
+		String messageID = "";
+		if (input.contains("messageID")) {
+			messageID = input.getStringByField("messageID");
+		}
+		LOGGER.info("TIME:" + messageID + "-Entering score publish bolt-" + System.currentTimeMillis());
 		int retryCount = 0;
 		while (retryCount < 5) {
 			try {
@@ -108,6 +110,7 @@ public class ScorePublishBolt extends BaseRichBolt {
 		}
 		countMetric.scope("publish_successful").incr();
 		outputCollector.ack(input);
+		LOGGER.info("TIME:" + messageID + "-Score publish complete-" + System.currentTimeMillis());
 	}
 
 	/*

@@ -13,6 +13,7 @@ import analytics.util.JsonUtils;
 import analytics.util.MongoNameConstants;
 import analytics.util.dao.MemberUUIDDao;
 import analytics.util.dao.ModelVariablesDao;
+import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -38,9 +39,8 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 	protected String sourceTopic;
 	protected MemberUUIDDao memberDao;
 	protected ModelVariablesDao modelVariablesDao;
-
+	protected MultiCountMetric countMetric;
     public ParseAAMFeeds() {
-
 	}
 
 	// Overloaded Paramterized constructor to get the topic to which the spout
@@ -57,6 +57,8 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         this.outputCollector = collector;
         System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+	     countMetric = new MultiCountMetric();
+	     context.registerMetric("custom_metrics", countMetric, 60);
         
 	/*
 	 * (non-Javadoc)
@@ -91,13 +93,15 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 		// 5) POPULATE TRAITS COLLECTION WITH THE FIRST TRAIT
 		
 		LOGGER.debug("PARSING DOCUMENT -- WEB TRAIT RECORD " + input.getString(0));
-		
+		countMetric.scope("incoming_tuples").incr();
 		// 1) SPLIT INPUT STRING
 		
         String interactionRec = input.getString(1);
         String splitRecArray[] = splitRec(interactionRec);
         
         if(splitRecArray == null || splitRecArray.length==0) {
+    		countMetric.scope("invalid_record").incr();
+    		outputCollector.fail(input);
         	return;
         }
         
@@ -109,6 +113,8 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
         if(this.currentUUID != null && this.currentUUID.equalsIgnoreCase(splitRecArray[0])) {
         	//skip processing if l_id is null
         	if(this.l_idToValueCollectionMap==null || this.l_idToValueCollectionMap.isEmpty()) {
+        		countMetric.scope("empty_lid_map").incr();
+        		outputCollector.fail(input);
         		return;
         	}
         	
@@ -185,7 +191,9 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 			logger.debug("Can not parse date",e);
 		}*/
         
-        return;
+		countMetric.scope("processed_record").incr();
+		outputCollector.fail(input);
+    	return;
         
 	}
 
