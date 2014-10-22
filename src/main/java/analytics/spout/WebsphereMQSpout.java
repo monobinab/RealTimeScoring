@@ -90,11 +90,13 @@ public class WebsphereMQSpout extends BaseRichSpout {
 		try {
 			JMSMessage receivedMessage = (JMSMessage) receiver.receive();
 			String messageID = receivedMessage.getJMSMessageID();
+			LOGGER.info("TIME:" + messageID + "-Entering spout-" + System.currentTimeMillis());
 			long timeStamp = receivedMessage.getJMSTimestamp();
 			if(LOGGER.isDebugEnabled())
 				LOGGER.debug("The time it enters with next message with it " +
 					"id" +messageID+ " and its time stamp" +timeStamp + "Start Time in millisecond "+System.currentTimeMillis());
-			collector.emit(new Values(receivedMessage), receivedMessage);
+			collector.emit(new Values(receivedMessage,messageID), receivedMessage);
+			LOGGER.info("TIME:" + messageID + "-Emitted from spout-" + System.currentTimeMillis());
 		} catch (JMSException e) {
 			LOGGER.error("Exception occurred while receiving message from queue ", e);
 		}
@@ -119,7 +121,7 @@ public class WebsphereMQSpout extends BaseRichSpout {
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("npos"));
+		declarer.declare(new Fields("npos","messageID"));
 	}
 
 	/**
