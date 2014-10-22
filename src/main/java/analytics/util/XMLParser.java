@@ -41,6 +41,7 @@ public class XMLParser {
 		boolean bDollarValuePostDisc = false;
 		boolean bRequestorID = false;
 		boolean bItemType=false;
+		boolean bEarnFlag=false;
 		try {
 			XMLStreamReader xmlStreamReader = xmlInputFactory
 					.createXMLStreamReader(new StringReader(fileName));
@@ -62,6 +63,8 @@ public class XMLParser {
 					} else if ("RequestorID".equals(
 							elementName)) {
 						bRequestorID = true;
+					} else if("EarnFlag".equals(elementName)){
+						bEarnFlag = true;
 					}
 					if ("LineItem".equals(elementName)) {
 						lineItem = new LineItem();
@@ -77,7 +80,7 @@ public class XMLParser {
 					} else if ("DollarValuePostDisc".equals(
 							elementName)) {
 						bDollarValuePostDisc = true;
-					}
+					} 
 					break;
 				case XMLStreamConstants.CHARACTERS:
 
@@ -107,6 +110,11 @@ public class XMLParser {
 					} else if (bItemType) {
 						lineItem.setItemType(xmlStreamReader.getText());
 						bItemType = false;
+					} else if (bEarnFlag){
+						if("E".equals(xmlStreamReader.getText()))
+								bEarnFlag = false;
+						else 
+							return null;
 					}
 
 					else if (bDollarValuePostDisc) {

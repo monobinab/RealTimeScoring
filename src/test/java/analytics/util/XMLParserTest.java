@@ -133,7 +133,7 @@ public class XMLParserTest {
             "            <TransactionTotalTax>0.00000</TransactionTotalTax>\n" +
             "            <TransactionDate>2014-08-07</TransactionDate>\n" +
             "            <TransactionTime>21:43:02</TransactionTime>\n" +
-            "            <EarnFlag>T</EarnFlag>\n" +
+            "            <EarnFlag>E</EarnFlag>\n" +
             "            <TimeZone>CDT</TimeZone>\n" +
             "            <LineItems>\n" +
             "                <LineItem>\n" +
@@ -208,7 +208,7 @@ public class XMLParserTest {
             "            <TransactionTotalTax>0.00000</TransactionTotalTax>\n" +
             "            <TransactionDate>2014-08-07</TransactionDate>\n" +
             "            <TransactionTime>21:43:02</TransactionTime>\n" +
-            "            <EarnFlag>T</EarnFlag>\n" +
+            "            <EarnFlag>E</EarnFlag>\n" +
             "            <TimeZone>CDT</TimeZone>\n" +
             "            <LineItems>\n" +
             "                <LineItem>\n" +
@@ -282,7 +282,7 @@ public class XMLParserTest {
             "            <TransactionTotalTax>0.00000</TransactionTotalTax>\n" +
             "            <TransactionDate>2014-08-07</TransactionDate>\n" +
             "            <TransactionTime>21:43:02</TransactionTime>\n" +
-            "            <EarnFlag>T</EarnFlag>\n" +
+            "            <EarnFlag>E</EarnFlag>\n" +
             "            <TimeZone>CDT</TimeZone>\n" +
             "            <LineItems>\n" +
             "                <LineItem>\n" +
