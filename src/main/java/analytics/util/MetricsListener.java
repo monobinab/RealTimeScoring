@@ -38,7 +38,6 @@ public class MetricsListener implements IMetricsConsumer {
 					jsonObj.put("valueAvg", map.get(key));
 					jsonObj.put("valueTotal", totalCount);
 					jedis.publish("metrics", jsonObj.toJSONString());
-					System.out.println(jsonObj.toJSONString());
 				}
 				}
 		}
