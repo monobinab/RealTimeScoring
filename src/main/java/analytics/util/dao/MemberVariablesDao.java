@@ -21,7 +21,8 @@ public class MemberVariablesDao extends AbstractDao {
 			.getLogger(MemberVariablesDao.class);
     DBCollection memberVariablesCollection;
     public MemberVariablesDao(){
-    	super();
+    	//Connect to secondary server
+    	super("server2");
 		memberVariablesCollection = db.getCollection("memberVariables");
     }
    

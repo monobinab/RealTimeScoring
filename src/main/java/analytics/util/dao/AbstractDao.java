@@ -9,16 +9,17 @@ import com.mongodb.DB;
 
 public abstract class AbstractDao {
 	static final Logger LOGGER = LoggerFactory
-			.getLogger(ChangedMemberScoresDao.class);
+			.getLogger(AbstractDao.class);
 
 	protected 	DB db;
 	public AbstractDao() {
-		{
+		this("default");
+	}
+	public AbstractDao(String server){
 			try {
-				db = DBConnection.getDBConnection();
+				db = DBConnection.getDBConnection(server);
 			} catch (Exception e) {
 				LOGGER.error("Unable to get DB connection", e);
 			}
 		}
-	}
 }
