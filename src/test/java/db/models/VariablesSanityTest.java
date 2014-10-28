@@ -20,8 +20,9 @@ import analytics.util.objects.Variable;
 public class VariablesSanityTest {
 	@Test
 	public void checkModelsMatchDb() throws ClassNotFoundException, SQLException{
+		System.setProperty("rtseprod", "true");
 		List<Variable> variables = new VariableDao().getVariables();
-	
+		System.setProperty("rtseprod", "test");
 		StringBuilder queryColumns = new StringBuilder();
 		for(Variable variable: variables){
 			Assert.assertNotNull((Double)variable.getCoefficient());

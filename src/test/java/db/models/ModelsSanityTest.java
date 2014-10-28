@@ -17,8 +17,9 @@ import analytics.util.dao.ModelsDao;
 public class ModelsSanityTest {
 	@Test
 	public void checkModelsMatchDb() throws ClassNotFoundException, SQLException{
+		System.setProperty("rtseprod", "true");
 		Map<Integer,String> modelNamesMap = new ModelsDao().getModelNames();
-	
+		System.setProperty("rtseprod", "test");
 		StringBuilder queryColumns = new StringBuilder();
 		for(String modelName: modelNamesMap.values()){
 			queryColumns.append(modelName);
