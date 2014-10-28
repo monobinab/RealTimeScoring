@@ -42,6 +42,10 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 	protected MultiCountMetric countMetric;
     public ParseAAMFeeds() {
 	}
+	 void initMetrics(TopologyContext context){
+	     countMetric = new MultiCountMetric();
+	     context.registerMetric("custom_metrics", countMetric, 60);
+	    }
 
 	// Overloaded Paramterized constructor to get the topic to which the spout
 	// is listening to
@@ -57,8 +61,7 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         this.outputCollector = collector;
         System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
-	     countMetric = new MultiCountMetric();
-	     context.registerMetric("custom_metrics", countMetric, 60);
+	    initMetrics(context);
         
 	/*
 	 * (non-Javadoc)
@@ -125,13 +128,12 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 	        	listToEmit.add(variableValueJSON);
 	        	listToEmit.add(sourceTopic);
 	        	this.outputCollector.emit(listToEmit);
+	        	countMetric.scope("processed_lid").incr();
 	        	LOGGER.debug(" *** PARSING BOLT EMITTING: " + listToEmit);
         	}
         	else {
         		LOGGER.debug(" *** NO VARIABLES FOUND - NOTHING TO EMIT");
-        		countMetric.scope("no_variables").incr();
-        		outputCollector.fail(input);
-            	return;	
+        		countMetric.scope("no_variables_affected").incr();
         	}
         	
         }
@@ -145,7 +147,7 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 			logger.debug("Can not parse date",e);
 		}*/
         
-		countMetric.scope("processed_records").incr();
+		countMetric.scope("successful").incr();
 		outputCollector.ack(input);
     	return;
         
