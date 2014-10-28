@@ -8,6 +8,7 @@ import analytics.util.dao.MemberBoostsDao;
 import analytics.util.dao.PidDivLnDao;
 import analytics.util.objects.SYWEntity;
 import analytics.util.objects.SYWInteraction;
+import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -45,7 +46,11 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 	private BoostDao boostDao;
 	private MemberBoostsDao memberBoostsDao;
 	Map<String, List<String>> boostListMap;
-
+	private MultiCountMetric countMetric;
+	 void initMetrics(TopologyContext context){
+	     countMetric = new MultiCountMetric();
+	     context.registerMetric("custom_metrics", countMetric, 60);
+	    }
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
@@ -69,6 +74,7 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 
 	@Override
 	public void execute(Tuple input) {
+		countMetric.scope("incoming_record").incr();
 		String feedType = null;
 		// Get l_id", "message", "InteractionType" from parsing bolt
 		/*SYWInteraction obj = (SYWInteraction) input
@@ -108,6 +114,7 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 
 		if (feedType == null) {
 			LOGGER.info("We process only own, like and want catalogs & SYW Likes");
+			countMetric.scope("customer_catalog").incr();
 			outputCollector.fail(input);
 			return;
 		}
@@ -213,6 +220,10 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 			listToEmit.add(feedType);
 			LOGGER.debug(" @@@ SYW PARSING BOLT EMITTING: " + listToEmit+ " lid: " + lId);
 			this.outputCollector.emit(listToEmit);
+			countMetric.scope("successful").incr();
+		}
+		else{
+			countMetric.scope("empty_var_map").incr();
 		}
 		this.outputCollector.ack(input);
 	}
