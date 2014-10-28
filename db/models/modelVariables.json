@@ -49,7 +49,6 @@
       "name" : "BOOST_BROWSE_CE_TCOUNT"
     }]
 }
-
 {
   "modelId" : 26,
   "modelDescription" : "Baby",
@@ -5033,7 +5032,7 @@
       "coefficient" : 0.030830804,
       "name" : "M_WEB_TRAIT_DISHWASHER_8_14"
     }, {
-      "coefficient" : 0,
+      "coefficient" : 0.0,
       "name" : "M_ZIPTREND_WATER_HEATER_AMT"
     }, {
       "coefficient" : 0.065408369,
