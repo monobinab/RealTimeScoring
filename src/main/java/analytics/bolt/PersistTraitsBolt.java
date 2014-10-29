@@ -37,6 +37,7 @@ public class PersistTraitsBolt extends BaseRichBolt {
         System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
 		memberTraitsDao = new MemberTraitsDao();
 		this.outputCollector = collector;
+		initMetrics(context);
 	}
 	 void initMetrics(TopologyContext context){
 	     countMetric = new MultiCountMetric();
