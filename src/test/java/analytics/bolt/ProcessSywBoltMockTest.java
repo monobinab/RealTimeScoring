@@ -11,10 +11,12 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import analytics.MockOutputCollector;
+import analytics.MockTopologyContext;
 import analytics.StormTestUtils;
 import analytics.util.DBConnection;
 import analytics.util.FakeMongo;
 import analytics.util.SywApiCalls;
+import backtype.storm.task.TopologyContext;
 import backtype.storm.tuple.Tuple;
 
 import com.github.fakemongo.Fongo;
@@ -40,8 +42,8 @@ public class ProcessSywBoltMockTest {
 	public void onlyCertainCatalogTypesAreProcessed(){		
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
         ProcessSYWInteractions boltUnderTest = new ProcessSYWInteractions();
-       
-        boltUnderTest.prepare(conf, null, outputCollector);
+       TopologyContext context = new MockTopologyContext();
+        boltUnderTest.prepare(conf,context , outputCollector);
         String lId = "xo0b7SN1eER9shCSj0DX+eSGag=";
 		String interactionType = "AddToCatalog";
 		String interactionString = "{\"InteractionId\":\"b7556eb8-e9ca-4e31-accc-4b56b69fcfad\",\"UserId\":6875997,\"UserSearsId\":6875997,\"Entities\":"
@@ -89,8 +91,8 @@ public class ProcessSywBoltMockTest {
 		
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
         ProcessSYWInteractions boltUnderTest = new ProcessSYWInteractions();
-       
-        boltUnderTest.prepare(conf, null, outputCollector);
+        TopologyContext context = new MockTopologyContext();
+        boltUnderTest.prepare(conf, context, outputCollector);
         String lId = "do0b7SN1eER9shCSj0DX+eSGag=";
 		String interactionType = "AddToCatalog";
 		String interactionString = "{\"InteractionId\":\"b7556eb8-e9ca-4e31-accc-4b56b69fcfad\",\"UserId\":6875997,\"UserSearsId\":6875997,\"Entities\":"

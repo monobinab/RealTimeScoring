@@ -10,8 +10,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import analytics.MockOutputCollector;
+import analytics.MockTopologyContext;
 import analytics.StormTestUtils;
 import analytics.util.FakeMongo;
+import backtype.storm.task.TopologyContext;
 import backtype.storm.tuple.Tuple;
 
 import com.github.fakemongo.Fongo;
@@ -33,8 +35,8 @@ public class ParsingBoltSYWMockTest {
 	public void invalidInteractionTypeIsIgnored(){		
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
         ParsingBoltSYW boltUnderTest = new ParsingBoltSYW();
-           
-        boltUnderTest.prepare(conf, null, outputCollector);
+        TopologyContext context = new MockTopologyContext();
+        boltUnderTest.prepare(conf, context, outputCollector);
         String input = "[{\"InteractionId\":\"b7556eb8-e9ca-4e31-accc-4b56b69fcfad\",\"UserId\":6875997,\"UserSearsId\":6875997,\"Entities\":"
         		+ "[{\"Id\":1221863,\"EntityType\":\"Topic\"},{\"IsTaggedItem\":true,\"Id\":373541114,\"EntityType\":\"Product\"}],\"InteractionType\":\"TagItem\","
         		+ "\"Time\":\"2014-09-24T13:27:45.3874132Z\",\"Client\":\"Web\"}]";
@@ -56,8 +58,8 @@ public class ParsingBoltSYWMockTest {
         		+ "\"Time\":\"2014-09-24T13:27:45.3874132Z\",\"Client\":\"Web\"}";
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
         ParsingBoltSYW boltUnderTest = new ParsingBoltSYW();
-       
-        boltUnderTest.prepare(conf, null, outputCollector);
+        TopologyContext context = new MockTopologyContext();
+        boltUnderTest.prepare(conf, context, outputCollector);
         String input = "[{\"InteractionId\":\"b7556eb8-e9ca-4e31-accc-4b56b69fcfad\",\"UserId\":6875997,\"UserSearsId\":6875997,\"Entities\":"
         		+ "[{\"Id\":184008680,\"EntityType\":\"Product\"},{\"Id\":8353466,\"EntityType\":\"Catalog\",\"OwnerId\":6875997}],\"InteractionType\":\"AddToCatalog\","
         		+ "\"Time\":\"2014-09-24T13:27:45.3874132Z\",\"Client\":\"Web\"}]";
