@@ -9,6 +9,7 @@ import analytics.bolt.PersistTraitsBolt;
 import analytics.bolt.ScorePublishBolt;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.spout.AAMRedisPubSubSpout;
+import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
 import analytics.util.RedisConnection;
 import analytics.util.TopicConstants;
@@ -46,6 +47,7 @@ public class AAMTopology {
 	    builder.setBolt("member_publish_bolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 2).shuffleGrouping("strategy_bolt", "member_stream");
 	      
 	    Config conf = new Config();
+	    conf.registerMetricsConsumer(MetricsListener.class, 3);
 		conf.setDebug(false);
 		conf.setNumWorkers(3);
 		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));

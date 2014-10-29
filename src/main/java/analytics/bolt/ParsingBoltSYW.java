@@ -3,6 +3,7 @@ package analytics.bolt;
 import analytics.util.MongoNameConstants;
 import analytics.util.SecurityUtils;
 import analytics.util.SywApiCalls;
+import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -30,6 +31,11 @@ public class ParsingBoltSYW extends BaseRichBolt {
 	private OutputCollector outputCollector;
 	private List<String> listOfInteractionsForRTS;
 	SywApiCalls sywApiCalls;
+	private MultiCountMetric countMetric;
+	 void initMetrics(TopologyContext context){
+	     countMetric = new MultiCountMetric();
+	     context.registerMetric("custom_metrics", countMetric, 60);
+	    }
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
@@ -47,6 +53,8 @@ public class ParsingBoltSYW extends BaseRichBolt {
 	@Override
 	public void execute(Tuple input) {
 		//Read the JSON message from the spout
+		countMetric.scope("incoming").incr();
+	
 		JsonParser parser = new JsonParser();
 		JsonArray interactionArray = parser.parse(input.getStringByField("message")).getAsJsonArray();
 
@@ -61,6 +69,7 @@ public class ParsingBoltSYW extends BaseRichBolt {
 			*/
 
 			if (l_id == null) {
+				countMetric.scope("null_lid").incr();
 				//LOGGER.warn("Unable to get member information" + input);
 				outputCollector.fail(input);
 				//could not process record
@@ -75,9 +84,11 @@ public class ParsingBoltSYW extends BaseRichBolt {
 			if (listOfInteractionsForRTS.contains(interactionTypeString)) {
 				// Create a SYW Interaction object
 					outputCollector.emit(tuple(l_id, interactionObject.toString(),interactionTypeString));
+					countMetric.scope("sent_to_process").incr();
 			} else {
 				//We should look into either processing this request type or not subscribing to it
 				LOGGER.info("Ignore interaction type" + interactionType.getAsString());
+				countMetric.scope("unwanted_interactiontype").incr();
 			}
 		}
 		outputCollector.ack(input);

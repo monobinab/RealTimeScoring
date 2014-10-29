@@ -71,7 +71,7 @@
                 <checksumPolicy>ignore</checksumPolicy>
             </releases>
             <snapshots>
-                <enabled>false</enabled>
+                <enabled>true</enabled>
             </snapshots>
             <url>file://${project.basedir}/lib</url>
         </repository>
@@ -99,7 +99,18 @@
     <artifactId>groovy-all</artifactId>
     <version>1.7.2</version>
   </dependency-->
-    
+    	<dependency>
+            <groupId>com.teradata</groupId>
+            <artifactId>terajdbc4</artifactId>
+            <version>15.00.00.15</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.teradata</groupId>
+ 			<artifactId>tdgssconfig</artifactId>
+  			<version>15.00.00.15</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
 			<groupId>com.github.kevinsawicki</groupId>
 			<artifactId>http-request</artifactId>

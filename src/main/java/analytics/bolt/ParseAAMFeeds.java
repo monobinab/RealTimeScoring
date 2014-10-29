@@ -13,6 +13,7 @@ import analytics.util.JsonUtils;
 import analytics.util.MongoNameConstants;
 import analytics.util.dao.MemberUUIDDao;
 import analytics.util.dao.ModelVariablesDao;
+import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -31,17 +32,20 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 	protected OutputCollector outputCollector;
 
     protected List<String> modelVariablesList;
-    protected Map<String,Collection<String>> l_idToValueCollectionMap; // USED TO MAP BETWEEN l_id AND THE TRAITS OR PID OR SearchKeyword ASSOCIATED WITH THAT ID UNTIL A NEW UUID IS FOUND
+    protected Map<String,Collection<String>> l_idToValueCollectionMap; // USED TO MAP BETWEEN l_id AND THE TRAITS OR PID OR SearchKeyword ASSOCIATED WITH THAT ID 
     protected String currentUUID;
     
     protected String topic;
 	protected String sourceTopic;
 	protected MemberUUIDDao memberDao;
 	protected ModelVariablesDao modelVariablesDao;
-
+	protected MultiCountMetric countMetric;
     public ParseAAMFeeds() {
-
 	}
+	 void initMetrics(TopologyContext context){
+	     countMetric = new MultiCountMetric();
+	     context.registerMetric("custom_metrics", countMetric, 60);
+	    }
 
 	// Overloaded Paramterized constructor to get the topic to which the spout
 	// is listening to
@@ -57,6 +61,7 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         this.outputCollector = collector;
         System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+	    initMetrics(context);
         
 	/*
 	 * (non-Javadoc)
@@ -68,8 +73,8 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
         modelVariablesDao =  new ModelVariablesDao(); 
         modelVariablesList = new ArrayList<String>();
         
-        this.currentUUID=null;
-        l_idToValueCollectionMap = new HashMap<String,Collection<String>>();
+        //this.currentUUID=null;
+        //l_idToValueCollectionMap = new HashMap<String,Collection<String>>();
         
 
 		//POPULATE MODEL VARIABLES LIST
@@ -83,97 +88,54 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
      */
 	@Override
 	public void execute(Tuple input) {
-
-		// 1) SPLIT STRING
-		// 2) IF THE CURRENT RECORD HAS THE SAME UUID AS PREVIOUS RECORD(S) THEN ADD TRAIT TO LIST AND RETURN
-		// 3) IF THE CURRENT RECORD HAS A DIFFERENT UUID THEN PROCESS THE CURRENT TRAITS LIST AND EMIT VARIABLES
-		// 4) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN SET CURRENT UUID FROM RECORD, SET CURRENT l_id TO NULL AND RETURN
-		// 5) POPULATE TRAITS COLLECTION WITH THE FIRST TRAIT
 		
 		LOGGER.debug("PARSING DOCUMENT -- WEB TRAIT RECORD " + input.getString(0));
-		
+		countMetric.scope("incoming_tuples").incr();
 		// 1) SPLIT INPUT STRING
 		
         String interactionRec = input.getString(1);
         String splitRecArray[] = splitRec(interactionRec);
         
         if(splitRecArray == null || splitRecArray.length==0) {
+    		countMetric.scope("invalid_record").incr();
+    		outputCollector.fail(input);
         	return;
-        }
-        
-        //2014-03-08 10:56:17,00000388763646853831116694914086674166,743651,US,Sears
-        
-        
-        
-		// 2) IF THE CURRENT RECORD HAS THE SAME UUID AS PREVIOUS RECORD(S) THEN ADD TRAIT TO LIST AND RETURN
-        if(this.currentUUID != null && this.currentUUID.equalsIgnoreCase(splitRecArray[0])) {
-        	//skip processing if l_id is null
-        	if(this.l_idToValueCollectionMap==null || this.l_idToValueCollectionMap.isEmpty()) {
-        		return;
-        	}
-        	
-        	for(String l : l_idToValueCollectionMap.keySet()) {
-        		for(int i=1;i<splitRecArray.length;i++){
-        			l_idToValueCollectionMap.get(l).add(splitRecArray[i].trim());
-        		}
-        	}
-        	return;
-        }
-        
-		// 3) IF THE CURRENT RECORD HAS A DIFFERENT UUID THEN PROCESS THE CURRENT VALUES(TRAIT/PID/Keyword) LIST AND EMIT VARIABLES
-        if(l_idToValueCollectionMap != null && !l_idToValueCollectionMap.isEmpty()) {
-            LOGGER.debug("processing found traits...");
-            
-            for(String current_l_id : l_idToValueCollectionMap.keySet()) {
-	        	
-	        	Map<String,String> variableValueMap = processList(current_l_id); //LIST OF VARIABLES FOUND DURING TRAITS PROCESSING
-	        	if(variableValueMap !=null && !variableValueMap.isEmpty()) {
-	 	        	Object variableValueJSON = JsonUtils.createJsonFromStringStringMap(variableValueMap);
-		        	List<Object> listToEmit = new ArrayList<Object>();
-		        	listToEmit.add(current_l_id);
-		        	listToEmit.add(variableValueJSON);
-		        	listToEmit.add(sourceTopic);
-		        	this.outputCollector.emit(listToEmit);
-		        	LOGGER.debug(" *** PARSING BOLT EMITTING: " + listToEmit);
-	        	}
-	        	else {
-	        		LOGGER.debug(" *** NO VARIABLES FOUND - NOTHING TO EMIT");
-	        	}
-            }
-            this.currentUUID=null;
-            this.l_idToValueCollectionMap=new HashMap<String, Collection<String>>();
         }
         
 		// 4) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN SET CURRENT UUID FROM RECORD, SET CURRENT l_id TO NULL AND RETURN
         //		If l_id is null and the next UUID is the same the current, then the next record will not be processed
-        List<String> l_ids = memberDao.getLoyaltyIdsFromUUID(splitRecArray[0]);
+        this.currentUUID = splitRecArray[0];
+        List<String> l_ids = memberDao.getLoyaltyIdsFromUUID(this.currentUUID);
         if(l_ids == null || l_ids.size() == 0) {
-            this.currentUUID=splitRecArray[0];
             LOGGER.info(" *** COULD NOT FIND UUID: " + this.currentUUID);
-        	this.l_idToValueCollectionMap=new HashMap<String, Collection<String>>();
-        	return;
+    		countMetric.scope("no_lids").incr();
+    		outputCollector.fail(input);
+        	return;	
         }
-        
+        l_idToValueCollectionMap = new HashMap<String, Collection<String>>();
         // set current uuid and l_id from mongoDB query results
         for(String l_id:l_ids) {
-        	if(this.currentUUID == null) {
-        		this.currentUUID = l_id;
-        	}
-        	try{
         	l_idToValueCollectionMap.put(l_id, new ArrayList<String>());
-        	}catch(NullPointerException e){
-        		LOGGER.error("l_id to value collection is null", e);
-        		System.exit(0);
-        	}
     		for(int i=1;i<splitRecArray.length;i++){
     			l_idToValueCollectionMap.get(l_id).add(splitRecArray[i].trim());
     		}
+    		LOGGER.debug("processing found traits...");
+        	Map<String,String> variableValueMap = processList(l_id); //LIST OF VARIABLES FOUND DURING TRAITS PROCESSING
+        	if(variableValueMap !=null && !variableValueMap.isEmpty()) {
+ 	        	Object variableValueJSON = JsonUtils.createJsonFromStringStringMap(variableValueMap);
+	        	List<Object> listToEmit = new ArrayList<Object>();
+	        	listToEmit.add(l_id);
+	        	listToEmit.add(variableValueJSON);
+	        	listToEmit.add(sourceTopic);
+	        	this.outputCollector.emit(listToEmit);
+	        	countMetric.scope("processed_lid").incr();
+	        	LOGGER.debug(" *** PARSING BOLT EMITTING: " + listToEmit);
+        	}
+        	else {
+        		LOGGER.debug(" *** NO VARIABLES FOUND - NOTHING TO EMIT");
+        		countMetric.scope("no_variables_affected").incr();
+        	}
         	
-        }
-        
-        if(l_idToValueCollectionMap == null || l_idToValueCollectionMap.isEmpty()) {
-        	this.l_idToValueCollectionMap=new HashMap<String, Collection<String>>();
-        	return;
         }
         
         //TODO: If we need this, we should ask Dustin to send it to Traits feed as well
@@ -185,7 +147,9 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 			logger.debug("Can not parse date",e);
 		}*/
         
-        return;
+		countMetric.scope("successful").incr();
+		outputCollector.ack(input);
+    	return;
         
 	}
 

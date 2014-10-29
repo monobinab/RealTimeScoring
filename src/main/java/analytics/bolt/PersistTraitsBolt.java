@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import analytics.util.MongoNameConstants;
 import analytics.util.dao.MemberTraitsDao;
+import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -28,16 +29,24 @@ public class PersistTraitsBolt extends BaseRichBolt {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(PersistTraitsBolt.class);
     private MemberTraitsDao memberTraitsDao;
+	private MultiCountMetric countMetric;
+	private OutputCollector outputCollector;
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {	
         System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
 		memberTraitsDao = new MemberTraitsDao();
+		this.outputCollector = collector;
 	}
-
+	 void initMetrics(TopologyContext context){
+	     countMetric = new MultiCountMetric();
+	     context.registerMetric("custom_metrics", countMetric, 60);
+	    }
+	 
 	@Override
 	public void execute(Tuple input) {
 		LOGGER.debug("Persisting trait date map in mongo");
+		countMetric.scope("incoming_record").incr();
 		//Get the encrypted loyalty id
 		String l_id = input.getString(0);
 		//The data comes as below
@@ -69,9 +78,12 @@ public class PersistTraitsBolt extends BaseRichBolt {
 				}
 			}
 			memberTraitsDao.addDateTrait(l_id, dateTraitMap);
-			
+    		countMetric.scope("persisted_traits").incr();
+    		outputCollector.ack(input);
 		} catch (JSONException e) {
 			LOGGER.error("unable to persist trait",e);
+    		countMetric.scope("persist_failed").incr();
+    		outputCollector.fail(input);
 		}
 	}
 

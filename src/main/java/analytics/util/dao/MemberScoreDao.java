@@ -18,7 +18,8 @@ public class MemberScoreDao extends AbstractDao {
 			.getLogger(MemberScoreDao.class);
     DBCollection memberScoreCollection;
     public MemberScoreDao(){
-    	super();
+    	//Connect to secondary server
+    	super("server2");
 		memberScoreCollection = db.getCollection("memberScore");
     }
     

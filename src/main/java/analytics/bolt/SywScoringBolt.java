@@ -7,6 +7,7 @@ import analytics.util.dao.MemberScoreDao;
 import analytics.util.dao.ModelPercentileDao;
 import analytics.util.dao.ModelSywBoostDao;
 import analytics.util.objects.ChangedMemberScore;
+import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -35,7 +36,11 @@ public class SywScoringBolt  extends BaseRichBolt{
 	private SimpleDateFormat simpleDateFormat;
 	private OutputCollector outputCollector;
 	private List<Integer> monthlyModelsMap;
-	
+	private MultiCountMetric countMetric;
+	 void initMetrics(TopologyContext context){
+	     countMetric = new MultiCountMetric();
+	     context.registerMetric("custom_metrics", countMetric, 60);
+	    }
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
@@ -61,7 +66,7 @@ public class SywScoringBolt  extends BaseRichBolt{
 		//l_id="jgjh" , source="SYW_LIKE/OWN/WANT
 		//newChangesVarValueMap - similar to strategy bolt
 		//current-pid, 2014-09-25-[6],...
-		
+		countMetric.scope("incoming_record").incr();
 		String lId = input.getStringByField("l_id");
 		String source = input.getStringByField("source");
 		String messageID = "";
@@ -185,6 +190,7 @@ public class SywScoringBolt  extends BaseRichBolt{
 			listToEmit.add(String.valueOf(modelId));
 			listToEmit.add(source);
 			listToEmit.add(messageID);
+			countMetric.scope("scored_"+source).incr();
 			outputCollector.emit("score_stream",listToEmit);
 		}
 		outputCollector.ack(input);
@@ -197,6 +203,7 @@ public class SywScoringBolt  extends BaseRichBolt{
 		List<Object> listToEmit = new ArrayList<Object>();
 		listToEmit.add(lId);
 		listToEmit.add(source);
+		countMetric.scope("member_scored").incr();
 		this.outputCollector.emit("member_stream", listToEmit);
 		this.outputCollector.ack(input);
 	}

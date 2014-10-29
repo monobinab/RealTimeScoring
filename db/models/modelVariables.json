@@ -49,7 +49,6 @@
       "name" : "BOOST_BROWSE_CE_TCOUNT"
     }]
 }
-
 {
   "modelId" : 26,
   "modelDescription" : "Baby",
@@ -5033,7 +5032,7 @@
       "coefficient" : 0.030830804,
       "name" : "M_WEB_TRAIT_DISHWASHER_8_14"
     }, {
-      "coefficient" : 0,
+      "coefficient" : 0.0,
       "name" : "M_ZIPTREND_WATER_HEATER_AMT"
     }, {
       "coefficient" : 0.065408369,
@@ -6757,7 +6756,7 @@
 	"modelId": 8,
 	"modelDescription": "Fitness & Sporting Goods",
 	"constant": -2.9778,
-	"modelName": "ModelName",
+	"modelName": "K_SCR_FSG",
 	"month": 8,
 	"variable": [{
 		"coefficient": 0.1666,
@@ -6831,7 +6830,7 @@
 	"modelId": 8,
 	"modelDescription": "Fitness & Sporting Goods",
 	"constant": -2.9778,
-	"modelName": "ModelName",
+	"modelName": "K_SCR_FSG",
 	"month": 12,
 	"variable": [{
 		"coefficient": 0.1666,
@@ -6905,7 +6904,7 @@
 	"modelId": 8,
 	"modelDescription": "Fitness & Sporting Goods",
 	"constant": -2.9778,
-	"modelName": "ModelName",
+	"modelName": "K_SCR_FSG",
 	"month": 7,
 	"variable": [{
 		"coefficient": 0.1666,
@@ -6979,7 +6978,7 @@
 	"modelId": 8,
 	"modelDescription": "Fitness & Sporting Goods",
 	"constant": -2.9778,
-	"modelName": "ModelName",
+	"modelName": "K_SCR_FSG",
 	"month": 6,
 	"variable": [{
 		"coefficient": 0.1666,
@@ -7053,7 +7052,7 @@
 	"modelId": 8,
 	"modelDescription": "Fitness & Sporting Goods",
 	"constant": -3.3131,
-	"modelName": "ModelName",
+	"modelName": "K_SCR_FSG",
 	"month": 4,
 	"variable": [{
 		"coefficient": 0.2006,
@@ -7107,7 +7106,7 @@
 	"modelId": 8,
 	"modelDescription": "Fitness & Sporting Goods",
 	"constant": -3.3131,
-	"modelName": "ModelName",
+	"modelName": "K_SCR_FSG",
 	"month": 2,
 	"variable": [{
 		"coefficient": 0.2006,
@@ -7161,7 +7160,7 @@
 	"modelId": 8,
 	"modelDescription": "Fitness & Sporting Goods",
 	"constant": -3.3131,
-	"modelName": "ModelName",
+	"modelName": "K_SCR_FSG",
 	"month": 1,
 	"variable": [{
 		"coefficient": 0.2006,
@@ -7215,7 +7214,7 @@
 	"modelId": 8,
 	"modelDescription": "Fitness & Sporting Goods",
 	"constant": -3.3131,
-	"modelName": "ModelName",
+	"modelName": "K_SCR_FSG",
 	"month": 3,
 	"variable": [{
 		"coefficient": 0.2006,
@@ -7269,7 +7268,7 @@
 	"modelId": 8,
 	"modelDescription": "Fitness & Sporting Goods",
 	"constant": -3.3131,
-	"modelName": "ModelName",
+	"modelName": "K_SCR_FSG",
 	"month": 5,
 	"variable": [{
 		"coefficient": 0.2006,
@@ -7323,7 +7322,7 @@
 	"modelId": 8,
 	"modelDescription": "Fitness & Sporting Goods",
 	"constant": -3.3131,
-	"modelName": "ModelName",
+	"modelName": "K_SCR_FSG",
 	"month": 11,
 	"variable": [{
 		"coefficient": 0.2006,
@@ -7377,7 +7376,7 @@
 	"modelId": 8,
 	"modelDescription": "Fitness & Sporting Goods",
 	"constant": -3.3131,
-	"modelName": "ModelName",
+	"modelName": "K_SCR_FSG",
 	"month": 10,
 	"variable": [{
 		"coefficient": 0.2006,
@@ -7431,7 +7430,7 @@
 	"modelId": 8,
 	"modelDescription": "Fitness & Sporting Goods",
 	"constant": -3.3131,
-	"modelName": "ModelName",
+	"modelName": "K_SCR_FSG",
 	"month": 9,
 	"variable": [{
 		"coefficient": 0.2006,

@@ -15,12 +15,15 @@ public class DBConnection {
 	private static final Logger LOGGER = LoggerFactory.getLogger(DBConnection.class);
 	private static MongoClient mongoClient;
 	private static String sServerName = "";
+	private static String sServerName2 = "";
 	private static int sPort = 0;
 	private static String sDatabaseName = "";
 	private static String sUserName = "";
 	private static String sPassword = "";
-
-	public static DB getDBConnection() throws ConfigurationException {
+	public static DB getDBConnection() throws ConfigurationException{
+		return getDBConnection("default");
+	}
+	public static DB getDBConnection(String server) throws ConfigurationException {
 		DB conn = null;
 		PropertiesConfiguration properties = null;
 		String isProd = System.getProperty(MongoNameConstants.IS_PROD);
@@ -41,13 +44,20 @@ public class DBConnection {
 		}		
 
 		sServerName = properties.getString("server.name");
+		sServerName2 = properties.getString("server2.name");
 		sPort = Integer.parseInt( properties.getString("port.no"));
 		sDatabaseName = properties.getString("database.name");
 		sUserName = properties.getString("user.name");
 		sPassword = properties.getString("user.password");
 		
 		try {
-			mongoClient = new MongoClient(sServerName, sPort);
+			if("server2".equals(server)&&sServerName2!=null&&!sServerName2.isEmpty())
+			{
+				mongoClient = new MongoClient(sServerName2, sPort);
+			}
+			else{
+				mongoClient = new MongoClient(sServerName, sPort);
+			}
 		} catch (UnknownHostException e) {
 			LOGGER.error("Mongo host unknown",e);
 		}

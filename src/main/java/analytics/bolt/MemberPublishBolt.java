@@ -63,7 +63,11 @@ public class MemberPublishBolt extends BaseRichBolt{
 
 		String message = new StringBuffer(l_id).append(",").append(zip)
 				.append(",").append(source).toString();
-
+		String messageID = "";
+		if (input.contains("messageID")) {
+			messageID = input.getStringByField("messageID");
+		}
+		LOGGER.info("TIME:" + messageID + "-Entering member publish bolt-" + System.currentTimeMillis());
 		int retryCount = 0;
 		while (retryCount < 5) {
 			try {
@@ -84,7 +88,7 @@ public class MemberPublishBolt extends BaseRichBolt{
 		}
 		countMetric.scope("publish_successful").incr();
 		outputCollector.ack(input);
-		
+		LOGGER.info("TIME:" + messageID + "-Member publish successful-" + System.currentTimeMillis());
 	}
 
 	@Override

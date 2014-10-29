@@ -5,6 +5,7 @@ import analytics.util.MongoNameConstants;
 import analytics.util.dao.MemberBoostsDao;
 import analytics.util.dao.VariableDao;
 import analytics.util.objects.Variable;
+import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -24,7 +25,11 @@ public class PersistBoostsBolt extends BaseRichBolt {
     private MemberBoostsDao memberBoostsDao;
     private VariableDao variableDao;
     private Map<String, String> variablesStrategyMap;
-
+	private MultiCountMetric countMetric;
+	 void initMetrics(TopologyContext context){
+	     countMetric = new MultiCountMetric();
+	     context.registerMetric("custom_metrics", countMetric, 60);
+	    }
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
@@ -44,7 +49,7 @@ public class PersistBoostsBolt extends BaseRichBolt {
 	@Override
 	public void execute(Tuple input) {
 
-
+		countMetric.scope("incoming_record").incr();
         Map<String, Map<String, List<String>>> memberBoostValuesMap = new HashMap<String, Map<String, List<String>>>();
 
         LOGGER.debug("Persisting boost + values in mongo");
@@ -93,6 +98,7 @@ public class PersistBoostsBolt extends BaseRichBolt {
 
 
         new MemberBoostsDao().writeMemberBoostValues(l_id, memberBoostValuesMap);
+		countMetric.scope("persisted_boost").incr();
 	}
 
 	private List<String> getTotalCount(Map<String, List<String>> dateValuesMap) {

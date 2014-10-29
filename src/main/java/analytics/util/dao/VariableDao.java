@@ -34,4 +34,14 @@ public class VariableDao extends AbstractDao{
 		return variables;
 			
 	}
+	
+	public List<String> getVariableNames() {
+		List<String> variables = new ArrayList<String>();
+		DBCursor vCursor = variablesCollection.find();
+		for (DBObject variable : vCursor) {
+			variables.add(((DBObject) variable).get(MongoNameConstants.V_NAME).toString().toUpperCase());
+		}
+		return variables;
+			
+	}
 }

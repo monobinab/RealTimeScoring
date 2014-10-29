@@ -38,9 +38,4 @@ public class ModelPercentileDao extends AbstractDao{
 		}
 		return modelPercentilesMap;
 	}
-	public static void main(String[] args) {
-		ModelPercentileDao mp = new ModelPercentileDao();
-		mp.getModelPercentiles();
-		
-	}
 }

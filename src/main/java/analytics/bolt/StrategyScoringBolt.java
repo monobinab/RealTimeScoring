@@ -79,7 +79,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 		if (input.contains("messageID")) {
 			messageID = input.getStringByField("messageID");
 		}
-
+		LOGGER.info("TIME:" + messageID + "-Entering scoring bolt-" + System.currentTimeMillis());
 		// 2) Create map of new changes from the input
 		Map<String, String> newChangesVarValueMap = JsonUtils
 				.restoreVariableListFromJson(input.getString(1));
@@ -162,15 +162,17 @@ public class StrategyScoringBolt extends BaseRichBolt {
 			}
 		}
 
-
+		LOGGER.info("TIME:" + messageID + "-Scoring complete-" + System.currentTimeMillis());
 		// 10) Write changedMemberScores with expiry
 		for (Integer modelId : modelIdList) {
 			ScoringSingleton.getInstance().updateChangedVariables(lId, modelId, allChanges);
 		}
 		ScoringSingleton.getInstance().updateChangedMemberScore(lId, modelIdList, allChanges, modelIdScoreMap);
+		LOGGER.info("TIME:" + messageID + "-Score updates complete-" + System.currentTimeMillis());
 		List<Object> listToEmit = new ArrayList<Object>();
 		listToEmit.add(lId);
 		listToEmit.add(source);
+		listToEmit.add(messageID);
 		this.outputCollector.emit("member_stream", listToEmit);
 		countMetric.scope("member_scored_successfully").incr();
 		this.outputCollector.ack(input);
@@ -180,7 +182,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		declarer.declareStream("score_stream",new Fields("l_id", "oldScore", "newScore", "model","source", "messageID"));
-		declarer.declareStream("member_stream", new Fields("l_id", "source"));
+		declarer.declareStream("member_stream", new Fields("l_id", "source","messageID"));
 
 	}
 

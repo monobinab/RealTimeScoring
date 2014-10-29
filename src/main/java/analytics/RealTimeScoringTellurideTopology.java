@@ -55,7 +55,7 @@ public class RealTimeScoringTellurideTopology {
 								mqCredential.getPort(), mqCredential
 										.getQueueOneManager(), mqCredential
 										.getQueueChannel(), mqCredential
-										.getQueueName()), 2);
+										.getQueueName()), 3);
 		topologyBuilder
 				.setSpout(
 						"telluride2",
@@ -63,17 +63,18 @@ public class RealTimeScoringTellurideTopology {
 								mqCredential.getPort(), mqCredential
 										.getQueueTwoManager(), mqCredential
 										.getQueueChannel(), mqCredential
-										.getQueueName()), 2);
+										.getQueueName()), 3);
 
 		// create definition of main spout for queue 1
-		topologyBuilder.setBolt("parsing_bolt", new TellurideParsingBoltPOS(), 6).shuffleGrouping("telluride1").shuffleGrouping("telluride2");
-        topologyBuilder.setBolt("strategy_scoring_bolt", new StrategyScoringBolt(), 8).shuffleGrouping("parsing_bolt");
+		topologyBuilder.setBolt("parsing_bolt", new TellurideParsingBoltPOS(), 6).localOrShuffleGrouping("telluride1").localOrShuffleGrouping("telluride2");
+        topologyBuilder.setBolt("strategy_scoring_bolt", new StrategyScoringBolt(), 12).localOrShuffleGrouping("parsing_bolt");
         //Redis publish to server 1
-
+        topologyBuilder.setBolt("score_publish_bolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 3).localOrShuffleGrouping("strategy_scoring_bolt", "score_stream");
+        topologyBuilder.setBolt("member_publish_bolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 3).localOrShuffleGrouping("strategy_scoring_bolt", "member_stream");
 
 
 		Config conf = new Config();
-		conf.registerMetricsConsumer(MetricsListener.class, 2);
+		conf.registerMetricsConsumer(MetricsListener.class, 3);
 		conf.setDebug(false);
 		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
 		if (args.length > 0) {

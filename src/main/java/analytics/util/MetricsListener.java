@@ -35,10 +35,9 @@ public class MetricsListener implements IMetricsConsumer {
 					jsonObj.put("topologyName", topologyName);
 					jsonObj.put("srcComponentId", taskInfo.srcComponentId);
 					jsonObj.put("type", key);
-					jsonObj.put("valueTotal", map.get(key));
-					jsonObj.put("valueAvg", totalCount);
-					jedis.publish("metrics_test", jsonObj.toJSONString());
-					System.out.println(jsonObj.toJSONString());
+					jsonObj.put("valueAvg", map.get(key));
+					jsonObj.put("valueTotal", totalCount);
+					jedis.publish("metrics", jsonObj.toJSONString());
 				}
 				}
 		}

@@ -105,7 +105,11 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 		countMetric.scope("incoming_tuples").incr();
 		String lyl_id_no = "";
 		ProcessTransaction processTransaction = null;
-
+		String messageID = "";
+		if (input.contains("messageID")) {
+			messageID = input.getStringByField("messageID");
+		}
+		LOGGER.info("TIME:" + messageID + "-Entering parsing bolt-" + System.currentTimeMillis());
 		String transactionXmlAsString = "";
 		// KPOS and KCOM
 		JMSMessage documentNPOS = (JMSMessage) input.getValueByField("npos");
@@ -130,8 +134,6 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 			//logger.info("Processing Soap Envelop xml String...");
 			processTransaction = XMLParser
 					.parseXMLProcessTransaction(transactionXmlAsString);
-			// XMLParser.parseXMLLineItems(nposTransaction);
-			LOGGER.error(transactionXmlAsString);
 		} else if (transactionXmlAsString.contains("tns:ProcessTransaction")) {
 			processTransaction = XMLParser
 					.parseXMLProcessTransaction(transactionXmlAsString);
@@ -170,12 +172,12 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 				outputCollector.fail(input);
 				return;
 			}
-			//TODO: comment this in future
-			if(lyl_id_no.equals("7081057588230760") || lyl_id_no.equals("7081400000032721")|| lyl_id_no.equals("7081187618793758") || lyl_id_no.equals("7081257366894445") 
+			//TODO: uncomment this to debug
+			/*if(lyl_id_no.equals("7081057588230760") || lyl_id_no.equals("7081400000032721")|| lyl_id_no.equals("7081187618793758") || lyl_id_no.equals("7081257366894445") 
 					|| lyl_id_no.equals("7081133318057649") || lyl_id_no.equals("7081020830587635")){
                 LOGGER.error("Received loyalty id" + lyl_id_no);
                 LOGGER.error("XML for transaction = " + transactionXmlAsString);
-          	}
+          	}*/
 			// 6) HASH LOYALTY ID
 			String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no);
 			// 7)FIND DIVISION #, ITEM #, AMOUNT AND
@@ -356,7 +358,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 					listToEmit.add(l_id);
 					listToEmit.add(JsonUtils.createJsonFromStringStringMap(varAmountMap));
 					listToEmit.add(requestorID);
-					listToEmit.add(input.getMessageId().toString());
+					listToEmit.add(messageID);
 					LOGGER.debug(requestorID + " Point of SALE is touched...");
 					LOGGER.debug(" *** telluride parsing bolt emitting: "
 						+ listToEmit.toString());
@@ -365,6 +367,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 				// 9) EMIT VARIABLES TO VALUES MAP IN JSON DOCUMENT
 				if (listToEmit != null && !listToEmit.isEmpty()) {
 					this.outputCollector.emit(listToEmit);
+					LOGGER.info("TIME:" + messageID + "-Emiting from parsing bolt-" + System.currentTimeMillis());
 				}
 			}
 			else{
@@ -376,6 +379,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 		else{
 			countMetric.scope("empty_xml").incr();
 			outputCollector.fail(input);
+			return;
 		}
 	}
 	/*
