@@ -10,14 +10,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
 import backtype.storm.metric.api.IMetricsConsumer;
 import backtype.storm.task.IErrorReporter;
 import backtype.storm.task.TopologyContext;
 
 public class MetricsListener implements IMetricsConsumer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MetricsListener.class);
-	String topologyName;
-	Jedis jedis;
+	private String topologyName;
+	private JedisPool jedisPool;
 	Properties prop = new Properties();
 	@Override
 	public void prepare(Map stormConf, Object registrationArgument,
@@ -28,11 +30,13 @@ public class MetricsListener implements IMetricsConsumer {
 			LOGGER.error("Unable to initialize metrics");
 		}
 		int port = Integer.parseInt(prop.getProperty("port"));
+        JedisPoolConfig poolConfig = new JedisPoolConfig();
+        poolConfig.setMaxActive(100);
 		if("true".equals(stormConf.get("rtseprod"))){
-			jedis = new Jedis(prop.getProperty("prod"), port);
+	        jedisPool = new JedisPool(poolConfig,prop.getProperty("prod"), port, 100);
 		}
 		else{
-			jedis = new Jedis(prop.getProperty("qa"), port);
+	        jedisPool = new JedisPool(poolConfig,prop.getProperty("qa"), port, 100);
 		}
 
 		topologyName = (String) stormConf.get("metrics_topology");
@@ -46,6 +50,7 @@ public class MetricsListener implements IMetricsConsumer {
 				Map<String, Long> map = (Map<String, Long>) dataPoint.value;
 				for (String key : map.keySet()) {
 					String redisKey = topologyName+taskInfo.srcComponentId + key;
+					Jedis jedis = jedisPool.getResource();
 					long totalCount = jedis.incrBy(redisKey, map.get(key));
 					JSONObject jsonObj = new JSONObject();
 					jsonObj.put("topologyName", topologyName);
@@ -54,6 +59,7 @@ public class MetricsListener implements IMetricsConsumer {
 					jsonObj.put("valueAvg", map.get(key));
 					jsonObj.put("valueTotal", totalCount);
 					jedis.publish("metrics", jsonObj.toJSONString());
+					jedisPool.returnResource(jedis);
 				}
 				}
 		}
