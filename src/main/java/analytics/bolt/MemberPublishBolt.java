@@ -73,6 +73,7 @@ public class MemberPublishBolt extends BaseRichBolt{
 			try {
 				Jedis jedis = jedisPool.getResource();
 				jedis.publish(pattern, message);
+				jedisPool.returnResource(jedis);
 				break;
 			} catch (Exception e) {
 				LOGGER.error(e.getMessage(), e);
