@@ -74,6 +74,7 @@ public class RealTimeScoringTellurideTopology {
 
 
 		Config conf = new Config();
+		conf.put("metrics_topology", "Telluride");
 		conf.registerMetricsConsumer(MetricsListener.class, 3);
 		conf.setDebug(false);
 		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));

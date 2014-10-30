@@ -47,6 +47,7 @@ public class AAMTopology {
 	    builder.setBolt("member_publish_bolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 2).shuffleGrouping("strategy_bolt", "member_stream");
 	      
 	    Config conf = new Config();
+		conf.put("metrics_topology", "AamTraits");
 	    conf.registerMetricsConsumer(MetricsListener.class, 3);
 		conf.setDebug(false);
 		conf.setNumWorkers(3);
