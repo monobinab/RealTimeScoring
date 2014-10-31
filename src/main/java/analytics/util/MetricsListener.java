@@ -49,7 +49,7 @@ public class MetricsListener implements IMetricsConsumer {
 			if (dataPoint.name.equalsIgnoreCase("custom_metrics")) {
 				Map<String, Long> map = (Map<String, Long>) dataPoint.value;
 				for (String key : map.keySet()) {
-					String redisKey = topologyName+taskInfo.srcComponentId + key;
+					String redisKey = topologyName+"_"+taskInfo.srcComponentId +"_"+ key;
 					Jedis jedis = jedisPool.getResource();
 					long totalCount = jedis.incrBy(redisKey, map.get(key));
 					JSONObject jsonObj = new JSONObject();
