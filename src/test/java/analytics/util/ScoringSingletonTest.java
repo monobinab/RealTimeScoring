@@ -858,9 +858,9 @@ public class ScoringSingletonTest {
 		
 		DBCollection changedMemberScore = conn.getCollection("changedMemberScores");
 		ChangedMemberScore changedMemScore = new ChangedMemberScore(0.02,
-				"2014-09-10", "2014-09-20", "2014-09-12");
+				"2014-09-10", "2014-09-20", "2014-09-12","test");
 		ChangedMemberScore changedMemScore2 = new ChangedMemberScore(0.102,
-				"2014-08-10", "2014-08-20", "2014-08-12");
+				"2014-08-10", "2014-08-20", "2014-08-12","test");
 		changedMemberScore.insert(new BasicDBObject("l_id", "SearsUpdate")
 				.append("51",
 						new BasicDBObject("s", changedMemScore.getScore())
@@ -921,7 +921,7 @@ public class ScoringSingletonTest {
 		modelIds.add(51);
 
 		scoringSingletonObj.updateChangedMemberScore("SearsUpdate", modelIds,
-				allChangesSyw, null);
+				allChangesSyw, null, "test");
 		DBObject dbObj = changedMemberScore.findOne(new BasicDBObject("l_id",
 				"SearsUpdate"));
 		HashMap<String, ChangedMemberScore> changedMemScores51 = (HashMap<String, ChangedMemberScore>) dbObj
@@ -945,9 +945,9 @@ public class ScoringSingletonTest {
 		DB conn = DBConnection.getDBConnection();
 		DBCollection changedMemberScore = conn.getCollection("changedMemberScores");
 		ChangedMemberScore changedMemScore = new ChangedMemberScore(0.02,
-				"2014-09-10", "2014-09-20", "2014-10-04");
+				"2014-09-10", "2014-09-20", "2014-10-04","test");
 		ChangedMemberScore changedMemScore2 = new ChangedMemberScore(0.102,
-				"2014-08-10", "2014-08-20", "2014-10-04");
+				"2014-08-10", "2014-08-20", "2014-10-04","test");
 		changedMemberScore.insert(new BasicDBObject("l_id", "SearsUpdate2")
 				.append("51",
 						new BasicDBObject("s", changedMemScore.getScore())
@@ -1008,7 +1008,7 @@ public class ScoringSingletonTest {
 		Map<Integer, Double> modelIdScoreMap = new HashMap<Integer, Double>();
 		modelIdScoreMap.put(51, 0.09);
 		scoringSingletonObj.updateChangedMemberScore("SearsUpdate2", modelIds,
-				allChangesSywBoost, modelIdScoreMap);
+				allChangesSywBoost, modelIdScoreMap,"test");
 		DBObject dbObj = changedMemberScore.findOne(new BasicDBObject("l_id",
 				"SearsUpdate2"));
 		HashMap<String, ChangedMemberScore> changedMemScores51 = (HashMap<String, ChangedMemberScore>) dbObj
