@@ -44,6 +44,7 @@ public class PersistBoostsBolt extends BaseRichBolt {
 				variablesStrategyMap.put(v.getName(), v.getStrategy());
 			}
 		}
+		initMetrics(context);
 	}
 
 	@Override

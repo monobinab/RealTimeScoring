@@ -6,6 +6,7 @@ import analytics.util.dao.ChangedMemberScoresDao;
 import analytics.util.dao.MemberScoreDao;
 import analytics.util.dao.ModelPercentileDao;
 import analytics.util.dao.ModelSywBoostDao;
+import analytics.util.dao.SourcesDao;
 import analytics.util.objects.ChangedMemberScore;
 import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
@@ -36,6 +37,8 @@ public class SywScoringBolt  extends BaseRichBolt{
 	private SimpleDateFormat simpleDateFormat;
 	private OutputCollector outputCollector;
 	private List<Integer> monthlyModelsMap;
+	private Map<String, String> sourcesMap;
+	private SourcesDao sourcesDao;
 	private MultiCountMetric countMetric;
 	 void initMetrics(TopologyContext context){
 	     countMetric = new MultiCountMetric();
@@ -44,8 +47,12 @@ public class SywScoringBolt  extends BaseRichBolt{
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
+		initMetrics(context);
         System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
 		outputCollector = collector;
+		sourcesDao = new SourcesDao();
+		// populate the variableVidToNameMap
+		sourcesMap = sourcesDao.getSources();
 		modelPercentileDao = new ModelPercentileDao();
 		memberScoreDao = new MemberScoreDao();
 		changedMemberScoresDao = new ChangedMemberScoresDao();
@@ -59,6 +66,7 @@ public class SywScoringBolt  extends BaseRichBolt{
 		monthlyModelsMap.add(27);
 		monthlyModelsMap.add(30);
 		monthlyModelsMap.add(59);
+
 	}
 
 	@Override
@@ -199,7 +207,7 @@ public class SywScoringBolt  extends BaseRichBolt{
 
 
 
-        updateChangedMemberScore(lId, modelIdToScore);
+        updateChangedMemberScore(lId, modelIdToScore,source);
 		List<Object> listToEmit = new ArrayList<Object>();
 		listToEmit.add(lId);
 		listToEmit.add(source);
@@ -214,7 +222,7 @@ public class SywScoringBolt  extends BaseRichBolt{
 		declarer.declareStream("member_stream", new Fields("l_id", "source"));
 	}
 
-	public void updateChangedMemberScore(String lId, Map<Integer, String> modelIdToScore) {
+	public void updateChangedMemberScore(String lId, Map<Integer, String> modelIdToScore, String source) {
 		Map<Integer, ChangedMemberScore> updatedScores = new HashMap<Integer, ChangedMemberScore>();
 		for(Integer modelId: modelIdToScore.keySet()){
 		// FIND THE MIN AND MAX EXPIRATION DATE OF ALL VARIABLE CHANGES FOR
@@ -252,7 +260,7 @@ public class SywScoringBolt  extends BaseRichBolt{
 			updatedScores.put(modelId, new ChangedMemberScore(Double.parseDouble(modelIdToScore.get(modelId)),
 					minDate != null ? simpleDateFormat.format(minDate) : null, 
 					maxDate != null ? simpleDateFormat.format(maxDate) : null, 
-					simpleDateFormat.format(new Date())));
+					simpleDateFormat.format(new Date()), sourcesMap.get(source)));
 		}
 		if (updatedScores != null && !updatedScores.isEmpty()) {
 			changedMemberScoresDao.upsertUpdateChangedScores(lId,updatedScores);

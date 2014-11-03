@@ -35,7 +35,8 @@ public class ChangedMemberScoresDao extends AbstractDao{
 							.append(MongoNameConstants.CMS_SCORE, scoreObj.getScore())
 							.append(MongoNameConstants.CMS_MIN_EXPIRY_DATE,scoreObj.getMinDate())
 							.append(MongoNameConstants.CMS_MAX_EXPIRY_DATE,scoreObj.getMaxDate())
-							.append(MongoNameConstants.CMS_EFFECTIVE_DATE, scoreObj.getEffDate()));
+							.append(MongoNameConstants.CMS_EFFECTIVE_DATE, scoreObj.getEffDate())
+							.append(MongoNameConstants.CMS_SOURCE, scoreObj.getSource()));
 		}}
 		if(!updateRec.isEmpty())
 		{
@@ -62,7 +63,7 @@ public class ChangedMemberScoresDao extends AbstractDao{
 					DBObject scoreObj = (DBObject) dbObj.get(key);
 					if(scoreObj!=null && scoreObj.get(MongoNameConstants.CMS_MIN_EXPIRY_DATE)!=null && 
 							scoreObj.get(MongoNameConstants.CMS_MAX_EXPIRY_DATE)!=null){
-						ChangedMemberScore score = new ChangedMemberScore((Double)scoreObj.get("s"), (String)scoreObj.get("minEx"), (String)scoreObj.get("maxEx"), (String)scoreObj.get("f"));
+						ChangedMemberScore score = new ChangedMemberScore((Double)scoreObj.get("s"), (String)scoreObj.get("minEx"), (String)scoreObj.get("maxEx"), (String)scoreObj.get("f"), (String)scoreObj.get("c"));
 						memberScores.put(key, score);
 					}
 				}
