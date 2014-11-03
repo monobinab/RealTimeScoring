@@ -22,6 +22,7 @@ import analytics.util.dao.MemberBoostsDao;
 import analytics.util.dao.ModelSywBoostDao;
 //TODO: end update
 import analytics.util.dao.ModelVariablesDao;
+import analytics.util.dao.SourcesDao;
 import analytics.util.dao.VariableDao;
 import analytics.util.objects.Boost;
 import analytics.util.objects.Change;
@@ -40,7 +41,9 @@ public class ScoringSingleton {
 	private Map<String, String> variableVidToNameMap;
 	private Map<String, String> variableNameToVidMap;
 	private Map<String, String> variableNameToStrategyMap;
+	private Map<String, String> sourcesMap;
 	private MemberVariablesDao memberVariablesDao;
+	private SourcesDao sourcesDao;
 	private ChangedMemberScoresDao changedMemberScoresDao;
 	private ChangedMemberVariablesDao changedVariablesDao;
 	private VariableDao variableDao;
@@ -70,7 +73,9 @@ public class ScoringSingleton {
 		changedVariablesDao = new ChangedMemberVariablesDao();
 		memberVariablesDao = new MemberVariablesDao();
 		changedMemberScoresDao = new ChangedMemberScoresDao(); 
+		sourcesDao = new SourcesDao();
 		// populate the variableVidToNameMap
+		sourcesMap = sourcesDao.getSources();
 		variableNameToStrategyMap = new HashMap<String, String>();
 		variableVidToNameMap = new HashMap<String, String>();
 		variableNameToVidMap = new HashMap<String, String>();
@@ -121,7 +126,7 @@ public class ScoringSingleton {
 					modelId);
 			modelIdScoreMap.put(modelId, score);
 		}
-		updateChangedMemberScore(loyaltyId, modelIdList, allChanges, modelIdScoreMap);
+		updateChangedMemberScore(loyaltyId, modelIdList, allChanges, modelIdScoreMap, source);
 		//TODO: This is a very bad way of defining, but a very temp fix before fixing other topologies
 		HashMap<String, Double> modelIdStringScoreMap = new HashMap<String, Double>();
 		for(Map.Entry<Integer, Double> entry : modelIdScoreMap.entrySet()){
@@ -406,7 +411,7 @@ public class ScoringSingleton {
 	}
 
 	
-	public void updateChangedMemberScore(String l_id, Set<Integer> modelIdList, Map<String, Change> allChanges, Map<Integer,Double> modelIdScoreMap) {
+	public void updateChangedMemberScore(String l_id, Set<Integer> modelIdList, Map<String, Change> allChanges, Map<Integer,Double> modelIdScoreMap, String source) {
 		Map<Integer, ChangedMemberScore> updatedScores = new HashMap<Integer, ChangedMemberScore>();
 
 		//TODO: update
@@ -470,7 +475,7 @@ public class ScoringSingleton {
 			updatedScores.put(modelId, new ChangedMemberScore(modelIdScoreMap.get(modelId),
 					minDate != null ? simpleDateFormat.format(minDate) : null, 
 					maxDate != null ? simpleDateFormat.format(maxDate) : null, 
-					simpleDateFormat.format(new Date())));
+					simpleDateFormat.format(new Date()), sourcesMap.get(source)));
 		}
 		}
 		if (updatedScores != null && !updatedScores.isEmpty()) {

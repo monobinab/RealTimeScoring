@@ -10,6 +10,7 @@ import analytics.bolt.ProcessSYWInteractions;
 import analytics.bolt.ScorePublishBolt;
 import analytics.bolt.SywScoringBolt;
 import analytics.spout.SYWRedisSpout;
+import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
 import analytics.util.RedisConnection;
 import analytics.util.TopicConstants;
@@ -56,6 +57,8 @@ server3=rtsapp403p.prod.ch4.s.com
 		toplologyBuilder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 1).shuffleGrouping("scoringBolt", "score_stream");
 		toplologyBuilder.setBolt("member_publish_bolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 2).shuffleGrouping("scoringBolt", "member_stream");
 		Config conf = new Config();
+		conf.put("metrics_topology", "Syw");
+	    conf.registerMetricsConsumer(MetricsListener.class, 3);
 		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
 		if (args != null && args.length > 0) {
 			conf.setNumWorkers(6);

@@ -70,6 +70,7 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 		feeds.add("SYW_OWN");
 		feeds.add("SYW_WANT");
 		boostListMap = boostDao.getBoostsMap(feeds);// Feed prefix
+		initMetrics(context);
 	}
 
 	@Override

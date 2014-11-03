@@ -34,9 +34,9 @@ public class ChangedMemberScoresDaoTest {
 		//Empty before we start
 		String date = "09/18/2014";
 		
-		ChangedMemberScore score1= new ChangedMemberScore(0.1, date, date, date);
-		ChangedMemberScore score2= new ChangedMemberScore(0.999, date, date, date);
-		ChangedMemberScore score3= new ChangedMemberScore(0.2181, date, date, date);
+		ChangedMemberScore score1= new ChangedMemberScore(0.1, date, date, date,"test");
+		ChangedMemberScore score2= new ChangedMemberScore(0.999, date, date, date,"test");
+		ChangedMemberScore score3= new ChangedMemberScore(0.2181, date, date, date,"test");
 		ChangedMemberScoresDao  changedMemberScoresDao= new ChangedMemberScoresDao();
 		 Map<Integer, ChangedMemberScore> myChangedScores = new HashMap<Integer, ChangedMemberScore>();
 		 myChangedScores.put(1, score1);

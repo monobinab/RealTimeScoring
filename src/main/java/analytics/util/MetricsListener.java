@@ -1,25 +1,45 @@
 package analytics.util;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Properties;
 
 import org.json.simple.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
 import backtype.storm.metric.api.IMetricsConsumer;
 import backtype.storm.task.IErrorReporter;
 import backtype.storm.task.TopologyContext;
 
 public class MetricsListener implements IMetricsConsumer {
-
-	String topologyName;
-	Jedis jedis;
-	
+	private static final Logger LOGGER = LoggerFactory.getLogger(MetricsListener.class);
+	private String topologyName;
+	private JedisPool jedisPool;
+	Properties prop = new Properties();
 	@Override
 	public void prepare(Map stormConf, Object registrationArgument,
 			TopologyContext context, IErrorReporter errorReporter) {
-		jedis = new Jedis("10.2.8.175", 11211);
-		topologyName = (String) stormConf.get("topology.name");
+		try {
+			prop.load(MetricsListener.class.getClassLoader().getResourceAsStream("resources/redis_server_metrics.properties"));
+		} catch (IOException e) {
+			LOGGER.error("Unable to initialize metrics");
+		}
+		int port = Integer.parseInt(prop.getProperty("port"));
+        JedisPoolConfig poolConfig = new JedisPoolConfig();
+        poolConfig.setMaxActive(100);
+		if("true".equals(stormConf.get("rtseprod"))){
+	        jedisPool = new JedisPool(poolConfig,prop.getProperty("prod"), port, 100);
+		}
+		else{
+	        jedisPool = new JedisPool(poolConfig,prop.getProperty("qa"), port, 100);
+		}
+
+		topologyName = (String) stormConf.get("metrics_topology");
 	}
 
 	@Override
@@ -29,15 +49,19 @@ public class MetricsListener implements IMetricsConsumer {
 			if (dataPoint.name.equalsIgnoreCase("custom_metrics")) {
 				Map<String, Long> map = (Map<String, Long>) dataPoint.value;
 				for (String key : map.keySet()) {
-					String redisKey = topologyName+taskInfo.srcComponentId + key;
+					String redisKey = topologyName+":"+taskInfo.srcComponentId +":"+ key;
+					Jedis jedis = jedisPool.getResource();
 					long totalCount = jedis.incrBy(redisKey, map.get(key));
 					JSONObject jsonObj = new JSONObject();
 					jsonObj.put("topologyName", topologyName);
 					jsonObj.put("srcComponentId", taskInfo.srcComponentId);
 					jsonObj.put("type", key);
-					jsonObj.put("valueAvg", map.get(key));
-					jsonObj.put("valueTotal", totalCount);
+					JSONObject display = new JSONObject();
+					display.put("valueAvg", map.get(key));
+					display.put("valueTotal", totalCount);
+					jsonObj.put("display", display);
 					jedis.publish("metrics", jsonObj.toJSONString());
+					jedisPool.returnResource(jedis);
 				}
 				}
 		}

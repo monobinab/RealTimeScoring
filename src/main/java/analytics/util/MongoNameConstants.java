@@ -82,6 +82,7 @@ public class MongoNameConstants {
 	public static final String CMS_MAX_EXPIRY_DATE = "maxEx";
 	public static final String CMS_EFFECTIVE_DATE = "f";
 	public static final String CMS_SCORE = "s";
+	public static final String CMS_SOURCE = "c";
 	
 	//Member boosts
 	public static final String BOOST_VAR_PREFIX="BOOST";
@@ -93,6 +94,8 @@ public class MongoNameConstants {
 	public static final String FB_BOOSTS="b";
 	public static final String FB_FEED="f";
 
-	
+	//Sources
+	public static final String SOURCES_S="s";
+	public static final String SOURCES_N="n";
 	
 }

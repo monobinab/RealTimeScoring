@@ -167,7 +167,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 		for (Integer modelId : modelIdList) {
 			ScoringSingleton.getInstance().updateChangedVariables(lId, modelId, allChanges);
 		}
-		ScoringSingleton.getInstance().updateChangedMemberScore(lId, modelIdList, allChanges, modelIdScoreMap);
+		ScoringSingleton.getInstance().updateChangedMemberScore(lId, modelIdList, allChanges, modelIdScoreMap,source);
 		LOGGER.info("TIME:" + messageID + "-Score updates complete-" + System.currentTimeMillis());
 		List<Object> listToEmit = new ArrayList<Object>();
 		listToEmit.add(lId);
