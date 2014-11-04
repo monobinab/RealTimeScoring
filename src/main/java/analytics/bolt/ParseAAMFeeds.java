@@ -135,6 +135,7 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
         		LOGGER.debug(" *** NO VARIABLES FOUND - NOTHING TO EMIT");
         		countMetric.scope("no_variables_affected").incr();
         	}
+        	countMetric.scope("total_processing").incr();
         	
         }
         
@@ -147,7 +148,7 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 			logger.debug("Can not parse date",e);
 		}*/
         
-		countMetric.scope("successful").incr();
+		countMetric.scope("unique_uuids_processed").incr();
 		outputCollector.ack(input);
     	return;
         
