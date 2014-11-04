@@ -39,25 +39,22 @@ public class AAM_BrowseTopology {
 		//RedisConnection redisConnection = new RedisConnection();
 		String[] servers = RedisConnection.getServers();
 		int counter = 0;
+		BoltDeclarer boltDeclarer = topologyBuilder.setBolt(
+				"ParsingBoltAAM_ATC", new ParsingBoltAAM_ATC(topic), 3);
 		for (String server : servers) {
 			topologyBuilder.setSpout(topic + ++counter, new AAMRedisPubSubSpout(
 					server, port, topic), 1);
+			boltDeclarer.fieldsGrouping(topic + counter, new Fields("uuid"));
 		}
 
-		BoltDeclarer boltDeclarer = topologyBuilder.setBolt(
-				"ParsingBoltAAM_ATC", new ParsingBoltAAM_ATC(topic), 3);
+		
 		topologyBuilder.setBolt("strategy_scoring_bolt", new StrategyScoringBolt(), 3)
 				.localOrShuffleGrouping("ParsingBoltAAM_ATC");
 		 topologyBuilder.setBolt("score_publish_bolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 3).localOrShuffleGrouping("strategy_scoring_bolt", "score_stream");
 	        topologyBuilder.setBolt("member_publish_bolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 3).localOrShuffleGrouping("strategy_scoring_bolt", "member_stream");
 
-
-		for (String server : servers) {
-			boltDeclarer.fieldsGrouping(topic + server, new Fields("uuid"));
-		}
-
 		Config conf = new Config();
-		conf.put("metrics_topology", "Telluride");
+		conf.put("metrics_topology", "Product_Browse");
 		conf.registerMetricsConsumer(MetricsListener.class, 3);
 		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
 		if (args.length > 0) {
