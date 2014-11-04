@@ -6,6 +6,7 @@ import analytics.util.dao.BoostDao;
 import analytics.util.dao.DivLnBoostDao;
 import analytics.util.dao.MemberBoostsDao;
 import analytics.util.dao.PidDivLnDao;
+import analytics.util.objects.DivLn;
 import analytics.util.objects.SYWEntity;
 import analytics.util.objects.SYWInteraction;
 import backtype.storm.metric.api.MultiCountMetric;
@@ -142,8 +143,8 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 					} else {
 						// TODO: We should also handle Kmart items - in which
 						// case it would be divLnItm???
-						PidDivLnDao.DivLn divLnObj = pidDivLnDao
-								.getVariableFromTopic(productId);
+						DivLn divLnObj = pidDivLnDao
+								.getDivLnFromPid(productId);
                         LOGGER.trace(" div line for " + productId + " are " + divLnObj+ " lid: " + lId);
 						if (divLnObj != null) {
 							String div = divLnObj.getDiv();

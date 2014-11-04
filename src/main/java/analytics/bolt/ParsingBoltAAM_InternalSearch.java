@@ -20,6 +20,7 @@ import org.jsoup.nodes.Document;
 import analytics.util.dao.DivLnBoostDao;
 import analytics.util.dao.DivLnVariableDao;
 import analytics.util.dao.PidDivLnDao;
+import analytics.util.objects.DivLn;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 
@@ -185,7 +186,7 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
     	Map<String,String> variableValueMap = new HashMap<String,String>();
     	
     	for(String pid: pidSet) {
-    		PidDivLnDao.DivLn divLnObj = pidDivLnDao.getVariableFromTopic(pid);
+    		DivLn divLnObj = pidDivLnDao.getDivLnFromPid(pid);
     		if(divLnObj != null) {
 	    		String div = divLnObj.getDiv();
 	    		String divLn = divLnObj.getDivLn();

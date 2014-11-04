@@ -17,6 +17,7 @@ import analytics.util.dao.DivLnBoostDao;
 import analytics.util.dao.MemberBoostsDao;
 import analytics.util.dao.PidDivLnDao;
 import analytics.util.dao.VariableDao;
+import analytics.util.objects.DivLn;
 import analytics.util.objects.Variable;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -111,7 +112,7 @@ public class ParsingBoltAAM_ATC extends ParseAAMFeeds {
 		
 		for (String pid : l_idToValueCollectionMap.get(current_l_id)) {
 			// query MongoDB for division and line associated with the pid
-			PidDivLnDao.DivLn divLnObj = pidDivLnDao.getVariableFromTopic(pid);
+			DivLn divLnObj = pidDivLnDao.getDivLnFromPid(pid);
 			if(divLnObj == null) {
 				continue;
 			}
