@@ -2,7 +2,6 @@ package analytics.bolt;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,10 +11,10 @@ import org.apache.commons.lang.StringUtils;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 
+import analytics.util.PidMatchUtils;
 import analytics.util.dao.BoostDao;
 import analytics.util.dao.DivLnBoostDao;
 import analytics.util.dao.MemberBoostsDao;
-import analytics.util.dao.PidDivLnDao;
 import analytics.util.dao.VariableDao;
 import analytics.util.objects.DivLn;
 import analytics.util.objects.Variable;
@@ -28,12 +27,12 @@ public class ParsingBoltAAM_ATC extends ParseAAMFeeds {
 	 * Created by Rock Wasserman 6/19/2014
 	 */
 	private DivLnBoostDao divLnBoostDao;
-	private PidDivLnDao pidDivLnDao;
 	private BoostDao boostDao;
 	private VariableDao variableDao;
 	private MemberBoostsDao memberBoostsDao;
 	private HashMap<String, List<String>> divLnBoostVariblesMap;
 	private Map<String,Variable>boostMap;
+	private PidMatchUtils pidMatchUtil;
 	
 	public ParsingBoltAAM_ATC() {
 		super();
@@ -61,7 +60,6 @@ public class ParsingBoltAAM_ATC extends ParseAAMFeeds {
 			sourceTopic = "BROWSE";
 		}
 		divLnBoostDao = new DivLnBoostDao();
-		pidDivLnDao = new PidDivLnDao();
 		boostDao = new BoostDao();
 		variableDao = new VariableDao();
 		memberBoostsDao = new MemberBoostsDao();
@@ -112,7 +110,7 @@ public class ParsingBoltAAM_ATC extends ParseAAMFeeds {
 		
 		for (String pid : l_idToValueCollectionMap.get(current_l_id)) {
 			// query MongoDB for division and line associated with the pid
-			DivLn divLnObj = pidDivLnDao.getDivLnFromPid(pid);
+			DivLn divLnObj = pidMatchUtil.getDivInformation(pid);
 			if(divLnObj == null) {
 				continue;
 			}
