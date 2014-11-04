@@ -3,9 +3,12 @@ package analytics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import analytics.bolt.MemberPublishBolt;
 import analytics.bolt.ParsingBoltAAM_ATC;
+import analytics.bolt.ScorePublishBolt;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.spout.AAMRedisPubSubSpout;
+import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
 import analytics.util.RedisConnection;
 import analytics.util.TopicConstants;
@@ -35,22 +38,27 @@ public class AAM_BrowseTopology {
 
 		//RedisConnection redisConnection = new RedisConnection();
 		String[] servers = RedisConnection.getServers();
-
+		int counter = 0;
 		for (String server : servers) {
-			topologyBuilder.setSpout(topic + server, new AAMRedisPubSubSpout(
+			topologyBuilder.setSpout(topic + ++counter, new AAMRedisPubSubSpout(
 					server, port, topic), 1);
 		}
 
 		BoltDeclarer boltDeclarer = topologyBuilder.setBolt(
-				"ParsingBoltAAM_ATC", new ParsingBoltAAM_ATC(topic), 1);
-		topologyBuilder.setBolt("strategy_bolt", new StrategyScoringBolt(), 1)
-				.shuffleGrouping("ParsingBoltAAM_ATC");
+				"ParsingBoltAAM_ATC", new ParsingBoltAAM_ATC(topic), 3);
+		topologyBuilder.setBolt("strategy_scoring_bolt", new StrategyScoringBolt(), 3)
+				.localOrShuffleGrouping("ParsingBoltAAM_ATC");
+		 topologyBuilder.setBolt("score_publish_bolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 3).localOrShuffleGrouping("strategy_scoring_bolt", "score_stream");
+	        topologyBuilder.setBolt("member_publish_bolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 3).localOrShuffleGrouping("strategy_scoring_bolt", "member_stream");
+
 
 		for (String server : servers) {
 			boltDeclarer.fieldsGrouping(topic + server, new Fields("uuid"));
 		}
 
 		Config conf = new Config();
+		conf.put("metrics_topology", "Telluride");
+		conf.registerMetricsConsumer(MetricsListener.class, 3);
 		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
 		if (args.length > 0) {
 			try {
