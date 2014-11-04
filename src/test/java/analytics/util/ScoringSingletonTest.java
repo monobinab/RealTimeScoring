@@ -853,7 +853,7 @@ public class ScoringSingletonTest {
 	public void updateChangedMemberScoreNullModelIdScoreMapTest()
 			throws SecurityException, NoSuchFieldException,
 			IllegalArgumentException, IllegalAccessException, ParseException,
-			ConfigurationException {
+			ConfigurationException, RealTimeScoringException {
 		DB conn = DBConnection.getDBConnection();
 		
 		DBCollection changedMemberScore = conn.getCollection("changedMemberScores");
@@ -940,7 +940,7 @@ public class ScoringSingletonTest {
 	@Test
 	public void updateChangedMemberScorePositiveCaseTest() throws SecurityException,
 			NoSuchFieldException, IllegalArgumentException,
-			IllegalAccessException, ParseException, ConfigurationException {
+			IllegalAccessException, ParseException, ConfigurationException, RealTimeScoringException {
 
 		DB conn = DBConnection.getDBConnection();
 		DBCollection changedMemberScore = conn.getCollection("changedMemberScores");
@@ -1027,6 +1027,82 @@ public class ScoringSingletonTest {
 				changedMemScores46.get("minEx"));
 	}
 
+	
+	@SuppressWarnings("unchecked")
+	@Test(expected = RealTimeScoringException.class)
+	@Ignore
+	public void updateChangedMemberScoreNullMinMaxDatesTest() throws SecurityException,
+			NoSuchFieldException, IllegalArgumentException,
+			IllegalAccessException, ParseException, ConfigurationException, RealTimeScoringException {
+
+		DB conn = DBConnection.getDBConnection();
+		DBCollection changedMemberScore = conn.getCollection("changedMemberScores");
+		ChangedMemberScore changedMemScore = new ChangedMemberScore(0.02,
+				"2014-09-10", "2014-09-20", "2014-10-04","null");
+		
+		changedMemberScore.insert(new BasicDBObject("l_id", "SearsUpdate3")
+				.append("51",
+						new BasicDBObject("s", changedMemScore.getScore())
+								.append("minEx", changedMemScore.getMinDate())
+								.append("maxEx", changedMemScore.getMaxDate())
+								.append("f", changedMemScore.getEffDate()))
+				);
+
+		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
+		variablesMap.put("SYW_WANT_TOYS_TCOUNT", new Variable(
+				"SYW_WANT_TOYS_TCOUNT", 0.0015));
+
+		Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
+		monthModelMap.put(
+				Calendar.getInstance().get(Calendar.MONTH) + 1,
+				new Model(51, "Model_Name5", Calendar.getInstance().get(
+						Calendar.MONTH) + 1, 5, variablesMap));
+		Map<Integer, Map<Integer, Model>> modelsMapContent= new HashMap<Integer, Map<Integer, Model>>();
+		modelsMapContent.put(51, monthModelMap);
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Change change = new Change("2270", 12.0,
+				simpleDateFormat.parse("2999-10-21"),
+				simpleDateFormat.parse("2014-10-01"));
+		Change change2 = new Change("2271", 10.0,
+				simpleDateFormat.parse("2999-10-21"),
+				simpleDateFormat.parse("2014-10-01"));
+		HashMap<String, Change> allChanges = new HashMap<String, Change>();
+		allChanges.put("SYW_WANT_TOYS_TCOUNT", change);
+		allChanges.put("SYW_WANT_TOYS_TCOUNT2", change2);
+		
+		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
+		List<Integer> modelLists2 = new ArrayList<Integer>();
+		modelLists2.add(46);
+		modelLists2.add(30);
+				
+		variableModelsMapContents.put("SYW_WANT_TOYS_TCOUNT", modelLists2);
+		variableModelsMapContents.put("SYW_WANT_TOYS_TCOUNT2",modelLists2);
+
+		Field variableModelsMap = ScoringSingleton.class
+				.getDeclaredField("variableModelsMap");
+		variableModelsMap.setAccessible(true);
+		variableModelsMap.set(scoringSingletonObj,
+				variableModelsMapContents);
+
+		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
+		modelsMap.setAccessible(true);
+		modelsMap.set(scoringSingletonObj, modelsMapContent);
+
+		Set<Integer> modelIds = new HashSet<Integer>();
+		modelIds.add(51);
+		Map<Integer, Double> modelIdScoreMap = new HashMap<Integer, Double>();
+		modelIdScoreMap.put(51, 0.09);
+		scoringSingletonObj.updateChangedMemberScore("SearsUpdate3", modelIds,
+				allChanges, modelIdScoreMap,"null");
+		DBObject dbObj = changedMemberScore.findOne(new BasicDBObject("l_id",
+				"SearsUpdate3"));
+		HashMap<String, ChangedMemberScore> changedMemScores51 = (HashMap<String, ChangedMemberScore>) dbObj
+				.get("51");
+		
+	}
+
+	
+	
 	// This is to check the update if all changedMemVariables is null
 	// The original values and dates will be restored as no variables are re-scored
 	// Ideally it will not happen, was just checking as an external class
