@@ -44,7 +44,7 @@ public class AAMTopology {
 	    builder.setBolt("strategy_bolt", new StrategyScoringBolt(),1).shuffleGrouping("ParsingBoltWebTraits");
 	    builder.setBolt("persist_traits" , new PersistTraitsBolt(), 1).shuffleGrouping("ParsingBoltWebTraits");
 	    builder.setBolt("score_publish_bolt", new ScorePublishBolt(servers[0], port,"score"), 1).shuffleGrouping("strategy_bolt", "score_stream");
-	    builder.setBolt("member_publish_bolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 2).shuffleGrouping("strategy_bolt", "member_stream");
+	    //builder.setBolt("member_publish_bolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 2).shuffleGrouping("strategy_bolt", "member_stream");
 	      
 	    Config conf = new Config();
 		conf.put("metrics_topology", "AamTraits");
