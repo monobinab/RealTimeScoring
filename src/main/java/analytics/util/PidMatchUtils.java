@@ -1,12 +1,18 @@
 package analytics.util;
 
+
 import analytics.util.dao.DivLnItmDao;
 import analytics.util.dao.PidDivLnDao;
 import analytics.util.objects.DivLn;
 
-public class PidMatchUtils {
-	PidDivLnDao pidDivLn = new PidDivLnDao();
-	DivLnItmDao divLnItm = new DivLnItmDao();
+public class PidMatchUtils{
+	private PidDivLnDao pidDivLn;
+	private DivLnItmDao divLnItm;
+	public PidMatchUtils() {
+		pidDivLn = new PidDivLnDao();
+		divLnItm = new DivLnItmDao();
+		
+	}
 	public DivLn getDivInformation(String pid){
 		String div;
 		String divLn;

@@ -33,10 +33,7 @@ public class ParsingBoltAAM_ATC extends ParseAAMFeeds {
 	private HashMap<String, List<String>> divLnBoostVariblesMap;
 	private Map<String,Variable>boostMap;
 	private PidMatchUtils pidMatchUtil;
-	
-	public ParsingBoltAAM_ATC() {
-		super();
-	}
+
 
 	public ParsingBoltAAM_ATC(String topic) {
 		super(topic);
@@ -51,7 +48,7 @@ public class ParsingBoltAAM_ATC extends ParseAAMFeeds {
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
-
+		pidMatchUtil = new PidMatchUtils();
 		// topic is chosen to populate divLnBoostVariblesMap with source
 		// specific variables
 		if ("AAM_CDF_ATCProducts".equalsIgnoreCase(topic)) {
