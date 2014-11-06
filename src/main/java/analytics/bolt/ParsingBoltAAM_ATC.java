@@ -33,7 +33,7 @@ public class ParsingBoltAAM_ATC extends ParseAAMFeeds {
 	private HashMap<String, List<String>> divLnBoostVariblesMap;
 	private Map<String,Variable>boostMap;
 	private PidMatchUtils pidMatchUtil;
-
+	private List<String> boostList;
 
 	public ParsingBoltAAM_ATC(String topic) {
 		super(topic);
@@ -63,7 +63,7 @@ public class ParsingBoltAAM_ATC extends ParseAAMFeeds {
 		
 		//populate divLnBoostvariablesMap & Boost list
 		divLnBoostVariblesMap = divLnBoostDao.getDivLnBoost();
-		List<String> boostList = boostDao.getBoosts(sourceTopic);
+		boostList = boostDao.getBoosts(sourceTopic);
 		List<Variable> variableList = variableDao.getVariables();
 		boostMap = new HashMap<String, Variable>();
 		for(Variable v: variableList) {
@@ -113,18 +113,23 @@ public class ParsingBoltAAM_ATC extends ParseAAMFeeds {
 			}
 			if(divLnBoostVariblesMap.containsKey(divLnObj.getDiv())) {
 				for(String b: divLnBoostVariblesMap.get(divLnObj.getDiv())) {
-					if(!boostValuesMap.containsKey(b)) {
-						boostValuesMap.put(b, new ArrayList<String>());
+					if (boostList.contains(b))
+					{
+							if(!boostValuesMap.containsKey(b)) {
+							boostValuesMap.put(b, new ArrayList<String>());
+						}
+						boostValuesMap.get(b).add(pid);
 					}
-					boostValuesMap.get(b).add(pid);
 				}
 			}
 			if(divLnBoostVariblesMap.containsKey(divLnObj.getDivLn())) {
 				for(String b: divLnBoostVariblesMap.get(divLnObj.getDivLn())) {
-					if(!boostValuesMap.containsKey(b)) {
-						boostValuesMap.put(b, new ArrayList<String>());
+					if (boostList.contains(b)){
+						if(!boostValuesMap.containsKey(b)) {
+							boostValuesMap.put(b, new ArrayList<String>());
+						}
+						boostValuesMap.get(b).add(pid);
 					}
-					boostValuesMap.get(b).add(pid);
 				}
 			}
 		}
