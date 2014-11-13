@@ -89,11 +89,11 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 	@Override
 	public void execute(Tuple input) {
 		
-		LOGGER.debug("PARSING DOCUMENT -- WEB TRAIT RECORD " + input.getString(0));
+		LOGGER.debug("PARSING DOCUMENT -- WEB TRAIT RECORD ");
 		countMetric.scope("incoming_tuples").incr();
 		// 1) SPLIT INPUT STRING
 		
-        String interactionRec = input.getString(1);
+        String interactionRec = input.getString(0);
         String splitRecArray[] = splitRec(interactionRec);
         
         if(splitRecArray == null || splitRecArray.length==0) {

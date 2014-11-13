@@ -36,18 +36,12 @@ public class AAMRedisPubSubSpout extends RedisPubSubSpout {
 		}
     	if (ret != null )
         {
-            String tokens[]= StringUtils.split(ret, ",");
-            if (tokens.length >= 2)
-            {
-                //System.out.println(tokens[1]);
-            	_collector.emit(tuple(tokens[0], ret));
-            	
-            }
+            _collector.emit(tuple(ret));
         }
     }
 
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields("uuid","message"));
+        declarer.declare(new Fields("message"));
     }
 
 }
