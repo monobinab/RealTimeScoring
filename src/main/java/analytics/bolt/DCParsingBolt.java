@@ -1,0 +1,117 @@
+package analytics.bolt;
+
+import java.io.StringReader;
+import java.util.Map;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import analytics.util.dao.DCDao;
+import backtype.storm.task.OutputCollector;
+import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.OutputFieldsDeclarer;
+import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Tuple;
+import backtype.storm.tuple.Values;
+
+import org.codehaus.jettison.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+
+public class DCParsingBolt extends BaseRichBolt {
+	private static final Logger LOGGER = LoggerFactory.getLogger(DCParsingBolt.class);
+	private static final long serialVersionUID = 1L;
+	private static OutputCollector collector;
+	private static DCDao dc;
+
+	@Override
+	public void execute(Tuple message) {
+
+		// UpdateMemberPrompts
+		String input = message.toString();
+		if (input.contains("GetMemberPromptsReply")) {
+
+			System.out.println(": Got a response");
+			System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+			try {
+				parseIncomingMessage("*", message);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+	}
+
+	public static void parseIncomingMessage(String tagName, Tuple message) {
+		try {
+			String str = (String) message.getValueByField("str");
+			JSONObject obj = new JSONObject(str);
+			Document doc = loadXMLFromString((String) obj.get("xmlRespData"));
+			String q_id = null;
+			String a_id = null;
+			String category = null;
+			NodeList elements = doc.getElementsByTagName(tagName);
+			if (elements == null || elements.getLength() <= 0) {
+				return;
+			}
+			for (int i = 0; i < elements.getLength(); i++) {
+				Element node = (Element) elements.item(i);
+				if (node.getChildNodes() != null && node.getChildNodes().getLength() > 0 && node.getChildNodes().item(0) != null) {
+					// map.put(node.getTagName(),
+					// node.getChildNodes().item(0).getNodeValue());
+					String key = node.getTagName();
+					String value = node.getChildNodes().item(0).getNodeValue();
+					if (key.contains("QuestionTextID") && !key.contains("FollowupQuestionTextID")) {
+						q_id = value;
+						System.out.println(key + " : " + value);
+					}
+					if (key.contains("AnswerID") && !key.contains("FollowupAnswerID")) {
+						a_id = value;
+						System.out.println(key + " : " + value);
+					}
+					if (key.contains("PromptGroupName")) {
+						category = value;
+						System.out.println(key + " : " + value);
+					}
+
+				}
+
+			}
+			if (q_id != null && a_id != null && category != null) {
+				Object strength = dc.getStrength(category, q_id, a_id);
+				if (strength != null)
+					collector.emit(new Values(strength));
+				System.err.println("YAY");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static Document loadXMLFromString(String xml) throws Exception {
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		InputSource is = new InputSource(new StringReader(xml));
+		Document doc = builder.parse(is);
+		return doc;
+	}
+
+	@Override
+	public void prepare(Map arg0, TopologyContext arg1, OutputCollector arg2) {
+		// TODO Auto-generated method stub
+		dc = new DCDao();
+		LOGGER.info("DC Bolt Preparing to Launch");
+	}
+
+	@Override
+	public void declareOutputFields(OutputFieldsDeclarer declarer) {
+		// TODO Auto-generated method stub
+		declarer.declare(new Fields("DCBolt"));
+	}
+
+}
