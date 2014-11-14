@@ -44,7 +44,7 @@ public class AAM_BrowseTopology {
 		for (String server : servers) {
 			topologyBuilder.setSpout(topic + ++counter, new AAMRedisPubSubSpout(
 					server, port, topic), 1);
-			boltDeclarer.fieldsGrouping(topic + counter, new Fields("uuid"));
+			boltDeclarer.shuffleGrouping(topic + counter);
 		}
 
 		

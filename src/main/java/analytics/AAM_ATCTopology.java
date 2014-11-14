@@ -45,11 +45,12 @@ public class AAM_ATCTopology {
 				"ParsingBoltAAM_ATC", new ParsingBoltAAM_ATC(topic), 1);
 		topologyBuilder.setBolt("strategy_bolt", new StrategyScoringBolt(), 1)
 				.shuffleGrouping("ParsingBoltAAM_ATC");
-
+		int counter = 0;
 		for (String server : servers) {
-			boltDeclarer.fieldsGrouping(topic + server, new Fields("uuid"));
+			topologyBuilder.setSpout(topic + ++counter, new AAMRedisPubSubSpout(
+					server, TopicConstants.PORT, topic), 1);
+			boltDeclarer.shuffleGrouping(topic + counter);
 		}
-
 		Config conf = new Config();
 		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
 		if (args.length > 0) {
