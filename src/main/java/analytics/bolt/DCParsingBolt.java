@@ -1,11 +1,16 @@
 package analytics.bolt;
 
 import java.io.StringReader;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import analytics.util.SecurityUtils;
 import analytics.util.dao.DCDao;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -15,6 +20,7 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
+import org.apache.commons.collections.map.HashedMap;
 import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,11 +29,15 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
+
 public class DCParsingBolt extends BaseRichBolt {
 	private static final Logger LOGGER = LoggerFactory.getLogger(DCParsingBolt.class);
 	private static final long serialVersionUID = 1L;
 	private static OutputCollector collector;
 	private static DCDao dc;
+	private Type varValueType;
 
 	@Override
 	public void execute(Tuple message) {
@@ -47,8 +57,11 @@ public class DCParsingBolt extends BaseRichBolt {
 
 	}
 
-	public static void parseIncomingMessage(String tagName, Tuple message) {
+	public void parseIncomingMessage(String tagName, Tuple message) {
 		try {
+			//Get the loyalty id from the message
+			//Call sEcurityUtils.hashLoyaltyId to get the l_id
+
 			String str = (String) message.getValueByField("str");
 			JSONObject obj = new JSONObject(str);
 			Document doc = loadXMLFromString((String) obj.get("xmlRespData"));
@@ -82,11 +95,19 @@ public class DCParsingBolt extends BaseRichBolt {
 				}
 
 			}
+			Map<String,String> variableValueMap = new HashMap<String, String>();
 			if (q_id != null && a_id != null && category != null) {
 				Object strength = dc.getStrength(category, q_id, a_id);
-				if (strength != null)
-					collector.emit(new Values(strength));
-				System.err.println("YAY");
+				if (strength != null){
+					variableValueMap.put("VARNAME", strength.toString());//Get varname from dcmodel collection
+					Gson gson = new Gson();
+					String varValueString = gson.toJson(variableValueMap, varValueType);
+					List<Object> listToEmit = new ArrayList<Object>();
+					listToEmit.add("l_id");//TODO: Get the lid
+					listToEmit.add(varValueString);
+					listToEmit.add("DC");
+				}
+				LOGGER.info("Emitted message");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -103,15 +124,16 @@ public class DCParsingBolt extends BaseRichBolt {
 
 	@Override
 	public void prepare(Map arg0, TopologyContext arg1, OutputCollector arg2) {
-		// TODO Auto-generated method stub
 		dc = new DCDao();
 		LOGGER.info("DC Bolt Preparing to Launch");
+		 Type varValueType = new TypeToken<Map<String, String>>() {
+				private static final long serialVersionUID = 1L;
+			}.getType();
 	}
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		// TODO Auto-generated method stub
-		declarer.declare(new Fields("DCBolt"));
+		declarer.declare(new Fields("l_id", "lineItemAsJsonString", "source"));
 	}
 
 }
