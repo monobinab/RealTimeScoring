@@ -265,7 +265,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 							}
 						} else {
 							LOGGER.debug("Sears transaction processing");
-							if (lineItem.getItemNumber().length() >= 6) {
+							if (lineItem.getItemNumber()!=null && lineItem.getItemNumber().length() >= 6) {
 
 								item = lineItem.getItemNumber().substring(
 										lineItem.getItemNumber().length() - 5);
