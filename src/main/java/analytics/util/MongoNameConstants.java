@@ -98,4 +98,8 @@ public class MongoNameConstants {
 	public static final String SOURCES_S="s";
 	public static final String SOURCES_N="n";
 	
+	//DC Collections
+	public static final String DC_MODEL = "dcModel";
+	public static final String DC_QA_STRENGTHS = "dcQAStrengths";
+	
 }
