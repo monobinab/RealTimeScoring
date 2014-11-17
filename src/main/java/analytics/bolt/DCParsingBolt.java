@@ -35,8 +35,8 @@ import com.google.gson.Gson;
 public class DCParsingBolt extends BaseRichBolt {
 	private static final Logger LOGGER = LoggerFactory.getLogger(DCParsingBolt.class);
 	private static final long serialVersionUID = 1L;
-	private static OutputCollector collector;
-	private static DCDao dc;
+	private OutputCollector collector;
+	private DCDao dc;
 	private Type varValueType;
 
 	@Override
@@ -47,12 +47,17 @@ public class DCParsingBolt extends BaseRichBolt {
 		if (input.contains("GetMemberPromptsReply")) {
 
 			System.out.println(": Got a response");
+			System.out.println(message);
 			System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 			try {
 				parseIncomingMessage("*", message);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			collector.ack(message);
+		}
+		else{
+			collector.ack(message);
 		}
 
 	}
@@ -61,7 +66,7 @@ public class DCParsingBolt extends BaseRichBolt {
 		try {
 			//Get the loyalty id from the message
 			//Call sEcurityUtils.hashLoyaltyId to get the l_id
-
+System.out.println(message);
 			String str = (String) message.getValueByField("str");
 			JSONObject obj = new JSONObject(str);
 			Document doc = loadXMLFromString((String) obj.get("xmlRespData"));
@@ -114,7 +119,7 @@ public class DCParsingBolt extends BaseRichBolt {
 		}
 	}
 
-	public static Document loadXMLFromString(String xml) throws Exception {
+	public Document loadXMLFromString(String xml) throws Exception {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
 		InputSource is = new InputSource(new StringReader(xml));
@@ -124,6 +129,7 @@ public class DCParsingBolt extends BaseRichBolt {
 
 	@Override
 	public void prepare(Map arg0, TopologyContext arg1, OutputCollector arg2) {
+		this.collector = arg2;
 		dc = new DCDao();
 		LOGGER.info("DC Bolt Preparing to Launch");
 		 Type varValueType = new TypeToken<Map<String, String>>() {
