@@ -21,11 +21,13 @@ public class DCDao extends AbstractDao {
 
 	public Object getStrength(String promptGroupName, String question_id, String answer_id) {
 		BasicDBObject query = new BasicDBObject();
-		query.put("q", question_id);
-		query.put("a", answer_id);
+		query.put("q", question_id.toLowerCase());
+		query.put("a", answer_id.toLowerCase());
 		query.put("c", promptGroupName);
+		
 		if (dcQAStrengths != null) {
 			DBObject obj = dcQAStrengths.findOne(query);
+			System.out.println("strength:"+obj);
 			if (obj != null) {
 				return obj.get("s");
 			}
@@ -40,6 +42,7 @@ public class DCDao extends AbstractDao {
 			BasicDBObject query = new BasicDBObject();
 			query.put("d", promptGroupName);
 			DBObject obj = dcModel.findOne(query);
+			System.out.println("varname:"+obj);
 			if (obj != null)
 				return obj.get("v");
 		}

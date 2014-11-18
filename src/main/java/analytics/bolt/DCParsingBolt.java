@@ -43,11 +43,11 @@ public class DCParsingBolt extends BaseRichBolt {
 
 	@Override
 	public void execute(Tuple input) {
+		
 		// UpdateMemberPrompts
 		String message = (String) input.getValueByField("str");
 		if (message.contains("GetMemberPromptsReply")) {
-			System.out.println("Got a response");
-			//System.out.println(input);
+			System.out.println("Got a response: ");
 			System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 			try {
 				parseIncomingMessage(message);
@@ -144,7 +144,6 @@ public class DCParsingBolt extends BaseRichBolt {
 					System.out.println("QuestionId : " + q_id);
 					System.out.println("AnswerId : " + a_id);
 					System.out.println("PromptGroupName : " + promptGroupName);
-					System.err.println("yay");
 					Object strength = dc.getStrength(promptGroupName, q_id, a_id);
 					Object varName = dc.getVarName(promptGroupName);
 					if (strength != null && varName != null) {
@@ -158,6 +157,7 @@ public class DCParsingBolt extends BaseRichBolt {
 						//TODO:right way to emit?
 						//outputCollector.emit(listToEmit);
 						LOGGER.info("Emitted message");
+						System.err.println("yay");
 					}
 				}
 				
