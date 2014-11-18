@@ -1,5 +1,6 @@
 package analytics.bolt;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -7,8 +8,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import org.xml.sax.Attributes;
 
 import analytics.util.SecurityUtils;
 import analytics.util.dao.DCDao;
@@ -18,16 +22,14 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-import backtype.storm.tuple.Values;
 
-import org.apache.commons.collections.map.HashedMap;
+import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
@@ -35,111 +37,138 @@ import com.google.gson.Gson;
 public class DCParsingBolt extends BaseRichBolt {
 	private static final Logger LOGGER = LoggerFactory.getLogger(DCParsingBolt.class);
 	private static final long serialVersionUID = 1L;
-	private OutputCollector collector;
+	private OutputCollector outputCollector;
 	private DCDao dc;
 	private Type varValueType;
 
 	@Override
-	public void execute(Tuple message) {
-
+	public void execute(Tuple input) {
 		// UpdateMemberPrompts
-		String input = message.toString();
-		if (input.contains("GetMemberPromptsReply")) {
-
-			System.out.println(": Got a response");
-			System.out.println(message);
+		String message = (String) input.getValueByField("str");
+		if (message.contains("GetMemberPromptsReply")) {
+			System.out.println("Got a response");
+			//System.out.println(input);
 			System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 			try {
-				parseIncomingMessage("*", message);
+				parseIncomingMessage(message);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			collector.ack(message);
-		}
-		else{
-			collector.ack(message);
-		}
-
-	}
-
-	public void parseIncomingMessage(String tagName, Tuple message) {
-		try {
-			//Get the loyalty id from the message
-			//Call sEcurityUtils.hashLoyaltyId to get the l_id
-System.out.println(message);
-			String str = (String) message.getValueByField("str");
-			JSONObject obj = new JSONObject(str);
-			Document doc = loadXMLFromString((String) obj.get("xmlRespData"));
-			String q_id = null;
-			String a_id = null;
-			String category = null;
-			NodeList elements = doc.getElementsByTagName(tagName);
-			if (elements == null || elements.getLength() <= 0) {
-				return;
-			}
-			for (int i = 0; i < elements.getLength(); i++) {
-				Element node = (Element) elements.item(i);
-				if (node.getChildNodes() != null && node.getChildNodes().getLength() > 0 && node.getChildNodes().item(0) != null) {
-					// map.put(node.getTagName(),
-					// node.getChildNodes().item(0).getNodeValue());
-					String key = node.getTagName();
-					String value = node.getChildNodes().item(0).getNodeValue();
-					if (key.contains("QuestionTextID") && !key.contains("FollowupQuestionTextID")) {
-						q_id = value;
-						System.out.println(key + " : " + value);
-					}
-					if (key.contains("AnswerID") && !key.contains("FollowupAnswerID")) {
-						a_id = value;
-						System.out.println(key + " : " + value);
-					}
-					if (key.contains("PromptGroupName")) {
-						category = value;
-						System.out.println(key + " : " + value);
-					}
-
-				}
-
-			}
-			Map<String,String> variableValueMap = new HashMap<String, String>();
-			if (q_id != null && a_id != null && category != null) {
-				Object strength = dc.getStrength(category, q_id, a_id);
-				if (strength != null){
-					variableValueMap.put("VARNAME", strength.toString());//Get varname from dcmodel collection
-					Gson gson = new Gson();
-					String varValueString = gson.toJson(variableValueMap, varValueType);
-					List<Object> listToEmit = new ArrayList<Object>();
-					listToEmit.add("l_id");//TODO: Get the lid
-					listToEmit.add(varValueString);
-					listToEmit.add("DC");
-				}
-				LOGGER.info("Emitted message");
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
+			outputCollector.ack(input);
+		} else {
+			outputCollector.ack(input);
 		}
 	}
 
-	public Document loadXMLFromString(String xml) throws Exception {
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder = factory.newDocumentBuilder();
-		InputSource is = new InputSource(new StringReader(xml));
-		Document doc = builder.parse(is);
-		return doc;
-	}
+	
 
 	@Override
-	public void prepare(Map arg0, TopologyContext arg1, OutputCollector arg2) {
-		this.collector = arg2;
+	public void prepare(Map arg0, TopologyContext arg1, OutputCollector collector) {
+		this.outputCollector = collector;
 		dc = new DCDao();
 		LOGGER.info("DC Bolt Preparing to Launch");
-		 Type varValueType = new TypeToken<Map<String, String>>() {
-				private static final long serialVersionUID = 1L;
-			}.getType();
+		varValueType = new TypeToken<Map<String, String>>() {
+			private static final long serialVersionUID = 1L;
+		}.getType();
 	}
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		declarer.declare(new Fields("l_id", "lineItemAsJsonString", "source"));
+	}
+
+	public void parseIncomingMessage(String message) throws ParserConfigurationException, SAXException, IOException, JSONException {
+		JSONObject obj = new JSONObject(message);
+		message = (String) obj.get("xmlRespData");
+		System.out.println(message);
+		SAXParserFactory factory = SAXParserFactory.newInstance();
+		SAXParser saxParser = factory.newSAXParser();
+		//TODO: Handle cases where there are multiple questions answered
+		DefaultHandler handler = new DefaultHandler() {
+			boolean bq_id = false;
+			boolean ba_id = false;
+			boolean bp_id = false;
+			boolean bm_id = false;
+			String q_id = null;
+			String a_id = null;
+			String promptGroupName = null;
+			String memberId = null;
+
+			public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+
+				if (qName.contains("QuestionTextID") && !qName.contains("FollowupQuestionTextID")) {
+					bq_id = true;
+				}
+
+				if (qName.contains("AnswerID") && !qName.contains("FollowupAnswerID")) {
+					ba_id = true;
+				}
+
+				if (qName.contains("PromptGroupName")) {
+					bp_id = true;
+				}
+				
+				if(qName.contains("MemberNumber")){
+					bm_id = true;
+				}
+
+			}
+
+			public void characters(char ch[], int start, int length) throws SAXException {
+				String str = new String(ch, start, length);
+				if (bq_id) {
+					q_id = str;
+					bq_id = false;
+				}
+
+				if (ba_id) {
+					a_id = str;
+					ba_id = false;
+				}
+
+				if (bp_id) {
+					promptGroupName = str;
+					bp_id = false;
+				}
+				
+				if(bm_id){
+					memberId = str;
+					bm_id = false;
+				}
+			}
+
+			public void endDocument() throws SAXException {
+				Map<String, String> variableValueMap = new HashMap<String, String>();
+				if (q_id != null && a_id != null && promptGroupName != null && memberId != null) {
+					System.out.println("Member ID : " + memberId);
+					System.out.println("QuestionId : " + q_id);
+					System.out.println("AnswerId : " + a_id);
+					System.out.println("PromptGroupName : " + promptGroupName);
+					System.err.println("yay");
+					Object strength = dc.getStrength(promptGroupName, q_id, a_id);
+					Object varName = dc.getVarName(promptGroupName);
+					if (strength != null && varName != null) {
+						variableValueMap.put(varName.toString(), strength.toString());
+						Gson gson = new Gson();
+						String varValueString = gson.toJson(variableValueMap, varValueType);
+						List<Object> listToEmit = new ArrayList<Object>();
+						listToEmit.add(SecurityUtils.hashLoyaltyId(memberId));
+						listToEmit.add(varValueString);
+						listToEmit.add("DC");
+						//TODO:right way to emit?
+						//outputCollector.emit(listToEmit);
+						LOGGER.info("Emitted message");
+					}
+				}
+				
+				q_id = null;
+				a_id = null;
+				promptGroupName = null;
+				memberId = null;
+			}
+
+		};
+		saxParser.parse(new InputSource(new StringReader(message)), handler);
 	}
 
 }
