@@ -113,7 +113,7 @@ public class SywScoringBolt extends BaseRichBolt {
 		outputCollector.ack(input);
 
 		LOGGER.trace(" modelIdToScore map second: " + modelIdToScore + " lid: " + lId);
-		// updateChangedMemberScore(lId, modelIdToScore,source);
+		updateChangedMemberScore(lId, modelIdToScore,source);
 		List<Object> listToEmit = new ArrayList<Object>();
 		listToEmit.add(lId);
 		listToEmit.add(source);
