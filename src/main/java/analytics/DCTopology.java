@@ -34,13 +34,13 @@ public class DCTopology {
 		// use topology Id as part of the consumer ID to make it unique
 		SpoutConfig kafkaConfig = new SpoutConfig(hosts, "telprod_reqresp_log_output", "", "RTSConsumer"+topologyId);
 		kafkaConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
-		kafkaConfig.forceFromStart = true;
+		//kafkaConfig.forceFromStart = true;
 		// TODO: partition number better be dynamic
 		builder.setSpout("kafka_spout", new KafkaSpout(kafkaConfig), 3);
-		builder.setBolt("DCParsing_Bolt", new DCParsingBolt(), 3).shuffleGrouping("kafka_spout");
-		builder.setBolt("scoringBolt", new SywScoringBolt(), 3).shuffleGrouping("DCParsing_Bolt");
-		builder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 3).shuffleGrouping("scoringBolt", "score_stream");
-		builder.setBolt("member_publish_bolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 3).shuffleGrouping("scoringBolt", "member_stream");
+		builder.setBolt("DCParsing_Bolt", new DCParsingBolt(), 3).localOrShuffleGrouping("kafka_spout");
+		builder.setBolt("scoringBolt", new SywScoringBolt(), 3).localOrShuffleGrouping("DCParsing_Bolt");
+		builder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 3).localOrShuffleGrouping("scoringBolt", "score_stream");
+		builder.setBolt("member_publish_bolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 3).localOrShuffleGrouping("scoringBolt", "member_stream");
 		Config conf = new Config();
 		conf.setDebug(false);
 
