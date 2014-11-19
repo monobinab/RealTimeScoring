@@ -110,7 +110,7 @@ public class SywScoringBolt extends BaseRichBolt {
 		// Add scoring logic here
 		// varToCount map has the total count for each variable
 		modelIdToScore = updateModelIdToScore(lId, source, messageID, varToCountMap, modelIdToScore);
-		outputCollector.ack(input);
+		//outputCollector.ack(input);
 
 		LOGGER.trace(" modelIdToScore map second: " + modelIdToScore + " lid: " + lId);
 		updateChangedMemberScore(lId, modelIdToScore,source);
