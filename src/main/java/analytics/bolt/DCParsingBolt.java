@@ -138,17 +138,17 @@ public class DCParsingBolt extends BaseRichBolt {
 			public void characters(char ch[], int start, int length) throws SAXException {
 				String str = new String(ch, start, length);
 				if (bq_id) {
-					q_id = str;
+					q_id = str;//"bb3300163e00123e11e4211b3aa234e0";
 					bq_id = false;
 				}
 
 				if (ba_id) {
-					a_id = str;
+					a_id = str; //"bb3300163e00123e11e4211b3aa34650";
 					ba_id = false;
 				}
 
 				if (bp_id) {
-					promptGroupName = str;
+					promptGroupName = str; //"DC_Appliance";
 					bp_id = false;
 				}
 				
@@ -168,8 +168,12 @@ public class DCParsingBolt extends BaseRichBolt {
 					Object strength = dc.getStrength(promptGroupName, q_id, a_id);
 					Object varName = dc.getVarName(promptGroupName);
 					if (strength != null && varName != null) {
-						variableValueMap.put(varName.toString(), strength.toString());
 						Gson gson = new Gson();
+						HashMap<String, List<Integer>> strengthMap = new HashMap<String, List<Integer>>();
+						List<Integer> list = new ArrayList<Integer>();
+						list.add((Integer)strength);
+						strengthMap.put("current", list);
+						variableValueMap.put(varName.toString(), gson.toJson(strengthMap, varValueType));
 						String varValueString = gson.toJson(variableValueMap, varValueType);
 						List<Object> listToEmit = new ArrayList<Object>();
 						listToEmit.add(SecurityUtils.hashLoyaltyId(memberId));
@@ -177,7 +181,6 @@ public class DCParsingBolt extends BaseRichBolt {
 						listToEmit.add("DC");
 						outputCollector.emit(listToEmit);
 						LOGGER.info("Emitted message");
-						//System.err.println("yay");
 					}
 				}
 				
