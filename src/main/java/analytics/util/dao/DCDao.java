@@ -1,5 +1,10 @@
 package analytics.util.dao;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.bson.BSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -7,6 +12,7 @@ import analytics.util.MongoNameConstants;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
 public class DCDao extends AbstractDao {
@@ -27,13 +33,12 @@ public class DCDao extends AbstractDao {
 		
 		if (dcQAStrengths != null) {
 			DBObject obj = dcQAStrengths.findOne(query);
-			System.out.println("strength:"+obj);
+			//System.out.println("strength:"+obj);
 			if (obj != null) {
 				return obj.get("s");
 			}
-		} else {
-			LOGGER.debug("Mongo Fetch Failure at DC_QA_STRENGTHS");
 		}
+		
 		return null;
 	}
 
@@ -42,11 +47,23 @@ public class DCDao extends AbstractDao {
 			BasicDBObject query = new BasicDBObject();
 			query.put("d", promptGroupName);
 			DBObject obj = dcModel.findOne(query);
-			System.out.println("varname:"+obj);
-			if (obj != null)
+			//System.out.println("varname:"+obj);
+			if (obj != null){
+				//System.out.println(obj.get("v"));
 				return obj.get("v");
+			}
 		}
 		return null;
+	}
+	
+	public Map<String, List<Object>> getDCModelMap(){
+		DBCollection dcModel =  db.getCollection("dcModel");
+		Map<String, List<Object>> varModelMap = new HashMap<String, List<Object>>();
+    	DBCursor varModelCursor = dcModel.find();
+    	for(DBObject varModelObj: varModelCursor) {
+    		varModelMap.put((String) varModelObj.get("v"), (List<Object>) varModelObj.get("m"));    		
+    	}
+    	return varModelMap;
 	}
 
 }

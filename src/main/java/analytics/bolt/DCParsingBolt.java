@@ -47,17 +47,39 @@ public class DCParsingBolt extends BaseRichBolt {
 		// UpdateMemberPrompts
 		String message = (String) input.getValueByField("str");
 		if (message.contains("GetMemberPromptsReply")) {
-			System.out.println("Got a response: ");
-			System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+//			System.out.println("Got a response: ");
+//			System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 			try {
 				parseIncomingMessage(message);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			//emitFakeData();
 			outputCollector.ack(input);
 		} else {
 			outputCollector.ack(input);
 		}
+	}
+
+
+
+	private void emitFakeData() {
+		List<Object> listToEmit = new ArrayList<Object>();
+		Gson gson = new Gson();
+		HashMap<String, String> variableValueMap = new HashMap<String, String>();
+		HashMap<String, List<String>> strengthMap = new HashMap<String, List<String>>();
+		List<String> list = new ArrayList<String>();
+		list.add("1");
+		strengthMap.put("current", list);
+		variableValueMap.put("BOOST_DC_APPLIANCE_SSUM", gson.toJson(strengthMap, varValueType));
+
+		//{"BOOST_SYW_WANT_HA_ALL_TCOUNT":"{\"current\":[\"04254571000P\"]}"}
+		String varValueString = gson.toJson(variableValueMap, varValueType);
+		listToEmit.add("dxo0b7SN1eER9shCSj0DX+eSGag=");
+		listToEmit.add(varValueString);
+		listToEmit.add("DC");
+		LOGGER.info("Emitted message");
+		outputCollector.emit(listToEmit);
 	}
 
 	
@@ -80,7 +102,6 @@ public class DCParsingBolt extends BaseRichBolt {
 	public void parseIncomingMessage(String message) throws ParserConfigurationException, SAXException, IOException, JSONException {
 		JSONObject obj = new JSONObject(message);
 		message = (String) obj.get("xmlRespData");
-		System.out.println(message);
 		SAXParserFactory factory = SAXParserFactory.newInstance();
 		SAXParser saxParser = factory.newSAXParser();
 		//TODO: Handle cases where there are multiple questions answered
@@ -140,10 +161,10 @@ public class DCParsingBolt extends BaseRichBolt {
 			public void endDocument() throws SAXException {
 				Map<String, String> variableValueMap = new HashMap<String, String>();
 				if (q_id != null && a_id != null && promptGroupName != null && memberId != null) {
-					System.out.println("Member ID : " + memberId);
-					System.out.println("QuestionId : " + q_id);
-					System.out.println("AnswerId : " + a_id);
-					System.out.println("PromptGroupName : " + promptGroupName);
+//					System.out.println("Member ID : " + memberId);
+//					System.out.println("QuestionId : " + q_id);
+//					System.out.println("AnswerId : " + a_id);
+//					System.out.println("PromptGroupName : " + promptGroupName);
 					Object strength = dc.getStrength(promptGroupName, q_id, a_id);
 					Object varName = dc.getVarName(promptGroupName);
 					if (strength != null && varName != null) {
@@ -154,10 +175,9 @@ public class DCParsingBolt extends BaseRichBolt {
 						listToEmit.add(SecurityUtils.hashLoyaltyId(memberId));
 						listToEmit.add(varValueString);
 						listToEmit.add("DC");
-						//TODO:right way to emit?
-						//outputCollector.emit(listToEmit);
+						outputCollector.emit(listToEmit);
 						LOGGER.info("Emitted message");
-						System.err.println("yay");
+						//System.err.println("yay");
 					}
 				}
 				

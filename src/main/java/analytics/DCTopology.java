@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import storm.kafka.*;
 import analytics.bolt.DCParsingBolt;
+import analytics.bolt.SywScoringBolt;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
@@ -34,6 +35,7 @@ public class DCTopology {
 		// TODO: partition number better be dynamic
 		builder.setSpout("kafka_spout", new KafkaSpout(kafkaConfig), 3);
 		builder.setBolt("DCParsing_Bolt", new DCParsingBolt(), 3).shuffleGrouping("kafka_spout");
+		builder.setBolt("scoringBolt", new SywScoringBolt(), 3).shuffleGrouping("DCParsing_Bolt");
 		Config conf = new Config();
 		conf.setDebug(false);
 
