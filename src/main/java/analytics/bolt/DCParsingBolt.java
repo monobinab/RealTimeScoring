@@ -55,10 +55,10 @@ public class DCParsingBolt extends BaseRichBolt {
 				e.printStackTrace();
 			}
 			//emitFakeData();
-			outputCollector.ack(input);
-		} else {
-			outputCollector.ack(input);
+			
 		}
+		outputCollector.ack(input);
+		
 	}
 
 
