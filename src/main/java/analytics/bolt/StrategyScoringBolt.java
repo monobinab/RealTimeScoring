@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.exception.RealTimeScoringException;
+import analytics.util.Constants;
 import analytics.util.JsonUtils;
 import analytics.util.MongoNameConstants;
 import analytics.util.ScoringSingleton;
@@ -48,7 +49,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 	}
 	 void initMetrics(TopologyContext context){
 	     countMetric = new MultiCountMetric();
-	     context.registerMetric("custom_metrics", countMetric, 60);
+	     context.registerMetric("custom_metrics", countMetric, Constants.METRICS_INTERVAL);
 	    }
 
 	@Override

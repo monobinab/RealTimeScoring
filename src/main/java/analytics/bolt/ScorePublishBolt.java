@@ -3,6 +3,7 @@
  */
 package analytics.bolt;
 
+import analytics.util.Constants;
 import analytics.util.MongoNameConstants;
 import analytics.util.ScoringSingleton;
 import analytics.util.dao.MemberScoreDao;
@@ -63,7 +64,7 @@ public class ScorePublishBolt extends BaseRichBolt {
 	}
 	 void initMetrics(TopologyContext context){
 	     countMetric = new MultiCountMetric();
-	     context.registerMetric("custom_metrics", countMetric, 60);
+	     context.registerMetric("custom_metrics", countMetric, Constants.METRICS_INTERVAL);
 	    }
 
 	/*

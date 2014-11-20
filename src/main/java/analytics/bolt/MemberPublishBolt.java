@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
+import analytics.util.Constants;
 import analytics.util.MongoNameConstants;
 import analytics.util.dao.MemberZipDao;
 import backtype.storm.metric.api.MultiCountMetric;
@@ -52,7 +53,7 @@ public class MemberPublishBolt extends BaseRichBolt{
 	}
 	 void initMetrics(TopologyContext context){
 	     countMetric = new MultiCountMetric();
-	     context.registerMetric("custom_metrics", countMetric, 60);
+	     context.registerMetric("custom_metrics", countMetric, Constants.METRICS_INTERVAL);
 	    }
 	@Override
 	public void execute(Tuple input) {
