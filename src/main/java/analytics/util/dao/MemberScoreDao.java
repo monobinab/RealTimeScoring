@@ -19,7 +19,7 @@ public class MemberScoreDao extends AbstractDao {
     DBCollection memberScoreCollection;
     public MemberScoreDao(){
     	//Connect to secondary server
-    	super("server2");
+    	super();
 		memberScoreCollection = db.getCollection("memberScore");
     }
     
