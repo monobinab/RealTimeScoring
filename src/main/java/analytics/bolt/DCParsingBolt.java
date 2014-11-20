@@ -15,6 +15,7 @@ import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.Attributes;
 
 import analytics.util.Constants;
+import analytics.util.MongoNameConstants;
 import analytics.util.SecurityUtils;
 import analytics.util.dao.DCDao;
 import backtype.storm.metric.api.MultiCountMetric;
@@ -91,8 +92,9 @@ public class DCParsingBolt extends BaseRichBolt {
 	
 
 	@Override
-	public void prepare(Map arg0, TopologyContext context, OutputCollector collector) {
+	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
 		this.outputCollector = collector;
+		System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
 		dc = new DCDao();
 		initMetrics(context);
 		LOGGER.info("DC Bolt Preparing to Launch");

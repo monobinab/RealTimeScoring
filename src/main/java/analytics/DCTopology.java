@@ -9,6 +9,7 @@ import analytics.bolt.MemberPublishBolt;
 import analytics.bolt.ScorePublishBolt;
 import analytics.bolt.SywScoringBolt;
 import analytics.util.MetricsListener;
+import analytics.util.MongoNameConstants;
 import analytics.util.RedisConnection;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.Config;
@@ -25,6 +26,10 @@ public class DCTopology {
 	public static void main(String[] args) {
 		boolean isLocal = true;
 		String topologyId = "";
+		System.clearProperty(MongoNameConstants.IS_PROD);
+		if (args.length > 0) {
+			System.setProperty(MongoNameConstants.IS_PROD, "true");
+		}
 		if(args.length > 0){
 			isLocal = false;
 			topologyId = args[0];
@@ -46,7 +51,7 @@ public class DCTopology {
 		conf.put("metrics_topology", "DC");
 		conf.registerMetricsConsumer(MetricsListener.class, 3);
 		conf.setDebug(false);
-
+		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
 		if (!isLocal) {
 			try {
 				StormSubmitter.submitTopology(args[0], conf, builder.createTopology());
