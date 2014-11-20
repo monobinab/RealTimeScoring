@@ -45,7 +45,7 @@ public class DCParsingBolt extends BaseRichBolt {
 	private MultiCountMetric countMetric;
 	@Override
 	public void execute(Tuple input) {
-		
+		countMetric.scope("incoming_tuples").incr();
 		// UpdateMemberPrompts
 		String message = (String) input.getValueByField("str");
 		if (message.contains("GetMemberPromptsReply")) {

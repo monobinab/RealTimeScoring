@@ -1,5 +1,6 @@
 package analytics.bolt;
 
+import analytics.util.Constants;
 import analytics.util.JsonUtils;
 import analytics.util.MongoNameConstants;
 import analytics.util.dao.ChangedMemberScoresDao;
@@ -46,7 +47,7 @@ public class SywScoringBolt extends BaseRichBolt {
 
 	void initMetrics(TopologyContext context) {
 		countMetric = new MultiCountMetric();
-		context.registerMetric("custom_metrics", countMetric, 60);
+		context.registerMetric("custom_metrics", countMetric, Constants.METRICS_INTERVAL);
 	}
 
 	@Override
