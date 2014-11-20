@@ -16,6 +16,7 @@ import org.xml.sax.Attributes;
 
 import analytics.util.SecurityUtils;
 import analytics.util.dao.DCDao;
+import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -40,7 +41,7 @@ public class DCParsingBolt extends BaseRichBolt {
 	private OutputCollector outputCollector;
 	private DCDao dc;
 	private Type varValueType;
-
+	private MultiCountMetric countMetric;
 	@Override
 	public void execute(Tuple input) {
 		
@@ -49,6 +50,7 @@ public class DCParsingBolt extends BaseRichBolt {
 		if (message.contains("GetMemberPromptsReply")) {
 //			System.out.println("Got a response: ");
 //			System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+    		countMetric.scope("dc_PromptsReply").incr();
 			try {
 				parseIncomingMessage(message);
 			} catch (Exception e) {
@@ -61,7 +63,10 @@ public class DCParsingBolt extends BaseRichBolt {
 		
 	}
 
-
+	 void initMetrics(TopologyContext context){
+	     countMetric = new MultiCountMetric();
+	     context.registerMetric("custom_metrics", countMetric, 10);
+	    }
 
 	private void emitFakeData() {
 		List<Object> listToEmit = new ArrayList<Object>();
@@ -85,9 +90,10 @@ public class DCParsingBolt extends BaseRichBolt {
 	
 
 	@Override
-	public void prepare(Map arg0, TopologyContext arg1, OutputCollector collector) {
+	public void prepare(Map arg0, TopologyContext context, OutputCollector collector) {
 		this.outputCollector = collector;
 		dc = new DCDao();
+		initMetrics(context);
 		LOGGER.info("DC Bolt Preparing to Launch");
 		varValueType = new TypeToken<Map<String, String>>() {
 			private static final long serialVersionUID = 1L;
@@ -161,6 +167,7 @@ public class DCParsingBolt extends BaseRichBolt {
 			public void endDocument() throws SAXException {
 				Map<String, String> variableValueMap = new HashMap<String, String>();
 				if (q_id != null && a_id != null && promptGroupName != null && memberId != null) {
+					countMetric.scope("dc_ValidReply").incr();
 //					System.out.println("Member ID : " + memberId);
 //					System.out.println("QuestionId : " + q_id);
 //					System.out.println("AnswerId : " + a_id);
@@ -180,7 +187,10 @@ public class DCParsingBolt extends BaseRichBolt {
 						listToEmit.add(varValueString);
 						listToEmit.add("DC");
 						outputCollector.emit(listToEmit);
+						countMetric.scope("dc_EmittedToScoring").incr();
 						LOGGER.info("Emitted message");
+					}else{
+						countMetric.scope("model_not_exist").incr();
 					}
 				}
 				

@@ -8,6 +8,7 @@ import analytics.bolt.DCParsingBolt;
 import analytics.bolt.MemberPublishBolt;
 import analytics.bolt.ScorePublishBolt;
 import analytics.bolt.SywScoringBolt;
+import analytics.util.MetricsListener;
 import analytics.util.RedisConnection;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.Config;
@@ -42,6 +43,8 @@ public class DCTopology {
 		builder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 3).localOrShuffleGrouping("scoringBolt", "score_stream");
 		builder.setBolt("member_publish_bolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 3).localOrShuffleGrouping("scoringBolt", "member_stream");
 		Config conf = new Config();
+		conf.put("metrics_topology", "DC");
+		conf.registerMetricsConsumer(MetricsListener.class, 3);
 		conf.setDebug(false);
 
 		if (!isLocal) {
