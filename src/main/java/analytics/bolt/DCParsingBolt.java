@@ -14,6 +14,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.xml.sax.Attributes;
 
+import analytics.util.Constants;
 import analytics.util.SecurityUtils;
 import analytics.util.dao.DCDao;
 import backtype.storm.metric.api.MultiCountMetric;
@@ -65,7 +66,7 @@ public class DCParsingBolt extends BaseRichBolt {
 
 	 void initMetrics(TopologyContext context){
 	     countMetric = new MultiCountMetric();
-	     context.registerMetric("custom_metrics", countMetric, 10);
+	     context.registerMetric("custom_metrics", countMetric, Constants.METRICS_INTERVAL);
 	    }
 
 	private void emitFakeData() {
