@@ -22,7 +22,7 @@ public class MemberVariablesDao extends AbstractDao {
     DBCollection memberVariablesCollection;
     public MemberVariablesDao(){
     	//Connect to secondary server
-    	super();
+    	super("server2");
 		memberVariablesCollection = db.getCollection("memberVariables");
     }
    
