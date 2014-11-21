@@ -81,8 +81,6 @@ public class MetricsListener implements IMetricsConsumer {
 			}
 
 		 */
-		System.out.println("passed");
-
 	}
 
 	@Override
