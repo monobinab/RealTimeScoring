@@ -90,7 +90,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 		if(modelIdList==null||modelIdList.isEmpty()){
 			LOGGER.info("No models affected");
 			countMetric.scope("no_models_affected").incr();
-			outputCollector.fail(input);
+			outputCollector.ack(input);
 			return;
 		}
 		// 4) Find all variables for models
@@ -105,7 +105,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 		if(memberVariablesMap==null){
 			LOGGER.warn("Unable to find member variables for" + lId);
 			countMetric.scope("no_membervariables").incr();
-			outputCollector.fail(input);
+			outputCollector.ack(input);
 			return;
 		}
 		

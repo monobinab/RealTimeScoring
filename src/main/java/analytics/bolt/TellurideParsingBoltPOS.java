@@ -125,7 +125,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 		}
 		if ( StringUtils.isEmpty(transactionXmlAsString)) {
 			countMetric.scope("empty_message").incr();
-			outputCollector.fail(input);
+			outputCollector.ack(input);
 			return;
 		}
 
@@ -170,7 +170,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 
 			if (lyl_id_no==null || StringUtils.isEmpty(lyl_id_no)) {
 				countMetric.scope("empty_lid").incr();
-				outputCollector.fail(input);
+				outputCollector.ack(input);
 				return;
 			}
 			//TODO: uncomment this to debug
@@ -373,13 +373,13 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 			}
 			else{
 				countMetric.scope("empty_lineitem").incr();
-				outputCollector.fail(input);
+				outputCollector.ack(input);
 				return;
 			}
 		}
 		else{
 			countMetric.scope("empty_xml").incr();
-			outputCollector.fail(input);
+			outputCollector.ack(input);
 			return;
 		}
 	}
