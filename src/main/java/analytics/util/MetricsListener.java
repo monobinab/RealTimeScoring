@@ -49,6 +49,7 @@ public class MetricsListener implements IMetricsConsumer {
 			if (dataPoint.name.equalsIgnoreCase("custom_metrics")) {
 				Map<String, Long> map = (Map<String, Long>) dataPoint.value;
 				for (String key : map.keySet()) {
+					try{
 					String redisKey = topologyName+":"+taskInfo.srcComponentId +":"+ key;
 					Jedis jedis = jedisPool.getResource();
 					long totalCount = jedis.incrBy(redisKey, map.get(key));
@@ -60,8 +61,12 @@ public class MetricsListener implements IMetricsConsumer {
 					display.put("valueAvg", map.get(key));
 					display.put("valueTotal", totalCount);
 					jsonObj.put("display", display);
-					jedis.publish("metrics", jsonObj.toJSONString());
+					if(jedis.isConnected())
+						jedis.publish("metrics", jsonObj.toJSONString());
 					jedisPool.returnResource(jedis);
+					}catch(Exception e){
+						e.printStackTrace();
+					}
 				}
 				}
 		}
@@ -76,7 +81,6 @@ public class MetricsListener implements IMetricsConsumer {
 			}
 
 		 */
-
 	}
 
 	@Override
