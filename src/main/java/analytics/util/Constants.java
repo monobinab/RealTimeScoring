@@ -1,5 +1,5 @@
 package analytics.util;
 
 public class Constants {
-public static final int METRICS_INTERVAL = 5;
+public static final int METRICS_INTERVAL = 60;
 }
