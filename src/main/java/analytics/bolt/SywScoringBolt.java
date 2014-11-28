@@ -142,6 +142,7 @@ public class SywScoringBolt extends BaseRichBolt {
 
 	private Map<Integer, String> insertModelToScoreUpdate(String lId, String source, String messageID, Map<String, Integer> varToCountMap, Map<Integer, String> modelIdToScore,
 			String v, String oldScore, int boostPercetages, int modelId) {
+		System.out.println("source"+source);
 		if (modelIdToScore == null || modelIdToScore.get(modelId) == null) {
 			// Getting next model since current one does not have score
 			return modelIdToScore;
@@ -171,6 +172,17 @@ public class SywScoringBolt extends BaseRichBolt {
 			}
 			Double maxScore = modelPercentileMap.get(modelId).get(96 + boostPercetages);
 
+			if (Double.valueOf(modelIdToScore.get(modelId)) < maxScore) {
+				modelIdToScore.put(modelId, maxScore.toString());
+			}
+		}
+		else if (source.equals("DC")){
+			if (varToCountMap.get(v) <= 10) {
+				boostPercetages += ((int) Math.ceil(varToCountMap.get(v) / 2.0)) - 1;
+			} else {
+				boostPercetages = 5;
+			}
+			Double maxScore = modelPercentileMap.get(modelId).get(90 + boostPercetages);
 			if (Double.valueOf(modelIdToScore.get(modelId)) < maxScore) {
 				modelIdToScore.put(modelId, maxScore.toString());
 			}
