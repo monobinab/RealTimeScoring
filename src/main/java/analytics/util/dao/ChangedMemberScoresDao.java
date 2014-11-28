@@ -24,6 +24,11 @@ public class ChangedMemberScoresDao extends AbstractDao{
     	super();
     	changedMemberScoresCollection = db.getCollection("changedMemberScores");
     }
+    
+    public void deleteChangedMemberScore(String lId){
+    	changedMemberScoresCollection.findAndRemove(new BasicDBObject("l_id",lId));
+    }
+    
 	public void upsertUpdateChangedScores(String lId, Map<Integer, ChangedMemberScore> updatedScores) {
 		BasicDBObject updateRec = new BasicDBObject();
 		for(Integer modelId: updatedScores.keySet()){
