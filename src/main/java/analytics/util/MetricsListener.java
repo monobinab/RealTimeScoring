@@ -61,8 +61,7 @@ public class MetricsListener implements IMetricsConsumer {
 					display.put("valueAvg", map.get(key));
 					display.put("valueTotal", totalCount);
 					jsonObj.put("display", display);
-					if(jedis.isConnected())
-						jedis.publish("metrics", jsonObj.toJSONString());
+					jedis.publish("metrics", jsonObj.toJSONString());
 					jedisPool.returnResource(jedis);
 					}catch(Exception e){
 						e.printStackTrace();
