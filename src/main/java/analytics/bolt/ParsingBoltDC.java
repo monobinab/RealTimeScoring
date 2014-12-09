@@ -17,9 +17,11 @@ import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.Attributes;
 
 import analytics.util.Constants;
+import analytics.util.JsonUtils;
 import analytics.util.MongoNameConstants;
 import analytics.util.SecurityUtils;
 import analytics.util.dao.DCDao;
+import analytics.util.objects.TransactionLineItem;
 import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -113,6 +115,7 @@ public class ParsingBoltDC extends BaseRichBolt {
 	public void parseIncomingMessage(String message) throws ParserConfigurationException, SAXException, IOException, JSONException {
 		JSONObject obj = new JSONObject(message);
 		message = (String) obj.get("xmlRespData");
+		message = "<soapenv:Envelope xmlns:soapenv=\"http://www.w3.org/2003/05/soap-envelope\"><soapenv:Body><PromptGroupName>DC_Appliance</PromptGroupName><MemberNumber>hzuzVKVINbBBen+WGYQT/VJVdwI=</MemberNumber><AnswerID>bb3300163e00123e11e4211b3aa34650</AnswerID><QuestionTextID>bb3300163e00123e11e4211b3aa234e0</QuestionTextID><AnswerID>bb3300163e00123e11e4211b3aa34650</AnswerID><QuestionTextID>bb3300163e00123e11e4211b3aa234e0</QuestionTextID><AnswerID>bb3300163e00123e11e4211b3aa34650</AnswerID><QuestionTextID>bb3300163e00123e11e4211b3aa234e0</QuestionTextID></soapenv:Body></soapenv:Envelope>"; 
 		SAXParserFactory factory = SAXParserFactory.newInstance();
 		SAXParser saxParser = factory.newSAXParser();
 		DefaultHandler handler = new DefaultHandler() {
@@ -234,25 +237,26 @@ public class ParsingBoltDC extends BaseRichBolt {
 	}
 	
 	private void processList(List<JSONObject> answers, String memberId) throws JSONException {
-		Gson gson = new Gson();
-		JSONObject json = new JSONObject();
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		json.put("d", simpleDateFormat.format(new Date()));
 		List<Object> dclist = new ArrayList<Object>();
 		for (int i = 0; i < answers.size(); i++) {
-			Map<String, String> variableValueMap = new HashMap<String, String>();
 			Object strength = dc.getStrength((String) (answers.get(i).get("promptGroupName")), (String) (answers.get(i).get("q_id")), (String) (answers.get(i).get("a_id")));
 			Object varName = dc.getVarName((String) (answers.get(i).get("promptGroupName")));
 			if (strength != null && varName != null) {
-				HashMap<String, List<Integer>> strengthMap = new HashMap<String, List<Integer>>();
-				List<Integer> list = new ArrayList<Integer>();
-				list.add((Integer) strength);
-				strengthMap.put("current", list);
-				variableValueMap.put(varName.toString(), gson.toJson(strengthMap, varValueType));
-				String varValueString = gson.toJson(variableValueMap, varValueType);
+				Map<String, Double> varAmountMap = new HashMap<String, Double>();
+				//strength.toString()
+				Double strengthDouble = 0.0;
+				if(strength instanceof Integer){
+					strengthDouble = ((Integer)strength).doubleValue();
+				}
+				else if(strength instanceof Double){
+					strengthDouble = (Double) strength;
+				}
+				varAmountMap.put((String)varName, strengthDouble);
 				List<Object> listToEmit = new ArrayList<Object>();
-				listToEmit.add(SecurityUtils.hashLoyaltyId(memberId));
-				listToEmit.add(varValueString);
+				String l_id = SecurityUtils.hashLoyaltyId(memberId);
+				listToEmit.add(l_id);
+				//listToEmit.add("hzuzVKVINbBBen+WGYQT/VJVdwI=");
+				listToEmit.add(JsonUtils.createJsonFromStringDoubleMap(varAmountMap));
 				listToEmit.add("DC");
 				outputCollector.emit("score_stream", listToEmit);
 				countMetric.scope("dc_EmittedToScoring").incr();
@@ -263,6 +267,9 @@ public class ParsingBoltDC extends BaseRichBolt {
 				LOGGER.info("Emitted message to score stream");
 			}
 		}
+		JSONObject json = new JSONObject();
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		json.put("d", simpleDateFormat.format(new Date()));
 		if(dclist.size() > 0){
 			json.put("dc", dclist);
 			List<Object> listToEmit = new ArrayList<Object>();

@@ -8,6 +8,7 @@ import analytics.util.strategies.StrategyBoostProductTotalCount;
 import analytics.util.strategies.StrategyCountTraitDates;
 import analytics.util.strategies.StrategyCountTraits;
 import analytics.util.strategies.StrategyCountTransactions;
+import analytics.util.strategies.StrategyDCFlag;
 import analytics.util.strategies.StrategyDaysSinceLast;
 import analytics.util.strategies.StrategySumSales;
 import analytics.util.strategies.StrategyTurnOffFlag;
@@ -49,6 +50,7 @@ public class StrategyMapper {
 		strategyMap.put("StrategyTurnOffFlag", new StrategyTurnOffFlag()); 
 		strategyMap.put("StrategyTurnOnFlag", new StrategyTurnOnFlag());
 		strategyMap.put("StrategyBoostProductTotalCount", new StrategyBoostProductTotalCount());
+		strategyMap.put("StrategyDCFlag", new StrategyDCFlag());
     }
     
 }
