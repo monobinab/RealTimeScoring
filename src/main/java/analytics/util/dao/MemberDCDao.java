@@ -1,6 +1,9 @@
 package analytics.util.dao;
 
+import java.util.Collection;
+
 import com.mongodb.util.JSON;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +24,7 @@ public class MemberDCDao extends AbstractDao{
     }
     
     public void addDateDC(String l_id, String obj_str){
+    	//System.out.println(obj_str);
     	DBObject query = new BasicDBObject();
     	DBObject obj = (DBObject)JSON.parse(obj_str);
     	query.put(MongoNameConstants.L_ID,l_id);
@@ -35,7 +39,13 @@ public class MemberDCDao extends AbstractDao{
     	}
     	else{
     		BasicDBList dateDCList = (BasicDBList) object.get(MongoNameConstants.MT_DATES_ARR);
-    		dateDCList.add(obj);
+    		for(int i = 0; i < dateDCList.size();i++){
+    			DBObject dc_obj = (DBObject) dateDCList.get(i);
+    			if(dc_obj.get("d").equals(obj.get("d"))){
+    				BasicDBList dclist = (BasicDBList)dc_obj.get("dc");
+    				dclist.addAll((BasicDBList)obj.get("dc"));
+    			}
+    		}
     		memberDCCollection.update(new BasicDBObject(MongoNameConstants.L_ID, l_id), object, true, false);
     	}
     	

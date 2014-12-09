@@ -256,21 +256,21 @@ public class ParsingBoltDC extends BaseRichBolt {
 				listToEmit.add("DC");
 				outputCollector.emit("score_stream", listToEmit);
 				countMetric.scope("dc_EmittedToScoring").incr();
-				
 				JSONObject dcObj = new JSONObject();
 				dcObj.put("c", (String) (answers.get(i).get("promptGroupName")));
 				dcObj.put("s", strength);
 				dclist.add(dcObj);
-				LOGGER.info("Emitted message");
+				LOGGER.info("Emitted message to score stream");
 			}
 		}
-		if(answers.size() > 0){
+		if(dclist.size() > 0){
 			json.put("dc", dclist);
 			List<Object> listToEmit = new ArrayList<Object>();
 			listToEmit.add(SecurityUtils.hashLoyaltyId(memberId));
 			listToEmit.add(json.toString());
 			listToEmit.add("DC");
 			outputCollector.emit("persist_stream", listToEmit);
+			LOGGER.info("Emitted message to persist stream");
 		}
 	}
 }
