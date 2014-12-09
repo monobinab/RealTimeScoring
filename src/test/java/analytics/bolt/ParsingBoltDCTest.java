@@ -12,12 +12,12 @@ import org.junit.Test;
 import org.xml.sax.SAXException;
 import org.codehaus.jettison.json.JSONException;
 
-public class DCParsingBoltTest {
-	DCParsingBolt bolt;
+public class ParsingBoltDCTest {
+	ParsingBoltDC bolt;
 
 	@Before
 	public void setUp() throws Exception {
-		bolt = new DCParsingBolt();
+		bolt = new ParsingBoltDC();
 	}
 
 	@After
@@ -47,5 +47,8 @@ public class DCParsingBoltTest {
 		String testMessage_DummyJSONWithxmlRespData = "{\"xmlRespData\":\"<properties><project.build.sourceEncoding>UTF-8</project.build.sourceEncoding><slf4j-version>1.7.2</slf4j-version><storm.version>0.9.0.1</storm.version></properties>\"}";
 		bolt.parseIncomingMessage(testMessage_DummyJSONWithxmlRespData);
 	}
+	
+	//TODO:
+	//Multi questions tests
 
 }
