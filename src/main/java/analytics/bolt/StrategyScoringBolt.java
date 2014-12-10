@@ -44,6 +44,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 			OutputCollector collector) {
 		LOGGER.info("PREPARING STRATEGY SCORING BOLT");	
 	     initMetrics(context);
+	     //TODO: ALL BOLTS SHOULD HAVE THIS LINE - ADD TO SUPER CLASS
         System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
 		this.outputCollector = collector;
 	}
@@ -98,7 +99,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 		// 5) Create a map of variable values, fetched from from memberVariables
 		Map<String, Object> memberVariablesMap = new HashMap<String, Object>();
 		try {
-			memberVariablesMap = ScoringSingleton.getInstance().createVariableValueMap(lId, modelIdList);
+			memberVariablesMap = ScoringSingleton.getInstance().createMemberVariableValueMap(lId, modelIdList);
 		} catch (RealTimeScoringException e1) {
 			LOGGER.error("Can not create member variable map", e1);
 		}

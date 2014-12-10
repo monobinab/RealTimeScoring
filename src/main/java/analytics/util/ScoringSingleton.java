@@ -113,7 +113,7 @@ public class ScoringSingleton {
 			modelIdList.add(Integer.parseInt(model));
 		}
 		//Contains a VID to object mapping, not var name
-		Map<String, Object> memberVariablesMap = ScoringSingleton.getInstance().createVariableValueMap(loyaltyId, modelIdList);
+		Map<String, Object> memberVariablesMap = ScoringSingleton.getInstance().createMemberVariableValueMap(loyaltyId, modelIdList);
 		if(memberVariablesMap==null){
 			LOGGER.warn("Unable to find member variables");
 			return null;
@@ -135,7 +135,7 @@ public class ScoringSingleton {
 		return modelIdStringScoreMap;
 	}
 	
-	public Map<String, Object> createVariableValueMap(String loyaltyId,
+	public Map<String, Object> createMemberVariableValueMap(String loyaltyId,
 			Set<Integer> modelIdList) throws RealTimeScoringException {
 		List<String> variableFilter = new ArrayList<String>();
     	for (Integer modId : modelIdList) {
@@ -185,7 +185,7 @@ public class ScoringSingleton {
 		Map<String, Change> changedMbrVariables = changedVariablesDao.getMemberVariables(lId);
 		
 		//Create a map from VName->Change
-		Map<String, Change> allChanges = new HashMap<String, Change>();
+		Map<String, Change> changedMemberVariablesMap = new HashMap<String, Change>();
 		if (changedMbrVariables != null && changedMbrVariables.keySet() != null) {
 			for (Map.Entry<String, Change> entry : changedMbrVariables.entrySet()){
 				String key = entry.getKey();
@@ -193,14 +193,14 @@ public class ScoringSingleton {
 				//key is VID
 				// skip expired changes
 				if (value.getExpirationDate().after(new Date())){
-						allChanges.put(variableVidToNameMap.get(key), value);
+						changedMemberVariablesMap.put(variableVidToNameMap.get(key), value);
 				} else {
 					LOGGER.debug("Got an expired value for "
 							+ value);
 				}
 			}
 		}
-		return allChanges;
+		return changedMemberVariablesMap;
 	}
 	
 	/**
@@ -234,6 +234,7 @@ public class ScoringSingleton {
 				Strategy strategy = StrategyMapper.getInstance().getStrategy(
 						variableNameToStrategyMap.get(variableName));
 				// If this member had a changed variable
+				// allChanges at this point only contain changedMemberVariables
 				if (allChanges != null && allChanges.containsKey(variableName)) {
 					context.setPreviousValue(allChanges.get(variableName)
 							.getValue());
@@ -247,11 +248,7 @@ public class ScoringSingleton {
 				}
 				LOGGER.debug(" ~~~ STRATEGY BOLT CHANGES - context: " + context);
 				Change executedValue = strategy.execute(context);
-				// TODO: Verify this
-				// newChanges so that iterate over it and upsert
-				allChanges.put(variableName, executedValue);// We do not need
-															// newChanges. We
-															// upsert allChanges
+				allChanges.put(variableName, executedValue);
 			}
 		}
 		return allChanges;
@@ -296,9 +293,9 @@ public class ScoringSingleton {
 	}
 	
 	public double calcScore(Map<String, Object> mbrVarMap,
-			Map<String, Change> varChangeMap, int modelId) throws RealTimeScoringException{
+			Map<String, Change> allChanges, int modelId) throws RealTimeScoringException{
 		// recalculate score for model
-			double baseScore = calcBaseScore(mbrVarMap, varChangeMap,
+			double baseScore = calcBaseScore(mbrVarMap, allChanges,
 					modelId);
 			double newScore;
 
@@ -313,13 +310,13 @@ public class ScoringSingleton {
 	}
 	
 	public double calcBaseScore(Map<String, Object> mbrVarMap,
-			Map<String, Change> varChangeMap, int modelId) throws RealTimeScoringException{
+			Map<String, Change> allChanges, int modelId) throws RealTimeScoringException{
 
 		if(mbrVarMap == null){
 			throw new RealTimeScoringException("member variables is null");
 		}
 		
-		if(varChangeMap == null){
+		if(allChanges == null){
 			throw new RealTimeScoringException("changed member vairbles is null");
 		}
 		Model model = null;
@@ -346,32 +343,32 @@ public class ScoringSingleton {
 			
 			if (variable.getName() != null && (variableNameToVidMap.get(variable.getName()) != null
 					&& mbrVarMap.get(variableNameToVidMap.get(variable.getName())) != null
-					&& !variable.getName().substring(0, 4).toUpperCase()
+					&& !variable.getName().substring(0, MongoNameConstants.BOOST_VAR_PREFIX.length()).toUpperCase()
 							.equals(MongoNameConstants.BOOST_VAR_PREFIX))) {
 				if (mbrVarMap.get(variableNameToVidMap.get(variable.getName())) instanceof Integer) {
 					val = val
 							+ ((Integer) calculateVariableValue(mbrVarMap,
-									variable, varChangeMap, "Integer") * variable
+									variable, allChanges, "Integer") * variable
 									.getCoefficient());
 				} else if (mbrVarMap.get(variableNameToVidMap.get(variable.getName())) instanceof Double) {
 					val = val
 							+ ((Double) calculateVariableValue(mbrVarMap,
-									variable, varChangeMap, "Double") * variable
+									variable, allChanges, "Double") * variable
 									.getCoefficient());
 				}
-			} else if (variable.getName() != null && varChangeMap != null
-					&& varChangeMap.get(variable.getName()) != null) {
-				if (varChangeMap.get(variable.getName().toUpperCase())
+			} else if (variable.getName() != null && allChanges != null
+					&& allChanges.get(variable.getName()) != null) {
+				if (allChanges.get(variable.getName().toUpperCase())
 						.getValue() instanceof Integer) {
 					val = val
 							+ ((Integer) calculateVariableValue(mbrVarMap,
-									variable, varChangeMap, "Integer") * variable
+									variable, allChanges, "Integer") * variable
 									.getCoefficient());
-				} else if (varChangeMap.get(variable.getName().toUpperCase())
+				} else if (allChanges.get(variable.getName().toUpperCase())
 						.getValue() instanceof Double) {
 					val = val
 							+ ((Double) calculateVariableValue(mbrVarMap,
-									variable, varChangeMap, "Double") * variable
+									variable, allChanges, "Double") * variable
 									.getCoefficient());
 				}
 
