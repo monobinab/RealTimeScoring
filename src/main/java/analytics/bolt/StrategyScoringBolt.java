@@ -115,16 +115,14 @@ public class StrategyScoringBolt extends BaseRichBolt {
 		
 		// 6.1) CREATE MAP FROM CHANGED VARIABLES TO VALUE AND EXPIRATION DATE
 		// (CHANGE CLASS) and store in allChanges
-		Map<String, Change> allChanges = ScoringSingleton.getInstance().createChangedVariablesMap(lId);
+		Map<String, Change> changedMemberVariables = ScoringSingleton.getInstance().createChangedVariablesMap(lId);
 		
 		
 		// 6) For each variable in new changes, execute strategy and store in
 		// allChanges
 		// allChanges will contain newChanges and the changedMemberVariables
-		allChanges = ScoringSingleton.getInstance().executeStrategy(allChanges, newChangesVarValueMap, memberVariablesMap);
+		Map<String, Change> allChanges = ScoringSingleton.getInstance().executeStrategy(changedMemberVariables, newChangesVarValueMap, memberVariablesMap);
 		
-		// newChanges has both changedMemberVariables and changes
-
 		// 8) Rescore - arbitrate between all changes and memberVariables
 		// Score each model in a loop
 		Map<Integer, Double> modelIdScoreMap = new HashMap<Integer, Double>();
