@@ -21,6 +21,7 @@ import analytics.util.JsonUtils;
 import analytics.util.MongoNameConstants;
 import analytics.util.SecurityUtils;
 import analytics.util.dao.DCDao;
+import analytics.util.dao.MemberDCDao;
 import analytics.util.objects.TransactionLineItem;
 import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
@@ -46,6 +47,7 @@ public class ParsingBoltDC extends BaseRichBolt {
 	private static final long serialVersionUID = 1L;
 	private OutputCollector outputCollector;
 	private DCDao dc;
+	private MemberDCDao memberDCDao;
 	private Type varValueType;
 	private MultiCountMetric countMetric;
 
@@ -99,6 +101,7 @@ public class ParsingBoltDC extends BaseRichBolt {
 		this.outputCollector = collector;
 		System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
 		dc = new DCDao();
+		memberDCDao = new MemberDCDao();
 		initMetrics(context);
 		LOGGER.info("DC Bolt Preparing to Launch");
 		varValueType = new TypeToken<Map<String, String>>() {
@@ -237,25 +240,28 @@ public class ParsingBoltDC extends BaseRichBolt {
 	}
 	
 	private void processList(List<JSONObject> answers, String memberId) throws JSONException {
+		String l_id = SecurityUtils.hashLoyaltyId(memberId);
+		//String l_id = "hzuzVKVINbBBen+WGYQT/VJVdwI=";
 		List<Object> dclist = new ArrayList<Object>();
 		for (int i = 0; i < answers.size(); i++) {
-			Object strength = dc.getStrength((String) (answers.get(i).get("promptGroupName")), (String) (answers.get(i).get("q_id")), (String) (answers.get(i).get("a_id")));
-			Object varName = dc.getVarName((String) (answers.get(i).get("promptGroupName")));
+			String category = (String) answers.get(i).get("promptGroupName");
+			Object strength = dc.getStrength(category, (String) (answers.get(i).get("q_id")), (String) (answers.get(i).get("a_id")));
+			Object varName = dc.getVarName(category);
 			if (strength != null && varName != null) {
 				Map<String, Double> varAmountMap = new HashMap<String, Double>();
 				//strength.toString()
-				Double strengthDouble = 0.0;
+				//TODO: get rid of the hard coded expiration date
+				Double strengthDouble = (Double)memberDCDao.getTotalStrength(category, l_id, 30);
 				if(strength instanceof Integer){
-					strengthDouble = ((Integer)strength).doubleValue();
+					strengthDouble += ((Integer)strength).doubleValue();
 				}
 				else if(strength instanceof Double){
-					strengthDouble = (Double) strength;
+					strengthDouble += (Double) strength;
 				}
+				System.out.println("passing:"+strengthDouble);
 				varAmountMap.put((String)varName, strengthDouble);
 				List<Object> listToEmit = new ArrayList<Object>();
-				String l_id = SecurityUtils.hashLoyaltyId(memberId);
 				listToEmit.add(l_id);
-				//listToEmit.add("hzuzVKVINbBBen+WGYQT/VJVdwI=");
 				listToEmit.add(JsonUtils.createJsonFromStringDoubleMap(varAmountMap));
 				listToEmit.add("DC");
 				outputCollector.emit("score_stream", listToEmit);
@@ -273,7 +279,7 @@ public class ParsingBoltDC extends BaseRichBolt {
 		if(dclist.size() > 0){
 			json.put("dc", dclist);
 			List<Object> listToEmit = new ArrayList<Object>();
-			listToEmit.add(SecurityUtils.hashLoyaltyId(memberId));
+			listToEmit.add(l_id);
 			listToEmit.add(json.toString());
 			listToEmit.add("DC");
 			outputCollector.emit("persist_stream", listToEmit);

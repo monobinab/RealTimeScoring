@@ -51,4 +51,25 @@ public class MemberDCDao extends AbstractDao{
     	
     }
     
+    public Object getTotalStrength(String category, String l_id, int expiration){
+    	System.out.println(l_id);
+    	DBObject query = new BasicDBObject();
+    	query.put("l_id", l_id);
+    	DBObject object = memberDCCollection.findOne(query);
+    	Double strengthTotal = 0.0;
+    	if(object != null){
+    		BasicDBList list = (BasicDBList) object.get("date");
+    		for(int i = 0; i < list.size(); i++){
+    			DBObject date = (DBObject) list.get(i);
+    			BasicDBList dclist = (BasicDBList) date.get("dc");
+    			for(int j = 0; j < dclist.size(); j++){
+    				DBObject dc = (DBObject) dclist.get(j);
+    				strengthTotal += (Integer)(dc.get("s"));
+    			}
+    		}
+    	}
+    	System.out.println(strengthTotal);
+    	return strengthTotal;
+    }
+    
 }

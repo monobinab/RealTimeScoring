@@ -42,7 +42,7 @@ public class DCTopology {
 		// use topology Id as part of the consumer ID to make it unique
 		SpoutConfig kafkaConfig = new SpoutConfig(hosts, "telprod_reqresp_log_output", "", "RTSConsumer"+topologyId);
 		kafkaConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
-		kafkaConfig.forceFromStart = true;
+		//kafkaConfig.forceFromStart = true;
 		// TODO: partition number better be dynamic
 		builder.setSpout("kafka_spout", new KafkaSpout(kafkaConfig), 3);
 		builder.setBolt("DCParsing_Bolt", new ParsingBoltDC(), 3).localOrShuffleGrouping("kafka_spout");
