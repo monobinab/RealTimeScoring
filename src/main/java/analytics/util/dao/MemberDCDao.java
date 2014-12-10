@@ -52,7 +52,6 @@ public class MemberDCDao extends AbstractDao{
     }
     
     public Object getTotalStrength(String category, String l_id, int expiration){
-    	System.out.println(l_id);
     	DBObject query = new BasicDBObject();
     	query.put("l_id", l_id);
     	DBObject object = memberDCCollection.findOne(query);
@@ -68,7 +67,6 @@ public class MemberDCDao extends AbstractDao{
     			}
     		}
     	}
-    	System.out.println(strengthTotal);
     	return strengthTotal;
     }
     
