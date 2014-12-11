@@ -30,10 +30,10 @@ public class JsonUtils {
 		return gson.toJson(variableValuesMap, varValueType);
 	}
 
-	public static final Object createJsonFromStringDoubleMap(Map<String, Double> variableValuesMap) {
+	public static final Object createJsonFromStringObjectMap(Map<String, Object> variableValuesMap) {
 
 		Gson gson = new Gson();
-		Type varValueType = new TypeToken<Map<String, Double>>() {
+		Type varValueType = new TypeToken<Map<String, Object>>() {
 			private static final long serialVersionUID = 1L;
 		}.getType();
 
@@ -48,12 +48,30 @@ public class JsonUtils {
 		return new Gson().fromJson(json, dateTraitType);
 	}
 
+	public static Map<String, Object> restoreDateDCMapFromJson(String json) {
+		Type dateDCType = new TypeToken<Map<String, Object>>() {
+			private static final long serialVersionUID = 1L;
+		}.getType();
+
+		return new Gson().fromJson(json, dateDCType);
+	}
+
 	public static Map<String, String> restoreVariableListFromJson(String json) {
 		Type varListType = new TypeToken<Map<String, String>>() {
 			private static final long serialVersionUID = 1L;
 		}.getType();
 
 		return new Gson().fromJson(json, varListType);
+	}
+	//Need to find a better place to put this method
+	public static Double convertToDouble(Object num) {
+		if (num instanceof Integer) {
+			return ((Integer) num).doubleValue();
+		} else if (num instanceof Double) {
+			return (Double) num;
+		}
+		return 0.0;
+
 	}
 
 }

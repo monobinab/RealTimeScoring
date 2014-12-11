@@ -24,6 +24,8 @@ import backtype.storm.spout.SchemeAsMultiScheme;
 public class DCTopology {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ParsingBoltDC.class);
 	private static final long serialVersionUID = 1L;
+	private static final int partition_num = 3;
+	private static final int redis_port = 6379;
 
 	public static void main(String[] args) {
 		boolean isLocal = true;
@@ -31,8 +33,6 @@ public class DCTopology {
 		System.clearProperty(MongoNameConstants.IS_PROD);
 		if (args.length > 0) {
 			System.setProperty(MongoNameConstants.IS_PROD, "true");
-		}
-		if(args.length > 0){
 			isLocal = false;
 			topologyId = args[0];
 		}
@@ -42,17 +42,19 @@ public class DCTopology {
 		// use topology Id as part of the consumer ID to make it unique
 		SpoutConfig kafkaConfig = new SpoutConfig(hosts, "telprod_reqresp_log_output", "", "RTSConsumer"+topologyId);
 		kafkaConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
-		//kafkaConfig.forceFromStart = true;
-		// TODO: partition number better be dynamic
-		builder.setSpout("kafka_spout", new KafkaSpout(kafkaConfig), 3);
-		builder.setBolt("DCParsing_Bolt", new ParsingBoltDC(), 3).localOrShuffleGrouping("kafka_spout");
-	    builder.setBolt("strategy_bolt", new StrategyScoringBolt(),3).localOrShuffleGrouping("DCParsing_Bolt", "score_stream");
-		builder.setBolt("dcPersistBolt", new PersistDCBolt(), 3).localOrShuffleGrouping("DCParsing_Bolt", "persist_stream");
-		builder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 3).localOrShuffleGrouping("strategy_bolt", "score_stream");
-		builder.setBolt("member_publish_bolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 3).localOrShuffleGrouping("strategy_bolt", "member_stream");
+		if(isLocal){
+			//default is false, only set to true for developing or testing locally
+			kafkaConfig.forceFromStart = true;
+		}
+		builder.setSpout("kafka_spout", new KafkaSpout(kafkaConfig), partition_num);
+		builder.setBolt("DCParsing_Bolt", new ParsingBoltDC(), partition_num).localOrShuffleGrouping("kafka_spout");
+	    builder.setBolt("strategy_bolt", new StrategyScoringBolt(),partition_num).localOrShuffleGrouping("DCParsing_Bolt", "score_stream");
+		builder.setBolt("dcPersistBolt", new PersistDCBolt(), partition_num).localOrShuffleGrouping("DCParsing_Bolt", "persist_stream");
+		builder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], redis_port,"score"), partition_num).localOrShuffleGrouping("strategy_bolt", "score_stream");
+		builder.setBolt("member_publish_bolt", new MemberPublishBolt(RedisConnection.getServers()[0], redis_port,"member"), partition_num).localOrShuffleGrouping("strategy_bolt", "member_stream");
 		Config conf = new Config();
 		conf.put("metrics_topology", "DC");
-		conf.registerMetricsConsumer(MetricsListener.class, 3);
+		conf.registerMetricsConsumer(MetricsListener.class, partition_num);
 		conf.setDebug(false);
 		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
 		if (!isLocal) {
@@ -65,7 +67,7 @@ public class DCTopology {
 			}
 		} else {
 			conf.setDebug(false);
-			conf.setMaxTaskParallelism(3);
+			conf.setMaxTaskParallelism(partition_num);
 			LocalCluster cluster = new LocalCluster();
 			cluster.submitTopology("DCTopology", conf, builder.createTopology());
 			try {

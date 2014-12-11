@@ -33,6 +33,7 @@ import backtype.storm.tuple.Tuple;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.mortbay.util.ajax.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
@@ -50,6 +51,9 @@ public class ParsingBoltDC extends BaseRichBolt {
 	private MemberDCDao memberDCDao;
 	private Type varValueType;
 	private MultiCountMetric countMetric;
+	//needs to be removed after development is completed and moved to prod
+	private static final boolean isDemo = false;
+
 
 	@Override
 	public void execute(Tuple input) {
@@ -118,7 +122,9 @@ public class ParsingBoltDC extends BaseRichBolt {
 	public void parseIncomingMessage(String message) throws ParserConfigurationException, SAXException, IOException, JSONException {
 		JSONObject obj = new JSONObject(message);
 		message = (String) obj.get("xmlRespData");
-		message = "<soapenv:Envelope xmlns:soapenv=\"http://www.w3.org/2003/05/soap-envelope\"><soapenv:Body><PromptGroupName>DC_Appliance</PromptGroupName><MemberNumber>hzuzVKVINbBBen+WGYQT/VJVdwI=</MemberNumber><AnswerID>bb3300163e00123e11e4211b3aa34650</AnswerID><QuestionTextID>bb3300163e00123e11e4211b3aa234e0</QuestionTextID><AnswerID>bb3300163e00123e11e4211b3aa34650</AnswerID><QuestionTextID>bb3300163e00123e11e4211b3aa234e0</QuestionTextID><AnswerID>bb3300163e00123e11e4211b3aa34650</AnswerID><QuestionTextID>bb3300163e00123e11e4211b3aa234e0</QuestionTextID></soapenv:Body></soapenv:Envelope>"; 
+		if(isDemo){
+			message = "<soapenv:Envelope xmlns:soapenv=\"http://www.w3.org/2003/05/soap-envelope\"><soapenv:Body><PromptGroupName>DC_Appliance</PromptGroupName><MemberNumber>fake</MemberNumber><AnswerID>bb3300163e00123e11e4211b3aa34650</AnswerID><QuestionTextID>bb3300163e00123e11e4211b3aa234e0</QuestionTextID><AnswerID>bb3300163e00123e11e4211b3aa34650</AnswerID><QuestionTextID>bb3300163e00123e11e4211b3aa234e0</QuestionTextID><AnswerID>bb3300163e00123e11e4211b3aa34650</AnswerID><QuestionTextID>bb3300163e00123e11e4211b3aa234e0</QuestionTextID></soapenv:Body></soapenv:Envelope>"; 
+		}
 		SAXParserFactory factory = SAXParserFactory.newInstance();
 		SAXParser saxParser = factory.newSAXParser();
 		DefaultHandler handler = new DefaultHandler() {
@@ -241,49 +247,75 @@ public class ParsingBoltDC extends BaseRichBolt {
 	
 	private void processList(List<JSONObject> answers, String memberId) throws JSONException {
 		String l_id = SecurityUtils.hashLoyaltyId(memberId);
-		//String l_id = "hzuzVKVINbBBen+WGYQT/VJVdwI=";
-		List<Object> dclist = new ArrayList<Object>();
+		if(isDemo){
+			l_id = "hzuzVKVINbBBen+WGYQT/VJVdwI=";
+		}
+		boolean hasStrength = false;
+		Double strength_sum = 0.0;
+		String category = null;
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		String date = simpleDateFormat.format(new Date());
+		Object varName = null;
 		for (int i = 0; i < answers.size(); i++) {
-			String category = (String) answers.get(i).get("promptGroupName");
+			category = (String) answers.get(i).get("promptGroupName");
 			Object strength = dc.getStrength(category, (String) (answers.get(i).get("q_id")), (String) (answers.get(i).get("a_id")));
-			Object varName = dc.getVarName(category);
+			varName = dc.getVarName(category);
 			if (strength != null && varName != null) {
-				Map<String, Double> varAmountMap = new HashMap<String, Double>();
-				//strength.toString()
-				//TODO: get rid of the hard coded expiration date
-				Double strengthDouble = (Double)memberDCDao.getTotalStrength(category, l_id, 30);
 				if(strength instanceof Integer){
-					strengthDouble += ((Integer)strength).doubleValue();
+					strength_sum += ((Integer)strength).doubleValue();;
 				}
 				else if(strength instanceof Double){
-					strengthDouble += (Double) strength;
+					strength_sum += (Double) strength;
 				}
-				System.out.println("passing:"+strengthDouble);
-				varAmountMap.put((String)varName, strengthDouble);
-				List<Object> listToEmit = new ArrayList<Object>();
-				listToEmit.add(l_id);
-				listToEmit.add(JsonUtils.createJsonFromStringDoubleMap(varAmountMap));
-				listToEmit.add("DC");
-				outputCollector.emit("score_stream", listToEmit);
-				countMetric.scope("dc_EmittedToScoring").incr();
-				JSONObject dcObj = new JSONObject();
-				dcObj.put("c", (String) (answers.get(i).get("promptGroupName")));
-				dcObj.put("s", strength);
-				dclist.add(dcObj);
-				LOGGER.info("Emitted message to score stream");
+				if(!hasStrength){
+					hasStrength = true;
+				}	
 			}
 		}
-		JSONObject json = new JSONObject();
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		json.put("d", simpleDateFormat.format(new Date()));
-		if(dclist.size() > 0){
-			json.put("dc", dclist);
-			List<Object> listToEmit = new ArrayList<Object>();
-			listToEmit.add(l_id);
-			listToEmit.add(json.toString());
-			listToEmit.add("DC");
-			outputCollector.emit("persist_stream", listToEmit);
-			LOGGER.info("Emitted message to persist stream");
+		
+		if(hasStrength){
+			emitToPersistStream(date, category, strength_sum, l_id);
+			emitToScoreStream(date, category, strength_sum, l_id, (String)varName);
 		}
+	}
+	
+	public void emitToPersistStream(String date, String category, Double strength_sum, String l_id) throws JSONException{
+		JSONObject json = new JSONObject();
+		json.put("d", date);
+		JSONObject dcObject = new JSONObject();
+		dcObject.put(category, strength_sum);
+		json.put("dc", dcObject);
+		List<Object> listToEmit_p = new ArrayList<Object>();
+		listToEmit_p.add(l_id);
+		listToEmit_p.add(json.toString());
+		listToEmit_p.add("DC");
+		outputCollector.emit("persist_stream", listToEmit_p);
+		LOGGER.info("Emitted message to persist stream");
+	}
+	
+	public void emitToScoreStream(String date, String category, Double strength_sum, String l_id, String varName) throws JSONException{
+		Map<String, String> dateDCMap = memberDCDao.getDateStrengthMap(category, l_id);
+		String today_str = dateDCMap.get(date);	
+		if( today_str == null){
+			//put strength_sum
+			JSONObject obj = new JSONObject();
+			obj.put(category, strength_sum);
+			dateDCMap.put(date, obj.toString());
+		}else{
+			Double today_val = JsonUtils.convertToDouble(JSON.parse(today_str));
+			//put val + strength_sum
+			today_val+=strength_sum;
+			dateDCMap.put(date, today_val.toString());
+		}
+		Map<String, String> map = new HashMap<String, String>();
+		map.put((String)varName, dateDCMap.toString());
+		List<Object> listToEmit_s = new ArrayList<Object>();
+		listToEmit_s.add(l_id);
+		listToEmit_s.add(JsonUtils.createJsonFromStringStringMap(map));
+		listToEmit_s.add("DC");
+		outputCollector.emit("score_stream", listToEmit_s);
+		countMetric.scope("dc_EmittedToScoring").incr();
+		LOGGER.info("Emitted message to score stream");
+		
 	}
 }
