@@ -220,7 +220,7 @@ public class ScoringSingletonTest {
 		newChangesVarValueMap2.put("S_HOME_6M_IND2", "value");
 		Set<Integer> modelIdList2 = scoringSingletonObj
 				.getModelIdList(newChangesVarValueMap2);
-		Map<String, Object> map = scoringSingletonObj.createVariableValueMap(
+		Map<String, Object> map = scoringSingletonObj.createMemberVariableValueMap(
 				"", modelIdList2);
 		assertEquals(map, null);
 	}
@@ -268,7 +268,7 @@ public class ScoringSingletonTest {
 		variableNameToVidMap.set(scoringSingletonObj,
 				variableNameToVidMapContents);
 		Map<String, Object> variableValueMap = scoringSingletonObj
-				.createVariableValueMap("SearsTesting", modelIdsList3);
+				.createMemberVariableValueMap("SearsTesting", modelIdsList3);
 		Set<String> memVarValue = new HashSet<String>();
 		memVarValue.add("2270");
 		memVarValue.add("2269");
@@ -320,7 +320,7 @@ public class ScoringSingletonTest {
 				variableNameToVidMapContents);
 		RealTimeScoringException realTimeScoreExc = null;
 		try {
-			scoringSingletonObj.createVariableValueMap("SearsTestingCheck",
+			scoringSingletonObj.createMemberVariableValueMap("SearsTestingCheck",
 					modelIdsList3);
 		} catch (RealTimeScoringException e) {
 			realTimeScoreExc = e;

@@ -152,7 +152,7 @@ public class ScoringSingletonIntegrationTest {
 		variableNameToStrategyMapContents.set(scoringSingletonObj, variableNameToStrategyMapContentsMap);
 		
 		Set<Integer> modelIdsList = scoringSingletonObj.getModelIdList(newChangesVarValueMap);
-		Map<String, Object> memberVariablesMap = scoringSingletonObj.createVariableValueMap("SearsTesting", modelIdsList);
+		Map<String, Object> memberVariablesMap = scoringSingletonObj.createMemberVariableValueMap("SearsTesting", modelIdsList);
 		Map<String, Change> changedMemberVariablesMap = scoringSingletonObj.createChangedVariablesMap("SearsTesting");
 		Map<String, Change> changedMemVariablesStrategy = scoringSingletonObj.executeStrategy(changedMemberVariablesMap, newChangesVarValueMap, memberVariablesMap);
 		List<Double> newScoreListActual = new LinkedList<Double>();
@@ -257,7 +257,7 @@ public class ScoringSingletonIntegrationTest {
 				variableNameToStrategyMapContents.set(scoringSingletonObj, variableNameToStrategyMapContentsMap);
 				
 				Set<Integer> modelIdsList = scoringSingletonObj.getModelIdList(newChangesVarValueMap);
-				Map<String, Object> memberVariablesMap = scoringSingletonObj.createVariableValueMap("SearsTesting2", modelIdsList);
+				Map<String, Object> memberVariablesMap = scoringSingletonObj.createMemberVariableValueMap("SearsTesting2", modelIdsList);
 				Map<String, Change> changedMemberVariablesMap = scoringSingletonObj.createChangedVariablesMap("SearsTesting2");
 				Map<String, Change> changedMemVariablesStrategy = scoringSingletonObj.executeStrategy(changedMemberVariablesMap, newChangesVarValueMap, memberVariablesMap);
 				List<Double> newScoreListActual = new LinkedList<Double>();
@@ -356,7 +356,7 @@ public class ScoringSingletonIntegrationTest {
 				variableNameToStrategyMapContents.set(scoringSingletonObj, variableNameToStrategyMapContentsMap);
 				
 				Set<Integer> modelIdsList = scoringSingletonObj.getModelIdList(newChangesVarValueMap);
-				Map<String, Object> memberVariablesMap = scoringSingletonObj.createVariableValueMap("SearsTesting3", modelIdsList);
+				Map<String, Object> memberVariablesMap = scoringSingletonObj.createMemberVariableValueMap("SearsTesting3", modelIdsList);
 				Map<String, Change> changedMemberVariablesMap = scoringSingletonObj.createChangedVariablesMap("SearsTesting3");
 				Map<String, Change> changedMemVariablesStrategy = scoringSingletonObj.executeStrategy(changedMemberVariablesMap, newChangesVarValueMap, memberVariablesMap);
 				List<Double> newScoreListActual = new LinkedList<Double>();
@@ -461,7 +461,7 @@ public class ScoringSingletonIntegrationTest {
 				variableNameToStrategyMapContents.set(scoringSingletonObj, variableNameToStrategyMapContentsMap);
 				
 				Set<Integer> modelIdsList = scoringSingletonObj.getModelIdList(newChangesVarValueMap);
-				Map<String, Object> memberVariablesMap = scoringSingletonObj.createVariableValueMap("SearsTesting4", modelIdsList);
+				Map<String, Object> memberVariablesMap = scoringSingletonObj.createMemberVariableValueMap("SearsTesting4", modelIdsList);
 				Map<String, Change> changedMemberVariablesMap = scoringSingletonObj.createChangedVariablesMap("SearsTesting4");
 				Map<String, Change> changedMemVariablesStrategy = scoringSingletonObj.executeStrategy(changedMemberVariablesMap, newChangesVarValueMap, memberVariablesMap);
 				List<Double> newScoreListActual = new LinkedList<Double>();
@@ -553,7 +553,7 @@ public class ScoringSingletonIntegrationTest {
 		variableNameToStrategyMapContents.set(scoringSingletonObj, variableNameToStrategyMapContentsMap);
 		
 		Set<Integer> modelIdsList = scoringSingletonObj.getModelIdList(newChangesVarValueMap);
-		Map<String, Object> memberVariablesMap = scoringSingletonObj.createVariableValueMap("SearsTesting2", modelIdsList);
+		Map<String, Object> memberVariablesMap = scoringSingletonObj.createMemberVariableValueMap("SearsTesting2", modelIdsList);
 		Map<String, Change> changedMemberVariablesMap = scoringSingletonObj.createChangedVariablesMap("SearsTesting2");
 		Map<String, Change> changedMemVariablesStrategy = scoringSingletonObj.executeStrategy(changedMemberVariablesMap, newChangesVarValueMap, memberVariablesMap);
 		List<Double> newScoreListActual = new LinkedList<Double>();
@@ -662,7 +662,7 @@ public class ScoringSingletonIntegrationTest {
 		variableNameToStrategyMapContents.set(scoringSingletonObj, variableNameToStrategyMapContentsMap);
 		
 		Set<Integer> modelIdsList = scoringSingletonObj.getModelIdList(newChangesVarValueMap);
-		Map<String, Object> memberVariablesMap = scoringSingletonObj.createVariableValueMap("SearsTesting8", modelIdsList);
+		Map<String, Object> memberVariablesMap = scoringSingletonObj.createMemberVariableValueMap("SearsTesting8", modelIdsList);
 		Map<String, Change> changedMemberVariablesMap = scoringSingletonObj.createChangedVariablesMap("SearsTesting8");
 		Map<String, Change> changedMemVariablesStrategy = scoringSingletonObj.executeStrategy(changedMemberVariablesMap, newChangesVarValueMap, memberVariablesMap);
 		List<Double> newScoreListActual = new LinkedList<Double>();
@@ -769,7 +769,7 @@ public class ScoringSingletonIntegrationTest {
 			variableNameToStrategyMapContents.set(scoringSingletonObj, variableNameToStrategyMapContentsMap);
 			
 			Set<Integer> modelIdsList = scoringSingletonObj.getModelIdList(newChangesVarValueMap);
-			Map<String, Object> memberVariablesMap = scoringSingletonObj.createVariableValueMap("SearsTesting9", modelIdsList);
+			Map<String, Object> memberVariablesMap = scoringSingletonObj.createMemberVariableValueMap("SearsTesting9", modelIdsList);
 			Map<String, Change> changedMemberVariablesMap = scoringSingletonObj.createChangedVariablesMap("SearsTesting9");
 			Map<String, Change> changedMemVariablesStrategy = scoringSingletonObj.executeStrategy(changedMemberVariablesMap, newChangesVarValueMap, memberVariablesMap);
 			List<Double> newScoreListActual = new LinkedList<Double>();
@@ -850,7 +850,7 @@ public class ScoringSingletonIntegrationTest {
 			variableNameToStrategyMapContents.set(scoringSingletonObj, variableNameToStrategyMapContentsMap);
 			
 			Set<Integer> modelIdsList = scoringSingletonObj.getModelIdList(newChangesVarValueMap);
-			Map<String, Object> memberVariablesMap = scoringSingletonObj.createVariableValueMap("SearsTesting10", modelIdsList);
+			Map<String, Object> memberVariablesMap = scoringSingletonObj.createMemberVariableValueMap("SearsTesting10", modelIdsList);
 			Map<String, Change> changedMemberVariablesMap = scoringSingletonObj.createChangedVariablesMap("SearsTesting10");
 			Map<String, Change> changedMemVariablesStrategy = scoringSingletonObj.executeStrategy(changedMemberVariablesMap, newChangesVarValueMap, memberVariablesMap);
 			List<Double> newScoreListActual = new LinkedList<Double>();
