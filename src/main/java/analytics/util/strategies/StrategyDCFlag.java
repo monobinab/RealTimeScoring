@@ -31,6 +31,7 @@ public class StrategyDCFlag implements Strategy {
 		Object contextPrevVal = context.getPreviousValue();
 		Object contextVal = context.getValue();
 		String text = (String) contextVal;
+		//code might break here if text cannot be parsed to a map
 		HashMap<String, Object> dateDCMap = (HashMap<String, Object>) JsonUtils.restoreDateDCMapFromJson((String) text);
 		Iterator<String> keyIt = dateDCMap.keySet().iterator();
 		Double totalUnexpiredStrength = 0.0;

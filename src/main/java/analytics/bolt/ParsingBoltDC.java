@@ -52,7 +52,8 @@ public class ParsingBoltDC extends BaseRichBolt {
 	private Type varValueType;
 	private MultiCountMetric countMetric;
 	//needs to be removed after development is completed and moved to prod
-	private static final boolean isDemo = false;
+	private static final boolean isTestL_ID = false;
+	private static final boolean isDemoXML = false;
 
 
 	@Override
@@ -122,7 +123,7 @@ public class ParsingBoltDC extends BaseRichBolt {
 	public void parseIncomingMessage(String message) throws ParserConfigurationException, SAXException, IOException, JSONException {
 		JSONObject obj = new JSONObject(message);
 		message = (String) obj.get("xmlRespData");
-		if(isDemo){
+		if(isDemoXML){
 			message = "<soapenv:Envelope xmlns:soapenv=\"http://www.w3.org/2003/05/soap-envelope\"><soapenv:Body><PromptGroupName>DC_Appliance</PromptGroupName><MemberNumber>fake</MemberNumber><AnswerID>bb3300163e00123e11e4211b3aa34650</AnswerID><QuestionTextID>bb3300163e00123e11e4211b3aa234e0</QuestionTextID><AnswerID>bb3300163e00123e11e4211b3aa34650</AnswerID><QuestionTextID>bb3300163e00123e11e4211b3aa234e0</QuestionTextID><AnswerID>bb3300163e00123e11e4211b3aa34650</AnswerID><QuestionTextID>bb3300163e00123e11e4211b3aa234e0</QuestionTextID></soapenv:Body></soapenv:Envelope>"; 
 		}
 		SAXParserFactory factory = SAXParserFactory.newInstance();
@@ -247,7 +248,7 @@ public class ParsingBoltDC extends BaseRichBolt {
 	
 	private void processList(List<JSONObject> answers, String memberId) throws JSONException {
 		String l_id = SecurityUtils.hashLoyaltyId(memberId);
-		if(isDemo){
+		if(isTestL_ID){
 			l_id = "hzuzVKVINbBBen+WGYQT/VJVdwI=";
 		}
 		boolean hasStrength = false;
@@ -261,12 +262,7 @@ public class ParsingBoltDC extends BaseRichBolt {
 			Object strength = dc.getStrength(category, (String) (answers.get(i).get("q_id")), (String) (answers.get(i).get("a_id")));
 			varName = dc.getVarName(category);
 			if (strength != null && varName != null) {
-				if(strength instanceof Integer){
-					strength_sum += ((Integer)strength).doubleValue();;
-				}
-				else if(strength instanceof Double){
-					strength_sum += (Double) strength;
-				}
+				strength_sum += JsonUtils.convertToDouble(strength);
 				if(!hasStrength){
 					hasStrength = true;
 				}	
@@ -274,6 +270,7 @@ public class ParsingBoltDC extends BaseRichBolt {
 		}
 		
 		if(hasStrength){
+			//System.out.println(memberId+" : "+answers);
 			emitToPersistStream(date, category, strength_sum, l_id);
 			emitToScoreStream(date, category, strength_sum, l_id, (String)varName);
 		}

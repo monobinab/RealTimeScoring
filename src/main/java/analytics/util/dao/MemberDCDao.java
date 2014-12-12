@@ -28,7 +28,6 @@ public class MemberDCDao extends AbstractDao {
 	}
 
 	public void addDateDC(String l_id, String obj_str) {
-		// System.out.println(obj_str);
 		DBObject query = new BasicDBObject();
 		DBObject obj = (DBObject) JSON.parse(obj_str);
 		query.put(MongoNameConstants.L_ID, l_id);
@@ -42,22 +41,29 @@ public class MemberDCDao extends AbstractDao {
 			memberDCCollection.update(new BasicDBObject(MongoNameConstants.L_ID, l_id), object, true, false);
 		} else {
 			BasicDBList dateDCList = (BasicDBList) object.get(MongoNameConstants.MT_DATES_ARR);
-			DBObject dc_obj = (DBObject) dateDCList.get(dateDCList.size() - 1);
-			if (dc_obj.get("d").equals(obj.get("d"))) {
-				DBObject dcMap = (BasicDBObject) dc_obj.get("dc");
-				DBObject objMap = (DBObject) obj.get("dc");
-				Set<String> keyset = objMap.keySet();
-				String key = keyset.iterator().next();
-				// type needs to be handled here
-				Object originVal = dcMap.get(key);
-				Object currVal = objMap.get(key);
-				Double originDoub = JsonUtils.convertToDouble(originVal);
-				Double currDoub = JsonUtils.convertToDouble(currVal);
-				dcMap.put(key, originDoub + currDoub);
-			} else {
+			if (dateDCList != null && dateDCList.size() > 0) {
+				DBObject dc_obj = (DBObject) dateDCList.get(dateDCList.size() - 1);
+				if (dc_obj.get("d").equals(obj.get("d"))) {
+					DBObject dcMap = (BasicDBObject) dc_obj.get("dc");
+					DBObject objMap = (DBObject) obj.get("dc");
+					Set<String> keyset = objMap.keySet();
+					String key = keyset.iterator().next();
+					Object originVal = dcMap.get(key);
+					Object currVal = objMap.get(key);
+					if(originVal == null){
+						originVal = 0.0;
+					}
+					Double originDoub = JsonUtils.convertToDouble(originVal);
+					Double currDoub = JsonUtils.convertToDouble(currVal);
+					dcMap.put(key, originDoub + currDoub);
+				}
+				else{
+					//TODO: Eliminate duplicated code
+					dateDCList.add(obj);
+				}
+			} else if(dateDCList != null){
 				dateDCList.add(obj);
 			}
-
 			memberDCCollection.update(new BasicDBObject(MongoNameConstants.L_ID, l_id), object, true, false);
 		}
 
@@ -70,15 +76,19 @@ public class MemberDCDao extends AbstractDao {
 		query.put("l_id", l_id);
 		DBObject object = memberDCCollection.findOne(query);
 		if (object != null) {
-			// TODO: filter by category
 			BasicDBList list = (BasicDBList) object.get("date");
 			for (int i = 0; i < list.size(); i++) {
 				DBObject dateObject = (DBObject) list.get(i);
 				String date = (String) dateObject.get("d");
 				DBObject dc = (DBObject) dateObject.get("dc");
-				DBObject dc_filtered_by_category = new BasicDBObject();
-				//dc_filtered_by_category.put(category, dc.get(category));
-				map.put(date, dc.get(category).toString());
+				//TODO: category here will be changed to an array of category because one var can be affected by multiple categories
+				//DBObject dc_filtered_by_category = new BasicDBObject();
+				// dc_filtered_by_category.put(category, dc.get(category));
+				Object val = dc.get(category);
+				if(val == null){
+					val = 0.0;
+				}
+				map.put(date, val.toString());
 			}
 		}
 		return map;
