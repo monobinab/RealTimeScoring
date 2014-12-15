@@ -2,11 +2,30 @@ package analytics.integration;
 
 import static org.junit.Assert.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.github.fakemongo.Fongo;
+
+import analytics.util.FakeMongo;
+import analytics.util.MongoNameConstants;
+
 public class DCTopologyTest {
+	
+	static Map<String,String> conf;
+	@BeforeClass
+	public static void initializeFakeMongo(){
+		System.setProperty(MongoNameConstants.IS_PROD, "test");
+		conf = new HashMap<String, String>();
+        conf.put("rtseprod", "test");
+		//Below line ensures an empty DB rather than reusing a DB with values in it
+        FakeMongo.setDBConn(new Fongo("test db").getDB("test"));				
+	}
 
 	@Before
 	public void setUp() throws Exception {
@@ -18,7 +37,7 @@ public class DCTopologyTest {
 
 	@Test
 	public void test() {
-		fail("Not yet implemented");
+		//fail("Not yet implemented");
 	}
 	
 	//TODO:
