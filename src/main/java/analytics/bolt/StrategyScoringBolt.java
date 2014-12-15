@@ -140,7 +140,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 
 			// 9) Emit the new score
 			double oldScore = 0;
-			// TODO: Why are we even emiting oldScore if its always 0
+			// TODO: change oldScore to a timestamp of the change to persist to changedMemberScore
 			List<Object> listToEmit = new ArrayList<Object>();
 			listToEmit.add(lId);
 			listToEmit.add(oldScore);
@@ -157,7 +157,6 @@ public class StrategyScoringBolt extends BaseRichBolt {
 			this.outputCollector.emit("score_stream",listToEmit);
 			countMetric.scope("model_scored").incr();
 			} catch (RealTimeScoringException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

@@ -17,10 +17,8 @@ import analytics.exception.RealTimeScoringException;
 import analytics.util.dao.ChangedMemberScoresDao;
 import analytics.util.dao.ChangedMemberVariablesDao;
 import analytics.util.dao.MemberVariablesDao;
-//TODO: update
 import analytics.util.dao.MemberBoostsDao;
 import analytics.util.dao.ModelSywBoostDao;
-//TODO: end update
 import analytics.util.dao.ModelVariablesDao;
 import analytics.util.dao.SourcesDao;
 import analytics.util.dao.VariableDao;
@@ -50,10 +48,8 @@ public class ScoringSingleton {
 	private ModelVariablesDao modelVariablesDao;
 	private static ScoringSingleton instance=null;
 	
-	//TODO: update
 	ModelSywBoostDao modelSywBoostDao;
 	MemberBoostsDao memberBoostsDao;
-	//TODO: end update
 	
 	
 	public static ScoringSingleton getInstance() {
@@ -97,10 +93,8 @@ public class ScoringSingleton {
 		//TODO: Refactor this so that it is a simple DAO method. Variable models map can be populated later
 		modelVariablesDao.populateModelVariables(modelsMap, variableModelsMap);
 
-		//TODO: update
 		modelSywBoostDao = new ModelSywBoostDao();
 		memberBoostsDao = new MemberBoostsDao();
-		//TODO: end update
 		
 		
 	}
@@ -256,35 +250,29 @@ public class ScoringSingleton {
 
 	public double getBoostScore(Map<String, Change> allChanges, Integer modelId) {
 		double boosts = 0;
+		Map<String,Variable> varMap = new HashMap<String,Variable>();
+		
+		if(modelsMap.get(modelId).containsKey(0)) {
+			varMap=modelsMap.get(modelId).get(0).getVariables();
+		} else if (modelsMap.get(modelId).containsKey(Calendar.getInstance().get(Calendar.MONTH) + 1)){
+			varMap=modelsMap.get(modelId).get(Calendar.getInstance().get(Calendar.MONTH) + 1).getVariables();
+		} 
+		if(varMap == null || varMap.isEmpty()) {
+			LOGGER.warn("getBoostScore() variables map is null or empty, modelId: " + modelId);
+			return 0;
+		}
 		if(allChanges != null && modelId != null){
 			for(Map.Entry<String, Change> entry : allChanges.entrySet()){
 				String ch = entry.getKey();
 				Change value = entry.getValue();
 				if(ch.substring(0,5).toUpperCase().equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
-					if(modelsMap.get(modelId).containsKey(0)) {
-						if(modelsMap.get(modelId).get(0).getVariables().containsKey(ch)){
-							Boost boost;
-							if(modelsMap.get(modelId).get(0).getVariables().get(ch) instanceof Boost) {
-								boost = (Boost) modelsMap.get(modelId).get(0).getVariables().get(ch);
-								boosts = boosts 
-										+ boost.getIntercept()
-										+ Double.valueOf(value.getValue().toString()) 
-										* boost.getCoefficient();
-							}
-						}
-					} else {
-						if(modelsMap.get(modelId).containsKey(Calendar.getInstance().get(Calendar.MONTH) + 1)) {
-							if(modelsMap.get(modelId).get(Calendar.getInstance().get(Calendar.MONTH) + 1).getVariables().containsKey(ch)){
-								Boost boost;
-								if(modelsMap.get(modelId).get(Calendar.getInstance().get(Calendar.MONTH) + 1).getVariables().get(ch) instanceof Boost) {
-									boost = (Boost) modelsMap.get(modelId).get(Calendar.getInstance().get(Calendar.MONTH) + 1).getVariables().get(ch);
-									boosts = boosts 
-										+ boost.getIntercept()
-										+ Double.valueOf(value.getValue().toString()) 
-										* boost.getCoefficient();
-								}
-							}		
-						}
+					Boost boost;
+					if(varMap.get(ch) instanceof Boost) {
+						boost = (Boost) varMap.get(ch);
+						boosts = boosts 
+								+ boost.getIntercept()
+								+ Double.valueOf(value.getValue().toString()) 
+								* boost.getCoefficient();
 					}
 				}
 			}
@@ -411,14 +399,12 @@ public class ScoringSingleton {
 	public void updateChangedMemberScore(String l_id, Set<Integer> modelIdList, Map<String, Change> allChanges, Map<Integer,Double> modelIdScoreMap, String source) {
 		Map<Integer, ChangedMemberScore> updatedScores = new HashMap<Integer, ChangedMemberScore>();
 
-		//TODO: update
 		Map<String, Map<String, List<String>>> mbrBoostsMap = memberBoostsDao.getAllMemberBoostValues(l_id);
 		if(mbrBoostsMap!=null && !mbrBoostsMap.isEmpty()) {
 			for(String boost: mbrBoostsMap.keySet()) {
 				modelIdList.remove(modelSywBoostDao.getModelId(boost));
 			}
 		}
-		//TODO: end update
 		
 		for(Integer modelId: modelIdList){
 		// FIND THE MIN AND MAX EXPIRATION DATE OF ALL VARIABLE CHANGES FOR
@@ -469,11 +455,11 @@ public class ScoringSingleton {
 			// APPEND CHANGED SCORE AND MIN/MAX EXPIRATION DATES TO DOCUMENT FOR
 			// UPDATE
 			if(modelIdScoreMap != null && !modelIdScoreMap.isEmpty()){
-			updatedScores.put(modelId, new ChangedMemberScore(modelIdScoreMap.get(modelId),
-					minDate != null ? simpleDateFormat.format(minDate) : null, 
-					maxDate != null ? simpleDateFormat.format(maxDate) : null, 
-					simpleDateFormat.format(new Date()), sourcesMap.get(source)));
-		}
+				updatedScores.put(modelId, new ChangedMemberScore(modelIdScoreMap.get(modelId),
+						minDate != null ? simpleDateFormat.format(minDate) : null, 
+						maxDate != null ? simpleDateFormat.format(maxDate) : null, 
+						simpleDateFormat.format(new Date()), sourcesMap.get(source)));
+			}
 		}
 		if (updatedScores != null && !updatedScores.isEmpty()) {
 			changedMemberScoresDao.upsertUpdateChangedScores(l_id,updatedScores);
