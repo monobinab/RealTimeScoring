@@ -17,6 +17,7 @@ import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.Attributes;
 
 import analytics.util.Constants;
+import analytics.util.DCParserHandler;
 import analytics.util.JsonUtils;
 import analytics.util.MongoNameConstants;
 import analytics.util.SecurityUtils;
@@ -128,122 +129,13 @@ public class ParsingBoltDC extends BaseRichBolt {
 		}
 		SAXParserFactory factory = SAXParserFactory.newInstance();
 		SAXParser saxParser = factory.newSAXParser();
-		DefaultHandler handler = new DefaultHandler() {
-			boolean bq_id = false;
-			boolean ba_id = false;
-			boolean bp_id = false;
-			boolean bm_id = false;
-			String q_id = null;
-			String a_id = null;
-			String promptGroupName = null;
-			String memberId = null;
-			List<JSONObject> answers = new ArrayList<JSONObject>();
-
-			int bq = 0;
-			int ba = 0;
-			int bp = 0;
-			int bm = 0;
-
-			public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-
-				if (qName.contains("QuestionTextID") && !qName.contains("FollowupQuestionTextID")) {
-					bq_id = true;
-					bq++;
-				}
-
-				if (qName.contains("AnswerID") && !qName.contains("FollowupAnswerID")) {
-					ba_id = true;
-					ba++;
-
-				}
-
-				if (qName.contains("PromptGroupName")) {
-					bp_id = true;
-					bp++;
-				}
-
-				if (qName.contains("MemberNumber")) {
-					bm_id = true;
-					bm++;
-				}
-
-			}
-
-			public void characters(char ch[], int start, int length) throws SAXException {
-				String str = new String(ch, start, length);
-				if (bq_id) {
-					q_id = str;// "bb3300163e00123e11e4211b3aa234e0";
-					bq_id = false;
-				}
-
-				if (ba_id) {
-					a_id = str; // "bb3300163e00123e11e4211b3aa34650";
-					ba_id = false;
-				}
-
-				if (bp_id) {
-					promptGroupName = str; // "DC_Appliance";
-					bp_id = false;
-				}
-
-				if (bm_id) {
-					memberId = str;
-					bm_id = false;
-				}
-
-				if (q_id != null && a_id != null && promptGroupName != null && memberId != null) {
-					JSONObject obj = new JSONObject();
-					try {
-						obj.put("promptGroupName", promptGroupName);
-						obj.put("memberId", memberId);
-						obj.put("q_id", q_id);
-						obj.put("a_id", a_id);
-						answers.add(obj);
-					} catch (JSONException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					clear();
-				}
-			}
-
-			public void clear() {
-				q_id = null;
-				a_id = null;
-				bq_id = false;
-				ba_id = false;
-			}
-
-			public void endDocument() throws SAXException {
-
-				if (ba > 1 && bq > 1 && answers.size() < 2) {
-					System.err.println("We are missing it! 2");
-				} else if (ba > 1 && bq > 1 && answers.size() > 1) {
-					//System.out.println("We scored it!");
-					//System.out.println(answers);
-
-				} else if (ba > 1) {
-					System.err.println("We are missing it! 1");
-				}
-				if(answers.size() > 0){
-					countMetric.scope("dc_ValidReply").incr();
-					try {
-						processList(answers, memberId);
-					} catch (JSONException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-
-				q_id = null;
-				a_id = null;
-				promptGroupName = null;
-				memberId = null;
-			}
-
-			
-		};
+		DCParserHandler handler = new DCParserHandler();
 		saxParser.parse(new InputSource(new StringReader(message)), handler);
+		List<JSONObject> answers = handler.getAnswerList();
+		String memberId = handler.getMemberId();
+		if(answers != null && answers.size() > 0 && memberId != null){
+			processList(answers, memberId);
+		}
 	}
 	
 	private void processList(List<JSONObject> answers, String memberId) throws JSONException {
