@@ -1,7 +1,9 @@
 package analytics.util.dao;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,5 +45,18 @@ public class VariableDao extends AbstractDao{
 		}
 		return variables;
 			
+	}
+	
+	public Set<String> getStrategyList() {
+		Set<String> strategyList = new HashSet<String>();
+		DBCursor varCollCursor = variablesCollection.find();
+		String strategy;
+		for(DBObject varDBO: varCollCursor) {
+			strategy = varDBO.get("strategy").toString();
+			if(!"NONE".equals(strategy)) {
+				strategyList.add(strategy);
+			}
+		}
+		return strategyList;
 	}
 }
