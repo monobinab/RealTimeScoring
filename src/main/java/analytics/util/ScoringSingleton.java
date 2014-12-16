@@ -249,9 +249,12 @@ public class ScoringSingleton {
 	}
 
 	public double getBoostScore(Map<String, Change> allChanges, Integer modelId) {
-		double boosts = 0;
+		double boosts = 0.0;
 		Map<String,Variable> varMap = new HashMap<String,Variable>();
 		
+		if(modelsMap.get(modelId)==null||modelsMap.get(modelId).isEmpty()){
+			return boosts;
+		}
 		if(modelsMap.get(modelId).containsKey(0)) {
 			varMap=modelsMap.get(modelId).get(0).getVariables();
 		} else if (modelsMap.get(modelId).containsKey(Calendar.getInstance().get(Calendar.MONTH) + 1)){
@@ -265,7 +268,7 @@ public class ScoringSingleton {
 			for(Map.Entry<String, Change> entry : allChanges.entrySet()){
 				String ch = entry.getKey();
 				Change value = entry.getValue();
-				if(ch.substring(0,5).toUpperCase().equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
+				if(ch.substring(0,MongoNameConstants.BOOST_VAR_PREFIX.length()).toUpperCase().equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
 					Boost boost;
 					if(varMap.get(ch) instanceof Boost) {
 						boost = (Boost) varMap.get(ch);
@@ -333,6 +336,7 @@ public class ScoringSingleton {
 					&& mbrVarMap.get(variableNameToVidMap.get(variable.getName())) != null
 					&& !variable.getName().substring(0, MongoNameConstants.BOOST_VAR_PREFIX.length()).toUpperCase()
 							.equals(MongoNameConstants.BOOST_VAR_PREFIX))) {
+				//Find the value from memberVariables/allChanges
 				if (mbrVarMap.get(variableNameToVidMap.get(variable.getName())) instanceof Integer) {
 					val = val
 							+ ((Integer) calculateVariableValue(mbrVarMap,
@@ -344,7 +348,8 @@ public class ScoringSingleton {
 									variable, allChanges, "Double") * variable
 									.getCoefficient());
 				}
-			} else if (variable.getName() != null && allChanges != null
+			} //This will handle variables not in memberVariables - Eg - value=0
+			else if (variable.getName() != null && allChanges != null
 					&& allChanges.get(variable.getName()) != null) {
 				if (allChanges.get(variable.getName().toUpperCase())
 						.getValue() instanceof Integer) {
@@ -368,16 +373,19 @@ public class ScoringSingleton {
 	}
 
 	private Object calculateVariableValue(Map<String, Object> mbrVarMap,
-			Variable var, Map<String, Change> changes, String dataType) {
+			Variable var, Map<String, Change> allChanges, String dataType) {
 		Object changedValue = null;
-		
+
 		if (var != null) {
-			if (changes != null && changes.containsKey(var.getName().toUpperCase())) {
-				changedValue = changes.get(var.getName().toUpperCase())
+			if (allChanges != null
+					&& allChanges.containsKey(var.getName().toUpperCase())) {
+				changedValue = allChanges.get(var.getName().toUpperCase())
 						.getValue();
 			}
-			if (changedValue == null && variableNameToVidMap.get(var.getName()) != null) {
-				changedValue = mbrVarMap.get(variableNameToVidMap.get(var.getName()));
+			if (changedValue == null
+					&& variableNameToVidMap.get(var.getName()) != null) {
+				changedValue = mbrVarMap.get(variableNameToVidMap.get(var
+						.getName()));
 				if (changedValue == null) {
 					changedValue = 0;
 				}
@@ -396,15 +404,9 @@ public class ScoringSingleton {
 	}
 
 	
-	public void updateChangedMemberScore(String l_id, Set<Integer> modelIdList, Map<String, Change> allChanges, Map<Integer,Double> modelIdScoreMap, String source) {
+	public void updateChangedMemberScore(String l_id, Set<Integer> modelIdList, Map<String, Change> allChanges, 
+			Map<Integer,Double> modelIdScoreMap, String source) {
 		Map<Integer, ChangedMemberScore> updatedScores = new HashMap<Integer, ChangedMemberScore>();
-
-		Map<String, Map<String, List<String>>> mbrBoostsMap = memberBoostsDao.getAllMemberBoostValues(l_id);
-		if(mbrBoostsMap!=null && !mbrBoostsMap.isEmpty()) {
-			for(String boost: mbrBoostsMap.keySet()) {
-				modelIdList.remove(modelSywBoostDao.getModelId(boost));
-			}
-		}
 		
 		for(Integer modelId: modelIdList){
 		// FIND THE MIN AND MAX EXPIRATION DATE OF ALL VARIABLE CHANGES FOR
@@ -466,12 +468,12 @@ public class ScoringSingleton {
 		}	
 	}
 
-	public void updateChangedVariables(String lId, Integer modelId,
+	public void updateChangedVariables(String lId, 
 			Map<String, Change> allChanges) {
 		// 11) Write changedMemberVariables with expiry
 		if ( allChanges != null && !allChanges.isEmpty() ) {
 			// upsert document
-			changedVariablesDao.upsertUpdateChangedScores(lId, allChanges, variableNameToVidMap);
+			changedVariablesDao.upsertUpdateChangedVariables(lId, allChanges, variableNameToVidMap);
 		}
 				
 		

@@ -162,10 +162,9 @@ public class StrategyScoringBolt extends BaseRichBolt {
 		}
 
 		LOGGER.info("TIME:" + messageID + "-Scoring complete-" + System.currentTimeMillis());
-		// 10) Write changedMemberScores with expiry
-		for (Integer modelId : modelIdList) {
-			ScoringSingleton.getInstance().updateChangedVariables(lId, modelId, allChanges);
-		}
+		// 10) Write changedMemberVariableswith expiry
+		ScoringSingleton.getInstance().updateChangedVariables(lId, allChanges);
+		// Write changes to changedMemberScores
 		ScoringSingleton.getInstance().updateChangedMemberScore(lId, modelIdList, allChanges, modelIdScoreMap,source);
 		LOGGER.info("TIME:" + messageID + "-Score updates complete-" + System.currentTimeMillis());
 		List<Object> listToEmit = new ArrayList<Object>();
