@@ -15,10 +15,10 @@ public class StrategyMapper {
 	
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ScoringSingleton.class);
-	private static StrategyMapper strategyMapperInstance;
+	private static StrategyMapper strategyMapperInstance = null;
 	private Map<String, Strategy> strategyMap;
 	
-	public StrategyMapper() {
+	private StrategyMapper() {
 		strategyMap = new HashMap<String, Strategy>();
    		populateStrategyMap();
 	}

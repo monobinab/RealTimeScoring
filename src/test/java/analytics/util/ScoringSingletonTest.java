@@ -699,8 +699,14 @@ public class ScoringSingletonTest {
 	@Test
 	public void executeStrategyWithEmptyChangedMemberVariablesTest() throws SecurityException,
 			NoSuchFieldException, IllegalArgumentException,
-			IllegalAccessException, ParseException {
-
+			IllegalAccessException, ParseException, ConfigurationException {
+		//Fake memberVariables collection
+		DB db = DBConnection.getDBConnection();
+		DBCollection varColl = db.getCollection("Variables");
+		varColl.insert(new BasicDBObject("name", "v1").append("VID", 1).append("strategy","StrategyCountTransactions"));
+		varColl.insert(new BasicDBObject("name", "v2").append("VID", 2).append("strategy","StrategyDaysSinceLast"));
+		varColl.insert(new BasicDBObject("name", "v3").append("VID", 3).append("strategy","StrategyTurnOffFlag"));
+		
 		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
 		newChangesVarValueMap.put("S_DSL_APP_INT_ACC_FTWR_TRS", "0.001");
 		newChangesVarValueMap.put("S_DSL_APP_INT_ACC_FTWR_ALL", "1");
@@ -763,7 +769,12 @@ public class ScoringSingletonTest {
 	@Test
 	public void executeStrategyPositiveCaseTest() throws SecurityException,
 			NoSuchFieldException, IllegalArgumentException,
-			IllegalAccessException, ParseException {
+			IllegalAccessException, ParseException, ConfigurationException {
+		DB db = DBConnection.getDBConnection();
+		DBCollection varColl = db.getCollection("Variables");
+		varColl.insert(new BasicDBObject("name", "v1").append("VID", 1).append("strategy","StrategyCountTransactions"));
+		varColl.insert(new BasicDBObject("name", "v2").append("VID", 2).append("strategy","StrategyDaysSinceLast"));
+		varColl.insert(new BasicDBObject("name", "v3").append("VID", 3).append("strategy","StrategyTurnOffFlag"));
 		
 		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
 		newChangesVarValueMap.put("S_DSL_APP_INT_ACC_FTWR_TRS", "0.001");
