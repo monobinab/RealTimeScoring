@@ -25,7 +25,7 @@ public class ChangedMemberVariablesDao extends AbstractDao{
     	super();
 		changedMemberVariablesCollection = db.getCollection("changedMemberVariables");
     }
-	public void upsertUpdateChangedScores(String lId, Map<String, Change> allChanges, Map<String, String> variableNameToVidMap) {
+	public void upsertUpdateChangedVariables(String lId, Map<String, Change> allChanges, Map<String, String> variableNameToVidMap) {
 		BasicDBObject newDocument = new BasicDBObject();
 		for(String varName:allChanges.keySet()){
 			String varVid = variableNameToVidMap.get(varName.toUpperCase());
