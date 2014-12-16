@@ -1126,7 +1126,7 @@ public class ScoringSingletonTest {
 						expected.getExpirationDateAsString()).append("f",
 						expected.getEffectiveDateAsString())));
 
-		scoringSingletonObj.updateChangedVariables("SearsUpdate3", 35, null);
+		scoringSingletonObj.updateChangedVariables("SearsUpdate3", null);
 		DBObject dbObj = changedMemberVar.findOne(new BasicDBObject("l_id",
 				"SearsUpdate3"));
 		HashMap<String, Object> map = (HashMap<String, Object>) dbObj
@@ -1156,7 +1156,7 @@ public class ScoringSingletonTest {
 						expected.getExpirationDateAsString()).append("f",
 						expected.getEffectiveDateAsString())));
 
-		scoringSingletonObj.updateChangedVariables("SearsUpdate4", null, null);
+		scoringSingletonObj.updateChangedVariables("SearsUpdate4", null);
 		DBObject dbObj = changedMemberVar.findOne(new BasicDBObject("l_id",
 				"SearsUpdate4"));
 		HashMap<String, Object> map = (HashMap<String, Object>) dbObj
@@ -1200,7 +1200,7 @@ public class ScoringSingletonTest {
 		variableNameToVidMap.setAccessible(true);
 		variableNameToVidMap.set(scoringSingletonObj,
 				variableNameToVidMapContents);
-		scoringSingletonObj.updateChangedVariables("SearsUpdate5", null,
+		scoringSingletonObj.updateChangedVariables("SearsUpdate5", 
 				allVarchanges);
 		DBObject dbObject = changedMemberVar.findOne(new BasicDBObject("l_id",
 				"SearsUpdate5"));
@@ -1252,7 +1252,7 @@ public class ScoringSingletonTest {
 		variableNameToVidMap.setAccessible(true);
 		variableNameToVidMap.set(scoringSingletonObj,
 				variableNameToVidMapContents);
-		scoringSingletonObj.updateChangedVariables("SearsUpdate6", 35,
+		scoringSingletonObj.updateChangedVariables("SearsUpdate6",
 				allVarchanges);
 
 		DBObject dbObject = changedMemberVar.findOne(new BasicDBObject("l_id",
@@ -1269,7 +1269,7 @@ public class ScoringSingletonTest {
 				dbObject2.get("f"));
 
 		// Testing insert
-		scoringSingletonObj.updateChangedVariables("Sears2", 35, allVarchanges);
+		scoringSingletonObj.updateChangedVariables("Sears2", allVarchanges);
 		DBObject dbObj = changedMemberVar.findOne(new BasicDBObject("l_id",
 				"Sears2"));
 		HashMap<String, Object> var333Map = (HashMap<String, Object>) dbObject.get("333");
