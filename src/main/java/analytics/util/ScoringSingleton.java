@@ -249,9 +249,12 @@ public class ScoringSingleton {
 	}
 
 	public double getBoostScore(Map<String, Change> allChanges, Integer modelId) {
-		double boosts = 0;
+		double boosts = 0.0;
 		Map<String,Variable> varMap = new HashMap<String,Variable>();
 		
+		if(modelsMap.get(modelId)==null||modelsMap.get(modelId).isEmpty()){
+			return boosts;
+		}
 		if(modelsMap.get(modelId).containsKey(0)) {
 			varMap=modelsMap.get(modelId).get(0).getVariables();
 		} else if (modelsMap.get(modelId).containsKey(Calendar.getInstance().get(Calendar.MONTH) + 1)){
