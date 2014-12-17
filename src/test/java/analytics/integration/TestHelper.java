@@ -40,6 +40,13 @@ public class TestHelper {
 		divLnVariableCollection.insert(new BasicDBObject("d", "07145").append("v", "m_TRIMMERS_EDGERS_history_flg"));
 	
 		DBCollection varCollection = conn.getCollection("Variables");
+		varCollection.insert(new BasicDBObject("name","S_DSL_LG_TRS").append("VID", 88).append("trs_lvl_fl", 0).append("strategy", "StrategyDaysSinceLast"));
+		varCollection.insert(new BasicDBObject("name","S_LG_24M_IND").append("VID", 194).append("trs_lvl_fl", 0).append("strategy", "StrategyTurnOnFlag"));
+		varCollection.insert(new BasicDBObject("name","S_LG_3M_IND").append("VID", 196).append("trs_lvl_fl", 0).append("strategy", "StrategyTurnOnFlag"));
+		varCollection.insert(new BasicDBObject("name","M_TRIMMERS_EDGERS_HISTORY_FLG").append("VID", 596).append("trs_lvl_fl", 0).append("strategy", "StrategyTurnOnFlag"));
+		varCollection.insert(new BasicDBObject("name","S_TOOLS_TL_TRS_3M").append("VID", 290).append("trs_lvl_fl", 0).append("strategy", "StrategyCountTransactions"));
+		varCollection.insert(new BasicDBObject("name","M_WEB_DAY_HAND_TOOL_0_7").append("VID", 606).append("trs_lvl_fl", 0).append("strategy", "StrategyCountTraitDates"));
+		
 		varCollection.insert(new BasicDBObject("name", "v1").append("VID", 1).append("strategy","StrategyCountTransactions"));
 		varCollection.insert(new BasicDBObject("name", "v2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
 		varCollection.insert(new BasicDBObject("name", "v3").append("VID", 3).append("strategy","StrategyCountTraits"));
