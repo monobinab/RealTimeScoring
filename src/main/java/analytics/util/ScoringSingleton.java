@@ -272,6 +272,7 @@ public class ScoringSingleton {
 			return 0;
 		}
 		
+		//create boost to send to calculateBoostValue method
 		Boost blackout = new Boost(MongoNameConstants.BLACKOUT_VAR_PREFIX,0,0);
 		int blackFlag = 0;
 		for(Map.Entry<String, Change> entry : allChanges.entrySet()){
