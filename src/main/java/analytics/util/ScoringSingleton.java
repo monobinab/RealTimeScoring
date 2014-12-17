@@ -252,8 +252,15 @@ public class ScoringSingleton {
 		double boosts = 0.0;
 		Map<String,Variable> varMap = new HashMap<String,Variable>();
 		
-		if(modelsMap.get(modelId)==null||modelsMap.get(modelId).isEmpty()){
-			return boosts;
+		if(modelId == null) {
+			LOGGER.warn("getBoostScore() modelId is null");
+			return 0;
+		} else if (modelsMap.get(modelId)==null || modelsMap.get(modelId).isEmpty()){
+			LOGGER.warn("getBoostScore() modelsMap is null or empty");
+			return 0;
+		} else if (allChanges == null || allChanges.isEmpty()){
+			LOGGER.warn("getBoostScore() allChanges is null or empty");
+			return 0;
 		}
 		if(modelsMap.get(modelId).containsKey(0)) {
 			varMap=modelsMap.get(modelId).get(0).getVariables();
@@ -264,23 +271,36 @@ public class ScoringSingleton {
 			LOGGER.warn("getBoostScore() variables map is null or empty, modelId: " + modelId);
 			return 0;
 		}
-		if(allChanges != null && modelId != null){
-			for(Map.Entry<String, Change> entry : allChanges.entrySet()){
-				String ch = entry.getKey();
-				Change value = entry.getValue();
-				if(ch.substring(0,MongoNameConstants.BOOST_VAR_PREFIX.length()).toUpperCase().equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
-					Boost boost;
-					if(varMap.get(ch) instanceof Boost) {
-						boost = (Boost) varMap.get(ch);
-						boosts = boosts 
-								+ boost.getIntercept()
-								+ Double.valueOf(value.getValue().toString()) 
-								* boost.getCoefficient();
-					}
+		
+		Boost blackout = new Boost(MongoNameConstants.BLACKOUT_VAR_PREFIX,0,0);
+		int blackFlag = 0;
+		for(Map.Entry<String, Change> entry : allChanges.entrySet()){
+			String ch = entry.getKey();
+			Change value = entry.getValue();
+			if(ch.startsWith(MongoNameConstants.BLACKOUT_VAR_PREFIX)) {
+				blackFlag = Integer.valueOf(value.getValue().toString());
+				boosts = calculateBoostValue(boosts, blackFlag, value, blackout);
+			}
+			if(ch.substring(0,MongoNameConstants.BOOST_VAR_PREFIX.length()).toUpperCase()
+					.equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
+				Boost boost;
+				if(varMap.get(ch) instanceof Boost) {
+					boost = (Boost) varMap.get(ch);
+					boosts = calculateBoostValue(boosts, blackFlag, value, boost);
 				}
 			}
 		}
 		return boosts;
+	}
+	
+	private double calculateBoostValue(double boosts, int blackFlag,
+			Change value, Boost boost) {
+		return (
+					boosts 
+					+ boost.getIntercept()
+					+ Double.valueOf(value.getValue().toString()) 
+					* boost.getCoefficient()
+				) * Math.abs(blackFlag - 1); // if flag is on it will be 0 - if flag is off it will be 1
 	}
 	
 	public double calcScore(Map<String, Object> mbrVarMap,

@@ -84,6 +84,9 @@ public class MongoNameConstants {
 	public static final String CMS_SCORE = "s";
 	public static final String CMS_SOURCE = "c";
 	
+	//Blackout variables
+	public static final String BLACKOUT_VAR_PREFIX="BLACKOUT";
+
 	//Member boosts
 	public static final String BOOST_VAR_PREFIX="BOOST";
 	public static final String MBR_BOOSTS_COLLECTION="memberBoosts";
