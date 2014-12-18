@@ -474,6 +474,8 @@ public class ScoringSingleton {
 	
 	public String getModelName(int modelId){
 		int month;
+		if(modelsMap.get(modelId)==null)
+			return "";
 		if (modelsMap.get(modelId).containsKey(0)) {
 			month = 0;
 		} else {

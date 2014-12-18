@@ -32,7 +32,7 @@ public class MemberScoreDao extends AbstractDao {
 		if (dbObj != null && dbObj.keySet() != null) {
 			for (String key : dbObj.keySet()) {
 				// skip expired changes
-				if (MongoNameConstants.L_ID.equals(key) || MongoNameConstants.ID.equals(key)) {
+				if (MongoNameConstants.L_ID.equals(key) || MongoNameConstants.ID.equals(key) || MongoNameConstants.TIMESTAMP.equals(key)) {
 					continue;
 				}
 				else{
