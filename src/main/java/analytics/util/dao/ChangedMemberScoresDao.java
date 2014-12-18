@@ -1,5 +1,7 @@
 package analytics.util.dao;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,7 +32,9 @@ public class ChangedMemberScoresDao extends AbstractDao{
     }
     
 	public void upsertUpdateChangedScores(String lId, Map<Integer, ChangedMemberScore> updatedScores) {
-		BasicDBObject updateRec = new BasicDBObject();
+		SimpleDateFormat timestampForMongo = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
+		String timeStamp = timestampForMongo.format(new Date());
+		BasicDBObject updateRec = new BasicDBObject("t",timeStamp);
 		for(Integer modelId: updatedScores.keySet()){
 			ChangedMemberScore scoreObj = updatedScores.get(modelId);
 			if(scoreObj!=null){
