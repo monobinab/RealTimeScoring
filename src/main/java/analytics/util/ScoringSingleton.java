@@ -447,13 +447,14 @@ public class ScoringSingleton {
 				}
 			}
 			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			String today = simpleDateFormat.format(new Date());
 			// APPEND CHANGED SCORE AND MIN/MAX EXPIRATION DATES TO DOCUMENT FOR
 			// UPDATE
 			if(modelIdScoreMap != null && !modelIdScoreMap.isEmpty()){
 				updatedScores.put(modelId, new ChangedMemberScore(modelIdScoreMap.get(modelId),
-						minDate != null ? simpleDateFormat.format(minDate) : null, 
-						maxDate != null ? simpleDateFormat.format(maxDate) : null, 
-						simpleDateFormat.format(new Date()), sourcesMap.get(source)));
+						minDate != null ? simpleDateFormat.format(minDate) : today, 
+						maxDate != null ? simpleDateFormat.format(maxDate) : today, 
+						simpleDateFormat.format(new Date()), source));
 			}
 		}
 		if (updatedScores != null && !updatedScores.isEmpty()) {
