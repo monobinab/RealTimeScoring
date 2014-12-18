@@ -34,7 +34,7 @@ public class ChangedMemberScoresDao extends AbstractDao{
 	public void upsertUpdateChangedScores(String lId, Map<Integer, ChangedMemberScore> updatedScores) {
 		SimpleDateFormat timestampForMongo = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
 		String timeStamp = timestampForMongo.format(new Date());
-		BasicDBObject updateRec = new BasicDBObject("t",timeStamp);
+		BasicDBObject updateRec = new BasicDBObject();
 		for(Integer modelId: updatedScores.keySet()){
 			ChangedMemberScore scoreObj = updatedScores.get(modelId);
 			if(scoreObj!=null){
@@ -49,6 +49,7 @@ public class ChangedMemberScoresDao extends AbstractDao{
 		}}
 		if(!updateRec.isEmpty())
 		{
+			updateRec.append("t",timeStamp);
 			changedMemberScoresCollection.update(new BasicDBObject(MongoNameConstants.L_ID,
 				lId), new BasicDBObject("$set", updateRec), true,
 				false);
