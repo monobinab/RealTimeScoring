@@ -409,9 +409,11 @@ public class ScoringSingleton {
 			for(Map.Entry<String, Change> entry : allChanges.entrySet()){
 				String key = entry.getKey();
 				Change value = entry.getValue();
-				
+				if(!variableModelsMap.containsKey(key)){
+					LOGGER.error("Could not find variable in map " + key);
+				}
 				// variable models map
-				if (variableModelsMap.get(key).contains(modelId)) {
+				if (variableModelsMap.containsKey(key)&&variableModelsMap.get(key).contains(modelId)) {
 					Date exprDate = value.getExpirationDate();
 					if (minDate == null) {
 						minDate = exprDate;
