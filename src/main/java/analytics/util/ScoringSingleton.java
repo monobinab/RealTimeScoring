@@ -252,8 +252,15 @@ public class ScoringSingleton {
 		double boosts = 0.0;
 		Map<String,Variable> varMap = new HashMap<String,Variable>();
 		
-		if(modelsMap.get(modelId)==null||modelsMap.get(modelId).isEmpty()){
-			return boosts;
+		if(modelId == null) {
+			LOGGER.warn("getBoostScore() modelId is null");
+			return 0;
+		} else if (modelsMap.get(modelId)==null || modelsMap.get(modelId).isEmpty()){
+			LOGGER.warn("getBoostScore() modelsMap is null or empty");
+			return 0;
+		} else if (allChanges == null || allChanges.isEmpty()){
+			LOGGER.warn("getBoostScore() allChanges is null or empty");
+			return 0;
 		}
 		if(modelsMap.get(modelId).containsKey(0)) {
 			varMap=modelsMap.get(modelId).get(0).getVariables();
@@ -264,23 +271,37 @@ public class ScoringSingleton {
 			LOGGER.warn("getBoostScore() variables map is null or empty, modelId: " + modelId);
 			return 0;
 		}
-		if(allChanges != null && modelId != null){
-			for(Map.Entry<String, Change> entry : allChanges.entrySet()){
-				String ch = entry.getKey();
-				Change value = entry.getValue();
-				if(ch.substring(0,MongoNameConstants.BOOST_VAR_PREFIX.length()).toUpperCase().equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
-					Boost boost;
-					if(varMap.get(ch) instanceof Boost) {
-						boost = (Boost) varMap.get(ch);
-						boosts = boosts 
-								+ boost.getIntercept()
-								+ Double.valueOf(value.getValue().toString()) 
-								* boost.getCoefficient();
-					}
+		
+		//create boost to send to calculateBoostValue method
+		Boost blackout = new Boost(MongoNameConstants.BLACKOUT_VAR_PREFIX,0,0);
+		int blackFlag = 0;
+		for(Map.Entry<String, Change> entry : allChanges.entrySet()){
+			String ch = entry.getKey();
+			Change value = entry.getValue();
+			if(ch.startsWith(MongoNameConstants.BLACKOUT_VAR_PREFIX)) {
+				blackFlag = Integer.valueOf(value.getValue().toString());
+				boosts = calculateBoostValue(boosts, blackFlag, value, blackout);
+			}
+			if(ch.substring(0,MongoNameConstants.BOOST_VAR_PREFIX.length()).toUpperCase()
+					.equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
+				Boost boost;
+				if(varMap.get(ch) instanceof Boost) {
+					boost = (Boost) varMap.get(ch);
+					boosts = calculateBoostValue(boosts, blackFlag, value, boost);
 				}
 			}
 		}
 		return boosts;
+	}
+	
+	private double calculateBoostValue(double boosts, int blackFlag,
+			Change value, Boost boost) {
+		return (
+					boosts 
+					+ boost.getIntercept()
+					+ Double.valueOf(value.getValue().toString()) 
+					* boost.getCoefficient()
+				) * Math.abs(blackFlag - 1); // if flag is on it will be 0 - if flag is off it will be 1
 	}
 	
 	public double calcScore(Map<String, Object> mbrVarMap,
@@ -332,75 +353,47 @@ public class ScoringSingleton {
 			//need variableNameToVidMap here before mbrVarMap is checked for its variables
 			//String vid = variableNameToVidMap.get(variable.getName());
 			
-			if (variable.getName() != null && (variableNameToVidMap.get(variable.getName()) != null
-					&& mbrVarMap.get(variableNameToVidMap.get(variable.getName())) != null
-					&& !variable.getName().substring(0, MongoNameConstants.BOOST_VAR_PREFIX.length()).toUpperCase()
-							.equals(MongoNameConstants.BOOST_VAR_PREFIX))) {
-				//Find the value from memberVariables/allChanges
-				if (mbrVarMap.get(variableNameToVidMap.get(variable.getName())) instanceof Integer) {
-					val = val
-							+ ((Integer) calculateVariableValue(mbrVarMap,
-									variable, allChanges, "Integer") * variable
-									.getCoefficient());
-				} else if (mbrVarMap.get(variableNameToVidMap.get(variable.getName())) instanceof Double) {
-					val = val
-							+ ((Double) calculateVariableValue(mbrVarMap,
-									variable, allChanges, "Double") * variable
-									.getCoefficient());
-				}
-			} //This will handle variables not in memberVariables - Eg - value=0
-			else if (variable.getName() != null && allChanges != null
-					&& allChanges.get(variable.getName()) != null) {
-				if (allChanges.get(variable.getName().toUpperCase())
-						.getValue() instanceof Integer) {
-					val = val
-							+ ((Integer) calculateVariableValue(mbrVarMap,
-									variable, allChanges, "Integer") * variable
-									.getCoefficient());
-				} else if (allChanges.get(variable.getName().toUpperCase())
-						.getValue() instanceof Double) {
-					val = val
-							+ ((Double) calculateVariableValue(mbrVarMap,
-									variable, allChanges, "Double") * variable
-									.getCoefficient());
-				}
-
+			//if variable does not have a name then skip it
+			if (variable.getName() == null) {
+				continue;
+			}
+			//if the variable is a boost variable then skip it
+			if(variable.getName()
+					.substring(0, MongoNameConstants.BOOST_VAR_PREFIX.length()).toUpperCase()
+					.equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
+				continue;
+			}
+			
+			String vid;
+			//if the variable VID cannot be found then skip it
+			if(variableNameToVidMap.get(variable.getName()) != null) {
+				vid = variableNameToVidMap.get(variable.getName());
+			} else {
+				continue;
+			}
+			
+			Object variableValue;
+			//if the variable has been changed then use the changed value
+			//if the variable has not been changed and has a value from memberVariables then use that value
+			//otherwise skip it
+			if(allChanges.containsKey(variable.getName())) {
+				variableValue = allChanges.get(variable.getName().toUpperCase()).getValue();
+			} else if(mbrVarMap.containsKey(vid)) {
+				variableValue = mbrVarMap.get(vid);
+			} else {
+				continue;
+			}
+			
+			
+			if (variableValue instanceof Integer) {
+				val = val + ((Integer) variableValue * variable.getCoefficient());
+			} else if (variableValue instanceof Double) {
+				val = val + ((Double) variableValue * variable.getCoefficient());
 			} else {
 				continue;
 			}
 		}
 		return val;
-	}
-
-	private Object calculateVariableValue(Map<String, Object> mbrVarMap,
-			Variable var, Map<String, Change> allChanges, String dataType) {
-		Object changedValue = null;
-
-		if (var != null) {
-			if (allChanges != null
-					&& allChanges.containsKey(var.getName().toUpperCase())) {
-				changedValue = allChanges.get(var.getName().toUpperCase())
-						.getValue();
-			}
-			if (changedValue == null
-					&& variableNameToVidMap.get(var.getName()) != null) {
-				changedValue = mbrVarMap.get(variableNameToVidMap.get(var
-						.getName()));
-				if (changedValue == null) {
-					changedValue = 0;
-				}
-			} else {
-				if ("Integer".equals(dataType)) {
-					changedValue = (int) Math.round(Double.valueOf(changedValue
-							.toString()));
-				} else {
-					changedValue = Double.parseDouble(changedValue.toString());
-				}
-			}
-		} else {
-			return 0;
-		}
-		return changedValue;
 	}
 
 	

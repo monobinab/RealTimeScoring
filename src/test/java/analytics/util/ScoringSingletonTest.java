@@ -408,6 +408,47 @@ public class ScoringSingletonTest {
 		Assert.assertEquals(0.0, boost);
 	}
 
+	@Test
+	public void getBoostScoreBlackoutSetOn()
+			throws ParseException, SecurityException, NoSuchFieldException,
+			IllegalArgumentException, IllegalAccessException {
+
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd");
+		Change changeBlk1 = new Change("2270", 12,
+				simpleDateFormat.parse("2999-10-21"),
+				simpleDateFormat.parse("2014-10-01"));
+		Change changeBlk2 = new Change("2271", 0.2,
+				simpleDateFormat.parse("2999-10-21"),
+				simpleDateFormat.parse("2014-10-01"));
+
+		Change changeBlk3 = new Change("2272", 1,
+				simpleDateFormat.parse("2999-10-21"),
+				simpleDateFormat.parse("2014-10-01"));
+
+		HashMap<String, Change> allChangesBoostBlk = new HashMap<String, Change>();
+		allChangesBoostBlk.put("BOOST_S_DSL_APP_INT_ACC", changeBlk1);
+		allChangesBoostBlk.put("BOOST_BROWSE_HA_COOK", changeBlk2);
+		allChangesBoostBlk.put("BLACKOUT_HA_COOK", changeBlk3);
+
+		Map<String, Variable> variablesMapBoostBlk = new HashMap<String, Variable>();
+		variablesMapBoostBlk.put("BOOST_BROWSE_HA_COOK", new Boost(
+				"BOOST_BROWSE_HA_COOK", 0.002, 0.1));
+		variablesMapBoostBlk.put("BOOST_S_HOME_6M_IND", new Variable(
+				"BOOST_S_HOME_6M_IND", 1));
+		Map<Integer, Model> monthModelMapBoostBlk = new HashMap<Integer, Model>();
+
+		monthModelMapBoostBlk.put(0, new Model(35, "Model_Name", 0, 5,
+				variablesMapBoostBlk));
+		Map<Integer, Map<Integer, Model>> modelsMapContentBoost = new HashMap<Integer, Map<Integer, Model>>();
+		modelsMapContentBoost.put(35, monthModelMapBoostBlk);
+
+		Field modelsMapBlk = ScoringSingleton.class.getDeclaredField("modelsMap");
+		modelsMapBlk.setAccessible(true);
+		modelsMapBlk.set(scoringSingletonObj, modelsMapContentBoost);
+		double boost = scoringSingletonObj.getBoostScore(allChangesBoostBlk, 35);
+		Assert.assertEquals(0.0, boost);
+	}
+
 	// If the modelsMap month is current month and if it contains the boost
 	// variables
 	@Test
@@ -699,8 +740,19 @@ public class ScoringSingletonTest {
 	@Test
 	public void executeStrategyWithEmptyChangedMemberVariablesTest() throws SecurityException,
 			NoSuchFieldException, IllegalArgumentException,
-			IllegalAccessException, ParseException {
-
+			IllegalAccessException, ParseException, ConfigurationException {
+		//Fake memberVariables collection
+		DB db = DBConnection.getDBConnection();
+		DBCollection varColl = db.getCollection("Variables");
+		varColl.insert(new BasicDBObject("name", "v1").append("VID", 1).append("strategy","StrategyCountTransactions"));
+		varColl.insert(new BasicDBObject("name", "v2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
+		varColl.insert(new BasicDBObject("name", "v3").append("VID", 3).append("strategy","StrategyCountTraits"));
+		varColl.insert(new BasicDBObject("name", "v4").append("VID", 4).append("strategy","StrategyDaysSinceLast"));
+		varColl.insert(new BasicDBObject("name", "v5").append("VID", 5).append("strategy","StrategyTurnOnFlag"));
+		varColl.insert(new BasicDBObject("name", "v6").append("VID", 6).append("strategy","StrategyBoostProductTotalCount"));
+		varColl.insert(new BasicDBObject("name", "v7").append("VID", 7).append("strategy","StrategySumSales"));
+		varColl.insert(new BasicDBObject("name", "v8").append("VID", 8).append("strategy","StrategyTurnOffFlag"));
+		
 		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
 		newChangesVarValueMap.put("S_DSL_APP_INT_ACC_FTWR_TRS", "0.001");
 		newChangesVarValueMap.put("S_DSL_APP_INT_ACC_FTWR_ALL", "1");
@@ -763,7 +815,17 @@ public class ScoringSingletonTest {
 	@Test
 	public void executeStrategyPositiveCaseTest() throws SecurityException,
 			NoSuchFieldException, IllegalArgumentException,
-			IllegalAccessException, ParseException {
+			IllegalAccessException, ParseException, ConfigurationException {
+		DB db = DBConnection.getDBConnection();
+		DBCollection varColl = db.getCollection("Variables");
+		varColl.insert(new BasicDBObject("name", "v1").append("VID", 1).append("strategy","StrategyCountTransactions"));
+		varColl.insert(new BasicDBObject("name", "v2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
+		varColl.insert(new BasicDBObject("name", "v3").append("VID", 3).append("strategy","StrategyCountTraits"));
+		varColl.insert(new BasicDBObject("name", "v4").append("VID", 4).append("strategy","StrategyDaysSinceLast"));
+		varColl.insert(new BasicDBObject("name", "v5").append("VID", 5).append("strategy","StrategyTurnOnFlag"));
+		varColl.insert(new BasicDBObject("name", "v6").append("VID", 6).append("strategy","StrategyBoostProductTotalCount"));
+		varColl.insert(new BasicDBObject("name", "v7").append("VID", 7).append("strategy","StrategySumSales"));
+		varColl.insert(new BasicDBObject("name", "v8").append("VID", 8).append("strategy","StrategyTurnOffFlag"));
 		
 		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
 		newChangesVarValueMap.put("S_DSL_APP_INT_ACC_FTWR_TRS", "0.001");

@@ -1,6 +1,14 @@
 package analytics.util;
 
+import org.apache.commons.configuration.ConfigurationException;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
+
+import com.github.fakemongo.Fongo;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
 
 import junit.framework.Assert;
 import analytics.util.objects.StrategyMapper;
@@ -13,6 +21,22 @@ import analytics.util.strategies.StrategyDaysSinceLast;
 import analytics.util.strategies.StrategyTurnOnFlag;
 
 public class StrategyMapperTest {
+
+	@BeforeClass
+	public static void setup() throws ConfigurationException {
+		System.setProperty("rtseprod", "test");
+		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));
+		DB db = DBConnection.getDBConnection();
+		DBCollection varColl = db.getCollection("Variables");
+		varColl.insert(new BasicDBObject("name", "v1").append("VID", 1).append("strategy","StrategyCountTransactions"));
+		varColl.insert(new BasicDBObject("name", "v2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
+		varColl.insert(new BasicDBObject("name", "v3").append("VID", 3).append("strategy","StrategyCountTraits"));
+		varColl.insert(new BasicDBObject("name", "v4").append("VID", 4).append("strategy","StrategyDaysSinceLast"));
+		varColl.insert(new BasicDBObject("name", "v5").append("VID", 5).append("strategy","StrategyTurnOnFlag"));
+		varColl.insert(new BasicDBObject("name", "v6").append("VID", 6).append("strategy","StrategyBoostProductTotalCount"));
+
+	}
+	
 	@Test
 	public void testGetStrategyCountTransactions() {
 		Strategy s = StrategyMapper.getInstance().getStrategy("StrategyCountTransactions");
