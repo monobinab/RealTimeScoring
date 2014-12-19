@@ -1,6 +1,7 @@
 package analytics.bolt;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -167,6 +168,8 @@ public class StrategyScoringBolt extends BaseRichBolt {
 		// Write changes to changedMemberScores
 		ScoringSingleton.getInstance().updateChangedMemberScore(lId, modelIdList, allChanges, modelIdScoreMap,source);
 		LOGGER.info("TIME:" + messageID + "-Score updates complete-" + System.currentTimeMillis());
+		LOGGER.info("PERSIST: " + new Date() + ": Topology: Changes Scores : lid: " + lId + ": scores: " + modelIdScoreMap);
+		
 		List<Object> listToEmit = new ArrayList<Object>();
 		listToEmit.add(lId);
 		listToEmit.add(source);

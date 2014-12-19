@@ -142,7 +142,7 @@ public class SywScoringBolt extends BaseRichBolt {
 
 		LOGGER.trace(" modelIdToScore map second: " + modelIdToScore + " lid: " + lId);
 		changedMemberVariablesDao.upsertUpdateChangedVariables(lId, varChanges, variableNameToVidMap);
-		
+		LOGGER.info("PERSIST: " + new Date() + ": Topology: Changes Scores : lid: " + lId + ": scores: " + modelIdToScore);
 		
 		updateChangedMemberScore(lId, modelIdToScore,source);
 		List<Object> listToEmit = new ArrayList<Object>();
