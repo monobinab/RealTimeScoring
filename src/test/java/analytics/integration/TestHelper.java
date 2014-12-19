@@ -47,6 +47,15 @@ public class TestHelper {
 		varCollection.insert(new BasicDBObject("name","S_TOOLS_TL_TRS_3M").append("VID", 290).append("trs_lvl_fl", 0).append("strategy", "StrategyCountTransactions"));
 		varCollection.insert(new BasicDBObject("name","M_WEB_DAY_HAND_TOOL_0_7").append("VID", 606).append("trs_lvl_fl", 0).append("strategy", "StrategyCountTraitDates"));
 		
+		varCollection.insert(new BasicDBObject("name", "v1").append("VID", 1).append("strategy","StrategyCountTransactions"));
+		varCollection.insert(new BasicDBObject("name", "v2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
+		varCollection.insert(new BasicDBObject("name", "v3").append("VID", 3).append("strategy","StrategyCountTraits"));
+		varCollection.insert(new BasicDBObject("name", "v4").append("VID", 4).append("strategy","StrategyDaysSinceLast"));
+		varCollection.insert(new BasicDBObject("name", "v5").append("VID", 5).append("strategy","StrategyTurnOnFlag"));
+		varCollection.insert(new BasicDBObject("name", "v6").append("VID", 6).append("strategy","StrategyBoostProductTotalCount"));
+		varCollection.insert(new BasicDBObject("name", "v7").append("VID", 7).append("strategy","StrategySumSales"));
+		varCollection.insert(new BasicDBObject("name", "v8").append("VID", 8).append("strategy","StrategyTurnOffFlag"));
+		
 		DBCollection modelVarCollection = conn.getCollection("modelVariables");
 		String json = "{"+
 				"  \"modelId\" : 59,"+

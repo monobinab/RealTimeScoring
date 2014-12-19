@@ -1,6 +1,7 @@
 package analytics.bolt;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -140,7 +141,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 
 			// 9) Emit the new score
 			double oldScore = 0;
-			// TODO: Why are we even emiting oldScore if its always 0
+			// TODO: change oldScore to a timestamp of the change to persist to changedMemberScore
 			List<Object> listToEmit = new ArrayList<Object>();
 			listToEmit.add(lId);
 			listToEmit.add(oldScore);
@@ -157,18 +158,18 @@ public class StrategyScoringBolt extends BaseRichBolt {
 			this.outputCollector.emit("score_stream",listToEmit);
 			countMetric.scope("model_scored").incr();
 			} catch (RealTimeScoringException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 
 		LOGGER.info("TIME:" + messageID + "-Scoring complete-" + System.currentTimeMillis());
-		// 10) Write changedMemberScores with expiry
-		for (Integer modelId : modelIdList) {
-			ScoringSingleton.getInstance().updateChangedVariables(lId, modelId, allChanges);
-		}
+		// 10) Write changedMemberVariableswith expiry
+		ScoringSingleton.getInstance().updateChangedVariables(lId, allChanges);
+		// Write changes to changedMemberScores
 		ScoringSingleton.getInstance().updateChangedMemberScore(lId, modelIdList, allChanges, modelIdScoreMap,source);
 		LOGGER.info("TIME:" + messageID + "-Score updates complete-" + System.currentTimeMillis());
+		LOGGER.info("PERSIST: " + new Date() + ": Topology: Changes Scores : lid: " + lId + ": scores: " + modelIdScoreMap);
+		
 		List<Object> listToEmit = new ArrayList<Object>();
 		listToEmit.add(lId);
 		listToEmit.add(source);

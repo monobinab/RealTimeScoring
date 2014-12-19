@@ -4,12 +4,16 @@ import analytics.util.Constants;
 import analytics.util.JsonUtils;
 import analytics.util.MongoNameConstants;
 import analytics.util.dao.ChangedMemberScoresDao;
+import analytics.util.dao.ChangedMemberVariablesDao;
 import analytics.util.dao.DCDao;
 import analytics.util.dao.MemberScoreDao;
 import analytics.util.dao.ModelPercentileDao;
 import analytics.util.dao.ModelSywBoostDao;
 import analytics.util.dao.SourcesDao;
+import analytics.util.dao.VariableDao;
+import analytics.util.objects.Change;
 import analytics.util.objects.ChangedMemberScore;
+import analytics.util.objects.Variable;
 import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -18,6 +22,7 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
+import org.apache.commons.collections.iterators.EntrySetMapIterator;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,10 +30,12 @@ import org.slf4j.LoggerFactory;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Map.Entry;
 
 public class SywScoringBolt extends BaseRichBolt {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SywScoringBolt.class);
 	private ChangedMemberScoresDao changedMemberScoresDao;
+	private ChangedMemberVariablesDao changedMemberVariablesDao;
 	private MemberScoreDao memberScoreDao;
 	private ModelSywBoostDao modelBoostDao;
 	private ModelPercentileDao modelPercentileDao;
@@ -42,8 +49,10 @@ public class SywScoringBolt extends BaseRichBolt {
 	private OutputCollector outputCollector;
 	private List<Integer> monthlyModelsMap;
 	private Map<String, String> sourcesMap;
-	private SourcesDao sourcesDao;
 	private MultiCountMetric countMetric;
+	private Map<String,String> variableNameToVidMap;
+	private VariableDao variableDao;
+	
 
 	void initMetrics(TopologyContext context) {
 		countMetric = new MultiCountMetric();
@@ -55,16 +64,25 @@ public class SywScoringBolt extends BaseRichBolt {
 		initMetrics(context);
 		System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
 		outputCollector = collector;
-		sourcesDao = new SourcesDao();
+		variableDao = new VariableDao();
 		// populate the variableVidToNameMap
-		sourcesMap = sourcesDao.getSources();
 		modelPercentileDao = new ModelPercentileDao();
 		memberScoreDao = new MemberScoreDao();
 		changedMemberScoresDao = new ChangedMemberScoresDao();
+		changedMemberVariablesDao = new ChangedMemberVariablesDao();
 		modelBoostDao = new ModelSywBoostDao();
 		sywBoostModelMap = modelBoostDao.getVarModelMap();
 		dcBoostModelMap = new DCDao().getDCModelMap();
 		modelPercentileMap = modelPercentileDao.getModelPercentiles();
+		
+		variableNameToVidMap = new HashMap<String, String>();
+		List<Variable> variables = variableDao.getVariables();
+		for(Variable variable:variables){
+			if (variable.getName() != null && variable.getVid()!= null) {
+				variableNameToVidMap.put(variable.getName(), variable.getVid());
+			}
+		}
+		
 		simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		// TODO: Dont hard code this
 		monthlyModelsMap = new ArrayList<Integer>();
@@ -72,6 +90,7 @@ public class SywScoringBolt extends BaseRichBolt {
 		monthlyModelsMap.add(27);
 		monthlyModelsMap.add(30);
 		monthlyModelsMap.add(59);
+		
 
 	}
 
@@ -98,6 +117,14 @@ public class SywScoringBolt extends BaseRichBolt {
 		// code
 		// 2) Create map of new changes from the input
 		Map<String, Integer> varToCountMap = getVarToCount(input);
+		Map<String, Change> varChanges = new HashMap<String, Change>();
+		Date today = new Date();
+		Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, 7);
+        Date expiry = cal.getTime();  
+		for(Entry<String, Integer> varValue: varToCountMap.entrySet()){
+			varChanges.put(varValue.getKey(), new Change( varValue.getKey(), varValue.getValue(), expiry, today));
+		}
 		LOGGER.trace(" varToCountMap: " + varToCountMap + " lid: " + lId);
 		// boost_syw... hand_tools_tcount
 		// boost_syw... tools_tcount
@@ -114,6 +141,9 @@ public class SywScoringBolt extends BaseRichBolt {
 		//outputCollector.ack(input);
 
 		LOGGER.trace(" modelIdToScore map second: " + modelIdToScore + " lid: " + lId);
+		changedMemberVariablesDao.upsertUpdateChangedVariables(lId, varChanges, variableNameToVidMap);
+		LOGGER.info("PERSIST: " + new Date() + ": Topology: Changes Scores : lid: " + lId + ": scores: " + modelIdToScore);
+		
 		updateChangedMemberScore(lId, modelIdToScore,source);
 		List<Object> listToEmit = new ArrayList<Object>();
 		listToEmit.add(lId);
@@ -142,7 +172,6 @@ public class SywScoringBolt extends BaseRichBolt {
 
 	private Map<Integer, String> insertModelToScoreUpdate(String lId, String source, String messageID, Map<String, Integer> varToCountMap, Map<Integer, String> modelIdToScore,
 			String v, String oldScore, int boostPercetages, int modelId) {
-		System.out.println("source"+source);
 		if (modelIdToScore == null || modelIdToScore.get(modelId) == null) {
 			// Getting next model since current one does not have score
 			return modelIdToScore;
@@ -245,7 +274,6 @@ public class SywScoringBolt extends BaseRichBolt {
 	}
 
 	private Map<String, Integer> getVarToCount(Tuple input) {
-		simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
 		Map<String, String> newChangesVarValueMap = JsonUtils.restoreVariableListFromJson(input.getString(1));
 		Map<String, Integer> varToCountMap = new HashMap<String, Integer>();
@@ -314,11 +342,11 @@ public class SywScoringBolt extends BaseRichBolt {
 					maxDate = lastDayOfMonth;
 				}
 			}
-			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			String today = simpleDateFormat.format(new Date());
 			// APPEND CHANGED SCORE AND MIN/MAX EXPIRATION DATES TO DOCUMENT FOR
 			// UPDATE
-			updatedScores.put(modelId, new ChangedMemberScore(Double.parseDouble(modelIdToScore.get(modelId)), minDate != null ? simpleDateFormat.format(minDate) : null,
-					maxDate != null ? simpleDateFormat.format(maxDate) : null, simpleDateFormat.format(new Date()), sourcesMap.get(source)));
+			updatedScores.put(modelId, new ChangedMemberScore(Double.parseDouble(modelIdToScore.get(modelId)), minDate != null ? simpleDateFormat.format(minDate) : today,
+					maxDate != null ? simpleDateFormat.format(maxDate) : today, simpleDateFormat.format(new Date()), source));
 		}
 		if (updatedScores != null && !updatedScores.isEmpty()) {
 			changedMemberScoresDao.upsertUpdateChangedScores(lId, updatedScores);

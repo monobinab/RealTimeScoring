@@ -1,5 +1,7 @@
 package analytics.util.dao;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,6 +32,8 @@ public class ChangedMemberScoresDao extends AbstractDao{
     }
     
 	public void upsertUpdateChangedScores(String lId, Map<Integer, ChangedMemberScore> updatedScores) {
+		SimpleDateFormat timestampForMongo = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
+		String timeStamp = timestampForMongo.format(new Date());
 		BasicDBObject updateRec = new BasicDBObject();
 		for(Integer modelId: updatedScores.keySet()){
 			ChangedMemberScore scoreObj = updatedScores.get(modelId);
@@ -45,6 +49,7 @@ public class ChangedMemberScoresDao extends AbstractDao{
 		}}
 		if(!updateRec.isEmpty())
 		{
+			updateRec.append("t",timeStamp);
 			changedMemberScoresCollection.update(new BasicDBObject(MongoNameConstants.L_ID,
 				lId), new BasicDBObject("$set", updateRec), true,
 				false);
@@ -61,7 +66,7 @@ public class ChangedMemberScoresDao extends AbstractDao{
 		if (dbObj != null && dbObj.keySet() != null) {
 			for (String key : dbObj.keySet()) {
 				// skip expired changes
-				if (MongoNameConstants.L_ID.equals(key) || MongoNameConstants.ID.equals(key)) {
+				if (MongoNameConstants.L_ID.equals(key) || MongoNameConstants.ID.equals(key) || MongoNameConstants.TIMESTAMP.equals(key)) {
 					continue;
 				}
 				else{
