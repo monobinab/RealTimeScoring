@@ -43,18 +43,20 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
+import com.mongodb.DB;
 
 public class ParsingBoltDC extends BaseRichBolt {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ParsingBoltDC.class);
 	private static final long serialVersionUID = 1L;
 	private OutputCollector outputCollector;
-	private DCDao dc;
+	private DCDao dc = new DCDao();
 	private MemberDCDao memberDCDao;
 	private Type varValueType;
 	private MultiCountMetric countMetric;
 	//needs to be removed after development is completed and moved to prod
 	private static final boolean isTestL_ID = false;
 	private static final boolean isDemoXML = false;
+	private static boolean isTest = false;
 
 
 	@Override
@@ -83,30 +85,10 @@ public class ParsingBoltDC extends BaseRichBolt {
 		context.registerMetric("custom_metrics", countMetric, Constants.METRICS_INTERVAL);
 	}
 
-	private void emitFakeData() {
-		List<Object> listToEmit = new ArrayList<Object>();
-		Gson gson = new Gson();
-		HashMap<String, String> variableValueMap = new HashMap<String, String>();
-		HashMap<String, List<String>> strengthMap = new HashMap<String, List<String>>();
-		List<String> list = new ArrayList<String>();
-		list.add("1");
-		strengthMap.put("current", list);
-		variableValueMap.put("BOOST_DC_APPLIANCE_SSUM", gson.toJson(strengthMap, varValueType));
-
-		// {"BOOST_SYW_WANT_HA_ALL_TCOUNT":"{\"current\":[\"04254571000P\"]}"}
-		String varValueString = gson.toJson(variableValueMap, varValueType);
-		listToEmit.add("dxo0b7SN1eER9shCSj0DX+eSGag=");
-		listToEmit.add(varValueString);
-		listToEmit.add("DC");
-		LOGGER.info("Emitted message");
-		outputCollector.emit("persist_stream",listToEmit);
-	}
-
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
 		this.outputCollector = collector;
 		System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
-		dc = new DCDao();
 		memberDCDao = new MemberDCDao();
 		initMetrics(context);
 		LOGGER.info("DC Bolt Preparing to Launch");
@@ -138,7 +120,7 @@ public class ParsingBoltDC extends BaseRichBolt {
 		}
 	}
 	
-	private void processList(List<JSONObject> answers, String memberId) throws JSONException {
+	protected Double processList(List<JSONObject> answers, String memberId) throws JSONException {
 		String l_id = SecurityUtils.hashLoyaltyId(memberId);
 		if(isTestL_ID){
 			l_id = "hzuzVKVINbBBen+WGYQT/VJVdwI=";
@@ -161,11 +143,16 @@ public class ParsingBoltDC extends BaseRichBolt {
 			}
 		}
 		
-		if(hasStrength){
+		if(hasStrength && !isTest){
 			//System.out.println(memberId+" : "+answers);
 			emitToPersistStream(date, category, strength_sum, l_id);
 			emitToScoreStream(date, category, strength_sum, l_id, (String)varName);
 		}
+		return strength_sum;
+	}
+	
+	protected void setDB(DB db){
+		dc.setDB(db);
 	}
 	
 	public void emitToPersistStream(String date, String category, Double strength_sum, String l_id) throws JSONException{
@@ -206,5 +193,9 @@ public class ParsingBoltDC extends BaseRichBolt {
 		countMetric.scope("dc_EmittedToScoring").incr();
 		LOGGER.info("Emitted message to score stream");
 		
+	}
+	
+	protected void setToTestMode(){
+		isTest = true;
 	}
 }
