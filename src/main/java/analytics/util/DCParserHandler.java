@@ -120,13 +120,8 @@ public class DCParserHandler extends DefaultHandler {
 	}
 
 	public void endDocument() throws SAXException {
-
-		if (ba > 1 && bq > 1 && answers.size() < 2) {
-			System.err.println("We are missing it!");
-		} else if (ba > 1 && bq > 1 && answers.size() > 1) {
-			// System.out.println("We scored it!");
-			// System.out.println(answers);
-		}
+		ba = 0;
+		bq = 0;
 	}
 	
 	public List<JSONObject> getAnswerList(){

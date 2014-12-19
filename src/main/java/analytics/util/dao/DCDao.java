@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import analytics.util.MongoNameConstants;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
@@ -24,15 +25,22 @@ public class DCDao extends AbstractDao {
 		dcQAStrengths = db.getCollection(MongoNameConstants.DC_QA_STRENGTHS); // MongoNameConstants.PID_DIV_LN_COLLECTION
 		dcModel = db.getCollection("dcModel");// TODO: add constant
 	}
+	
+	public void setDB(DB db){
+		this.db = db;
+		dcQAStrengths = db.getCollection(MongoNameConstants.DC_QA_STRENGTHS); // MongoNameConstants.PID_DIV_LN_COLLECTION
+		dcModel = db.getCollection("dcModel");// TODO: add constant
+	}
 
 	public Object getStrength(String promptGroupName, String question_id, String answer_id) {
 		BasicDBObject query = new BasicDBObject();
 		query.put("q", question_id.toLowerCase());
 		query.put("a", answer_id.toLowerCase());
 		query.put("c", promptGroupName);
-		
 		if (dcQAStrengths != null) {
 			DBObject obj = dcQAStrengths.findOne(query);
+			System.out.println(query);
+			System.out.println("QA:"+obj);
 			if (obj != null) {
 				//System.out.println("strength:"+ obj.get("s"));
 				return obj.get("s");
@@ -55,7 +63,7 @@ public class DCDao extends AbstractDao {
 		}
 		return null;
 	}
-	
+	//not using this method for now, might need it after change of data-base schema
 	public Map<String, List<Object>> getDCModelMap(){
 		DBCollection dcModel =  db.getCollection("dcModel");
 		Map<String, List<Object>> varModelMap = new HashMap<String, List<Object>>();
