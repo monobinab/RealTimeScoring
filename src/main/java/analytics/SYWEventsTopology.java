@@ -6,8 +6,10 @@ import org.slf4j.LoggerFactory;
 import analytics.bolt.MemberPublishBolt;
 import analytics.bolt.ParsingBoltSYW;
 import analytics.bolt.PersistBoostsBolt;
+import analytics.bolt.PersistDCBolt;
 import analytics.bolt.ProcessSYWInteractions;
 import analytics.bolt.ScorePublishBolt;
+import analytics.bolt.StrategyScoringBolt;
 import analytics.bolt.SywScoringBolt;
 import analytics.spout.SYWRedisSpout;
 import analytics.util.MetricsListener;
@@ -44,6 +46,8 @@ server3=rtsapp403p.prod.ch4.s.com
  */
 		toplologyBuilder.setSpout("SYWEventsSpout", new SYWRedisSpout(
 				"rtsapp401p.prod.ch4.s.com", TopicConstants.PORT, "SYW_Interactions"), 1);
+		//rtsapp302p.qa.ch3.s.com
+		//
 		// Parse the JSON
 		toplologyBuilder.setBolt("ParseEventsBolt", new ParsingBoltSYW(), 1)
 				.shuffleGrouping("SYWEventsSpout");
@@ -51,9 +55,10 @@ server3=rtsapp403p.prod.ch4.s.com
 		toplologyBuilder.setBolt("ProcessSYWEvents",
 				new ProcessSYWInteractions(), 4).shuffleGrouping(
 				"ParseEventsBolt");
-		toplologyBuilder.setBolt("scoringBolt", new SywScoringBolt(), 1).shuffleGrouping("ProcessSYWEvents");
+		toplologyBuilder.setBolt("scoringBolt", new StrategyScoringBolt(), 1).shuffleGrouping("ProcessSYWEvents", "score_stream");
 		//TODO: Persist is still being fixed
-		toplologyBuilder.setBolt("persistBolt", new PersistBoostsBolt(), 1).shuffleGrouping("ProcessSYWEvents");
+		toplologyBuilder.setBolt("persistBolt", new PersistBoostsBolt(), 1).shuffleGrouping("ProcessSYWEvents", "persist_stream");
+
 		toplologyBuilder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 1).shuffleGrouping("scoringBolt", "score_stream");
 		toplologyBuilder.setBolt("member_publish_bolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 2).shuffleGrouping("scoringBolt", "member_stream");
 		Config conf = new Config();

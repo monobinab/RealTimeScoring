@@ -3,9 +3,14 @@ package analytics.bolt;
 import analytics.util.MongoNameConstants;
 import analytics.util.SywApiCalls;
 import analytics.util.dao.BoostDao;
+import analytics.util.dao.ChangedMemberScoresDao;
 import analytics.util.dao.DivLnBoostDao;
 import analytics.util.dao.MemberBoostsDao;
+import analytics.util.dao.MemberScoreDao;
+import analytics.util.dao.ModelPercentileDao;
+import analytics.util.dao.ModelSywBoostDao;
 import analytics.util.dao.PidDivLnDao;
+import analytics.util.objects.ChangedMemberScore;
 import analytics.util.objects.DivLn;
 import analytics.util.objects.SYWEntity;
 import analytics.util.objects.SYWInteraction;
@@ -36,8 +41,7 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(ProcessSYWInteractions.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ProcessSYWInteractions.class);
 	private List<String> entityTypes;
 	private OutputCollector outputCollector;
 	private PidDivLnDao pidDivLnDao;
@@ -46,16 +50,23 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 	private Map<String, List<String>> divLnBoostVariblesMap;
 	private BoostDao boostDao;
 	private MemberBoostsDao memberBoostsDao;
+	private MemberScoreDao memberScoreDao;
+	private ChangedMemberScoresDao changedMemberScoresDao;
+	private ModelPercentileDao modelPercentileDao;
+	private ModelSywBoostDao modelBoostDao;
 	Map<String, List<String>> boostListMap;
+	private Map sywBoostModelMap;
 	private MultiCountMetric countMetric;
-	 void initMetrics(TopologyContext context){
-	     countMetric = new MultiCountMetric();
-	     context.registerMetric("custom_metrics", countMetric, 60);
-	    }
+	private static final int percentile = 90;
+
+	void initMetrics(TopologyContext context) {
+		countMetric = new MultiCountMetric();
+		context.registerMetric("custom_metrics", countMetric, 60);
+	}
+
 	@Override
-	public void prepare(Map stormConf, TopologyContext context,
-			OutputCollector collector) {
-        System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
+		System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
 		this.outputCollector = collector;
 		sywApiCalls = new SywApiCalls();
 
@@ -63,9 +74,14 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 		divLnBoostDao = new DivLnBoostDao();
 		boostDao = new BoostDao();
 		memberBoostsDao = new MemberBoostsDao();
+		memberScoreDao = new MemberScoreDao();
+		changedMemberScoresDao = new ChangedMemberScoresDao();
+		modelPercentileDao = new ModelPercentileDao();
+		modelBoostDao = new ModelSywBoostDao();
 		entityTypes = new ArrayList<String>();
 		entityTypes.add("Product");
 		divLnBoostVariblesMap = divLnBoostDao.getDivLnBoost();
+		sywBoostModelMap = modelBoostDao.getVarModelMap();
 		List<String> feeds = new ArrayList<String>();
 		feeds.add("SYW_LIKE");
 		feeds.add("SYW_OWN");
@@ -79,16 +95,21 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 		countMetric.scope("incoming_record").incr();
 		String feedType = null;
 		// Get l_id", "message", "InteractionType" from parsing bolt
-		/*SYWInteraction obj = (SYWInteraction) input
-				.getValueByField("message");*/
+		/*
+		 * SYWInteraction obj = (SYWInteraction) input
+		 * .getValueByField("message");
+		 */
 		String lId = input.getStringByField("l_id");
 		JsonParser parser = new JsonParser();
 		JsonObject interactionObject = parser.parse(input.getStringByField("message")).getAsJsonObject();
-		/*JsonObject interactionObject = (JsonObject) input
-				.getValueByField("message");*/
-		
+		/*
+		 * JsonObject interactionObject = (JsonObject) input
+		 * .getValueByField("message");
+		 */
+
 		Gson gson = new Gson();
-		SYWInteraction obj = gson.fromJson(interactionObject,SYWInteraction.class);
+		SYWInteraction obj = gson.fromJson(interactionObject, SYWInteraction.class);
+
 
 		/* Ignore interactions that we dont want. */
 		/*
@@ -99,16 +120,18 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 		for (SYWEntity currentEntity : obj.getEntities()) {
 			if (currentEntity != null) {
 				if ("Catalog".equals(currentEntity.getType())) {
-					String catalogType = sywApiCalls
-							.getCatalogType(currentEntity.getId());
+					String catalogType = sywApiCalls.getCatalogType(currentEntity.getId());
 					LOGGER.debug(catalogType);
 					if (catalogType != null) {
-						if (catalogType.equals("Own"))
+						if (catalogType.equals("Own")){
 							feedType = "SYW_OWN";
-						else if (catalogType.equals("Like"))
+						}
+						else if (catalogType.equals("Like")){
 							feedType = "SYW_LIKE";
-						else if (catalogType.equals("Want"))
+						}
+						else if (catalogType.equals("Want")){
 							feedType = "SYW_WANT";
+						}
 					}
 				}
 			}
@@ -130,26 +153,26 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 					LOGGER.debug(currentEntity.getType());
 				// TODO: If more types handle in a more robust manner. If we
 				// expect only Products, this makes sense
-				if (currentEntity != null
-						&& "Product".equals(currentEntity.getType())) {
-					String productId = sywApiCalls.getCatalogId(currentEntity
-							.getId());
+				if (currentEntity != null && "Product".equals(currentEntity.getType())) {
+					String productId = sywApiCalls.getCatalogId(currentEntity.getId());
 					/* Product does not exist? */
 					if (productId == null) {
-						LOGGER.info("Unable to get product id for "
-                                + currentEntity.getId());
+						LOGGER.info("Unable to get product id for " + currentEntity.getId());
 						// Get the next entity
+						System.out.println("no productId");
 						continue;
 					} else {
 						// TODO: We should also handle Kmart items - in which
 						// case it would be divLnItm???
-						DivLn divLnObj = pidDivLnDao
-								.getDivLnFromPid(productId);
-                        LOGGER.trace(" div line for " + productId + " are " + divLnObj+ " lid: " + lId);
+						System.out.println(productId);
+						DivLn divLnObj = pidDivLnDao.getDivLnFromPid(productId);
+						System.out.println(divLnObj);
+						LOGGER.trace(" div line for " + productId + " are " + divLnObj + " lid: " + lId);
 						if (divLnObj != null) {
 							String div = divLnObj.getDiv();
 							String divLn = divLnObj.getDivLn();
 							// Get the boost variable
+							System.out.println("div"+divLnBoostVariblesMap);
 							if (divLnBoostVariblesMap.containsKey(div)) {
 								for (String b : divLnBoostVariblesMap.get(div)) {
 									if (boostListMap.get(feedType).contains(b)) {// If
@@ -159,16 +182,14 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 																					// current
 																					// feed
 										if (!boostValuesMap.containsKey(b)) {
-											boostValuesMap.put(b,
-													new ArrayList<String>());
+											boostValuesMap.put(b, new ArrayList<String>());
 										}
 										boostValuesMap.get(b).add(productId);
 									}
 								}
 							}
 							if (divLnBoostVariblesMap.containsKey(divLn)) {
-								for (String b : divLnBoostVariblesMap
-										.get(divLn)) {
+								for (String b : divLnBoostVariblesMap.get(divLn)) {
 									if (boostListMap.get(feedType).contains(b)) {// If
 																					// it
 																					// belongs
@@ -176,8 +197,7 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 																					// current
 																					// feed
 										if (!boostValuesMap.containsKey(b)) {
-											boostValuesMap.put(b,
-													new ArrayList<String>());
+											boostValuesMap.put(b, new ArrayList<String>());
 										}
 										boostValuesMap.get(b).add(productId);
 									}
@@ -187,8 +207,8 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 						// Eg - BOOST_SYW_APP_LIKETCOUNT
 						// divLnBoost -
 						// d:004 , b:BOOST_SYW_APP_LIKETCOUNT
-						// 004                        
-                        LOGGER.trace(" boost value map :" + boostValuesMap+ " lid: " + lId);
+						// 004
+						LOGGER.trace(" boost value map :" + boostValuesMap + " lid: " + lId);
 					}
 
 				}
@@ -196,11 +216,13 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 			}
 		}
 		// Get the memberBoostVariables for current lid. Consolidate into a map
-		Map<String, Map<String, List<String>>> allBoostValuesMap = memberBoostsDao
-				.getMemberBoostsValues(lId, boostValuesMap.keySet());
+		Map<String, Map<String, List<String>>> allBoostValuesMap = memberBoostsDao.getMemberBoostsValues(lId, boostValuesMap.keySet());
 		if (allBoostValuesMap == null) {
 			allBoostValuesMap = new HashMap<String, Map<String, List<String>>>();
 		}
+		
+		System.out.println(boostValuesMap);
+		System.out.println(allBoostValuesMap);
 
 		for (String b : boostValuesMap.keySet()) {
 			if (allBoostValuesMap.containsKey(b)) {
@@ -212,27 +234,80 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 			variableValueMap.put(b, createJsonDoc(allBoostValuesMap.get(b)));
 		}
 		if (variableValueMap != null && !variableValueMap.isEmpty()) {
+			System.out.println(input);
 			Type varValueType = new TypeToken<Map<String, String>>() {
 				private static final long serialVersionUID = 1L;
 			}.getType();
 			String varValueString = gson.toJson(variableValueMap, varValueType);
-			List<Object> listToEmit = new ArrayList<Object>();
-			listToEmit.add(input.getValueByField("l_id"));
-			listToEmit.add(varValueString);
-			listToEmit.add(feedType);
-			LOGGER.debug(" @@@ SYW PARSING BOLT EMITTING: " + listToEmit+ " lid: " + lId);
-			this.outputCollector.emit(listToEmit);
+			List<Object> listToEmit1 = new ArrayList<Object>();
+			listToEmit1.add(input.getValueByField("l_id"));
+			listToEmit1.add(varValueString);
+			listToEmit1.add(feedType);
+			LOGGER.debug(" @@@ SYW PARSING BOLT EMITTING: " + listToEmit1 + " lid: " + lId);
+			this.outputCollector.emit("persist_stream", listToEmit1);
+
+			List<Object> listToEmit2 = new ArrayList<Object>();
+			Map<String, String> map = formMapForScoringBolt(feedType, lId, variableValueMap);
+			listToEmit2.add(input.getValueByField("l_id"));
+			// TODO: varValueType to be determined
+			listToEmit2.add(gson.toJson(map, varValueType));
+			listToEmit2.add(feedType);
+			this.outputCollector.emit("score_stream", listToEmit2);
 			countMetric.scope("successful").incr();
-		}
-		else{
+
+		} else {
 			countMetric.scope("empty_var_map").incr();
 		}
 		this.outputCollector.ack(input);
 	}
 
+	public Map<String, String> formMapForScoringBolt(String feedType, String lId, Map<String, String> variableValueMap) {
+		Map<String, String> memberScores = memberScoreDao.getMemberScores(lId);
+		Map<String, ChangedMemberScore> changedMemberScores = changedMemberScoresDao.getChangedMemberScores(lId);
+		Map<Integer, Map<Integer, Double>> percentileScores = modelPercentileDao.getModelPercentiles();
+		Map<String, String> varValToScore = new HashMap<String, String>();
+		for(String variableName : variableValueMap.keySet()){
+			
+			Object modelIdObj= sywBoostModelMap.get(variableName);
+			if (modelIdObj instanceof Integer) {
+				int modelId = (Integer)modelIdObj;
+				double memberScore = Double.valueOf(memberScores.get(modelId));
+				double changedMemberScore= changedMemberScores.get(modelId).getScore();
+				double percentileScore = percentileScores.get(modelId).get(percentile);
+				double val = 0;
+				
+				if ("SYW_LIKE".equals(feedType) || "SYW_WANT".equals(feedType)) {
+//					Find the current memberScore
+//					Find the 90% percentile score
+//					Set the difference of 90% percentile score and memberScore as value of variable. If difference is below 0, set it as 0
+//					Set intercept = 0, coefficient = 1
+//					If member has changedmemberscores from other feeds, they would end up slightly above 9
+					//TODO: check logic with Devika
+					double difference = percentileScore - memberScore;
+					if(difference < 0)
+						difference = 0;
+					varValToScore.put(variableName, String.valueOf(val));
+				} else if ("SYW_OWN".equals(feedType)) {
+					double greater = Math.max(memberScore, changedMemberScore);
+					if(greater >= 50){
+						val = percentileScore - greater;
+						if(val > 0)
+							val *= (-1);
+						varValToScore.put(variableName, String.valueOf(val));
+					}
+				}
+			}
+		}
+
+		return varValToScore;
+	}
+
+	
+
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("l_id", "lineItemAsJsonString", "source"));
+		declarer.declareStream("score_stream", new Fields("l_id", "lineItemAsJsonString", "source"));
+		declarer.declareStream("persist_stream", new Fields("l_id", "lineItemAsJsonString", "source"));
 	}
 
 	private String createJsonDoc(Map<String, List<String>> dateValuesMap) {

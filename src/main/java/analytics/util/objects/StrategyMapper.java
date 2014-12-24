@@ -46,7 +46,8 @@ public class StrategyMapper {
     	Strategy strategy;
     	
     	for(String s: strategyList) {
-    		if(s.startsWith("StrategySyw"))continue;
+    		//TODO: remove this line after the strategy is added
+    		//if(s.startsWith("StrategySyw"))continue;
     		String fullyQualifiedName = "analytics.util.strategies."+s;
     		Class<?> strategyClass;
 			try {

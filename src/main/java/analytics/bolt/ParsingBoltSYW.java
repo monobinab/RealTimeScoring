@@ -46,7 +46,7 @@ public class ParsingBoltSYW extends BaseRichBolt {
 		
 		//TODO: This is where more interactions are added. 	
 		//Master list of interactions we process
-		//listOfInteractionsForRTS.add("Like");
+		listOfInteractionsForRTS.add("Like");
 		listOfInteractionsForRTS.add("AddToCatalog"); 
 		initMetrics(context);
 	}
