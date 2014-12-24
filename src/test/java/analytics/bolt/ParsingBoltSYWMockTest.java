@@ -45,7 +45,7 @@ public class ParsingBoltSYWMockTest {
         
         boltUnderTest.execute(tuple);
         
-        List<Object> outputTuple = outputCollector.getTuple();
+        List<Object> outputTuple = outputCollector.getTuple().get("main");
         Assert.assertNull(outputTuple);
 	}
 	
@@ -69,7 +69,7 @@ public class ParsingBoltSYWMockTest {
         
         boltUnderTest.execute(tuple);
         
-        List<Object> outputTuple = outputCollector.getTuple();
+        List<Object> outputTuple = outputCollector.getTuple().get("main");
         Assert.assertEquals(lId, outputTuple.get(0));
         Assert.assertEquals(interactionType, outputTuple.get(2));
         Assert.assertEquals(expected, outputTuple.get(1));

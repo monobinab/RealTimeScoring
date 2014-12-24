@@ -63,9 +63,7 @@ public class ParsingBoltDCTest {
 		query.put("c", "DC_1");
 		query.put("q", "q_id_1");
 		query.put("a", "a_id_1");
-		System.out.println(query);
 		DBObject result = (DBObject) dcQAStrength.findOne(query);
-		System.out.println("expecting: " + result);
 	}
 
 	private static void populateDCCollections() {
@@ -93,7 +91,6 @@ public class ParsingBoltDCTest {
 		strengthRecord.put("a", "a_id_" + s);
 		strengthRecord.put("c", "DC_" + s);
 		strengthRecord.put("s", s);
-		System.out.println(strengthRecord);
 		dcQAStrength.insert(strengthRecord);
 	}
 
@@ -243,7 +240,6 @@ public class ParsingBoltDCTest {
 		String memberID = "test";
 		List<JSONObject> answers = createAnswerList(memberID, 0);
 		Double result = bolt.processList(answers, memberID);
-		System.out.println(result);
 		double expected = 1.0;
 		assertEquals(expected, (double) result, 0.0);
 	}
@@ -253,7 +249,6 @@ public class ParsingBoltDCTest {
 		String memberID = "test";
 		List<JSONObject> answers = createAnswerList(memberID, 1);
 		Double result = bolt.processList(answers, memberID);
-		System.out.println(result);
 		double expected = 0.0;
 		assertEquals(expected, (double) result, 0.0);
 	}
@@ -263,7 +258,6 @@ public class ParsingBoltDCTest {
 		String memberID = "test";
 		List<JSONObject> answers = createAnswerList(memberID, 2);
 		Double result = bolt.processList(answers, memberID);
-		System.out.println(result);
 		double expected = 0.0;
 		assertEquals(expected, (double) result, 0.0);
 	}
@@ -273,7 +267,6 @@ public class ParsingBoltDCTest {
 		String memberID = "test";
 		List<JSONObject> answers = createAnswerList(memberID, 3);
 		Double result = bolt.processList(answers, memberID);
-		System.out.println(result);
 		double expected = 2.0;
 		assertEquals(expected, (double) result, 0.0);
 	}

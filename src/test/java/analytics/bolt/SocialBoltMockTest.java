@@ -69,7 +69,7 @@ public class SocialBoltMockTest {
 		
         boltUnderTest.execute(tuple);
         
-        List<Object> outputTuple = outputCollector.getTuple();
+        List<Object> outputTuple = outputCollector.getTuple().get("main");
         
         Assert.assertEquals(expectedLid,outputTuple.get(0));
         Assert.assertEquals(expectedBoostVar, outputTuple.get(1));

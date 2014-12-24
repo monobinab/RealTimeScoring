@@ -55,7 +55,7 @@ public class ProcessSywBoltMockTest {
         
         boltUnderTest.execute(tuple);
         
-        List<Object> outputTuple = outputCollector.getTuple();
+        List<Object> outputTuple = outputCollector.getTuple().get("persist_stream");
         Assert.assertNull(outputTuple);
 	}
 	
@@ -102,8 +102,8 @@ public class ProcessSywBoltMockTest {
         Tuple tuple = StormTestUtils.mockInteractionTuple(lId, interactionString, interactionType);
         
         boltUnderTest.execute(tuple);
-
-        List<Object> outputTuple = outputCollector.getTuple();
+       
+        List<Object> outputTuple = outputCollector.getTuple().get("persist_stream");
         /*[null, {"BOOST_SYW_OWN_HA_ALL_TCOUNT":"{\"current\":[\"02280322000P\"]}","BOOST_SYW_OWN_REGRIG_TCOUNT":"{\"current\":[\"02280322000P\"]}"}, SYW_WANT]*/
         Assert.assertEquals(lId, outputTuple.get(0));
         Assert.assertEquals("SYW_WANT", outputTuple.get(2));

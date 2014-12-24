@@ -119,7 +119,6 @@ public class PersistDCBoltTest {
 		dcObject.remove("DC_Appliance");
 		dcObject.put("DC_Appliance", strength2);
 		json.put("dc", dcObject);
-		System.out.println(json.toString());
 		memberDCDao.addDateDC(l_id, json.toString());
 		Map<String, String> map = memberDCDao.getDateStrengthMap("DC_Appliance", l_id);
 		assertEquals(map.get(date), Double.toString(strength1+strength2));
@@ -138,7 +137,6 @@ public class PersistDCBoltTest {
 		dcObject.remove("DC_Appliance");
 		dcObject.put("DC_Appliance", strength1);
 		json.put("dc", dcObject);
-		System.out.println(json.toString());
 		memberDCDao.addDateDC(l_id, json.toString());
 		Map<String, String> map = memberDCDao.getDateStrengthMap("DC_Appliance", l_id);
 		assertEquals(map.get(date), Double.toString(strength1));
@@ -161,12 +159,10 @@ public class PersistDCBoltTest {
 		DBObject member_object = memberDCCollection.findOne(query);
 		member_object.put("date", new BasicDBList());
 		memberDCCollection.update(new BasicDBObject(MongoNameConstants.L_ID, l_id), member_object, true, false);
-		System.err.println(memberDCCollection.findOne(query));
 		json.put("d", date);
 		dcObject.remove("DC_Appliance");
 		dcObject.put("DC_Appliance", strength1);
 		json.put("dc", dcObject);
-		System.out.println(json.toString());
 		memberDCDao.addDateDC(l_id, json.toString());
 		Map<String, String> map = memberDCDao.getDateStrengthMap("DC_Appliance", l_id);
 		assertEquals(map.get(date), Double.toString(strength1));
@@ -193,7 +189,6 @@ public class PersistDCBoltTest {
 		dcObject.remove("DC_Appliance");
 		dcObject.put("DC_Appliance", strength1);
 		json.put("dc", dcObject);
-		System.out.println(json.toString());
 		memberDCDao.addDateDC(l_id, json.toString());
 		Map<String, String> map = memberDCDao.getDateStrengthMap("DC_Appliance", l_id);
 		assertEquals(map.get(date), Double.toString(strength1));

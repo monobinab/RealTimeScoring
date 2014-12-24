@@ -39,10 +39,7 @@ public class DCDao extends AbstractDao {
 		query.put("c", promptGroupName);
 		if (dcQAStrengths != null) {
 			DBObject obj = dcQAStrengths.findOne(query);
-			System.out.println(query);
-			System.out.println("QA:"+obj);
 			if (obj != null) {
-				//System.out.println("strength:"+ obj.get("s"));
 				return obj.get("s");
 			}
 		}

@@ -34,8 +34,6 @@ public class MemberDCDao extends AbstractDao {
 		DBObject obj = (DBObject) JSON.parse(obj_str);
 		query.put(MongoNameConstants.L_ID, l_id);
 		DBObject object = memberDCCollection.findOne(query);
-		System.out.println(object);
-		System.out.println(db.getName());
 		if (object == null) {
 			BasicDBList dateDCList = new BasicDBList();
 			BasicDBObject dcObject = (BasicDBObject) obj.get("dc");

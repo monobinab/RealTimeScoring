@@ -184,7 +184,7 @@ public class XMLParserTest {
     	 String fileName = noMemberId;
         ProcessTransaction processTransaction = XMLParser.parseXMLProcessTransaction(fileName);
         assertTrue(processTransaction != null);
-        System.out.println(processTransaction.getMemberNumber());
+        //System.out.println(processTransaction.getMemberNumber());
         assertEquals(null,processTransaction.getMemberNumber());
         assertEquals("KCOM",processTransaction.getRequestorID());
         assertTrue(processTransaction.getLineItemList()!=null);
