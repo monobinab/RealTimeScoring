@@ -105,7 +105,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 			LOGGER.error("Can not create member variable map", e1);
 		}
 		if(memberVariablesMap==null){
-			LOGGER.warn("Unable to find member variables for" + lId);
+			LOGGER.warn("Unable to find member variables for " + lId);
 			countMetric.scope("no_membervariables").incr();
 			outputCollector.ack(input);
 			return;

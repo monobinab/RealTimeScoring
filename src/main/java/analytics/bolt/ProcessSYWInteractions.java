@@ -100,6 +100,8 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 		 * .getValueByField("message");
 		 */
 		String lId = input.getStringByField("l_id");
+		String interactionType = input.getStringByField("InteractionType");
+		//lId = "a7V7rU68LLBethrQ3W5+xTff7fo=";
 		JsonParser parser = new JsonParser();
 		JsonObject interactionObject = parser.parse(input.getStringByField("message")).getAsJsonObject();
 		/*
@@ -119,7 +121,9 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 		// Find type of catalog to process, and hence the boost variable
 		for (SYWEntity currentEntity : obj.getEntities()) {
 			if (currentEntity != null) {
+				//TODO: confirm with devika, catalog only has likes, product has all of them
 				if ("Catalog".equals(currentEntity.getType())) {
+					//interactionType
 					String catalogType = sywApiCalls.getCatalogType(currentEntity.getId());
 					LOGGER.debug(catalogType);
 					if (catalogType != null) {
@@ -134,6 +138,11 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 						}
 					}
 				}
+//				else{
+//					if(interactionType.equals("Like")){
+//						feedType = "SYW_LIKE";
+//					}
+//				}
 			}
 		}
 
@@ -159,20 +168,16 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 					if (productId == null) {
 						LOGGER.info("Unable to get product id for " + currentEntity.getId());
 						// Get the next entity
-						System.out.println("no productId");
 						continue;
 					} else {
 						// TODO: We should also handle Kmart items - in which
 						// case it would be divLnItm???
-						System.out.println(productId);
 						DivLn divLnObj = pidDivLnDao.getDivLnFromPid(productId);
-						System.out.println(divLnObj);
 						LOGGER.trace(" div line for " + productId + " are " + divLnObj + " lid: " + lId);
 						if (divLnObj != null) {
 							String div = divLnObj.getDiv();
 							String divLn = divLnObj.getDivLn();
 							// Get the boost variable
-							System.out.println("div"+divLnBoostVariblesMap);
 							if (divLnBoostVariblesMap.containsKey(div)) {
 								for (String b : divLnBoostVariblesMap.get(div)) {
 									if (boostListMap.get(feedType).contains(b)) {// If
@@ -221,9 +226,6 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 			allBoostValuesMap = new HashMap<String, Map<String, List<String>>>();
 		}
 		
-		System.out.println(boostValuesMap);
-		System.out.println(allBoostValuesMap);
-
 		for (String b : boostValuesMap.keySet()) {
 			if (allBoostValuesMap.containsKey(b)) {
 				allBoostValuesMap.get(b).put("current", boostValuesMap.get(b));
@@ -234,7 +236,6 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 			variableValueMap.put(b, createJsonDoc(allBoostValuesMap.get(b)));
 		}
 		if (variableValueMap != null && !variableValueMap.isEmpty()) {
-			System.out.println(input);
 			Type varValueType = new TypeToken<Map<String, String>>() {
 				private static final long serialVersionUID = 1L;
 			}.getType();
@@ -248,8 +249,7 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 
 			List<Object> listToEmit2 = new ArrayList<Object>();
 			Map<String, String> map = formMapForScoringBolt(feedType, lId, variableValueMap);
-			listToEmit2.add(input.getValueByField("l_id"));
-			// TODO: varValueType to be determined
+			listToEmit2.add(lId);
 			listToEmit2.add(gson.toJson(map, varValueType));
 			listToEmit2.add(feedType);
 			this.outputCollector.emit("score_stream", listToEmit2);
@@ -271,8 +271,11 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 			Object modelIdObj= sywBoostModelMap.get(variableName);
 			if (modelIdObj instanceof Integer) {
 				int modelId = (Integer)modelIdObj;
-				double memberScore = Double.valueOf(memberScores.get(modelId));
-				double changedMemberScore= changedMemberScores.get(modelId).getScore();
+				String modelIdStr = String.valueOf(modelId);
+				if(memberScores.get(modelIdStr) == null || percentileScores.get(modelId) == null){
+					return varValToScore;
+				}
+				double memberScore = Double.valueOf(memberScores.get(modelIdStr));
 				double percentileScore = percentileScores.get(modelId).get(percentile);
 				double val = 0;
 				
@@ -288,7 +291,14 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 						difference = 0;
 					varValToScore.put(variableName, String.valueOf(val));
 				} else if ("SYW_OWN".equals(feedType)) {
-					double greater = Math.max(memberScore, changedMemberScore);
+					double greater = memberScore;
+					double changedMemberScore = 0;
+					ChangedMemberScore changedMemberScoreObject = changedMemberScores.get(modelIdStr);
+					if(changedMemberScoreObject != null){
+						changedMemberScore = changedMemberScoreObject.getScore();
+						greater = Math.max(memberScore, changedMemberScore);
+						//System.out.println(greater);
+					}
 					if(greater >= 50){
 						val = percentileScore - greater;
 						if(val > 0)
@@ -298,7 +308,6 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 				}
 			}
 		}
-
 		return varValToScore;
 	}
 
