@@ -738,7 +738,6 @@ public class ScoringSingletonTest {
 	// in executeStrategy(), changedMemberVariables map gets updated with new
 	// values, dates etc
 	@Test
-	@Ignore
 	public void executeStrategyWithEmptyChangedMemberVariablesTest() throws SecurityException,
 			NoSuchFieldException, IllegalArgumentException,
 			IllegalAccessException, ParseException, ConfigurationException {
@@ -814,7 +813,6 @@ public class ScoringSingletonTest {
 	//Note for variables S_DSL_APP_INT_ACC_FTWR_TRS and S_DSL_APP_INT_ACC_FTWR_MEM, exp date and value updated based on strategy
 	//for variable S_DSL_APP_INT_ACC_FTWR_ALL, expiration date and value are from changedMemVariables
 	@Test
-	@Ignore
 	public void executeStrategyPositiveCaseTest() throws SecurityException,
 			NoSuchFieldException, IllegalArgumentException,
 			IllegalAccessException, ParseException, ConfigurationException {
