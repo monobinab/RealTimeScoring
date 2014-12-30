@@ -36,12 +36,12 @@ public class DCParserHandler extends DefaultHandler {
 	}
 
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-
-		if (qName.contains("QuestionTextID") && !qName.contains("FollowupQuestionTextID")) {
+//&& !qName.contains("FollowupQuestionTextID")
+		if (qName.contains("QuestionTextID") ) {
 			bq_id = true;
 		}
-
-		if (qName.contains("AnswerID") && !qName.contains("FollowupAnswerID")) {
+//&& !qName.contains("FollowupAnswerID")
+		if (qName.contains("AnswerID") ) {
 			ba_id = true;
 		}
 
