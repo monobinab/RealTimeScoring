@@ -57,7 +57,6 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 	Map<String, List<String>> boostListMap;
 	private Map sywBoostModelMap;
 	private MultiCountMetric countMetric;
-	private static final int percentile = 90;
 
 	void initMetrics(TopologyContext context) {
 		countMetric = new MultiCountMetric();
@@ -248,7 +247,7 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 			this.outputCollector.emit("persist_stream", listToEmit1);
 
 			List<Object> listToEmit2 = new ArrayList<Object>();
-			Map<String, String> map = formMapForScoringBolt(feedType, lId, variableValueMap);
+			Map<String, String> map = formMapForScoringBolt(feedType, lId, allBoostValuesMap);
 			listToEmit2.add(lId);
 			listToEmit2.add(gson.toJson(map, varValueType));
 			listToEmit2.add(feedType);
@@ -261,12 +260,12 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 		this.outputCollector.ack(input);
 	}
 
-	public Map<String, String> formMapForScoringBolt(String feedType, String lId, Map<String, String> variableValueMap) {
+	public Map<String, String> formMapForScoringBolt(String feedType, String lId, Map<String, Map<String, List<String>>> allBoostValuesMap) {
 		Map<String, String> memberScores = memberScoreDao.getMemberScores(lId);
 		Map<String, ChangedMemberScore> changedMemberScores = changedMemberScoresDao.getChangedMemberScores(lId);
 		Map<Integer, Map<Integer, Double>> percentileScores = modelPercentileDao.getModelPercentiles();
 		Map<String, String> varValToScore = new HashMap<String, String>();
-		for(String variableName : variableValueMap.keySet()){
+		for(String variableName : allBoostValuesMap.keySet()){
 			
 			Object modelIdObj= sywBoostModelMap.get(variableName);
 			if (modelIdObj instanceof Integer) {
@@ -276,8 +275,9 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 					return varValToScore;
 				}
 				double memberScore = Double.valueOf(memberScores.get(modelIdStr));
+				int percentile = getPercentileScore(variableName, allBoostValuesMap, feedType);
 				double percentileScore = percentileScores.get(modelId).get(percentile);
-				double val = 0;
+				double val = 0.0;
 				
 				if ("SYW_LIKE".equals(feedType) || "SYW_WANT".equals(feedType)) {
 					//TODO: Get the count from last 7 days.
@@ -289,31 +289,73 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 //					Set intercept = 0, coefficient = 1
 //					If member has changedmemberscores from other feeds, they would end up slightly above 9
 					//TODO: check logic with Devika
-					double difference = percentileScore - memberScore;
-					if(difference < 0)
-						difference = 0;
+					val = percentileScore - memberScore;
+					if(val < 0)
+						val = 0.0;
 					varValToScore.put(variableName, String.valueOf(val));
 				} else if ("SYW_OWN".equals(feedType)) {
 					double greater = memberScore;
-					double changedMemberScore = 0;
+					double changedMemberScore = 0.0;
 					ChangedMemberScore changedMemberScoreObject = changedMemberScores.get(modelIdStr);
 					if(changedMemberScoreObject != null){
 						changedMemberScore = changedMemberScoreObject.getScore();
 						greater = Math.max(memberScore, changedMemberScore);
 						//System.out.println(greater);
 					}
-					double percentile50Score = percentileScores.get(modelId).get(50);
-					if(greater >= percentile50Score){
-						val = percentile50Score - greater;//This will be negative
-						varValToScore.put(variableName, String.valueOf(val));
+					if(greater >= percentileScore){
+						val = percentileScore - greater;//This will be negative
 					}
-					else{
-						varValToScore.put(variableName, "0.0");
-					}
+					varValToScore.put(variableName, String.valueOf(val));
 				}
 			}
 		}
 		return varValToScore;
+	}
+	
+	
+	public int getPercentileScore(String variableName, Map<String, Map<String, List<String>>> allBoostValuesMap, String interactionType){
+		Map<String, List<String>> boostValueMap = allBoostValuesMap.get(variableName);
+		int numberOfEntries = 0;
+		if(boostValueMap != null){
+			//throw new NullPointerException("No Record Persisted for "+variableName);
+			numberOfEntries = boostValueMap.entrySet().size();
+		}
+		if("SYW_LIKE".equals(interactionType)){
+			//To be discussed whether to throw and exception or put 0 in consideration
+			switch(numberOfEntries){
+				case 0: case 1 : case 2:
+					return 90;
+				case 3: case 4:
+					return 91;
+				case 5: case 6:
+					return 92;
+				case 7: case 8:
+					return 93;
+				//numberOfEntries is always greater than or equal to 0, so default is equivalent to numberOfEntries >8
+				default:
+					return 94;
+			}
+		}
+		else if("SYW_WANT".equals(interactionType)){
+			switch(numberOfEntries){
+			case 0: case 1 : case 2:
+				return 95;
+			case 3: case 4:
+				return 96;
+			case 5: case 6:
+				return 97;
+			case 7: case 8:
+				return 98;
+			//numberOfEntries is always greater than or equal to 0, so default is equivalent to numberOfEntries >8
+			default:
+				return 99;
+			}
+			
+		}
+		else if("SYW_OWN".equals(interactionType)){
+			return 50;
+		}
+		return 0;
 	}
 
 	
