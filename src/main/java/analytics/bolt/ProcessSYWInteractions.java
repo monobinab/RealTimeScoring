@@ -280,6 +280,9 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 				double val = 0;
 				
 				if ("SYW_LIKE".equals(feedType) || "SYW_WANT".equals(feedType)) {
+					//TODO: Get the count from last 7 days.
+					//Based on the count, vary the percentile
+					
 //					Find the current memberScore
 //					Find the 90% percentile score
 //					Set the difference of 90% percentile score and memberScore as value of variable. If difference is below 0, set it as 0
@@ -299,11 +302,13 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 						greater = Math.max(memberScore, changedMemberScore);
 						//System.out.println(greater);
 					}
-					if(greater >= 50){
-						val = percentileScore - greater;
-						if(val > 0)
-							val *= (-1);
+					double percentile50Score = percentileScores.get(modelId).get(50);
+					if(greater >= percentile50Score){
+						val = percentile50Score - greater;//This will be negative
 						varValToScore.put(variableName, String.valueOf(val));
+					}
+					else{
+						varValToScore.put(variableName, "0.0");
 					}
 				}
 			}
