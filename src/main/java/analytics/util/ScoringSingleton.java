@@ -227,6 +227,11 @@ public class ScoringSingleton {
 
 				Strategy strategy = StrategyMapper.getInstance().getStrategy(
 						variableNameToStrategyMap.get(variableName));
+				if(strategy == null)
+				{
+					LOGGER.error("Unable to obtain strategy for " + variableName);
+					continue;
+				}
 				// If this member had a changed variable
 				// allChanges at this point only contain changedMemberVariables
 				if (allChanges != null && allChanges.containsKey(variableName)) {
