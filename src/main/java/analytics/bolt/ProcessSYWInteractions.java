@@ -280,15 +280,11 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 				double val = 0.0;
 				
 				if ("SYW_LIKE".equals(feedType) || "SYW_WANT".equals(feedType)) {
-					//TODO: Get the count from last 7 days.
-					//Based on the count, vary the percentile
-					
 //					Find the current memberScore
 //					Find the 90% percentile score
 //					Set the difference of 90% percentile score and memberScore as value of variable. If difference is below 0, set it as 0
 //					Set intercept = 0, coefficient = 1
 //					If member has changedmemberscores from other feeds, they would end up slightly above 9
-					//TODO: check logic with Devika
 					val = percentileScore - memberScore;
 					if(val < 0)
 						val = 0.0;
