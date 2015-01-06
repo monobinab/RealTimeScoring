@@ -31,9 +31,9 @@ emited [Cieh1BvT91qFFXXtzzSU1GFZjfk=, {"M_WEB_TRAIT_POWER_TOOL_8_14":"{\"2014-10
 		
 		System.clearProperty(MongoNameConstants.IS_PROD);
 		if (args.length > 0) {
-			System.setProperty(MongoNameConstants.IS_PROD, "true");
+			System.setProperty(MongoNameConstants.IS_PROD, "test");
 		}
-		System.setProperty(MongoNameConstants.IS_PROD, "true");
+		System.setProperty(MongoNameConstants.IS_PROD, "test");
 		
 		TopologyBuilder builder = new TopologyBuilder();
 
@@ -54,7 +54,7 @@ emited [Cieh1BvT91qFFXXtzzSU1GFZjfk=, {"M_WEB_TRAIT_POWER_TOOL_8_14":"{\"2014-10
 			cluster.submitTopology("AAMTraitsTopology", conf,
 					builder.createTopology());
 			try {
-				Thread.sleep(10000000);
+				Thread.sleep(100000);
 			} catch (InterruptedException e) {
 				System.out.println(e.getMessage());
 			}
