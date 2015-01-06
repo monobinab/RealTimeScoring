@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class ProcessSYWInteractions extends BaseRichBolt {
 	/**
@@ -247,7 +248,7 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 			this.outputCollector.emit("persist_stream", listToEmit1);
 
 			List<Object> listToEmit2 = new ArrayList<Object>();
-			Map<String, String> map = formMapForScoringBolt(feedType, lId, allBoostValuesMap);
+			Map<String, String> map = formMapForScoringBolt(feedType, lId, allBoostValuesMap, variableValueMap);
 			listToEmit2.add(lId);
 			listToEmit2.add(gson.toJson(map, varValueType));
 			listToEmit2.add(feedType);
@@ -260,12 +261,12 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 		this.outputCollector.ack(input);
 	}
 
-	public Map<String, String> formMapForScoringBolt(String feedType, String lId, Map<String, Map<String, List<String>>> allBoostValuesMap) {
+	public Map<String, String> formMapForScoringBolt(String feedType, String lId, Map<String, Map<String, List<String>>> allBoostValuesMap, Map<String, String> variableValueMap) {
 		Map<String, String> memberScores = memberScoreDao.getMemberScores(lId);
 		Map<String, ChangedMemberScore> changedMemberScores = changedMemberScoresDao.getChangedMemberScores(lId);
 		Map<Integer, Map<Integer, Double>> percentileScores = modelPercentileDao.getModelPercentiles();
 		Map<String, String> varValToScore = new HashMap<String, String>();
-		for(String variableName : allBoostValuesMap.keySet()){
+		for(String variableName : variableValueMap.keySet()){
 			
 			Object modelIdObj= sywBoostModelMap.get(variableName);
 			if (modelIdObj instanceof Integer) {
@@ -276,6 +277,10 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 				}
 				double memberScore = Double.valueOf(memberScores.get(modelIdStr));
 				int percentile = getPercentileScore(variableName, allBoostValuesMap, feedType);
+				if(percentile == 0){
+					LOGGER.error("New "+variableName+" boost value failed to get recorded in memberBoosts collection or allBoostValuesMap for user "+lId);
+					continue;
+				}
 				double percentileScore = percentileScores.get(modelId).get(percentile);
 				double val = 0.0;
 				
@@ -313,13 +318,26 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 		Map<String, List<String>> boostValueMap = allBoostValuesMap.get(variableName);
 		int numberOfEntries = 0;
 		if(boostValueMap != null){
-			//throw new NullPointerException("No Record Persisted for "+variableName);
-			numberOfEntries = boostValueMap.entrySet().size();
+			for(Entry<String, List<String>> entry : boostValueMap.entrySet()){
+				if("current".equals(entry.getKey())){
+					numberOfEntries += 1;
+					continue;
+				}
+				if(entry.getValue() != null){
+					for(String num : entry.getValue()){
+						numberOfEntries += Integer.valueOf(num);
+					}
+				}
+			}
 		}
+		
+		if(numberOfEntries == 0){
+			return 0;
+		}
+		
 		if("SYW_LIKE".equals(interactionType)){
-			//To be discussed whether to throw and exception or put 0 in consideration
 			switch(numberOfEntries){
-				case 0: case 1 : case 2:
+				case 1 : case 2:
 					return 90;
 				case 3: case 4:
 					return 91;
@@ -334,7 +352,7 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 		}
 		else if("SYW_WANT".equals(interactionType)){
 			switch(numberOfEntries){
-			case 0: case 1 : case 2:
+			case 1 : case 2:
 				return 95;
 			case 3: case 4:
 				return 96;
