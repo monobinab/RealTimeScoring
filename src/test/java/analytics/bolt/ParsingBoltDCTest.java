@@ -32,7 +32,6 @@ import analytics.util.DBConnection;
 import analytics.util.DCParserHandler;
 import analytics.util.FakeMongo;
 import analytics.util.MongoNameConstants;
-import analytics.util.dao.DCDao;
 
 public class ParsingBoltDCTest {
 	static ParsingBoltDC bolt;
@@ -45,20 +44,21 @@ public class ParsingBoltDCTest {
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		bolt = new ParsingBoltDC();
+		System.setProperty(MongoNameConstants.IS_PROD, "test");
+		conf = new HashMap<String, String>();
+		conf.put("rtseprod", "test");
+		//Below line ensures an empty DB rather than reusing a DB with values in it
+        FakeMongo.setDBConn(new Fongo("test db").getDB("test"));	
+		DB db = DBConnection.getDBConnection();
+		
+        bolt = new ParsingBoltDC();
 		bolt.setToTestMode();
 		factory = SAXParserFactory.newInstance();
 		saxParser = factory.newSAXParser();
 		handler = new DCParserHandler();
 
-		System.setProperty(MongoNameConstants.IS_PROD, "test");
-		conf = new HashMap<String, String>();
-		conf.put("rtseprod", "test");
-		DB db = FakeMongo.getTestDB();
-		//Below line ensures an empty DB rather than reusing a DB with values in it
-        FakeMongo.setDBConn(new Fongo("test db").getDB("test"));	
-        
-		bolt.setDB(db);
+		        
+		//bolt.setDB(db);
 		dcQAStrength = db.getCollection(MongoNameConstants.DC_QA_STRENGTHS);
 		dcModels = db.getCollection(MongoNameConstants.DC_MODEL);
 		populateDCCollections();
