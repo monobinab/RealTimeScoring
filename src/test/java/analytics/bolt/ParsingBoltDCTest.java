@@ -55,6 +55,9 @@ public class ParsingBoltDCTest {
 		conf = new HashMap<String, String>();
 		conf.put("rtseprod", "test");
 		DB db = FakeMongo.getTestDB();
+		//Below line ensures an empty DB rather than reusing a DB with values in it
+        FakeMongo.setDBConn(new Fongo("test db").getDB("test"));	
+        
 		bolt.setDB(db);
 		dcQAStrength = db.getCollection(MongoNameConstants.DC_QA_STRENGTHS);
 		dcModels = db.getCollection(MongoNameConstants.DC_MODEL);
