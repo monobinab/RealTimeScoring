@@ -21,7 +21,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import analytics.exception.RealTimeScoringException;
@@ -187,9 +186,18 @@ public class ScoringSingletonIntegrationTest {
 	public void executeScoringSingletonAllChangedMemberVariablesExpiredTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, RealTimeScoringException, ConfigurationException, ParseException{
 		
 		//Fake memberVariables collection
+		
 				DBCollection memVarColl = db.getCollection("memberVariables");
 				memVarColl.insert(new BasicDBObject("l_id", "SearsTesting2").append("2269", 1).append("2270",0.4));
-				
+				DBCollection varColl = db.getCollection("Variables");
+				varColl.insert(new BasicDBObject("name", "v1").append("VID", 1).append("strategy","StrategyCountTransactions"));
+				varColl.insert(new BasicDBObject("name", "v2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
+				varColl.insert(new BasicDBObject("name", "v3").append("VID", 3).append("strategy","StrategyCountTraits"));
+				varColl.insert(new BasicDBObject("name", "v4").append("VID", 4).append("strategy","StrategyDaysSinceLast"));
+				varColl.insert(new BasicDBObject("name", "v5").append("VID", 5).append("strategy","StrategyTurnOnFlag"));
+				varColl.insert(new BasicDBObject("name", "v6").append("VID", 6).append("strategy","StrategyBoostProductTotalCount"));
+				varColl.insert(new BasicDBObject("name", "v7").append("VID", 7).append("strategy","StrategySumSales"));
+				varColl.insert(new BasicDBObject("name", "v8").append("VID", 8).append("strategy","StrategyTurnOffFlag"));
 						//fake changedMemberVariables Collection
 						DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
 						SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -298,7 +306,15 @@ public class ScoringSingletonIntegrationTest {
 			
 				DBCollection memVarColl = db.getCollection("memberVariables");
 				memVarColl.insert(new BasicDBObject("l_id", "SearsTesting3").append("2269", 1).append("2270",0.4));
-				
+				DBCollection varColl = db.getCollection("Variables");
+				varColl.insert(new BasicDBObject("name", "v1").append("VID", 1).append("strategy","StrategyCountTransactions"));
+				varColl.insert(new BasicDBObject("name", "v2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
+				varColl.insert(new BasicDBObject("name", "v3").append("VID", 3).append("strategy","StrategyCountTraits"));
+				varColl.insert(new BasicDBObject("name", "v4").append("VID", 4).append("strategy","StrategyDaysSinceLast"));
+				varColl.insert(new BasicDBObject("name", "v5").append("VID", 5).append("strategy","StrategyTurnOnFlag"));
+				varColl.insert(new BasicDBObject("name", "v6").append("VID", 6).append("strategy","StrategyBoostProductTotalCount"));
+				varColl.insert(new BasicDBObject("name", "v7").append("VID", 7).append("strategy","StrategySumSales"));
+				varColl.insert(new BasicDBObject("name", "v8").append("VID", 8).append("strategy","StrategyTurnOffFlag"));
 						//fake changedMemberVariables Collection
 						DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
 						SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -391,7 +407,15 @@ public class ScoringSingletonIntegrationTest {
 			//Fake memberVariables collection
 				DBCollection memVarColl = db.getCollection("memberVariables");
 				memVarColl.insert(new BasicDBObject("l_id", "SearsTesting4").append("2269", 1).append("2270",0.4));
-				
+				DBCollection varColl = db.getCollection("Variables");
+				varColl.insert(new BasicDBObject("name", "v1").append("VID", 1).append("strategy","StrategyCountTransactions"));
+				varColl.insert(new BasicDBObject("name", "v2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
+				varColl.insert(new BasicDBObject("name", "v3").append("VID", 3).append("strategy","StrategyCountTraits"));
+				varColl.insert(new BasicDBObject("name", "v4").append("VID", 4).append("strategy","StrategyDaysSinceLast"));
+				varColl.insert(new BasicDBObject("name", "v5").append("VID", 5).append("strategy","StrategyTurnOnFlag"));
+				varColl.insert(new BasicDBObject("name", "v6").append("VID", 6).append("strategy","StrategyBoostProductTotalCount"));
+				varColl.insert(new BasicDBObject("name", "v7").append("VID", 7).append("strategy","StrategySumSales"));
+				varColl.insert(new BasicDBObject("name", "v8").append("VID", 8).append("strategy","StrategyTurnOffFlag"));
 						//fake changedMemberVariables Collection
 						DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
 						SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -497,7 +521,15 @@ public class ScoringSingletonIntegrationTest {
 		//Fake memberVariables collection
 		DBCollection memVarColl = db.getCollection("memberVariables");
 		memVarColl.insert(new BasicDBObject("l_id", "SearsTesting2").append("2269", 1).append("2270",0.4));
-		
+		DBCollection varColl = db.getCollection("Variables");
+		varColl.insert(new BasicDBObject("name", "v1").append("VID", 1).append("strategy","StrategyCountTransactions"));
+		varColl.insert(new BasicDBObject("name", "v2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
+		varColl.insert(new BasicDBObject("name", "v3").append("VID", 3).append("strategy","StrategyCountTraits"));
+		varColl.insert(new BasicDBObject("name", "v4").append("VID", 4).append("strategy","StrategyDaysSinceLast"));
+		varColl.insert(new BasicDBObject("name", "v5").append("VID", 5).append("strategy","StrategyTurnOnFlag"));
+		varColl.insert(new BasicDBObject("name", "v6").append("VID", 6).append("strategy","StrategyBoostProductTotalCount"));
+		varColl.insert(new BasicDBObject("name", "v7").append("VID", 7).append("strategy","StrategySumSales"));
+		varColl.insert(new BasicDBObject("name", "v8").append("VID", 8).append("strategy","StrategyTurnOffFlag"));
 				//fake changedMemberVariables Collection
 				DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
 				SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -706,7 +738,15 @@ public class ScoringSingletonIntegrationTest {
 			//Fake memberVariables collection
 			DBCollection memVarColl = db.getCollection("memberVariables");
 			memVarColl.insert(new BasicDBObject("l_id", "SearsTesting9").append("2269", 1).append("2270",0.4));
-			
+			DBCollection varColl = db.getCollection("Variables");
+			varColl.insert(new BasicDBObject("name", "v1").append("VID", 1).append("strategy","StrategyCountTransactions"));
+			varColl.insert(new BasicDBObject("name", "v2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
+			varColl.insert(new BasicDBObject("name", "v3").append("VID", 3).append("strategy","StrategyCountTraits"));
+			varColl.insert(new BasicDBObject("name", "v4").append("VID", 4).append("strategy","StrategyDaysSinceLast"));
+			varColl.insert(new BasicDBObject("name", "v5").append("VID", 5).append("strategy","StrategyTurnOnFlag"));
+			varColl.insert(new BasicDBObject("name", "v6").append("VID", 6).append("strategy","StrategyBoostProductTotalCount"));
+			varColl.insert(new BasicDBObject("name", "v7").append("VID", 7).append("strategy","StrategySumSales"));
+			varColl.insert(new BasicDBObject("name", "v8").append("VID", 8).append("strategy","StrategyTurnOffFlag"));
 					//fake changedMemberVariables Collection
 					DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
 					SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -807,7 +847,15 @@ public class ScoringSingletonIntegrationTest {
 			//Fake memberVariables collection
 			DBCollection memVarColl = db.getCollection("memberVariables");
 			memVarColl.insert(new BasicDBObject("l_id", "SearsTesting10").append("2269", 1).append("2270",0.4));
-			
+			DBCollection varColl = db.getCollection("Variables");
+			varColl.insert(new BasicDBObject("name", "v1").append("VID", 1).append("strategy","StrategyCountTransactions"));
+			varColl.insert(new BasicDBObject("name", "v2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
+			varColl.insert(new BasicDBObject("name", "v3").append("VID", 3).append("strategy","StrategyCountTraits"));
+			varColl.insert(new BasicDBObject("name", "v4").append("VID", 4).append("strategy","StrategyDaysSinceLast"));
+			varColl.insert(new BasicDBObject("name", "v5").append("VID", 5).append("strategy","StrategyTurnOnFlag"));
+			varColl.insert(new BasicDBObject("name", "v6").append("VID", 6).append("strategy","StrategyBoostProductTotalCount"));
+			varColl.insert(new BasicDBObject("name", "v7").append("VID", 7).append("strategy","StrategySumSales"));
+			varColl.insert(new BasicDBObject("name", "v8").append("VID", 8).append("strategy","StrategyTurnOffFlag"));
 					//fake changedMemberVariables Collection
 					DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
 					SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
