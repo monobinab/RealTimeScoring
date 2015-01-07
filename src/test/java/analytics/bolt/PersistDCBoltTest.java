@@ -10,9 +10,11 @@ import java.util.Map;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 
+import analytics.util.DBConnection;
 import analytics.util.FakeMongo;
 import analytics.util.MongoNameConstants;
 import analytics.util.dao.MemberDCDao;
@@ -29,12 +31,14 @@ public class PersistDCBoltTest {
 	static Map<String,String> conf;
 	MemberDCDao memberDCDao;
 	String date;
+	static DB db;
 	@Before
 	public void setUp() throws Exception {
 		System.setProperty(MongoNameConstants.IS_PROD, "test");
 		conf = new HashMap<String, String>();
         conf.put("rtseprod", "test");
         FakeMongo.setDBConn(new Fongo("test db").getDB("test"));
+		db = DBConnection.getDBConnection();
         memberDCDao = new MemberDCDao();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		date = simpleDateFormat.format(new Date());
@@ -192,6 +196,10 @@ public class PersistDCBoltTest {
 		memberDCDao.addDateDC(l_id, json.toString());
 		Map<String, String> map = memberDCDao.getDateStrengthMap("DC_Appliance", l_id);
 		assertEquals(map.get(date), Double.toString(strength1));
+	}
+	@AfterClass
+	public static void cleanUp(){
+		db.dropDatabase();
 	}
 
 }

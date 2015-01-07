@@ -1,6 +1,7 @@
 package analytics.util;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -22,11 +23,12 @@ import analytics.util.strategies.StrategyTurnOnFlag;
 
 public class StrategyMapperTest {
 
+	static DB db;
 	@BeforeClass
 	public static void setup() throws ConfigurationException {
 		System.setProperty("rtseprod", "test");
 		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));
-		DB db = DBConnection.getDBConnection();
+		db = DBConnection.getDBConnection();
 		DBCollection varColl = db.getCollection("Variables");
 		varColl.insert(new BasicDBObject("name", "v1").append("VID", 1).append("strategy","StrategyCountTransactions"));
 		varColl.insert(new BasicDBObject("name", "v2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
@@ -35,6 +37,11 @@ public class StrategyMapperTest {
 		varColl.insert(new BasicDBObject("name", "v5").append("VID", 5).append("strategy","StrategyTurnOnFlag"));
 		varColl.insert(new BasicDBObject("name", "v6").append("VID", 6).append("strategy","StrategyBoostProductTotalCount"));
 
+	}
+	
+	@AfterClass
+	public static void cleanUp(){
+		db.dropDatabase();
 	}
 	
 	@Test

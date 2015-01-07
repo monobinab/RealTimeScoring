@@ -7,11 +7,13 @@ import java.util.Map;
 import junit.framework.Assert;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import analytics.MockOutputCollector;
 import analytics.StormTestUtils;
+import analytics.util.DBConnection;
 import analytics.util.FakeMongo;
 import analytics.util.MongoNameConstants;
 import backtype.storm.tuple.Tuple;
@@ -24,18 +26,21 @@ import com.mongodb.DBCollection;
 public class SocialBoltMockTest {
 
 	static Map<String,String> conf;
+	static DB conn;
 	@BeforeClass
-	public static void initializeFakeMongo(){
+	public static void initializeFakeMongo() throws ConfigurationException{
 		System.setProperty("rtseprod", "test");
 		conf = new HashMap<String, String>();
         conf.put("rtseprod", "test");
 		//Below line ensures an empty DB rather than reusing a DB with values in it
-		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));		
+		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));	
+		conn = DBConnection.getDBConnection();
+		
 	}
 	
 	@Test
 	public void setVariablesAfterBoltInitialization() throws ConfigurationException, IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
-		DB conn = FakeMongo.getTestDB();
+
 				
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
         SocialBolt boltUnderTest = new SocialBolt();
@@ -76,5 +81,9 @@ public class SocialBoltMockTest {
         Assert.assertEquals(source, outputTuple.get(2));
         //[y2gpsDmSmaKudbyxsGUbpDeTU1Q=, {"BOOST_DISHWASHER_FB":"0."}, FB]
 	}
-
+	@AfterClass
+	public static void cleanUp(){
+		conn.dropDatabase();
+	}
+	
 }

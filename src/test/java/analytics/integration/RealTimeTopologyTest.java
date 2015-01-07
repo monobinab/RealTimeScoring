@@ -4,11 +4,16 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
+import org.apache.commons.configuration.ConfigurationException;
+import org.junit.After;
 import org.junit.Test;
+
+import com.mongodb.DB;
 
 import analytics.bolt.ParsingBoltPOS;
 import analytics.bolt.ScorePublishBolt;
 import analytics.bolt.StrategyScoringBolt;
+import analytics.util.DBConnection;
 import analytics.util.MongoNameConstants;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
@@ -16,7 +21,7 @@ import backtype.storm.topology.TopologyBuilder;
 
 public class RealTimeTopologyTest {
 	@Test
-	public void testWithValidRecord(){
+	public void testWithValidRecord() throws ConfigurationException{
 		TestHelper.initializeDBForTests();
 		Map<String,Object> expected = new HashMap<String, Object>();
 		expected.put("l_id","1hGa3VmrRXWbAcwTcw0qw6BfzS4=");
@@ -49,5 +54,10 @@ public class RealTimeTopologyTest {
 		}
 		if(!System.getProperty("os.name").startsWith("Windows"))
 			cluster.shutdown();//This fails on windows. Known issue
+	}
+	@After
+	public void cleanUp() throws ConfigurationException{
+		DB db = DBConnection.getDBConnection();
+		db.dropDatabase();
 	}
 }

@@ -6,30 +6,36 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
+import org.apache.commons.configuration.ConfigurationException;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import analytics.MockOutputCollector;
 import analytics.MockTopologyContext;
 import analytics.StormTestUtils;
+import analytics.util.DBConnection;
 import analytics.util.FakeMongo;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.tuple.Tuple;
 
 import com.github.fakemongo.Fongo;
+import com.mongodb.DB;
 
 public class ParsingBoltSYWMockTest {
 	/**
 	 * WE ARE NOT STUBBING OUT SYWAPICALL FOR USERID
 	 */
 	static Map<String,String> conf;
+	static DB db;
 	@BeforeClass
-	public static void initializeFakeMongo(){
+	public static void initializeFakeMongo() throws ConfigurationException{
 		System.setProperty("rtseprod", "test");
 		conf = new HashMap<String, String>();
         conf.put("rtseprod", "test");
 		//Below line ensures an empty DB rather than reusing a DB with values in it
-		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));			
+		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));	
+		db = DBConnection.getDBConnection();
 	}
 	@Test
 	public void invalidInteractionTypeIsIgnored(){		
@@ -73,6 +79,11 @@ public class ParsingBoltSYWMockTest {
         Assert.assertEquals(lId, outputTuple.get(0));
         Assert.assertEquals(interactionType, outputTuple.get(2));
         Assert.assertEquals(expected, outputTuple.get(1));
+	}
+	
+	@AfterClass
+	public static void cleanUp(){
+		db.dropDatabase();
 	}
 
 }

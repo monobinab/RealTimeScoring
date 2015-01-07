@@ -1,24 +1,10 @@
 package analytics.integration;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import junit.framework.Assert;
-import analytics.bolt.MemberPublishBolt;
-import analytics.bolt.ParsingBoltPOS;
-import analytics.bolt.ParsingBoltWebTraits;
 import analytics.bolt.PersistTraitsBolt;
-import analytics.bolt.ScorePublishBolt;
 import analytics.bolt.StrategyScoringBolt;
-import analytics.spout.AAMRedisPubSubSpout;
 import analytics.util.MongoNameConstants;
-import analytics.util.RedisConnection;
-import analytics.util.TopicConstants;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
-import backtype.storm.StormSubmitter;
-import backtype.storm.generated.AlreadyAliveException;
-import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.topology.TopologyBuilder;
 
 public class AAMTraitsTestTopology {

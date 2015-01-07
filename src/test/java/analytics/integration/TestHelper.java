@@ -3,6 +3,9 @@ package analytics.integration;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.configuration.ConfigurationException;
+
+import analytics.util.DBConnection;
 import analytics.util.FakeMongo;
 
 import com.github.fakemongo.Fongo;
@@ -13,12 +16,12 @@ import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
 
 public class TestHelper {
-	public static void initializeDBForTests(){
+	public static void initializeDBForTests() throws ConfigurationException{
 		//Ensure usage of a clean new test DB
 		System.setProperty("rtseprod", "test");
 		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));
 		
-		DB conn = FakeMongo.getTestDB();
+		DB conn = DBConnection.getDBConnection();
 		DBCollection divLnItem = conn.getCollection("divLnItm");
 		divLnItem.insert(new BasicDBObject("d", "071" ).append("i", "77380").append("l", "45"));
 		DBCollection memberVarCollection = conn.getCollection("memberVariables");

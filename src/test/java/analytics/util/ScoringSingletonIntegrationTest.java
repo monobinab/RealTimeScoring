@@ -6,7 +6,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -19,6 +18,7 @@ import junit.framework.Assert;
 import org.apache.commons.configuration.ConfigurationException;
 import org.joda.time.LocalDate;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -36,6 +36,7 @@ import com.mongodb.DBCollection;
 
 public class ScoringSingletonIntegrationTest {
 	private static ScoringSingleton scoringSingletonObj;
+	private static DB db;
 
 	@SuppressWarnings("unchecked")
 	@BeforeClass
@@ -44,6 +45,7 @@ public class ScoringSingletonIntegrationTest {
 			InvocationTargetException, ParseException, ConfigurationException {
 		System.setProperty("rtseprod", "test");
 		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));
+		db = DBConnection.getDBConnection();
 		
 		Constructor<ScoringSingleton> constructor = (Constructor<ScoringSingleton>) ScoringSingleton.class
 				.getDeclaredConstructors()[0];
@@ -61,12 +63,16 @@ public class ScoringSingletonIntegrationTest {
 	public void tearDown() throws Exception {
 	}
 
+	@AfterClass
+	public static void cleanUp(){
+		db.dropDatabase();
+	}
+	
 	//This integration test is check the re-scored value for modelIds 35  (a positive case)
 	@Test
 	public void executeScoringSingletonBasicPositiveCaseTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, RealTimeScoringException, ConfigurationException, ParseException{
 		
 		//Fake memberVariables collection
-		DB db = DBConnection.getDBConnection();
 		DBCollection memVarColl = db.getCollection("memberVariables");
 		memVarColl.insert(new BasicDBObject("l_id", "SearsTesting").append("2269", 1).append("2270",0.4));
 
@@ -181,7 +187,6 @@ public class ScoringSingletonIntegrationTest {
 	public void executeScoringSingletonAllChangedMemberVariablesExpiredTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, RealTimeScoringException, ConfigurationException, ParseException{
 		
 		//Fake memberVariables collection
-				DB db = DBConnection.getDBConnection();
 				DBCollection memVarColl = db.getCollection("memberVariables");
 				memVarColl.insert(new BasicDBObject("l_id", "SearsTesting2").append("2269", 1).append("2270",0.4));
 				
@@ -288,9 +293,7 @@ public class ScoringSingletonIntegrationTest {
 	//The value for that variable will be set from executestrategy method 
 	@Test
 	public void executeScoringSingletonchangedMemberVariablesNotExpiredPresentinNewChangesVariableTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, RealTimeScoringException, ConfigurationException, ParseException{
-			
-		DB db = DBConnection.getDBConnection();
-		
+
 		//Fake memberVariables collection
 			
 				DBCollection memVarColl = db.getCollection("memberVariables");
@@ -385,10 +388,7 @@ public class ScoringSingletonIntegrationTest {
 	//i.e the variable is not coming from parsing bolt
 	@Test
 	public void executeScoringSingletonChangedMemberVarNotExpiredNotPresentInNewChangesVarTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, RealTimeScoringException, ConfigurationException, ParseException{
-			
-		DB db = DBConnection.getDBConnection();
-		
-				//Fake memberVariables collection
+			//Fake memberVariables collection
 				DBCollection memVarColl = db.getCollection("memberVariables");
 				memVarColl.insert(new BasicDBObject("l_id", "SearsTesting4").append("2269", 1).append("2270",0.4));
 				
@@ -495,7 +495,6 @@ public class ScoringSingletonIntegrationTest {
 	public void executeScoringSingletonChangedMemberVarExpiredPresentInNewChangesVarTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, RealTimeScoringException, ConfigurationException, ParseException{
 			
 		//Fake memberVariables collection
-		DB db = DBConnection.getDBConnection();
 		DBCollection memVarColl = db.getCollection("memberVariables");
 		memVarColl.insert(new BasicDBObject("l_id", "SearsTesting2").append("2269", 1).append("2270",0.4));
 		
@@ -585,7 +584,6 @@ public class ScoringSingletonIntegrationTest {
 	public void executeScoringSingletonOneVarExpOneVarNotExpBothPresentinNewChangesVarValueMap() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, RealTimeScoringException, ConfigurationException, ParseException{
 		
 		//Fake memberVariables collection
-		DB db = DBConnection.getDBConnection();
 		DBCollection memVarColl = db.getCollection("memberVariables");
 		memVarColl.insert(new BasicDBObject("l_id", "SearsTesting8").append("2269", 1).append("2270",0.4));
 		
@@ -706,7 +704,6 @@ public class ScoringSingletonIntegrationTest {
 		public void executeScoringSingletonOneVarExpOneVarNotExpButOnlyExpVarPresentinNewChangesVarValueMap() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, RealTimeScoringException, ConfigurationException, ParseException{
 			
 			//Fake memberVariables collection
-			DB db = DBConnection.getDBConnection();
 			DBCollection memVarColl = db.getCollection("memberVariables");
 			memVarColl.insert(new BasicDBObject("l_id", "SearsTesting9").append("2269", 1).append("2270",0.4));
 			
@@ -808,7 +805,6 @@ public class ScoringSingletonIntegrationTest {
 		public void executeScoringSingletonNullExpiratioDateVarPresentInNewChangesVarTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, RealTimeScoringException, ConfigurationException, ParseException{
 				
 			//Fake memberVariables collection
-			DB db = DBConnection.getDBConnection();
 			DBCollection memVarColl = db.getCollection("memberVariables");
 			memVarColl.insert(new BasicDBObject("l_id", "SearsTesting10").append("2269", 1).append("2270",0.4));
 			

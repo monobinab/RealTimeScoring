@@ -7,27 +7,37 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
+import org.apache.commons.configuration.ConfigurationException;
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import analytics.util.DBConnection;
 import analytics.util.FakeMongo;
 import analytics.util.MongoNameConstants;
 import analytics.util.objects.ChangedMemberScore;
 
 import com.github.fakemongo.Fongo;
+import com.mongodb.DB;
 import com.mongodb.DBObject;
 
 public class ChangedMemberScoresDaoTest {
 	static String lId = "oI8ko3pdaHrhdlI3MJIXMPgSCX";
+    DB db;
 	@Before
-	public void initialize() {
+	public void initialize() throws ConfigurationException {
 		// DO NOT REMOVE BELOW LINE
 		System.setProperty("rtseprod", "test");
 		//Ensure we have an empty DB
 		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));
+		db = DBConnection.getDBConnection();
 	}
-	
+	@After
+	public void cleanUp(){
+		db.dropDatabase();
+	}
 	@Test
 	public void testValidScoresCanBeRetrieved() {
 		

@@ -1,21 +1,19 @@
 package analytics.bolt;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import junit.framework.Assert;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
-import redis.clients.jedis.JedisPubSub;
 import analytics.MockOutputCollector;
 import analytics.StormTestUtils;
 import analytics.util.DBConnection;
@@ -32,13 +30,15 @@ import com.mongodb.DBCollection;
 
 public class MemberScoreBoltTest {
 	static Map<String,String> conf;
+	static DB conn;
 	@BeforeClass
-	public static void initializeFakeMongo(){
+	public static void initializeFakeMongo() throws ConfigurationException{
 		System.setProperty("rtseprod", "test");
 		conf = new HashMap<String, String>();
         conf.put("rtseprod", "test");
 		//Below line ensures an empty DB rather than reusing a DB with values in it
-        FakeMongo.setDBConn(new Fongo("test db").getDB("test"));				
+        FakeMongo.setDBConn(new Fongo("test db").getDB("test"));	
+        conn = DBConnection.getDBConnection();
 	}
 	
 	@Ignore("This is just a test of redis publish. We should ideally find an inmemory redis")
@@ -47,7 +47,8 @@ public class MemberScoreBoltTest {
         String input = "nIeO76q2TF8QBTjKkchXxBoGoUY=";
         String redisHost = "rtsapp301p.qa.ch3.s.com";
         int port = 6379;
-        DB conn = DBConnection.getDBConnection();
+        //This sets the one set by fake mongo already
+        
 		DBCollection memberZip = conn.getCollection("memberZip");
 		
 		memberZip.insert(new BasicDBObject(MongoNameConstants.ZIP,"11111").append(MongoNameConstants.L_ID, input));
@@ -77,6 +78,11 @@ public class MemberScoreBoltTest {
         	ret = queue.poll();
         }
         Assert.assertEquals("nIeO76q2TF8QBTjKkchXxBoGoUY=,11111,unit_test_source", ret);
+	}
+	
+	@AfterClass
+	public static void cleanUp(){
+		conn.dropDatabase();
 	}
 	
 }

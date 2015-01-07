@@ -7,6 +7,7 @@ import java.util.Map;
 import junit.framework.Assert;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -30,13 +31,15 @@ public class ProcessSywBoltMockTest {
 	 * WE ARE NOT STUBBING OUT SYWAPICALLS
 	 */
 	static Map<String,String> conf;
+	static DB db;
 	@BeforeClass
-	public static void initializeFakeMongo(){
+	public static void initializeFakeMongo() throws ConfigurationException{
 		System.setProperty("rtseprod", "test");
 		conf = new HashMap<String, String>();
         conf.put("rtseprod", "test");
 		//Below line ensures an empty DB rather than reusing a DB with values in it
-		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));		
+		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));	
+		db = DBConnection.getDBConnection();
 	}
 	@Test
 	public void onlyCertainCatalogTypesAreProcessed(){		
@@ -113,6 +116,9 @@ public class ProcessSywBoltMockTest {
 
 	}
 	
-	
+	@AfterClass
+	public static void cleanUp(){
+		db.dropDatabase();
+	}
 	
 }

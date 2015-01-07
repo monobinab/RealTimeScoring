@@ -21,6 +21,7 @@ import junit.framework.Assert;
 import org.apache.commons.configuration.ConfigurationException;
 import org.joda.time.LocalDate;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -43,6 +44,7 @@ import com.mongodb.util.JSON;
 
 public class ScoringSingletonTest {
 	private static ScoringSingleton scoringSingletonObj;
+	private static DB conn;
 	@SuppressWarnings("unchecked")
 	@BeforeClass
 	public static void initializeFakeMongo() throws InstantiationException,
@@ -52,6 +54,7 @@ public class ScoringSingletonTest {
 		// Below line ensures an empty DB rather than reusing a DB with values
 		// in it
 		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));
+		conn = DBConnection.getDBConnection();
 		// We do not need instance of scoring singleton created by previous
 		// tests. If different methods need different instances, move this to
 		// @Before rather than before class
@@ -83,7 +86,7 @@ public class ScoringSingletonTest {
 		Change expected = new Change("2270", 12,
 				simpleDateFormat.parse("2999-10-21"),
 				simpleDateFormat.parse("2014-10-01"));
-		DB conn = DBConnection.getDBConnection();
+	
 		DBCollection changedMemberVar = conn
 				.getCollection("changedMemberVariables");
 		String l_id = "6RpGnW1XhFFBoJV+T9cT9ok=";
@@ -1343,4 +1346,9 @@ public class ScoringSingletonTest {
 		Assert.assertEquals(4, dbObj.keySet().size());
 		changedMemberVar.remove(new BasicDBObject("l_id", "Sears2"));
 	}
+	@AfterClass
+	public static void cleanUp(){
+		conn.dropDatabase();
+	}
+	
 }

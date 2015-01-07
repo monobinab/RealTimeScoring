@@ -1,6 +1,6 @@
 package analytics.bolt;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -13,25 +13,25 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
+
+import analytics.util.DBConnection;
+import analytics.util.DCParserHandler;
+import analytics.util.FakeMongo;
+import analytics.util.MongoNameConstants;
 
 import com.github.fakemongo.Fongo;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
-
-import analytics.util.DBConnection;
-import analytics.util.DCParserHandler;
-import analytics.util.FakeMongo;
-import analytics.util.MongoNameConstants;
 
 public class ParsingBoltDCTest {
 	static ParsingBoltDC bolt;
@@ -41,6 +41,7 @@ public class ParsingBoltDCTest {
 	static Map<String, String> conf;
 	static DBCollection dcQAStrength;
 	static DBCollection dcModels;
+	static DB db;
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -49,7 +50,7 @@ public class ParsingBoltDCTest {
 		conf.put("rtseprod", "test");
 		//Below line ensures an empty DB rather than reusing a DB with values in it
         FakeMongo.setDBConn(new Fongo("test db").getDB("test"));	
-		DB db = DBConnection.getDBConnection();
+		db = DBConnection.getDBConnection();
 		
         bolt = new ParsingBoltDC();
 		bolt.setToTestMode();
@@ -312,5 +313,9 @@ public class ParsingBoltDCTest {
 
 	// TODO: flip all those expected placed to actual
 	// TODO: place all helper methods on top
-
+	
+	@AfterClass
+	public static void cleanUp(){
+		db.dropDatabase();
+	}
 }

@@ -5,26 +5,36 @@ import java.util.List;
 
 import junit.framework.Assert;
 
+import org.apache.commons.configuration.ConfigurationException;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import analytics.util.DBConnection;
 import analytics.util.FakeMongo;
 import analytics.util.MongoNameConstants;
 
 import com.github.fakemongo.Fongo;
 import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
 
 public class MemberUUIDDaoTest {
 	private static MemberUUIDDao memberUUIDao;
 	private static List<String> seedDataLIds;
 	private static List<String> seedDataUuids;
+	private static DB db;
 
+	@AfterClass
+	public static void cleanUp(){
+		db.dropDatabase();
+	}
 	@BeforeClass
-	public static void initialize() {
+	public static void initialize() throws ConfigurationException {
 		// DO NOT REMOVE BELOW LINE
 		System.setProperty("rtseprod", "test");
-
+		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));
+		db = DBConnection.getDBConnection();
 		
 		seedDataLIds = new ArrayList<String>();
 		seedDataUuids = new ArrayList<String>();
