@@ -68,7 +68,32 @@ public class ProcessSywBoltMockTest {
 		 *     15009844,    15009912,    16881520 - like, want and own catalog ids
 		 */
 		DB conn = DBConnection.getDBConnection();
+		
 		DBCollection pidDivLn = conn.getCollection("pidDivLn");
+		
+		DBCollection modelSywBoosts = conn.getCollection("modelSywBoosts");
+		modelSywBoosts.insert(new BasicDBObject("m",34).append("b", "BOOST_SYW_OWN_HA_ALL_TCOUNT"));
+		modelSywBoosts.insert(new BasicDBObject("m",57).append("b", "BOOST_SYW_OWN_REGRIG_TCOUNT"));
+
+		DBCollection memberScore = conn.getCollection("memberScore");
+		memberScore.insert(new BasicDBObject("l_id","do0b7SN1eER9shCSj0DX+eSGag=").append("34", 0.0079098).append("57", 0.00213123));
+		
+
+		
+		DBCollection modelPercentile = conn.getCollection("modelPercentile");
+		modelPercentile.insert(new BasicDBObject("modelId","34").append("modelName", "BOOST_SYW_OWN_HA_ALL_TCOUNT").append("modelDesc", "Home Appliance").append("percentile","90").append("maxScore", "0.0158418"));
+		modelPercentile.insert(new BasicDBObject("modelId","34").append("modelName", "BOOST_SYW_OWN_HA_ALL_TCOUNT").append("modelDesc", "Home Appliance").append("percentile","91").append("maxScore", "0.0172141"));
+		modelPercentile.insert(new BasicDBObject("modelId","34").append("modelName", "BOOST_SYW_OWN_HA_ALL_TCOUNT").append("modelDesc", "Home Appliance").append("percentile","92").append("maxScore", "0.0188900"));
+		modelPercentile.insert(new BasicDBObject("modelId","34").append("modelName", "BOOST_SYW_OWN_HA_ALL_TCOUNT").append("modelDesc", "Home Appliance").append("percentile","93").append("maxScore", "0.0209311"));
+		modelPercentile.insert(new BasicDBObject("modelId","34").append("modelName", "BOOST_SYW_OWN_HA_ALL_TCOUNT").append("modelDesc", "Home Appliance").append("percentile","94").append("maxScore", "0.0234838"));
+		modelPercentile.insert(new BasicDBObject("modelId","34").append("modelName", "BOOST_SYW_OWN_HA_ALL_TCOUNT").append("modelDesc", "Home Appliance").append("percentile","95").append("maxScore", "0.0268622"));
+		modelPercentile.insert(new BasicDBObject("modelId","34").append("modelName", "BOOST_SYW_OWN_HA_ALL_TCOUNT").append("modelDesc", "Home Appliance").append("percentile","96").append("maxScore", "0.0314226"));
+		modelPercentile.insert(new BasicDBObject("modelId","34").append("modelName", "BOOST_SYW_OWN_HA_ALL_TCOUNT").append("modelDesc", "Home Appliance").append("percentile","97").append("maxScore", "0.0382990"));
+		modelPercentile.insert(new BasicDBObject("modelId","34").append("modelName", "BOOST_SYW_OWN_HA_ALL_TCOUNT").append("modelDesc", "Home Appliance").append("percentile","98").append("maxScore", "0.0512915"));
+		modelPercentile.insert(new BasicDBObject("modelId","34").append("modelName", "BOOST_SYW_OWN_HA_ALL_TCOUNT").append("modelDesc", "Home Appliance").append("percentile","99").append("maxScore", "0.1304244"));
+		modelPercentile.insert(new BasicDBObject("modelId","34").append("modelName", "BOOST_SYW_OWN_HA_ALL_TCOUNT").append("modelDesc", "Home Appliance").append("percentile","50").append("maxScore", "0.0033978"));
+
+		
 		String pid = new SywApiCalls().getCatalogId(280987671);
 		pidDivLn.insert(new BasicDBObject("pid",pid).append("d","046").append("l","04601"));
 		DBCollection divLnBoost = conn.getCollection("divLnBoost");
@@ -106,13 +131,19 @@ public class ProcessSywBoltMockTest {
         
         boltUnderTest.execute(tuple);
        
-        List<Object> outputTuple = outputCollector.getTuple().get("persist_stream");
+        List<Object> outputTupleP = outputCollector.getTuple().get("persist_stream");
+        System.out.println(outputCollector.getTuple().get("score_stream"));
         /*[null, {"BOOST_SYW_OWN_HA_ALL_TCOUNT":"{\"current\":[\"02280322000P\"]}","BOOST_SYW_OWN_REGRIG_TCOUNT":"{\"current\":[\"02280322000P\"]}"}, SYW_WANT]*/
-        Assert.assertEquals(lId, outputTuple.get(0));
-        Assert.assertEquals("SYW_WANT", outputTuple.get(2));
+        Assert.assertEquals(lId, outputTupleP.get(0));
+        Assert.assertEquals("SYW_WANT", outputTupleP.get(2));
         Assert.assertEquals("{\"BOOST_SYW_OWN_HA_ALL_TCOUNT\":\"{\\\"current\\\":[\\\""+pid+"\\\"]}\","
-        		+ "\"BOOST_SYW_OWN_REGRIG_TCOUNT\":\"{\\\"current\\\":[\\\""+pid+"\\\"]}\"}",outputTuple.get(1));
-     
+        		+ "\"BOOST_SYW_OWN_REGRIG_TCOUNT\":\"{\\\"current\\\":[\\\""+pid+"\\\"]}\"}",outputTupleP.get(1));
+        
+        
+        List<Object> outputTupleS = outputCollector.getTuple().get("score_stream");
+        Assert.assertEquals(lId, outputTupleS.get(0));
+        Assert.assertEquals("SYW_WANT", outputTupleS.get(2));
+        Assert.assertEquals("{\"BOOST_SYW_OWN_HA_ALL_TCOUNT\":\"0.0189524\"}",outputTupleS.get(1));
 
 	}
 	
