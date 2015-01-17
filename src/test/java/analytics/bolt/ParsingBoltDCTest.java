@@ -59,7 +59,7 @@ public class ParsingBoltDCTest {
 		handler = new DCParserHandler();
 
 		        
-		//bolt.setDB(db);
+		bolt.setDCDao();
 		dcQAStrength = db.getCollection(MongoNameConstants.DC_QA_STRENGTHS);
 		dcModels = db.getCollection(MongoNameConstants.DC_MODEL);
 		populateDCCollections();

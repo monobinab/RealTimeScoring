@@ -152,8 +152,8 @@ public class ParsingBoltDC extends BaseRichBolt {
 		return strength_sum;
 	}
 	
-	protected void setDB(DB db){
-		dc.setDB(db);
+	protected void setDCDao(){
+		dc = new DCDao();
 	}
 	
 	public void emitToPersistStream(String date, String category, Double strength_sum, String l_id) throws JSONException{
