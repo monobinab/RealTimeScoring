@@ -56,7 +56,7 @@ public class ParsingBoltSYW extends BaseRichBolt {
 	@Override
 	public void execute(Tuple input) {
 		//Read the JSON message from the spout
-		countMetric.scope("incoming").incr();
+		countMetric.scope("incoming_tuples").incr();
 	
 		JsonParser parser = new JsonParser();
 		JsonArray interactionArray = parser.parse(input.getStringByField("message")).getAsJsonArray();

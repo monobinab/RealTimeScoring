@@ -92,7 +92,7 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 
 	@Override
 	public void execute(Tuple input) {
-		countMetric.scope("incoming_record").incr();
+		countMetric.scope("incoming_tuples").incr();
 		String feedType = null;
 		// Get l_id", "message", "InteractionType" from parsing bolt
 		/*
