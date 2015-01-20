@@ -67,7 +67,7 @@ public class ParsingBoltDC extends BaseRichBolt {
 		if (message.contains("GetMemberPromptsReply")) {
 			// System.out.println("Got a response: ");
 			// System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-			countMetric.scope("dc_PromptsReply").incr();
+			countMetric.scope("prompts_reply").incr();
 			try {
 				parseIncomingMessage(message);
 			} catch (Exception e) {
@@ -191,7 +191,7 @@ public class ParsingBoltDC extends BaseRichBolt {
 		listToEmit_s.add(JsonUtils.createJsonFromStringStringMap(map));
 		listToEmit_s.add("DC");
 		outputCollector.emit("score_stream", listToEmit_s);
-		countMetric.scope("dc_EmittedToScoring").incr();
+		countMetric.scope("emitted_to_scoring").incr();
 		LOGGER.info("Emitted message to score stream");
 		
 	}
