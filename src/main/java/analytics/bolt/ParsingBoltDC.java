@@ -49,7 +49,7 @@ public class ParsingBoltDC extends BaseRichBolt {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ParsingBoltDC.class);
 	private static final long serialVersionUID = 1L;
 	private OutputCollector outputCollector;
-	private DCDao dc = new DCDao();
+	private DCDao dc;
 	private MemberDCDao memberDCDao;
 	private Type varValueType;
 	private MultiCountMetric countMetric;
@@ -90,6 +90,7 @@ public class ParsingBoltDC extends BaseRichBolt {
 		this.outputCollector = collector;
 		System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
 		memberDCDao = new MemberDCDao();
+		dc = new DCDao();
 		initMetrics(context);
 		LOGGER.info("DC Bolt Preparing to Launch");
 		varValueType = new TypeToken<Map<String, String>>() {
@@ -151,8 +152,8 @@ public class ParsingBoltDC extends BaseRichBolt {
 		return strength_sum;
 	}
 	
-	protected void setDB(DB db){
-		dc.setDB(db);
+	protected void setDCDao(){
+		dc = new DCDao();
 	}
 	
 	public void emitToPersistStream(String date, String category, Double strength_sum, String l_id) throws JSONException{
