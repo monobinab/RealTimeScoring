@@ -40,7 +40,7 @@ public class AAM_BrowseTopology {
 		String[] servers = RedisConnection.getServers();
 		int counter = 0;
 		BoltDeclarer boltDeclarer = topologyBuilder.setBolt(
-				"ParsingBoltAAM_ATC", new ParsingBoltAAM_ATC(topic), 3);
+				"parsingBoltBrowse", new ParsingBoltAAM_ATC(topic), 3);
 		for (String server : servers) {
 			topologyBuilder.setSpout(topic + ++counter, new AAMRedisPubSubSpout(
 					server, port, topic), 1);
@@ -48,10 +48,10 @@ public class AAM_BrowseTopology {
 		}
 
 		
-		topologyBuilder.setBolt("strategy_scoring_bolt", new StrategyScoringBolt(), 3)
-				.localOrShuffleGrouping("ParsingBoltAAM_ATC");
-		 topologyBuilder.setBolt("score_publish_bolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 3).localOrShuffleGrouping("strategy_scoring_bolt", "score_stream");
-	        topologyBuilder.setBolt("member_publish_bolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 3).localOrShuffleGrouping("strategy_scoring_bolt", "member_stream");
+		topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(), 3)
+				.localOrShuffleGrouping("parsingBoltBrowse");
+		 topologyBuilder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 3).localOrShuffleGrouping("strategyScoringBolt", "score_stream");
+	        topologyBuilder.setBolt("memberPublishBolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 3).localOrShuffleGrouping("strategyScoringBolt", "member_stream");
 
 		Config conf = new Config();
 		conf.put("metrics_topology", "Product_Browse");
