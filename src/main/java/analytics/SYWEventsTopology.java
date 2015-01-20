@@ -44,23 +44,23 @@ public class SYWEventsTopology {
 server2=rtsapp402p.prod.ch4.s.com
 server3=rtsapp403p.prod.ch4.s.com
  */
-		toplologyBuilder.setSpout("SYWEventsSpout", new SYWRedisSpout(
+		toplologyBuilder.setSpout("sywEventsSpout", new SYWRedisSpout(
 				"rtsapp401p.prod.ch4.s.com", TopicConstants.PORT, "SYW_Interactions"), 1);
 		//rtsapp302p.qa.ch3.s.com
 		//
 		// Parse the JSON
-		toplologyBuilder.setBolt("ParseEventsBolt", new ParsingBoltSYW(), 1)
-				.shuffleGrouping("SYWEventsSpout");
+		toplologyBuilder.setBolt("parseEventsBolt", new ParsingBoltSYW(), 1)
+				.shuffleGrouping("sywEventsSpout");
 		// Get the div line and boost variable
-		toplologyBuilder.setBolt("ProcessSYWEvents",
+		toplologyBuilder.setBolt("processSYWEvents",
 				new ProcessSYWInteractions(), 4).shuffleGrouping(
-				"ParseEventsBolt");
-		toplologyBuilder.setBolt("scoringBolt", new StrategyScoringBolt(), 1).shuffleGrouping("ProcessSYWEvents", "score_stream");
+				"parseEventsBolt");
+		toplologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(), 1).shuffleGrouping("processSYWEvents", "score_stream");
 		//TODO: Persist is still being fixed
-		toplologyBuilder.setBolt("persistBolt", new PersistBoostsBolt(), 1).shuffleGrouping("ProcessSYWEvents", "persist_stream");
+		toplologyBuilder.setBolt("persistBolt", new PersistBoostsBolt(), 1).shuffleGrouping("processSYWEvents", "persist_stream");
 
-		toplologyBuilder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 1).shuffleGrouping("scoringBolt", "score_stream");
-		toplologyBuilder.setBolt("member_publish_bolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 2).shuffleGrouping("scoringBolt", "member_stream");
+		toplologyBuilder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
+		toplologyBuilder.setBolt("memberPublishBolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 2).shuffleGrouping("strategyScoringBolt", "member_stream");
 		Config conf = new Config();
 		conf.put("metrics_topology", "Syw");
 	    conf.registerMetricsConsumer(MetricsListener.class, 3);

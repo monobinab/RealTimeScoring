@@ -296,6 +296,10 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 					if(val < 0)
 						val = 0.0;
 					varValToScore.put(variableName, String.valueOf(val));
+					if("SYW_LIKE".equals(feedType))
+							countMetric.scope("type_like").incr();
+					if("SYW_WANT".equals(feedType))
+						countMetric.scope("type_want").incr();
 				} else if ("SYW_OWN".equals(feedType)) {
 					double greater = memberScore;
 					double changedMemberScore = 0.0;
@@ -309,6 +313,7 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 						val = percentileScore - greater;//This will be negative
 					}
 					varValToScore.put(variableName, String.valueOf(val));
+					countMetric.scope("type_own").incr();
 				}
 			}
 		}
