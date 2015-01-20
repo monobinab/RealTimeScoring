@@ -105,5 +105,16 @@ public class MongoNameConstants {
 	//DC Collections
 	public static final String DC_MODEL = "dcModel";
 	public static final String DC_QA_STRENGTHS = "dcQAStrengths";
-	
+
+    //Client Campaign
+    public static final String CC_client = "client";
+    public static final String CC_channel = "channel";
+    public static final  String CC_startDate = "startDate";
+    public static final  String CC_endDate = "endDate";
+    public static final  String CC_maxCount = "maxCount";
+    public static final  String CC_currentCount = "currentCount";
+    public static final  String CC_tagType = "type";
+    public static final  String CC_tagId = "tagId";
+
+
 }
