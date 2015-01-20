@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import analytics.util.JsonUtils;
 import analytics.util.MongoNameConstants;
+import analytics.util.SecurityUtils;
 import analytics.util.dao.MemberUUIDDao;
 import analytics.util.dao.ModelVariablesDao;
 import backtype.storm.metric.api.MultiCountMetric;
@@ -33,7 +34,7 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 
     protected List<String> modelVariablesList;
     protected Map<String,Collection<String>> l_idToValueCollectionMap; // USED TO MAP BETWEEN l_id AND THE TRAITS OR PID OR SearchKeyword ASSOCIATED WITH THAT ID 
-    protected String currentUUID;
+    protected String loyalty_id;
     
     protected String topic;
 	protected String sourceTopic;
@@ -98,23 +99,24 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
         
         if(splitRecArray == null || splitRecArray.length==0) {
     		countMetric.scope("invalid_record").incr();
-    		outputCollector.fail(input);
+    		outputCollector.ack(input);
         	return;
         }
         
 		// 4) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN SET CURRENT UUID FROM RECORD, SET CURRENT l_id TO NULL AND RETURN
         //		If l_id is null and the next UUID is the same the current, then the next record will not be processed
-        this.currentUUID = splitRecArray[0].trim();
-        List<String> l_ids = memberDao.getLoyaltyIdsFromUUID(this.currentUUID);
-        if(l_ids == null || l_ids.size() == 0) {
-            LOGGER.info(" *** COULD NOT FIND UUID: " + this.currentUUID);
-    		countMetric.scope("no_lids").incr();
-    		outputCollector.fail(input);
-        	return;	
+        this.loyalty_id = splitRecArray[0].trim();
+        if(loyalty_id.length()!=16 || !loyalty_id.startsWith("7081")){
+        	LOGGER.info("Could not find Lid: " + this.loyalty_id);
+        	countMetric.scope("no_lids").incr();
+        	outputCollector.ack(input);
+        	return;
         }
+        String l_id = SecurityUtils.hashLoyaltyId(loyalty_id);
+        
         l_idToValueCollectionMap = new HashMap<String, Collection<String>>();
         // set current uuid and l_id from mongoDB query results
-        for(String l_id:l_ids) {
+        //for(String l_id:l_ids) {
         	l_idToValueCollectionMap.put(l_id, new ArrayList<String>());
     		for(int i=1;i<splitRecArray.length;i++){
     			l_idToValueCollectionMap.get(l_id).add(splitRecArray[i].trim());
@@ -137,7 +139,7 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
         	}
         	countMetric.scope("total_processing").incr();
         	
-        }
+        //}
         
         //TODO: If we need this, we should ask Dustin to send it to Traits feed as well
         /*SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
@@ -158,7 +160,7 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 	protected abstract Map<String, String> processList(String current_l_id);
 
 	/*
-     * (non-Javadoc)
+     * (nn-Javadoc)
      *
      * @see
      * backtype.storm.topology.IComponent#declareOutputFields(backtype.storm.
