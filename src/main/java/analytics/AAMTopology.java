@@ -27,9 +27,9 @@ public class AAMTopology {
 	public static void main(String[] args){
 		LOGGER.info("Starting aam traits topology");
 		System.clearProperty(MongoNameConstants.IS_PROD);
-		if (args.length > 0) {
+		//if (args.length > 0) {
 			System.setProperty(MongoNameConstants.IS_PROD, "true");
-		}
+		//}
 		String topic = TopicConstants.AAM_CDF_TRAITS; 
 		int port = TopicConstants.PORT;
 		TopologyBuilder builder = new TopologyBuilder();
@@ -39,12 +39,12 @@ public class AAMTopology {
 	    builder.setSpout("AAM_CDF_Traits2", new AAMRedisPubSubSpout(servers[1], port, topic), 1);
 	    builder.setSpout("AAM_CDF_Traits3", new AAMRedisPubSubSpout(servers[2], port, topic), 1);
 
-	    builder.setBolt("ParsingBoltWebTraits", new ParsingBoltWebTraits(), 1)
+	    builder.setBolt("parsingBoltWebTraits", new ParsingBoltWebTraits(), 1)
 	    .shuffleGrouping("AAM_CDF_Traits1").shuffleGrouping("AAM_CDF_Traits2").shuffleGrouping("AAM_CDF_Traits3");
-	    builder.setBolt("strategy_bolt", new StrategyScoringBolt(),1).shuffleGrouping("ParsingBoltWebTraits");
-	    builder.setBolt("persist_traits" , new PersistTraitsBolt(), 1).shuffleGrouping("ParsingBoltWebTraits");
-	    builder.setBolt("score_publish_bolt", new ScorePublishBolt(servers[0], port,"score"), 1).shuffleGrouping("strategy_bolt", "score_stream");
-	    //builder.setBolt("member_publish_bolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 2).shuffleGrouping("strategy_bolt", "member_stream");
+	    builder.setBolt("strategyScoringBolt", new StrategyScoringBolt(),1).shuffleGrouping("parsingBoltWebTraits");
+	    builder.setBolt("persistTraits" , new PersistTraitsBolt(), 1).shuffleGrouping("parsingBoltWebTraits");
+	    builder.setBolt("scorePublishBolt", new ScorePublishBolt(servers[0], port,"score"), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
+	    builder.setBolt("memberPublishBolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 2).shuffleGrouping("strategyScoringBolt", "member_stream");
 	      
 	    Config conf = new Config();
 		conf.put("metrics_topology", "AamTraits");
