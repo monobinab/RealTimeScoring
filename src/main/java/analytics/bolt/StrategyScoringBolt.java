@@ -106,7 +106,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 		}
 		if(memberVariablesMap==null){
 			LOGGER.warn("Unable to find member variables for " + lId);
-			countMetric.scope("no_membervariables").incr();
+			countMetric.scope("no_member_variables").incr();
 			outputCollector.ack(input);
 			return;
 		}

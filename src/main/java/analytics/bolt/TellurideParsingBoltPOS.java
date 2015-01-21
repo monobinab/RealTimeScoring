@@ -372,7 +372,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 				}
 			}
 			else{
-				countMetric.scope("empty_lineitem").incr();
+				countMetric.scope("empty_line_item").incr();
 				outputCollector.ack(input);
 				return;
 			}

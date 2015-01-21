@@ -91,7 +91,7 @@ public class ParsingBoltSYW extends BaseRichBolt {
 			} else {
 				//We should look into either processing this request type or not subscribing to it
 				LOGGER.info("Ignore interaction type" + interactionType.getAsString());
-				countMetric.scope("unwanted_interactiontype").incr();
+				countMetric.scope("unwanted_interaction_type").incr();
 			}
 		}
 		outputCollector.ack(input);
