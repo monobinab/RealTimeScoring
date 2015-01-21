@@ -33,6 +33,7 @@ public class PersistDCBolt extends BaseRichBolt{
 	@Override
 	public void execute(Tuple input) {
 		LOGGER.debug("Persisting DC in mongo");
+		countMetric.scope("incoming_record").incr();
 		String l_id = input.getString(0);
 		try {
 			JSONObject obj = new JSONObject(input.getString(1));
