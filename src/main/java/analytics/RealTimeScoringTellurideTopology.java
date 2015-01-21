@@ -66,11 +66,11 @@ public class RealTimeScoringTellurideTopology {
 										.getQueueName()), 3);
 
 		// create definition of main spout for queue 1
-		topologyBuilder.setBolt("parsing_bolt", new TellurideParsingBoltPOS(), 12).localOrShuffleGrouping("telluride1").localOrShuffleGrouping("telluride2");
-        topologyBuilder.setBolt("strategy_scoring_bolt", new StrategyScoringBolt(), 12).localOrShuffleGrouping("parsing_bolt");
+		topologyBuilder.setBolt("parsingBolt", new TellurideParsingBoltPOS(), 12).localOrShuffleGrouping("telluride1").localOrShuffleGrouping("telluride2");
+        topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(), 12).localOrShuffleGrouping("parsingBolt");
         //Redis publish to server 1
-        //topologyBuilder.setBolt("score_publish_bolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 3).localOrShuffleGrouping("strategy_scoring_bolt", "score_stream");
-        //topologyBuilder.setBolt("member_publish_bolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 3).localOrShuffleGrouping("strategy_scoring_bolt", "member_stream");
+        //topologyBuilder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 3).localOrShuffleGrouping("strategyScoringBolt", "score_stream");
+        //topologyBuilder.setBolt("memberPublishBolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 3).localOrShuffleGrouping("strategyScoringBolt", "member_stream");
 
 
 		Config conf = new Config();
