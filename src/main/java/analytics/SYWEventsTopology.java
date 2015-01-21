@@ -36,7 +36,7 @@ public class SYWEventsTopology {
 		if (args.length > 0) {
 			System.setProperty(MongoNameConstants.IS_PROD, "true");
 		}
-		TopologyBuilder toplologyBuilder = new TopologyBuilder();
+		TopologyBuilder topologyBuilder = new TopologyBuilder();
 		String[] servers = RedisConnection.getServers();
 		String topic = TopicConstants.SYW;
 /*
@@ -44,23 +44,22 @@ public class SYWEventsTopology {
 server2=rtsapp402p.prod.ch4.s.com
 server3=rtsapp403p.prod.ch4.s.com
  */
-		toplologyBuilder.setSpout("sywEventsSpout", new SYWRedisSpout(
+		topologyBuilder.setSpout("sywEventsSpout", new SYWRedisSpout(
 				"rtsapp401p.prod.ch4.s.com", TopicConstants.PORT, "SYW_Interactions"), 1);
 		//rtsapp302p.qa.ch3.s.com
 		//
 		// Parse the JSON
-		toplologyBuilder.setBolt("parseEventsBolt", new ParsingBoltSYW(), 1)
+		topologyBuilder.setBolt("parseEventsBolt", new ParsingBoltSYW(), 1)
 				.shuffleGrouping("sywEventsSpout");
 		// Get the div line and boost variable
-		toplologyBuilder.setBolt("processSYWEvents",
+		topologyBuilder.setBolt("processSYWEvents",
 				new ProcessSYWInteractions(), 4).shuffleGrouping(
 				"parseEventsBolt");
-		toplologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(), 1).shuffleGrouping("processSYWEvents", "score_stream");
-		//TODO: Persist is still being fixed
-		toplologyBuilder.setBolt("persistBolt", new PersistBoostsBolt(), 1).shuffleGrouping("processSYWEvents", "persist_stream");
+		topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(), 1).shuffleGrouping("processSYWEvents", "score_stream");
+		topologyBuilder.setBolt("persistBolt", new PersistBoostsBolt(), 1).shuffleGrouping("processSYWEvents", "persist_stream");
 
-		toplologyBuilder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
-		toplologyBuilder.setBolt("memberPublishBolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 2).shuffleGrouping("strategyScoringBolt", "member_stream");
+		topologyBuilder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
+		topologyBuilder.setBolt("memberPublishBolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 2).shuffleGrouping("strategyScoringBolt", "member_stream");
 		Config conf = new Config();
 		conf.put("metrics_topology", "Syw");
 	    conf.registerMetricsConsumer(MetricsListener.class, 3);
@@ -68,13 +67,13 @@ server3=rtsapp403p.prod.ch4.s.com
 		if (args != null && args.length > 0) {
 			conf.setNumWorkers(6);
 			StormSubmitter.submitTopology(args[0], conf,
-					toplologyBuilder.createTopology());
+					topologyBuilder.createTopology());
 		} else {
 			conf.setDebug(false);
 			conf.setMaxTaskParallelism(3);
 			LocalCluster cluster = new LocalCluster();
 			cluster.submitTopology("syw_topology", conf,
-					toplologyBuilder.createTopology());
+					topologyBuilder.createTopology());
 			Thread.sleep(10000000);
 			cluster.shutdown();
 		}
