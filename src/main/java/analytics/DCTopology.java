@@ -47,7 +47,7 @@ public class DCTopology {
 			kafkaConfig.forceFromStart = true;
 		}
 		builder.setSpout("kafkaSpout", new KafkaSpout(kafkaConfig), partition_num);
-		builder.setBolt("dCParsingBolt", new ParsingBoltDC(), partition_num).localOrShuffleGrouping("kafkaSpout");
+		builder.setBolt("dcParsingBolt", new ParsingBoltDC(), partition_num).localOrShuffleGrouping("kafkaSpout");
 	    builder.setBolt("strategyScoringBolt", new StrategyScoringBolt(),partition_num).localOrShuffleGrouping("dCParsingBolt", "score_stream");
 		builder.setBolt("dcPersistBolt", new PersistDCBolt(), partition_num).localOrShuffleGrouping("dCParsingBolt", "persist_stream");
 		builder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], redis_port,"score"), partition_num).localOrShuffleGrouping("strategyScoringBolt", "score_stream");
