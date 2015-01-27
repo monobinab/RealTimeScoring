@@ -54,11 +54,8 @@ server3=rtsapp403p.prod.ch4.s.com
 		//
 		// Parse the JSON
 		topologyBuilder.setBolt("parseEventsBolt", new ParsingBoltSYW(), 1)
-				.shuffleGrouping("sywEventsSpout1");
-		topologyBuilder.setBolt("parseEventsBolt", new ParsingBoltSYW(), 1)
-		.shuffleGrouping("sywEventsSpout2");
-		topologyBuilder.setBolt("parseEventsBolt", new ParsingBoltSYW(), 1)
-		.shuffleGrouping("sywEventsSpout3");
+				.shuffleGrouping("sywEventsSpout1").shuffleGrouping("sywEventsSpout2").shuffleGrouping("sywEventsSpout3");
+
 		// Get the div line and boost variable
 		topologyBuilder.setBolt("processSYWEvents",
 				new ProcessSYWInteractions(), 4).shuffleGrouping(
