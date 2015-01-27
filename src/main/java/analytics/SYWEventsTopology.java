@@ -44,13 +44,21 @@ public class SYWEventsTopology {
 server2=rtsapp402p.prod.ch4.s.com
 server3=rtsapp403p.prod.ch4.s.com
  */
-		topologyBuilder.setSpout("sywEventsSpout", new SYWRedisSpout(
-				"rtsapp401p.prod.ch4.s.com", TopicConstants.PORT, "SYW_Interactions"), 1);
+		topologyBuilder.setSpout("sywEventsSpout1", new SYWRedisSpout(
+				servers[0], TopicConstants.PORT, "SYW_Interactions"), 1);
+		topologyBuilder.setSpout("sywEventsSpout2", new SYWRedisSpout(
+				servers[1], TopicConstants.PORT, "SYW_Interactions"), 1);
+		topologyBuilder.setSpout("sywEventsSpout3", new SYWRedisSpout(
+				servers[2], TopicConstants.PORT, "SYW_Interactions"), 1);
 		//rtsapp302p.qa.ch3.s.com
 		//
 		// Parse the JSON
 		topologyBuilder.setBolt("parseEventsBolt", new ParsingBoltSYW(), 1)
-				.shuffleGrouping("sywEventsSpout");
+				.shuffleGrouping("sywEventsSpout1");
+		topologyBuilder.setBolt("parseEventsBolt", new ParsingBoltSYW(), 1)
+		.shuffleGrouping("sywEventsSpout2");
+		topologyBuilder.setBolt("parseEventsBolt", new ParsingBoltSYW(), 1)
+		.shuffleGrouping("sywEventsSpout3");
 		// Get the div line and boost variable
 		topologyBuilder.setBolt("processSYWEvents",
 				new ProcessSYWInteractions(), 4).shuffleGrouping(
