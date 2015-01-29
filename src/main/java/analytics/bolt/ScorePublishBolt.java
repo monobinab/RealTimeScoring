@@ -118,7 +118,6 @@ public class ScorePublishBolt extends BaseRichBolt {
 		outputCollector.ack(input);
 		LOGGER.info("TIME:" + messageID + "-Score publish complete-" + System.currentTimeMillis());
 		LOGGER.info("PERSIST: " + new Date() + ": Topology: Changes Scores : lid: " + l_id + ", modelId: "+modelId + ", oldScore: "+oldScore +", newScore: "+newScore+", minExpiry: "+minExpiry+": source: " + source);
-		System.out.println("PERSIST: " + new Date() + ": Topology: Changes Scores : lid: " + l_id + ", modelId: "+modelId + ", oldScore: "+oldScore +", newScore: "+newScore+", minExpiry: "+minExpiry+": source: " + source);
 
 		//l_id, modelId, oldScore, newScore, minExpiry, source 
 
