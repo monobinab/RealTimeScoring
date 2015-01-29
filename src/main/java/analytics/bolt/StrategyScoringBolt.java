@@ -141,6 +141,12 @@ public class StrategyScoringBolt extends BaseRichBolt {
 
 			// 9) Emit the new score
 			double oldScore = 0;
+			Map<String, Date> minMaxMap = ScoringSingleton.getInstance().getMinMaxExpiry(modelId, allChanges);
+			Date minExpiryDate = minMaxMap.get("minExpiry");
+			String minExpiry = null;
+			if(minExpiryDate != null){
+				minExpiry = minExpiryDate.toString();
+			}
 			// TODO: change oldScore to a timestamp of the change to persist to changedMemberScore
 			List<Object> listToEmit = new ArrayList<Object>();
 			listToEmit.add(lId);
@@ -149,6 +155,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 			listToEmit.add(modelId.toString());
 			listToEmit.add(source);
 			listToEmit.add(messageID);
+			listToEmit.add(minExpiry);
 			modelIdScoreMap.put(modelId, newScore);
 			LOGGER.debug(" ### SCORING BOLT EMITTING: " + listToEmit);
 			if(LOGGER.isDebugEnabled())
@@ -168,7 +175,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 		// Write changes to changedMemberScores
 		ScoringSingleton.getInstance().updateChangedMemberScore(lId, modelIdList, allChanges, modelIdScoreMap,source);
 		LOGGER.info("TIME:" + messageID + "-Score updates complete-" + System.currentTimeMillis());
-		LOGGER.info("PERSIST: " + new Date() + ": Topology: Changes Scores : lid: " + lId + ": scores: " + modelIdScoreMap);
+		
 		
 		List<Object> listToEmit = new ArrayList<Object>();
 		listToEmit.add(lId);
@@ -182,7 +189,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declareStream("score_stream",new Fields("l_id", "oldScore", "newScore", "model","source", "messageID"));
+		declarer.declareStream("score_stream",new Fields("l_id", "oldScore", "newScore", "model","source", "messageID", "minExpiry"));
 		declarer.declareStream("member_stream", new Fields("l_id", "source","messageID"));
 
 	}

@@ -17,6 +17,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
+import java.util.Date;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -81,9 +82,12 @@ public class ScorePublishBolt extends BaseRichBolt {
 		String modelName = ScoringSingleton.getInstance().getModelName(
 				Integer.parseInt(modelId));
 		String oldScore = memberScoreDao.getMemberScores(l_id).get(modelId);
+		String source = input.getStringByField("source");
+		Double newScore = input.getDoubleByField("newScore");
+		String minExpiry = input.getStringByField("minExpiry");
 		String message = new StringBuffer(l_id).append(",").append(modelName)
-				.append(",").append(input.getStringByField("source"))
-				.append(",").append(input.getDoubleByField("newScore"))
+				.append(",").append(source)
+				.append(",").append(newScore)
 				.append(",").append(oldScore).toString();
 		// System.out.println(" %%% message : " + message);
 		String messageID = "";
@@ -113,6 +117,11 @@ public class ScorePublishBolt extends BaseRichBolt {
 		countMetric.scope("publish_successful").incr();
 		outputCollector.ack(input);
 		LOGGER.info("TIME:" + messageID + "-Score publish complete-" + System.currentTimeMillis());
+		LOGGER.info("PERSIST: " + new Date() + ": Topology: Changes Scores : lid: " + l_id + ", modelId: "+modelId + ", oldScore: "+oldScore +", newScore: "+newScore+", minExpiry: "+minExpiry+": source: " + source);
+		System.out.println("PERSIST: " + new Date() + ": Topology: Changes Scores : lid: " + l_id + ", modelId: "+modelId + ", oldScore: "+oldScore +", newScore: "+newScore+", minExpiry: "+minExpiry+": source: " + source);
+
+		//l_id, modelId, oldScore, newScore, minExpiry, source 
+
 	}
 
 	/*
