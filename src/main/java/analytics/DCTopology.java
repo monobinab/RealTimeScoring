@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import storm.kafka.*;
+import analytics.bolt.LoggingBolt;
 import analytics.bolt.ParsingBoltDC;
 import analytics.bolt.MemberPublishBolt;
 import analytics.bolt.PersistDCBolt;
@@ -50,8 +51,9 @@ public class DCTopology {
 		builder.setBolt("dcParsingBolt", new ParsingBoltDC(), partition_num).localOrShuffleGrouping("kafkaSpout");
 	    builder.setBolt("strategyScoringBolt", new StrategyScoringBolt(),partition_num).localOrShuffleGrouping("dcParsingBolt", "score_stream");
 		builder.setBolt("dcPersistBolt", new PersistDCBolt(), partition_num).localOrShuffleGrouping("dcParsingBolt", "persist_stream");
-		builder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], redis_port,"score"), partition_num).localOrShuffleGrouping("strategyScoringBolt", "score_stream");
-		builder.setBolt("memberPublishBolt", new MemberPublishBolt(RedisConnection.getServers()[0], redis_port,"member"), partition_num).localOrShuffleGrouping("strategyScoringBolt", "member_stream");
+		builder.setBolt("loggingBolt", new LoggingBolt(), partition_num).localOrShuffleGrouping("strategyScoringBolt", "score_stream");
+		//builder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], redis_port,"score"), partition_num).localOrShuffleGrouping("strategyScoringBolt", "score_stream");
+		//builder.setBolt("memberPublishBolt", new MemberPublishBolt(RedisConnection.getServers()[0], redis_port,"member"), partition_num).localOrShuffleGrouping("strategyScoringBolt", "member_stream");
 		Config conf = new Config();
 		conf.put("metrics_topology", "DC");
 		conf.registerMetricsConsumer(MetricsListener.class, partition_num);
