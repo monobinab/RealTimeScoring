@@ -127,6 +127,8 @@ public class StrategyScoringBolt extends BaseRichBolt {
 		// 8) Rescore - arbitrate between all changes and memberVariables
 		// Score each model in a loop
 		Map<Integer, Double> modelIdScoreMap = new HashMap<Integer, Double>();
+		Map<Integer,Map<String,Date>> modelIdToExpiryMap = new HashMap<Integer, Map<String,Date>>();
+		
 		for (Integer modelId : modelIdList) {// Score and emit for all modelIds
 												// before mongo inserts
 			// recalculate score for model
@@ -142,6 +144,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 			// 9) Emit the new score
 			double oldScore = 0;
 			Map<String, Date> minMaxMap = ScoringSingleton.getInstance().getMinMaxExpiry(modelId, allChanges);
+			modelIdToExpiryMap.put(modelId, minMaxMap);
 			Date minExpiryDate = minMaxMap.get("minExpiry");
 			String minExpiry = null;
 			if(minExpiryDate != null){
@@ -173,7 +176,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 		// 10) Write changedMemberVariableswith expiry
 		ScoringSingleton.getInstance().updateChangedVariables(lId, allChanges);
 		// Write changes to changedMemberScores
-		ScoringSingleton.getInstance().updateChangedMemberScore(lId, modelIdList, allChanges, modelIdScoreMap,source);
+		ScoringSingleton.getInstance().updateChangedMemberScore(lId, modelIdList, modelIdToExpiryMap, modelIdScoreMap,source);
 		LOGGER.info("TIME:" + messageID + "-Score updates complete-" + System.currentTimeMillis());
 		
 		

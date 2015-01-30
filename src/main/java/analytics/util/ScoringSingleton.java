@@ -113,11 +113,14 @@ public class ScoringSingleton {
 		}
 		Map<String, Change> allChanges = ScoringSingleton.getInstance().createChangedVariablesMap(loyaltyId);
 		Map<Integer, Double> modelIdScoreMap = new HashMap<Integer, Double>();
+		Map<Integer,Map<String,Date>> modelIdToExpiryMap = new HashMap<Integer, Map<String,Date>>();
 		for (Integer modelId : modelIdList) {
 			double score = ScoringSingleton.getInstance().calcScore(memberVariablesMap, allChanges, modelId);
 			modelIdScoreMap.put(modelId, score);
+			modelIdToExpiryMap.put(modelId, getMinMaxExpiry(modelId, allChanges));
+			
 		}
-		updateChangedMemberScore(loyaltyId, modelIdList, allChanges, modelIdScoreMap, source);
+		updateChangedMemberScore(loyaltyId, modelIdList, modelIdToExpiryMap, modelIdScoreMap, source);
 		// TODO: This is a very bad way of defining, but a very temp fix before
 		// fixing other topologies
 		HashMap<String, Double> modelIdStringScoreMap = new HashMap<String, Double>();
@@ -421,14 +424,22 @@ public class ScoringSingleton {
 		minMaxMap.put("maxExpiry", maxDate);
 		return minMaxMap;
 	}
-
-	public void updateChangedMemberScore(String l_id, Set<Integer> modelIdList, Map<String, Change> allChanges, Map<Integer, Double> modelIdScoreMap, String source) {
+	
+	/**
+	 * 
+	 * @param l_id
+	 * @param modelIdList
+	 * @param modelIdToExpiryMap
+	 * @param modelIdScoreMap
+	 * @param source
+	 */
+	public void updateChangedMemberScore(String l_id, Set<Integer> modelIdList, Map<Integer, Map<String,Date>> modelIdToExpiry, Map<Integer, Double> modelIdScoreMap, String source) {
 		Map<Integer, ChangedMemberScore> updatedScores = new HashMap<Integer, ChangedMemberScore>();
 
 		for (Integer modelId : modelIdList) {
 			// FIND THE MIN AND MAX EXPIRATION DATE OF ALL VARIABLE CHANGES FOR
 			// CHANGED MODEL SCORE TO WRITE TO SCORE CHANGES COLLECTION
-			Map<String, Date> minMaxMap = getMinMaxExpiry(modelId, allChanges);
+			Map<String, Date> minMaxMap = modelIdToExpiry.get(modelId);
 			Date minDate = minMaxMap.get("minExpiry");
 			Date maxDate = minMaxMap.get("maxExpiry");
 			// IF THE MODEL IS MONTH SPECIFIC AND THE MIN/MAX DATE IS AFTER THE
