@@ -984,9 +984,14 @@ public class ScoringSingletonTest {
 
 		Set<Integer> modelIds = new HashSet<Integer>();
 		modelIds.add(51);
-
+		
+		Map<Integer,Map<String,Date>> modelIdToExpiryMap = new HashMap<Integer, Map<String,Date>>();
+		for (Integer modelId : modelIds) {
+			modelIdToExpiryMap.put(modelId, scoringSingletonObj.getMinMaxExpiry(modelId, allChangesSyw));
+		}
+		
 		scoringSingletonObj.updateChangedMemberScore("SearsUpdate", modelIds,
-				allChangesSyw, null, "test");
+				modelIdToExpiryMap, null, "test");
 		DBObject dbObj = changedMemberScore.findOne(new BasicDBObject("l_id",
 				"SearsUpdate"));
 		HashMap<String, ChangedMemberScore> changedMemScores51 = (HashMap<String, ChangedMemberScore>) dbObj
@@ -1072,8 +1077,13 @@ public class ScoringSingletonTest {
 		modelIds.add(51);
 		Map<Integer, Double> modelIdScoreMap = new HashMap<Integer, Double>();
 		modelIdScoreMap.put(51, 0.09);
+		Map<Integer,Map<String,Date>> modelIdToExpiryMap = new HashMap<Integer, Map<String,Date>>();
+		for (Integer modelId : modelIds) {
+			modelIdToExpiryMap.put(modelId, scoringSingletonObj.getMinMaxExpiry(modelId, allChangesSywBoost));
+			
+		}
 		scoringSingletonObj.updateChangedMemberScore("SearsUpdate2", modelIds,
-				allChangesSywBoost, modelIdScoreMap,"test");
+				modelIdToExpiryMap, modelIdScoreMap,"test");
 		DBObject dbObj = changedMemberScore.findOne(new BasicDBObject("l_id",
 				"SearsUpdate2"));
 		HashMap<String, ChangedMemberScore> changedMemScores51 = (HashMap<String, ChangedMemberScore>) dbObj
@@ -1157,8 +1167,13 @@ public class ScoringSingletonTest {
 		modelIds.add(51);
 		Map<Integer, Double> modelIdScoreMap = new HashMap<Integer, Double>();
 		modelIdScoreMap.put(51, 0.09);
+		Map<Integer,Map<String,Date>> modelIdToExpiryMap = new HashMap<Integer, Map<String,Date>>();
+		for (Integer modelId : modelIds) {
+			modelIdToExpiryMap.put(modelId, scoringSingletonObj.getMinMaxExpiry(modelId, allChanges));
+			
+		}
 		scoringSingletonObj.updateChangedMemberScore("SearsUpdate3", modelIds,
-				allChanges, modelIdScoreMap,"null");
+				modelIdToExpiryMap, modelIdScoreMap,"null");
 		DBObject dbObj = changedMemberScore.findOne(new BasicDBObject("l_id",
 				"SearsUpdate3"));
 		HashMap<String, ChangedMemberScore> changedMemScores51 = (HashMap<String, ChangedMemberScore>) dbObj
