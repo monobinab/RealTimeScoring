@@ -6,7 +6,6 @@ package analytics.bolt;
 import analytics.util.Constants;
 import analytics.util.MongoNameConstants;
 import analytics.util.ScoringSingleton;
-import analytics.util.dao.MemberScoreDao;
 import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -33,7 +32,6 @@ public class LoggingBolt extends BaseRichBolt {
 	private static final long serialVersionUID = 1L;
 	private OutputCollector outputCollector;
 
-	private MemberScoreDao memberScoreDao;
 	private MultiCountMetric countMetric;
 	public LoggingBolt() {
 	}
@@ -48,7 +46,6 @@ public class LoggingBolt extends BaseRichBolt {
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
 	    initMetrics(context);
-		memberScoreDao = new MemberScoreDao();
 		this.outputCollector = collector;
 	}
 	 void initMetrics(TopologyContext context){
