@@ -1,5 +1,6 @@
 package analytics.bolt;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -15,6 +16,7 @@ import analytics.util.Constants;
 import analytics.util.JsonUtils;
 import analytics.util.MongoNameConstants;
 import analytics.util.ScoringSingleton;
+import analytics.util.dao.MemberScoreDao;
 import analytics.util.objects.Change;
 import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
@@ -40,6 +42,8 @@ public class StrategyScoringBolt extends BaseRichBolt {
 	private static final long serialVersionUID = 1L;
 	private OutputCollector outputCollector;
 	private MultiCountMetric countMetric;
+	private MemberScoreDao memberScoreDao;
+
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
@@ -48,6 +52,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 	     //TODO: ALL BOLTS SHOULD HAVE THIS LINE - ADD TO SUPER CLASS
         System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
 		this.outputCollector = collector;
+		memberScoreDao = new MemberScoreDao();
 	}
 	 void initMetrics(TopologyContext context){
 	     countMetric = new MultiCountMetric();
@@ -143,12 +148,21 @@ public class StrategyScoringBolt extends BaseRichBolt {
 
 			// 9) Emit the new score
 			double oldScore = 0;
+			String oldScoreStr = memberScoreDao.getMemberScores(lId).get(modelId.toString());
+			if(oldScoreStr != null)
+				oldScore = Double.parseDouble(oldScoreStr);
 			Map<String, Date> minMaxMap = ScoringSingleton.getInstance().getMinMaxExpiry(modelId, allChanges);
 			modelIdToExpiryMap.put(modelId, minMaxMap);
 			Date minExpiryDate = minMaxMap.get("minExpiry");
+			Date maxExpiryDate = minMaxMap.get("maxExpiry");
+			SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
 			String minExpiry = null;
+			String maxExpiry = null;
 			if(minExpiryDate != null){
-				minExpiry = minExpiryDate.toString();
+				minExpiry = format.format(minExpiryDate);
+			}
+			if(maxExpiryDate != null){
+				maxExpiry = format.format(maxExpiryDate);
 			}
 			// TODO: change oldScore to a timestamp of the change to persist to changedMemberScore
 			List<Object> listToEmit = new ArrayList<Object>();
@@ -159,6 +173,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 			listToEmit.add(source);
 			listToEmit.add(messageID);
 			listToEmit.add(minExpiry);
+			listToEmit.add(maxExpiry);
 			modelIdScoreMap.put(modelId, newScore);
 			LOGGER.debug(" ### SCORING BOLT EMITTING: " + listToEmit);
 			if(LOGGER.isDebugEnabled())
@@ -192,7 +207,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declareStream("score_stream",new Fields("l_id", "oldScore", "newScore", "model","source", "messageID", "minExpiry"));
+		declarer.declareStream("score_stream",new Fields("l_id", "oldScore", "newScore", "model","source", "messageID", "minExpiry", "maxExpiry"));
 		declarer.declareStream("member_stream", new Fields("l_id", "source","messageID"));
 
 	}

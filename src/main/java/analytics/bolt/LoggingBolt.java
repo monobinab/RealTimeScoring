@@ -64,19 +64,23 @@ public class LoggingBolt extends BaseRichBolt {
 	@Override
 	public void execute(Tuple input) {
 		countMetric.scope("incoming_tuples").incr();
-		// System.out.println(" %%% scorepublishbolt :" + input);
+		//System.out.println(" %%% scorepublishbolt :" + input);
 		String l_id = input.getStringByField("l_id");
 		String modelId = input.getStringByField("model");
-		String oldScore = memberScoreDao.getMemberScores(l_id).get(modelId);
+		Double oldScore = input.getDoubleByField("oldScore");
 		String source = input.getStringByField("source");
 		Double newScore = input.getDoubleByField("newScore");
 		String minExpiry = input.getStringByField("minExpiry");
+		String maxExpiry = input.getStringByField("maxExpiry");
+
 		String messageID = "";
 		if (input.contains("messageID")) {
 			messageID = input.getStringByField("messageID");
 		}
 		LOGGER.info("TIME:" + messageID + "-Entering logging bolt-" + System.currentTimeMillis());
-		LOGGER.info("PERSIST: " + new Date() + ": Topology: Changes Scores : lid: " + l_id + ", modelId: "+modelId + ", oldScore: "+oldScore +", newScore: "+newScore+", minExpiry: "+minExpiry+": source: " + source);
+		LOGGER.info("PERSIST: " + new Date() + ": Topology: Changes Scores : lid: " + l_id + ", modelId: "+modelId + ", oldScore: "+oldScore +", newScore: "+newScore+", minExpiry: "+minExpiry+", maxExpiry: "+maxExpiry+", source: " + source);
+		//System.out.println("PERSIST: " + new Date() + ": Topology: Changes Scores : lid: " + l_id + ", modelId: "+modelId + ", oldScore: "+oldScore +", newScore: "+newScore+", minExpiry: "+minExpiry+", maxExpiry: "+maxExpiry+", source: " + source);
+
 		countMetric.scope("score_logged").incr();
 		outputCollector.ack(input);	}
 
