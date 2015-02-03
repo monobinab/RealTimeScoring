@@ -47,8 +47,8 @@ public class FlumeRPCBolt extends BaseRichBolt {
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
 		String isProd = System.getProperty(MongoNameConstants.IS_PROD);
 		initMetrics(context);
-
-		String[] hostArray = {};
+		memberScoreDao = new MemberScoreDao();
+		String[] hostArray = new String[1];
 		this.collector = collector;
 		final Properties sinkProperties = new Properties();
 		Properties prop = new Properties();
