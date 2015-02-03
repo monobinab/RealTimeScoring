@@ -59,7 +59,7 @@ public class PersistDCBoltTest {
 		json.put("dc", dcObject);
 		memberDCDao.addDateDC(l_id, json.toString());
 		Map<String, String> map = memberDCDao.getDateStrengthMap("DC_Appliance", l_id);
-		assertEquals(map.get(date),Double.toString(strength));
+		assertEquals(Double.toString(strength), map.get(date));
 	}
 	
 	@Test
@@ -79,8 +79,8 @@ public class PersistDCBoltTest {
 		json.put("dc", dcObject);
 		memberDCDao.addDateDC(l_id, json.toString());
 		Map<String, String> map = memberDCDao.getDateStrengthMap("DC_Appliance", l_id);
-		assertEquals(map.get("2014-12-15"), Double.toString(strength1));
-		assertEquals(map.get("2014-12-16"), Double.toString(strength2));
+		assertEquals(Double.toString(strength1), map.get("2014-12-15"));
+		assertEquals(Double.toString(strength2), map.get("2014-12-16"));
 	}
 	
 	@Test
@@ -100,10 +100,10 @@ public class PersistDCBoltTest {
 		json.put("dc", dcObject);
 		memberDCDao.addDateDC(l_id, json.toString());
 		Map<String, String> map = memberDCDao.getDateStrengthMap("DC_Appliance", l_id);
-		assertEquals(map.get(date), Double.toString(strength1));
+		assertEquals(Double.toString(strength1), map.get(date));
 		
 		map = memberDCDao.getDateStrengthMap("DC_Beverage", l_id);
-		assertEquals(map.get("2014-12-16"), Double.toString(strength2));
+		assertEquals(Double.toString(strength2), map.get("2014-12-16"));
 		//This is because json.toString actually converts double to integer, it will be converted back 
 	
 	}
@@ -125,7 +125,7 @@ public class PersistDCBoltTest {
 		json.put("dc", dcObject);
 		memberDCDao.addDateDC(l_id, json.toString());
 		Map<String, String> map = memberDCDao.getDateStrengthMap("DC_Appliance", l_id);
-		assertEquals(map.get(date), Double.toString(strength1+strength2));
+		assertEquals(Double.toString(strength1+strength2), map.get(date));
 	}
 	
 	@Test
@@ -143,7 +143,7 @@ public class PersistDCBoltTest {
 		json.put("dc", dcObject);
 		memberDCDao.addDateDC(l_id, json.toString());
 		Map<String, String> map = memberDCDao.getDateStrengthMap("DC_Appliance", l_id);
-		assertEquals(map.get(date), Double.toString(strength1));
+		assertEquals(Double.toString(strength1), map.get(date));
 	}
 	
 	@Test
@@ -169,7 +169,7 @@ public class PersistDCBoltTest {
 		json.put("dc", dcObject);
 		memberDCDao.addDateDC(l_id, json.toString());
 		Map<String, String> map = memberDCDao.getDateStrengthMap("DC_Appliance", l_id);
-		assertEquals(map.get(date), Double.toString(strength1));
+		assertEquals(Double.toString(strength1), map.get(date));
 	}
 	
 	@Test
@@ -195,8 +195,35 @@ public class PersistDCBoltTest {
 		json.put("dc", dcObject);
 		memberDCDao.addDateDC(l_id, json.toString());
 		Map<String, String> map = memberDCDao.getDateStrengthMap("DC_Appliance", l_id);
-		assertEquals(map.get(date), Double.toString(strength1));
+		assertEquals(Double.toString(strength1), map.get(date));
 	}
+	
+	@Test
+	public void testPersistSameMemberTwiceWithSameContent() throws JSONException {
+		double strength = 12.0;
+		String l_id = "=ASDDDDDDDDDDDDDDDDDDD";
+		JSONObject json = new JSONObject();
+		json.put("d", date);
+		JSONObject dcObject = new JSONObject();
+		dcObject.put("DC_Appliance", strength);
+		json.put("dc", dcObject);
+		memberDCDao.addDateDC(l_id, json.toString());
+		Map<String, String> map = memberDCDao.getDateStrengthMap("DC_Appliance", l_id);
+		assertEquals(Double.toString(strength), map.get(date));
+		
+		JSONObject dcObject1 = new JSONObject();
+		JSONObject json1 = new JSONObject();
+		double strength1 = 13;
+		dcObject1.put("DC_Appliance", strength1);
+		json1.put("d", date);
+		json1.put("dc", dcObject1);
+		memberDCDao.addDateDC(l_id, json1.toString());
+		map = memberDCDao.getDateStrengthMap("DC_Appliance", l_id);
+		assertEquals(Double.toString(strength+strength1), map.get(date));
+	}
+	
+	
+	
 	@AfterClass
 	public static void cleanUp(){
 		db.dropDatabase();

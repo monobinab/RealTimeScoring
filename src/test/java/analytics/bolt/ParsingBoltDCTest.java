@@ -232,8 +232,8 @@ public class ParsingBoltDCTest {
 		saxParser.parse(new InputSource(new StringReader(message)), handler);
 		List<JSONObject> answers = handler.getAnswerList();
 		assertEquals(2, answers.size());
-		assertEquals((String)answers.get(1).get("a_id"), "BB3300163E00123E11E4211D06A40C21");
-		assertEquals((String)answers.get(1).get("q_id"), "BB3300163E00123E11E4211D06A2FAB0");
+		assertEquals("BB3300163E00123E11E4211D06A40C21", (String)answers.get(1).get("a_id"));
+		assertEquals("BB3300163E00123E11E4211D06A2FAB0", (String)answers.get(1).get("q_id"));
 		assertEquals("BB3300163E00123E11E4211D06A2AC90",(String)answers.get(0).get("q_id"));
 		assertEquals("BB3300163E00123E11E4211D06A3BE01", (String)answers.get(0).get("a_id"));
 	}
