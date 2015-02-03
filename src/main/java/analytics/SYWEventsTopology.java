@@ -3,15 +3,11 @@ package analytics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.bolt.LoggingBolt;
-import analytics.bolt.MemberPublishBolt;
+import analytics.bolt.FlumeRPCBolt;
 import analytics.bolt.ParsingBoltSYW;
 import analytics.bolt.PersistBoostsBolt;
-import analytics.bolt.PersistDCBolt;
 import analytics.bolt.ProcessSYWInteractions;
-import analytics.bolt.ScorePublishBolt;
 import analytics.bolt.StrategyScoringBolt;
-import analytics.bolt.SywScoringBolt;
 import analytics.spout.SYWRedisSpout;
 import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
@@ -63,7 +59,7 @@ server3=rtsapp403p.prod.ch4.s.com
 				"parseEventsBolt");
 		topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(), 1).shuffleGrouping("processSYWEvents", "score_stream");
 		topologyBuilder.setBolt("persistBolt", new PersistBoostsBolt(), 1).shuffleGrouping("processSYWEvents", "persist_stream");
-		topologyBuilder.setBolt("loggingBolt", new LoggingBolt(), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
+		topologyBuilder.setBolt("flumeLoggingBolt", new FlumeRPCBolt(), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
 		
 		//topologyBuilder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
 		//topologyBuilder.setBolt("memberPublishBolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 2).shuffleGrouping("strategyScoringBolt", "member_stream");

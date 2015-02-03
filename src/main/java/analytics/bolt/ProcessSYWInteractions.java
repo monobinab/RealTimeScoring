@@ -249,7 +249,6 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 
 			List<Object> listToEmit2 = new ArrayList<Object>();
 			Map<String, String> map = formMapForScoringBolt(feedType, lId, allBoostValuesMap, variableValueMap);
-			System.out.println(map);
 			listToEmit2.add(lId);
 			listToEmit2.add(gson.toJson(map, varValueType));
 			listToEmit2.add(feedType);
@@ -270,7 +269,6 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 		for(String variableName : variableValueMap.keySet()){
 			
 			Object modelIdObj= sywBoostModelMap.get(variableName);
-			System.out.println(variableName);
 			if (modelIdObj instanceof Integer) {
 				int modelId = (Integer)modelIdObj;
 				String modelIdStr = String.valueOf(modelId);
