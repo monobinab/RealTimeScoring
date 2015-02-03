@@ -3,6 +3,7 @@ package analytics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import analytics.bolt.FlumeRPCBolt;
 import analytics.bolt.LoggingBolt;
 import analytics.bolt.MemberPublishBolt;
 import analytics.bolt.ParsingBoltAAM_ATC;
@@ -51,7 +52,7 @@ public class AAM_BrowseTopology {
 		
 		topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(), 3)
 				.localOrShuffleGrouping("parsingBoltBrowse");
-		topologyBuilder.setBolt("loggingBolt", new LoggingBolt(), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
+		topologyBuilder.setBolt("flumeLoggingBolt", new FlumeRPCBolt(), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
 		
 //		 topologyBuilder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 3).localOrShuffleGrouping("strategyScoringBolt", "score_stream");
 	//        topologyBuilder.setBolt("memberPublishBolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 3).localOrShuffleGrouping("strategyScoringBolt", "member_stream");
