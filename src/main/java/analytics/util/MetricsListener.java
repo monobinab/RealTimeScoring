@@ -33,10 +33,10 @@ public class MetricsListener implements IMetricsConsumer {
         JedisPoolConfig poolConfig = new JedisPoolConfig();
         poolConfig.setMaxActive(100);
 		if("true".equals(stormConf.get("rtseprod"))){
-	        jedisPool = new JedisPool(poolConfig,prop.getProperty("prod"), port, 100);
+	        jedisPool = new JedisPool(poolConfig,prop.getProperty("prod"), port, 1000);
 		}
 		else{
-	        jedisPool = new JedisPool(poolConfig,prop.getProperty("qa"), port, 100);
+	        jedisPool = new JedisPool(poolConfig,prop.getProperty("qa"), port, 1000);
 		}
 
 		topologyName = (String) stormConf.get("metrics_topology");

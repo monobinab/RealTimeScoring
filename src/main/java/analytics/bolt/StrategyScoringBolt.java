@@ -1,5 +1,6 @@
 package analytics.bolt;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -15,6 +16,7 @@ import analytics.util.Constants;
 import analytics.util.JsonUtils;
 import analytics.util.MongoNameConstants;
 import analytics.util.ScoringSingleton;
+import analytics.util.dao.MemberScoreDao;
 import analytics.util.objects.Change;
 import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
@@ -40,6 +42,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 	private static final long serialVersionUID = 1L;
 	private OutputCollector outputCollector;
 	private MultiCountMetric countMetric;
+
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
@@ -142,23 +145,28 @@ public class StrategyScoringBolt extends BaseRichBolt {
 			newScore = newScore + ScoringSingleton.getInstance().getBoostScore(allChanges, modelId );
 
 			// 9) Emit the new score
-			double oldScore = 0;
 			Map<String, Date> minMaxMap = ScoringSingleton.getInstance().getMinMaxExpiry(modelId, allChanges);
 			modelIdToExpiryMap.put(modelId, minMaxMap);
 			Date minExpiryDate = minMaxMap.get("minExpiry");
+			Date maxExpiryDate = minMaxMap.get("maxExpiry");
+			SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
 			String minExpiry = null;
+			String maxExpiry = null;
 			if(minExpiryDate != null){
-				minExpiry = minExpiryDate.toString();
+				minExpiry = format.format(minExpiryDate);
+			}
+			if(maxExpiryDate != null){
+				maxExpiry = format.format(maxExpiryDate);
 			}
 			// TODO: change oldScore to a timestamp of the change to persist to changedMemberScore
 			List<Object> listToEmit = new ArrayList<Object>();
 			listToEmit.add(lId);
-			listToEmit.add(oldScore);
 			listToEmit.add(newScore);
 			listToEmit.add(modelId.toString());
 			listToEmit.add(source);
 			listToEmit.add(messageID);
 			listToEmit.add(minExpiry);
+			listToEmit.add(maxExpiry);
 			modelIdScoreMap.put(modelId, newScore);
 			LOGGER.debug(" ### SCORING BOLT EMITTING: " + listToEmit);
 			if(LOGGER.isDebugEnabled())
@@ -192,7 +200,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declareStream("score_stream",new Fields("l_id", "oldScore", "newScore", "model","source", "messageID", "minExpiry"));
+		declarer.declareStream("score_stream",new Fields("l_id", "newScore", "model","source", "messageID", "minExpiry", "maxExpiry"));
 		declarer.declareStream("member_stream", new Fields("l_id", "source","messageID"));
 
 	}

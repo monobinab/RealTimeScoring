@@ -46,7 +46,7 @@ public class DCTopology {
 		kafkaConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
 		if(isLocal){
 			//default is false, only set to true for developing or testing locally
-			kafkaConfig.forceFromStart = true;
+			//kafkaConfig.forceFromStart = true;
 		}
 		builder.setSpout("kafkaSpout", new KafkaSpout(kafkaConfig), partition_num);
 		builder.setBolt("dcParsingBolt", new ParsingBoltDC(), partition_num).localOrShuffleGrouping("kafkaSpout");

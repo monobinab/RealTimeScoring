@@ -95,7 +95,7 @@ public class MemberDCDao extends AbstractDao {
 				}
 					
 			}
-			memberDCCollection.update(new BasicDBObject(MongoNameConstants.L_ID, l_id), object, true, false);
+			memberDCCollection.update(new BasicDBObject(MongoNameConstants.L_ID, l_id), new BasicDBObject("$set", object), true, false);
 		}
 
 	}
