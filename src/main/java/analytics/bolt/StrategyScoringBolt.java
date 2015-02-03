@@ -42,7 +42,6 @@ public class StrategyScoringBolt extends BaseRichBolt {
 	private static final long serialVersionUID = 1L;
 	private OutputCollector outputCollector;
 	private MultiCountMetric countMetric;
-	private MemberScoreDao memberScoreDao;
 
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
@@ -52,7 +51,6 @@ public class StrategyScoringBolt extends BaseRichBolt {
 	     //TODO: ALL BOLTS SHOULD HAVE THIS LINE - ADD TO SUPER CLASS
         System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
 		this.outputCollector = collector;
-		memberScoreDao = new MemberScoreDao();
 	}
 	 void initMetrics(TopologyContext context){
 	     countMetric = new MultiCountMetric();
@@ -147,10 +145,6 @@ public class StrategyScoringBolt extends BaseRichBolt {
 			newScore = newScore + ScoringSingleton.getInstance().getBoostScore(allChanges, modelId );
 
 			// 9) Emit the new score
-			double oldScore = 0;
-			String oldScoreStr = memberScoreDao.getMemberScores(lId).get(modelId.toString());
-			if(oldScoreStr != null)
-				oldScore = Double.parseDouble(oldScoreStr);
 			Map<String, Date> minMaxMap = ScoringSingleton.getInstance().getMinMaxExpiry(modelId, allChanges);
 			modelIdToExpiryMap.put(modelId, minMaxMap);
 			Date minExpiryDate = minMaxMap.get("minExpiry");
@@ -167,7 +161,6 @@ public class StrategyScoringBolt extends BaseRichBolt {
 			// TODO: change oldScore to a timestamp of the change to persist to changedMemberScore
 			List<Object> listToEmit = new ArrayList<Object>();
 			listToEmit.add(lId);
-			listToEmit.add(oldScore);
 			listToEmit.add(newScore);
 			listToEmit.add(modelId.toString());
 			listToEmit.add(source);
@@ -207,7 +200,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declareStream("score_stream",new Fields("l_id", "oldScore", "newScore", "model","source", "messageID", "minExpiry", "maxExpiry"));
+		declarer.declareStream("score_stream",new Fields("l_id", "newScore", "model","source", "messageID", "minExpiry", "maxExpiry"));
 		declarer.declareStream("member_stream", new Fields("l_id", "source","messageID"));
 
 	}

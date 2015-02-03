@@ -6,6 +6,7 @@ package analytics.bolt;
 import analytics.util.Constants;
 import analytics.util.MongoNameConstants;
 import analytics.util.ScoringSingleton;
+import analytics.util.dao.MemberScoreDao;
 import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -33,6 +34,7 @@ public class LoggingBolt extends BaseRichBolt {
 	private OutputCollector outputCollector;
 
 	private MultiCountMetric countMetric;
+	private MemberScoreDao memberScoreDao;
 	public LoggingBolt() {
 	}
 
@@ -47,6 +49,8 @@ public class LoggingBolt extends BaseRichBolt {
 			OutputCollector collector) {
 	    initMetrics(context);
 		this.outputCollector = collector;
+		memberScoreDao = new MemberScoreDao();
+        System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
 	}
 	 void initMetrics(TopologyContext context){
 	     countMetric = new MultiCountMetric();
@@ -64,7 +68,7 @@ public class LoggingBolt extends BaseRichBolt {
 		//System.out.println(" %%% scorepublishbolt :" + input);
 		String l_id = input.getStringByField("l_id");
 		String modelId = input.getStringByField("model");
-		Double oldScore = input.getDoubleByField("oldScore");
+		String oldScore = memberScoreDao.getMemberScores(l_id).get(modelId);
 		String source = input.getStringByField("source");
 		Double newScore = input.getDoubleByField("newScore");
 		String minExpiry = input.getStringByField("minExpiry");
@@ -76,7 +80,7 @@ public class LoggingBolt extends BaseRichBolt {
 		}
 		LOGGER.info("TIME:" + messageID + "-Entering logging bolt-" + System.currentTimeMillis());
 		LOGGER.info("PERSIST: " + new Date() + ": Topology: Changes Scores : lid: " + l_id + ", modelId: "+modelId + ", oldScore: "+oldScore +", newScore: "+newScore+", minExpiry: "+minExpiry+", maxExpiry: "+maxExpiry+", source: " + source);
-		//System.out.println("PERSIST: " + new Date() + ": Topology: Changes Scores : lid: " + l_id + ", modelId: "+modelId + ", oldScore: "+oldScore +", newScore: "+newScore+", minExpiry: "+minExpiry+", maxExpiry: "+maxExpiry+", source: " + source);
+		System.out.println("PERSIST: " + new Date() + ": Topology: Changes Scores : lid: " + l_id + ", modelId: "+modelId + ", oldScore: "+oldScore +", newScore: "+newScore+", minExpiry: "+minExpiry+", maxExpiry: "+maxExpiry+", source: " + source);
 
 		countMetric.scope("score_logged").incr();
 		outputCollector.ack(input);	}
