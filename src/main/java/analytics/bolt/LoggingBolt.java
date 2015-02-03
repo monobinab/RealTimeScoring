@@ -47,10 +47,10 @@ public class LoggingBolt extends BaseRichBolt {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
+        System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
 	    initMetrics(context);
 		this.outputCollector = collector;
 		memberScoreDao = new MemberScoreDao();
-        System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
 	}
 	 void initMetrics(TopologyContext context){
 	     countMetric = new MultiCountMetric();
