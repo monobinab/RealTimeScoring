@@ -47,7 +47,7 @@ public class MemberDCDao extends AbstractDao {
 			object = new BasicDBObject();
 			object.put(MongoNameConstants.L_ID, l_id);
 			object.put(MongoNameConstants.MT_DATES_ARR, dateDCList);
-			memberDCCollection.update(new BasicDBObject(MongoNameConstants.L_ID, l_id), object, true, false);
+			memberDCCollection.update(new BasicDBObject(MongoNameConstants.L_ID, l_id), new BasicDBObject("$set", object), true, false);
 		} else {
 			BasicDBList dateDCList = (BasicDBList) object.get(MongoNameConstants.MT_DATES_ARR);
 			if (dateDCList != null && dateDCList.size() > 0) {
