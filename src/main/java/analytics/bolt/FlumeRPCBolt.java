@@ -113,6 +113,8 @@ public class FlumeRPCBolt extends BaseRichBolt {
 			this.client.append(event);
 		} catch (EventDeliveryException e) {
 			e.printStackTrace();
+		} catch(NullPointerException e){
+			e.printStackTrace();
 		}
 		countMetric.scope("score_logged").incr();
 		this.collector.ack(input);	
