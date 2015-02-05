@@ -79,7 +79,7 @@ public class FlumeRPCBolt extends BaseRichBolt {
 		sinkProperties.put("backoff", Boolean.TRUE.toString());
 		sinkProperties.put("maxBackoff", String.valueOf(MAX_BACKOFF));
 		
-		client = RpcClientFactory.getInstance(sinkProperties);
+		this.client = RpcClientFactory.getInstance(sinkProperties);
 		}
 	}
 	
@@ -110,6 +110,12 @@ public class FlumeRPCBolt extends BaseRichBolt {
 		String logMessage = "PERSIST: " + new Date() + ": Topology: Changes Scores : lid: " + l_id + ", modelId: "+modelId + ", oldScore: "+oldScore +", newScore: "+newScore+", minExpiry: "+minExpiry+": source: " + source;
 		Event event = EventBuilder.withBody(logMessage.getBytes(), headers);
 		try {
+			if(this.client==null){
+				LOGGER.error("client is null");
+			}
+			if(event == null){
+				LOGGER.error("event is null");
+			}
 			this.client.append(event);
 		} catch (EventDeliveryException e) {
 			e.printStackTrace();
