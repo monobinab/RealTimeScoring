@@ -110,13 +110,14 @@ public class FlumeRPCBolt extends BaseRichBolt {
 		String logMessage = "PERSIST: " + new Date() + ": Topology: Changes Scores : lid: " + l_id + ", modelId: "+modelId + ", oldScore: "+oldScore +", newScore: "+newScore+", minExpiry: "+minExpiry+": source: " + source;
 		Event event = EventBuilder.withBody(logMessage.getBytes(), headers);
 		try {
-			if(this.client==null){
+			LOGGER.error("Received message");
+			if(client==null){
 				LOGGER.error("client is null");
 			}
 			if(event == null){
 				LOGGER.error("event is null");
 			}
-			this.client.append(event);
+			client.append(event);
 		} catch (EventDeliveryException e) {
 			e.printStackTrace();
 		} catch(NullPointerException e){
