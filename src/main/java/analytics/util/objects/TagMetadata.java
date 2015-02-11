@@ -6,6 +6,8 @@ public class TagMetadata implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String mdTags;
 	private String businessUnit;
+	private String subBusinessUnit;
+	private String purchaseOccassion;
 
 	public String getMdTags() {
 		return mdTags;
@@ -24,11 +26,11 @@ public class TagMetadata implements Serializable {
 	}
 
 	public String getSubBussinessUnit() {
-		return subBussinessUnit;
+		return subBusinessUnit;
 	}
 
 	public void setSubBussinessUnit(String subBussinessUnit) {
-		this.subBussinessUnit = subBussinessUnit;
+		this.subBusinessUnit = subBussinessUnit;
 	}
 
 	public String getPurchaseOccassion() {
@@ -38,7 +40,4 @@ public class TagMetadata implements Serializable {
 	public void setPurchaseOccassion(String purchaseOccassion) {
 		this.purchaseOccassion = purchaseOccassion;
 	}
-
-	private String subBussinessUnit;
-	private String purchaseOccassion;
 }
