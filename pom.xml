@@ -359,7 +359,7 @@
 		    this will create a jar file without the storm dependencies
 		    suitable for deployment to a cluster.
 		     -->
-		     <plugin>
+  <plugin>
   <groupId>com.atlassian.maven.plugins</groupId> 
   <artifactId>maven-clover2-plugin</artifactId> 
   <version>2.6.3</version> 
