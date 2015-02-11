@@ -14,6 +14,9 @@ public class TagMetadataDao extends AbstractDao {
 			.getLogger(MemberTraitsDao.class);
 	DBCollection tagMetadataCollection;
 
+	/**
+	 * t,b,s,po
+	 */
 	public TagMetadataDao() {
 		super();
 		tagMetadataCollection = db.getCollection("tagMetadata");
@@ -23,8 +26,15 @@ public class TagMetadataDao extends AbstractDao {
 		BasicDBObject query = new BasicDBObject();
 		query.put("t", tag);
 		DBObject dbObj = tagMetadataCollection.findOne(query);
-		
-		return null;
+		TagMetadata metaDataObj = null;
+		if(dbObj!=null && dbObj.containsField("po")){
+			metaDataObj = new TagMetadata();
+			metaDataObj.setMdTags(tag);
+			metaDataObj.setBusinessUnit((String)dbObj.get("b"));
+			metaDataObj.setSubBusinessUnit((String)dbObj.get("s"));
+			metaDataObj.setPurchaseOccassion((String)dbObj.get("po"));
+		}
+		return metaDataObj;
 		
 	}
 }
