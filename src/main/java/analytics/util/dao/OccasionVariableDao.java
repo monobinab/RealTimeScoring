@@ -27,7 +27,7 @@ public class OccasionVariableDao extends AbstractDao{
 	    	DBObject occasionVariable = occasionVariablesCollection.findOne(query);
 	    	
 	    	if(occasionVariable!=null && occasionVariable.containsField("v")){
-	    		return (String)occasionVariable.get("v");
+	    		return (String.valueOf(occasionVariable.get("v")));
 	    	}
 	    	return null;
 	    }

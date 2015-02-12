@@ -8,8 +8,8 @@ import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.StormSubmitter;
-
 import analytics.bolt.ParsingBoltOccassion;
+import analytics.bolt.StrategyScoringBolt;
 import analytics.spout.OccassionRedisSpout;
 import analytics.util.MongoNameConstants;
 import analytics.util.RedisConnection;
@@ -38,6 +38,8 @@ public class PurchaseOccassionTopology{
 		
 		topologyBuilder.setBolt("parseOccassionBolt", new ParsingBoltOccassion(), 1)
 		.shuffleGrouping("occassionSpout1");//.shuffleGrouping("occassionSpout2").shuffleGrouping("occassionSpout3");
+		topologyBuilder.setBolt("strategy_bolt", new StrategyScoringBolt(), 1)
+		.shuffleGrouping("parseOccassionBolt");
 		
 		Config conf = new Config();
 		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
