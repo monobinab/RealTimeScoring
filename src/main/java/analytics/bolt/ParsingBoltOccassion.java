@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import analytics.util.JsonUtils;
@@ -67,8 +68,12 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 		String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no.getAsString());
 		JsonArray tags = (JsonArray) jsonElement.getAsJsonObject().get("tags");
 		List<Object> emitToPersist = new ArrayList<Object>();
+		List<String> tagsList = new ArrayList<String>();
 		emitToPersist.add(l_id);
-		emitToPersist.add(tags.getAsString());
+		for(int i=0; i<tags.size(); i++){
+			tagsList.add(tags.get(i).getAsString());
+		}
+		emitToPersist.add(tagsList);
 		this.outputCollector.emit("persist_stream", emitToPersist);
 		LOGGER.debug("Scoring for " + l_id);
 			
