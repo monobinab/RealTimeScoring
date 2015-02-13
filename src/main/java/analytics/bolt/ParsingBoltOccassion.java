@@ -14,6 +14,8 @@ import com.google.gson.JsonParser;
 
 import analytics.util.JsonUtils;
 import analytics.util.SecurityUtils;
+import analytics.util.dao.MemberMDTagsDao;
+import analytics.util.dao.MemberTraitsDao;
 import analytics.util.dao.OccasionVariableDao;
 import analytics.util.dao.TagMetadataDao;
 import analytics.util.dao.TagVariableDao;
@@ -34,6 +36,7 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 	private TagVariableDao tagVariableDao;
 	private OccasionVariableDao occasionVariableDao;
 	private MultiCountMetric countMetric;
+	private MemberMDTagsDao memberTagDao;
 	 void initMetrics(TopologyContext context){
 	     countMetric = new MultiCountMetric();
 	     context.registerMetric("custom_metrics", countMetric, 60);
@@ -70,7 +73,12 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 		this.outputCollector.emit("persist_stream", emitToPersist);
 		LOGGER.debug("Scoring for " + l_id);
 		
-
+		//Reset all tags to 0
+		List<String> memberTags = memberTagDao.getMemberMDTags(l_id);
+		for(String tag:memberTags){
+			variableValueTagsMap.put(tag, "0");
+		}
+		
 		if (tags != null && tags.size() != 0) {
 			for (JsonElement tag : tags) {
 				TagMetadata tagMetaData = tagMetadataDao.getDetails(tag
@@ -93,11 +101,8 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 					countMetric.scope("unwanted_tag_metadata");
 				}
 			}
-		} else{
-			countMetric.scope("empty_tag_list");
-			outputCollector.ack(input);
-			return;
-		}
+		} 
+		//Even if there are no new tags and the list is null, we need to process the deletes
 		List<Object> listToEmit = new ArrayList<Object>();
     	listToEmit.add(l_id);
     	listToEmit.add(JsonUtils.createJsonFromStringStringMap(variableValueTagsMap));
