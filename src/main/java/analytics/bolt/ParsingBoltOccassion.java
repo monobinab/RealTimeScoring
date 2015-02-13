@@ -57,7 +57,7 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 		JsonElement jsonElement = parser.parse(input
 				.getStringByField("message"));
 		JsonElement lyl_id_no = jsonElement.getAsJsonObject().get("lyl_id_no");
-		if (lyl_id_no == null || lyl_id_no.toString().length()!=16) {
+		if (lyl_id_no == null || lyl_id_no.getAsString().length()!=16) {
 			countMetric.scope("empty_lid").incr();
 			outputCollector.ack(input);
 			return;
