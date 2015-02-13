@@ -40,4 +40,13 @@ public class MemberMDTagsDao extends AbstractDao {
 		memberMDTagsCollection.update(new BasicDBObject(
 				MongoNameConstants.L_ID, l_id), tagstoUpdate, true, false);
 	}
+	public void deleteMemberMDTags(String l_id){
+		DBObject doc = memberMDTagsCollection.findOne(new BasicDBObject("l_id",l_id)); //get first document
+		memberMDTagsCollection.remove(doc);
+	}
+	/*public static void main(String[] args) {
+		MemberMDTagsDao dao = new MemberMDTagsDao();
+		List<String> sample = dao.getMemberMDTags("hzuzVKVINbBBen+WGYQT/VJVdwI=");
+		System.out.println(sample);
+	}*/
 }

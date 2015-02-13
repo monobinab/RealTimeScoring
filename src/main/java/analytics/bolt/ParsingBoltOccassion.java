@@ -15,7 +15,6 @@ import com.google.gson.JsonParser;
 import analytics.util.JsonUtils;
 import analytics.util.SecurityUtils;
 import analytics.util.dao.MemberMDTagsDao;
-import analytics.util.dao.MemberTraitsDao;
 import analytics.util.dao.OccasionVariableDao;
 import analytics.util.dao.TagMetadataDao;
 import analytics.util.dao.TagVariableDao;
