@@ -72,8 +72,7 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 		emitToPersist.add(tags.getAsString());
 		this.outputCollector.emit("persist_stream", emitToPersist);
 		LOGGER.debug("Scoring for " + l_id);
-	
-		
+			
 		//Reset all tags to 0
 		List<String> memberTags = memberTagDao.getMemberMDTags(l_id);
 		for(String tag:memberTags){
