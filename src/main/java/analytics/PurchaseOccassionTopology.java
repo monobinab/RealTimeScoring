@@ -11,6 +11,7 @@ import backtype.storm.StormSubmitter;
 import analytics.bolt.ParsingBoltOccassion;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.spout.OccassionRedisSpout;
+import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
 import analytics.util.RedisConnection;
 import analytics.util.TopicConstants;
@@ -42,6 +43,8 @@ public class PurchaseOccassionTopology{
 		.shuffleGrouping("parseOccassionBolt");
 		
 		Config conf = new Config();
+		conf.put("metrics_topology", "Occasion");
+	    conf.registerMetricsConsumer(MetricsListener.class, 3);
 		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
 		
 		if (args != null && args.length > 0) {

@@ -18,6 +18,7 @@ import analytics.util.dao.OccasionVariableDao;
 import analytics.util.dao.TagMetadataDao;
 import analytics.util.dao.TagVariableDao;
 import analytics.util.objects.TagMetadata;
+import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -32,6 +33,11 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 	private TagMetadataDao tagMetadataDao;
 	private TagVariableDao tagVariableDao;
 	private OccasionVariableDao occasionVariableDao;
+	private MultiCountMetric countMetric;
+	 void initMetrics(TopologyContext context){
+	     countMetric = new MultiCountMetric();
+	     context.registerMetric("custom_metrics", countMetric, 60);
+	    }
 
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
@@ -40,21 +46,24 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 		tagMetadataDao = new TagMetadataDao();
 		tagVariableDao = new TagVariableDao();
 		occasionVariableDao = new OccasionVariableDao();
+		initMetrics(context);
 	}
 
 	@Override
 	public void execute(Tuple input) {
-		
+		countMetric.scope("incoming_tuples").incr();
 		Map<String, String> variableValueTagsMap = new HashMap<String, String>();
 		JsonParser parser = new JsonParser();
 		JsonElement jsonElement = parser.parse(input
 				.getStringByField("message"));
 		JsonElement lyl_id_no = jsonElement.getAsJsonObject().get("lyl_id_no");
 		if (lyl_id_no == null) {
+			countMetric.scope("null_lid").incr();
 			outputCollector.ack(input);
 			return;
 		} 
 		String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no.getAsString());
+		System.out.println(l_id);
 		
 		JsonArray tags = (JsonArray) jsonElement.getAsJsonObject().get("tags");
 		if (tags != null && tags.size() != 0) {
