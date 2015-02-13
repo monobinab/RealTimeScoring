@@ -63,9 +63,14 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 			return;
 		} 
 		String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no.getAsString());
+		JsonArray tags = (JsonArray) jsonElement.getAsJsonObject().get("tags");
+		List<Object> emitToPersist = new ArrayList<Object>();
+		emitToPersist.add(l_id);
+		emitToPersist.add(tags);
+		this.outputCollector.emit("persist_stream", emitToPersist);
 		LOGGER.debug("Scoring for " + l_id);
 		
-		JsonArray tags = (JsonArray) jsonElement.getAsJsonObject().get("tags");
+
 		if (tags != null && tags.size() != 0) {
 			for (JsonElement tag : tags) {
 				TagMetadata tagMetaData = tagMetadataDao.getDetails(tag
@@ -105,6 +110,7 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		declarer.declare(new Fields("l_id","lineItemAsJsonString","source"));
+		declarer.declareStream("persist_stream", new Fields("l_id", "tags"));
 	}
 
 }
