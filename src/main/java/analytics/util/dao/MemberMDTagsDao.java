@@ -25,8 +25,12 @@ public class MemberMDTagsDao extends AbstractDao {
 	public List<String> getMemberMDTags(String l_id) {
 		DBObject dbObj = memberMDTagsCollection.findOne(new BasicDBObject(
 				"l_id", l_id));
+		if(dbObj != null){
 		List<String> mdTags = (List<String>) dbObj.get("tags");
 		return mdTags;
+		}
+		else
+			return null;
 	}
 
 	public void addMemberMDTags(String l_id, List<String> tags) {

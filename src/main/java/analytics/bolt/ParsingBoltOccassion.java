@@ -49,6 +49,7 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 		tagMetadataDao = new TagMetadataDao();
 		tagVariableDao = new TagVariableDao();
 		occasionVariableDao = new OccasionVariableDao();
+		memberTagDao = new MemberMDTagsDao();
 		initMetrics(context);
 	}
 
@@ -74,7 +75,7 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 			tagsList.add(tags.get(i).getAsString());
 		}
 		emitToPersist.add(tagsList);
-		this.outputCollector.emit("persist_stream", emitToPersist);
+//		this.outputCollector.emit("persist_stream", emitToPersist);
 		LOGGER.debug("Scoring for " + l_id);
 			
 		//Reset all tags to 0
