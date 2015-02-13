@@ -57,28 +57,39 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 		JsonElement jsonElement = parser.parse(input
 				.getStringByField("message"));
 		JsonElement lyl_id_no = jsonElement.getAsJsonObject().get("lyl_id_no");
-		if (lyl_id_no == null) {
-			countMetric.scope("null_lid").incr();
+		if (lyl_id_no == null || lyl_id_no.toString().length()!=16) {
+			countMetric.scope("empty_lid").incr();
 			outputCollector.ack(input);
 			return;
 		} 
 		String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no.getAsString());
-		System.out.println(l_id);
+		LOGGER.debug("Scoring for " + l_id);
 		
 		JsonArray tags = (JsonArray) jsonElement.getAsJsonObject().get("tags");
 		if (tags != null && tags.size() != 0) {
 			for (JsonElement tag : tags) {
 				TagMetadata tagMetaData = tagMetadataDao.getDetails(tag
 						.getAsString());
-				if (tagMetaData != null) {
+				if (tagMetaData != null) {//TODO: Add list of tagMetadatas you can process. Egh- ignore unwanted
 					String tagVariableValue = occasionVariableDao
 							.getValue(tagMetaData);
 					String tagVariable = tagVariableDao.getTagVariable(tag
 							.getAsString());
-					variableValueTagsMap.put(tagVariable, tagVariableValue);
+					if(tagVariable!=null && tagVariableValue!=null &&!tagVariable.isEmpty() && !tagVariableValue.isEmpty())
+					{
+						variableValueTagsMap.put(tagVariable, tagVariableValue);
+						countMetric.scope("tag_variable_added");
+					}
+					else{
+						countMetric.scope("no_tag_variable").incr();
+					}
+				}
+				else{
+					countMetric.scope("unwanted_tag_metadata");
 				}
 			}
 		} else{
+			countMetric.scope("empty_tag_list");
 			outputCollector.ack(input);
 			return;
 		}
@@ -86,6 +97,7 @@ public class ParsingBoltOccassion extends BaseRichBolt {
     	listToEmit.add(l_id);
     	listToEmit.add(JsonUtils.createJsonFromStringStringMap(variableValueTagsMap));
     	listToEmit.add("PurchaseOccasion");
+    	countMetric.scope("successful");
     	this.outputCollector.emit(listToEmit);
     	outputCollector.ack(input);
 	}
