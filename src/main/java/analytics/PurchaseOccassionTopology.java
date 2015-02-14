@@ -9,6 +9,7 @@ import backtype.storm.StormSubmitter;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.StormSubmitter;
 import analytics.bolt.ParsingBoltOccassion;
+import analytics.bolt.PersistOccasionBolt;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.spout.OccassionRedisSpout;
 import analytics.util.MetricsListener;
@@ -31,7 +32,7 @@ public class PurchaseOccassionTopology{
 		String topic = TopicConstants.OCCASSION;
 		
 		topologyBuilder.setSpout("occassionSpout1", new OccassionRedisSpout(
-				"rtsapp302p.qa.ch3.s.com", TopicConstants.PORT, topic), 1);
+				servers[1], TopicConstants.PORT, topic), 1);
 		/*topologyBuilder.setSpout("occassionSpout2", new OccassionRedisSpout(
 				servers[1], TopicConstants.PORT, topic), 1);
 		topologyBuilder.setSpout("occassionSpout3", new OccassionRedisSpout(
@@ -39,7 +40,7 @@ public class PurchaseOccassionTopology{
 		
 		topologyBuilder.setBolt("parseOccassionBolt", new ParsingBoltOccassion(), 1)
 		.shuffleGrouping("occassionSpout1");//.shuffleGrouping("occassionSpout2").shuffleGrouping("occassionSpout3");
-		topologyBuilder.setBolt("PersistOccasionBolt", new ParsingBoltOccassion(), 1)
+		topologyBuilder.setBolt("PersistOccasionBolt", new PersistOccasionBolt(), 1)
 		.shuffleGrouping("parseOccassionBolt", "persist_stream");
 		topologyBuilder.setBolt("strategy_bolt", new StrategyScoringBolt(), 1)
 		.shuffleGrouping("parseOccassionBolt");

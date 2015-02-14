@@ -10,6 +10,8 @@ import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import scala.actors.threadpool.Arrays;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -33,17 +35,17 @@ public class PersistOccasionBolt extends BaseRichBolt{
 		memberMDTagsDao = new MemberMDTagsDao();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void execute(Tuple input) {
 		List<String> tags = new ArrayList<String>();
 		String l_id = input.getString(0);
 		try {
-			JSONArray tagsArray = new JSONArray(input.getString(1));
-			for(int i=0; i<tagsArray.length(); i++){
-				tags.add(tagsArray.getString(i));
-			}
+			String tag = input.getString(1);
+			String[] tagsArray = tag.split(",");
+			tags = Arrays.asList(tagsArray);
 			memberMDTagsDao.addMemberMDTags(l_id, tags);
-		} catch (JSONException e) {
+		} catch (Exception e) {
 			LOGGER.error("Json Exception ", e);
 		}
 	}

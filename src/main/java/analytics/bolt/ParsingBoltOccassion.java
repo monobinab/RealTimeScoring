@@ -67,21 +67,29 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 			return;
 		} 
 		String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no.getAsString());
+		StringBuilder tagsString = new StringBuilder();
 		JsonArray tags = (JsonArray) jsonElement.getAsJsonObject().get("tags");
 		List<Object> emitToPersist = new ArrayList<Object>();
-		List<String> tagsList = new ArrayList<String>();
 		emitToPersist.add(l_id);
 		for(int i=0; i<tags.size(); i++){
-			tagsList.add(tags.get(i).getAsString());
+			tagsString.append(tags.get(i).getAsString());
+			if(i != tags.size()-1)
+				tagsString.append(",");
 		}
-		emitToPersist.add(tagsList);
-//		this.outputCollector.emit("persist_stream", emitToPersist);
+		emitToPersist.add(tagsString.toString());
+		this.outputCollector.emit("persist_stream", emitToPersist);
 		LOGGER.debug("Scoring for " + l_id);
 			
 		//Reset all tags to 0
+		//check this...variableValueTagsMap keys are variables not tags
 		List<String> memberTags = memberTagDao.getMemberMDTags(l_id);
+		if(memberTags != null){
 		for(String tag:memberTags){
 			variableValueTagsMap.put(tag, "0");
+		}
+		}
+		else{
+			return;
 		}
 		
 		if (tags != null && tags.size() != 0) {
