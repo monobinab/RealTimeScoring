@@ -195,7 +195,6 @@ public class StrategyScoringBolt extends BaseRichBolt {
 		this.outputCollector.emit("member_stream", listToEmit);
 		countMetric.scope("member_scored_successfully").incr();
 		this.outputCollector.ack(input);
-
 	}
 
 	@Override
