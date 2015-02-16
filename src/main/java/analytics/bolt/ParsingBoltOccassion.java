@@ -78,7 +78,9 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 						//Get variable name from tagVariableDao
 						//TODO: optimize this call to take list of tags
 						String tagVariable = tagVariableDao.getTagVariable(tag);
-						variableValueTagsMap.put(tagVariable, "0");
+						if(tagVariable != null){
+							variableValueTagsMap.put(tagVariable, "0");
+						}
 					}
 				}
 		
