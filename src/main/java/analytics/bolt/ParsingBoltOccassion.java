@@ -60,6 +60,7 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 		JsonParser parser = new JsonParser();
 		JsonElement jsonElement = parser.parse(input
 				.getStringByField("message"));
+		//Fetch l_id from json
 		JsonElement lyl_id_no = jsonElement.getAsJsonObject().get("lyl_id_no");
 		if (lyl_id_no == null || lyl_id_no.getAsString().length()!=16) {
 			countMetric.scope("empty_lid").incr();
@@ -67,8 +68,20 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 			return;
 		} 
 		String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no.getAsString());
+		//Get list of tags from json
 		StringBuilder tagsString = new StringBuilder();
 		JsonArray tags = (JsonArray) jsonElement.getAsJsonObject().get("tags");
+		//Reset all variables to 0
+				List<String> memberTags = memberTagDao.getMemberMDTags(l_id);
+				if(memberTags != null){
+					for(String tag:memberTags){//
+						//Get variable name from tagVariableDao
+						//TODO: optimize this call to take list of tags
+						String tagVariable = tagVariableDao.getTagVariable(tag);
+						variableValueTagsMap.put(tagVariable, "0");
+					}
+				}
+		
 		List<Object> emitToPersist = new ArrayList<Object>();
 		emitToPersist.add(l_id);
 		for(int i=0; i<tags.size(); i++){
@@ -79,18 +92,7 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 		emitToPersist.add(tagsString.toString());
 		this.outputCollector.emit("persist_stream", emitToPersist);
 		LOGGER.debug("Scoring for " + l_id);
-			
-		//Reset all tags to 0
-		//check this...variableValueTagsMap keys are variables not tags
-		List<String> memberTags = memberTagDao.getMemberMDTags(l_id);
-		if(memberTags != null){
-		for(String tag:memberTags){
-			variableValueTagsMap.put(tag, "0");
-		}
-		}
-		else{
-			return;
-		}
+		
 		
 		if (tags != null && tags.size() != 0) {
 			for (JsonElement tag : tags) {
@@ -116,12 +118,18 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 			}
 		} 
 		//Even if there are no new tags and the list is null, we need to process the deletes
-		List<Object> listToEmit = new ArrayList<Object>();
-    	listToEmit.add(l_id);
-    	listToEmit.add(JsonUtils.createJsonFromStringStringMap(variableValueTagsMap));
-    	listToEmit.add("PurchaseOccasion");
-    	countMetric.scope("successful");
-    	this.outputCollector.emit(listToEmit);
+		if(variableValueTagsMap!=null && !variableValueTagsMap.isEmpty())
+		{
+			List<Object> listToEmit = new ArrayList<Object>();
+	    	listToEmit.add(l_id);
+	    	listToEmit.add(JsonUtils.createJsonFromStringStringMap(variableValueTagsMap));
+	    	listToEmit.add("PurchaseOccasion");
+	    	countMetric.scope("successful");
+	    	this.outputCollector.emit(listToEmit);
+		}
+		else{
+	    	countMetric.scope("no_variables_affected");			
+		}
     	outputCollector.ack(input);
 	}
 

@@ -42,9 +42,14 @@ public class PersistOccasionBolt extends BaseRichBolt{
 		String l_id = input.getString(0);
 		try {
 			String tag = input.getString(1);
+			if(tag != null && !tag.isEmpty()){
 			String[] tagsArray = tag.split(",");
 			tags = Arrays.asList(tagsArray);
 			memberMDTagsDao.addMemberMDTags(l_id, tags);
+			}
+			else{
+				memberMDTagsDao.deleteMemberMDTags(l_id);
+			}
 		} catch (Exception e) {
 			LOGGER.error("Json Exception ", e);
 		}

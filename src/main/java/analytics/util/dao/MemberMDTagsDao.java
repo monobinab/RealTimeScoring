@@ -55,7 +55,8 @@ public class MemberMDTagsDao extends AbstractDao {
 	}
 	public void deleteMemberMDTags(String l_id){
 		DBObject doc = memberMDTagsCollection.findOne(new BasicDBObject(MongoNameConstants.L_ID,l_id)); //get first document
-		memberMDTagsCollection.remove(doc);
+		if(doc != null)
+			memberMDTagsCollection.remove(doc);
 	}
 	/*public static void main(String[] args) {
 		MemberMDTagsDao dao = new MemberMDTagsDao();
