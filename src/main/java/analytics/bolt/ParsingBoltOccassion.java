@@ -107,7 +107,7 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 					if(tagVariable!=null && tagVariableValue!=null &&!tagVariable.isEmpty() && !tagVariableValue.isEmpty())
 					{
 						variableValueTagsMap.put(tagVariable, tagVariableValue);
-						countMetric.scope("tag_variable_added");
+						countMetric.scope("tag_variable_added").incr();
 					}
 					else{
 						countMetric.scope("no_tag_variable").incr();
