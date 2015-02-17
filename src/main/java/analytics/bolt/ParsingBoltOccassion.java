@@ -94,8 +94,7 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 		emitToPersist.add(tagsString.toString());
 		this.outputCollector.emit("persist_stream", emitToPersist);
 		LOGGER.debug("Scoring for " + l_id);
-		
-		
+			
 		if (tags != null && tags.size() != 0) {
 			for (JsonElement tag : tags) {
 				TagMetadata tagMetaData = tagMetadataDao.getDetails(tag

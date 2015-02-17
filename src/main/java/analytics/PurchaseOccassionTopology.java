@@ -32,7 +32,7 @@ public class PurchaseOccassionTopology{
 		String topic = TopicConstants.OCCASSION;
 		
 		topologyBuilder.setSpout("occassionSpout1", new OccassionRedisSpout(
-				servers[1], TopicConstants.PORT, topic), 1);
+				servers[0], TopicConstants.PORT, topic), 1);
 		/*topologyBuilder.setSpout("occassionSpout2", new OccassionRedisSpout(
 				servers[1], TopicConstants.PORT, topic), 1);
 		topologyBuilder.setSpout("occassionSpout3", new OccassionRedisSpout(
