@@ -3,6 +3,7 @@ package analytics.util.dao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import analytics.util.Constants;
 import analytics.util.objects.TagMetadata;
 
 import com.mongodb.BasicDBObject;
@@ -21,9 +22,9 @@ public class OccasionVariableDao extends AbstractDao{
 			occasionVariablesCollection = db.getCollection("occasionVariable");
 	    }
 	    public String getValue(TagMetadata tagMetadata){
-	    	BasicDBObject query = new BasicDBObject("b",tagMetadata.getBusinessUnit());
-	    	query.append("s", tagMetadata.getSubBusinessUnit());
-	    	query.append("po", tagMetadata.getPurchaseOccasion());
+	    	BasicDBObject query = new BasicDBObject(Constants.BUSINESS_UNIT,tagMetadata.getBusinessUnit());
+	    	query.append(Constants.SUB_BUSINESS_UNIT, tagMetadata.getSubBusinessUnit());
+	    	query.append(Constants.PURCHASE_OCCASSION, tagMetadata.getPurchaseOccasion());
 	    	DBObject occasionVariable = occasionVariablesCollection.findOne(query);
 	    	
 	    	if(occasionVariable!=null && occasionVariable.containsField("v")){
@@ -31,4 +32,5 @@ public class OccasionVariableDao extends AbstractDao{
 	    	}
 	    	return null;
 	    }
+
 }
