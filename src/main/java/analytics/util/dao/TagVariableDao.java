@@ -30,7 +30,9 @@ public class TagVariableDao extends AbstractDao{
 	    
 	    public List<String> getTagVariablesList(List<String> tagsList){
 	    	BasicDBList list = new BasicDBList();
-	    	list.add(tagsList);
+	    	for(String tag:tagsList){
+	    	list.add(tag);
+	    	}
 	    	BasicDBObject query = new BasicDBObject();
 	    	query.put("t", new BasicDBObject("$in", list));
 	    	DBCursor tagVariablesCursor = tagVariablesCollection.find(query);
