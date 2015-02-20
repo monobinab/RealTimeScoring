@@ -73,17 +73,13 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 		JsonArray tags = (JsonArray) jsonElement.getAsJsonObject().get("tags");
 		//Reset all variables to 0
 				List<String> memberTags = memberTagDao.getMemberMDTags(l_id);
-				if(memberTags != null){
-					for(String tag:memberTags){//
-						//Get variable name from tagVariableDao
-						//TODO: optimize this call to take list of tags
-						String tagVariable = tagVariableDao.getTagVariable(tag);
-						if(tagVariable != null){
-							variableValueTagsMap.put(tagVariable, "0");
-						}
+				List<String> tagVarList= tagVariableDao.getTagVariablesList(memberTags);
+				if(!tagVarList.isEmpty()){
+					for(String var:tagVarList){
+						variableValueTagsMap.put(var, "0");
 					}
 				}
-		
+			
 		List<Object> emitToPersist = new ArrayList<Object>();
 		emitToPersist.add(l_id);
 		for(int i=0; i<tags.size(); i++){
