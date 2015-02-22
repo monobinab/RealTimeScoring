@@ -28,7 +28,7 @@ public class TagMetadataDao extends AbstractDao {
 
 	public TagMetadata getDetails(String tag){
 		BasicDBObject query = new BasicDBObject();
-		query.put("t", tag);
+		query.put(Constants.SEG, tag);
 		DBObject dbObj = tagMetadataCollection.findOne(query);
 		TagMetadata metaDataObj = null;
 		if(dbObj!=null && dbObj.containsField(Constants.PURCHASE_OCCASSION)){

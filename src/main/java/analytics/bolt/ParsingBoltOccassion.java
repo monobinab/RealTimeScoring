@@ -41,6 +41,19 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 	     countMetric = new MultiCountMetric();
 	     context.registerMetric("custom_metrics", countMetric, 60);
 	    }
+	 
+	 public void setMemberTagsDao(){
+		 memberTagDao = new MemberMDTagsDao();
+	 }
+	 public void setTagMetadataDao(){
+		 tagMetadataDao = new TagMetadataDao();
+	 }
+	 public void setTagVariableDao(){
+		 tagVariableDao = new TagVariableDao();
+	 }
+	 public void setOccassionDao(){
+		 occasionVariableDao = new OccasionVariableDao();
+	 }
 
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
@@ -68,41 +81,31 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 			return;
 		} 
 		String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no.getAsString());
+		
 		//Get list of tags from json
 		StringBuilder tagsString = new StringBuilder();
 		JsonArray tags = (JsonArray) jsonElement.getAsJsonObject().get("tags");
-		//Reset all variables to 0
-				List<String> memberTags = memberTagDao.getMemberMDTags(l_id);
-				List<String> tagVarList= tagVariableDao.getTagVariablesList(memberTags);
-				if(!tagVarList.isEmpty()){
-					for(String var:tagVarList){
-						variableValueTagsMap.put(var, "0");
-					}
-				}
+		
+		//reset the variableValueMap to 0 before persisting new incoming tags
+		resetVariableValuesMap(variableValueTagsMap, l_id);
 			
 		List<Object> emitToPersist = new ArrayList<Object>();
+		persistTagsToMemberTagsColl(l_id, tagsString, tags);
 		emitToPersist.add(l_id);
-		for(int i=0; i<tags.size(); i++){
-			tagsString.append(tags.get(i).getAsString());
-			if(i != tags.size()-1)
-				tagsString.append(",");
-		}
 		emitToPersist.add(tagsString.toString());
 		this.outputCollector.emit("persist_stream", emitToPersist);
 		LOGGER.debug("Scoring for " + l_id);
 			
 		if (tags != null && tags.size() != 0) {
 			for (JsonElement tag : tags) {
-				TagMetadata tagMetaData = tagMetadataDao.getDetails(tag
-						.getAsString());
+				TagMetadata tagMetaData = getTagMetaData(tag);
 				if (tagMetaData != null) {//TODO: Add list of tagMetadatas you can process. Egh- ignore unwanted
-					String tagVariableValue = occasionVariableDao
-							.getValue(tagMetaData);
-					String tagVariable = tagVariableDao.getTagVariable(tag
-							.getAsString());
+					String tagVariableValue = getTagVarValue(tagMetaData);
+					String tagVariable = getTagVariable(tag);
 					if(tagVariable!=null && tagVariableValue!=null &&!tagVariable.isEmpty() && !tagVariableValue.isEmpty())
 					{
-						variableValueTagsMap.put(tagVariable, tagVariableValue);
+						populateVariableValueTagsMap(variableValueTagsMap,
+								tagVariableValue, tagVariable);
 						countMetric.scope("tag_variable_added").incr();
 					}
 					else{
@@ -128,6 +131,54 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 	    	countMetric.scope("no_variables_affected");			
 		}
     	outputCollector.ack(input);
+	}
+
+	private void populateVariableValueTagsMap(
+			Map<String, String> variableValueTagsMap, String tagVariableValue,
+			String tagVariable) {
+		variableValueTagsMap.put(tagVariable, tagVariableValue);
+	}
+
+	public String getTagVariable(JsonElement tag) {
+		String tagVariable = tagVariableDao.getTagVariable(tag
+				.getAsString());
+		return tagVariable;
+	}
+
+	public String getTagVarValue(TagMetadata tagMetaData) {
+		String tagVariableValue = occasionVariableDao
+				.getValue(tagMetaData);
+		return tagVariableValue;
+	}
+
+	public TagMetadata getTagMetaData(JsonElement tag) {
+		TagMetadata tagMetaData = tagMetadataDao.getDetails(tag
+				.getAsString());
+		return tagMetaData;
+	}
+
+	public void persistTagsToMemberTagsColl(String l_id,
+			StringBuilder tagsString, JsonArray tags) {
+		for(int i=0; i<tags.size(); i++){
+			tagsString.append(tags.get(i).getAsString());
+			if(i != tags.size()-1)
+				tagsString.append(",");
+		}
+		//return tagsString.toString();
+	}
+
+	public void resetVariableValuesMap(
+			Map<String, String> variableValueTagsMap, String l_id) {
+		//Reset all variables to 0
+				List<String> memberTags = memberTagDao.getMemberMDTags(l_id);
+				if(memberTags != null){
+				List<String> tagVarList= tagVariableDao.getTagVariablesList(memberTags);
+				if(!tagVarList.isEmpty()){
+					for(String var:tagVarList){
+						variableValueTagsMap.put(var, "0");
+					}
+				}
+				}
 	}
 
 	@Override

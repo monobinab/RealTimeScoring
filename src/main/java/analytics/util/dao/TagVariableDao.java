@@ -6,6 +6,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import analytics.util.Constants;
+
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
@@ -21,9 +23,9 @@ public class TagVariableDao extends AbstractDao{
 			tagVariablesCollection = db.getCollection("tagVariable");
 	    }
 	    public String getTagVariable(String tag){
-	    	DBObject tagVariable = tagVariablesCollection.findOne(new BasicDBObject("t",tag));
-	    	if(tagVariable!=null && tagVariable.containsField("v")){
-	    		return (String)tagVariable.get("v");
+	    	DBObject tagVariable = tagVariablesCollection.findOne(new BasicDBObject(Constants.TAG_MDTAG,tag));
+	    	if(tagVariable!=null && tagVariable.containsField(Constants.TAG_VAR)){
+	    		return (String)tagVariable.get(Constants.TAG_VAR);
 	    	}
 	    	return null;
 	    }

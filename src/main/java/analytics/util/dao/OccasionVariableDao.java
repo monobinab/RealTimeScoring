@@ -22,13 +22,13 @@ public class OccasionVariableDao extends AbstractDao{
 			occasionVariablesCollection = db.getCollection("occasionVariable");
 	    }
 	    public String getValue(TagMetadata tagMetadata){
-	    	BasicDBObject query = new BasicDBObject(Constants.BUSINESS_UNIT,tagMetadata.getBusinessUnit());
-	    	query.append(Constants.SUB_BUSINESS_UNIT, tagMetadata.getSubBusinessUnit());
-	    	query.append(Constants.PURCHASE_OCCASSION, tagMetadata.getPurchaseOccasion());
+	    	BasicDBObject query = new BasicDBObject(Constants.OCC_BU,tagMetadata.getBusinessUnit());
+	    	query.append(Constants.OCC_SUB, tagMetadata.getSubBusinessUnit());
+	    	query.append(Constants.OCC_PO, tagMetadata.getPurchaseOccasion());
 	    	DBObject occasionVariable = occasionVariablesCollection.findOne(query);
 	    	
-	    	if(occasionVariable!=null && occasionVariable.containsField("v")){
-	    		return (String.valueOf(occasionVariable.get("v")));
+	    	if(occasionVariable!=null && occasionVariable.containsField(Constants.OCC_VAR)){
+	    		return (String.valueOf(occasionVariable.get(Constants.OCC_VAR)));
 	    	}
 	    	return null;
 	    }
