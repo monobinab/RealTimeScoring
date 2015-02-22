@@ -81,6 +81,7 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 			return;
 		} 
 		String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no.getAsString());
+		System.out.println(l_id);
 		
 		//Get list of tags from json
 		StringBuilder tagsString = new StringBuilder();

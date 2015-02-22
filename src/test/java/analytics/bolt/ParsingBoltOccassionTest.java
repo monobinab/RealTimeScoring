@@ -7,6 +7,7 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -222,6 +223,11 @@ public void getVariablenullTest(){
 	JsonElement tag = parser.parse("HAKKS2010");
 	String tagVar = parsingBoltOccassion.getTagVariable(tag);
 	Assert.assertNull(tagVar);
+}
+
+@AfterClass
+public static void tearDown(){
+	db.dropDatabase();
 }
 }
  
