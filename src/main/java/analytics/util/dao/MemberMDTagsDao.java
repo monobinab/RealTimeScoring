@@ -32,7 +32,7 @@ public class MemberMDTagsDao extends AbstractDao {
 		List<String> mdTags = new ArrayList<String>();
 		for(Object tag:dbListTags){
 			if(tag instanceof String){
-				mdTags.add(tag.toString());
+				mdTags.add(tag.toString().substring(0, 5));
 			}
 		}
 		//List<String> mdTags = (List<String>) dbObj.get("tags");

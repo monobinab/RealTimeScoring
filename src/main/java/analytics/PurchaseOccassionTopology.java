@@ -40,7 +40,7 @@ public class PurchaseOccassionTopology{
 		
 		topologyBuilder.setBolt("parseOccassionBolt", new ParsingBoltOccassion(), 1)
 		.shuffleGrouping("occassionSpout1");//.shuffleGrouping("occassionSpout2").shuffleGrouping("occassionSpout3");
-		topologyBuilder.setBolt("PersistOccasionBolt", new PersistOccasionBolt(), 1)
+		topologyBuilder.setBolt("persistOccasionBolt", new PersistOccasionBolt(), 1)
 		.shuffleGrouping("parseOccassionBolt", "persist_stream");
 		topologyBuilder.setBolt("strategy_bolt", new StrategyScoringBolt(), 1)
 		.shuffleGrouping("parseOccassionBolt");

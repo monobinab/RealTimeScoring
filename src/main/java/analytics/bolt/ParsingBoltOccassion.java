@@ -10,8 +10,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 
 import analytics.util.JsonUtils;
 import analytics.util.SecurityUtils;
@@ -71,8 +71,14 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 		countMetric.scope("incoming_tuples").incr();
 		Map<String, String> variableValueTagsMap = new HashMap<String, String>();
 		JsonParser parser = new JsonParser();
-		JsonElement jsonElement = parser.parse(input
-				.getStringByField("message"));
+		JsonElement jsonElement= null;
+		try{
+		jsonElement = getParsedJson(input, parser);
+		}
+		catch(Exception e){
+			LOGGER.error("exception in parsing: " + e);
+		}
+		
 		//Fetch l_id from json
 		JsonElement lyl_id_no = jsonElement.getAsJsonObject().get("lyl_id_no");
 		if (lyl_id_no == null || lyl_id_no.getAsString().length()!=16) {
@@ -85,8 +91,9 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 		
 		//Get list of tags from json
 		StringBuilder tagsString = new StringBuilder();
-		JsonArray tags = (JsonArray) jsonElement.getAsJsonObject().get("tags");
-		
+		JsonArray tags = null;
+		tags = getTagsFromInput(jsonElement);
+				
 		//reset the variableValueMap to 0 before persisting new incoming tags
 		resetVariableValuesMap(variableValueTagsMap, l_id);
 			
@@ -125,13 +132,24 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 	    	listToEmit.add(l_id);
 	    	listToEmit.add(JsonUtils.createJsonFromStringStringMap(variableValueTagsMap));
 	    	listToEmit.add("PurchaseOccasion");
-	    	countMetric.scope("successful");
+	    	countMetric.scope("emitted_to_scoring");
 	    	this.outputCollector.emit(listToEmit);
 		}
 		else{
 	    	countMetric.scope("no_variables_affected");			
 		}
     	outputCollector.ack(input);
+	}
+
+	public JsonElement getParsedJson(Tuple input, JsonParser parser) throws JsonSyntaxException{
+		JsonElement jsonElement = parser.parse(input
+				.getStringByField("message"));
+		return jsonElement;
+	}
+
+	public JsonArray getTagsFromInput(JsonElement jsonElement) {
+		JsonArray tags = (JsonArray) jsonElement.getAsJsonObject().get("tags");
+		return tags;
 	}
 
 	private void populateVariableValueTagsMap(
@@ -142,7 +160,7 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 
 	public String getTagVariable(JsonElement tag) {
 		String tagVariable = tagVariableDao.getTagVariable(tag
-				.getAsString());
+				.getAsString().substring(0, 5));
 		return tagVariable;
 	}
 

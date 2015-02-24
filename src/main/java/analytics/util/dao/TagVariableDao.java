@@ -23,7 +23,7 @@ public class TagVariableDao extends AbstractDao{
 			tagVariablesCollection = db.getCollection("tagVariable");
 	    }
 	    public String getTagVariable(String tag){
-	    	DBObject tagVariable = tagVariablesCollection.findOne(new BasicDBObject(Constants.TAG_MDTAG,tag));
+	    	DBObject tagVariable = tagVariablesCollection.findOne(new BasicDBObject(Constants.TAG_MDTAG,tag.substring(0, 5)));
 	    	if(tagVariable!=null && tagVariable.containsField(Constants.TAG_VAR)){
 	    		return (String)tagVariable.get(Constants.TAG_VAR);
 	    	}

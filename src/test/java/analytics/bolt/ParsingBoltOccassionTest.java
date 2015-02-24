@@ -18,6 +18,8 @@ import analytics.util.dao.OccasionVariableDao;
 import analytics.util.dao.TagVariableDao;
 import analytics.util.objects.TagMetadata;
 import backtype.storm.tuple.Tuple;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.github.fakemongo.Fongo;
 import com.google.gson.JsonArray;
@@ -84,6 +86,23 @@ public static void intialize() throws Exception{
 		memberMDTagsDao = new MemberMDTagsDao();
 		tagVariableDao = new TagVariableDao();
 		
+				
+}
+
+public Tuple mockTuple(){
+	//mock the tuple
+			String message = "{\"lyl_id_no\":\"Occ\",\"tags\":[\"HACKS2010\"]}";
+			Tuple tuple = mock(Tuple.class, message);
+			 when(tuple.getStringByField("message")).thenReturn(message);
+			return tuple;
+}
+
+public Tuple mockTuple2(){
+	//mock the tuple
+			String message = "{\"lyl_id_no\":\"Occ\",\"tags\":\"HACKS2010\"]}";
+			Tuple tuple = mock(Tuple.class, message);
+			 when(tuple.getStringByField("message")).thenReturn(message);
+			return tuple;
 }
 
 //test for null l_id
@@ -223,6 +242,49 @@ public void getVariablenullTest(){
 	JsonElement tag = parser.parse("HAKKS2010");
 	String tagVar = parsingBoltOccassion.getTagVariable(tag);
 	Assert.assertNull(tagVar);
+}
+
+//test to check the tags ["HASCKS2010", "HALAS2010"] format of the input from spout
+@Test
+public void getTagsFromInputTest() {
+	String str = "{\"lyl_id_no\":\"Occ\",\"tags\":[\"HACKS2010\"]}";
+	JsonParser parser = new JsonParser();
+	JsonElement jsonElement = parser.parse(str);
+	JsonArray array = parsingBoltOccassion.getTagsFromInput(jsonElement);
+	String actual = array.getAsString();
+	Assert.assertEquals("HACKS2010", actual);
+}
+
+//test to check the tags if the "tags" is not there in the input
+@Test
+public void getTagsFromInputTest2() {
+	String str = "{\"lyl_id_no\":\"Occ\",\"tag\":[\"HACKS2010\"]}";
+	JsonParser parser = new JsonParser();
+	JsonElement jsonElement = parser.parse(str);
+	Assert.assertEquals(null, parsingBoltOccassion.getTagsFromInput(jsonElement));
+	
+}
+
+//test the incoming tuple for its format
+@Test
+public void getParsedJsonTest(){
+	Tuple tuple = mockTuple();
+	JsonParser parser = new JsonParser();
+	JsonElement jsonElementActual = parsingBoltOccassion.getParsedJson(tuple, parser);
+	String str = "{\"lyl_id_no\":\"Occ\",\"tags\":[\"HACKS2010\"]}";
+	JsonElement jsonElementExpected = parser.parse(str);
+	Assert.assertEquals(jsonElementExpected, jsonElementActual);
+
+}
+
+//test the incoming tuple for its format
+@Test(expected = com.google.gson.JsonSyntaxException.class)
+public void getParsedJsonTest2(){
+	Tuple tuple = mockTuple2();
+	JsonParser parser = new JsonParser();
+	 parsingBoltOccassion.getParsedJson(tuple, parser);
+	
+
 }
 
 @AfterClass

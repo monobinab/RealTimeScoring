@@ -19,7 +19,7 @@ public class OccasionVariableDao extends AbstractDao{
 		 */
 	    public OccasionVariableDao(){
 	    	super();
-			occasionVariablesCollection = db.getCollection("occasionVariable");
+			occasionVariablesCollection = db.getCollection("occasionValue");
 	    }
 	    public String getValue(TagMetadata tagMetadata){
 	    	BasicDBObject query = new BasicDBObject(Constants.OCC_BU,tagMetadata.getBusinessUnit());
