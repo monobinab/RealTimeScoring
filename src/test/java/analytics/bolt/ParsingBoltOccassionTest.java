@@ -66,12 +66,12 @@ public static void intialize() throws Exception{
 		
 		//fake tagVariable collection
 		tagVariableColl = db.getCollection("tagVariable");
-		tagVariableColl.insert(new BasicDBObject("t", "HACKS2010").append("v", "BOOST_PO_HA_COOK_TEST"));
-		tagVariableColl.insert(new BasicDBObject("t", "HARFS2010").append("v", "BOOST_PO_HA_REF_TEST"));
-		tagVariableColl.insert(new BasicDBObject("t", "HALAS2010").append("v", "BOOST_PO_HA_LA_TEST"));
+		tagVariableColl.insert(new BasicDBObject("t", "HACKS").append("v", "BOOST_PO_HA_COOK_TEST").append("m", 35));
+		tagVariableColl.insert(new BasicDBObject("t", "HARFS").append("v", "BOOST_PO_HA_REF_TEST").append("m", 39));
+		tagVariableColl.insert(new BasicDBObject("t", "HALAS").append("v", "BOOST_PO_HA_LA_TEST").append("m", 46));
 		
 		//fake occassionVariable collection
-		occassionVariableColl = db.getCollection("occasionVariable");
+		occassionVariableColl = db.getCollection("occasionValue");
 		occassionVariableColl.insert(new BasicDBObject("v", 1).append("b", "HA").append("s", "CK").append("po", "Duress"));
 		
 		parsingBoltOccassion = new ParsingBoltOccassion();
@@ -117,10 +117,10 @@ public void getMemberTagsNullTest(){
 public void getMemberTagsTest(){
 	List<String> mdTagsActual = memberMDTagsDao.getMemberMDTags("OccassionTopologyTestingl_id");
 	List<String> mdTagsExpected = new ArrayList<String>();
-	mdTagsExpected.add("HACKS2010");
-	mdTagsExpected.add("HARFS2010");
-	mdTagsExpected.add("HALAS2010");
-	mdTagsExpected.add("HADHS2010");
+	mdTagsExpected.add("HACKS");
+	mdTagsExpected.add("HARFS");
+	mdTagsExpected.add("HALAS");
+	mdTagsExpected.add("HADHS");
 	Assert.assertEquals(4, mdTagsActual.size());
 	Assert.assertEquals(mdTagsExpected.get(0), mdTagsActual.get(0));
 }
@@ -129,8 +129,8 @@ public void getMemberTagsTest(){
 @Test
 public void getTagVariablesListTest(){
 	List<String> tagsList = new ArrayList<String>();
-	tagsList.add("HACKS2010");
-	tagsList.add("HARFS2010");
+	tagsList.add("HACKS");
+	tagsList.add("HARFS");
 	List<String> tagsVarListActual = tagVariableDao.getTagVariablesList(tagsList);
 	List<String> tagsVarListExpected = new ArrayList<String>();
 	tagsVarListExpected.add("BOOST_PO_HA_COOK_TEST");
