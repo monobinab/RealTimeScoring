@@ -24,22 +24,22 @@ public class PurchaseOccassionTopology{
 	public static void main(String[] args)  throws Exception{
 		LOGGER.info("starting purchase occassion topology");
 		System.clearProperty(MongoNameConstants.IS_PROD);
-		if (args.length > 0) {
+		/*if (args.length > 0) {
 			System.setProperty(MongoNameConstants.IS_PROD, "true");
-		}
+		}*/
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 		String[] servers = RedisConnection.getServers();
 	//	String topic = TopicConstants.OCCASSION;
 		String topic = "Member_Tags";
 		topologyBuilder.setSpout("occassionSpout1", new OccassionRedisSpout(
-				"rtsapp401p.prod.ch4.s.com", TopicConstants.PORT, topic), 1);
-		topologyBuilder.setSpout("occassionSpout2", new OccassionRedisSpout(
+				"rtsapp401p.prod.ch4.s.com", TopicConstants.PORT, "Occassion_Tags"), 1);
+		/*topologyBuilder.setSpout("occassionSpout2", new OccassionRedisSpout(
 				"rtsapp402p.prod.ch4.s.com", TopicConstants.PORT, topic), 1);
 		topologyBuilder.setSpout("occassionSpout3", new OccassionRedisSpout(
-				"rtsapp403p.prod.ch4.s.com", TopicConstants.PORT, topic), 1);
+				"rtsapp403p.prod.ch4.s.com", TopicConstants.PORT, topic), 1);*/
 		
 		topologyBuilder.setBolt("parseOccassionBolt", new ParsingBoltOccassion(), 1)
-		.shuffleGrouping("occassionSpout1").shuffleGrouping("occassionSpout2").shuffleGrouping("occassionSpout3");
+		.shuffleGrouping("occassionSpout1");//.shuffleGrouping("occassionSpout2").shuffleGrouping("occassionSpout3");
 		topologyBuilder.setBolt("persistOccasionBolt", new PersistOccasionBolt(), 1)
 		.shuffleGrouping("parseOccassionBolt", "persist_stream");
 		topologyBuilder.setBolt("strategy_bolt", new StrategyScoringBolt(), 1)

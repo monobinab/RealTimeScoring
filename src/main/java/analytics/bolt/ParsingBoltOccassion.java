@@ -128,7 +128,7 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 					}
 				}
 				else{
-					countMetric.scope("unwanted_tag_metadata");
+					countMetric.scope("unwanted_tag_metadata").incr();
 				}
 			}
 		} 
@@ -139,11 +139,11 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 	    	listToEmit.add(l_id);
 	    	listToEmit.add(JsonUtils.createJsonFromStringStringMap(variableValueTagsMap));
 	    	listToEmit.add("PurchaseOccasion");
-	    	countMetric.scope("emitted_to_scoring");
+	    	countMetric.scope("emitted_to_scoring").incr();
 	    	this.outputCollector.emit(listToEmit);
 		}
 		else{
-	    	countMetric.scope("no_variables_affected");			
+	    	countMetric.scope("no_variables_affected").incr();			
 		}
     	outputCollector.ack(input);
 	}
