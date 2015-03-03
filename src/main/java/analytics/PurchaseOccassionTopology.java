@@ -24,15 +24,15 @@ public class PurchaseOccassionTopology{
 	public static void main(String[] args)  throws Exception{
 		LOGGER.info("starting purchase occassion topology");
 		System.clearProperty(MongoNameConstants.IS_PROD);
-		/*if (args.length > 0) {
+	//	if (args.length > 0) {
 			System.setProperty(MongoNameConstants.IS_PROD, "true");
-		}*/
+	//	}
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 		String[] servers = RedisConnection.getServers();
-	//	String topic = TopicConstants.OCCASSION;
-		String topic = "Member_Tags";
+		String topic = TopicConstants.OCCASSION;
+		
 		topologyBuilder.setSpout("occassionSpout1", new OccassionRedisSpout(
-				"rtsapp401p.prod.ch4.s.com", TopicConstants.PORT, "Occassion_Tags"), 1);
+				"rtsapp401p.prod.ch4.s.com", TopicConstants.PORT, "kkr"), 1);
 		/*topologyBuilder.setSpout("occassionSpout2", new OccassionRedisSpout(
 				"rtsapp402p.prod.ch4.s.com", TopicConstants.PORT, topic), 1);
 		topologyBuilder.setSpout("occassionSpout3", new OccassionRedisSpout(
@@ -46,7 +46,7 @@ public class PurchaseOccassionTopology{
 		.shuffleGrouping("parseOccassionBolt");
 		
 		Config conf = new Config();
-		conf.put("metrics_topology", "Occasion");
+		conf.put("metrics_topology", "PurchaseOccasion");
 	    conf.registerMetricsConsumer(MetricsListener.class, 3);
 		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
 		

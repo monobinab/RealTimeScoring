@@ -15,6 +15,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
 import analytics.util.JsonUtils;
+import analytics.util.MongoNameConstants;
 import analytics.util.SecurityUtils;
 import analytics.util.dao.MemberMDTagsDao;
 import analytics.util.dao.ModelPercentileDao;
@@ -62,6 +63,7 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
 		this.outputCollector = collector;
+		 System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
 		tagMetadataDao = new TagMetadataDao();
 	//	System.out.println(tagMetadataDao.getDetails("HACKS2010"));
 		tagVariableDao = new TagVariableDao();
