@@ -63,7 +63,7 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 			OutputCollector collector) {
 		this.outputCollector = collector;
 		tagMetadataDao = new TagMetadataDao();
-		System.out.println(tagMetadataDao.getDetails("HACKS2010"));
+	//	System.out.println(tagMetadataDao.getDetails("HACKS2010"));
 		tagVariableDao = new TagVariableDao();
 		memberTagDao = new MemberMDTagsDao();
 		modelPercDao = new ModelPercentileDao();
