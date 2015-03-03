@@ -1,6 +1,8 @@
 package analytics.util.dao;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -12,6 +14,19 @@ import org.slf4j.LoggerFactory;
 
 
 
+
+
+
+
+
+
+
+import scala.Array;
+import analytics.util.MongoNameConstants;
+import clojure.main;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
@@ -38,4 +53,25 @@ public class ModelPercentileDao extends AbstractDao{
 		}
 		return modelPercentilesMap;
 	}
+	
+	public String getSingleModelPercentile(String modelId){
+		
+		List<BasicDBObject> query = new ArrayList<BasicDBObject>();
+		query.add(new BasicDBObject(MongoNameConstants.MODEL_ID, modelId));
+		query.add(new BasicDBObject(MongoNameConstants.MODEL_PERC, "99"));
+		BasicDBObject andQuery = new BasicDBObject();
+		andQuery.put("$and", query);
+		DBObject dbObj = modelPercentileCollection.findOne(andQuery);
+		if(dbObj != null){
+		return dbObj.get(MongoNameConstants.MAX_SCORE).toString();
+		}
+		else{
+			return null;
+		}
+	}
+	/*
+	public static void main(String[] args){
+		ModelPercentileDao dao = new ModelPercentileDao();
+		dao.getSingleModelPercentile("68");
+	}*/
 }

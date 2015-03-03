@@ -14,6 +14,7 @@ import org.junit.Test;
 import analytics.util.DBConnection;
 import analytics.util.FakeMongo;
 import analytics.util.dao.MemberMDTagsDao;
+import analytics.util.dao.ModelPercentileDao;
 import analytics.util.dao.OccasionVariableDao;
 import analytics.util.dao.TagVariableDao;
 import analytics.util.objects.TagMetadata;
@@ -25,8 +26,6 @@ import com.github.fakemongo.Fongo;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 
@@ -36,12 +35,14 @@ static DBCollection memberMDTagsColl;
 static DBCollection tagMetadataColl;
 static DBCollection tagVariableColl;
 static DBCollection occassionVariableColl;
+static DBCollection modelPercColl;
 static ParsingBoltOccassion parsingBoltOccassion;
 static String input;
 static Tuple tuple;
 static MemberMDTagsDao memberMDTagsDao;
 static TagVariableDao tagVariableDao;
 static OccasionVariableDao occasionVariableDao;
+static ModelPercentileDao modelPercDao;
 	
 @BeforeClass
 public static void intialize() throws Exception{
@@ -49,44 +50,23 @@ public static void intialize() throws Exception{
 	  FakeMongo.setDBConn(new Fongo("test db").getDB("test"));	
 		db = DBConnection.getDBConnection();
 		
-		//fake memberMDTags collection
-		memberMDTagsColl = db.getCollection("memberMDTags");
-		BasicDBList list = new BasicDBList();
-		list.add("HACKS2010");
-		list.add("HARFS2010");
-		list.add("HALAS2010");
-		list.add("HADHS2010");
-		memberMDTagsColl.insert(new BasicDBObject("l_id", "OccassionTopologyTestingl_id").append("tags", list));
-		
-		//fake tagMetaData collection
-		tagMetadataColl = db.getCollection("tagMetadata");
-		tagMetadataColl.insert(new BasicDBObject("SEG", "HACKS2010").append("BRA", "Nikon").append("BU_", "HA").append("SUB", "CK").append("OCC", "Duress"));
-		tagMetadataColl.insert(new BasicDBObject("SEG", "HARFS2010").append("BRA", "LG").append("BU_", "HA").append("SUB", "RF").append("OCC", "Moving"));
-		tagMetadataColl.insert(new BasicDBObject("SEG", "HALAS2010").append("BRA", "Unknown").append("BU_", "HA").append("SUB", "LA").append("OCC", "Duress"));
-		
-		//fake tagVariable collection
-		tagVariableColl = db.getCollection("tagVariable");
-		tagVariableColl.insert(new BasicDBObject("t", "HACKS").append("v", "BOOST_PO_HA_COOK_TEST").append("m", 35));
-		tagVariableColl.insert(new BasicDBObject("t", "HARFS").append("v", "BOOST_PO_HA_REF_TEST").append("m", 39));
-		tagVariableColl.insert(new BasicDBObject("t", "HALAS").append("v", "BOOST_PO_HA_LA_TEST").append("m", 46));
-		
-		//fake occassionVariable collection
-		occassionVariableColl = db.getCollection("occasionValue");
-		occassionVariableColl.insert(new BasicDBObject("v", 1).append("b", "HA").append("s", "CK").append("po", "Duress"));
-		
-		parsingBoltOccassion = new ParsingBoltOccassion();
-		parsingBoltOccassion.setMemberTagsDao();
-		parsingBoltOccassion.setOccassionDao();
-		parsingBoltOccassion.setTagMetadataDao();
-		parsingBoltOccassion.setTagVariableDao();
-				
-		/*input = "{\"l_id\":\"kkr\",\"tags\":[\"HACKS2010\",\"HARFS2010\", \"HALAS2010\"]}"; 
-		tuple = StormTestUtils.mockTuple(input,"occassion");*/
+		//get the fakeMongoColl from ParsingBoltOccassionFakeMonogColl
+		ParsingBoltOccassionFakeMonogColl.fakeMongoColl();
+		memberMDTagsColl = ParsingBoltOccassionFakeMonogColl.getMemberMDTagsColl();
+		tagVariableColl = ParsingBoltOccassionFakeMonogColl.getTagVariableColl();
+		tagMetadataColl = ParsingBoltOccassionFakeMonogColl.getTagMetadataColl();
+		modelPercColl = ParsingBoltOccassionFakeMonogColl.getModelPercColl();
 		
 		memberMDTagsDao = new MemberMDTagsDao();
 		tagVariableDao = new TagVariableDao();
+		modelPercDao = new ModelPercentileDao();
+			
+		parsingBoltOccassion = new ParsingBoltOccassion();
+		parsingBoltOccassion.setMemberTagsDao();
+		parsingBoltOccassion.setTagMetadataDao();
+		parsingBoltOccassion.setTagVariableDao();
+		parsingBoltOccassion.setModelPercDao();
 		
-				
 }
 
 public Tuple mockTuple(){
@@ -155,7 +135,6 @@ public void resetVariableValueMap(){
 	parsingBoltOccassion.resetVariableValuesMap(varValueMap, "OccassionTopologyTestingl_id");
 	Assert.assertEquals(3, varValueMap.size());
 	Assert.assertEquals("0", varValueMap.get("BOOST_PO_HA_COOK_TEST"));
-	
 }
 
 //test to check the empty variableBalueMap for non existent member in memberMDTags collection
@@ -208,21 +187,14 @@ public void getTagMetaDataNullTest(){
 //test to the variable value for mdTag from tagVariable collection
 @Test
 public void getVariableValueTest(){
-	TagMetadata metaData = new TagMetadata();
-	metaData.setBusinessUnit("HA");
-	metaData.setSubBusinessUnit("CK");
-	metaData.setPurchaseOccassion("Duress");
-	String tagVarValue = parsingBoltOccassion.getTagVarValue(metaData);
-	Assert.assertEquals("1", tagVarValue);
+	
+	String tagVarValue = parsingBoltOccassion.getTagVarValue("68");
+	Assert.assertEquals("0.11", tagVarValue);
 }
 
 @Test
 public void getVariableValueNullTest(){
-	TagMetadata metaData = new TagMetadata();
-	metaData.setBusinessUnit("LG");
-	metaData.setSubBusinessUnit("CK");
-	metaData.setPurchaseOccassion("Duress");
-	String tagVarValue = parsingBoltOccassion.getTagVarValue(metaData);
+	String tagVarValue = parsingBoltOccassion.getTagVarValue(null);
 	Assert.assertNull(tagVarValue);
 }
 
@@ -231,8 +203,10 @@ public void getVariableValueNullTest(){
 public void getVariableTest(){
 	JsonParser parser = new JsonParser();
 	JsonElement tag = parser.parse("HACKS2010");
-	String tagVar = parsingBoltOccassion.getTagVariable(tag);
-	Assert.assertEquals("BOOST_PO_HA_COOK_TEST", tagVar);
+	Map<String, String> tagVarActual = parsingBoltOccassion.getTagVariable(tag);
+	Map<String, String> tagVarExpected = new HashMap<String, String>();
+	tagVarExpected.put("BOOST_PO_HA_COOK_TEST", "35");
+	Assert.assertEquals(tagVarExpected, tagVarActual);
 }
 
 //test to check the variable for non existent mdTag from tagVariables collection
@@ -240,7 +214,7 @@ public void getVariableTest(){
 public void getVariablenullTest(){
 	JsonParser parser = new JsonParser();
 	JsonElement tag = parser.parse("HAKKS2010");
-	String tagVar = parsingBoltOccassion.getTagVariable(tag);
+	Map<String, String> tagVar = parsingBoltOccassion.getTagVariable(tag);
 	Assert.assertNull(tagVar);
 }
 
@@ -283,8 +257,6 @@ public void getParsedJsonTest2(){
 	Tuple tuple = mockTuple2();
 	JsonParser parser = new JsonParser();
 	 parsingBoltOccassion.getParsedJson(tuple, parser);
-	
-
 }
 
 @AfterClass

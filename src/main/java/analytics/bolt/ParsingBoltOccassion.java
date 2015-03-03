@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,7 @@ import com.google.gson.JsonSyntaxException;
 import analytics.util.JsonUtils;
 import analytics.util.SecurityUtils;
 import analytics.util.dao.MemberMDTagsDao;
+import analytics.util.dao.ModelPercentileDao;
 import analytics.util.dao.OccasionVariableDao;
 import analytics.util.dao.TagMetadataDao;
 import analytics.util.dao.TagVariableDao;
@@ -34,9 +36,9 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 	private OutputCollector outputCollector;
 	private TagMetadataDao tagMetadataDao;
 	private TagVariableDao tagVariableDao;
-	private OccasionVariableDao occasionVariableDao;
 	private MultiCountMetric countMetric;
 	private MemberMDTagsDao memberTagDao;
+	private ModelPercentileDao modelPercDao;
 	 void initMetrics(TopologyContext context){
 	     countMetric = new MultiCountMetric();
 	     context.registerMetric("custom_metrics", countMetric, 60);
@@ -51,8 +53,9 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 	 public void setTagVariableDao(){
 		 tagVariableDao = new TagVariableDao();
 	 }
-	 public void setOccassionDao(){
-		 occasionVariableDao = new OccasionVariableDao();
+		 
+	 public void setModelPercDao(){
+		 modelPercDao = new ModelPercentileDao();
 	 }
 
 	@Override
@@ -60,14 +63,16 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 			OutputCollector collector) {
 		this.outputCollector = collector;
 		tagMetadataDao = new TagMetadataDao();
+		System.out.println(tagMetadataDao.getDetails("HACKS2010"));
 		tagVariableDao = new TagVariableDao();
-		occasionVariableDao = new OccasionVariableDao();
 		memberTagDao = new MemberMDTagsDao();
+		modelPercDao = new ModelPercentileDao();
 		initMetrics(context);
 	}
 
 	@Override
 	public void execute(Tuple input) {
+		System.out.println("IN PARSING BOLT: " + input);
 		countMetric.scope("incoming_tuples").incr();
 		Map<String, String> variableValueTagsMap = new HashMap<String, String>();
 		JsonParser parser = new JsonParser();
@@ -108,12 +113,14 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 			for (JsonElement tag : tags) {
 				TagMetadata tagMetaData = getTagMetaData(tag);
 				if (tagMetaData != null) {//TODO: Add list of tagMetadatas you can process. Egh- ignore unwanted
-					String tagVariableValue = getTagVarValue(tagMetaData);
-					String tagVariable = getTagVariable(tag);
-					if(tagVariable!=null && tagVariableValue!=null &&!tagVariable.isEmpty() && !tagVariableValue.isEmpty())
+							
+					Map<String, String> tagVariable = getTagVariable(tag);
+					String tagVariableValue = getTagVarValue(tagVariable.get(tagVariable.keySet().iterator().next()));
+					
+					if(tagVariable!=null && tagVariableValue!=null &&!tagVariable.isEmpty() )
 					{
 						populateVariableValueTagsMap(variableValueTagsMap,
-								tagVariableValue, tagVariable);
+								tagVariableValue, tagVariable.keySet().iterator().next());
 						countMetric.scope("tag_variable_added").incr();
 					}
 					else{
@@ -158,15 +165,15 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 		variableValueTagsMap.put(tagVariable, tagVariableValue);
 	}
 
-	public String getTagVariable(JsonElement tag) {
-		String tagVariable = tagVariableDao.getTagVariable(tag
+	public Map<String, String> getTagVariable(JsonElement tag) {
+		Map<String, String> tagVariable = tagVariableDao.getTagVariable(tag
 				.getAsString().substring(0, 5));
 		return tagVariable;
 	}
 
-	public String getTagVarValue(TagMetadata tagMetaData) {
-		String tagVariableValue = occasionVariableDao
-				.getValue(tagMetaData);
+	public String getTagVarValue(String modelId) {
+		String tagVariableValue = modelPercDao.getSingleModelPercentile(modelId);
+				
 		return tagVariableValue;
 	}
 

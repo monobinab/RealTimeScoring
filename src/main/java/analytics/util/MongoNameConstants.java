@@ -115,6 +115,23 @@ public class MongoNameConstants {
     public static final  String CC_currentCount = "currentCount";
     public static final  String CC_tagType = "type";
     public static final  String CC_tagId = "tagId";
+    
+    
+    //modelPercentile collections
+     public static final String MODEL_PERC = "percentile";
+     public static final String MAX_SCORE = "maxScore";
+     
+     
+     //tagVaraible collections
+     public static final String TAG_VAR_VAR = "v";
+     public static final String TAG_VAR_MDTAG = "t";
+     public static final String TAG_VAR_MODEL = "m";
+     
+     //tagsMetadata collection
+     public static final String PURCHASE_OCCASSION = "OCC";
+     public static final String SUB_BUSINESS_UNIT = "SUB";
+     public static final String BUSINESS_UNIT= "BU_";
+     public static final String SEG = "SEG";
 
 
 }

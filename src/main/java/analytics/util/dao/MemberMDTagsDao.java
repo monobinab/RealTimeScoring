@@ -21,7 +21,7 @@ public class MemberMDTagsDao extends AbstractDao {
 
 	public MemberMDTagsDao() {
 		super();
-		memberMDTagsCollection = db.getCollection("memberMDTags");
+		memberMDTagsCollection = db.getCollection("memberMdTags");
 	}
 
 	public List<String> getMemberMDTags(String l_id) {

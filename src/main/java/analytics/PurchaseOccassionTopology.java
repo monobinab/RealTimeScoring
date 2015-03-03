@@ -29,14 +29,14 @@ public class PurchaseOccassionTopology{
 		}
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 		String[] servers = RedisConnection.getServers();
-		String topic = TopicConstants.OCCASSION;
-		
+	//	String topic = TopicConstants.OCCASSION;
+		String topic = "Member_Tags";
 		topologyBuilder.setSpout("occassionSpout1", new OccassionRedisSpout(
-				servers[0], TopicConstants.PORT, topic), 1);
+				"rtsapp401p.prod.ch4.s.com", TopicConstants.PORT, topic), 1);
 		/*topologyBuilder.setSpout("occassionSpout2", new OccassionRedisSpout(
-				servers[1], TopicConstants.PORT, topic), 1);
+				"rtsapp402p.prod.ch4.s.com", TopicConstants.PORT, topic), 1);
 		topologyBuilder.setSpout("occassionSpout3", new OccassionRedisSpout(
-				servers[2], TopicConstants.PORT, topic), 1);*/
+				"rtsapp403p.prod.ch4.s.com", TopicConstants.PORT, topic), 1);*/
 		
 		topologyBuilder.setBolt("parseOccassionBolt", new ParsingBoltOccassion(), 1)
 		.shuffleGrouping("occassionSpout1");//.shuffleGrouping("occassionSpout2").shuffleGrouping("occassionSpout3");

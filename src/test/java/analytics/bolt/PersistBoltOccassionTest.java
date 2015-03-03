@@ -36,7 +36,7 @@ public class PersistBoltOccassionTest {
 		db = DBConnection.getDBConnection();
 
 		// fake memberMDTags collection
-		memberMDTagsColl = db.getCollection("memberMDTags");
+		memberMDTagsColl = db.getCollection("memberMdTags");
 		BasicDBList list = new BasicDBList();
 		list.add("HACKS2010");
 

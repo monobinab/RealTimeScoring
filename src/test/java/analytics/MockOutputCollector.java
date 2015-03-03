@@ -17,6 +17,14 @@ public class MockOutputCollector extends OutputCollector {
 	public Map<String, List<Object>> getTuple(){
 		return tuple;
 	}
+
+	public MockOutputCollector(IOutputCollector delegate) {
+		super(delegate);
+		TestCaseListeners = new LinkedList<IBoltListener>();
+	}
+
+	private LinkedList<IBoltListener> TestCaseListeners;
+
 	@Override
 	public java.util.List<Integer> emit(java.util.List<Object> tuple) {
 		Iterator<IBoltListener> iterator = TestCaseListeners.iterator();
@@ -26,7 +34,6 @@ public class MockOutputCollector extends OutputCollector {
 		//Create tuples here
 		this.tuple.put("main", tuple);
 		return null;
-		
 	};
 	
 	@Override
@@ -41,13 +48,6 @@ public class MockOutputCollector extends OutputCollector {
 		return null;
 		
 	}
-
-	public MockOutputCollector(IOutputCollector delegate) {
-		super(delegate);
-		TestCaseListeners = new LinkedList<IBoltListener>();
-	}
-
-	private LinkedList<IBoltListener> TestCaseListeners;
 
 	@Override
 	public List<Integer> emit(String streamId, Collection<Tuple> anchors,

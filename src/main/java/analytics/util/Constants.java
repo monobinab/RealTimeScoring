@@ -8,6 +8,7 @@ public static final String BUSINESS_UNIT= "BU_";
 public static final String SEG = "SEG";
 public static final String TAG_VAR = "v";
 public static final String TAG_MDTAG = "t";
+public static final String TAG_MODEL = "m";
 public static final String OCC_VAR = "v";
 public static final String OCC_BU = "b";
 public static final String OCC_SUB = "s";

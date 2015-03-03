@@ -1,12 +1,15 @@
 package analytics.util.dao;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.util.Constants;
+import analytics.util.MongoNameConstants;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
@@ -22,10 +25,12 @@ public class TagVariableDao extends AbstractDao{
 	    	super();
 			tagVariablesCollection = db.getCollection("tagVariable");
 	    }
-	    public String getTagVariable(String tag){
-	    	DBObject tagVariable = tagVariablesCollection.findOne(new BasicDBObject(Constants.TAG_MDTAG,tag.substring(0, 5)));
-	    	if(tagVariable!=null && tagVariable.containsField(Constants.TAG_VAR)){
-	    		return (String)tagVariable.get(Constants.TAG_VAR);
+	    public Map<String, String> getTagVariable(String tag){
+	    	DBObject tagVariable = tagVariablesCollection.findOne(new BasicDBObject(MongoNameConstants.TAG_VAR_MDTAG,tag.substring(0, 5)));
+	    	if(tagVariable!=null && tagVariable.containsField(MongoNameConstants.TAG_VAR_VAR) && tagVariable.containsField(MongoNameConstants.TAG_VAR_MODEL)){
+	    		Map<String, String> tagVarMap = new HashMap<String, String>();
+	    		tagVarMap.put((String)tagVariable.get(MongoNameConstants.TAG_VAR_VAR), tagVariable.get(MongoNameConstants.TAG_VAR_MODEL)+"");
+	    		return tagVarMap;
 	    	}
 	    	return null;
 	    }
@@ -36,11 +41,11 @@ public class TagVariableDao extends AbstractDao{
 	    	list.add(tag);
 	    	}
 	    	BasicDBObject query = new BasicDBObject();
-	    	query.put("t", new BasicDBObject("$in", list));
+	    	query.put(MongoNameConstants.TAG_VAR_MDTAG, new BasicDBObject("$in", list));
 	    	DBCursor tagVariablesCursor = tagVariablesCollection.find(query);
 	    	List<String> tagVariablesList = new ArrayList<String>();
 	    	while(tagVariablesCursor.hasNext()){
-	    		tagVariablesList.add((String) tagVariablesCursor.next().get("v"));
+	    		tagVariablesList.add((String) tagVariablesCursor.next().get(MongoNameConstants.TAG_VAR_VAR));
 	    	}
 	    	return tagVariablesList;
 	    }
