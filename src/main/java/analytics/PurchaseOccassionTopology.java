@@ -24,9 +24,9 @@ public class PurchaseOccassionTopology{
 	public static void main(String[] args)  throws Exception{
 		LOGGER.info("starting purchase occassion topology");
 		System.clearProperty(MongoNameConstants.IS_PROD);
-		/*if (args.length > 0) {
+		if (args.length > 0) {
 			System.setProperty(MongoNameConstants.IS_PROD, "true");
-		}*/
+		}
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 		String[] servers = RedisConnection.getServers();
 		String topic = TopicConstants.OCCASSION;
