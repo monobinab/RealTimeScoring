@@ -87,7 +87,14 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 		}
 		
 		//Fetch l_id from json
-		JsonElement lyl_id_no = jsonElement.getAsJsonObject().get("lyl_id_no");
+		JsonElement lyl_id_no = null;
+		if(jsonElement.getAsJsonObject().get("lyl_id_no") != null){
+		 lyl_id_no = jsonElement.getAsJsonObject().get("lyl_id_no");
+		}
+		else{
+			LOGGER.error("Invalid incmoing json");
+			return;
+		}
 		if (lyl_id_no == null || lyl_id_no.getAsString().length()!=16) {
 			countMetric.scope("empty_lid").incr();
 			outputCollector.ack(input);
