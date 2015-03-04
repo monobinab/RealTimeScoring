@@ -20,7 +20,7 @@ public class MemberMDTagsDao extends AbstractDao {
 	DBCollection memberMDTagsCollection;
 
 	public MemberMDTagsDao() {
-		super();
+		super("server2");
 		memberMDTagsCollection = db.getCollection("memberMdTags");
 	}
 
