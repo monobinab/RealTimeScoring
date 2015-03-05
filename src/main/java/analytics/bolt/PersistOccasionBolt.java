@@ -41,7 +41,8 @@ public class PersistOccasionBolt extends BaseRichBolt{
 	@SuppressWarnings("unchecked")
 	@Override
 	public void execute(Tuple input) {
-		System.out.println("IN PERSIST BOLT: " + input);
+	//	System.out.println("IN PERSIST BOLT: " + input);
+		countMetric.scope("incoming_tuples").incr();
 		List<String> tags = new ArrayList<String>();
 		String l_id = input.getString(0);
 		try {

@@ -74,7 +74,7 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 
 	@Override
 	public void execute(Tuple input) {
-		System.out.println("IN PARSING BOLT: " + input);
+		//System.out.println("IN PARSING BOLT: " + input);
 		countMetric.scope("incoming_tuples").incr();
 		Map<String, String> variableValueTagsMap = new HashMap<String, String>();
 		JsonParser parser = new JsonParser();
@@ -92,7 +92,7 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 		 lyl_id_no = jsonElement.getAsJsonObject().get("lyl_id_no");
 		}
 		else{
-			LOGGER.error("Invalid incmoing json");
+			LOGGER.error("Invalid incoming json");
 			return;
 		}
 		if (lyl_id_no == null || lyl_id_no.getAsString().length()!=16) {
@@ -101,7 +101,7 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 			return;
 		} 
 		String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no.getAsString());
-		System.out.println(l_id);
+		//System.out.println(l_id);
 		
 		//Get list of tags from json
 		StringBuilder tagsString = new StringBuilder();
