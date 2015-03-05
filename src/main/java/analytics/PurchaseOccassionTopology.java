@@ -32,14 +32,14 @@ public class PurchaseOccassionTopology{
 		String topic = TopicConstants.OCCASSION;
 		
 		topologyBuilder.setSpout("occassionSpout1", new OccassionRedisSpout(
-				"rtsapp302p.qa.ch3.s.com", TopicConstants.PORT, topic), 1);
-		/*topologyBuilder.setSpout("occassionSpout2", new OccassionRedisSpout(
+				servers[0], TopicConstants.PORT, topic), 1);
+		topologyBuilder.setSpout("occassionSpout2", new OccassionRedisSpout(
 				servers[1], TopicConstants.PORT, topic), 1);
 		topologyBuilder.setSpout("occassionSpout3", new OccassionRedisSpout(
 				servers[2], TopicConstants.PORT, topic), 1);
-		*/
+		
 		topologyBuilder.setBolt("parseOccassionBolt", new ParsingBoltOccassion(), 1)
-		.shuffleGrouping("occassionSpout1");//.shuffleGrouping("occassionSpout2").shuffleGrouping("occassionSpout3");
+		.shuffleGrouping("occassionSpout1").shuffleGrouping("occassionSpout2").shuffleGrouping("occassionSpout3");
 		topologyBuilder.setBolt("persistOccasionBolt", new PersistOccasionBolt(), 1)
 		.shuffleGrouping("parseOccassionBolt", "persist_stream");
 		topologyBuilder.setBolt("strategy_bolt", new StrategyScoringBolt(), 1)
