@@ -4,12 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.bolt.FlumeRPCBolt;
-import analytics.bolt.LoggingBolt;
-import analytics.bolt.MemberPublishBolt;
 import analytics.bolt.ParsingBoltAAM_ATC;
-import analytics.bolt.ScorePublishBolt;
 import analytics.bolt.StrategyScoringBolt;
-import analytics.spout.AAMRedisPubSubSpout;
+import analytics.spout.TraitsSpout;
+import analytics.util.Constants;
 import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
 import analytics.util.RedisConnection;
@@ -19,9 +17,7 @@ import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
 import backtype.storm.generated.AlreadyAliveException;
 import backtype.storm.generated.InvalidTopologyException;
-import backtype.storm.topology.BoltDeclarer;
 import backtype.storm.topology.TopologyBuilder;
-import backtype.storm.tuple.Fields;
 
 public class AAM_BrowseTopology {
 	private static final Logger LOGGER = LoggerFactory
@@ -41,18 +37,23 @@ public class AAM_BrowseTopology {
 		//RedisConnection redisConnection = new RedisConnection();
 		String[] servers = RedisConnection.getServers();
 		int counter = 0;
-		BoltDeclarer boltDeclarer = topologyBuilder.setBolt(
+		/*BoltDeclarer boltDeclarer = topologyBuilder.setBolt(
 				"parsingBoltBrowse", new ParsingBoltAAM_ATC(topic), 3);
 		for (String server : servers) {
 			topologyBuilder.setSpout(topic + ++counter, new AAMRedisPubSubSpout(
 					server, port, topic), 1);
 			boltDeclarer.shuffleGrouping(topic + counter);
-		}
+		}*/
+		
+		//Sree. Spout that wakes up every 5 mins and process the Traits
+		topologyBuilder.setSpout("traitsSpout", new TraitsSpout(servers[1], TopicConstants.PORT, Constants.AAM_BROWSER_PATH, "aamBrowser"), 1);
+		topologyBuilder.setBolt("parsingBoltBrowse", new ParsingBoltAAM_ATC(topic), 3)
+	  		.shuffleGrouping("traitsSpout");
 
 		
-		topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(), 3)
+		/*topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(), 3)
 				.localOrShuffleGrouping("parsingBoltBrowse");
-		topologyBuilder.setBolt("flumeLoggingBolt", new FlumeRPCBolt(), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
+		topologyBuilder.setBolt("flumeLoggingBolt", new FlumeRPCBolt(), 1).shuffleGrouping("strategyScoringBolt", "score_stream");*/
 		
 //		 topologyBuilder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 3).localOrShuffleGrouping("strategyScoringBolt", "score_stream");
 	//        topologyBuilder.setBolt("memberPublishBolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 3).localOrShuffleGrouping("strategyScoringBolt", "member_stream");
