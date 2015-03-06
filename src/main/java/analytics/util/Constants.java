@@ -1,7 +1,13 @@
 package analytics.util;
 
 public class Constants {
-public static final int METRICS_INTERVAL = 60;
+	public static final int METRICS_INTERVAL = 60;
+	public static final String SCORING_API_PRE = "http://realtimescoring.intra.searshc.com/rtsapi/v1/top/categories/";
+	public static final String SCORING_API_POST = "?key=rtsTeam&format=kmart&tags=nonmodels"; 
+	public static final String AUTH_PROPERTY_FILE = "authentication.properties";
+	public static final String RESP_URL_USER_NAME = "responseWebserviceUsrname";
+	public static final String RESP_URL_PASSWORD = "responseWebservicePassword";
+	public static final String RESP_URL = "responseWebserviceURL";
 public static final String PURCHASE_OCCASSION = "OCC";
 public static final String SUB_BUSINESS_UNIT = "SUB";
 public static final String BUSINESS_UNIT= "BU_";
