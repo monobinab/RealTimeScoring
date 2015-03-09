@@ -69,7 +69,7 @@ public class TraitsSpout extends BaseRichSpout{
 		TreeSet<Long> sortedSubSet = new TreeSet<Long>();
 		try{
 			//Sleep for 5 mins before starting the next process
-			//Thread.sleep(300000);
+			Thread.sleep(300000);
 			
 			Jedis jedis = jedisPool.getResource();
 			//jedis.set(topologyIdentifier, latestPrefix.toString());
