@@ -1,6 +1,7 @@
 package analytics.util.objects;
 
 import java.io.Serializable;
+import java.util.Map;
 
 public class TagMetadata implements Serializable {
 	private static final long serialVersionUID = 1L;

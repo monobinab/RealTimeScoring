@@ -1,7 +1,6 @@
 package analytics.util.dao;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -12,6 +11,7 @@ import analytics.util.MongoNameConstants;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
 public class MemberMDTagsDao extends AbstractDao {
@@ -20,8 +20,8 @@ public class MemberMDTagsDao extends AbstractDao {
 	DBCollection memberMDTagsCollection;
 
 	public MemberMDTagsDao() {
-		super();
-		memberMDTagsCollection = db.getCollection("memberMDTags");
+		super("server2");
+		memberMDTagsCollection = db.getCollection("memberMdTags");
 	}
 
 	public List<String> getMemberMDTags(String l_id) {
@@ -32,7 +32,7 @@ public class MemberMDTagsDao extends AbstractDao {
 		List<String> mdTags = new ArrayList<String>();
 		for(Object tag:dbListTags){
 			if(tag instanceof String){
-				mdTags.add(tag.toString());
+				mdTags.add(tag.toString().substring(0, 5));
 			}
 		}
 		//List<String> mdTags = (List<String>) dbObj.get("tags");
@@ -43,6 +43,7 @@ public class MemberMDTagsDao extends AbstractDao {
 	}
 
 	public void addMemberMDTags(String l_id, List<String> tags) {
+		
 		DBObject tagstoUpdate = new BasicDBObject();
 		tagstoUpdate.put(MongoNameConstants.L_ID, l_id);
 		BasicDBList mdTagsList = new BasicDBList();
@@ -52,10 +53,12 @@ public class MemberMDTagsDao extends AbstractDao {
 		tagstoUpdate.put("tags", mdTagsList);
 		memberMDTagsCollection.update(new BasicDBObject(
 				MongoNameConstants.L_ID, l_id), tagstoUpdate, true, false);
+	
 	}
 	public void deleteMemberMDTags(String l_id){
 		DBObject doc = memberMDTagsCollection.findOne(new BasicDBObject(MongoNameConstants.L_ID,l_id)); //get first document
-		memberMDTagsCollection.remove(doc);
+		if(doc != null)
+			memberMDTagsCollection.remove(doc);
 	}
 	/*public static void main(String[] args) {
 		MemberMDTagsDao dao = new MemberMDTagsDao();

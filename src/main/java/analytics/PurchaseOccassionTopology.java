@@ -32,21 +32,21 @@ public class PurchaseOccassionTopology{
 		String topic = TopicConstants.OCCASSION;
 		
 		topologyBuilder.setSpout("occassionSpout1", new OccassionRedisSpout(
-				servers[1], TopicConstants.PORT, topic), 1);
-		/*topologyBuilder.setSpout("occassionSpout2", new OccassionRedisSpout(
+				servers[0], TopicConstants.PORT, topic), 1);
+		topologyBuilder.setSpout("occassionSpout2", new OccassionRedisSpout(
 				servers[1], TopicConstants.PORT, topic), 1);
 		topologyBuilder.setSpout("occassionSpout3", new OccassionRedisSpout(
-				servers[2], TopicConstants.PORT, topic), 1);*/
+				servers[2], TopicConstants.PORT, topic), 1);
 		
 		topologyBuilder.setBolt("parseOccassionBolt", new ParsingBoltOccassion(), 1)
-		.shuffleGrouping("occassionSpout1");//.shuffleGrouping("occassionSpout2").shuffleGrouping("occassionSpout3");
-		topologyBuilder.setBolt("PersistOccasionBolt", new PersistOccasionBolt(), 1)
+		.shuffleGrouping("occassionSpout1").shuffleGrouping("occassionSpout2").shuffleGrouping("occassionSpout3");
+		topologyBuilder.setBolt("persistOccasionBolt", new PersistOccasionBolt(), 1)
 		.shuffleGrouping("parseOccassionBolt", "persist_stream");
 		topologyBuilder.setBolt("strategy_bolt", new StrategyScoringBolt(), 1)
 		.shuffleGrouping("parseOccassionBolt");
 		
 		Config conf = new Config();
-		conf.put("metrics_topology", "Occasion");
+		conf.put("metrics_topology", "PurchaseOccasion");
 	    conf.registerMetricsConsumer(MetricsListener.class, 3);
 		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
 		
@@ -63,6 +63,6 @@ public class PurchaseOccassionTopology{
 			Thread.sleep(10000000);
 			cluster.shutdown();
 		}
-
+		}
 	}
-}
+
