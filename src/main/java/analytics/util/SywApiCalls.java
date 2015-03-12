@@ -187,6 +187,11 @@ public class SywApiCalls {
 		/*sourceProductId":"05771769000P","numberOfBuyingOptions":0,"itemId":"05771769000"*/
 	}
 	
+	/**
+	 * Get catalog type - like, want, or have
+	 * @param i
+	 * @return
+	 */
 	public String getCatalogType(int i){
 		String requestURL = BASEURI + "/catalogs/get?ids="+i;
 		JsonElement element = makeGetRequestToSywAPI(requestURL);
