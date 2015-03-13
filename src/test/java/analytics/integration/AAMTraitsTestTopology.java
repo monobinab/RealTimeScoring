@@ -33,7 +33,7 @@ emited [Cieh1BvT91qFFXXtzzSU1GFZjfk=, {"M_WEB_TRAIT_POWER_TOOL_8_14":"{\"2014-10
 		conf.setDebug(false);
 		conf.setNumWorkers(3);
 		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
-		
+		conf.put("nimbus.host", "test");
 			conf.setDebug(false);
 			conf.setMaxTaskParallelism(3);
 			LocalCluster cluster = new LocalCluster();

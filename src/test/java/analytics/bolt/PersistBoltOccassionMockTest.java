@@ -41,6 +41,7 @@ public class PersistBoltOccassionMockTest {
 		System.setProperty("rtseprod", "test");
 		conf = new HashMap<String, String>();
 		conf.put("rtseprod", "test");
+		conf.put("nimbus.host", "test");
 		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));
 		db = DBConnection.getDBConnection();
 
@@ -77,8 +78,7 @@ public class PersistBoltOccassionMockTest {
 		Tuple tuple = StormTestUtils.mockTupleList(emitToPersist, "PurchaseOccassion");
 		TopologyContext context = new MockTopologyContext();
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
-		Map<String, String> stormConf = new HashMap<String, String>();
-		stormConf.put("nimbus.host", "test");
+		
 		boltUnderTest.prepare(conf, context, outputCollector);
 		boltUnderTest.execute(tuple);
 		DBObject dbObj = memberMDTagsColl.findOne(new BasicDBObject("l_id", "iFTsBvgexZasfSxbq2nOtwAj4bc="));
@@ -103,6 +103,7 @@ public class PersistBoltOccassionMockTest {
 		Tuple tuple = StormTestUtils.mockTupleList(emitToPersist, "PurchaseOccassion");
 		TopologyContext context = new MockTopologyContext();
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
+
 		boltUnderTest.prepare(conf, context, outputCollector);
 		boltUnderTest.execute(tuple);
 		DBObject dbObj = memberMDTagsColl.findOne(new BasicDBObject("l_id", "jnJgNqJpVI3Lt4olN7uCUH0Zcuc="));

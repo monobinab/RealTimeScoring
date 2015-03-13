@@ -40,6 +40,7 @@ public class RealTimeTopologyTest {
 		conf.setDebug(false);
 		conf.setMaxTaskParallelism(3);
 		conf.put(MongoNameConstants.IS_PROD, "test");
+		conf.put("nimbus.host", "test");
 		LocalCluster cluster = new LocalCluster();
 		cluster.submitTopology("realtimescoring_topology", conf,
 				topologyBuilder.createTopology());

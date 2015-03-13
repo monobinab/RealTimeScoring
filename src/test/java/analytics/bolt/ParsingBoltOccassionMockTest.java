@@ -31,7 +31,7 @@ public class ParsingBoltOccassionMockTest {
 	static DBCollection tagsMetadaColl;
 	static DBCollection tagsVarColl;
 	static DBCollection modelPercColl;
-	
+	static Map<String, String> stormConf;
 	@BeforeClass
 	public static void intializeFakeMongo() throws ConfigurationException{
 		System.setProperty("rtseprod", "test");
@@ -39,7 +39,8 @@ public class ParsingBoltOccassionMockTest {
 		conf.put("rtseprod", "test");
 		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));	
 		db = DBConnection.getDBConnection();
-		
+		stormConf = new HashMap<String, String>();
+		stormConf.put("nimbus.host", "test");
 		//get the fakMongo collections from ParsingBotlOccassionDaoTest
 		ParsingBoltOccassionFakeMonogColl.fakeMongoColl();
 		tagsMetadaColl = ParsingBoltOccassionFakeMonogColl.getTagMetadataColl();
@@ -55,8 +56,7 @@ public class ParsingBoltOccassionMockTest {
 		
 		TopologyContext context = new MockTopologyContext();
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
-		Map<String, String> stormConf = new HashMap<String, String>();
-		stormConf.put("nimbus.host", "test");
+		
 		boltUnderTest.prepare(stormConf, context, outputCollector);
 		System.out.println(tuple.getStringByField("message"));
 		boltUnderTest.execute(tuple);
@@ -71,6 +71,6 @@ public class ParsingBoltOccassionMockTest {
 	
 	@AfterClass
 	public static void tearDown(){
-		db.dropDatabase();
+	//	db.dropDatabase();
 	}
 }

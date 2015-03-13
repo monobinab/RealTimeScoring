@@ -57,6 +57,7 @@ public class MemberScoreBoltTest {
 		//Publish to a test db in REDIS
         MemberPublishBolt boltUnderTest = new MemberPublishBolt(redisHost, port,"member_test");
    
+        //TODO: This will fail when we enable the test
         boltUnderTest.prepare(conf, null, outputCollector);
         Tuple tuple = StormTestUtils.mockMemberTuple(input,"unit_test_source");
         
@@ -67,6 +68,7 @@ public class MemberScoreBoltTest {
         pool = new JedisPool(new JedisPoolConfig(),redisHost, port);
         ListenerThread listener = new ListenerThread(queue,pool,"member_test");
         listener.start();
+        
         
         //call the bolt method
         boltUnderTest.execute(tuple);

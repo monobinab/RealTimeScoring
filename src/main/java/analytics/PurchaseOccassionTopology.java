@@ -21,10 +21,9 @@ public class PurchaseOccassionTopology{
 
 	public static void main(String[] args)  throws Exception{
 		LOGGER.info("starting purchase occassion topology");
-		System.clearProperty(MongoNameConstants.IS_PROD);
+		//System.clearProperty(MongoNameConstants.IS_PROD);
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
-		String topic = TopicConstants.OCCASSION;
-
+		//String topic = TopicConstants.OCCASSION;
 		topologyBuilder.setSpout("occassionSpout1", new OccassionRedisSpout(
 				0, "Member_Sample_Tags"), 1);
 		topologyBuilder.setSpout("occassionSpout2", new OccassionRedisSpout(
@@ -56,5 +55,6 @@ public class PurchaseOccassionTopology{
 			Thread.sleep(10000000);
 			cluster.shutdown();
 		}
-		}
+		
+	}
 	}
