@@ -84,6 +84,10 @@ public class MemberScoreBoltTest {
 	
 	@AfterClass
 	public static void cleanUp(){
+		if(conn.toString().equalsIgnoreCase("FongoDB.test"))
+			conn.dropDatabase();
+		  else
+		   Assert.fail("Something went wrong. Tests connected to " + conn.toString());
 		conn.dropDatabase();
 	}
 	

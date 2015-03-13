@@ -17,6 +17,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.xml.sax.InputSource;
@@ -316,6 +317,9 @@ public class ParsingBoltDCTest {
 	
 	@AfterClass
 	public static void cleanUp(){
-		db.dropDatabase();
+		if(db.toString().equalsIgnoreCase("FongoDB.test"))
+		   db.dropDatabase();
+		  else
+		   Assert.fail("Something went wrong. Tests connected to " + db.toString());
 	}
 }

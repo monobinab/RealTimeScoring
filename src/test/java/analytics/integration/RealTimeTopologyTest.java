@@ -59,6 +59,9 @@ public class RealTimeTopologyTest {
 	@After
 	public void cleanUp() throws ConfigurationException{
 		DB db = DBConnection.getDBConnection();
-		db.dropDatabase();
+		if(db.toString().equalsIgnoreCase("FongoDB.test"))
+			   db.dropDatabase();
+			  else
+			   Assert.fail("Something went wrong. Tests connected to " + db.toString());
 	}
 }

@@ -150,7 +150,10 @@ public class ProcessSywBoltMockTest {
 	
 	@AfterClass
 	public static void cleanUp(){
-		db.dropDatabase();
+		if(db.toString().equalsIgnoreCase("FongoDB.test"))
+			   db.dropDatabase();
+			  else
+			   Assert.fail("Something went wrong. Tests connected to " + db.toString());
 	}
 	
 }
