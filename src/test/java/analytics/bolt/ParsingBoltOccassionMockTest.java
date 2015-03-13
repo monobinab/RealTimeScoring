@@ -55,10 +55,12 @@ public class ParsingBoltOccassionMockTest {
 		
 		TopologyContext context = new MockTopologyContext();
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
-		boltUnderTest.prepare(conf, context, outputCollector);
+		Map<String, String> stormConf = new HashMap<String, String>();
+		stormConf.put("nimbus.host", "test");
+		boltUnderTest.prepare(stormConf, context, outputCollector);
 		System.out.println(tuple.getStringByField("message"));
 		boltUnderTest.execute(tuple);
-		 List<Object> outputTuple = outputCollector.getTuple().get("main");
+		List<Object> outputTuple = outputCollector.getTuple().get("main");
 		 
 		 String l_id_expected = "iFTsBvgexZasfSxbq2nOtwAj4bc=";
 		 String var_Map_Expected = "{\"BOOST_PO_HA_LA_TEST\":\"0.11\",\"BOOST_PO_HA_COOK_TEST\":\"0.11\",\"BOOST_PO_HA_REF_TEST\":\"0.11\"}";
