@@ -28,11 +28,12 @@ public class HostPortUtility {
 	@SuppressWarnings("unchecked")
 	public static void getEnvironment(String nimbusHost){
 		try {
-			mongoClient = new MongoClient("trprrta2mong4.vm.itg.corp.us.shldcorp.com", 27000);
+			mongoClient = new MongoClient("trprmongod1.vm.itg.corp.us.shldcorp.com", 27000);
 		} catch (UnknownHostException e) {
 			LOGGER.error("Mongo host unknown",e);
 		}
 		DB db = mongoClient.getDB("test");
+		db.authenticateCommand("appuser", "sears123".toCharArray());
 		DBCollection prodQaColl = db.getCollection("stormProdQaUrls");
 		DBCursor cursor = prodQaColl.find(new BasicDBObject());
 		while(cursor.hasNext()){
