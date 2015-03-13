@@ -77,6 +77,8 @@ public class PersistBoltOccassionMockTest {
 		Tuple tuple = StormTestUtils.mockTupleList(emitToPersist, "PurchaseOccassion");
 		TopologyContext context = new MockTopologyContext();
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
+		Map<String, String> stormConf = new HashMap<String, String>();
+		stormConf.put("nimbus.host", "test");
 		boltUnderTest.prepare(conf, context, outputCollector);
 		boltUnderTest.execute(tuple);
 		DBObject dbObj = memberMDTagsColl.findOne(new BasicDBObject("l_id", "iFTsBvgexZasfSxbq2nOtwAj4bc="));
