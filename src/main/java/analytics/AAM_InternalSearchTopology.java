@@ -27,19 +27,19 @@ public class AAM_InternalSearchTopology {
 			System.setProperty(MongoNameConstants.IS_PROD, "true");
 		}
 		String topic = TopicConstants.AAM_CDF_INTERNALSEARCH;
-		int port = TopicConstants.PORT;
+		//int port = TopicConstants.PORT;
 
 		//RedisConnection redisConnection = new RedisConnection();
-		String[] servers = RedisConnection.getServers();
+		//String[] servers = RedisConnection.getServers();
 
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 
 		topologyBuilder.setSpout("AAM_CDF_InternalSearch1",
-				new AAMRedisPubSubSpout(servers[0], port, topic), 1);
+				new AAMRedisPubSubSpout(0, topic), 1);
 		topologyBuilder.setSpout("AAM_CDF_InternalSearch2",
-				new AAMRedisPubSubSpout(servers[1], port, topic), 1);
+				new AAMRedisPubSubSpout(1, topic), 1);
 		topologyBuilder.setSpout("AAM_CDF_InternalSearch3",
-				new AAMRedisPubSubSpout(servers[2], port, topic), 1);
+				new AAMRedisPubSubSpout(2, topic), 1);
 
 		topologyBuilder
 				.setBolt("ParsingBoltAAM_InternalSearch",

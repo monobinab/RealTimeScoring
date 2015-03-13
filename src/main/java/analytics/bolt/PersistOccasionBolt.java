@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import scala.actors.threadpool.Arrays;
 
 
+import analytics.util.HostPortUtility;
 import analytics.util.MongoNameConstants;
 import analytics.util.dao.MemberMDTagsDao;
 import backtype.storm.metric.api.MultiCountMetric;
@@ -28,7 +29,7 @@ public class PersistOccasionBolt extends BaseRichBolt{
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
-		 System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+		HostPortUtility.getEnvironment(stormConf.get("nimbus.host").toString());
 		memberMDTagsDao = new MemberMDTagsDao();
 		initMetrics(context);
 	}

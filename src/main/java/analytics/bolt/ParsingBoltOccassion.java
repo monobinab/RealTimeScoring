@@ -14,6 +14,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
+import analytics.util.HostPortUtility;
 import analytics.util.JsonUtils;
 import analytics.util.MongoNameConstants;
 import analytics.util.SecurityUtils;
@@ -63,9 +64,8 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
 		this.outputCollector = collector;
-		 System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+		HostPortUtility.getEnvironment(stormConf.get("nimbus.host").toString());
 		tagMetadataDao = new TagMetadataDao();
-	//	System.out.println(tagMetadataDao.getDetails("HACKS2010"));
 		tagVariableDao = new TagVariableDao();
 		memberTagDao = new MemberMDTagsDao();
 		modelPercDao = new ModelPercentileDao();

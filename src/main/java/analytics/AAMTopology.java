@@ -33,13 +33,13 @@ public class AAMTopology {
 			System.setProperty(MongoNameConstants.IS_PROD, "true");
 		}
 		String topic = TopicConstants.AAM_CDF_TRAITS; 
-		int port = TopicConstants.PORT;
+		//int port = TopicConstants.PORT;
 		TopologyBuilder builder = new TopologyBuilder();
 
-	   	String[] servers = RedisConnection.getServers();
-	    builder.setSpout("AAM_CDF_Traits1", new AAMRedisPubSubSpout(servers[0], port, topic), 1);
-	    builder.setSpout("AAM_CDF_Traits2", new AAMRedisPubSubSpout(servers[1], port, topic), 1);
-	    builder.setSpout("AAM_CDF_Traits3", new AAMRedisPubSubSpout(servers[2], port, topic), 1);
+	   	//String[] servers = RedisConnection.getServers();
+	    builder.setSpout("AAM_CDF_Traits1", new AAMRedisPubSubSpout(0, topic), 1);
+	    builder.setSpout("AAM_CDF_Traits2", new AAMRedisPubSubSpout(1, topic), 1);
+	    builder.setSpout("AAM_CDF_Traits3", new AAMRedisPubSubSpout(2, topic), 1);
 
 	    builder.setBolt("parsingBoltWebTraits", new ParsingBoltWebTraits(), 1)
 	    .shuffleGrouping("AAM_CDF_Traits1").shuffleGrouping("AAM_CDF_Traits2").shuffleGrouping("AAM_CDF_Traits3");
