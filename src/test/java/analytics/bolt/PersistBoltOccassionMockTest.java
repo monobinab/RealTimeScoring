@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -109,5 +110,14 @@ public class PersistBoltOccassionMockTest {
 		DBObject dbObj = memberMDTagsColl.findOne(new BasicDBObject("l_id", "jnJgNqJpVI3Lt4olN7uCUH0Zcuc="));
 		Assert.assertEquals(null, dbObj);
 	}
+	
+	@AfterClass
+	public static void cleanUp(){
+		if(db.toString().equalsIgnoreCase("FongoDB.test"))
+			   db.dropDatabase();
+			  else
+			   Assert.fail("Something went wrong. Tests connected to " + db.toString());
+	}
+
 
 }

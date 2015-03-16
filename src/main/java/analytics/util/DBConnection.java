@@ -38,7 +38,7 @@ public class DBConnection {
 			properties=  new PropertiesConfiguration("resources/connection_config_prod.properties");
 			LOGGER.info("Using production properties");
 		}
-		else{
+		else if(isProd!=null && "QA".equals(isProd)){
 			properties=  new PropertiesConfiguration("resources/connection_config.properties");
 			LOGGER.info("Using test properties");	
 		}		
