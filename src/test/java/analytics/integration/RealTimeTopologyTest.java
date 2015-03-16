@@ -14,6 +14,7 @@ import analytics.bolt.ParsingBoltPOS;
 import analytics.bolt.ScorePublishBolt;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.util.DBConnection;
+import analytics.util.HostPortUtility;
 import analytics.util.MongoNameConstants;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
