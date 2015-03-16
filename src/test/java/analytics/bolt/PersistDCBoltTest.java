@@ -11,6 +11,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -44,9 +45,13 @@ public class PersistDCBoltTest {
 		date = simpleDateFormat.format(new Date());
 	}
 
-	@After
+/*	@After
 	public void tearDown() throws Exception {
-	}
+		if(db.toString()=="FongoDB.test")
+			   db.dropDatabase();
+			  else
+			   Assert.fail("Something went wrong. Tests connected to " + db.toString());
+	}*/
 
 	@Test
 	public void testPersistWhenMemberNotExist() throws JSONException {
@@ -223,10 +228,13 @@ public class PersistDCBoltTest {
 	}
 	
 	
-	
 	@AfterClass
-	public static void cleanUp(){
-		db.dropDatabase();
+	public static void teardown() {
+		if(db.toString().equalsIgnoreCase("FongoDB.test"))
+			   db.dropDatabase();
+			  else
+			   Assert.fail("Something went wrong. Tests connected to " + db.toString());
 	}
+
 
 }

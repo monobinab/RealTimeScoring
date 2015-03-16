@@ -33,6 +33,7 @@ public class ParsingBoltSYWMockTest {
 		System.setProperty("rtseprod", "test");
 		conf = new HashMap<String, String>();
         conf.put("rtseprod", "test");
+        conf.put("nimbus.host", "test");
 		//Below line ensures an empty DB rather than reusing a DB with values in it
 		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));	
 		db = DBConnection.getDBConnection();
@@ -83,7 +84,10 @@ public class ParsingBoltSYWMockTest {
 	
 	@AfterClass
 	public static void cleanUp(){
-		db.dropDatabase();
+		if(db.toString().equalsIgnoreCase("FongoDB.test"))
+			   db.dropDatabase();
+			  else
+			   Assert.fail("Something went wrong. Tests connected to " + db.toString());
 	}
 
 }

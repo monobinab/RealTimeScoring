@@ -31,11 +31,14 @@ import com.mongodb.DBCollection;
 public class MemberScoreBoltTest {
 	static Map<String,String> conf;
 	static DB conn;
+	static Map<String, String> stormConf;
 	@BeforeClass
 	public static void initializeFakeMongo() throws ConfigurationException{
 		System.setProperty("rtseprod", "test");
 		conf = new HashMap<String, String>();
         conf.put("rtseprod", "test");
+        stormConf = new HashMap<String, String>();
+		stormConf.put("nimbus.host", "test");
 		//Below line ensures an empty DB rather than reusing a DB with values in it
         FakeMongo.setDBConn(new Fongo("test db").getDB("test"));	
         conn = DBConnection.getDBConnection();
@@ -57,7 +60,8 @@ public class MemberScoreBoltTest {
 		//Publish to a test db in REDIS
         MemberPublishBolt boltUnderTest = new MemberPublishBolt(redisHost, port,"member_test");
    
-        boltUnderTest.prepare(conf, null, outputCollector);
+        //TODO: This will fail when we enable the test
+        boltUnderTest.prepare(stormConf, null, outputCollector);
         Tuple tuple = StormTestUtils.mockMemberTuple(input,"unit_test_source");
         
         //initialize subscriber
@@ -67,6 +71,7 @@ public class MemberScoreBoltTest {
         pool = new JedisPool(new JedisPoolConfig(),redisHost, port);
         ListenerThread listener = new ListenerThread(queue,pool,"member_test");
         listener.start();
+        
         
         //call the bolt method
         boltUnderTest.execute(tuple);
@@ -82,7 +87,10 @@ public class MemberScoreBoltTest {
 	
 	@AfterClass
 	public static void cleanUp(){
+		if(conn.toString().equalsIgnoreCase("FongoDB.test"))
+			conn.dropDatabase();
+		  else
+		   Assert.fail("Something went wrong. Tests connected to " + conn.toString());
 		conn.dropDatabase();
 	}
-	
 }

@@ -24,8 +24,7 @@ public class XMLParserTest {
         assertEquals( 1,processTransaction.getLineItemList().size());
         assertEquals( "000084902",processTransaction.getLineItemList().get(0).getItemNumber());
     }
-    
-
+ 
     static String oneLineItem=//"<request>\n" +
             "  <tns:ProcessTransaction>\n" +
             "    <tns:MessageVersion>09</tns:MessageVersion>\n" +

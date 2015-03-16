@@ -261,7 +261,10 @@ public void getParsedJsonTest2(){
 
 @AfterClass
 public static void tearDown(){
-	db.dropDatabase();
+	if(db.toString().equalsIgnoreCase("FongoDB.test"))
+	   db.dropDatabase();
+	  else
+	   Assert.fail("Something went wrong. Tests connected to " + db.toString());
 }
 }
  

@@ -31,7 +31,7 @@ public class ParsingBoltOccassionMockTest {
 	static DBCollection tagsMetadaColl;
 	static DBCollection tagsVarColl;
 	static DBCollection modelPercColl;
-	
+	static Map<String, String> stormConf;
 	@BeforeClass
 	public static void intializeFakeMongo() throws ConfigurationException{
 		System.setProperty("rtseprod", "test");
@@ -39,7 +39,8 @@ public class ParsingBoltOccassionMockTest {
 		conf.put("rtseprod", "test");
 		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));	
 		db = DBConnection.getDBConnection();
-		
+		stormConf = new HashMap<String, String>();
+		stormConf.put("nimbus.host", "test");
 		//get the fakMongo collections from ParsingBotlOccassionDaoTest
 		ParsingBoltOccassionFakeMonogColl.fakeMongoColl();
 		tagsMetadaColl = ParsingBoltOccassionFakeMonogColl.getTagMetadataColl();
@@ -55,10 +56,11 @@ public class ParsingBoltOccassionMockTest {
 		
 		TopologyContext context = new MockTopologyContext();
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
-		boltUnderTest.prepare(conf, context, outputCollector);
+		
+		boltUnderTest.prepare(stormConf, context, outputCollector);
 		System.out.println(tuple.getStringByField("message"));
 		boltUnderTest.execute(tuple);
-		 List<Object> outputTuple = outputCollector.getTuple().get("main");
+		List<Object> outputTuple = outputCollector.getTuple().get("main");
 		 
 		 String l_id_expected = "iFTsBvgexZasfSxbq2nOtwAj4bc=";
 		 String var_Map_Expected = "{\"BOOST_PO_HA_LA_TEST\":\"0.11\",\"BOOST_PO_HA_COOK_TEST\":\"0.11\",\"BOOST_PO_HA_REF_TEST\":\"0.11\"}";
@@ -69,6 +71,9 @@ public class ParsingBoltOccassionMockTest {
 	
 	@AfterClass
 	public static void tearDown(){
-		db.dropDatabase();
+		if(db.toString().equalsIgnoreCase("FongoDB.test"))
+		   db.dropDatabase();
+		  else
+		   Assert.fail("Something went wrong. Tests connected to " + db.toString());
 	}
 }

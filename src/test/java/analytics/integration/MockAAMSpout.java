@@ -65,6 +65,7 @@ public class MockAAMSpout extends BaseRichSpout{
 	@Override
 	public void open(Map conf, TopologyContext context,
 			SpoutOutputCollector collector) {
+		System.out.println("~~~~~~~~~~~~~~~~TESTING THE STORMCONF IN INTEGRATION TESTING OF AAMTRAITS~~~~~~~~~~~~~~~" + conf.get("nimbus.host"));
 		this.collector = collector;
     	mockTuple();
 	}

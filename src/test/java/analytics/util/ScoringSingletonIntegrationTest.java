@@ -64,7 +64,10 @@ public class ScoringSingletonIntegrationTest {
 
 	@AfterClass
 	public static void cleanUp(){
-		db.dropDatabase();
+		if(db.toString().equalsIgnoreCase("FongoDB.test"))
+			   db.dropDatabase();
+			  else
+			   Assert.fail("Something went wrong. Tests connected to " + db.toString());
 	}
 	
 	//This integration test is check the re-scored value for modelIds 35  (a positive case)
