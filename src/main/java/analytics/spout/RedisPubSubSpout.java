@@ -1,6 +1,9 @@
 package analytics.spout;
 
 
+import analytics.util.HostPortUtility;
+import analytics.util.MongoNameConstants;
+import analytics.util.RedisConnection;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -25,18 +28,15 @@ public class RedisPubSubSpout extends BaseRichSpout {
     private static Logger LOGGER = LoggerFactory.getLogger(RedisPubSubSpout.class);
 
     SpoutOutputCollector _collector;
-    final String host;
-    final int port;
-    final String pattern;
+     final String pattern;
     LinkedBlockingQueue<String> queue;
     JedisPool pool;
+    final int number;
 
-    public RedisPubSubSpout(String host, int port, String pattern) {
-        this.host = host;
-        this.port = port;
+    public RedisPubSubSpout( int number, String pattern) {
+        this.number = number;
         this.pattern = pattern;
     }
-
     class ListenerThread extends Thread {
         LinkedBlockingQueue<String> queue;
         JedisPool pool;
@@ -96,14 +96,16 @@ public class RedisPubSubSpout extends BaseRichSpout {
         }
     };
 
+    @Override
     public void open(Map conf, TopologyContext context, SpoutOutputCollector collector) {
         _collector = collector;
         queue = new LinkedBlockingQueue<String>(1000);
-        pool = new JedisPool(new JedisPoolConfig(),host,port);
-
-        ListenerThread listener = new ListenerThread(queue,pool,pattern);
+        HostPortUtility.getEnvironment(conf.get("nimbus.host").toString());
+        String[] redisServers = RedisConnection.getServers();
+        pool = new JedisPool(new JedisPoolConfig(), redisServers[number], 6379);
+        System.out.println(redisServers[number]);
+        ListenerThread listener = new ListenerThread(queue, pool, pattern);
         listener.start();
-
     }
 
     public void close() {

@@ -16,7 +16,7 @@ public class RedisConnection {
 		String isProd = System.getProperty(MongoNameConstants.IS_PROD);
 		try {
 		    //load a properties file from class path, inside static method
-			if(isProd!=null && "true".equals(isProd)){
+			if(isProd!=null && "PROD".equals(isProd)){
 				prop.load(RedisConnection.class.getClassLoader().getResourceAsStream("resources/redis_server_prod.properties"));
 				LOGGER.info("Using production properties");
 			}

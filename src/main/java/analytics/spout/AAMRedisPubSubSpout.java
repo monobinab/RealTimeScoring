@@ -22,8 +22,8 @@ public class AAMRedisPubSubSpout extends RedisPubSubSpout {
 
 
 
-    public AAMRedisPubSubSpout(String host, int port, String pattern) {
-        super(host, port, pattern);
+    public AAMRedisPubSubSpout(int number, String pattern) {
+        super(number, pattern);
     }
 
     @Override

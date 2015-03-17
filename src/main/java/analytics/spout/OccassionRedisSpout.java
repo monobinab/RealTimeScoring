@@ -11,8 +11,8 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 
 public class OccassionRedisSpout extends RedisPubSubSpout{
-	public OccassionRedisSpout(String host, int port, String pattern) {
-		super(host, port, pattern);
+	public OccassionRedisSpout(int number, String pattern) {
+	super(number, pattern)	;
 	}
 	
 	private static final long serialVersionUID = 1L;
