@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import analytics.exception.RealTimeScoringException;
 import analytics.util.Constants;
+import analytics.util.HostPortUtility;
 import analytics.util.JsonUtils;
 import analytics.util.MongoNameConstants;
 import analytics.util.ScoringSingleton;
@@ -49,7 +50,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 		LOGGER.info("PREPARING STRATEGY SCORING BOLT");	
 	     initMetrics(context);
 	     //TODO: ALL BOLTS SHOULD HAVE THIS LINE - ADD TO SUPER CLASS
-        System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+	    HostPortUtility.getEnvironment(stormConf.get("nimbus.host").toString());
 		this.outputCollector = collector;
 	}
 	 void initMetrics(TopologyContext context){

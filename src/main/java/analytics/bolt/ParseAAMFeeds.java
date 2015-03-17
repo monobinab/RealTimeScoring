@@ -9,6 +9,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import analytics.util.HostPortUtility;
 import analytics.util.JsonUtils;
 import analytics.util.MongoNameConstants;
 import analytics.util.SecurityUtils;
@@ -61,7 +62,8 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         this.outputCollector = collector;
-        System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+     //   System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+        HostPortUtility.getEnvironment(stormConf.get("nimbus.host").toString());
 	    initMetrics(context);
         
 	/*
