@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import analytics.bolt.FlumeRPCBolt;
 import analytics.bolt.ParsingBoltAAM_ATC;
 import analytics.bolt.StrategyScoringBolt;
-import analytics.spout.TraitsSpout;
+import analytics.spout.WebHDFSSpout;
 import analytics.util.Constants;
 import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
@@ -46,7 +46,7 @@ public class AAM_BrowseTopology {
 		}*/
 		
 		//Sree. Spout that wakes up every 5 mins and process the Traits
-		topologyBuilder.setSpout("traitsSpout", new TraitsSpout(servers[1], TopicConstants.PORT, Constants.AAM_BROWSER_PATH, "aamBrowser"), 1);
+		topologyBuilder.setSpout("browseSpout", new WebHDFSSpout(servers[1], TopicConstants.PORT, Constants.AAM_BROWSER_PATH, "aamBrowser"), 1);
 		topologyBuilder.setBolt("parsingBoltBrowse", new ParsingBoltAAM_ATC(topic), 3)
 	  		.shuffleGrouping("traitsSpout");
 

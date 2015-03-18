@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.TreeSet;
 
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,13 +26,16 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 
-public class TraitsSpout extends BaseRichSpout{
+public class Write2HDFSSpout extends BaseRichSpout{
 	
 	private static final long serialVersionUID = 1L;
-	private static final Logger LOGGER = LoggerFactory.getLogger(TraitsSpout.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(Write2HDFSSpout.class);
 	static String HADOOP_WEBHDFS_URL="http://151.149.131.21:14000/webhdfs/v1<HDFS_LOCATION>?user.name=spannal&op=LISTSTATUS";
 	static String CONTENT_SUMMARY_URL = "http://151.149.131.21:14000/webhdfs/v1<HDFS_LOCATION>/<PATH>?user.name=spannal&op=GETCONTENTSUMMARY";
 	static String FILE_READ_URL = "http://151.149.131.21:14000/webhdfs/v1<HDFS_LOCATION>/<PATH>?user.name=spannal&op=OPEN";
+	static String FILE_WRITE_URL = "http://151.149.131.21:14000/webhdfs/v1<PATH>?user.name=spannal&op=CREATE";
+	static String FILE_APPEND_URL = "http://151.149.131.21:14000/webhdfs/v1<PATH>?user.name=spannal&op=APPEND";
+	static String FILE_STATUS_URL = "http://151.149.131.21:14000/webhdfs/v1<PATH>?user.name=spannal&op=GETFILESTATUS";
 
     private SpoutOutputCollector collector;
 	private JedisPool jedisPool;
@@ -38,12 +43,15 @@ public class TraitsSpout extends BaseRichSpout{
 	private int port;
 	private String hdfsPath;
 	private String topologyIdentifier;
+	private String write2HdfsPath;
+	private String write2HdfsFile;
 	
-	public TraitsSpout(String host, int port, String hdfsPath, String topologyIdentifier) {
+	public Write2HDFSSpout(String host, int port, String hdfsPath, String topologyIdentifier, String writeHdfsFile) {
 		this.host = host;
 		this.port = port;
 		this.hdfsPath = hdfsPath;
 		this.topologyIdentifier = topologyIdentifier;
+		this.write2HdfsFile = writeHdfsFile;
 	}
 	
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
@@ -68,8 +76,7 @@ public class TraitsSpout extends BaseRichSpout{
 		TreeSet<Long> sortedSet = new TreeSet<Long>();
 		TreeSet<Long> sortedSubSet = new TreeSet<Long>();
 		try{
-			//Sleep for 5 mins before starting the next process
-			Thread.sleep(300000);
+			
 			
 			Jedis jedis = jedisPool.getResource();
 			//jedis.set(topologyIdentifier, latestPrefix.toString());
@@ -102,7 +109,7 @@ public class TraitsSpout extends BaseRichSpout{
 				
 				for(int i=0;i<fileCount;i++){
 					currentURL = FILE_READ_URL.replace("<PATH>", path+"/00000"+i+"_0").replace("<HDFS_LOCATION>", hdfsPath);
-					readURLAndStoreData(currentURL);
+					readURLAndWriteToHDFS(currentURL,write2HdfsFile);
 				}
 				
 				//Write back to reds that the files in the directory are processed so 
@@ -111,6 +118,8 @@ public class TraitsSpout extends BaseRichSpout{
 				jedis.set(topologyIdentifier, latestPrefix.toString());
 				jedisPool.returnResource(jedis);
 			}
+			//Sleep for 5 mins before starting the next process
+			//Thread.sleep(300000);
 		}
 		catch(Exception e){
 			LOGGER.error("Error in communication with webhdfs ["+hdfsPath+"]");
@@ -122,8 +131,9 @@ public class TraitsSpout extends BaseRichSpout{
 	 *  Call the bolt to process the records
 	 * @param url
 	 * @throws IOException
+	 * @throws JSONException 
 	 */
-	public void readURLAndStoreData(String url) throws IOException{
+	public void readURLAndWriteToHDFS(String url,String write2HdfsFile) throws IOException, JSONException{
 		URL oracle = new URL(url);
         BufferedReader in = new BufferedReader(
         new InputStreamReader(oracle.openStream()));
@@ -131,6 +141,9 @@ public class TraitsSpout extends BaseRichSpout{
         String inputLine;
         while ((inputLine = in.readLine()) != null){
         	String str = formatRecordsToFitRespectiveBolts(inputLine);
+        	
+        	write2HDFS(inputLine,write2HdfsFile);
+        	
         	
         	//Time to call the BOLT
         	 collector.emit(tuple(str));
@@ -154,6 +167,31 @@ public class TraitsSpout extends BaseRichSpout{
 		}
 		
 		return replacedString;
+	}
+	
+	public void write2HDFS(String inputString, String write2HdfsFile) throws JSONException{
+		//Check If the file already exists
+		String fileStatusURL = FILE_STATUS_URL.replace("<PATH>", write2HdfsFile);
+		
+		try{
+			JSONObject obj= HttpClientUtils.httpGetCall(fileStatusURL);
+			if(!obj.has("FileStatus")){
+				String fileCreate = FILE_WRITE_URL.replace("<PATH>", write2HdfsFile);
+			
+				ProcessBuilder pb = new ProcessBuilder(
+		            "curl",
+		            "-s",
+		            "-X PUT "+fileCreate);
+			
+				
+
+			}
+			
+		}catch (Exception e){
+			System.out.println("Exception Occurred. File does not exist" );
+			e.printStackTrace();
+		}
+		
 	}
 
 }

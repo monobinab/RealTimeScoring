@@ -45,7 +45,7 @@ static OccasionVariableDao occasionVariableDao;
 static ModelPercentileDao modelPercDao;
 	
 @BeforeClass
-public static void intialize() throws Exception{
+/*public static void intialize() throws Exception{
 	System.setProperty("rtseprod", "test");
 	  FakeMongo.setDBConn(new Fongo("test db").getDB("test"));	
 		db = DBConnection.getDBConnection();
@@ -258,7 +258,7 @@ public void getParsedJsonTest2(){
 	JsonParser parser = new JsonParser();
 	 parsingBoltOccassion.getParsedJson(tuple, parser);
 }
-
+*/
 @AfterClass
 public static void tearDown(){
 	db.dropDatabase();

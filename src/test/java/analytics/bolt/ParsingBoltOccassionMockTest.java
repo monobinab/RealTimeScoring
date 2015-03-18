@@ -1,4 +1,4 @@
-package analytics.bolt;
+/*package analytics.bolt;
 
 import java.util.HashMap;
 import java.util.List;
@@ -72,3 +72,4 @@ public class ParsingBoltOccassionMockTest {
 		db.dropDatabase();
 	}
 }
+*/

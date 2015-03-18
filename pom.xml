@@ -342,8 +342,24 @@
 			<artifactId>storm-kafka</artifactId>
 			<version>0.9.2-incubating</version>
 			
-		</dependency> 
-		
+		</dependency>
+
+		 <dependency>
+		 	<groupId>org.json</groupId>
+		 	<artifactId>json</artifactId>
+		 	<version>20090211</version>
+		 </dependency>
+		 
+		 <dependency>
+		 	<groupId>org.codehaus.jettison</groupId>
+		 	<artifactId>jettison</artifactId>
+		 	<version>1.1</version>
+		 </dependency>
+        <dependency>
+		   <groupId>xerces</groupId>
+		   <artifactId>xercesImpl</artifactId>
+		   <version>2.9.0</version>
+		</dependency>
     </dependencies>
 
 	<build>

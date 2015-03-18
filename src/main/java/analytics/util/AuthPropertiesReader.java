@@ -7,11 +7,7 @@ import org.apache.log4j.Logger;
 
 
 
-/**
- * Code to pull password for Ecommerce
- * 
- *
- */
+
 public class AuthPropertiesReader extends PropertiesFileReader {
 
 	/**

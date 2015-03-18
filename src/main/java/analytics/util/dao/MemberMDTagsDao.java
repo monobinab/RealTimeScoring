@@ -28,15 +28,15 @@ public class MemberMDTagsDao extends AbstractDao {
 		DBObject dbObj = memberMDTagsCollection.findOne(new BasicDBObject(
 				MongoNameConstants.L_ID, l_id));
 		if(dbObj != null){
-		BasicDBList dbListTags = (BasicDBList) dbObj.get("tags");
-		List<String> mdTags = new ArrayList<String>();
-		for(Object tag:dbListTags){
-			if(tag instanceof String){
-				mdTags.add(tag.toString().substring(0, 5));
+			BasicDBList dbListTags = (BasicDBList) dbObj.get("tags");
+			List<String> mdTags = new ArrayList<String>();
+			for(Object tag:dbListTags){
+				if(tag instanceof String){
+					mdTags.add(tag.toString().substring(0, 5));
+				}
 			}
-		}
-		//List<String> mdTags = (List<String>) dbObj.get("tags");
-		return mdTags;
+			//List<String> mdTags = (List<String>) dbObj.get("tags");
+			return mdTags;
 		}
 		else
 			return null;

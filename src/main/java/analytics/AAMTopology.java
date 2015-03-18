@@ -11,7 +11,7 @@ import analytics.bolt.PersistTraitsBolt;
 import analytics.bolt.ScorePublishBolt;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.spout.AAMRedisPubSubSpout;
-import analytics.spout.TraitsSpout;
+import analytics.spout.WebHDFSSpout;
 import analytics.util.Constants;
 import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
@@ -45,7 +45,7 @@ public class AAMTopology {
 	    builder.setSpout("AAM_CDF_Traits3", new AAMRedisPubSubSpout(servers[2], port, topic), 1);*/
 	   	
 	   	//Sree. Spout that wakes up every 5 mins and process the Traits
-	  	builder.setSpout("traitsSpout", new TraitsSpout(servers[1], TopicConstants.PORT, Constants.AAM_TRAITS_PATH, "aamTraits"), 1);
+	  	builder.setSpout("traitsSpout", new WebHDFSSpout(servers[1], TopicConstants.PORT, Constants.AAM_TRAITS_PATH, "aamTraits"), 1);
 	  	builder.setBolt("parsingBoltWebTraits", new ParsingBoltWebTraits(), 1)
 	  		.shuffleGrouping("traitsSpout");
 

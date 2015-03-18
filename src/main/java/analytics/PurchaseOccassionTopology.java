@@ -13,6 +13,7 @@ import analytics.bolt.PersistOccasionBolt;
 import analytics.bolt.ResponseBolt;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.spout.OccassionRedisSpout;
+import analytics.util.Constants;
 import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
 import analytics.util.RedisConnection;
@@ -39,7 +40,7 @@ public class PurchaseOccassionTopology{
 		topologyBuilder.setSpout("occassionSpout3", new OccassionRedisSpout(
 				servers[2], TopicConstants.PORT, topic), 1);
 		
-		topologyBuilder.setBolt("parseOccassionBolt", new ParsingBoltOccassion(), 1)
+		topologyBuilder.setBolt("parseOccassionBolt", new ParsingBoltOccassion(servers[1], TopicConstants.PORT), 1)
 		.shuffleGrouping("occassionSpout1");//.shuffleGrouping("occassionSpout2").shuffleGrouping("occassionSpout3");
 		topologyBuilder.setBolt("persistOccasionBolt", new PersistOccasionBolt(), 1)
 		.shuffleGrouping("parseOccassionBolt", "persist_stream");
@@ -47,7 +48,7 @@ public class PurchaseOccassionTopology{
 		.shuffleGrouping("parseOccassionBolt");
 		
 		//Sree. Added the new bolt for Responses
-		topologyBuilder.setBolt("responses_bolt", new ResponseBolt(), 2)
+		topologyBuilder.setBolt("responses_bolt", new ResponseBolt(servers[1], TopicConstants.PORT), 2)
 		.shuffleGrouping("strategy_bolt", "response_stream");
 		
 		Config conf = new Config();

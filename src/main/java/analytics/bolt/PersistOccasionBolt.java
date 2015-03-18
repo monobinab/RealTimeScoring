@@ -48,10 +48,10 @@ public class PersistOccasionBolt extends BaseRichBolt{
 		try {
 			String tag = input.getString(1);
 			if(tag != null && !tag.isEmpty()){
-			String[] tagsArray = tag.split(",");
-			tags = Arrays.asList(tagsArray);
-			memberMDTagsDao.addMemberMDTags(l_id, tags);
-			countMetric.scope("persisted_occasionTags").incr();
+				String[] tagsArray = tag.split(",");
+				tags = Arrays.asList(tagsArray);
+				memberMDTagsDao.addMemberMDTags(l_id, tags);
+				countMetric.scope("persisted_occasionTags").incr();
 			}
 			else{
 				memberMDTagsDao.deleteMemberMDTags(l_id);

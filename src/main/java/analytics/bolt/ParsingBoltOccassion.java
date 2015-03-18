@@ -1,6 +1,8 @@
 package analytics.bolt;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +10,10 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -40,6 +46,15 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 	private MultiCountMetric countMetric;
 	private MemberMDTagsDao memberTagDao;
 	private ModelPercentileDao modelPercDao;
+	private JedisPool jedisPool;
+	private String host;
+	private int port;
+	
+	public ParsingBoltOccassion(String host, int port) {
+		this.host = host;
+		this.port = port;
+	}
+	
 	 void initMetrics(TopologyContext context){
 	     countMetric = new MultiCountMetric();
 	     context.registerMetric("custom_metrics", countMetric, 60);
@@ -70,37 +85,68 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 		memberTagDao = new MemberMDTagsDao();
 		modelPercDao = new ModelPercentileDao();
 		initMetrics(context);
+		
+		JedisPoolConfig poolConfig = new JedisPoolConfig();
+        poolConfig.setMaxActive(100);
+        jedisPool = new JedisPool(poolConfig,host, port, 100);
 	}
 
 	@Override
 	public void execute(Tuple input) {
-		System.out.println("IN PARSING BOLT: " + input);
+		//System.out.println("IN PARSING BOLT: " + input);
 		countMetric.scope("incoming_tuples").incr();
 		Map<String, String> variableValueTagsMap = new HashMap<String, String>();
 		JsonParser parser = new JsonParser();
 		JsonElement jsonElement= null;
 		try{
-		jsonElement = getParsedJson(input, parser);
+			jsonElement = getParsedJson(input, parser);
 		}
 		catch(Exception e){
 			LOGGER.error("exception in parsing: " + e);
 		}
 		
 		//Fetch l_id from json
-		JsonElement lyl_id_no = jsonElement.getAsJsonObject().get("lyl_id_no");
+		JsonElement lyl_id_no = null;
+		if(jsonElement.getAsJsonObject().get("lyl_id_no") != null){
+		 lyl_id_no = jsonElement.getAsJsonObject().get("lyl_id_no");
+		}
+		else{
+			LOGGER.error("Invalid incoming json");
+			return;
+		}
 		if (lyl_id_no == null || lyl_id_no.getAsString().length()!=16) {
 			countMetric.scope("empty_lid").incr();
 			outputCollector.ack(input);
 			return;
 		} 
 		String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no.getAsString());
-		System.out.println(l_id);
+		//System.out.println(l_id);
 		
 		//Get list of tags from json
 		StringBuilder tagsString = new StringBuilder();
 		JsonArray tags = null;
 		tags = getTagsFromInput(jsonElement);
 				
+		/**
+		 * Sree. Get the Difference in Tags (Input vs Existing)
+		 */
+		ArrayList<String> diffTags = findDiffTags(l_id, tags);
+		if(diffTags!= null && diffTags.size()>0){
+			String diffTagsString = getStringFromArray(diffTags); 
+			
+			//Add Date as part of value so incase the Tags are not score for the member
+			//atleast we know we have to cleanup from Redis...			
+			Date dNow = new Date( );
+			SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd_HH:mm:ss");
+			diffTagsString = diffTagsString +","+ft.format(dNow);
+			System.out.println(l_id +" ----" +diffTagsString);
+			
+			Jedis jedis = jedisPool.getResource();
+			jedis.set(l_id, diffTagsString);
+			jedisPool.returnResource(jedis);
+		}
+		//Changes for adding the difference tags ends here.
+		
 		//reset the variableValueMap to 0 before persisting new incoming tags
 		resetVariableValuesMap(variableValueTagsMap, l_id);
 			
@@ -141,6 +187,7 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 	    	listToEmit.add(l_id);
 	    	listToEmit.add(JsonUtils.createJsonFromStringStringMap(variableValueTagsMap));
 	    	listToEmit.add("PurchaseOccasion");
+	    	listToEmit.add(lyl_id_no.getAsString());
 	    	countMetric.scope("emitted_to_scoring").incr();
 	    	this.outputCollector.emit(listToEmit);
 		}
@@ -148,6 +195,20 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 	    	countMetric.scope("no_variables_affected").incr();			
 		}
     	outputCollector.ack(input);
+	}
+
+	/**
+	 * Sree.
+	 * @param diffTags
+	 * @return comma separated string with the elements in the arraylist.
+	 */
+	private String getStringFromArray(ArrayList<String> diffTags) {
+		StringBuilder string = new StringBuilder();
+		for(Object str:diffTags){
+			string.append(str.toString());
+			string.append(",");
+		}
+		return (string.toString().substring(0, string.toString().length()-1));
 	}
 
 	public JsonElement getParsedJson(Tuple input, JsonParser parser) throws JsonSyntaxException{
@@ -208,10 +269,30 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 				}
 				}
 	}
+	
+	
+	/**
+	 * Get the Difference between the Input Tags and the Already existing Tags in the DB
+	 * @param l_id
+	 * @param newTags
+	 * @return List of only new tags...
+	 */
+	public ArrayList<String> findDiffTags(String l_id, JsonArray newTags){
+		List<String> memberTags = memberTagDao.getMemberMDTags(l_id);
+		
+		ArrayList<String> diffTags= new ArrayList<String>();
+		for(int i=0; i < newTags.size(); i++){
+			if(memberTags == null || !memberTags.contains(newTags.get(i).getAsString()))
+				diffTags.add(newTags.get(i).getAsString());
+		}
+		return diffTags;
+	}
+	
+	
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("l_id","lineItemAsJsonString","source"));
+		declarer.declare(new Fields("l_id","lineItemAsJsonString","source","lyl_id_no"));
 		declarer.declareStream("persist_stream", new Fields("l_id", "tags"));
 	}
 
