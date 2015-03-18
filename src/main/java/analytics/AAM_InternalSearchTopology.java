@@ -54,8 +54,8 @@ public class AAM_InternalSearchTopology {
 				.shuffleGrouping("AAM_CDF_InternalSearch2")
 				.shuffleGrouping("AAM_CDF_InternalSearch3");
 */
-		topologyBuilder.setBolt("strategy_bolt", new StrategyScoringBolt(), 1)
-				.shuffleGrouping("ParsingBoltAAM_InternalSearch");
+		/*topologyBuilder.setBolt("strategy_bolt", new StrategyScoringBolt(), 1)
+				.shuffleGrouping("ParsingBoltAAM_InternalSearch");*/
 		Config conf = new Config();
 		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
 		if (args.length > 0) {
