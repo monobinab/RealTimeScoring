@@ -28,10 +28,10 @@ public class AAMTopology {
 			.getLogger(AAMTopology.class);
 	public static void main(String[] args){
 		LOGGER.info("Starting aam traits topology");
-		System.clearProperty(MongoNameConstants.IS_PROD);
+		/*System.clearProperty(MongoNameConstants.IS_PROD);
 		if (args.length > 0) {
 			System.setProperty(MongoNameConstants.IS_PROD, "true");
-		}
+		}*/
 		String topic = TopicConstants.AAM_CDF_TRAITS; 
 		//int port = TopicConstants.PORT;
 		TopologyBuilder builder = new TopologyBuilder();
@@ -55,7 +55,7 @@ public class AAMTopology {
 	    conf.registerMetricsConsumer(MetricsListener.class, 3);
 		conf.setDebug(false);
 		conf.setNumWorkers(3);
-		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
+	//	conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
 		if (args.length > 0) {
 			try {
 				StormSubmitter.submitTopology(args[0], conf,

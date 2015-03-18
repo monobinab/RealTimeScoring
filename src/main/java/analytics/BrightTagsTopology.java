@@ -15,10 +15,10 @@ public class BrightTagsTopology {
 
 
   public static void main(String[] args) throws Exception {
-		System.clearProperty(MongoNameConstants.IS_PROD);
+		/*System.clearProperty(MongoNameConstants.IS_PROD);
 		if (args.length > 0) {
 			System.setProperty(MongoNameConstants.IS_PROD, "true");
-		}
+		}*/
 
     TopologyBuilder builder = new TopologyBuilder();
 
@@ -29,7 +29,7 @@ public class BrightTagsTopology {
 
 
     Config conf = new Config();
-	conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
+//	conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
 
 
     if (args != null && args.length > 0) {

@@ -22,10 +22,10 @@ public class AAM_InternalSearchTopology {
 			.getLogger(AAM_InternalSearchTopology.class);
 
 	public static void main(String[] args) {
-		System.clearProperty(MongoNameConstants.IS_PROD);
+		/*System.clearProperty(MongoNameConstants.IS_PROD);
 		if (args.length > 0) {
 			System.setProperty(MongoNameConstants.IS_PROD, "true");
-		}
+		}*/
 		String topic = TopicConstants.AAM_CDF_INTERNALSEARCH;
 		//int port = TopicConstants.PORT;
 
@@ -51,7 +51,7 @@ public class AAM_InternalSearchTopology {
 		topologyBuilder.setBolt("strategy_bolt", new StrategyScoringBolt(), 1)
 				.shuffleGrouping("ParsingBoltAAM_InternalSearch");
 		Config conf = new Config();
-		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
+	//	conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
 		if (args.length > 0) {
 			try {
 				StormSubmitter.submitTopology(args[0], conf,

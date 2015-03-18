@@ -18,6 +18,7 @@ import org.xml.sax.Attributes;
 
 import analytics.util.Constants;
 import analytics.util.DCParserHandler;
+import analytics.util.HostPortUtility;
 import analytics.util.JsonUtils;
 import analytics.util.MongoNameConstants;
 import analytics.util.SecurityUtils;
@@ -88,7 +89,8 @@ public class ParsingBoltDC extends BaseRichBolt {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
 		this.outputCollector = collector;
-		System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+	//	System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+		   HostPortUtility.getEnvironment(stormConf.get("nimbus.host").toString());
 		memberDCDao = new MemberDCDao();
 		dc = new DCDao();
 		initMetrics(context);

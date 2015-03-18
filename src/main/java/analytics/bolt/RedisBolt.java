@@ -11,6 +11,7 @@ import backtype.storm.tuple.Tuple;
 
 import com.ibm.jms.JMSMessage;
 
+import analytics.util.HostPortUtility;
 import analytics.util.MongoNameConstants;
 import analytics.util.StoreZipMap;
 import redis.clients.jedis.Jedis;
@@ -50,7 +51,8 @@ public class RedisBolt extends BaseRichBolt {
          */
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
-        System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+    //    System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+		   HostPortUtility.getEnvironment(stormConf.get("nimbus.host").toString());
         jedis = new Jedis(host, port);
         this.outputCollector = collector;
     }

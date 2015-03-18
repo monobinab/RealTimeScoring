@@ -25,10 +25,10 @@ public class SocialTopology {
 
 	public static void main(String[] args) throws AlreadyAliveException,
 			InvalidTopologyException, InterruptedException {
-		System.clearProperty(MongoNameConstants.IS_PROD);
+		/*System.clearProperty(MongoNameConstants.IS_PROD);
 		if (args.length > 0) {
 			System.setProperty(MongoNameConstants.IS_PROD, "true");
-		}
+		}*/
 		LOGGER.info("Starting social topology ");
 		String facebookTopic = TopicConstants.FB;
 		String twitterTopic = TopicConstants.TW;
@@ -57,7 +57,7 @@ public class SocialTopology {
 		topologyBuilder.setBolt("strategyBolt", new StrategyScoringBolt(), 1)
 				.shuffleGrouping("socialBolt");
 		Config conf = new Config();
-		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
+	//	conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
 		if (args != null && args.length > 0) {
 			conf.setNumWorkers(3);
 

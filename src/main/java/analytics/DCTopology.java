@@ -32,13 +32,13 @@ public class DCTopology {
 	public static void main(String[] args) {
 		boolean isLocal = true;
 		String topologyId = "";
-		System.clearProperty(MongoNameConstants.IS_PROD);
+		/*System.clearProperty(MongoNameConstants.IS_PROD);
 		if (args.length > 0) {
 			System.setProperty(MongoNameConstants.IS_PROD, "true");
 			isLocal = false;
 			topologyId = args[0];
 		}
-
+*/
 		TopologyBuilder builder = new TopologyBuilder();
 		BrokerHosts hosts = new ZkHosts("trprtelpacmapp1.vm.itg.corp.us.shldcorp.com:2181");
 		// use topology Id as part of the consumer ID to make it unique
@@ -60,7 +60,7 @@ public class DCTopology {
 		conf.put("metrics_topology", "DC");
 		conf.registerMetricsConsumer(MetricsListener.class, partition_num);
 		conf.setDebug(false);
-		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
+	//	conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
 		if (!isLocal) {
 			try {
 				StormSubmitter.submitTopology(args[0], conf, builder.createTopology());

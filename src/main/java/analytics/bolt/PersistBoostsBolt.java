@@ -1,5 +1,6 @@
 package analytics.bolt;
 
+import analytics.util.HostPortUtility;
 import analytics.util.JsonUtils;
 import analytics.util.MongoNameConstants;
 import analytics.util.dao.MemberBoostsDao;
@@ -33,7 +34,8 @@ public class PersistBoostsBolt extends BaseRichBolt {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
-        System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+     //   System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+		   HostPortUtility.getEnvironment(stormConf.get("nimbus.host").toString());
 		memberBoostsDao = new MemberBoostsDao();
 		variableDao = new VariableDao();
 		variablesStrategyMap = new HashMap<String, String>();

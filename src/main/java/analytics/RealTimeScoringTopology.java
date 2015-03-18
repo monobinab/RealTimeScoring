@@ -28,7 +28,7 @@ public class RealTimeScoringTopology {
 			.getLogger(RealTimeScoringTopology.class);
 
 	public static void main(String[] args) throws ConfigurationException {
-		System.clearProperty(MongoNameConstants.IS_PROD);
+		//System.clearProperty(MongoNameConstants.IS_PROD);
 		/*if (args.length > 0) {
 			System.setProperty(MongoNameConstants.IS_PROD, "true");
 		}*/

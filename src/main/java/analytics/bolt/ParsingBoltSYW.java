@@ -1,5 +1,6 @@
 package analytics.bolt;
 
+import analytics.util.HostPortUtility;
 import analytics.util.MongoNameConstants;
 import analytics.util.SecurityUtils;
 import analytics.util.SywApiCalls;
@@ -39,7 +40,8 @@ public class ParsingBoltSYW extends BaseRichBolt {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
-        System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+      //  System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+		   HostPortUtility.getEnvironment(stormConf.get("nimbus.host").toString());
 		sywApiCalls = new SywApiCalls();
 		this.outputCollector = collector;
 		listOfInteractionsForRTS = new ArrayList<String>();

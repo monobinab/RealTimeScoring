@@ -1,6 +1,7 @@
 package analytics.bolt;
 
 import analytics.util.Constants;
+import analytics.util.HostPortUtility;
 import analytics.util.JsonUtils;
 import analytics.util.MongoNameConstants;
 import analytics.util.dao.ChangedMemberScoresDao;
@@ -62,7 +63,8 @@ public class SywScoringBolt extends BaseRichBolt {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
 		initMetrics(context);
-		System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+	//	System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+		   HostPortUtility.getEnvironment(stormConf.get("nimbus.host").toString());
 		outputCollector = collector;
 		variableDao = new VariableDao();
 		// populate the variableVidToNameMap

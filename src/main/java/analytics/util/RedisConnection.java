@@ -20,7 +20,7 @@ public class RedisConnection {
 				prop.load(RedisConnection.class.getClassLoader().getResourceAsStream("resources/redis_server_prod.properties"));
 				LOGGER.info("Using production properties");
 			}
-			else{
+			else if(isProd!=null && "QA".equals(isProd)){
 				prop.load(RedisConnection.class.getClassLoader().getResourceAsStream("resources/redis_server.properties"));
 				LOGGER.info("Using test properties");	
 			}	

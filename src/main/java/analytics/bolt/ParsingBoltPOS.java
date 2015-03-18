@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import shc.npos.segments.Segment;
 import shc.npos.util.SegmentUtils;
+import analytics.util.HostPortUtility;
 import analytics.util.JsonUtils;
 import analytics.util.MongoNameConstants;
 import analytics.util.SecurityUtils;
@@ -56,7 +57,8 @@ public class ParsingBoltPOS extends BaseRichBolt {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         this.outputCollector = collector;
-        System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+    //    System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+        HostPortUtility.getEnvironment(stormConf.get("nimbus.host").toString());
 
 	/*
 	 * (non-Javadoc)

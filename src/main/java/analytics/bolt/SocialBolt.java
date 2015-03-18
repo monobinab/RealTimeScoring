@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.spout.TwitterRedisSpout;
+import analytics.util.HostPortUtility;
 import analytics.util.MongoNameConstants;
 import analytics.util.dao.FacebookLoyaltyIdDao;
 import analytics.util.dao.SocialVariableDao;
@@ -39,7 +40,8 @@ public class SocialBolt extends BaseRichBolt {
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
 		this.collector = collector;
-        System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+      //  System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+		   HostPortUtility.getEnvironment(stormConf.get("nimbus.host").toString());
 		twitterLoyaltyIdDao = new TwitterLoyaltyIdDao();
 		facebookLoyaltyIdDao = new FacebookLoyaltyIdDao();
 		socialVariableDao = new SocialVariableDao();

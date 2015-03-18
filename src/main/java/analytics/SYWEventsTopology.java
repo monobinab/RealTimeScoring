@@ -29,10 +29,10 @@ public class SYWEventsTopology {
 
 	public static void main(String[] args) throws Exception {
 		LOGGER.info("starting syw events topology");
-		System.clearProperty(MongoNameConstants.IS_PROD);
+		/*System.clearProperty(MongoNameConstants.IS_PROD);
 		if (args.length > 0) {
 			System.setProperty(MongoNameConstants.IS_PROD, "true");
-		}
+		}*/
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 		String[] servers = RedisConnection.getServers();
 		String topic = TopicConstants.SYW;
@@ -66,7 +66,7 @@ server3=rtsapp403p.prod.ch4.s.com
 		Config conf = new Config();
 		conf.put("metrics_topology", "Syw");
 	    conf.registerMetricsConsumer(MetricsListener.class, 3);
-		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
+	//	conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
 		if (args != null && args.length > 0) {
 			conf.setNumWorkers(6);
 			StormSubmitter.submitTopology(args[0], conf,

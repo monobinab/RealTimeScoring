@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.util.Constants;
+import analytics.util.HostPortUtility;
 import analytics.util.JsonUtils;
 import analytics.util.MongoNameConstants;
 import analytics.util.SecurityUtils;
@@ -72,7 +73,8 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 		
 		this.outputCollector = collector;
 	     initMetrics(context);
-        System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+     //   System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+	     HostPortUtility.getEnvironment(stormConf.get("nimbus.host").toString());
 		LOGGER.info("Preparing telluride parsing bolt");
 
 		LOGGER.debug("Getting mongo collections");

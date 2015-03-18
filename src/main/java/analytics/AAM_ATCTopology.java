@@ -30,7 +30,7 @@ public class AAM_ATCTopology {
 	public static void main(String[] args) throws ConfigurationException {
 
 		LOGGER.info("Starting web feed topology from ATC source");
-		System.clearProperty(MongoNameConstants.IS_PROD);
+		//System.clearProperty(MongoNameConstants.IS_PROD);
 		/*if (args.length > 0) {
 			System.setProperty(MongoNameConstants.IS_PROD, "true");
 		}*/

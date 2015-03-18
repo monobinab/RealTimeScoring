@@ -13,6 +13,7 @@ import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import analytics.util.HostPortUtility;
 import analytics.util.MongoNameConstants;
 import analytics.util.dao.MemberTraitsDao;
 import backtype.storm.metric.api.MultiCountMetric;
@@ -34,7 +35,8 @@ public class PersistTraitsBolt extends BaseRichBolt {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {	
-        System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+     //   System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+		   HostPortUtility.getEnvironment(stormConf.get("nimbus.host").toString());
 		memberTraitsDao = new MemberTraitsDao();
 		this.outputCollector = collector;
 		initMetrics(context);
