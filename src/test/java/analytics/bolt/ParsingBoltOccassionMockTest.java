@@ -26,7 +26,7 @@ import com.mongodb.DBCollection;
 public class ParsingBoltOccassionMockTest {
 	
 	static Map<String,String> conf;
-	static DB db;
+	//static DB db;
 	static ParsingBoltOccassion parsingBoltOccassion;
 	static DBCollection tagsMetadaColl;
 	static DBCollection tagsVarColl;
@@ -35,10 +35,9 @@ public class ParsingBoltOccassionMockTest {
 	@BeforeClass
 	public static void intializeFakeMongo() throws ConfigurationException{
 		System.setProperty("rtseprod", "test");
-		conf = new HashMap<String, String>();
-		conf.put("rtseprod", "test");
-		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));	
-		db = DBConnection.getDBConnection();
+		
+		/*FakeMongo.setDBConn(new Fongo("test db").getDB("test"));	
+		db = DBConnection.getDBConnection();*/
 		stormConf = new HashMap<String, String>();
 		stormConf.put("nimbus.host", "test");
 		//get the fakMongo collections from ParsingBotlOccassionDaoTest
@@ -71,9 +70,9 @@ public class ParsingBoltOccassionMockTest {
 	
 	@AfterClass
 	public static void tearDown(){
-		if(db.toString().equalsIgnoreCase("FongoDB.test"))
-		   db.dropDatabase();
+		if(ParsingBoltOccassionFakeMonogColl.db.toString().equalsIgnoreCase("FongoDB.test"))
+			ParsingBoltOccassionFakeMonogColl.db.dropDatabase();
 		  else
-		   Assert.fail("Something went wrong. Tests connected to " + db.toString());
+		   Assert.fail("Something went wrong. Tests connected to " + ParsingBoltOccassionFakeMonogColl.db.toString());
 	}
 }

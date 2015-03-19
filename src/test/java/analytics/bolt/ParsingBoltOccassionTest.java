@@ -7,6 +7,7 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
+import org.apache.commons.configuration.ConfigurationException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -29,8 +30,8 @@ import com.google.gson.JsonParser;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 
-public class ParsingBoltOccassionTest {
-static DB db;
+public class ParsingBoltOccassionTest{
+//static DB db;
 static DBCollection memberMDTagsColl;
 static DBCollection tagMetadataColl;
 static DBCollection tagVariableColl;
@@ -46,9 +47,6 @@ static ModelPercentileDao modelPercDao;
 	
 @BeforeClass
 public static void intialize() throws Exception{
-	System.setProperty("rtseprod", "test");
-	  FakeMongo.setDBConn(new Fongo("test db").getDB("test"));	
-		db = DBConnection.getDBConnection();
 		
 		//get the fakeMongoColl from ParsingBoltOccassionFakeMonogColl
 		ParsingBoltOccassionFakeMonogColl.fakeMongoColl();
@@ -261,10 +259,10 @@ public void getParsedJsonTest2(){
 
 @AfterClass
 public static void tearDown(){
-	if(db.toString().equalsIgnoreCase("FongoDB.test"))
-	   db.dropDatabase();
+	if(ParsingBoltOccassionFakeMonogColl.db.toString().equalsIgnoreCase("FongoDB.test"))
+		ParsingBoltOccassionFakeMonogColl.db.dropDatabase();
 	  else
-	   Assert.fail("Something went wrong. Tests connected to " + db.toString());
-}
+	   Assert.fail("Something went wrong. Tests connected to " + ParsingBoltOccassionFakeMonogColl.db.toString());
+	}
 }
  
