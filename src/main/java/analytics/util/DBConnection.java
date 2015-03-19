@@ -63,7 +63,7 @@ public class DBConnection {
 		}
 
 		conn = mongoClient.getDB(sDatabaseName);
-		LOGGER.info("Connection is established...."+conn.getName());
+		LOGGER.info("Connection is established...."+ mongoClient.getAddress() + " " + conn.getName());
 		conn.authenticate(sUserName, sPassword.toCharArray());
 		return conn;
 	}
