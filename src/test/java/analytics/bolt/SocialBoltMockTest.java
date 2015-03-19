@@ -16,6 +16,7 @@ import analytics.StormTestUtils;
 import analytics.util.DBConnection;
 import analytics.util.FakeMongo;
 import analytics.util.MongoNameConstants;
+import analytics.util.SystemPropertyUtility;
 import backtype.storm.tuple.Tuple;
 
 import com.github.fakemongo.Fongo;
@@ -25,17 +26,19 @@ import com.mongodb.DBCollection;
 
 public class SocialBoltMockTest {
 
-	static Map<String,String> conf;
-	static DB conn;
+	/*static Map<String,String> conf;
+	static DB conn;*/
 	@BeforeClass
 	public static void initializeFakeMongo() throws ConfigurationException{
-		System.setProperty("rtseprod", "test");
+		/*System.setProperty("rtseprod", "test");
 		conf = new HashMap<String, String>();
         conf.put("rtseprod", "test");
         conf.put("nimbus.host", "test");
 		//Below line ensures an empty DB rather than reusing a DB with values in it
 		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));	
-		conn = DBConnection.getDBConnection();
+		conn = DBConnection.getDBConnection();*/
+		
+		SystemPropertyUtility.setSystemProperty();
 		
 	}
 	
@@ -46,7 +49,7 @@ public class SocialBoltMockTest {
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
         SocialBolt boltUnderTest = new SocialBolt();
        
-        boltUnderTest.prepare(conf, null, outputCollector);
+        boltUnderTest.prepare(SystemPropertyUtility.getStormConf(), null, outputCollector);
         String input = "8/1/2014 7:07,1123404212,[0.0],[0.0],dishwasher";
         String expectedLid = "2gpsDmSmaKudbyxsGUbpDeTU1Q=";
         String expectedBoostVar = "{\"BOOST_DISHWASHER_SOCIAL\":\"0.0\"}";//postive score is only considered here
@@ -67,10 +70,10 @@ public class SocialBoltMockTest {
         fbCollection.setAccessible(true);
         fbCollection.set(boltUnderTest, dao);
         */
-		DBCollection fbLoyaltyCollection = conn.getCollection("fbLoyaltyIds");
+		DBCollection fbLoyaltyCollection = SystemPropertyUtility.getDb().getCollection("fbLoyaltyIds");
         fbLoyaltyCollection.insert(new BasicDBObject(MongoNameConstants.L_ID, expectedLid).append(MongoNameConstants.SOCIAL_ID,"1123404212"));
         
-		DBCollection socialVariable = conn.getCollection("socialVariable");
+		DBCollection socialVariable = SystemPropertyUtility.getDb().getCollection("socialVariable");
 		socialVariable.insert(new BasicDBObject(MongoNameConstants.SOCIAL_KEYWORD, "dishwasher").append(MongoNameConstants.SOCIAL_VARIABLE,"BOOST_DISHWASHER_SOCIAL"));
 		
         boltUnderTest.execute(tuple);
@@ -84,10 +87,11 @@ public class SocialBoltMockTest {
 	}
 	@AfterClass
 	public static void cleanUp(){
-		if(conn.toString().equalsIgnoreCase("FongoDB.test"))
+		/*if(conn.toString().equalsIgnoreCase("FongoDB.test"))
 			   conn.dropDatabase();
 			  else
-			   Assert.fail("Something went wrong. Tests connected to " + conn.toString());
+			   Assert.fail("Something went wrong. Tests connected to " + conn.toString());*/
+		SystemPropertyUtility.dropDatabase();
 	}
 	
 }

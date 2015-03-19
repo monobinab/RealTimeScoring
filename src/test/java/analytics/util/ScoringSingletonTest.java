@@ -44,17 +44,19 @@ import com.mongodb.util.JSON;
 
 public class ScoringSingletonTest {
 	private static ScoringSingleton scoringSingletonObj;
-	private static DB conn;
+//	private static DB conn;
 	@SuppressWarnings("unchecked")
 	@BeforeClass
 	public static void initializeFakeMongo() throws InstantiationException,
 			IllegalAccessException, IllegalArgumentException,
 			InvocationTargetException, ParseException, ConfigurationException {
-		System.setProperty("rtseprod", "test");
-		// Below line ensures an empty DB rather than reusing a DB with values
-		// in it
+	/*	System.setProperty("rtseprod", "test");
+		// Below line ensures an empty DB rather than reusing a DB with valuesin it
 		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));
-		conn = DBConnection.getDBConnection();
+		conn = DBConnection.getDBConnection();*/
+		
+		SystemPropertyUtility.setSystemProperty();
+		
 		// We do not need instance of scoring singleton created by previous
 		// tests. If different methods need different instances, move this to
 		// @Before rather than before class
@@ -87,7 +89,7 @@ public class ScoringSingletonTest {
 				simpleDateFormat.parse("2999-10-21"),
 				simpleDateFormat.parse("2014-10-01"));
 	
-		DBCollection changedMemberVar = conn
+		DBCollection changedMemberVar = SystemPropertyUtility.getDb()
 				.getCollection("changedMemberVariables");
 		String l_id = "6RpGnW1XhFFBoJV+T9cT9ok=";
 
@@ -1363,10 +1365,12 @@ public class ScoringSingletonTest {
 	}
 	@AfterClass
 	public static void cleanUp(){
-		if(conn.toString().equalsIgnoreCase("FongoDB.test"))
+	/*	if(conn.toString().equalsIgnoreCase("FongoDB.test"))
 			conn.dropDatabase();
 			  else
-			   Assert.fail("Something went wrong. Tests connected to " + conn.toString());
+			   Assert.fail("Something went wrong. Tests connected to " + conn.toString());*/
+		SystemPropertyUtility.dropDatabase();
+		
 	}
 	
 }

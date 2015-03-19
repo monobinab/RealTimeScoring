@@ -41,7 +41,7 @@ public class SocialBolt extends BaseRichBolt {
 			OutputCollector collector) {
 		this.collector = collector;
       //  System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
-		   HostPortUtility.getEnvironment(stormConf.get("nimbus.host").toString());
+		   HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
 		twitterLoyaltyIdDao = new TwitterLoyaltyIdDao();
 		facebookLoyaltyIdDao = new FacebookLoyaltyIdDao();
 		socialVariableDao = new SocialVariableDao();

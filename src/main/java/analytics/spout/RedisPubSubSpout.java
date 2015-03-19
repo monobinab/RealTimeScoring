@@ -100,7 +100,7 @@ public class RedisPubSubSpout extends BaseRichSpout {
     public void open(Map conf, TopologyContext context, SpoutOutputCollector collector) {
         _collector = collector;
         queue = new LinkedBlockingQueue<String>(1000);
-        HostPortUtility.getEnvironment(conf.get("nimbus.host").toString());
+        HostPortUtility.getInstance(conf.get("nimbus.host").toString());
         String[] redisServers = RedisConnection.getServers();
         pool = new JedisPool(new JedisPoolConfig(), redisServers[number], 6379);
         System.out.println(redisServers[number]);

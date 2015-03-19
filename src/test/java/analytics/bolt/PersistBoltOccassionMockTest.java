@@ -17,6 +17,7 @@ import analytics.StormTestUtils;
 import analytics.util.DBConnection;
 import analytics.util.FakeMongo;
 import analytics.util.SecurityUtils;
+import analytics.util.SystemPropertyUtility;
 import analytics.util.dao.MemberMDTagsDao;
 import analytics.util.dao.MemberTraitsDao;
 import backtype.storm.task.TopologyContext;
@@ -32,22 +33,23 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
 public class PersistBoltOccassionMockTest {
-	static Map<String,String> conf;
-	static DB db;
+	/*static Map<String,String> stormConf;
+	static DB db;*/
 	DBCollection memberMDTagsColl;
 	MemberMDTagsDao memberMDTagsDao;
 
 	@Before
 	public void initialize() throws ConfigurationException {
-		System.setProperty("rtseprod", "test");
-		conf = new HashMap<String, String>();
+		/*System.setProperty("rtseprod", "test");
+		stormConf = new HashMap<String, String>();
 		conf.put("rtseprod", "test");
-		conf.put("nimbus.host", "test");
+		stormConf.put("nimbus.host", "test");
 		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));
-		db = DBConnection.getDBConnection();
+		db = DBConnection.getDBConnection();*/
+		SystemPropertyUtility.setSystemProperty();
 
 		// fake memberMDTags collection
-		memberMDTagsColl = db.getCollection("memberMdTags");
+		memberMDTagsColl = SystemPropertyUtility.getDb().getCollection("memberMdTags");
 		BasicDBList list = new BasicDBList();
 		list.add("HACKS2010");
 
@@ -80,7 +82,7 @@ public class PersistBoltOccassionMockTest {
 		TopologyContext context = new MockTopologyContext();
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
 		
-		boltUnderTest.prepare(conf, context, outputCollector);
+		boltUnderTest.prepare(SystemPropertyUtility.getStormConf(), context, outputCollector);
 		boltUnderTest.execute(tuple);
 		DBObject dbObj = memberMDTagsColl.findOne(new BasicDBObject("l_id", "iFTsBvgexZasfSxbq2nOtwAj4bc="));
 		BasicDBList list = (BasicDBList) dbObj.get("tags");
@@ -105,7 +107,7 @@ public class PersistBoltOccassionMockTest {
 		TopologyContext context = new MockTopologyContext();
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
 
-		boltUnderTest.prepare(conf, context, outputCollector);
+		boltUnderTest.prepare(SystemPropertyUtility.getStormConf(), context, outputCollector);
 		boltUnderTest.execute(tuple);
 		DBObject dbObj = memberMDTagsColl.findOne(new BasicDBObject("l_id", "jnJgNqJpVI3Lt4olN7uCUH0Zcuc="));
 		Assert.assertEquals(null, dbObj);
@@ -113,10 +115,11 @@ public class PersistBoltOccassionMockTest {
 	
 	@AfterClass
 	public static void cleanUp(){
-		if(db.toString().equalsIgnoreCase("FongoDB.test"))
+		/*if(db.toString().equalsIgnoreCase("FongoDB.test"))
 			   db.dropDatabase();
 			  else
-			   Assert.fail("Something went wrong. Tests connected to " + db.toString());
+			   Assert.fail("Something went wrong. Tests connected to " + db.toString());*/
+		SystemPropertyUtility.dropDatabase();
 	}
 
 

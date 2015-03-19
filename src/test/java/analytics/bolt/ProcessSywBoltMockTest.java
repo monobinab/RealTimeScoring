@@ -16,6 +16,7 @@ import analytics.MockTopologyContext;
 import analytics.StormTestUtils;
 import analytics.util.DBConnection;
 import analytics.util.FakeMongo;
+import analytics.util.SystemPropertyUtility;
 import analytics.util.SywApiCalls;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.tuple.Tuple;
@@ -30,24 +31,26 @@ public class ProcessSywBoltMockTest {
 	/**
 	 * WE ARE NOT STUBBING OUT SYWAPICALLS
 	 */
-	static Map<String,String> conf;
-	static DB db;
+	/*static Map<String,String> conf;
+	static DB db;*/
 	@BeforeClass
 	public static void initializeFakeMongo() throws ConfigurationException{
-		System.setProperty("rtseprod", "test");
+		/*System.setProperty("rtseprod", "test");
 		conf = new HashMap<String, String>();
         conf.put("rtseprod", "test");
         conf.put("nimbus.host","test");
 		//Below line ensures an empty DB rather than reusing a DB with values in it
 		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));	
-		db = DBConnection.getDBConnection();
+		db = DBConnection.getDBConnection();*/
+		
+		SystemPropertyUtility.setSystemProperty();
 	}
 	@Test
 	public void onlyCertainCatalogTypesAreProcessed(){		
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
         ProcessSYWInteractions boltUnderTest = new ProcessSYWInteractions();
        TopologyContext context = new MockTopologyContext();
-        boltUnderTest.prepare(conf,context , outputCollector);
+        boltUnderTest.prepare(SystemPropertyUtility.getStormConf(),context , outputCollector);
         String lId = "xo0b7SN1eER9shCSj0DX+eSGag=";
 		String interactionType = "AddToCatalog";
 		String interactionString = "{\"InteractionId\":\"b7556eb8-e9ca-4e31-accc-4b56b69fcfad\",\"UserId\":6875997,\"UserSearsId\":6875997,\"Entities\":"
@@ -121,7 +124,7 @@ public class ProcessSywBoltMockTest {
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
         ProcessSYWInteractions boltUnderTest = new ProcessSYWInteractions();
         TopologyContext context = new MockTopologyContext();
-        boltUnderTest.prepare(conf, context, outputCollector);
+        boltUnderTest.prepare(SystemPropertyUtility.getStormConf(), context, outputCollector);
         String lId = "do0b7SN1eER9shCSj0DX+eSGag=";
 		String interactionType = "AddToCatalog";
 		String interactionString = "{\"InteractionId\":\"b7556eb8-e9ca-4e31-accc-4b56b69fcfad\",\"UserId\":6875997,\"UserSearsId\":6875997,\"Entities\":"
@@ -150,10 +153,12 @@ public class ProcessSywBoltMockTest {
 	
 	@AfterClass
 	public static void cleanUp(){
-		if(db.toString().equalsIgnoreCase("FongoDB.test"))
+		/*if(db.toString().equalsIgnoreCase("FongoDB.test"))
 			   db.dropDatabase();
 			  else
-			   Assert.fail("Something went wrong. Tests connected to " + db.toString());
+			   Assert.fail("Something went wrong. Tests connected to " + db.toString());*/
+		
+		SystemPropertyUtility.dropDatabase();
 	}
 	
 }

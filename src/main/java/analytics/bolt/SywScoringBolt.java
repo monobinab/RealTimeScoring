@@ -64,7 +64,7 @@ public class SywScoringBolt extends BaseRichBolt {
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
 		initMetrics(context);
 	//	System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
-		   HostPortUtility.getEnvironment(stormConf.get("nimbus.host").toString());
+		   HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
 		outputCollector = collector;
 		variableDao = new VariableDao();
 		// populate the variableVidToNameMap

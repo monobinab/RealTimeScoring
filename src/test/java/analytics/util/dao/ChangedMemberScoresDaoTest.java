@@ -17,6 +17,7 @@ import org.junit.Test;
 import analytics.util.DBConnection;
 import analytics.util.FakeMongo;
 import analytics.util.MongoNameConstants;
+import analytics.util.SystemPropertyUtility;
 import analytics.util.objects.ChangedMemberScore;
 
 import com.github.fakemongo.Fongo;
@@ -25,21 +26,26 @@ import com.mongodb.DBObject;
 
 public class ChangedMemberScoresDaoTest {
 	static String lId = "oI8ko3pdaHrhdlI3MJIXMPgSCX";
-    DB db;
+  //  DB db;
 	@Before
 	public void initialize() throws ConfigurationException {
 		// DO NOT REMOVE BELOW LINE
-		System.setProperty("rtseprod", "test");
+		/*System.setProperty("rtseprod", "test");
 		//Ensure we have an empty DB
 		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));
-		db = DBConnection.getDBConnection();
+		db = DBConnection.getDBConnection();*/
+		
+		SystemPropertyUtility.setSystemProperty();
+		
 	}
 	@After
 	public void cleanUp(){
-		if(db.toString().equalsIgnoreCase("FongoDB.test"))
+		/*if(db.toString().equalsIgnoreCase("FongoDB.test"))
 			   db.dropDatabase();
 			  else
-			   Assert.fail("Something went wrong. Tests connected to " + db.toString());
+			   Assert.fail("Something went wrong. Tests connected to " + db.toString());*/
+		
+		SystemPropertyUtility.dropDatabase();
 	}
 	@Test
 	public void testValidScoresCanBeRetrieved() {

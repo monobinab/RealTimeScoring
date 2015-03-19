@@ -64,7 +64,7 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
 		this.outputCollector = collector;
-		HostPortUtility.getEnvironment(stormConf.get("nimbus.host").toString());
+		HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
 		tagMetadataDao = new TagMetadataDao();
 		tagVariableDao = new TagVariableDao();
 		memberTagDao = new MemberMDTagsDao();

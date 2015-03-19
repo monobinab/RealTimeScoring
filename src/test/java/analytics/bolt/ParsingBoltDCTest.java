@@ -27,6 +27,7 @@ import analytics.util.DBConnection;
 import analytics.util.DCParserHandler;
 import analytics.util.FakeMongo;
 import analytics.util.MongoNameConstants;
+import analytics.util.SystemPropertyUtility;
 
 import com.github.fakemongo.Fongo;
 import com.mongodb.BasicDBObject;
@@ -39,19 +40,20 @@ public class ParsingBoltDCTest {
 	static SAXParserFactory factory;
 	static SAXParser saxParser;
 	static DCParserHandler handler;
-	static Map<String, String> conf;
+	//static Map<String, String> conf;
 	static DBCollection dcQAStrength;
 	static DBCollection dcModels;
-	static DB db;
+//	static DB db;
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		System.setProperty(MongoNameConstants.IS_PROD, "test");
+	/*	System.setProperty(MongoNameConstants.IS_PROD, "test");
 		conf = new HashMap<String, String>();
 		conf.put("rtseprod", "test");
 		//Below line ensures an empty DB rather than reusing a DB with values in it
         FakeMongo.setDBConn(new Fongo("test db").getDB("test"));	
-		db = DBConnection.getDBConnection();
+		db = DBConnection.getDBConnection();*/
+		SystemPropertyUtility.setSystemProperty();
 		
         bolt = new ParsingBoltDC();
 		bolt.setToTestMode();
@@ -61,8 +63,8 @@ public class ParsingBoltDCTest {
 
 		        
 		bolt.setDCDao();
-		dcQAStrength = db.getCollection(MongoNameConstants.DC_QA_STRENGTHS);
-		dcModels = db.getCollection(MongoNameConstants.DC_MODEL);
+		dcQAStrength = SystemPropertyUtility.getDb().getCollection(MongoNameConstants.DC_QA_STRENGTHS);
+		dcModels = SystemPropertyUtility.getDb().getCollection(MongoNameConstants.DC_MODEL);
 		populateDCCollections();
 		DBObject query = new BasicDBObject();
 		query.put("c", "DC_1");
@@ -317,9 +319,10 @@ public class ParsingBoltDCTest {
 	
 	@AfterClass
 	public static void cleanUp(){
-		if(db.toString().equalsIgnoreCase("FongoDB.test"))
+		/*if(db.toString().equalsIgnoreCase("FongoDB.test"))
 		   db.dropDatabase();
 		  else
-		   Assert.fail("Something went wrong. Tests connected to " + db.toString());
+		   Assert.fail("Something went wrong. Tests connected to " + db.toString());*/
+		SystemPropertyUtility.dropDatabase();
 	}
 }

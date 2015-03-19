@@ -16,6 +16,7 @@ import analytics.MockTopologyContext;
 import analytics.StormTestUtils;
 import analytics.util.DBConnection;
 import analytics.util.FakeMongo;
+import analytics.util.SystemPropertyUtility;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.tuple.Tuple;
 
@@ -23,24 +24,25 @@ import com.github.fakemongo.Fongo;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 
-public class ParsingBoltOccassionMockTest {
+public class ParsingBoltOccassionMockTest extends SystemPropertyUtility{
 	
-	static Map<String,String> conf;
+	//static Map<String,String> conf;
 	//static DB db;
 	static ParsingBoltOccassion parsingBoltOccassion;
 	static DBCollection tagsMetadaColl;
 	static DBCollection tagsVarColl;
 	static DBCollection modelPercColl;
-	static Map<String, String> stormConf;
+	//static Map<String, String> stormConf;
 	@BeforeClass
 	public static void intializeFakeMongo() throws ConfigurationException{
-		System.setProperty("rtseprod", "test");
+		//System.setProperty("rtseprod", "test");
 		
 		/*FakeMongo.setDBConn(new Fongo("test db").getDB("test"));	
 		db = DBConnection.getDBConnection();*/
-		stormConf = new HashMap<String, String>();
-		stormConf.put("nimbus.host", "test");
+		/*stormConf = new HashMap<String, String>();
+		stormConf.put("nimbus.host", "test");*/
 		//get the fakMongo collections from ParsingBotlOccassionDaoTest
+		SystemPropertyUtility.setSystemProperty();
 		ParsingBoltOccassionFakeMonogColl.fakeMongoColl();
 		tagsMetadaColl = ParsingBoltOccassionFakeMonogColl.getTagMetadataColl();
 		tagsVarColl = ParsingBoltOccassionFakeMonogColl.getTagVariableColl();
@@ -56,7 +58,7 @@ public class ParsingBoltOccassionMockTest {
 		TopologyContext context = new MockTopologyContext();
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
 		
-		boltUnderTest.prepare(stormConf, context, outputCollector);
+		boltUnderTest.prepare(SystemPropertyUtility.getStormConf(), context, outputCollector);
 		System.out.println(tuple.getStringByField("message"));
 		boltUnderTest.execute(tuple);
 		List<Object> outputTuple = outputCollector.getTuple().get("main");
@@ -70,9 +72,10 @@ public class ParsingBoltOccassionMockTest {
 	
 	@AfterClass
 	public static void tearDown(){
-		if(ParsingBoltOccassionFakeMonogColl.db.toString().equalsIgnoreCase("FongoDB.test"))
+		/*if(ParsingBoltOccassionFakeMonogColl.db.toString().equalsIgnoreCase("FongoDB.test"))
 			ParsingBoltOccassionFakeMonogColl.db.dropDatabase();
 		  else
-		   Assert.fail("Something went wrong. Tests connected to " + ParsingBoltOccassionFakeMonogColl.db.toString());
+		   Assert.fail("Something went wrong. Tests connected to " + ParsingBoltOccassionFakeMonogColl.db.toString());*/
+		SystemPropertyUtility.dropDatabase();
 	}
 }

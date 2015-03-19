@@ -58,7 +58,7 @@ public class ParsingBoltPOS extends BaseRichBolt {
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         this.outputCollector = collector;
     //    System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
-        HostPortUtility.getEnvironment(stormConf.get("nimbus.host").toString());
+        HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
 
 	/*
 	 * (non-Javadoc)

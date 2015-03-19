@@ -74,7 +74,7 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 		this.outputCollector = collector;
 	     initMetrics(context);
      //   System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
-	     HostPortUtility.getEnvironment(stormConf.get("nimbus.host").toString());
+	     HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
 		LOGGER.info("Preparing telluride parsing bolt");
 
 		LOGGER.debug("Getting mongo collections");

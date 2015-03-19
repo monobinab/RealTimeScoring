@@ -18,6 +18,7 @@ import org.junit.Test;
 import analytics.util.DBConnection;
 import analytics.util.FakeMongo;
 import analytics.util.MongoNameConstants;
+import analytics.util.SystemPropertyUtility;
 import analytics.util.dao.MemberDCDao;
 
 import com.github.fakemongo.Fongo;
@@ -29,17 +30,20 @@ import com.mongodb.DBObject;
 
 public class PersistDCBoltTest {
 
-	static Map<String,String> conf;
+	//static Map<String,String> stormConf;
 	MemberDCDao memberDCDao;
 	String date;
-	static DB db;
+	//static DB db;
 	@Before
 	public void setUp() throws Exception {
-		System.setProperty(MongoNameConstants.IS_PROD, "test");
-		conf = new HashMap<String, String>();
-        conf.put("rtseprod", "test");
+		/*System.setProperty(MongoNameConstants.IS_PROD, "test");
+		stormConf = new HashMap<String, String>();
+		//stormConf.put("rtseprod", "test");
         FakeMongo.setDBConn(new Fongo("test db").getDB("test"));
-		db = DBConnection.getDBConnection();
+		db = DBConnection.getDBConnection();*/
+		
+		SystemPropertyUtility.setSystemProperty();
+		
         memberDCDao = new MemberDCDao();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		date = simpleDateFormat.format(new Date());
@@ -230,10 +234,12 @@ public class PersistDCBoltTest {
 	
 	@AfterClass
 	public static void teardown() {
-		if(db.toString().equalsIgnoreCase("FongoDB.test"))
+		/*if(db.toString().equalsIgnoreCase("FongoDB.test"))
 			   db.dropDatabase();
 			  else
-			   Assert.fail("Something went wrong. Tests connected to " + db.toString());
+			   Assert.fail("Something went wrong. Tests connected to " + db.toString());*/
+		
+		SystemPropertyUtility.dropDatabase();
 	}
 
 

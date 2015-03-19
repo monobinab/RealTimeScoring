@@ -24,7 +24,7 @@ public class MetricsListener implements IMetricsConsumer {
 	@Override
 	public void prepare(Map stormConf, Object registrationArgument,
 			TopologyContext context, IErrorReporter errorReporter) {
-		HostPortUtility.getEnvironment(stormConf.get("nimbus.host").toString());
+		HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
 		String isProd = System.getProperty(MongoNameConstants.IS_PROD);
 		try {
 			prop.load(MetricsListener.class.getClassLoader().getResourceAsStream("resources/redis_server_metrics.properties"));

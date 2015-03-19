@@ -29,7 +29,7 @@ public class PersistOccasionBolt extends BaseRichBolt{
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
-		HostPortUtility.getEnvironment(stormConf.get("nimbus.host").toString());
+		HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
 		memberMDTagsDao = new MemberMDTagsDao();
 		initMetrics(context);
 	}

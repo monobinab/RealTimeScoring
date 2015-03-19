@@ -14,6 +14,7 @@ import org.junit.Test;
 
 import analytics.util.DBConnection;
 import analytics.util.FakeMongo;
+import analytics.util.SystemPropertyUtility;
 import analytics.util.dao.MemberMDTagsDao;
 import analytics.util.dao.ModelPercentileDao;
 import analytics.util.dao.OccasionVariableDao;
@@ -259,10 +260,12 @@ public void getParsedJsonTest2(){
 
 @AfterClass
 public static void tearDown(){
-	if(ParsingBoltOccassionFakeMonogColl.db.toString().equalsIgnoreCase("FongoDB.test"))
+	/*if(ParsingBoltOccassionFakeMonogColl.db.toString().equalsIgnoreCase("FongoDB.test"))
 		ParsingBoltOccassionFakeMonogColl.db.dropDatabase();
 	  else
 	   Assert.fail("Something went wrong. Tests connected to " + ParsingBoltOccassionFakeMonogColl.db.toString());
-	}
+	}*/
+	SystemPropertyUtility.dropDatabase();
+}
 }
  

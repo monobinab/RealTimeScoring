@@ -56,7 +56,7 @@ public class ScorePublishBolt extends BaseRichBolt {
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
       //  System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
-		   HostPortUtility.getEnvironment(stormConf.get("nimbus.host").toString());
+		   HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
 	     initMetrics(context);
         JedisPoolConfig poolConfig = new JedisPoolConfig();
         poolConfig.setMaxActive(100);

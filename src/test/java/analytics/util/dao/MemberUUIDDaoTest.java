@@ -14,6 +14,7 @@ import org.junit.Test;
 import analytics.util.DBConnection;
 import analytics.util.FakeMongo;
 import analytics.util.MongoNameConstants;
+import analytics.util.SystemPropertyUtility;
 
 import com.github.fakemongo.Fongo;
 import com.mongodb.BasicDBObject;
@@ -23,21 +24,25 @@ public class MemberUUIDDaoTest {
 	private static MemberUUIDDao memberUUIDao;
 	private static List<String> seedDataLIds;
 	private static List<String> seedDataUuids;
-	private static DB db;
+//	private static DB db;
 
 	@AfterClass
 	public static void cleanUp(){
-		if(db.toString().equalsIgnoreCase("FongoDB.test"))
+		/*if(db.toString().equalsIgnoreCase("FongoDB.test"))
 			   db.dropDatabase();
 			  else
-			   Assert.fail("Something went wrong. Tests connected to " + db.toString());
+			   Assert.fail("Something went wrong. Tests connected to " + db.toString());*/
+		
+		SystemPropertyUtility.dropDatabase();
 	}
 	@BeforeClass
 	public static void initialize() throws ConfigurationException {
 		// DO NOT REMOVE BELOW LINE
-		System.setProperty("rtseprod", "test");
+		/*System.setProperty("rtseprod", "test");
 		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));
-		db = DBConnection.getDBConnection();
+		db = DBConnection.getDBConnection();*/
+		
+		SystemPropertyUtility.setSystemProperty();
 		
 		seedDataLIds = new ArrayList<String>();
 		seedDataUuids = new ArrayList<String>();

@@ -16,13 +16,22 @@ import com.mongodb.MongoClient;
 
 public class HostPortUtility {
 	private static final Logger LOGGER = LoggerFactory
-			.getLogger(DBConnection.class);
+			.getLogger(HostPortUtility.class);
 	static Map<String, Object> connectionsMap = new HashMap<String, Object>();
 	static MongoClient mongoClient;
-
-	// TODO: Change this to a singleton and call only once per jvm
-	@SuppressWarnings("unchecked")
-	public static void getEnvironment(String nimbusHost) {
+	private static HostPortUtility instance = null;
+	
+	public static HostPortUtility getInstance(String nimbusHost) {
+		if (instance == null) {
+			synchronized (HostPortUtility.class) {
+				if (instance == null)
+					instance = new HostPortUtility(nimbusHost);
+			}
+		}
+		return instance;
+	}
+	
+	private HostPortUtility(String nimbusHost) {
 		try {
 			mongoClient = new MongoClient(
 					"trprrta2mong4.vm.itg.corp.us.shldcorp.com", 27000);

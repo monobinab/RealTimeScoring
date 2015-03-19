@@ -35,22 +35,23 @@ import com.mongodb.DBCollection;
 
 public class ScoringSingletonIntegrationTest {
 	private static ScoringSingleton scoringSingletonObj;
-	private static DB db;
+//	private static DB db;
 
 	@SuppressWarnings("unchecked")
 	@BeforeClass
 	public static void initializeFakeMongo() throws InstantiationException,
 			IllegalAccessException, IllegalArgumentException,
 			InvocationTargetException, ParseException, ConfigurationException {
-		System.setProperty("rtseprod", "test");
+		/*System.setProperty("rtseprod", "test");
 		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));
-		db = DBConnection.getDBConnection();
+		db = DBConnection.getDBConnection();*/
+		
+		SystemPropertyUtility.setSystemProperty();
 		
 		Constructor<ScoringSingleton> constructor = (Constructor<ScoringSingleton>) ScoringSingleton.class
 				.getDeclaredConstructors()[0];
 		constructor.setAccessible(true);
 		scoringSingletonObj = constructor.newInstance();
-		
 	}
 	
 	@Before
@@ -64,10 +65,11 @@ public class ScoringSingletonIntegrationTest {
 
 	@AfterClass
 	public static void cleanUp(){
-		if(db.toString().equalsIgnoreCase("FongoDB.test"))
+		/*if(db.toString().equalsIgnoreCase("FongoDB.test"))
 			   db.dropDatabase();
 			  else
-			   Assert.fail("Something went wrong. Tests connected to " + db.toString());
+			   Assert.fail("Something went wrong. Tests connected to " + db.toString());*/
+		SystemPropertyUtility.dropDatabase();
 	}
 	
 	//This integration test is check the re-scored value for modelIds 35  (a positive case)
@@ -75,10 +77,10 @@ public class ScoringSingletonIntegrationTest {
 	public void executeScoringSingletonBasicPositiveCaseTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, RealTimeScoringException, ConfigurationException, ParseException{
 		
 		//Fake memberVariables collection
-		DBCollection memVarColl = db.getCollection("memberVariables");
+		DBCollection memVarColl = SystemPropertyUtility.getDb().getCollection("memberVariables");
 		memVarColl.insert(new BasicDBObject("l_id", "SearsTesting").append("2269", 1).append("2270",0.4));
 
-		DBCollection varColl = db.getCollection("Variables");
+		DBCollection varColl = SystemPropertyUtility.getDb().getCollection("Variables");
 		varColl.insert(new BasicDBObject("name", "v1").append("VID", 1).append("strategy","StrategyCountTransactions"));
 		varColl.insert(new BasicDBObject("name", "v2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
 		varColl.insert(new BasicDBObject("name", "v3").append("VID", 3).append("strategy","StrategyCountTraits"));
@@ -88,7 +90,7 @@ public class ScoringSingletonIntegrationTest {
 		varColl.insert(new BasicDBObject("name", "v7").append("VID", 7).append("strategy","StrategySumSales"));
 		varColl.insert(new BasicDBObject("name", "v8").append("VID", 8).append("strategy","StrategyTurnOffFlag"));
 				//fake changedMemberVariables Collection
-				DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
+				DBCollection changedMemberVar = SystemPropertyUtility.getDb().getCollection("changedMemberVariables");
 				SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 				Change expected = new Change("2269", 12,
 						simpleDateFormat.parse("2999-09-23"),
@@ -97,7 +99,7 @@ public class ScoringSingletonIntegrationTest {
 						simpleDateFormat.parse("2999-09-23"),
 						simpleDateFormat.parse("2014-09-01"));
 				
-				changedMemberVar = db
+				changedMemberVar = SystemPropertyUtility.getDb()
 						.getCollection("changedMemberVariables");
 				String l_id = "SearsTesting";
 				changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
@@ -190,9 +192,9 @@ public class ScoringSingletonIntegrationTest {
 		
 		//Fake memberVariables collection
 		
-				DBCollection memVarColl = db.getCollection("memberVariables");
+				DBCollection memVarColl = SystemPropertyUtility.getDb().getCollection("memberVariables");
 				memVarColl.insert(new BasicDBObject("l_id", "SearsTesting2").append("2269", 1).append("2270",0.4));
-				DBCollection varColl = db.getCollection("Variables");
+				DBCollection varColl = SystemPropertyUtility.getDb().getCollection("Variables");
 				varColl.insert(new BasicDBObject("name", "v1").append("VID", 1).append("strategy","StrategyCountTransactions"));
 				varColl.insert(new BasicDBObject("name", "v2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
 				varColl.insert(new BasicDBObject("name", "v3").append("VID", 3).append("strategy","StrategyCountTraits"));
@@ -202,7 +204,7 @@ public class ScoringSingletonIntegrationTest {
 				varColl.insert(new BasicDBObject("name", "v7").append("VID", 7).append("strategy","StrategySumSales"));
 				varColl.insert(new BasicDBObject("name", "v8").append("VID", 8).append("strategy","StrategyTurnOffFlag"));
 						//fake changedMemberVariables Collection
-						DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
+						DBCollection changedMemberVar = SystemPropertyUtility.getDb().getCollection("changedMemberVariables");
 						SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 						Change expected = new Change("2269", 12,
 								simpleDateFormat.parse("2014-08-23"),
@@ -211,7 +213,7 @@ public class ScoringSingletonIntegrationTest {
 								simpleDateFormat.parse("2014-08-23"),
 								simpleDateFormat.parse("2014-09-01"));
 						
-						changedMemberVar = db
+						changedMemberVar = SystemPropertyUtility.getDb()
 								.getCollection("changedMemberVariables");
 						String l_id = "SearsTesting2";
 						changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
@@ -307,9 +309,9 @@ public class ScoringSingletonIntegrationTest {
 
 		//Fake memberVariables collection
 			
-				DBCollection memVarColl = db.getCollection("memberVariables");
+				DBCollection memVarColl = SystemPropertyUtility.getDb().getCollection("memberVariables");
 				memVarColl.insert(new BasicDBObject("l_id", "SearsTesting3").append("2269", 1).append("2270",0.4));
-				DBCollection varColl = db.getCollection("Variables");
+				DBCollection varColl = SystemPropertyUtility.getDb().getCollection("Variables");
 				varColl.insert(new BasicDBObject("name", "v1").append("VID", 1).append("strategy","StrategyCountTransactions"));
 				varColl.insert(new BasicDBObject("name", "v2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
 				varColl.insert(new BasicDBObject("name", "v3").append("VID", 3).append("strategy","StrategyCountTraits"));
@@ -319,13 +321,13 @@ public class ScoringSingletonIntegrationTest {
 				varColl.insert(new BasicDBObject("name", "v7").append("VID", 7).append("strategy","StrategySumSales"));
 				varColl.insert(new BasicDBObject("name", "v8").append("VID", 8).append("strategy","StrategyTurnOffFlag"));
 						//fake changedMemberVariables Collection
-						DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
+						DBCollection changedMemberVar = SystemPropertyUtility.getDb().getCollection("changedMemberVariables");
 						SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 						Change expected = new Change("2269", 12,
 								simpleDateFormat.parse("2999-09-23"),
 								simpleDateFormat.parse("2014-09-01"));
 					
-						changedMemberVar = db
+						changedMemberVar = SystemPropertyUtility.getDb()
 								.getCollection("changedMemberVariables");
 						String l_id = "SearsTesting3";
 						changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
@@ -408,9 +410,9 @@ public class ScoringSingletonIntegrationTest {
 	@Test
 	public void executeScoringSingletonChangedMemberVarNotExpiredNotPresentInNewChangesVarTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, RealTimeScoringException, ConfigurationException, ParseException{
 			//Fake memberVariables collection
-				DBCollection memVarColl = db.getCollection("memberVariables");
+				DBCollection memVarColl = SystemPropertyUtility.getDb().getCollection("memberVariables");
 				memVarColl.insert(new BasicDBObject("l_id", "SearsTesting4").append("2269", 1).append("2270",0.4));
-				DBCollection varColl = db.getCollection("Variables");
+				DBCollection varColl = SystemPropertyUtility.getDb().getCollection("Variables");
 				varColl.insert(new BasicDBObject("name", "v1").append("VID", 1).append("strategy","StrategyCountTransactions"));
 				varColl.insert(new BasicDBObject("name", "v2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
 				varColl.insert(new BasicDBObject("name", "v3").append("VID", 3).append("strategy","StrategyCountTraits"));
@@ -420,13 +422,13 @@ public class ScoringSingletonIntegrationTest {
 				varColl.insert(new BasicDBObject("name", "v7").append("VID", 7).append("strategy","StrategySumSales"));
 				varColl.insert(new BasicDBObject("name", "v8").append("VID", 8).append("strategy","StrategyTurnOffFlag"));
 						//fake changedMemberVariables Collection
-						DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
+						DBCollection changedMemberVar = SystemPropertyUtility.getDb().getCollection("changedMemberVariables");
 						SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 						Change expected = new Change("2269", 12,
 								simpleDateFormat.parse("2999-09-23"),
 								simpleDateFormat.parse("2014-09-01"));
 					
-						changedMemberVar = db
+						changedMemberVar = SystemPropertyUtility.getDb()
 								.getCollection("changedMemberVariables");
 						String l_id = "SearsTesting4";
 						changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
@@ -522,9 +524,9 @@ public class ScoringSingletonIntegrationTest {
 	public void executeScoringSingletonChangedMemberVarExpiredPresentInNewChangesVarTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, RealTimeScoringException, ConfigurationException, ParseException{
 			
 		//Fake memberVariables collection
-		DBCollection memVarColl = db.getCollection("memberVariables");
+		DBCollection memVarColl = SystemPropertyUtility.getDb().getCollection("memberVariables");
 		memVarColl.insert(new BasicDBObject("l_id", "SearsTesting2").append("2269", 1).append("2270",0.4));
-		DBCollection varColl = db.getCollection("Variables");
+		DBCollection varColl = SystemPropertyUtility.getDb().getCollection("Variables");
 		varColl.insert(new BasicDBObject("name", "v1").append("VID", 1).append("strategy","StrategyCountTransactions"));
 		varColl.insert(new BasicDBObject("name", "v2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
 		varColl.insert(new BasicDBObject("name", "v3").append("VID", 3).append("strategy","StrategyCountTraits"));
@@ -534,13 +536,13 @@ public class ScoringSingletonIntegrationTest {
 		varColl.insert(new BasicDBObject("name", "v7").append("VID", 7).append("strategy","StrategySumSales"));
 		varColl.insert(new BasicDBObject("name", "v8").append("VID", 8).append("strategy","StrategyTurnOffFlag"));
 				//fake changedMemberVariables Collection
-				DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
+				DBCollection changedMemberVar = SystemPropertyUtility.getDb().getCollection("changedMemberVariables");
 				SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 				Change expected = new Change("2269", 12,
 						simpleDateFormat.parse("2014-08-23"),
 						simpleDateFormat.parse("2014-09-01"));
 						
-				changedMemberVar = db
+				changedMemberVar = SystemPropertyUtility.getDb()
 						.getCollection("changedMemberVariables");
 				String l_id = "SearsTesting2";
 				changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
@@ -619,10 +621,10 @@ public class ScoringSingletonIntegrationTest {
 	public void executeScoringSingletonOneVarExpOneVarNotExpBothPresentinNewChangesVarValueMap() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, RealTimeScoringException, ConfigurationException, ParseException{
 		
 		//Fake memberVariables collection
-		DBCollection memVarColl = db.getCollection("memberVariables");
+		DBCollection memVarColl = SystemPropertyUtility.getDb().getCollection("memberVariables");
 		memVarColl.insert(new BasicDBObject("l_id", "SearsTesting8").append("2269", 1).append("2270",0.4));
 		
-		DBCollection varColl = db.getCollection("Variables");
+		DBCollection varColl = SystemPropertyUtility.getDb().getCollection("Variables");
 		varColl.insert(new BasicDBObject("name", "v1").append("VID", 1).append("strategy","StrategyCountTransactions"));
 		varColl.insert(new BasicDBObject("name", "v2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
 		varColl.insert(new BasicDBObject("name", "v3").append("VID", 3).append("strategy","StrategyCountTraits"));
@@ -632,7 +634,7 @@ public class ScoringSingletonIntegrationTest {
 		varColl.insert(new BasicDBObject("name", "v7").append("VID", 7).append("strategy","StrategySumSales"));
 		varColl.insert(new BasicDBObject("name", "v8").append("VID", 8).append("strategy","StrategyTurnOffFlag"));
 						//fake changedMemberVariables Collection
-				DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
+				DBCollection changedMemberVar = SystemPropertyUtility.getDb().getCollection("changedMemberVariables");
 				SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 				Change expected = new Change("2269", 12,
 						simpleDateFormat.parse("2999-09-23"),
@@ -641,7 +643,7 @@ public class ScoringSingletonIntegrationTest {
 						simpleDateFormat.parse("2014-08-23"),
 						simpleDateFormat.parse("2014-09-01"));
 				
-				changedMemberVar = db
+				changedMemberVar = SystemPropertyUtility.getDb()
 						.getCollection("changedMemberVariables");
 				String l_id = "SearsTesting8";
 				changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
@@ -739,9 +741,9 @@ public class ScoringSingletonIntegrationTest {
 		public void executeScoringSingletonOneVarExpOneVarNotExpButOnlyExpVarPresentinNewChangesVarValueMap() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, RealTimeScoringException, ConfigurationException, ParseException{
 			
 			//Fake memberVariables collection
-			DBCollection memVarColl = db.getCollection("memberVariables");
+			DBCollection memVarColl = SystemPropertyUtility.getDb().getCollection("memberVariables");
 			memVarColl.insert(new BasicDBObject("l_id", "SearsTesting9").append("2269", 1).append("2270",0.4));
-			DBCollection varColl = db.getCollection("Variables");
+			DBCollection varColl = SystemPropertyUtility.getDb().getCollection("Variables");
 			varColl.insert(new BasicDBObject("name", "v1").append("VID", 1).append("strategy","StrategyCountTransactions"));
 			varColl.insert(new BasicDBObject("name", "v2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
 			varColl.insert(new BasicDBObject("name", "v3").append("VID", 3).append("strategy","StrategyCountTraits"));
@@ -751,7 +753,7 @@ public class ScoringSingletonIntegrationTest {
 			varColl.insert(new BasicDBObject("name", "v7").append("VID", 7).append("strategy","StrategySumSales"));
 			varColl.insert(new BasicDBObject("name", "v8").append("VID", 8).append("strategy","StrategyTurnOffFlag"));
 					//fake changedMemberVariables Collection
-					DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
+					DBCollection changedMemberVar = SystemPropertyUtility.getDb().getCollection("changedMemberVariables");
 					SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 					Change expected = new Change("2269", 12,
 							simpleDateFormat.parse("2999-09-23"),
@@ -760,7 +762,7 @@ public class ScoringSingletonIntegrationTest {
 							simpleDateFormat.parse("2014-08-23"),
 							simpleDateFormat.parse("2014-09-01"));
 					
-					changedMemberVar = db
+					changedMemberVar = SystemPropertyUtility.getDb()
 							.getCollection("changedMemberVariables");
 					String l_id = "SearsTesting9";
 					changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
@@ -848,9 +850,9 @@ public class ScoringSingletonIntegrationTest {
 		public void executeScoringSingletonNullExpiratioDateVarPresentInNewChangesVarTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, RealTimeScoringException, ConfigurationException, ParseException{
 				
 			//Fake memberVariables collection
-			DBCollection memVarColl = db.getCollection("memberVariables");
+			DBCollection memVarColl = SystemPropertyUtility.getDb().getCollection("memberVariables");
 			memVarColl.insert(new BasicDBObject("l_id", "SearsTesting10").append("2269", 1).append("2270",0.4));
-			DBCollection varColl = db.getCollection("Variables");
+			DBCollection varColl = SystemPropertyUtility.getDb().getCollection("Variables");
 			varColl.insert(new BasicDBObject("name", "v1").append("VID", 1).append("strategy","StrategyCountTransactions"));
 			varColl.insert(new BasicDBObject("name", "v2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
 			varColl.insert(new BasicDBObject("name", "v3").append("VID", 3).append("strategy","StrategyCountTraits"));
@@ -860,10 +862,10 @@ public class ScoringSingletonIntegrationTest {
 			varColl.insert(new BasicDBObject("name", "v7").append("VID", 7).append("strategy","StrategySumSales"));
 			varColl.insert(new BasicDBObject("name", "v8").append("VID", 8).append("strategy","StrategyTurnOffFlag"));
 					//fake changedMemberVariables Collection
-					DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
+					DBCollection changedMemberVar = SystemPropertyUtility.getDb().getCollection("changedMemberVariables");
 					SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 											
-					changedMemberVar = db
+					changedMemberVar = SystemPropertyUtility.getDb()
 							.getCollection("changedMemberVariables");
 					String l_id = "SearsTesting10";
 			

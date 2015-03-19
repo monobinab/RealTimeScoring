@@ -90,7 +90,7 @@ public class ParsingBoltDC extends BaseRichBolt {
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
 		this.outputCollector = collector;
 	//	System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
-		   HostPortUtility.getEnvironment(stormConf.get("nimbus.host").toString());
+		   HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
 		memberDCDao = new MemberDCDao();
 		dc = new DCDao();
 		initMetrics(context);

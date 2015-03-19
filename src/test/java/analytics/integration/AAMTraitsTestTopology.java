@@ -3,6 +3,7 @@ package analytics.integration;
 import analytics.bolt.PersistTraitsBolt;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.util.MongoNameConstants;
+import analytics.util.SystemPropertyUtility;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.topology.TopologyBuilder;
@@ -19,9 +20,11 @@ emited [Cieh1BvT91qFFXXtzzSU1GFZjfk=, {"M_WEB_TRAIT_POWER_TOOL_8_14":"{\"2014-10
 		
 		System.clearProperty(MongoNameConstants.IS_PROD);
 		if (args.length > 0) {
-			System.setProperty(MongoNameConstants.IS_PROD, "test");
+			SystemPropertyUtility.setSystemProperty();
+			
 		}
-		System.setProperty(MongoNameConstants.IS_PROD, "test");
+		SystemPropertyUtility.setSystemProperty();
+	
 		
 		TopologyBuilder builder = new TopologyBuilder();
 

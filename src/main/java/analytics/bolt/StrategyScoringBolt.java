@@ -50,7 +50,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 		LOGGER.info("PREPARING STRATEGY SCORING BOLT");	
 	     initMetrics(context);
 	     //TODO: ALL BOLTS SHOULD HAVE THIS LINE - ADD TO SUPER CLASS
-	    HostPortUtility.getEnvironment(stormConf.get("nimbus.host").toString());
+	    HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
 		this.outputCollector = collector;
 	}
 	 void initMetrics(TopologyContext context){
