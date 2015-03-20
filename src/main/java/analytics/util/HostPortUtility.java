@@ -50,5 +50,6 @@ public class HostPortUtility {
 		}
 		System.setProperty(MongoNameConstants.IS_PROD,
 				(String) connectionsMap.get(nimbusHost));
+		LOGGER.info("nimbus.host in HostPortUtility: " + nimbusHost + "System's property: " + System.getProperty(MongoNameConstants.IS_PROD));
 	}
 }

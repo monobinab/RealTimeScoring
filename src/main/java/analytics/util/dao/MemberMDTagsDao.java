@@ -22,6 +22,7 @@ public class MemberMDTagsDao extends AbstractDao {
 	public MemberMDTagsDao() {
 		super("server2");
 		memberMDTagsCollection = db.getCollection("memberMdTags");
+		LOGGER.info("colelction in tagMetadataDao: " + memberMDTagsCollection.getFullName());
 	
 	}
 

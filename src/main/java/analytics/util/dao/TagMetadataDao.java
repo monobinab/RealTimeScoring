@@ -23,6 +23,7 @@ public class TagMetadataDao extends AbstractDao {
 	public TagMetadataDao() {
 		super();
 		tagMetadataCollection = db.getCollection("tagsMetadata");
+		LOGGER.info("colelction in tagMetadataDao: " + tagMetadataCollection.getFullName());
 	}
 
 	public TagMetadata getDetails(String tag){
