@@ -1,4 +1,4 @@
-package analytics;
+/*package analytics;
 
 import analytics.bolt.PrinterBolt;
 import analytics.spout.RedisPubSubSpout;
@@ -8,17 +8,17 @@ import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
 import backtype.storm.topology.TopologyBuilder;
 
-/**
+*//**
  * This topology demonstrates Storm's stream groupings and multilang capabilities.
- */
+ *//*
 public class BrightTagsTopology {
 
 
   public static void main(String[] args) throws Exception {
-		/*System.clearProperty(MongoNameConstants.IS_PROD);
+		System.clearProperty(MongoNameConstants.IS_PROD);
 		if (args.length > 0) {
 			System.setProperty(MongoNameConstants.IS_PROD, "true");
-		}*/
+		}
 
     TopologyBuilder builder = new TopologyBuilder();
 
@@ -47,3 +47,4 @@ public class BrightTagsTopology {
     }
   }
 }
+*/

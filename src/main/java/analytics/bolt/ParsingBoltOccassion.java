@@ -41,6 +41,7 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 	private MultiCountMetric countMetric;
 	private MemberMDTagsDao memberTagDao;
 	private ModelPercentileDao modelPercDao;
+	String environment;
 	 void initMetrics(TopologyContext context){
 	     countMetric = new MultiCountMetric();
 	     context.registerMetric("custom_metrics", countMetric, 60);
@@ -60,11 +61,16 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 		 modelPercDao = new ModelPercentileDao();
 	 }
 
+	 public ParsingBoltOccassion(String systemProperty){
+		 super();
+		 environment = systemProperty;
+	 }
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
 		this.outputCollector = collector;
-		HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
+	//	HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
+		System.setProperty(MongoNameConstants.IS_PROD, environment);
 		tagMetadataDao = new TagMetadataDao();
 		tagVariableDao = new TagVariableDao();
 		memberTagDao = new MemberMDTagsDao();

@@ -1,4 +1,4 @@
-package analytics.spout;
+/*package analytics.spout;
 
 import static backtype.storm.utils.Utils.tuple;
 
@@ -19,11 +19,11 @@ public class FacebookRedisSpout extends RedisPubSubSpout {
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(FacebookRedisSpout.class);
-	/*
+	
 	 * Read the redis lines for SYW events (non-Javadoc)
 	 * 
 	 * @see analytics.spout.RedisPubSubSpout#emit(java.lang.String)
-	 */
+	 
 	@Override
 	protected void emit(String ret) {
 		try {
@@ -41,3 +41,4 @@ public class FacebookRedisSpout extends RedisPubSubSpout {
 	}
 
 }
+*/

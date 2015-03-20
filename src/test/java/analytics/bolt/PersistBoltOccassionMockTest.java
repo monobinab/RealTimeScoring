@@ -70,7 +70,7 @@ public class PersistBoltOccassionMockTest {
 		DBObject dbObjBefore = memberMDTagsColl.findOne(new BasicDBObject("l_id", "iFTsBvgexZasfSxbq2nOtwAj4bc="));
 		BasicDBList listBefore = (BasicDBList) dbObjBefore.get("tags");
 		Assert.assertEquals("memberMdTags coll before adding incoming member tags", 1, listBefore.size());
-		PersistOccasionBolt boltUnderTest =  new PersistOccasionBolt();
+		PersistOccasionBolt boltUnderTest =  new PersistOccasionBolt(System.getProperty("rtseprod"));
 		List<Object> emitToPersist = new ArrayList<Object>();
 		StringBuilder tags = new StringBuilder();
 		tags.append("HACKS2010");
@@ -98,7 +98,7 @@ public class PersistBoltOccassionMockTest {
 		DBObject dbObjBefore = memberMDTagsColl.findOne(new BasicDBObject("l_id", "jnJgNqJpVI3Lt4olN7uCUH0Zcuc="));
 		BasicDBList listBefore = (BasicDBList) dbObjBefore.get("tags");
 		Assert.assertEquals("memberMdTags coll before adding incoming member tags", 2, listBefore.size());
-		PersistOccasionBolt boltUnderTest =  new PersistOccasionBolt();
+		PersistOccasionBolt boltUnderTest =  new PersistOccasionBolt(System.getProperty("rtseprod"));
 		List<Object> emitToPersist = new ArrayList<Object>();
 		StringBuilder tags = new StringBuilder();
 		emitToPersist.add("jnJgNqJpVI3Lt4olN7uCUH0Zcuc=");

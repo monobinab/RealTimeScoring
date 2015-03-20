@@ -1,4 +1,4 @@
-package analytics;
+/*package analytics;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,10 +31,10 @@ public class AAM_BrowseTopology {
 
 	public static void main(String[] args) throws Exception {
 		LOGGER.info("Starting web feed topology from browse source");
-		/*System.clearProperty(MongoNameConstants.IS_PROD);
+		System.clearProperty(MongoNameConstants.IS_PROD);
 		if (args.length > 0) {
 			System.setProperty(MongoNameConstants.IS_PROD, "true");
-		}*/
+		}
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 
 		String topic = TopicConstants.AAM_BROWSE_PRODUCTS;
@@ -90,3 +90,4 @@ public class AAM_BrowseTopology {
 
 	}
 }
+*/

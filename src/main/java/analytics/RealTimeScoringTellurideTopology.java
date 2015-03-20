@@ -1,4 +1,4 @@
-package analytics;
+/*package analytics;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.slf4j.Logger;
@@ -23,10 +23,10 @@ import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.topology.TopologyBuilder;
 
 
-/**
+*//**
  * Created with IntelliJ IDEA. User: syermalk Date: 10/9/13 Time: 10:14 AM To
  * change this template use File | Settings | File Templates.
- */
+ *//*
 public class RealTimeScoringTellurideTopology {
 
 	private static final Logger LOGGER = LoggerFactory
@@ -109,3 +109,4 @@ public class RealTimeScoringTellurideTopology {
 		}
 	}
 }
+*/

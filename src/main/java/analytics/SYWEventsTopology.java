@@ -1,4 +1,4 @@
-package analytics;
+/*package analytics;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,10 +18,10 @@ import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
 import backtype.storm.topology.TopologyBuilder;
 
-/**
+*//**
  * This topology demonstrates Storm's stream groupings and multilang
  * capabilities.
- */
+ *//*
 public class SYWEventsTopology {
 
 	private static final Logger LOGGER = LoggerFactory
@@ -29,18 +29,18 @@ public class SYWEventsTopology {
 
 	public static void main(String[] args) throws Exception {
 		LOGGER.info("starting syw events topology");
-		/*System.clearProperty(MongoNameConstants.IS_PROD);
+		System.clearProperty(MongoNameConstants.IS_PROD);
 		if (args.length > 0) {
 			System.setProperty(MongoNameConstants.IS_PROD, "true");
-		}*/
+		}
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 		String[] servers = RedisConnection.getServers();
 		String topic = TopicConstants.SYW;
-/*
+
  * server1=rtsapp401p.prod.ch4.s.com
 server2=rtsapp402p.prod.ch4.s.com
 server3=rtsapp403p.prod.ch4.s.com
- */
+ 
 		topologyBuilder.setSpout("sywEventsSpout1", new SYWRedisSpout(
 				0, "SYW_Interactions"), 1);
 		topologyBuilder.setSpout("sywEventsSpout2", new SYWRedisSpout(
@@ -82,3 +82,4 @@ server3=rtsapp403p.prod.ch4.s.com
 		}
 	}
 }
+*/

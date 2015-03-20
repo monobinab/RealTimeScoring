@@ -1,4 +1,4 @@
-package analytics;
+/*package analytics;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 import analytics.bolt.ParsingBoltAAM_InternalSearch;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.spout.AAMRedisPubSubSpout;
+import analytics.spout.WebHDFSSpout;
+import analytics.util.Constants;
 import analytics.util.MongoNameConstants;
 import analytics.util.RedisConnection;
 import analytics.util.TopicConstants;
@@ -22,25 +24,29 @@ public class AAM_InternalSearchTopology {
 			.getLogger(AAM_InternalSearchTopology.class);
 
 	public static void main(String[] args) {
-		/*System.clearProperty(MongoNameConstants.IS_PROD);
+		System.clearProperty(MongoNameConstants.IS_PROD);
 		if (args.length > 0) {
 			System.setProperty(MongoNameConstants.IS_PROD, "true");
-		}*/
+		}
 		String topic = TopicConstants.AAM_CDF_INTERNALSEARCH;
-		//int port = TopicConstants.PORT;
+		int port = TopicConstants.PORT;
 
 		//RedisConnection redisConnection = new RedisConnection();
-		//String[] servers = RedisConnection.getServers();
+		String[] servers = RedisConnection.getServers();
 
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 
 		topologyBuilder.setSpout("AAM_CDF_InternalSearch1",
-				new AAMRedisPubSubSpout(0, topic), 1);
+				new AAMRedisPubSubSpout(servers[0], port, topic), 1);
 		topologyBuilder.setSpout("AAM_CDF_InternalSearch2",
-				new AAMRedisPubSubSpout(1, topic), 1);
+				new AAMRedisPubSubSpout(servers[1], port, topic), 1);
 		topologyBuilder.setSpout("AAM_CDF_InternalSearch3",
-				new AAMRedisPubSubSpout(2, topic), 1);
-
+				new AAMRedisPubSubSpout(servers[2], port, topic), 1);
+		
+		//Sree. Spout that wakes up every 5 mins and process the Traits
+		topologyBuilder.setSpout("internalSearchSpout", new WebHDFSSpout(servers[1], TopicConstants.PORT, Constants.AAM_INTERNAL_SEARCH_PATH, "aamInternalSearch"), 1);
+		topologyBuilder.setBolt("ParsingBoltAAM_InternalSearch",new ParsingBoltAAM_InternalSearch()).shuffleGrouping("internalSearchSpout");
+		
 		topologyBuilder
 				.setBolt("ParsingBoltAAM_InternalSearch",
 						new ParsingBoltAAM_InternalSearch())
@@ -78,3 +84,4 @@ public class AAM_InternalSearchTopology {
 
 	}
 }
+*/

@@ -1,4 +1,4 @@
-package analytics.spout;
+/*package analytics.spout;
 
 import static backtype.storm.utils.Utils.tuple;
 
@@ -30,11 +30,11 @@ public class SYWRedisSpout extends RedisPubSubSpout {
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(SYWRedisSpout.class);
-	/*
+	
 	 * Read the redis lines for SYW events (non-Javadoc)
 	 * 
 	 * @see analytics.spout.RedisPubSubSpout#emit(java.lang.String)
-	 */
+	 
 	@Override
 	protected void emit(String ret) {
 		// TODO: Find why there was a sleep?? Copied form AAMTopology
@@ -53,3 +53,4 @@ public class SYWRedisSpout extends RedisPubSubSpout {
 	}
 
 }
+*/

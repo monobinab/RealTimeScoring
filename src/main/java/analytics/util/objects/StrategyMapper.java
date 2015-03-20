@@ -65,8 +65,7 @@ public class StrategyMapper {
 				e.printStackTrace();
 			}
     	}
-    	
-    	
+      	
 //		strategyMap.put("StrategyCountTraitDates", new StrategyCountTraitDates()); 
 //		strategyMap.put("StrategyCountTraits", new StrategyCountTraits()); 
 //		strategyMap.put("StrategyCountTransactions", new StrategyCountTransactions()); 

@@ -32,7 +32,7 @@ public class ParsingBoltOccassionMockTest extends SystemPropertyUtility{
 	static DBCollection tagsMetadaColl;
 	static DBCollection tagsVarColl;
 	static DBCollection modelPercColl;
-	//static Map<String, String> stormConf;
+	static Map<String, String> stormConf;
 	@BeforeClass
 	public static void intializeFakeMongo() throws ConfigurationException{
 		//System.setProperty("rtseprod", "test");
@@ -51,14 +51,14 @@ public class ParsingBoltOccassionMockTest extends SystemPropertyUtility{
 	
 	@Test
 	public void parsingBoltEmissionTest(){
-		ParsingBoltOccassion boltUnderTest = new ParsingBoltOccassion();
+		ParsingBoltOccassion boltUnderTest = new ParsingBoltOccassion(System.getProperty("rtseprod"));
 		String input = "{\"lyl_id_no\":\"7081000000000000\",\"tags\":[\"HACKS2010\",\"HALAS2010\",\"HARFS2010\"]}";
 		Tuple tuple = StormTestUtils.mockTuple(input, "PurchaseOccassion");
 		
 		TopologyContext context = new MockTopologyContext();
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
 		
-		boltUnderTest.prepare(SystemPropertyUtility.getStormConf(), context, outputCollector);
+		boltUnderTest.prepare(stormConf, context, outputCollector);
 		System.out.println(tuple.getStringByField("message"));
 		boltUnderTest.execute(tuple);
 		List<Object> outputTuple = outputCollector.getTuple().get("main");

@@ -1,4 +1,4 @@
-package analytics;
+/*package analytics;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,10 +25,10 @@ public class SocialTopology {
 
 	public static void main(String[] args) throws AlreadyAliveException,
 			InvalidTopologyException, InterruptedException {
-		/*System.clearProperty(MongoNameConstants.IS_PROD);
+		System.clearProperty(MongoNameConstants.IS_PROD);
 		if (args.length > 0) {
 			System.setProperty(MongoNameConstants.IS_PROD, "true");
-		}*/
+		}
 		LOGGER.info("Starting social topology ");
 		String facebookTopic = TopicConstants.FB;
 		String twitterTopic = TopicConstants.TW;
@@ -74,3 +74,4 @@ public class SocialTopology {
 		}
 	}
 }
+*/

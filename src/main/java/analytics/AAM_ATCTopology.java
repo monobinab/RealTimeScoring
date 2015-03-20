@@ -1,4 +1,4 @@
-package analytics;
+/*package analytics;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.slf4j.Logger;
@@ -31,9 +31,9 @@ public class AAM_ATCTopology {
 
 		LOGGER.info("Starting web feed topology from ATC source");
 		//System.clearProperty(MongoNameConstants.IS_PROD);
-		/*if (args.length > 0) {
+		if (args.length > 0) {
 			System.setProperty(MongoNameConstants.IS_PROD, "true");
-		}*/
+		}
 		String topic = TopicConstants.AAM_ATC_PRODUCTS;
 
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
@@ -55,7 +55,7 @@ public class AAM_ATCTopology {
 		topologyBuilder.setBolt("strategy_bolt", new StrategyScoringBolt(), 1)
 				.shuffleGrouping("ParsingBoltAAM_ATC");
 		
-		/*String[] servers = RedisConnection.getServers();
+		String[] servers = RedisConnection.getServers();
 
 		for (String server : servers) {
 			topologyBuilder.setSpout(topic + server, new AAMRedisPubSubSpout(
@@ -72,7 +72,7 @@ public class AAM_ATCTopology {
 			topologyBuilder.setSpout(topic + ++counter, new AAMRedisPubSubSpout(
 					server, TopicConstants.PORT, topic), 1);
 			boltDeclarer.shuffleGrouping(topic + counter);
-		}*/
+		}
 		Config conf = new Config();
 		//conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
 		if (args.length > 0) {
@@ -102,3 +102,4 @@ public class AAM_ATCTopology {
 	}
 
 }
+*/

@@ -1,4 +1,4 @@
-package analytics.spout;
+/*package analytics.spout;
 
 
 import java.util.concurrent.TimeUnit;
@@ -14,9 +14,9 @@ import static backtype.storm.utils.Utils.tuple;
 
 public class AAMRedisPubSubSpout extends RedisPubSubSpout {
 
-    /**
+    *//**
 	 * 
-	 */
+	 *//*
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = LoggerFactory.getLogger(AAMRedisPubSubSpout.class);
 
@@ -45,3 +45,4 @@ public class AAMRedisPubSubSpout extends RedisPubSubSpout {
     }
 
 }
+*/

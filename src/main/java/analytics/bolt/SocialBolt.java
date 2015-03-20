@@ -1,4 +1,4 @@
-package analytics.bolt;
+/*package analytics.bolt;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -28,9 +28,9 @@ import com.google.gson.Gson;
 public class SocialBolt extends BaseRichBolt {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(SocialBolt.class);
-	/**
+	*//**
 	 * 
-	 */
+	 *//*
 	private static final long serialVersionUID = 1L;
 	private OutputCollector collector;
 	private FacebookLoyaltyIdDao facebookLoyaltyIdDao;
@@ -100,3 +100,4 @@ public class SocialBolt extends BaseRichBolt {
 	}
 
 }
+*/

@@ -38,10 +38,16 @@ public class DBConnection {
 			properties=  new PropertiesConfiguration("resources/connection_config_prod.properties");
 			LOGGER.info("Using production properties");
 		}
+		
 		else if(isProd!=null && "QA".equals(isProd)){
 			properties=  new PropertiesConfiguration("resources/connection_config.properties");
 			LOGGER.info("Using test properties");	
-		}		
+		}
+		
+		else if(isProd!=null && "LOCAL".equals(isProd)){
+			properties=  new PropertiesConfiguration("resources/connection_config_local.properties");
+			LOGGER.info("Using test properties");	
+		}
 
 		sServerName = properties.getString("server.name");
 		sServerName2 = properties.getString("server2.name");

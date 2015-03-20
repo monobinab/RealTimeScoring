@@ -32,10 +32,12 @@ public class RedisPubSubSpout extends BaseRichSpout {
     LinkedBlockingQueue<String> queue;
     JedisPool pool;
     final int number;
+    String environment;
 
-    public RedisPubSubSpout( int number, String pattern) {
+    public RedisPubSubSpout( int number, String pattern, String systemProperty) {
         this.number = number;
         this.pattern = pattern;
+        environment = systemProperty;
     }
     class ListenerThread extends Thread {
         LinkedBlockingQueue<String> queue;
@@ -100,8 +102,8 @@ public class RedisPubSubSpout extends BaseRichSpout {
     public void open(Map conf, TopologyContext context, SpoutOutputCollector collector) {
         _collector = collector;
         queue = new LinkedBlockingQueue<String>(1000);
-        HostPortUtility.getInstance(conf.get("nimbus.host").toString());
-        String[] redisServers = RedisConnection.getServers();
+     //   HostPortUtility.getInstance(conf.get("nimbus.host").toString());
+        String[] redisServers = RedisConnection.getServers(environment);
         pool = new JedisPool(new JedisPoolConfig(), redisServers[number], 6379);
         System.out.println(redisServers[number]);
         ListenerThread listener = new ListenerThread(queue, pool, pattern);

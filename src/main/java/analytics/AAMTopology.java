@@ -1,4 +1,4 @@
-package analytics;
+/*package analytics;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,10 +28,10 @@ public class AAMTopology {
 			.getLogger(AAMTopology.class);
 	public static void main(String[] args){
 		LOGGER.info("Starting aam traits topology");
-		/*System.clearProperty(MongoNameConstants.IS_PROD);
+		System.clearProperty(MongoNameConstants.IS_PROD);
 		if (args.length > 0) {
 			System.setProperty(MongoNameConstants.IS_PROD, "true");
-		}*/
+		}
 		String topic = TopicConstants.AAM_CDF_TRAITS; 
 		//int port = TopicConstants.PORT;
 		TopologyBuilder builder = new TopologyBuilder();
@@ -81,3 +81,4 @@ public class AAMTopology {
 		}
 			}
 }
+*/

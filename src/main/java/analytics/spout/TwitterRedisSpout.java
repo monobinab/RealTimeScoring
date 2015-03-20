@@ -1,4 +1,4 @@
-package analytics.spout;
+/*package analytics.spout;
 
 import static backtype.storm.utils.Utils.tuple;
 
@@ -18,11 +18,11 @@ public class TwitterRedisSpout extends RedisPubSubSpout {
 			.getLogger(TwitterRedisSpout.class);
 	private static final long serialVersionUID = 1L;
 
-	/*
+	
 	 * Read the redis lines for SYW events (non-Javadoc)
 	 * 
 	 * @see analytics.spout.RedisPubSubSpout#emit(java.lang.String)
-	 */
+	 
 	@Override
 	protected void emit(String ret) {
 		try {
@@ -40,3 +40,4 @@ public class TwitterRedisSpout extends RedisPubSubSpout {
 	}
 
 }
+*/

@@ -55,12 +55,13 @@ public static void intialize() throws Exception{
 		tagVariableColl = ParsingBoltOccassionFakeMonogColl.getTagVariableColl();
 		tagMetadataColl = ParsingBoltOccassionFakeMonogColl.getTagMetadataColl();
 		modelPercColl = ParsingBoltOccassionFakeMonogColl.getModelPercColl();
-		
+		 System.setProperty("rtseprod", "test");
+		 String env = System.getProperty("rtseprod");
 		memberMDTagsDao = new MemberMDTagsDao();
 		tagVariableDao = new TagVariableDao();
 		modelPercDao = new ModelPercentileDao();
 			
-		parsingBoltOccassion = new ParsingBoltOccassion();
+		parsingBoltOccassion = new ParsingBoltOccassion(env);
 		parsingBoltOccassion.setMemberTagsDao();
 		parsingBoltOccassion.setTagMetadataDao();
 		parsingBoltOccassion.setTagVariableDao();

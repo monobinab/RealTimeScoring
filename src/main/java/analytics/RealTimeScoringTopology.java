@@ -1,4 +1,4 @@
-package analytics;
+/*package analytics;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +29,9 @@ public class RealTimeScoringTopology {
 
 	public static void main(String[] args) throws ConfigurationException {
 		//System.clearProperty(MongoNameConstants.IS_PROD);
-		/*if (args.length > 0) {
+		if (args.length > 0) {
 			System.setProperty(MongoNameConstants.IS_PROD, "true");
-		}*/
+		}
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 
 		MQConnectionConfig mqConnection = new MQConnectionConfig();
@@ -90,3 +90,4 @@ public class RealTimeScoringTopology {
 		}
 	}
 }
+*/

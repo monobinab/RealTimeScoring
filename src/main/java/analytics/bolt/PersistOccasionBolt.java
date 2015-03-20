@@ -25,11 +25,18 @@ public class PersistOccasionBolt extends BaseRichBolt{
 			.getLogger(PersistOccasionBolt.class);
 	private MemberMDTagsDao memberMDTagsDao;
 	private MultiCountMetric countMetric;
+	String environment;
+	
+	 public PersistOccasionBolt(String systemProperty){
+		 super();
+		 environment = systemProperty;
+	 }
 
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
-		HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
+	//	HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
+		System.setProperty(MongoNameConstants.IS_PROD, environment);
 		memberMDTagsDao = new MemberMDTagsDao();
 		initMetrics(context);
 	}

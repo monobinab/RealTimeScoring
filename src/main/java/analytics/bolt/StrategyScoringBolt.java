@@ -43,6 +43,13 @@ public class StrategyScoringBolt extends BaseRichBolt {
 	private static final long serialVersionUID = 1L;
 	private OutputCollector outputCollector;
 	private MultiCountMetric countMetric;
+	String environment;
+	
+	 public StrategyScoringBolt(String systemProperty){
+		 super();
+		 environment = systemProperty;
+	 }
+
 
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
@@ -50,7 +57,8 @@ public class StrategyScoringBolt extends BaseRichBolt {
 		LOGGER.info("PREPARING STRATEGY SCORING BOLT");	
 	     initMetrics(context);
 	     //TODO: ALL BOLTS SHOULD HAVE THIS LINE - ADD TO SUPER CLASS
-	    HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
+	   // HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
+	     System.setProperty(MongoNameConstants.IS_PROD, environment);
 		this.outputCollector = collector;
 	}
 	 void initMetrics(TopologyContext context){

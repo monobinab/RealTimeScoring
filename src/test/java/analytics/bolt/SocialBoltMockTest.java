@@ -1,4 +1,4 @@
-package analytics.bolt;
+/*package analytics.bolt;
 
 import java.util.HashMap;
 import java.util.List;
@@ -26,17 +26,17 @@ import com.mongodb.DBCollection;
 
 public class SocialBoltMockTest {
 
-	/*static Map<String,String> conf;
-	static DB conn;*/
+	static Map<String,String> conf;
+	static DB conn;
 	@BeforeClass
 	public static void initializeFakeMongo() throws ConfigurationException{
-		/*System.setProperty("rtseprod", "test");
+		System.setProperty("rtseprod", "test");
 		conf = new HashMap<String, String>();
         conf.put("rtseprod", "test");
         conf.put("nimbus.host", "test");
 		//Below line ensures an empty DB rather than reusing a DB with values in it
 		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));	
-		conn = DBConnection.getDBConnection();*/
+		conn = DBConnection.getDBConnection();
 		
 		SystemPropertyUtility.setSystemProperty();
 		
@@ -58,7 +58,7 @@ public class SocialBoltMockTest {
         Tuple tuple = StormTestUtils.mockTuple(input, source);
         
         //Pass the collections that need to be looked up by the bolt
-        /* Use reflection to set if we can not get handle to DB after some refactoring again
+         Use reflection to set if we can not get handle to DB after some refactoring again
          * FacebookLoyaltyIdDao dao = new FacebookLoyaltyIdDao();
   	    Field fbLoyalty = FacebookLoyaltyIdDao.class.getDeclaredField("fbLoyaltyCollection");
   	    fbLoyalty.setAccessible(true);
@@ -69,7 +69,7 @@ public class SocialBoltMockTest {
         Field fbCollection = SocialBolt.class.getDeclaredField("facebookLoyaltyIdDao");
         fbCollection.setAccessible(true);
         fbCollection.set(boltUnderTest, dao);
-        */
+        
 		DBCollection fbLoyaltyCollection = SystemPropertyUtility.getDb().getCollection("fbLoyaltyIds");
         fbLoyaltyCollection.insert(new BasicDBObject(MongoNameConstants.L_ID, expectedLid).append(MongoNameConstants.SOCIAL_ID,"1123404212"));
         
@@ -87,11 +87,12 @@ public class SocialBoltMockTest {
 	}
 	@AfterClass
 	public static void cleanUp(){
-		/*if(conn.toString().equalsIgnoreCase("FongoDB.test"))
+		if(conn.toString().equalsIgnoreCase("FongoDB.test"))
 			   conn.dropDatabase();
 			  else
-			   Assert.fail("Something went wrong. Tests connected to " + conn.toString());*/
+			   Assert.fail("Something went wrong. Tests connected to " + conn.toString());
 		SystemPropertyUtility.dropDatabase();
 	}
 	
 }
+*/
