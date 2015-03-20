@@ -23,13 +23,13 @@ public class PurchaseOccassionTopology{
 		LOGGER.info("starting purchase occassion topology");
 		//System.clearProperty(MongoNameConstants.IS_PROD);
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
-		//String topic = TopicConstants.OCCASSION;
+		String topic = TopicConstants.OCCASSION;
 		topologyBuilder.setSpout("occassionSpout1", new OccassionRedisSpout(
-				0, "Member_Sample_Tags"), 1);
+				0, topic), 1);
 		topologyBuilder.setSpout("occassionSpout2", new OccassionRedisSpout(
-				1, "Member_Sample_Tags"), 1);
+				1, topic), 1);
 		topologyBuilder.setSpout("occassionSpout3", new OccassionRedisSpout(
-				2, "Member_Sample_Tags"), 1);
+				2, topic), 1);
 
 		topologyBuilder.setBolt("parseOccassionBolt", new ParsingBoltOccassion(), 1)
 		.shuffleGrouping("occassionSpout1").shuffleGrouping("occassionSpout2").shuffleGrouping("occassionSpout3");
