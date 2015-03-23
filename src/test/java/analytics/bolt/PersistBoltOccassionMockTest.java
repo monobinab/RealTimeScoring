@@ -33,19 +33,13 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
 public class PersistBoltOccassionMockTest {
-	/*static Map<String,String> stormConf;
-	static DB db;*/
+	
 	DBCollection memberMDTagsColl;
 	MemberMDTagsDao memberMDTagsDao;
 
 	@Before
 	public void initialize() throws ConfigurationException {
-		/*System.setProperty("rtseprod", "test");
-		stormConf = new HashMap<String, String>();
-		conf.put("rtseprod", "test");
-		stormConf.put("nimbus.host", "test");
-		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));
-		db = DBConnection.getDBConnection();*/
+		
 		SystemPropertyUtility.setSystemProperty();
 
 		// fake memberMDTags collection

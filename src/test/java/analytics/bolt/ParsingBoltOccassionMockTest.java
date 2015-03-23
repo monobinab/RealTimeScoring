@@ -25,23 +25,16 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 
 public class ParsingBoltOccassionMockTest extends SystemPropertyUtility{
-	
-	//static Map<String,String> conf;
-	//static DB db;
+
 	static ParsingBoltOccassion parsingBoltOccassion;
 	static DBCollection tagsMetadaColl;
 	static DBCollection tagsVarColl;
 	static DBCollection modelPercColl;
 	static Map<String, String> stormConf;
+	
 	@BeforeClass
 	public static void intializeFakeMongo() throws ConfigurationException{
-		//System.setProperty("rtseprod", "test");
 		
-		/*FakeMongo.setDBConn(new Fongo("test db").getDB("test"));	
-		db = DBConnection.getDBConnection();*/
-		/*stormConf = new HashMap<String, String>();
-		stormConf.put("nimbus.host", "test");*/
-		//get the fakMongo collections from ParsingBotlOccassionDaoTest
 		SystemPropertyUtility.setSystemProperty();
 		ParsingBoltOccassionFakeMonogColl.fakeMongoColl();
 		tagsMetadaColl = ParsingBoltOccassionFakeMonogColl.getTagMetadataColl();
@@ -58,8 +51,8 @@ public class ParsingBoltOccassionMockTest extends SystemPropertyUtility{
 		TopologyContext context = new MockTopologyContext();
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
 		
-		boltUnderTest.prepare(stormConf, context, outputCollector);
-		System.out.println(tuple.getStringByField("message"));
+		boltUnderTest.prepare(SystemPropertyUtility.getStormConf(), context, outputCollector);
+		//System.out.println(tuple.getStringByField("message"));
 		boltUnderTest.execute(tuple);
 		List<Object> outputTuple = outputCollector.getTuple().get("main");
 		 
@@ -72,10 +65,6 @@ public class ParsingBoltOccassionMockTest extends SystemPropertyUtility{
 	
 	@AfterClass
 	public static void tearDown(){
-		/*if(ParsingBoltOccassionFakeMonogColl.db.toString().equalsIgnoreCase("FongoDB.test"))
-			ParsingBoltOccassionFakeMonogColl.db.dropDatabase();
-		  else
-		   Assert.fail("Something went wrong. Tests connected to " + ParsingBoltOccassionFakeMonogColl.db.toString());*/
 		SystemPropertyUtility.dropDatabase();
 	}
 }

@@ -55,13 +55,11 @@ public static void intialize() throws Exception{
 		tagVariableColl = ParsingBoltOccassionFakeMonogColl.getTagVariableColl();
 		tagMetadataColl = ParsingBoltOccassionFakeMonogColl.getTagMetadataColl();
 		modelPercColl = ParsingBoltOccassionFakeMonogColl.getModelPercColl();
-		 System.setProperty("rtseprod", "test");
-		 String env = System.getProperty("rtseprod");
 		memberMDTagsDao = new MemberMDTagsDao();
 		tagVariableDao = new TagVariableDao();
 		modelPercDao = new ModelPercentileDao();
 			
-		parsingBoltOccassion = new ParsingBoltOccassion(env);
+		parsingBoltOccassion = new ParsingBoltOccassion(System.getProperty("rtseprod"));
 		parsingBoltOccassion.setMemberTagsDao();
 		parsingBoltOccassion.setTagMetadataDao();
 		parsingBoltOccassion.setTagVariableDao();
@@ -261,11 +259,6 @@ public void getParsedJsonTest2(){
 
 @AfterClass
 public static void tearDown(){
-	/*if(ParsingBoltOccassionFakeMonogColl.db.toString().equalsIgnoreCase("FongoDB.test"))
-		ParsingBoltOccassionFakeMonogColl.db.dropDatabase();
-	  else
-	   Assert.fail("Something went wrong. Tests connected to " + ParsingBoltOccassionFakeMonogColl.db.toString());
-	}*/
 	SystemPropertyUtility.dropDatabase();
 }
 }

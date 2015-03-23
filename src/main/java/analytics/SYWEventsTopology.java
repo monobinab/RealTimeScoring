@@ -8,7 +8,6 @@ import analytics.bolt.ParsingBoltSYW;
 import analytics.bolt.PersistBoostsBolt;
 import analytics.bolt.ProcessSYWInteractions;
 import analytics.bolt.StrategyScoringBolt;
-import analytics.spout.SYWRedisSpout;
 import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
 import analytics.util.RedisConnection;
@@ -29,17 +28,14 @@ public class SYWEventsTopology {
 
 	public static void main(String[] args) throws Exception {
 		LOGGER.info("starting syw events topology");
-		System.clearProperty(MongoNameConstants.IS_PROD);
-		if (args.length > 0) {
-			System.setProperty(MongoNameConstants.IS_PROD, "true");
-		}
+		
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 		String[] servers = RedisConnection.getServers();
 		String topic = TopicConstants.SYW;
 
- * server1=rtsapp401p.prod.ch4.s.com
+ *//** server1=rtsapp401p.prod.ch4.s.com
 server2=rtsapp402p.prod.ch4.s.com
-server3=rtsapp403p.prod.ch4.s.com
+server3=rtsapp403p.prod.ch4.s.com*//*
  
 		topologyBuilder.setSpout("sywEventsSpout1", new SYWRedisSpout(
 				0, "SYW_Interactions"), 1);

@@ -15,14 +15,12 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 
 public class ParsingBoltOccassionFakeMonogColl {
-	//static DB db;
+	
 	static DBCollection memberMDTagsColl;
 	static DBCollection tagMetadataColl;
 	static DBCollection tagVariableColl;
 	static DBCollection modelPercColl;
-	/*public ParsingBoltOccassionFakeMonogColl() throws ConfigurationException{
-		super();
-	}*/
+
 	public static DBCollection getModelPercColl() {
 		return modelPercColl;
 	}
@@ -57,12 +55,6 @@ public class ParsingBoltOccassionFakeMonogColl {
 	}
 
 	public static void fakeMongoColl() throws ConfigurationException{
-		
-		/*FakeMongo.setDBConn(new Fongo("test db").getDB("test"));	
-		db = DBConnection.getDBConnection();*/
-		
-		//fake memberMDTags collection
-		//new ParsingBoltOccassionFakeMonogColl();
 		SystemPropertyUtility.setSystemProperty();
 		memberMDTagsColl = SystemPropertyUtility.getDb().getCollection("memberMdTags");
 		BasicDBList list = new BasicDBList();

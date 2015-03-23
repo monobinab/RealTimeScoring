@@ -35,7 +35,6 @@ public class PurchaseOccassionTopology{
 			else if(argument.equalsIgnoreCase("LOCAL")){
 				System.setProperty(MongoNameConstants.IS_PROD, "LOCAL");
 			}
-			
 		}
 	}
 	else{

@@ -60,7 +60,7 @@ public class AAM_ATCTopology {
 		for (String server : servers) {
 			topologyBuilder.setSpout(topic + server, new AAMRedisPubSubSpout(
 					server, TopicConstants.PORT, topic), 1);
-		}*
+		}
 
 		BoltDeclarer boltDeclarer = topologyBuilder.setBolt(
 				"ParsingBoltAAM_ATC", new ParsingBoltAAM_ATC(topic), 1);
@@ -68,7 +68,7 @@ public class AAM_ATCTopology {
 				.shuffleGrouping("ParsingBoltAAM_ATC");
 		int counter = 0;
 		
-		/*for (String server : servers) {
+		for (String server : servers) {
 			topologyBuilder.setSpout(topic + ++counter, new AAMRedisPubSubSpout(
 					server, TopicConstants.PORT, topic), 1);
 			boltDeclarer.shuffleGrouping(topic + counter);

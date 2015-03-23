@@ -32,9 +32,6 @@ public class PersistBoltOccassionTest {
 
 	@Before
 	public void initialize() throws ConfigurationException {
-		/*System.setProperty("rtseprod", "test");
-		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));
-		db = DBConnection.getDBConnection();*/
 		
 		SystemPropertyUtility.setSystemProperty();
 
@@ -131,11 +128,6 @@ public class PersistBoltOccassionTest {
 
 	@AfterClass
 	public static void teardown() {
-		/*if(db.toString().equalsIgnoreCase("FongoDB.test"))
-			   db.dropDatabase();
-			  else
-			   Assert.fail("Something went wrong. Tests connected to " + db.toString());*/
 		SystemPropertyUtility.dropDatabase();
 	}
-
 }
