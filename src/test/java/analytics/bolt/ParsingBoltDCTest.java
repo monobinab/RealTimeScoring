@@ -55,7 +55,7 @@ public class ParsingBoltDCTest {
 		db = DBConnection.getDBConnection();*/
 		SystemPropertyUtility.setSystemProperty();
 		
-        bolt = new ParsingBoltDC();
+        bolt = new ParsingBoltDC(System.getProperty(MongoNameConstants.IS_PROD));
 		bolt.setToTestMode();
 		factory = SAXParserFactory.newInstance();
 		saxParser = factory.newSAXParser();

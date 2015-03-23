@@ -33,6 +33,12 @@ public class ParsingBoltSYW extends BaseRichBolt {
 	private List<String> listOfInteractionsForRTS;
 	SywApiCalls sywApiCalls;
 	private MultiCountMetric countMetric;
+	private String environment;
+	
+	 public ParsingBoltSYW(String systemProperty){
+		 super();
+		 environment = systemProperty;
+	 }
 	 void initMetrics(TopologyContext context){
 	     countMetric = new MultiCountMetric();
 	     context.registerMetric("custom_metrics", countMetric, 60);
@@ -40,7 +46,7 @@ public class ParsingBoltSYW extends BaseRichBolt {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
-      //  System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+		System.setProperty(MongoNameConstants.IS_PROD, environment);
 		   HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
 		sywApiCalls = new SywApiCalls();
 		this.outputCollector = collector;

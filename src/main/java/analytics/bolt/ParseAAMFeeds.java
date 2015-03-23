@@ -42,6 +42,8 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 	protected MemberUUIDDao memberDao;
 	protected ModelVariablesDao modelVariablesDao;
 	protected MultiCountMetric countMetric;
+	protected String environment;
+	
     public ParseAAMFeeds() {
 	}
 	 void initMetrics(TopologyContext context){
@@ -50,8 +52,9 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 	    }
 
 	// Overloaded Paramterized constructor to get the topic to which the spout is listening to
-	public ParseAAMFeeds(String topic) {
+	public ParseAAMFeeds( String systemProperty, String topic) {
 		this.topic = topic;
+		environment = systemProperty;
 	}
 	
     public void setOutputCollector(OutputCollector outputCollector) {
@@ -61,7 +64,8 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         this.outputCollector = collector;
-         HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
+        System.setProperty(MongoNameConstants.IS_PROD, environment);
+      //   HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
 	    initMetrics(context);
         
 	/*

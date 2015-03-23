@@ -1,4 +1,4 @@
-/*package analytics;
+package analytics;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,9 +11,12 @@ import analytics.bolt.PersistTraitsBolt;
 import analytics.bolt.ScorePublishBolt;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.spout.AAMRedisPubSubSpout;
+import analytics.spout.WebHDFSSpout;
+import analytics.util.Constants;
 import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
 import analytics.util.RedisConnection;
+import analytics.util.SystemUtility;
 import analytics.util.TopicConstants;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
@@ -28,24 +31,31 @@ public class AAMTopology {
 			.getLogger(AAMTopology.class);
 	public static void main(String[] args){
 		LOGGER.info("Starting aam traits topology");
-		System.clearProperty(MongoNameConstants.IS_PROD);
-		if (args.length > 0) {
-			System.setProperty(MongoNameConstants.IS_PROD, "true");
-		}
+		if (!SystemUtility.setEnvironment(args)) {
+			System.out
+					.println("Please pass the environment variable argument- 'PROD' or 'QA' or 'LOCAL'");
+			System.exit(0);
+		} else {
 		String topic = TopicConstants.AAM_CDF_TRAITS; 
-		//int port = TopicConstants.PORT;
+		int port = TopicConstants.PORT;
 		TopologyBuilder builder = new TopologyBuilder();
 
-	   	//String[] servers = RedisConnection.getServers();
-	    builder.setSpout("AAM_CDF_Traits1", new AAMRedisPubSubSpout(0, topic), 1);
-	    builder.setSpout("AAM_CDF_Traits2", new AAMRedisPubSubSpout(1, topic), 1);
-	    builder.setSpout("AAM_CDF_Traits3", new AAMRedisPubSubSpout(2, topic), 1);
+	   	String[] servers = RedisConnection.getServers("PROD");
+	   	//Sree. Commented to disable the spouts since we have the webhdfs. 
+	    /*builder.setSpout("AAM_CDF_Traits1", new AAMRedisPubSubSpout(servers[0], port, topic), 1);
+	    builder.setSpout("AAM_CDF_Traits2", new AAMRedisPubSubSpout(servers[1], port, topic), 1);
+	    builder.setSpout("AAM_CDF_Traits3", new AAMRedisPubSubSpout(servers[2], port, topic), 1);*/
+	   	
+	   	//Sree. Spout that wakes up every 5 mins and process the Traits
+	  	builder.setSpout("traitsSpout", new WebHDFSSpout(servers[1], TopicConstants.PORT, Constants.AAM_TRAITS_PATH, "aamTraits"), 1);
+	  	builder.setBolt("parsingBoltWebTraits", new ParsingBoltWebTraits(System.getProperty(MongoNameConstants.IS_PROD), "aamTraits"), 1)
+	  		.shuffleGrouping("traitsSpout");
 
-	    builder.setBolt("parsingBoltWebTraits", new ParsingBoltWebTraits(), 1)
-	    .shuffleGrouping("AAM_CDF_Traits1").shuffleGrouping("AAM_CDF_Traits2").shuffleGrouping("AAM_CDF_Traits3");
-	    builder.setBolt("strategyScoringBolt", new StrategyScoringBolt(),1).shuffleGrouping("parsingBoltWebTraits");
+	    //builder.setBolt("parsingBoltWebTraits", new ParsingBoltWebTraits(), 1)
+	    //.shuffleGrouping("AAM_CDF_Traits1").shuffleGrouping("AAM_CDF_Traits2").shuffleGrouping("AAM_CDF_Traits3");
+	    /*builder.setBolt("strategyScoringBolt", new StrategyScoringBolt(),1).shuffleGrouping("parsingBoltWebTraits");
 	    builder.setBolt("persistTraits" , new PersistTraitsBolt(), 1).shuffleGrouping("parsingBoltWebTraits");
-	    builder.setBolt("flumeLoggingBolt", new FlumeRPCBolt(), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
+	    builder.setBolt("flumeLoggingBolt", new FlumeRPCBolt(), 1).shuffleGrouping("strategyScoringBolt", "score_stream");*/
 		
 	    //builder.setBolt("scorePublishBolt", new ScorePublishBolt(servers[0], port,"score"), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
 	    //builder.setBolt("memberPublishBolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 2).shuffleGrouping("strategyScoringBolt", "member_stream");
@@ -55,7 +65,7 @@ public class AAMTopology {
 	    conf.registerMetricsConsumer(MetricsListener.class, 3);
 		conf.setDebug(false);
 		conf.setNumWorkers(3);
-	//	conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
+		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
 		if (args.length > 0) {
 			try {
 				StormSubmitter.submitTopology(args[0], conf,
@@ -79,6 +89,7 @@ public class AAMTopology {
 			cluster.shutdown();
 
 		}
-			}
+	
+		}
+		}
 }
-*/

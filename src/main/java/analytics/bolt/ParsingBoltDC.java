@@ -58,7 +58,12 @@ public class ParsingBoltDC extends BaseRichBolt {
 	private static final boolean isTestL_ID = false;
 	private static final boolean isDemoXML = false;
 	private static boolean isTest = false;
-
+	private String environment;
+	
+	 public ParsingBoltDC(String systemProperty){
+		 super();
+		 environment = systemProperty;
+	 }
 
 	@Override
 	public void execute(Tuple input) {
@@ -78,7 +83,6 @@ public class ParsingBoltDC extends BaseRichBolt {
 
 		}
 		outputCollector.ack(input);
-
 	}
 
 	void initMetrics(TopologyContext context) {
@@ -89,7 +93,7 @@ public class ParsingBoltDC extends BaseRichBolt {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
 		this.outputCollector = collector;
-	//	System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+		System.setProperty(MongoNameConstants.IS_PROD, environment);
 		   HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
 		memberDCDao = new MemberDCDao();
 		dc = new DCDao();

@@ -11,6 +11,7 @@ import org.apache.commons.lang.StringUtils;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 
+import analytics.util.MongoNameConstants;
 import analytics.util.PidMatchUtils;
 import analytics.util.dao.BoostDao;
 import analytics.util.dao.DivLnBoostDao;
@@ -34,9 +35,12 @@ public class ParsingBoltAAM_ATC extends ParseAAMFeeds {
 	private Map<String,Variable>boostMap;
 	private PidMatchUtils pidMatchUtil;
 	private List<String> boostList;
+	private String environment;
 
-	public ParsingBoltAAM_ATC(String topic) {
-		super(topic);
+	public ParsingBoltAAM_ATC (String systemProperty, String topic) {
+		super(systemProperty, topic);
+		environment = systemProperty;
+		
 	}
 	/*
 	 * (non-Javadoc)
@@ -47,6 +51,7 @@ public class ParsingBoltAAM_ATC extends ParseAAMFeeds {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
+		System.setProperty(MongoNameConstants.IS_PROD, environment);
 		super.prepare(stormConf, context, collector);
 		pidMatchUtil = new PidMatchUtils();
 		// topic is chosen to populate divLnBoostVariblesMap with source
@@ -73,31 +78,6 @@ public class ParsingBoltAAM_ATC extends ParseAAMFeeds {
 		}
 	}
 	
-
-	/*
-	 * private Map<String,String> processPidList() { Map<String,String>
-	 * variableValueMap = new HashMap<String,String>();
-	 * 
-	 * for(String pid: l_idToPidCollectionMap.get(current_l_id)) { //query
-	 * MongoDB for division and line associated with the pid DBObject
-	 * pidDivLnQueryResult = pidDivLnCollection.findOne(new
-	 * BasicDBObject().append("pid", pid)); if(pidDivLnQueryResult != null) {
-	 * //get division and division/line concatenation from query results String
-	 * div = pidDivLnQueryResult.get("d").toString(); String divLn =
-	 * pidDivLnQueryResult.get("l").toString(); Collection<String> var = new
-	 * ArrayList<String>(); if(divLnVariablesMap.containsKey(div)) { var =
-	 * divLnVariablesMap.get(div); for(String v:var) {
-	 * if(variableValueMap.containsKey(var)) { int value = 1 +
-	 * Integer.valueOf(variableValueMap.get(v)); variableValueMap.remove(v);
-	 * variableValueMap.put(v, String.valueOf(value)); } else {
-	 * variableValueMap.put(v, "1"); } } }
-	 * if(divLnVariablesMap.containsKey(divLn)) { var =
-	 * divLnVariablesMap.get(divLn); for(String v:var) {
-	 * if(variableValueMap.containsKey(var)) { int value = 1 +
-	 * Integer.valueOf(variableValueMap.get(v)); variableValueMap.remove(v);
-	 * variableValueMap.put(v, String.valueOf(value)); } else {
-	 * variableValueMap.put(v, "1"); } } } } } return variableValueMap; }
-	 */
 
 	
 	@Override

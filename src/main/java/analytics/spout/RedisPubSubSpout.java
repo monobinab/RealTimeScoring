@@ -1,8 +1,6 @@
 package analytics.spout;
 
 
-import analytics.util.HostPortUtility;
-import analytics.util.MongoNameConstants;
 import analytics.util.RedisConnection;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;

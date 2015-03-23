@@ -1,29 +1,24 @@
-/*package analytics;
+package analytics;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.bolt.FlumeRPCBolt;
-import analytics.bolt.LoggingBolt;
-import analytics.bolt.MemberPublishBolt;
 import analytics.bolt.ParsingBoltAAM_ATC;
-import analytics.bolt.ParsingBoltOccassion;
-import analytics.bolt.ScorePublishBolt;
 import analytics.bolt.StrategyScoringBolt;
-import analytics.spout.AAMRedisPubSubSpout;
-import analytics.spout.OccassionRedisSpout;
+import analytics.spout.WebHDFSSpout;
+import analytics.util.Constants;
 import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
 import analytics.util.RedisConnection;
+import analytics.util.SystemUtility;
 import analytics.util.TopicConstants;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
 import backtype.storm.generated.AlreadyAliveException;
 import backtype.storm.generated.InvalidTopologyException;
-import backtype.storm.topology.BoltDeclarer;
 import backtype.storm.topology.TopologyBuilder;
-import backtype.storm.tuple.Fields;
 
 public class AAM_BrowseTopology {
 	private static final Logger LOGGER = LoggerFactory
@@ -31,31 +26,38 @@ public class AAM_BrowseTopology {
 
 	public static void main(String[] args) throws Exception {
 		LOGGER.info("Starting web feed topology from browse source");
-		System.clearProperty(MongoNameConstants.IS_PROD);
-		if (args.length > 0) {
-			System.setProperty(MongoNameConstants.IS_PROD, "true");
-		}
+		if (!SystemUtility.setEnvironment(args)) {
+			System.out
+					.println("Please pass the environment variable argument- 'PROD' or 'QA' or 'LOCAL'");
+			System.exit(0);
+		} else {
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 
 		String topic = TopicConstants.AAM_BROWSE_PRODUCTS;
-		//int port = TopicConstants.PORT;
+		
 
 		//RedisConnection redisConnection = new RedisConnection();
-		//String[] servers = RedisConnection.getServers();
-		//int counter = 0;
-		topologyBuilder.setSpout(topic + 0, new OccassionRedisSpout(
-				0, topic), 1);
-		topologyBuilder.setSpout(topic + 1, new OccassionRedisSpout(
-				1, topic), 1);
-		topologyBuilder.setSpout(topic + 2, new OccassionRedisSpout(
-				2, topic), 1);
+		String[] servers = RedisConnection.getServers("PROD");
+		int counter = 0;
+		/*BoltDeclarer boltDeclarer = topologyBuilder.setBolt(
+				"parsingBoltBrowse", new ParsingBoltAAM_ATC(topic), 3);
+		for (String server : servers) {
+			topologyBuilder.setSpout(topic + ++counter, new AAMRedisPubSubSpout(
+					server, port, topic), 1);
+			boltDeclarer.shuffleGrouping(topic + counter);
+		}*/
 		
-		topologyBuilder.setBolt("parsingBoltBrowse", new ParsingBoltOccassion(), 1)
-		.shuffleGrouping(topic + 0).shuffleGrouping(topic +1 ).shuffleGrouping(topic + 2);
-				
-		topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(), 3)
+		//Sree. Spout that wakes up every 5 mins and process the Traits
+		topologyBuilder.setSpout("browseSpout", new WebHDFSSpout(servers[1], TopicConstants.PORT, Constants.AAM_BROWSER_PATH, "aamBrowser"), 1);
+		topologyBuilder.setBolt("parsingBoltBrowse", new ParsingBoltAAM_ATC(System
+				.getProperty(MongoNameConstants.IS_PROD), topic), 3)
+	  		.shuffleGrouping("browseSpout");
+
+		
+		topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System
+				.getProperty(MongoNameConstants.IS_PROD)), 3)
 				.localOrShuffleGrouping("parsingBoltBrowse");
-		topologyBuilder.setBolt("flumeLoggingBolt", new FlumeRPCBolt(), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
+	/*	topologyBuilder.setBolt("flumeLoggingBolt", new FlumeRPCBolt(), 1).shuffleGrouping("strategyScoringBolt", "score_stream");*/
 		
 //		 topologyBuilder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 3).localOrShuffleGrouping("strategyScoringBolt", "score_stream");
 	//        topologyBuilder.setBolt("memberPublishBolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 3).localOrShuffleGrouping("strategyScoringBolt", "member_stream");
@@ -63,7 +65,7 @@ public class AAM_BrowseTopology {
 		Config conf = new Config();
 		conf.put("metrics_topology", "Product_Browse");
 		conf.registerMetricsConsumer(MetricsListener.class, 3);
-//		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
+		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
 		if (args.length > 0) {
 			try {
 				StormSubmitter.submitTopology(args[0], conf,
@@ -89,5 +91,5 @@ public class AAM_BrowseTopology {
 		}
 
 	}
+	}
 }
-*/

@@ -30,7 +30,12 @@ public class PersistDCBolt extends BaseRichBolt{
     private MemberDCDao memberDCDao;
 	private MultiCountMetric countMetric;
 	private OutputCollector outputCollector;
-
+	private String environment;
+	
+	 public PersistDCBolt(String systemProperty){
+		 super();
+		 environment = systemProperty;
+	 }
 	@Override
 	public void execute(Tuple input) {
 		LOGGER.debug("Persisting DC in mongo");
