@@ -53,6 +53,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
+		super.prepare(stormConf, context, collector);
 		LOGGER.info("PREPARING STRATEGY SCORING BOLT");	
 	     initMetrics(context);
 	  	this.outputCollector = collector;

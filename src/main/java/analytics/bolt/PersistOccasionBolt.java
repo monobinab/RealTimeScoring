@@ -33,7 +33,7 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
-	
+		super.prepare(stormConf, context, collector);
 		memberMDTagsDao = new MemberMDTagsDao();
 		initMetrics(context);
 	}

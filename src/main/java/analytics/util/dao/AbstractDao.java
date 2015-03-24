@@ -19,7 +19,7 @@ public abstract class AbstractDao {
 
 	public AbstractDao(String server) {
 		try {
-			LOGGER.info("~~~~~~~~~~~~~~~BASTRACT DAO~~~~~~~: " + System.getProperty(MongoNameConstants.IS_PROD));
+			LOGGER.info("~~~~~~~~~~~~~~~ABSTRACT DAO~~~~~~~: " + System.getProperty(MongoNameConstants.IS_PROD));
 			db = DBConnection.getDBConnection(server);
 		} catch (Exception e) {
 			LOGGER.error("Unable to get DB connection", e);
