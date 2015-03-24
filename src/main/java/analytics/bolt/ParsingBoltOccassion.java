@@ -131,20 +131,22 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 		 * Sree. Get the Difference in Tags (Input vs Existing)
 		 */
 		ArrayList<String> diffTags = findDiffTags(l_id, tags);
+		String diffTagsString = "";
 		if(diffTags!= null && diffTags.size()>0){
-			String diffTagsString = getStringFromArray(diffTags); 
-			
-			//Add Date as part of value so incase the Tags are not score for the member
-			//atleast we know we have to cleanup from Redis...			
-			Date dNow = new Date( );
-			SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd_HH:mm:ss");
-			diffTagsString = diffTagsString +","+ft.format(dNow);
-			System.out.println(l_id +" ----" +diffTagsString);
-			
-			Jedis jedis = jedisPool.getResource();
-			jedis.set(l_id, diffTagsString);
-			jedisPool.returnResource(jedis);
+			diffTagsString = getStringFromArray(diffTags); 
 		}
+		//Set the id will null value on Redis so Response Bolt would not fail with
+		//null pointer exception while reading redis key for this l_id
+		//Add Date as part of key so incase the Tags are not scored for the member
+		//atleast we know we have to cleanup from Redis...			
+		Date dNow = new Date( );
+		SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd");
+		String lId_Date = l_id +"~~~"+ft.format(dNow);
+		System.out.println(lId_Date +" ---- " +diffTagsString);
+		Jedis jedis = jedisPool.getResource();
+		jedis.set("Responses:"+lId_Date, diffTagsString);
+		jedisPool.returnResource(jedis);
+		
 		//Changes for adding the difference tags ends here.
 		
 		//reset the variableValueMap to 0 before persisting new incoming tags
@@ -259,7 +261,7 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 	public void resetVariableValuesMap(
 			Map<String, String> variableValueTagsMap, String l_id) {
 		//Reset all variables to 0
-				List<String> memberTags = memberTagDao.getMemberMDTags(l_id);
+				List<String> memberTags = memberTagDao.getMemberMDTagsForVariables(l_id);
 				if(memberTags != null){
 				List<String> tagVarList= tagVariableDao.getTagVariablesList(memberTags);
 				if(!tagVarList.isEmpty()){

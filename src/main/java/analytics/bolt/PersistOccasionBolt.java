@@ -51,10 +51,12 @@ public class PersistOccasionBolt extends BaseRichBolt{
 				String[] tagsArray = tag.split(",");
 				tags = Arrays.asList(tagsArray);
 				memberMDTagsDao.addMemberMDTags(l_id, tags);
+				LOGGER.info("PERSIST OCCATION UPDATE: " + l_id + "~"+tags);
 				countMetric.scope("persisted_occasionTags").incr();
 			}
 			else{
 				memberMDTagsDao.deleteMemberMDTags(l_id);
+				LOGGER.info("PERSIST OCCATION DELETE: " + l_id);
 			}
 		} catch (Exception e) {
 			LOGGER.error("Json Exception ", e);

@@ -107,6 +107,7 @@ public class WebHDFSSpout extends BaseRichSpout{
 				
 				for(int i=0;i<files.size();i++){
 					currentURL = Constants.FILE_READ_URL.replace("<PATH>", files.get(i)).replace("<HDFS_LOCATION>", hdfsPath+"/"+path);
+					System.out.println("File being Processed = " + currentURL);
 					readURLAndStoreData(currentURL);
 				}
 				

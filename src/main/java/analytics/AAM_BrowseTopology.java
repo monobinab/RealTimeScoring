@@ -51,9 +51,9 @@ public class AAM_BrowseTopology {
 	  		.shuffleGrouping("traitsSpout");
 
 		
-		/*topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(), 3)
+		topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(), 3)
 				.localOrShuffleGrouping("parsingBoltBrowse");
-		topologyBuilder.setBolt("flumeLoggingBolt", new FlumeRPCBolt(), 1).shuffleGrouping("strategyScoringBolt", "score_stream");*/
+		topologyBuilder.setBolt("flumeLoggingBolt", new FlumeRPCBolt(), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
 		
 //		 topologyBuilder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 3).localOrShuffleGrouping("strategyScoringBolt", "score_stream");
 	//        topologyBuilder.setBolt("memberPublishBolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 3).localOrShuffleGrouping("strategyScoringBolt", "member_stream");

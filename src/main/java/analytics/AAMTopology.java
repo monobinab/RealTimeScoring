@@ -46,14 +46,14 @@ public class AAMTopology {
 	   	
 	   	//Sree. Spout that wakes up every 5 mins and process the Traits
 	  	builder.setSpout("traitsSpout", new WebHDFSSpout(servers[1], TopicConstants.PORT, Constants.AAM_TRAITS_PATH, "aamTraits"), 1);
-	  	builder.setBolt("parsingBoltWebTraits", new ParsingBoltWebTraits(), 1)
+	  	builder.setBolt("parsingBoltWebTraits", new ParsingBoltWebTraits(), 3)
 	  		.shuffleGrouping("traitsSpout");
 
 	    //builder.setBolt("parsingBoltWebTraits", new ParsingBoltWebTraits(), 1)
 	    //.shuffleGrouping("AAM_CDF_Traits1").shuffleGrouping("AAM_CDF_Traits2").shuffleGrouping("AAM_CDF_Traits3");
-	    /*builder.setBolt("strategyScoringBolt", new StrategyScoringBolt(),1).shuffleGrouping("parsingBoltWebTraits");
-	    builder.setBolt("persistTraits" , new PersistTraitsBolt(), 1).shuffleGrouping("parsingBoltWebTraits");
-	    builder.setBolt("flumeLoggingBolt", new FlumeRPCBolt(), 1).shuffleGrouping("strategyScoringBolt", "score_stream");*/
+	    builder.setBolt("strategyScoringBolt", new StrategyScoringBolt(),3).shuffleGrouping("parsingBoltWebTraits");
+	    builder.setBolt("persistTraits" , new PersistTraitsBolt(), 3).shuffleGrouping("parsingBoltWebTraits");
+	    builder.setBolt("flumeLoggingBolt", new FlumeRPCBolt(), 3).shuffleGrouping("strategyScoringBolt", "score_stream");
 		
 	    //builder.setBolt("scorePublishBolt", new ScorePublishBolt(servers[0], port,"score"), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
 	    //builder.setBolt("memberPublishBolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 2).shuffleGrouping("strategyScoringBolt", "member_stream");

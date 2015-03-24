@@ -24,7 +24,7 @@ public class MemberMDTagsDao extends AbstractDao {
 		memberMDTagsCollection = db.getCollection("memberMdTags");
 	}
 
-	public List<String> getMemberMDTags(String l_id) {
+	public List<String> getMemberMDTagsForVariables(String l_id) {
 		DBObject dbObj = memberMDTagsCollection.findOne(new BasicDBObject(
 				MongoNameConstants.L_ID, l_id));
 		if(dbObj != null){
@@ -33,6 +33,24 @@ public class MemberMDTagsDao extends AbstractDao {
 			for(Object tag:dbListTags){
 				if(tag instanceof String){
 					mdTags.add(tag.toString().substring(0, 5));
+				}
+			}
+			//List<String> mdTags = (List<String>) dbObj.get("tags");
+			return mdTags;
+		}
+		else
+			return null;
+	}
+	
+	public List<String> getMemberMDTags(String l_id) {
+		DBObject dbObj = memberMDTagsCollection.findOne(new BasicDBObject(
+				MongoNameConstants.L_ID, l_id));
+		if(dbObj != null){
+			BasicDBList dbListTags = (BasicDBList) dbObj.get("tags");
+			List<String> mdTags = new ArrayList<String>();
+			for(Object tag:dbListTags){
+				if(tag instanceof String){
+					mdTags.add(tag.toString());
 				}
 			}
 			//List<String> mdTags = (List<String>) dbObj.get("tags");
