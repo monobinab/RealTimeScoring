@@ -48,7 +48,7 @@ public class AAM_BrowseTopology {
 		//Sree. Spout that wakes up every 5 mins and process the Traits
 		topologyBuilder.setSpout("browseSpout", new WebHDFSSpout(servers[1], TopicConstants.PORT, Constants.AAM_BROWSER_PATH, "aamBrowser"), 1);
 		topologyBuilder.setBolt("parsingBoltBrowse", new ParsingBoltAAM_ATC(topic), 3)
-	  		.shuffleGrouping("traitsSpout");
+	  		.shuffleGrouping("browseSpout");
 
 		
 		topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(), 3)
