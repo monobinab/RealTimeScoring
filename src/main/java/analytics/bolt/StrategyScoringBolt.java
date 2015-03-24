@@ -43,16 +43,18 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	private static final long serialVersionUID = 1L;
 	private OutputCollector outputCollector;
 	private MultiCountMetric countMetric;
-	
+	private String environment;
 	
 	 public StrategyScoringBolt(String systemProperty){
 		 super(systemProperty);
+		 environment = systemProperty;
  }
 
 
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
+		System.setProperty(MongoNameConstants.IS_PROD, environment);
 		super.prepare(stormConf, context, collector);
 		LOGGER.info("PREPARING STRATEGY SCORING BOLT");	
 	     initMetrics(context);
