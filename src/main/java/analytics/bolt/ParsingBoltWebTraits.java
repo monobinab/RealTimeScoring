@@ -44,12 +44,10 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
     
     public ParsingBoltWebTraits (String systemProperty, String topic) {
 		super(systemProperty, topic);
-		environment = systemProperty;
-		
+	
 	}
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
-		System.setProperty(MongoNameConstants.IS_PROD, environment);
 		super.prepare(stormConf, context, collector);
 		sourceTopic="WebTraits";
 

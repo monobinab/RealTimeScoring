@@ -1,14 +1,11 @@
 package analytics.bolt;
 
-import analytics.util.HostPortUtility;
-import analytics.util.MongoNameConstants;
 import analytics.util.SecurityUtils;
 import analytics.util.SywApiCalls;
 import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
@@ -26,19 +23,17 @@ import java.util.Map;
 
 import static backtype.storm.utils.Utils.tuple;
 
-public class ParsingBoltSYW extends BaseRichBolt {
+public class ParsingBoltSYW extends EnvironmentBolt {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ParsingBoltSYW.class);
 	private OutputCollector outputCollector;
 	private List<String> listOfInteractionsForRTS;
 	SywApiCalls sywApiCalls;
 	private MultiCountMetric countMetric;
-	private String environment;
 	
 	 public ParsingBoltSYW(String systemProperty){
-		 super();
-		 environment = systemProperty;
-	 }
+		 super(systemProperty);
+		 }
 	 void initMetrics(TopologyContext context){
 	     countMetric = new MultiCountMetric();
 	     context.registerMetric("custom_metrics", countMetric, 60);
@@ -46,8 +41,7 @@ public class ParsingBoltSYW extends BaseRichBolt {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
-		System.setProperty(MongoNameConstants.IS_PROD, environment);
-		   HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
+	//   HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
 		sywApiCalls = new SywApiCalls();
 		this.outputCollector = collector;
 		listOfInteractionsForRTS = new ArrayList<String>();

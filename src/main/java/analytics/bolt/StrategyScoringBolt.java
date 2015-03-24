@@ -33,7 +33,7 @@ import backtype.storm.tuple.Tuple;
  *         apply strategy on each model and rescore each model
  *
  */
-public class StrategyScoringBolt extends BaseRichBolt {
+public class StrategyScoringBolt extends EnvironmentBolt {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(StrategyScoringBolt.class);
 
@@ -43,12 +43,11 @@ public class StrategyScoringBolt extends BaseRichBolt {
 	private static final long serialVersionUID = 1L;
 	private OutputCollector outputCollector;
 	private MultiCountMetric countMetric;
-	String environment;
+	
 	
 	 public StrategyScoringBolt(String systemProperty){
-		 super();
-		 environment = systemProperty;
-	 }
+		 super(systemProperty);
+ }
 
 
 	@Override
@@ -56,10 +55,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 			OutputCollector collector) {
 		LOGGER.info("PREPARING STRATEGY SCORING BOLT");	
 	     initMetrics(context);
-	     //TODO: ALL BOLTS SHOULD HAVE THIS LINE - ADD TO SUPER CLASS
-	   // HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
-	     System.setProperty(MongoNameConstants.IS_PROD, environment);
-		this.outputCollector = collector;
+	  	this.outputCollector = collector;
 	}
 	 void initMetrics(TopologyContext context){
 	     countMetric = new MultiCountMetric();

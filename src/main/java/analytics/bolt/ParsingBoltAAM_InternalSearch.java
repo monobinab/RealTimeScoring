@@ -48,9 +48,7 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
          */
 	public ParsingBoltAAM_InternalSearch (String systemProperty, String topic) {
 		super(systemProperty, topic);
-		environment = systemProperty;
-		
-		
+	
 	}
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
@@ -62,7 +60,6 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
 	 * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
 	 */
 	//	HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
-		System.setProperty(MongoNameConstants.IS_PROD, environment);
 		divLnVariableDao = new DivLnVariableDao();
 		pidDivLnDao = new PidDivLnDao();
 		sourceTopic = "InternalSearch";

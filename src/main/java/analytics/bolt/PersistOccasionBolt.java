@@ -20,23 +20,20 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
 
-public class PersistOccasionBolt extends BaseRichBolt{
+public class PersistOccasionBolt extends EnvironmentBolt{
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(PersistOccasionBolt.class);
 	private MemberMDTagsDao memberMDTagsDao;
 	private MultiCountMetric countMetric;
-	String environment;
 	
 	 public PersistOccasionBolt(String systemProperty){
-		 super();
-		 environment = systemProperty;
+		 super(systemProperty);
 	 }
 
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
-	//	HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
-		System.setProperty(MongoNameConstants.IS_PROD, environment);
+	
 		memberMDTagsDao = new MemberMDTagsDao();
 		initMetrics(context);
 	}

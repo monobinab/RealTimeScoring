@@ -24,18 +24,16 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
 
-public class PersistDCBolt extends BaseRichBolt{
+public class PersistDCBolt extends EnvironmentBolt{
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(PersistTraitsBolt.class);
     private MemberDCDao memberDCDao;
 	private MultiCountMetric countMetric;
 	private OutputCollector outputCollector;
-	private String environment;
 	
 	 public PersistDCBolt(String systemProperty){
-		 super();
-		 environment = systemProperty;
-	 }
+		 super(systemProperty);
+		 }
 	@Override
 	public void execute(Tuple input) {
 		LOGGER.debug("Persisting DC in mongo");
@@ -55,8 +53,7 @@ public class PersistDCBolt extends BaseRichBolt{
 
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
-		// System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
-		   HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
+		//   HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
 			memberDCDao = new MemberDCDao();
 			this.outputCollector = collector;
 			initMetrics(context);

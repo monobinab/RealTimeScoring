@@ -32,7 +32,7 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
-public class ParsingBoltOccassion extends BaseRichBolt {
+public class ParsingBoltOccassion extends EnvironmentBolt {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ParsingBoltOccassion.class);
 	private OutputCollector outputCollector;
@@ -41,7 +41,7 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 	private MultiCountMetric countMetric;
 	private MemberMDTagsDao memberTagDao;
 	private ModelPercentileDao modelPercDao;
-	String environment;
+	
 	 void initMetrics(TopologyContext context){
 	     countMetric = new MultiCountMetric();
 	     context.registerMetric("custom_metrics", countMetric, 60);
@@ -62,15 +62,13 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 	 }
 
 	 public ParsingBoltOccassion(String systemProperty){
-		 super();
-		 environment = systemProperty;
+		 super(systemProperty);
+		
 	 }
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
 		this.outputCollector = collector;
-	//	HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
-		System.setProperty(MongoNameConstants.IS_PROD, environment);
 		tagMetadataDao = new TagMetadataDao();
 		tagVariableDao = new TagVariableDao();
 		memberTagDao = new MemberMDTagsDao();

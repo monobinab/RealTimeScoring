@@ -46,7 +46,7 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.mongodb.DB;
 
-public class ParsingBoltDC extends BaseRichBolt {
+public class ParsingBoltDC extends EnvironmentBolt {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ParsingBoltDC.class);
 	private static final long serialVersionUID = 1L;
 	private OutputCollector outputCollector;
@@ -58,12 +58,10 @@ public class ParsingBoltDC extends BaseRichBolt {
 	private static final boolean isTestL_ID = false;
 	private static final boolean isDemoXML = false;
 	private static boolean isTest = false;
-	private String environment;
 	
 	 public ParsingBoltDC(String systemProperty){
-		 super();
-		 environment = systemProperty;
-	 }
+		 super(systemProperty);
+		  }
 
 	@Override
 	public void execute(Tuple input) {
@@ -93,8 +91,7 @@ public class ParsingBoltDC extends BaseRichBolt {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
 		this.outputCollector = collector;
-		System.setProperty(MongoNameConstants.IS_PROD, environment);
-		   HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
+		//HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
 		memberDCDao = new MemberDCDao();
 		dc = new DCDao();
 		initMetrics(context);

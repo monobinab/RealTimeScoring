@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.bolt.FlumeRPCBolt;
-import analytics.bolt.ParsingBoltAAM_ATC;
+import analytics.bolt.ParsingBoltAAM_Browse;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.spout.WebHDFSSpout;
 import analytics.util.Constants;
@@ -38,18 +38,10 @@ public class AAM_BrowseTopology {
 
 		//RedisConnection redisConnection = new RedisConnection();
 		String[] servers = RedisConnection.getServers("PROD");
-		int counter = 0;
-		/*BoltDeclarer boltDeclarer = topologyBuilder.setBolt(
-				"parsingBoltBrowse", new ParsingBoltAAM_ATC(topic), 3);
-		for (String server : servers) {
-			topologyBuilder.setSpout(topic + ++counter, new AAMRedisPubSubSpout(
-					server, port, topic), 1);
-			boltDeclarer.shuffleGrouping(topic + counter);
-		}*/
 		
 		//Sree. Spout that wakes up every 5 mins and process the Traits
 		topologyBuilder.setSpout("browseSpout", new WebHDFSSpout(servers[1], TopicConstants.PORT, Constants.AAM_BROWSER_PATH, "aamBrowser"), 1);
-		topologyBuilder.setBolt("parsingBoltBrowse", new ParsingBoltAAM_ATC(System
+		topologyBuilder.setBolt("parsingBoltBrowse", new ParsingBoltAAM_Browse(System
 				.getProperty(MongoNameConstants.IS_PROD), topic), 3)
 	  		.shuffleGrouping("browseSpout");
 

@@ -23,13 +23,10 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
-public abstract class ParseAAMFeeds  extends BaseRichBolt {
+public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 
 	static final Logger LOGGER = LoggerFactory
 			.getLogger(ParseAAMFeeds.class);
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	protected OutputCollector outputCollector;
 
@@ -42,8 +39,7 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 	protected MemberUUIDDao memberDao;
 	protected ModelVariablesDao modelVariablesDao;
 	protected MultiCountMetric countMetric;
-	protected String environment;
-	
+		
     public ParseAAMFeeds() {
 	}
 	 void initMetrics(TopologyContext context){
@@ -53,9 +49,9 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 
 	// Overloaded Paramterized constructor to get the topic to which the spout is listening to
 	public ParseAAMFeeds( String systemProperty, String topic) {
+		super(systemProperty);
 		this.topic = topic;
-		environment = systemProperty;
-	}
+		}
 	
     public void setOutputCollector(OutputCollector outputCollector) {
         this.outputCollector = outputCollector;
@@ -64,9 +60,7 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         this.outputCollector = collector;
-        System.setProperty(MongoNameConstants.IS_PROD, environment);
-      //   HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
-	    initMetrics(context);
+        initMetrics(context);
         
 	/*
 	 * (non-Javadoc)

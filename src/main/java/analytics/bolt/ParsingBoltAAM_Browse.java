@@ -22,7 +22,7 @@ import analytics.util.objects.Variable;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 
-public class ParsingBoltAAM_ATC extends ParseAAMFeeds {
+public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 
 	/**
 	 * Created by Rock Wasserman 6/19/2014
@@ -35,12 +35,10 @@ public class ParsingBoltAAM_ATC extends ParseAAMFeeds {
 	private Map<String,Variable>boostMap;
 	private PidMatchUtils pidMatchUtil;
 	private List<String> boostList;
-	private String environment;
-
-	public ParsingBoltAAM_ATC (String systemProperty, String topic) {
+	
+	public ParsingBoltAAM_Browse (String systemProperty, String topic) {
 		super(systemProperty, topic);
-		environment = systemProperty;
-		
+			
 	}
 	/*
 	 * (non-Javadoc)
@@ -51,7 +49,6 @@ public class ParsingBoltAAM_ATC extends ParseAAMFeeds {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
-		System.setProperty(MongoNameConstants.IS_PROD, environment);
 		super.prepare(stormConf, context, collector);
 		pidMatchUtil = new PidMatchUtils();
 		// topic is chosen to populate divLnBoostVariblesMap with source
