@@ -16,6 +16,7 @@ import analytics.MockTopologyContext;
 import analytics.StormTestUtils;
 import analytics.util.DBConnection;
 import analytics.util.FakeMongo;
+import analytics.util.MongoNameConstants;
 import analytics.util.SystemPropertyUtility;
 import analytics.util.SywApiCalls;
 import backtype.storm.task.TopologyContext;
@@ -48,7 +49,7 @@ public class ProcessSywBoltMockTest {
 	@Test
 	public void onlyCertainCatalogTypesAreProcessed(){		
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
-        ProcessSYWInteractions boltUnderTest = new ProcessSYWInteractions();
+        ProcessSYWInteractions boltUnderTest = new ProcessSYWInteractions(System.getProperty(MongoNameConstants.IS_PROD));
        TopologyContext context = new MockTopologyContext();
         boltUnderTest.prepare(SystemPropertyUtility.getStormConf(),context , outputCollector);
         String lId = "xo0b7SN1eER9shCSj0DX+eSGag=";
@@ -122,7 +123,7 @@ public class ProcessSywBoltMockTest {
 		feedBoosts.insert(new BasicDBObject("f","SYW_WANT").append("b",boosts));
 		
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
-        ProcessSYWInteractions boltUnderTest = new ProcessSYWInteractions();
+        ProcessSYWInteractions boltUnderTest = new ProcessSYWInteractions(System.getProperty(MongoNameConstants.IS_PROD));
         TopologyContext context = new MockTopologyContext();
         boltUnderTest.prepare(SystemPropertyUtility.getStormConf(), context, outputCollector);
         String lId = "do0b7SN1eER9shCSj0DX+eSGag=";
