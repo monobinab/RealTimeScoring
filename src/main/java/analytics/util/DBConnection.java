@@ -24,6 +24,7 @@ public class DBConnection {
 		return getDBConnection("default");
 	}
 	public static DB getDBConnection(String server) throws ConfigurationException {
+		LOGGER.info("~~~~~~~~~~~~~~~DBCONNECTION CLASS~~~~~~~: " + System.getProperty(MongoNameConstants.IS_PROD));
 		DB conn = null;
 		PropertiesConfiguration properties = null;
 		String isProd = System.getProperty(MongoNameConstants.IS_PROD);
