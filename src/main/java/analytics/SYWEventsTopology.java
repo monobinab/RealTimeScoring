@@ -12,6 +12,7 @@ import analytics.spout.SYWRedisSpout;
 import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
 import analytics.util.RedisConnection;
+import analytics.util.SystemUtility;
 import analytics.util.TopicConstants;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
@@ -28,23 +29,24 @@ public class SYWEventsTopology {
 
 	public static void main(String[] args) throws Exception {
 		LOGGER.info("starting syw events topology");
-		
+		if (!SystemUtility.setEnvironment(args)) {
+			System.out
+					.println("Please pass the environment variable argument- 'PROD' or 'QA' or 'LOCAL'");
+			System.exit(0);
+		} else {
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
-	//	String[] servers = RedisConnection.getServers();
 		String topic = TopicConstants.SYW;
-
  
 		topologyBuilder.setSpout("sywEventsSpout1", new SYWRedisSpout(
-				0, "SYW_Interactions", System
+				0, topic, System
 				.getProperty(MongoNameConstants.IS_PROD)), 1);
 		topologyBuilder.setSpout("sywEventsSpout2", new SYWRedisSpout(
-				1, "SYW_Interactions", System
+				1, topic, System
 				.getProperty(MongoNameConstants.IS_PROD)), 1);
 		topologyBuilder.setSpout("sywEventsSpout3", new SYWRedisSpout(
-				2, "SYW_Interactions", System
+				2, topic, System
 				.getProperty(MongoNameConstants.IS_PROD)), 1);
-		//rtsapp302p.qa.ch3.s.com
-		//
+		
 		// Parse the JSON
 		topologyBuilder.setBolt("parseEventsBolt", new ParsingBoltSYW(System
 				.getProperty(MongoNameConstants.IS_PROD)), 1)
@@ -52,7 +54,7 @@ public class SYWEventsTopology {
 
 		// Get the div line and boost variable
 		topologyBuilder.setBolt("processSYWEvents",
-				new ProcessSYWInteractions(), 4).shuffleGrouping(
+				new ProcessSYWInteractions(System.getProperty(MongoNameConstants.IS_PROD)), 4).shuffleGrouping(
 				"parseEventsBolt");
 		topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System
 				.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("processSYWEvents", "score_stream");
@@ -64,8 +66,11 @@ public class SYWEventsTopology {
 		Config conf = new Config();
 		conf.put("metrics_topology", "Syw");
 	    conf.registerMetricsConsumer(MetricsListener.class, 3);
-	//	conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
-		if (args != null && args.length > 0) {
+	
+	    if (System.getProperty(MongoNameConstants.IS_PROD)
+				.equalsIgnoreCase("PROD")
+				|| System.getProperty(MongoNameConstants.IS_PROD)
+						.equalsIgnoreCase("QA")) {
 			conf.setNumWorkers(6);
 			StormSubmitter.submitTopology(args[0], conf,
 					topologyBuilder.createTopology());
@@ -77,6 +82,7 @@ public class SYWEventsTopology {
 					topologyBuilder.createTopology());
 			Thread.sleep(10000000);
 			cluster.shutdown();
+		}
 		}
 	}
 }

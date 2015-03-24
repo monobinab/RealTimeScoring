@@ -41,6 +41,7 @@ public class ParsingBoltSYW extends EnvironmentBolt {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
+		super.prepare(stormConf, context, collector);
 	//   HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
 		sywApiCalls = new SywApiCalls();
 		this.outputCollector = collector;
