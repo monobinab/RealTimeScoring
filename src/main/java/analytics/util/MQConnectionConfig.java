@@ -10,19 +10,24 @@ public class MQConnectionConfig {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(MQConnectionConfig.class);
 	
-	public WebsphereMQCredential getWebsphereMQCredential(String feed) throws ConfigurationException{
+	public WebsphereMQCredential getWebsphereMQCredential(String environment, String feed) throws ConfigurationException{
 		PropertiesConfiguration properties=null;
-		String isProd = System.getProperty(MongoNameConstants.IS_PROD);
+		//String isProd = System.getProperty(MongoNameConstants.IS_PROD);
+		String isProd = environment;
     	//Configure logger
         BasicConfigurator.configure();
         if(feed.equals("Telluride")){
-        	if("true".equals(isProd))
+        	if("PROD".equals(isProd))
         		properties = new PropertiesConfiguration("resources/Telluride_MQ_Prod_config.properties");
-        	else
+        	else if("QA".equals(isProd)){
         		properties = new PropertiesConfiguration("resources/Telluride_MQ_config.properties");
+        	}
+        	else if("LOCAL".equals(isProd)){
+        		properties = new PropertiesConfiguration("resources/Telluride_MQ_config_local.properties");
+        	}
         }
         else if(feed.equals("POS")){
-        	if("true".equals(isProd))
+        	if("PROD".equals(isProd))
         		properties = new PropertiesConfiguration("resources/POS_MQ_config.properties");
         }
         if(properties==null){

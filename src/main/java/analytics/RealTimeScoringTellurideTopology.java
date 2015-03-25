@@ -48,7 +48,7 @@ public class RealTimeScoringTellurideTopology {
 
 		MQConnectionConfig mqConnection = new MQConnectionConfig();
 		WebsphereMQCredential mqCredential = mqConnection
-				.getWebsphereMQCredential("Telluride");
+				.getWebsphereMQCredential(System.getProperty(MongoNameConstants.IS_PROD), "Telluride");
 		if(mqCredential==null){
 			LOGGER.error("Unable to get a MQ connections");
 			return;
@@ -71,7 +71,7 @@ public class RealTimeScoringTellurideTopology {
 										.getQueueName()), 3);
 
 		// create definition of main spout for queue 1
-		topologyBuilder.setBolt("parsingBolt", new TellurideParsingBoltPOS(), 12).localOrShuffleGrouping("telluride1").localOrShuffleGrouping("telluride2");
+		topologyBuilder.setBolt("parsingBolt", new TellurideParsingBoltPOS(System.getProperty(MongoNameConstants.IS_PROD)), 12).localOrShuffleGrouping("telluride1").localOrShuffleGrouping("telluride2");
         topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System.getProperty(MongoNameConstants.IS_PROD), AuthPropertiesReader
 				.getProperty(Constants.TELLURIDE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
 				.getProperty(Constants.TELLURIDE_REDIS_SERVER_PORT))), 12).localOrShuffleGrouping("parsingBolt");

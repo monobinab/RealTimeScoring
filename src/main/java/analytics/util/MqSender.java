@@ -1,4 +1,4 @@
-package analytics.util;
+/*package analytics.util;
 
 import com.ibm.mq.jms.*;
 
@@ -79,7 +79,7 @@ public class MqSender {
 			// Receive the reply message.
 			// NOTE: This method blocks until a message is received.
 			
-			/*Message replyJMSMessage = consumer.receive();
+			Message replyJMSMessage = consumer.receive();
 			// The message format should be a bytes message.
 			if (replyJMSMessage != null && replyJMSMessage instanceof javax.jms.BytesMessage)
 			{
@@ -93,7 +93,7 @@ public class MqSender {
 			    // the JMS correlation ID can be used to match a sent message with a response message 
 			    String jmsCorrelationID = replyJMSMessage.getJMSCorrelationID();
 			    logger.info("   reply message ID = " + jmsCorrelationID);
-			}*/
+			}
 			// After the message is sent, get the message ID.
 			// You would keep the message ID around somewhere so you can match it to a reply later.
 			//String messageID = message.getJMSMessageID();
@@ -118,4 +118,4 @@ public class MqSender {
 
 	}
 
-}
+}*/
