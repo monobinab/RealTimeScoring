@@ -25,7 +25,7 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 			.getLogger(PersistOccasionBolt.class);
 	private MemberMDTagsDao memberMDTagsDao;
 	private MultiCountMetric countMetric;
-	
+	private OutputCollector outputCollector;
 	 public PersistOccasionBolt(String systemProperty){
 		 super(systemProperty);
 	 }
@@ -34,6 +34,7 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
+		this.outputCollector = collector;
 		memberMDTagsDao = new MemberMDTagsDao();
 		initMetrics(context);
 	}
@@ -62,6 +63,7 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 			else{
 				memberMDTagsDao.deleteMemberMDTags(l_id);
 			}
+			outputCollector.ack(input);
 		} catch (Exception e) {
 			LOGGER.error("Json Exception ", e);
 			countMetric.scope("persist_failed").incr();
@@ -71,7 +73,6 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		// TODO Auto-generated method stub
-		
-	}
+		}
 
 }
