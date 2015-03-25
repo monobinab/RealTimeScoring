@@ -32,15 +32,15 @@ public class PurchaseOccassionTopology {
 			String topic = TopicConstants.OCCASSION;
 			topologyBuilder.setSpout(
 					"occassionSpout1",
-					new OccassionRedisSpout(0, "Member_Sample_Tags", System
+					new OccassionRedisSpout(0, topic, System
 							.getProperty(MongoNameConstants.IS_PROD)), 1);
 			topologyBuilder.setSpout(
 					"occassionSpout2",
-					new OccassionRedisSpout(1, "Member_Sample_Tags", System
+					new OccassionRedisSpout(1, topic, System
 							.getProperty(MongoNameConstants.IS_PROD)), 1);
 			topologyBuilder.setSpout(
 					"occassionSpout3",
-					new OccassionRedisSpout(2, "Member_Sample_Tags", System
+					new OccassionRedisSpout(2, topic, System
 							.getProperty(MongoNameConstants.IS_PROD)), 1);
 
 			topologyBuilder
