@@ -47,6 +47,7 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 	@Override
 	public void execute(Tuple input) {
 	//	System.out.println("IN PERSIST BOLT: " + input);
+		LOGGER.info("~~~~~~~~~~Incoming tuple in PersistOccasionbolt: " + input);
 		countMetric.scope("incoming_tuples").incr();
 		List<String> tags = new ArrayList<String>();
 		String l_id = input.getString(0);

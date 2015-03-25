@@ -80,6 +80,7 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 	@Override
 	public void execute(Tuple input) {
 		//System.out.println("IN PARSING BOLT: " + input);
+		LOGGER.info("~~~~~~~~~~~Incoming tuple in ParsingboltOccasion: " + input);
 		countMetric.scope("incoming_tuples").incr();
 		Map<String, String> variableValueTagsMap = new HashMap<String, String>();
 		JsonParser parser = new JsonParser();

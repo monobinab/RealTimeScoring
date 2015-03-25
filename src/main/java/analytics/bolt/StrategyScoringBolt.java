@@ -11,9 +11,11 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
 import analytics.exception.RealTimeScoringException;
 import analytics.util.Constants;
-import analytics.util.HostPortUtility;
 import analytics.util.JsonUtils;
 import analytics.util.MongoNameConstants;
 import analytics.util.ScoringSingleton;
@@ -36,6 +38,10 @@ import backtype.storm.tuple.Tuple;
 public class StrategyScoringBolt extends EnvironmentBolt {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(StrategyScoringBolt.class);
+	
+	private String host;
+	private int port;
+	private JedisPool jedisPool;
 
 	/**
 	 * 
@@ -44,6 +50,14 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	private OutputCollector outputCollector;
 	private MultiCountMetric countMetric;
 	private String environment;
+	
+	public StrategyScoringBolt(String systemProperty, String host, int port) {
+		super(systemProperty);
+		environment = systemProperty;
+		this.host = host;
+		this.port = port;
+		
+	}
 	
 	 public StrategyScoringBolt(String systemProperty){
 		 super(systemProperty);
@@ -59,6 +73,13 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		LOGGER.info("PREPARING STRATEGY SCORING BOLT");	
 	     initMetrics(context);
 	  	this.outputCollector = collector;
+		//Configure the Redis Server.
+		if(host!=null && !host.equalsIgnoreCase("")){
+			JedisPoolConfig poolConfig = new JedisPoolConfig();
+	        poolConfig.setMaxActive(100);
+	        jedisPool = new JedisPool(poolConfig,host, port, 100);
+		}
+		
 	}
 	 void initMetrics(TopologyContext context){
 	     countMetric = new MultiCountMetric();
@@ -151,6 +172,15 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			LOGGER.debug("new score before boost var: " + newScore);
 
 			newScore = newScore + ScoringSingleton.getInstance().getBoostScore(allChanges, modelId );
+			
+			//Persisting to Redis to be retrieved quicker than getting from Mongo.
+			//Perform the below operation only when the Redis is configured
+			if(jedisPool!=null){
+				Jedis jedis = jedisPool.getResource();
+				jedis.hset("RTS:Telluride:"+lId, ""+modelId, ""+newScore);
+				jedisPool.returnResource(jedis);
+			}
+			
 
 			// 9) Emit the new score
 			Map<String, Date> minMaxMap = ScoringSingleton.getInstance().getMinMaxExpiry(modelId, allChanges);

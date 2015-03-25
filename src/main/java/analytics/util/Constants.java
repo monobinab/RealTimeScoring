@@ -27,4 +27,10 @@ public class Constants {
 	public static final String HADOOP_WEBHDFS_URL="http://151.149.131.21:14000/webhdfs/v1<HDFS_LOCATION>?user.name=spannal&op=LISTSTATUS";
 	public static final String CONTENT_SUMMARY_URL = "http://151.149.131.21:14000/webhdfs/v1<HDFS_LOCATION>/<PATH>?user.name=spannal&op=GETCONTENTSUMMARY";
 	public static final String FILE_READ_URL = "http://151.149.131.21:14000/webhdfs/v1<HDFS_LOCATION>/<PATH>?user.name=spannal&op=OPEN";
+	
+	public static final String RESPONSE_REDIS_SERVER_HOST="respRedisServerHost";
+	public static final String RESPONSE_REDIS_SERVER_PORT="respRedisServerPort";
+	
+	public static final String TELLURIDE_REDIS_SERVER_HOST="tellurideRedisServerHost";
+	public static final String TELLURIDE_REDIS_SERVER_PORT="tellurideRedisServerPort";
 }
