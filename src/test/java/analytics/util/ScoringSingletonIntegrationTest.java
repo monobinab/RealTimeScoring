@@ -21,6 +21,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import analytics.exception.RealTimeScoringException;
@@ -73,6 +74,7 @@ public class ScoringSingletonIntegrationTest {
 	}
 	
 	//This integration test is check the re-scored value for modelIds 35  (a positive case)
+	@Ignore
 	@Test
 	public void executeScoringSingletonBasicPositiveCaseTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, RealTimeScoringException, ConfigurationException, ParseException{
 		
@@ -617,6 +619,7 @@ public class ScoringSingletonIntegrationTest {
 	
 	//S_DSL_APP_INT_ACC is expired and S_DSL_APP_INT_ACC2 is not expired but both variables present in newChangesVariableValueMap
 	//So, both variables value and date will get updated with newChangesVarValuesMap based on their strategy
+	@Ignore
 	@Test
 	public void executeScoringSingletonOneVarExpOneVarNotExpBothPresentinNewChangesVarValueMap() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, RealTimeScoringException, ConfigurationException, ParseException{
 		

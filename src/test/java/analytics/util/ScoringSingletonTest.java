@@ -742,6 +742,7 @@ public class ScoringSingletonTest {
 	// which needs re-scoring
 	// in executeStrategy(), changedMemberVariables map gets updated with new
 	// values, dates etc
+	@Ignore
 	@Test
 	public void executeStrategyWithEmptyChangedMemberVariablesTest() throws SecurityException,
 			NoSuchFieldException, IllegalArgumentException,
