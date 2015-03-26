@@ -145,6 +145,7 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 		System.out.println(lId_Date +" ---- " +diffTagsString);
 		Jedis jedis = jedisPool.getResource();
 		jedis.set("Responses:"+lId_Date, diffTagsString);
+		jedis.expire("Responses:"+lId_Date, 300);
 		jedisPool.returnResource(jedis);
 		
 		//Changes for adding the difference tags ends here.
