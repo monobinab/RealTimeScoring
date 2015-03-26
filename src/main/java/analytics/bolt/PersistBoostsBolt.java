@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class PersistBoostsBolt extends BaseRichBolt {
+public class PersistBoostsBolt extends EnvironmentBolt {
 	
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(PersistBoostsBolt.class);
@@ -31,9 +31,14 @@ public class PersistBoostsBolt extends BaseRichBolt {
 	     countMetric = new MultiCountMetric();
 	     context.registerMetric("custom_metrics", countMetric, 60);
 	    }
+	 
+	 public PersistBoostsBolt(String systemProperty){
+		 super(systemProperty);
+		 }
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
+		super.prepare(stormConf, context, collector);
      //   System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
 		   HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
 		memberBoostsDao = new MemberBoostsDao();

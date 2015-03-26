@@ -55,7 +55,9 @@ public class DCTopology {
 				.getProperty(MongoNameConstants.IS_PROD)),partition_num).localOrShuffleGrouping("dcParsingBolt", "score_stream");
 		builder.setBolt("dcPersistBolt", new PersistDCBolt(System
 				.getProperty(MongoNameConstants.IS_PROD)), partition_num).localOrShuffleGrouping("dcParsingBolt", "persist_stream");
-		builder.setBolt("flumeLoggingBolt", new FlumeRPCBolt(), partition_num).localOrShuffleGrouping("strategyScoringBolt", "score_stream");
+		if(System.getProperty(MongoNameConstants.IS_PROD).equals("PROD")){
+			builder.setBolt("flumeLoggingBolt", new FlumeRPCBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
+			}	
 			
 		//builder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], redis_port,"score"), partition_num).localOrShuffleGrouping("strategyScoringBolt", "score_stream");
 		//builder.setBolt("memberPublishBolt", new MemberPublishBolt(RedisConnection.getServers()[0], redis_port,"member"), partition_num).localOrShuffleGrouping("strategyScoringBolt", "member_stream");

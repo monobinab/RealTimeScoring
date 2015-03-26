@@ -58,9 +58,11 @@ public class SYWEventsTopology {
 				"parseEventsBolt");
 		topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System
 				.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("processSYWEvents", "score_stream");
-		topologyBuilder.setBolt("persistBolt", new PersistBoostsBolt(), 1).shuffleGrouping("processSYWEvents", "persist_stream");
-		topologyBuilder.setBolt("flumeLoggingBolt", new FlumeRPCBolt(), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
+		topologyBuilder.setBolt("persistBolt", new PersistBoostsBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("processSYWEvents", "persist_stream");
 		
+		if(System.getProperty(MongoNameConstants.IS_PROD).equals("PROD")){
+		topologyBuilder.setBolt("flumeLoggingBolt", new FlumeRPCBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
+		}	
 		//topologyBuilder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
 		//topologyBuilder.setBolt("memberPublishBolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 2).shuffleGrouping("strategyScoringBolt", "member_stream");
 		Config conf = new Config();
