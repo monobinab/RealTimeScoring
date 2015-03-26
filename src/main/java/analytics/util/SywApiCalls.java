@@ -66,7 +66,7 @@ public class SywApiCalls {
 	public SywApiCalls()  {
 		LOGGER.info("~~~~~~~~~~~~~~~DBCONNECTION CLASS~~~~~~~: " + System.getProperty(MongoNameConstants.IS_PROD));
 		String environment = System.getProperty(MongoNameConstants.IS_PROD);
-		if(environment.equals("PROD")){
+		if(environment.equals("PROD") || environment.equals("test")){
 			APPSECRET = "70370867e53649b994b5f0175c107189";
 			BASEURI = "http://platform.shopyourway.com";
 			BASEURI_HTTPS = "https://platform.shopyourway.com";
