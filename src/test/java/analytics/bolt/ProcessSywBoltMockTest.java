@@ -67,7 +67,7 @@ public class ProcessSywBoltMockTest {
         List<Object> outputTuple = outputCollector.getTuple().get("persist_stream");
         Assert.assertNull(outputTuple);
 	}
-	@Ignore
+	
 	@Test
 	public void standardCatalogsAreProcessed() throws ConfigurationException{
 		/*

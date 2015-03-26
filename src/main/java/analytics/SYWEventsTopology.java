@@ -65,6 +65,7 @@ public class SYWEventsTopology {
 		//topologyBuilder.setBolt("memberPublishBolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 2).shuffleGrouping("strategyScoringBolt", "member_stream");
 		Config conf = new Config();
 		conf.put("metrics_topology", "Syw");
+		conf.put("topology_environment", System.getProperty(MongoNameConstants.IS_PROD));
 	    conf.registerMetricsConsumer(MetricsListener.class, 3);
 	
 	    if (System.getProperty(MongoNameConstants.IS_PROD)

@@ -14,6 +14,7 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 
+@Deprecated
 public class HostPortUtility {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(HostPortUtility.class);
