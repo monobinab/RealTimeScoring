@@ -51,6 +51,7 @@ public class XMLParser {
 			while (xmlStreamReader.hasNext()) {
 				
 				int event = xmlStreamReader.getEventType();
+				//event = 4;
                 switch (event) {
 									
 				case XMLStreamConstants.START_ELEMENT:

@@ -57,8 +57,11 @@ public class AAM_BrowseTopology {
 		Config conf = new Config();
 		conf.put("metrics_topology", "Product_Browse");
 		conf.registerMetricsConsumer(MetricsListener.class, 3);
-		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
-		if (args.length > 0) {
+	//	conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
+		if (System.getProperty(MongoNameConstants.IS_PROD)
+				.equalsIgnoreCase("PROD")
+				|| System.getProperty(MongoNameConstants.IS_PROD)
+						.equalsIgnoreCase("QA")) {
 			try {
 				StormSubmitter.submitTopology(args[0], conf,
 						topologyBuilder.createTopology());

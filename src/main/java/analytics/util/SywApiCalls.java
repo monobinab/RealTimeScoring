@@ -41,11 +41,16 @@ public class SywApiCalls {
 	 */
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(SywApiCalls.class);
-	private static final String APPSECRET = "70370867e53649b994b5f0175c107189";
-	private static final String BASEURI = "http://platform.shopyourway.com";
-	private static final String BASEURI_HTTPS = "https://platform.shopyourway.com";
-	private static final Long APPID = (long) 	11875 ;
-	private static final Long USERID = (long)6875997;
+//	private static final String APPSECRET = "70370867e53649b994b5f0175c107189";
+	private static final String APPSECRET = "7d7bdd89350c4ceda2d3ca2d0884b2a7";
+//	private static final String BASEURI = "http://platform.shopyourway.com";
+	private static final String BASEURI = "http://sandboxplatform.shopyourway.com";
+//	private static final String BASEURI_HTTPS = "https://platform.shopyourway.com";
+	private static final String BASEURI_HTTPS = "https://sandboxplatform.shopyourway.com";
+//	private static final Long APPID = (long) 	11875 ;
+	private static final Long APPID = (long) 	16735 ;
+//	private static final Long USERID = (long)6875997;
+	private static final Long USERID = (long)5643226;
 	
 	public static final String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss";
 	public static final String TOKEN_REQUEST_PATTERN = "/auth/get-token?userId=%d&appId=%d&signature=%s&timestamp=%s";

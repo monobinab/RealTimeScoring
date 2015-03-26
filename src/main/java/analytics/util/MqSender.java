@@ -15,6 +15,9 @@ import java.nio.charset.Charset;
 
 public class MqSender {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MqSender.class);
+	public static void main(String[] args){
+		initJMS("POS");
+	}
 
 	static int counter = 0;
 	public static void initJMS(String feed) {
@@ -24,7 +27,7 @@ public class MqSender {
 			
 			MQConnectionConfig mqConnection = new MQConnectionConfig();
 			WebsphereMQCredential mqCredential = mqConnection
-					.getWebsphereMQCredential(feed);
+					.getWebsphereMQCredential("LOCAL", feed);
 			cf1.setHostName(mqCredential.getHostOneName());
 			cf1.setPort(mqCredential.getPort());
 			cf1.setTransportType(JMSC.MQJMS_TP_CLIENT_MQ_TCPIP);
@@ -65,7 +68,7 @@ public class MqSender {
 
 			String sCurrentLine;
 			BufferedReader br = null;
-			FileReader fr = new FileReader("resources/PROCTRAN3.txt");
+			FileReader fr = new FileReader("resources/RTS_TELLURIDE_TEST.txt");
 			br = new BufferedReader(fr);
 			while ((sCurrentLine = br.readLine()) != null && counter<=1) {
 				BytesMessage message = (BytesMessage)session.createBytesMessage();
