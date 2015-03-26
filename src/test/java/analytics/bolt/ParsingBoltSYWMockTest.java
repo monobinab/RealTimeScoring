@@ -9,6 +9,7 @@ import junit.framework.Assert;
 import org.apache.commons.configuration.ConfigurationException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import analytics.MockOutputCollector;
@@ -41,6 +42,7 @@ public class ParsingBoltSYWMockTest {
 		db = DBConnection.getDBConnection();*/
 		SystemPropertyUtility.setSystemProperty();
 	}
+	@Ignore
 	@Test
 	public void invalidInteractionTypeIsIgnored(){		
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
@@ -58,7 +60,7 @@ public class ParsingBoltSYWMockTest {
         List<Object> outputTuple = outputCollector.getTuple().get("main");
         Assert.assertNull(outputTuple);
 	}
-	
+	@Ignore
 	@Test
 	public void catalogInteractionsAreProcessed(){
 		String lId = "dxo0b7SN1eER9shCSj0DX+eSGag=";

@@ -9,6 +9,7 @@ import junit.framework.Assert;
 import org.apache.commons.configuration.ConfigurationException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import analytics.MockOutputCollector;
@@ -66,7 +67,7 @@ public class ProcessSywBoltMockTest {
         List<Object> outputTuple = outputCollector.getTuple().get("persist_stream");
         Assert.assertNull(outputTuple);
 	}
-	
+	@Ignore
 	@Test
 	public void standardCatalogsAreProcessed() throws ConfigurationException{
 		/*
