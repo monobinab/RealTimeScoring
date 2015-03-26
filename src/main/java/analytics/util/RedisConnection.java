@@ -18,7 +18,7 @@ public class RedisConnection {
 		    //load a properties file from class path, inside static method
 			if(env!=null && "PROD".equals(env)){
 				prop.load(RedisConnection.class.getClassLoader().getResourceAsStream("resources/redis_server_prod.properties"));
-				LOGGER.info("Using production properties");
+				LOGGER.info("~~~~~~~Using production properties in Redis connection~~~~");
 			}
 			else if(env!=null && "QA".equals(env)){
 				prop.load(RedisConnection.class.getClassLoader().getResourceAsStream("resources/redis_server_qa.properties"));

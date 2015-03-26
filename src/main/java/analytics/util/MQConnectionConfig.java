@@ -17,8 +17,10 @@ public class MQConnectionConfig {
     	//Configure logger
         BasicConfigurator.configure();
         if(feed.equals("Telluride")){
-        	if("PROD".equals(isProd))
+        	if("PROD".equals(isProd)){
         		properties = new PropertiesConfiguration("resources/Telluride_MQ_Prod_config.properties");
+        		LOGGER.info("~~~~~~PROD MQ in MQSpout~~~~~");
+        	}
         	else if("QA".equals(isProd)){
         		properties = new PropertiesConfiguration("resources/Telluride_MQ_config.properties");
         	}
