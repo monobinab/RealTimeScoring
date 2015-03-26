@@ -66,7 +66,7 @@ public class SywApiCalls {
 	public SywApiCalls()  {
 		LOGGER.info("~~~~~~~~~~~~~~~DBCONNECTION CLASS~~~~~~~: " + System.getProperty(MongoNameConstants.IS_PROD));
 		String environment = System.getProperty(MongoNameConstants.IS_PROD);
-		if(environment.equals("PROD") || environment.equals("test")){
+		if(environment.equals("PROD")){
 			APPSECRET = "70370867e53649b994b5f0175c107189";
 			BASEURI = "http://platform.shopyourway.com";
 			BASEURI_HTTPS = "https://platform.shopyourway.com";
@@ -74,6 +74,13 @@ public class SywApiCalls {
 			USERID = (long)6875997;
 		}
 		else if(environment.equals("QA")||environment.equals("LOCAL")){
+			APPSECRET = "7d7bdd89350c4ceda2d3ca2d0884b2a7";
+			BASEURI = "http://sandboxplatform.shopyourway.com";
+			BASEURI_HTTPS = "https://sandboxplatform.shopyourway.com";
+			APPID = (long) 	16735 ;
+			USERID = (long)5643226;
+		}
+		else if(environment.equals("test")){
 			APPSECRET = "7d7bdd89350c4ceda2d3ca2d0884b2a7";
 			BASEURI = "http://sandboxplatform.shopyourway.com";
 			BASEURI_HTTPS = "https://sandboxplatform.shopyourway.com";

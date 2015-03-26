@@ -49,7 +49,7 @@ public class ParsingBoltSYWMockTest {
         ParsingBoltSYW boltUnderTest = new ParsingBoltSYW(System.getProperty(MongoNameConstants.IS_PROD));
         TopologyContext context = new MockTopologyContext();
         boltUnderTest.prepare(SystemPropertyUtility.getStormConf(), context, outputCollector);
-        String input = "[{\"InteractionId\":\"b7556eb8-e9ca-4e31-accc-4b56b69fcfad\",\"UserId\":6875997,\"UserSearsId\":6875997,\"Entities\":"
+        String input = "[{\"InteractionId\":\"b7556eb8-e9ca-4e31-accc-4b56b69fcfad\",\"UserId\":5643226,\"UserSearsId\":5643226,\"Entities\":"
         		+ "[{\"Id\":1221863,\"EntityType\":\"Topic\"},{\"IsTaggedItem\":true,\"Id\":373541114,\"EntityType\":\"Product\"}],\"InteractionType\":\"TagItem\","
         		+ "\"Time\":\"2014-09-24T13:27:45.3874132Z\",\"Client\":\"Web\"}]";
         //source: facebookSpout:3, stream: default, id: {}, [8/1/2014 7:07,1123404212,[0.0],[0.0],dishwasher]
@@ -63,17 +63,17 @@ public class ParsingBoltSYWMockTest {
 
 	@Test
 	public void catalogInteractionsAreProcessed(){
-		String lId = "dxo0b7SN1eER9shCSj0DX+eSGag=";
+		String lId = "b1Ydvqii2CTcolqxu8oyHdzq1NQ=";
 		String interactionType = "AddToCatalog";
-		String expected = "{\"InteractionId\":\"b7556eb8-e9ca-4e31-accc-4b56b69fcfad\",\"UserId\":6875997,\"UserSearsId\":6875997,\"Entities\":"
-        		+ "[{\"Id\":184008680,\"EntityType\":\"Product\"},{\"Id\":8353466,\"EntityType\":\"Catalog\",\"OwnerId\":6875997}],\"InteractionType\":\"AddToCatalog\","
+		String expected = "{\"InteractionId\":\"b7556eb8-e9ca-4e31-accc-4b56b69fcfad\",\"UserId\":5643226,\"UserSearsId\":5643226,\"Entities\":"
+        		+ "[{\"Id\":184008680,\"EntityType\":\"Product\"},{\"Id\":8353466,\"EntityType\":\"Catalog\",\"OwnerId\":5643226}],\"InteractionType\":\"AddToCatalog\","
         		+ "\"Time\":\"2014-09-24T13:27:45.3874132Z\",\"Client\":\"Web\"}";
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
         ParsingBoltSYW boltUnderTest = new ParsingBoltSYW(System.getProperty(MongoNameConstants.IS_PROD));
         TopologyContext context = new MockTopologyContext();
         boltUnderTest.prepare(SystemPropertyUtility.getStormConf(), context, outputCollector);
-        String input = "[{\"InteractionId\":\"b7556eb8-e9ca-4e31-accc-4b56b69fcfad\",\"UserId\":6875997,\"UserSearsId\":6875997,\"Entities\":"
-        		+ "[{\"Id\":184008680,\"EntityType\":\"Product\"},{\"Id\":8353466,\"EntityType\":\"Catalog\",\"OwnerId\":6875997}],\"InteractionType\":\"AddToCatalog\","
+        String input = "[{\"InteractionId\":\"b7556eb8-e9ca-4e31-accc-4b56b69fcfad\",\"UserId\":5643226,\"UserSearsId\":5643226,\"Entities\":"
+        		+ "[{\"Id\":184008680,\"EntityType\":\"Product\"},{\"Id\":8353466,\"EntityType\":\"Catalog\",\"OwnerId\":5643226}],\"InteractionType\":\"AddToCatalog\","
         		+ "\"Time\":\"2014-09-24T13:27:45.3874132Z\",\"Client\":\"Web\"}]";
         
         //source: facebookSpout:3, stream: default, id: {}, [8/1/2014 7:07,1123404212,[0.0],[0.0],dishwasher]
