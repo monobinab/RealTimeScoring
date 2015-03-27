@@ -224,14 +224,13 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			jedis.hmset("RTS:Telluride:"+lId, modelIdScoreStringMap);
 			//jedis.hset("RTS:Telluride:"+lId, ""+modelId, ""+BigDecimal.valueOf(newScore).toPlainString());
 			
-			jedis.expire("RTS:Telluride:"+lId, 1800);
+			jedis.expire("RTS:Telluride:"+lId, 600);
 			jedisPool.returnResource(jedis);
 			
 		}
 		Long timeAfter = System.currentTimeMillis();
-		LOGGER.info("~~~~TIME TAKEN FOR REDIS~~~: " +  (timeAfter - timeBefore));
-	//	System.out.println("time for redis:" + (timeAfter - timeBefore));
-		
+	//	LOGGER.info("~~~~TIME TAKEN FOR REDIS~~~: " +  (timeAfter - timeBefore));
+			
 		
 		// 10) Write changedMemberVariableswith expiry
 		ScoringSingleton.getInstance().updateChangedVariables(lId, allChanges);
@@ -241,8 +240,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		// Write changes to changedMemberScores
 		ScoringSingleton.getInstance().updateChangedMemberScore(lId, modelIdList, modelIdToExpiryMap, modelIdScoreMap,source);
 		timeAfter = System.currentTimeMillis();
-		LOGGER.info("~~~~~TIME TAKED FOR MONGO~~~: " + (timeAfter - timeBefore) );
-	//	System.out.println("time for mongo: " + (timeAfter - timeBefore));
+	//	LOGGER.info("~~~~~TIME TAKED FOR MONGO~~~: " + (timeAfter - timeBefore) );
 		LOGGER.info("TIME:" + messageID + "- Scoring complete-" + System.currentTimeMillis());
 		
 		List<Object> listToEmit = new ArrayList<Object>();
