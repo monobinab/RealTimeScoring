@@ -90,6 +90,7 @@ public class ParsingBoltDC extends EnvironmentBolt {
 
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
+		super.prepare(stormConf, context, collector);
 		this.outputCollector = collector;
 		//HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
 		memberDCDao = new MemberDCDao();

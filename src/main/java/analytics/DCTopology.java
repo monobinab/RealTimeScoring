@@ -65,9 +65,11 @@ public class DCTopology {
 		conf.put("metrics_topology", "DC");
 		conf.registerMetricsConsumer(MetricsListener.class, partition_num);
 		conf.setDebug(false);
-	//	conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
-		if (!isLocal) {
-			try {
+		conf.put("topology_environment", System.getProperty(MongoNameConstants.IS_PROD));
+		if (System.getProperty(MongoNameConstants.IS_PROD)
+				.equalsIgnoreCase("PROD")
+				|| System.getProperty(MongoNameConstants.IS_PROD)
+						.equalsIgnoreCase("QA")) {			try {
 				StormSubmitter.submitTopology(args[0], conf, builder.createTopology());
 			} catch (AlreadyAliveException e) {
 				LOGGER.error(e.getClass() + ": " + e.getMessage(), e);

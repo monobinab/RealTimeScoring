@@ -28,7 +28,6 @@ public EnvironmentBolt(){
 			OutputCollector collector) {
 		LOGGER.info("~~~~~~~~~~~~~~~ENVIRONMENT BOLT~~~~~~~: " + System.getProperty(MongoNameConstants.IS_PROD));
 		System.setProperty(MongoNameConstants.IS_PROD, environment);
-		
 	}
 
 	@Override
