@@ -70,7 +70,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
-	//	super.prepare(stormConf, context, collector);
+		super.prepare(stormConf, context, collector);
 	//	System.setProperty(MongoNameConstants.IS_PROD, environment);
 		LOGGER.info("PREPARING STRATEGY SCORING BOLT");	
 	     initMetrics(context);
