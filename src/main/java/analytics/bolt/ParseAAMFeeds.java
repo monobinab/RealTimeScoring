@@ -61,7 +61,7 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         this.outputCollector = collector;
         initMetrics(context);
-        
+        super.prepare(stormConf, context, collector);
 	/*
 	 * (non-Javadoc)
 	 *
