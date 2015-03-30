@@ -74,9 +74,7 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 			}
 		}
 	}
-	
 
-	
 	@Override
 	protected Map<String, String> processList(String current_l_id) {
 		Map<String, String> variableValueMap = new HashMap<String, String>();
