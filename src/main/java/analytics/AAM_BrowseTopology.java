@@ -37,7 +37,7 @@ public class AAM_BrowseTopology {
 		
 
 		//RedisConnection redisConnection = new RedisConnection();
-		String[] servers = RedisConnection.getServers("PROD");
+		String[] servers = RedisConnection.getServers(System.getProperty(MongoNameConstants.IS_PROD));
 		
 		//Sree. Spout that wakes up every 5 mins and process the Traits
 		topologyBuilder.setSpout("browseSpout", new WebHDFSSpout(servers[1], TopicConstants.PORT, Constants.AAM_BROWSER_PATH, "aamBrowser"), 1);
