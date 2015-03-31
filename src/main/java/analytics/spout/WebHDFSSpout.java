@@ -158,27 +158,29 @@ public class WebHDFSSpout extends BaseRichSpout{
 	}
 	
 	public String formatRecordsToFitRespectiveBolts(String str){
-		String replacedString = null;
-		if(str!=null && !str.equals("")){
-			String returnStr = str.replace("\u0001","', '").replace("\u0002","', '");
-			//returnStr.replace(",", "',");
-			if(topologyIdentifier.equalsIgnoreCase("aamTraits")){
-				returnStr = returnStr.substring(0, returnStr.indexOf(",")+1)+" \"[" +returnStr.substring(returnStr.indexOf(",")+1, returnStr.length());
-				returnStr = returnStr.substring(0, returnStr.length())+"']\"";
-				replacedString = "['"+returnStr+"]";
-			}
-			else if(topologyIdentifier.equalsIgnoreCase("aamInternalSearch")){
-				returnStr = returnStr.replace("null", "");
-				String[] splitStr = returnStr.split(",");
-				returnStr = splitStr[2]+"', '"+splitStr[0]+"', '"+splitStr[1]+"', '"+splitStr[5];
-				replacedString = "['"+returnStr+"']";
-			}
-			else
-				replacedString = "['"+returnStr+"']";
-			LOGGER.info("Formatted String = " +replacedString);
-		}
-		
-		return replacedString;
-	}
+		  String replacedString = null;
+		  if(str!=null && !str.equals("")){
+		   String returnStr = str.replace("\u0001","', '").replace("\u0002","', '");
+		   //returnStr.replace(",", "',");
+		   if(topologyIdentifier.equalsIgnoreCase("aamTraits")){
+		    returnStr = returnStr.substring(0, returnStr.indexOf(",")+1)+" \"[" +returnStr.substring(returnStr.indexOf(",")+1, returnStr.length());
+		    returnStr = returnStr.substring(0, returnStr.length())+"']\"";
+		    replacedString = "['"+returnStr+"]";
+		   }
+		   else if(topologyIdentifier.equalsIgnoreCase("aamInternalSearch")){
+		    returnStr = returnStr.replace("null", "");
+		    String[] splitStr = returnStr.split(",");
+		    returnStr = splitStr[2]+"', '"+splitStr[0]+"', '"+splitStr[1]+"', '"+splitStr[5];
+		    replacedString = "['"+returnStr+"']";
+		    splitStr = null;
+		   }
+		   else
+		    replacedString = "['"+returnStr+"']";
+		   LOGGER.info("Formatted String = " +replacedString);
+		   returnStr = null;
+		  }
+		  
+		  return replacedString;
+		 }
 
 }
