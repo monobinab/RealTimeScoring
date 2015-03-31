@@ -46,9 +46,9 @@ public class AAM_BrowseTopology {
 	  		.shuffleGrouping("browseSpout");
 
 		
-		/*topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System
+		topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System
 				.getProperty(MongoNameConstants.IS_PROD)), 3)
-				.localOrShuffleGrouping("parsingBoltBrowse");*/
+				.localOrShuffleGrouping("parsingBoltBrowse");
 		
 		if(System.getProperty(MongoNameConstants.IS_PROD).equals("PROD")){
 			topologyBuilder.setBolt("flumeLoggingBolt", new FlumeRPCBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
