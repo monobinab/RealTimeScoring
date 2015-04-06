@@ -54,7 +54,7 @@ public class SYWEventsTopology {
 
 		// Get the div line and boost variable
 		topologyBuilder.setBolt("processSYWEvents",
-				new ProcessSYWInteractions(System.getProperty(MongoNameConstants.IS_PROD)), 4).shuffleGrouping(
+				new ProcessSYWInteractions(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping(
 				"parseEventsBolt");
 		topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System
 				.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("processSYWEvents", "score_stream");
