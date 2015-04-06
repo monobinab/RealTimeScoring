@@ -15,6 +15,7 @@ import analytics.util.MongoNameConstants;
 import analytics.util.PidMatchUtils;
 import analytics.util.dao.BoostDao;
 import analytics.util.dao.DivLnBoostDao;
+import analytics.util.dao.DivLnVariableDao;
 import analytics.util.dao.MemberBoostsDao;
 import analytics.util.dao.VariableDao;
 import analytics.util.objects.DivLn;
@@ -27,7 +28,7 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 	/**
 	 * Created by Rock Wasserman 6/19/2014
 	 */
-	private DivLnBoostDao divLnBoostDao;
+	private DivLnVariableDao divLnVariableDao;
 	private BoostDao boostDao;
 	private VariableDao variableDao;
 	private MemberBoostsDao memberBoostsDao;
@@ -58,13 +59,14 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 		} else if ("AAM_CDF_Products".equalsIgnoreCase(topic)) {
 			sourceTopic = "BROWSE";
 		}
-		divLnBoostDao = new DivLnBoostDao();
+		divLnVariableDao = new DivLnVariableDao();
+		//divLnBoostDao = new DivLnBoostDao();
 		boostDao = new BoostDao();
 		variableDao = new VariableDao();
 		memberBoostsDao = new MemberBoostsDao();
 		
 		//populate divLnBoostvariablesMap & Boost list
-		divLnBoostVariblesMap = divLnBoostDao.getDivLnBoost();
+		divLnBoostVariblesMap = divLnVariableDao.getDivLnVariable();
 		boostList = boostDao.getBoosts(sourceTopic);
 		List<Variable> variableList = variableDao.getVariables();
 		boostMap = new HashMap<String, Variable>();
