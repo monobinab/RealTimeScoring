@@ -61,19 +61,22 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 		}
 		divLnVariableDao = new DivLnVariableDao();
 		//divLnBoostDao = new DivLnBoostDao();
-		boostDao = new BoostDao();
+		//boostDao = new BoostDao();
 		variableDao = new VariableDao();
 		memberBoostsDao = new MemberBoostsDao();
 		
 		//populate divLnBoostvariablesMap & Boost list
 		divLnBoostVariblesMap = divLnVariableDao.getDivLnVariable();
-		boostList = boostDao.getBoosts(sourceTopic);
+		//boostList = boostDao.getBoosts(sourceTopic);
 		List<Variable> variableList = variableDao.getVariables();
 		boostMap = new HashMap<String, Variable>();
 		for(Variable v: variableList) {
-			if(boostList.contains(v.getName())) {
+			if(v.getName().contains(MongoNameConstants.BROWSE_BOOST_PREFIX)) {
 				boostMap.put(v.getName(),v);
 			}
+//			if(boostList.contains(v.getName())) {
+//				boostMap.put(v.getName(),v);
+//			}
 		}
 	}
 
