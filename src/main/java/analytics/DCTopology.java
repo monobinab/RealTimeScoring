@@ -48,13 +48,13 @@ public class DCTopology {
 			//default is false, only set to true for developing or testing locally
 			//kafkaConfig.forceFromStart = true;
 		}
-		builder.setSpout("kafkaSpout", new KafkaSpout(kafkaConfig), partition_num);
+		builder.setSpout("kafkaSpout", new KafkaSpout(kafkaConfig), 2);
 		builder.setBolt("dcParsingBolt", new ParsingBoltDC(System
-				.getProperty(MongoNameConstants.IS_PROD)), partition_num).localOrShuffleGrouping("kafkaSpout");
+				.getProperty(MongoNameConstants.IS_PROD)), 2).localOrShuffleGrouping("kafkaSpout");
 	    builder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System
-				.getProperty(MongoNameConstants.IS_PROD)),partition_num).localOrShuffleGrouping("dcParsingBolt", "score_stream");
+				.getProperty(MongoNameConstants.IS_PROD)),1).localOrShuffleGrouping("dcParsingBolt", "score_stream");
 		builder.setBolt("dcPersistBolt", new PersistDCBolt(System
-				.getProperty(MongoNameConstants.IS_PROD)), partition_num).localOrShuffleGrouping("dcParsingBolt", "persist_stream");
+				.getProperty(MongoNameConstants.IS_PROD)), 1).localOrShuffleGrouping("dcParsingBolt", "persist_stream");
 		if(System.getProperty(MongoNameConstants.IS_PROD).equals("PROD")){
 			builder.setBolt("flumeLoggingBolt", new FlumeRPCBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
 			}	
