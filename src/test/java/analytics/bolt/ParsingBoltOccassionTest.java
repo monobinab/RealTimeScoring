@@ -7,12 +7,14 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
+import org.apache.commons.configuration.ConfigurationException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import analytics.util.DBConnection;
 import analytics.util.FakeMongo;
+import analytics.util.SystemPropertyUtility;
 import analytics.util.dao.MemberMDTagsDao;
 import analytics.util.dao.ModelPercentileDao;
 import analytics.util.dao.OccasionVariableDao;
@@ -29,8 +31,8 @@ import com.google.gson.JsonParser;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 
-public class ParsingBoltOccassionTest {
-static DB db;
+public class ParsingBoltOccassionTest{
+//static DB db;
 static DBCollection memberMDTagsColl;
 static DBCollection tagMetadataColl;
 static DBCollection tagVariableColl;
@@ -45,10 +47,8 @@ static OccasionVariableDao occasionVariableDao;
 static ModelPercentileDao modelPercDao;
 	
 @BeforeClass
-/*public static void intialize() throws Exception{
-	System.setProperty("rtseprod", "test");
-	  FakeMongo.setDBConn(new Fongo("test db").getDB("test"));	
-		db = DBConnection.getDBConnection();
+
+public static void intialize() throws Exception{
 		
 		//get the fakeMongoColl from ParsingBoltOccassionFakeMonogColl
 		ParsingBoltOccassionFakeMonogColl.fakeMongoColl();
@@ -56,12 +56,11 @@ static ModelPercentileDao modelPercDao;
 		tagVariableColl = ParsingBoltOccassionFakeMonogColl.getTagVariableColl();
 		tagMetadataColl = ParsingBoltOccassionFakeMonogColl.getTagMetadataColl();
 		modelPercColl = ParsingBoltOccassionFakeMonogColl.getModelPercColl();
-		
 		memberMDTagsDao = new MemberMDTagsDao();
 		tagVariableDao = new TagVariableDao();
 		modelPercDao = new ModelPercentileDao();
 			
-		parsingBoltOccassion = new ParsingBoltOccassion();
+		parsingBoltOccassion = new ParsingBoltOccassion(System.getProperty("rtseprod"));
 		parsingBoltOccassion.setMemberTagsDao();
 		parsingBoltOccassion.setTagMetadataDao();
 		parsingBoltOccassion.setTagVariableDao();
@@ -258,10 +257,10 @@ public void getParsedJsonTest2(){
 	JsonParser parser = new JsonParser();
 	 parsingBoltOccassion.getParsedJson(tuple, parser);
 }
-*/
+
 @AfterClass
 public static void tearDown(){
-	db.dropDatabase();
+	SystemPropertyUtility.dropDatabase();
 }
 }
  

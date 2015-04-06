@@ -23,7 +23,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LoggingBolt extends BaseRichBolt {
+public class LoggingBolt extends EnvironmentBolt {
 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(LoggingBolt.class);
@@ -37,6 +37,10 @@ public class LoggingBolt extends BaseRichBolt {
 	private MemberScoreDao memberScoreDao;
 	public LoggingBolt() {
 	}
+	 public LoggingBolt(String systemProperty){
+		 super(systemProperty);
+		
+	 }
 
 	/*
 	 * (non-Javadoc)
@@ -47,7 +51,8 @@ public class LoggingBolt extends BaseRichBolt {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
-        System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+		super.prepare(stormConf, context, collector);
+   //     System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
 	    initMetrics(context);
 		this.outputCollector = collector;
 		memberScoreDao = new MemberScoreDao();

@@ -15,6 +15,7 @@ import analytics.bolt.SywScoringBolt;
 import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
 import analytics.util.RedisConnection;
+import analytics.util.SystemUtility;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
@@ -32,12 +33,11 @@ public class DCTopology {
 	public static void main(String[] args) {
 		boolean isLocal = true;
 		String topologyId = "";
-		System.clearProperty(MongoNameConstants.IS_PROD);
-		if (args.length > 0) {
-			System.setProperty(MongoNameConstants.IS_PROD, "true");
-			isLocal = false;
-			topologyId = args[0];
-		}
+		if (!SystemUtility.setEnvironment(args)) {
+			System.out
+					.println("Please pass the environment variable argument- 'PROD' or 'QA' or 'LOCAL'");
+			System.exit(0);
+		} else {
 
 		TopologyBuilder builder = new TopologyBuilder();
 		BrokerHosts hosts = new ZkHosts("trprtelpacmapp1.vm.itg.corp.us.shldcorp.com:2181");
@@ -48,11 +48,16 @@ public class DCTopology {
 			//default is false, only set to true for developing or testing locally
 			//kafkaConfig.forceFromStart = true;
 		}
-		builder.setSpout("kafkaSpout", new KafkaSpout(kafkaConfig), partition_num);
-		builder.setBolt("dcParsingBolt", new ParsingBoltDC(), partition_num).localOrShuffleGrouping("kafkaSpout");
-	    builder.setBolt("strategyScoringBolt", new StrategyScoringBolt(),partition_num).localOrShuffleGrouping("dcParsingBolt", "score_stream");
-		builder.setBolt("dcPersistBolt", new PersistDCBolt(), partition_num).localOrShuffleGrouping("dcParsingBolt", "persist_stream");
-		builder.setBolt("flumeLoggingBolt", new FlumeRPCBolt(), partition_num).localOrShuffleGrouping("strategyScoringBolt", "score_stream");
+		builder.setSpout("kafkaSpout", new KafkaSpout(kafkaConfig), 2);
+		builder.setBolt("dcParsingBolt", new ParsingBoltDC(System
+				.getProperty(MongoNameConstants.IS_PROD)), 2).localOrShuffleGrouping("kafkaSpout");
+	    builder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System
+				.getProperty(MongoNameConstants.IS_PROD)),1).localOrShuffleGrouping("dcParsingBolt", "score_stream");
+		builder.setBolt("dcPersistBolt", new PersistDCBolt(System
+				.getProperty(MongoNameConstants.IS_PROD)), 1).localOrShuffleGrouping("dcParsingBolt", "persist_stream");
+		if(System.getProperty(MongoNameConstants.IS_PROD).equals("PROD")){
+			builder.setBolt("flumeLoggingBolt", new FlumeRPCBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
+			}	
 			
 		//builder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], redis_port,"score"), partition_num).localOrShuffleGrouping("strategyScoringBolt", "score_stream");
 		//builder.setBolt("memberPublishBolt", new MemberPublishBolt(RedisConnection.getServers()[0], redis_port,"member"), partition_num).localOrShuffleGrouping("strategyScoringBolt", "member_stream");
@@ -60,9 +65,11 @@ public class DCTopology {
 		conf.put("metrics_topology", "DC");
 		conf.registerMetricsConsumer(MetricsListener.class, partition_num);
 		conf.setDebug(false);
-		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
-		if (!isLocal) {
-			try {
+		conf.put("topology_environment", System.getProperty(MongoNameConstants.IS_PROD));
+		if (System.getProperty(MongoNameConstants.IS_PROD)
+				.equalsIgnoreCase("PROD")
+				|| System.getProperty(MongoNameConstants.IS_PROD)
+						.equalsIgnoreCase("QA")) {			try {
 				StormSubmitter.submitTopology(args[0], conf, builder.createTopology());
 			} catch (AlreadyAliveException e) {
 				LOGGER.error(e.getClass() + ": " + e.getMessage(), e);
@@ -81,7 +88,7 @@ public class DCTopology {
 			}
 			cluster.shutdown();
 		}
-
+		}
 	}
 
 }

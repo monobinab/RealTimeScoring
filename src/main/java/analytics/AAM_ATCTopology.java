@@ -1,10 +1,11 @@
-package analytics;
+
+/*package analytics;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.bolt.ParsingBoltAAM_Browse;
+import analytics.bolt.ParsingBoltAAM_ATC;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.spout.AAMRedisPubSubSpout;
 import analytics.util.MongoNameConstants;
@@ -42,7 +43,7 @@ public class AAM_ATCTopology {
 		}
 
 		BoltDeclarer boltDeclarer = topologyBuilder.setBolt(
-				"ParsingBoltAAM_ATC", new ParsingBoltAAM_Browse(topic), 1);
+				"ParsingBoltAAM_ATC", new ParsingBoltAAM_ATC(topic), 1);
 		topologyBuilder.setBolt("strategy_bolt", new StrategyScoringBolt(), 1)
 				.shuffleGrouping("ParsingBoltAAM_ATC");
 		int counter = 0;
@@ -79,4 +80,5 @@ public class AAM_ATCTopology {
 
 	}
 
-}
+}*/
+

@@ -24,6 +24,7 @@ public class DBConnection {
 		return getDBConnection("default");
 	}
 	public static DB getDBConnection(String server) throws ConfigurationException {
+		LOGGER.info("~~~~~~~~~~~~~~~DBCONNECTION CLASS~~~~~~~: " + System.getProperty(MongoNameConstants.IS_PROD));
 		DB conn = null;
 		PropertiesConfiguration properties = null;
 		String isProd = System.getProperty(MongoNameConstants.IS_PROD);
@@ -34,14 +35,20 @@ public class DBConnection {
 		//TODO: Hard coding prod
 		//isProd = "true";
 
-		if(isProd!=null &&"true".equals(isProd)){
+		if(isProd!=null && "PROD".equals(isProd)){
 			properties=  new PropertiesConfiguration("resources/connection_config_prod.properties");
-			LOGGER.info("Using production properties");
+			LOGGER.info("~~~~~~~Using production properties in DBConnection~~~~~~~~~");
 		}
-		else{
+		
+		else if(isProd!=null && "QA".equals(isProd)){
 			properties=  new PropertiesConfiguration("resources/connection_config.properties");
 			LOGGER.info("Using test properties");	
-		}		
+		}
+		
+		else if(isProd!=null && "LOCAL".equals(isProd)){
+			properties=  new PropertiesConfiguration("resources/connection_config_local.properties");
+			LOGGER.info("Using test properties");	
+		}
 
 		sServerName = properties.getString("server.name");
 		sServerName2 = properties.getString("server2.name");
@@ -63,7 +70,7 @@ public class DBConnection {
 		}
 
 		conn = mongoClient.getDB(sDatabaseName);
-		LOGGER.info("Connection is established...."+conn.getName());
+		LOGGER.info("Connection is established...."+ mongoClient.getAddress() + " " + conn.getName());
 		conn.authenticate(sUserName, sPassword.toCharArray());
 		return conn;
 	}

@@ -18,6 +18,7 @@ import org.xml.sax.Attributes;
 
 import analytics.util.Constants;
 import analytics.util.DCParserHandler;
+import analytics.util.HostPortUtility;
 import analytics.util.JsonUtils;
 import analytics.util.MongoNameConstants;
 import analytics.util.SecurityUtils;
@@ -45,7 +46,7 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.mongodb.DB;
 
-public class ParsingBoltDC extends BaseRichBolt {
+public class ParsingBoltDC extends EnvironmentBolt {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ParsingBoltDC.class);
 	private static final long serialVersionUID = 1L;
 	private OutputCollector outputCollector;
@@ -57,7 +58,10 @@ public class ParsingBoltDC extends BaseRichBolt {
 	private static final boolean isTestL_ID = false;
 	private static final boolean isDemoXML = false;
 	private static boolean isTest = false;
-
+	
+	 public ParsingBoltDC(String systemProperty){
+		 super(systemProperty);
+		  }
 
 	@Override
 	public void execute(Tuple input) {
@@ -77,7 +81,6 @@ public class ParsingBoltDC extends BaseRichBolt {
 
 		}
 		outputCollector.ack(input);
-
 	}
 
 	void initMetrics(TopologyContext context) {
@@ -87,8 +90,9 @@ public class ParsingBoltDC extends BaseRichBolt {
 
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
+		super.prepare(stormConf, context, collector);
 		this.outputCollector = collector;
-		System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+		//HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
 		memberDCDao = new MemberDCDao();
 		dc = new DCDao();
 		initMetrics(context);

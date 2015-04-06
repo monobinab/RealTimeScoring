@@ -1,4 +1,4 @@
-package analytics;
+/*package analytics;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,20 +33,20 @@ public class SocialTopology {
 		String facebookTopic = TopicConstants.FB;
 		String twitterTopic = TopicConstants.TW;
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
-		String[] servers = RedisConnection.getServers();
+		//String[] servers = RedisConnection.getServers();
 
 		topologyBuilder.setSpout("facebookSpout1", new FacebookRedisSpout(
-				servers[0], TopicConstants.PORT, facebookTopic), 1);
+				0, facebookTopic), 1);
 		topologyBuilder.setSpout("facebookSpout2", new FacebookRedisSpout(
-				servers[1], TopicConstants.PORT, facebookTopic), 1);
+				1, facebookTopic), 1);
 		topologyBuilder.setSpout("facebookSpout3", new FacebookRedisSpout(
-				servers[2], TopicConstants.PORT, facebookTopic), 1);
+				2, facebookTopic), 1);
 		topologyBuilder.setSpout("twitterSpout1", new TwitterRedisSpout(
-				servers[0], TopicConstants.PORT, twitterTopic), 1);
+				0, twitterTopic), 1);
 		topologyBuilder.setSpout("twitterSpout2", new TwitterRedisSpout(
-				servers[1], TopicConstants.PORT, twitterTopic), 1);
+				1, twitterTopic), 1);
 		topologyBuilder.setSpout("twitterSpout3", new TwitterRedisSpout(
-				servers[2], TopicConstants.PORT, twitterTopic), 1);
+				2, twitterTopic), 1);
 		topologyBuilder.setBolt("socialBolt", new SocialBolt())
 				.shuffleGrouping("facebookSpout1")
 				.shuffleGrouping("facebookSpout2")
@@ -57,7 +57,7 @@ public class SocialTopology {
 		topologyBuilder.setBolt("strategyBolt", new StrategyScoringBolt(), 1)
 				.shuffleGrouping("socialBolt");
 		Config conf = new Config();
-		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
+	//	conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
 		if (args != null && args.length > 0) {
 			conf.setNumWorkers(3);
 
@@ -74,3 +74,4 @@ public class SocialTopology {
 		}
 	}
 }
+*/

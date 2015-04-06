@@ -1,5 +1,6 @@
 package analytics.bolt;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,13 +36,14 @@ import backtype.storm.tuple.Tuple;
  *         apply strategy on each model and rescore each model
  *
  */
-public class StrategyScoringBolt extends BaseRichBolt { 
+public class StrategyScoringBolt extends EnvironmentBolt {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(StrategyScoringBolt.class);
 	
 	private String host;
 	private int port;
 	private JedisPool jedisPool;
+	private Jedis jedis;
 
 	/**
 	 * 
@@ -49,31 +51,36 @@ public class StrategyScoringBolt extends BaseRichBolt {
 	private static final long serialVersionUID = 1L;
 	private OutputCollector outputCollector;
 	private MultiCountMetric countMetric;
-
-	public StrategyScoringBolt(String host, int port) {
-		super();
+	private String environment;
+	
+	public StrategyScoringBolt(String systemProperty, String host, int port) {
+		super(systemProperty);
+		environment = systemProperty;
 		this.host = host;
 		this.port = port;
+		
 	}
 	
-	public StrategyScoringBolt() {
-		super();
-	}
-	
+	 public StrategyScoringBolt(String systemProperty){
+		 super(systemProperty);
+		 environment = systemProperty;
+ }
+
+
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
+	//	super.prepare(stormConf, context, collector);
+		System.setProperty(MongoNameConstants.IS_PROD, environment);
 		LOGGER.info("PREPARING STRATEGY SCORING BOLT");	
 	     initMetrics(context);
-	     //TODO: ALL BOLTS SHOULD HAVE THIS LINE - ADD TO SUPER CLASS
-        System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
-		this.outputCollector = collector;
-		
+	  	this.outputCollector = collector;
 		//Configure the Redis Server.
 		if(host!=null && !host.equalsIgnoreCase("")){
 			JedisPoolConfig poolConfig = new JedisPoolConfig();
 	        poolConfig.setMaxActive(100);
 	        jedisPool = new JedisPool(poolConfig,host, port, 100);
+	    //    jedis = jedisPool.getResource();
 		}
 		
 	}
@@ -159,6 +166,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 		// 8) Rescore - arbitrate between all changes and memberVariables
 		// Score each model in a loop
 		Map<Integer, Double> modelIdScoreMap = new HashMap<Integer, Double>();
+		Map<String, String> modelIdScoreStringMap = new HashMap<String, String>();
 		Map<Integer,Map<String,Date>> modelIdToExpiryMap = new HashMap<Integer, Map<String,Date>>();
 		
 		for (Integer modelId : modelIdList) {// Score and emit for all modelIds
@@ -173,16 +181,6 @@ public class StrategyScoringBolt extends BaseRichBolt {
 
 			newScore = newScore + ScoringSingleton.getInstance().getBoostScore(allChanges, modelId );
 			
-			//Persisting to Redis to be retrieved quicker than getting from Mongo.
-			//Perform the below operation only when the Redis is configured
-			if(jedisPool!=null){
-				Jedis jedis = jedisPool.getResource();
-				jedis.hset("RTS:Telluride:"+lId, ""+modelId, ""+newScore);
-				jedis.expire("RTS:Telluride:"+lId,600);
-				jedisPool.returnResource(jedis);
-			}
-			
-
 			// 9) Emit the new score
 			Map<String, Date> minMaxMap = ScoringSingleton.getInstance().getMinMaxExpiry(modelId, allChanges);
 			modelIdToExpiryMap.put(modelId, minMaxMap);
@@ -207,6 +205,9 @@ public class StrategyScoringBolt extends BaseRichBolt {
 			listToEmit.add(minExpiry);
 			listToEmit.add(maxExpiry);
 			modelIdScoreMap.put(modelId, newScore);
+			
+			//String Map to set to redis...
+			modelIdScoreStringMap.put(""+modelId, ""+BigDecimal.valueOf(newScore).toPlainString());
 			LOGGER.debug(" ### SCORING BOLT EMITTING: " + listToEmit);
 			if(LOGGER.isDebugEnabled())
 			LOGGER.debug("The time spent for creating scores..... "
@@ -218,14 +219,33 @@ public class StrategyScoringBolt extends BaseRichBolt {
 				e.printStackTrace();
 			}
 		}
-
-		LOGGER.info("TIME:" + messageID + "-Scoring complete-" + System.currentTimeMillis());
+		
+		//Persisting to Redis to be retrieved quicker than getting from Mongo.
+		//Perform the below operation only when the Redis is configured
+		Long timeBefore = System.currentTimeMillis();
+		if(jedisPool!=null){
+			Jedis jedis = jedisPool.getResource();
+			jedis.hmset("RTS:Telluride:"+lId, modelIdScoreStringMap);
+			//jedis.hset("RTS:Telluride:"+lId, ""+modelId, ""+BigDecimal.valueOf(newScore).toPlainString());
+			
+			jedis.expire("RTS:Telluride:"+lId, 600);
+			jedisPool.returnResource(jedis);
+			
+		}
+		Long timeAfter = System.currentTimeMillis();
+	//	LOGGER.info("~~~~TIME TAKEN FOR REDIS~~~: " +  (timeAfter - timeBefore));
+			
+		
 		// 10) Write changedMemberVariableswith expiry
 		ScoringSingleton.getInstance().updateChangedVariables(lId, allChanges);
-		// Write changes to changedMemberScores
-		ScoringSingleton.getInstance().updateChangedMemberScore(lId, modelIdList, modelIdToExpiryMap, modelIdScoreMap,source);
 		LOGGER.info("TIME:" + messageID + "-Score updates complete-" + System.currentTimeMillis());
 		
+		timeBefore = System.currentTimeMillis();
+		// Write changes to changedMemberScores
+		ScoringSingleton.getInstance().updateChangedMemberScore(lId, modelIdList, modelIdToExpiryMap, modelIdScoreMap,source);
+		timeAfter = System.currentTimeMillis();
+	//	LOGGER.info("~~~~~TIME TAKED FOR MONGO~~~: " + (timeAfter - timeBefore) );
+		LOGGER.info("TIME:" + messageID + "- Scoring complete-" + System.currentTimeMillis());
 		
 		List<Object> listToEmit = new ArrayList<Object>();
 		listToEmit.add(lId);

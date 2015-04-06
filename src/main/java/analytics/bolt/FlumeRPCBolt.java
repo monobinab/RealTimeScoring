@@ -30,7 +30,7 @@ import backtype.storm.tuple.Tuple;
  * 
  * @author smehta2
  */
-public class FlumeRPCBolt extends BaseRichBolt {
+public class FlumeRPCBolt extends EnvironmentBolt {
 
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FlumeRPCBolt.class);
@@ -42,10 +42,14 @@ public class FlumeRPCBolt extends BaseRichBolt {
 	private RpcClient client;
 	private MemberScoreDao memberScoreDao;
 	private MultiCountMetric countMetric;
-
+	
+	public FlumeRPCBolt(String systemProperty){
+		 super(systemProperty);
+		 }
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
-		String isProd = System.getProperty(MongoNameConstants.IS_PROD);
+		super.prepare(stormConf, context, collector);
+			String isProd = System.getProperty(MongoNameConstants.IS_PROD);
 		initMetrics(context);
 		memberScoreDao = new MemberScoreDao();
 		String[] hostArray = new String[1];
@@ -53,7 +57,6 @@ public class FlumeRPCBolt extends BaseRichBolt {
 		final Properties sinkProperties = new Properties();
 		Properties prop = new Properties();
 	    //load a properties file from class path, inside static method
-		if(isProd!=null && "true".equals(isProd)){
 			try {
 				prop.load(RedisConnection.class.getClassLoader().getResourceAsStream("resources/flume_agent.properties"));
 			} catch (IOException e) {
@@ -80,7 +83,7 @@ public class FlumeRPCBolt extends BaseRichBolt {
 		sinkProperties.put("maxBackoff", String.valueOf(MAX_BACKOFF));
 		
 		this.client = RpcClientFactory.getInstance(sinkProperties);
-		}
+		
 	}
 	
     

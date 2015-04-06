@@ -14,18 +14,11 @@ import static backtype.storm.utils.Utils.tuple;
 
 public class AAMRedisPubSubSpout extends RedisPubSubSpout {
 
-    /**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = LoggerFactory.getLogger(AAMRedisPubSubSpout.class);
-
-
-
-    public AAMRedisPubSubSpout(String host, int port, String pattern) {
-        super(host, port, pattern);
-    }
-
+	public AAMRedisPubSubSpout(int number, String pattern, String systemProperty) {
+		super(number, pattern, systemProperty)	;
+		}
     @Override
     protected void emit(String ret) {
     	LOGGER.debug("Reading message from Redis");

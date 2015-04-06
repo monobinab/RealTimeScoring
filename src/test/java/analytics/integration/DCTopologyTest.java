@@ -14,17 +14,20 @@ import com.github.fakemongo.Fongo;
 
 import analytics.util.FakeMongo;
 import analytics.util.MongoNameConstants;
+import analytics.util.SystemPropertyUtility;
 
 public class DCTopologyTest {
 	
-	static Map<String,String> conf;
+	//static Map<String,String> conf;
 	@BeforeClass
 	public static void initializeFakeMongo(){
-		System.setProperty(MongoNameConstants.IS_PROD, "test");
+		/*System.setProperty(MongoNameConstants.IS_PROD, "test");
 		conf = new HashMap<String, String>();
         conf.put("rtseprod", "test");
 		//Below line ensures an empty DB rather than reusing a DB with values in it
-        FakeMongo.setDBConn(new Fongo("test db").getDB("test"));				
+        FakeMongo.setDBConn(new Fongo("test db").getDB("test"));	*/			
+		
+		SystemPropertyUtility.setSystemProperty();
 	}
 
 	@Before

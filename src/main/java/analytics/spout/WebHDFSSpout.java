@@ -111,6 +111,17 @@ public class WebHDFSSpout extends BaseRichSpout{
 					readURLAndStoreData(currentURL);
 				}
 				
+				
+				/*String currentURL = Constants.CONTENT_SUMMARY_URL.replace("<PATH>", path).replace("<HDFS_LOCATION>", hdfsPath);
+				Integer fileCount = HttpClientUtils.httpGetCall(currentURL).getJSONObject("ContentSummary").getInt("fileCount");
+				for(int i=0;i<fileCount;i++){
+					if(topologyIdentifier.equalsIgnoreCase("aamTraits") || topologyIdentifier.equalsIgnoreCase("aamBrowser"))
+						currentURL = Constants.FILE_READ_URL.replace("<PATH>", path+"/00000"+i+"_0").replace("<HDFS_LOCATION>", hdfsPath);
+					else
+						currentURL = Constants.FILE_READ_URL.replace("<PATH>", path+"/part-m-0000"+i+"_0").replace("<HDFS_LOCATION>", hdfsPath);
+					readURLAndStoreData(currentURL);
+				}*/
+				
 				//Write back to reds that the files in the directory are processed so 
 				//the next run would not pick it up to process
 				jedis = jedisPool.getResource();
@@ -147,29 +158,29 @@ public class WebHDFSSpout extends BaseRichSpout{
 	}
 	
 	public String formatRecordsToFitRespectiveBolts(String str){
-		String replacedString = null;
-		if(str!=null && !str.equals("")){
-			String returnStr = str.replace("\u0001","', '").replace("\u0002","', '");
-			//returnStr.replace(",", "',");
-			if(topologyIdentifier.equalsIgnoreCase("aamTraits")){
-				returnStr = returnStr.substring(0, returnStr.indexOf(",")+1)+" \"[" +returnStr.substring(returnStr.indexOf(",")+1, returnStr.length());
-				returnStr = returnStr.substring(0, returnStr.length())+"']\"";
-				replacedString = "['"+returnStr+"]";
-			}
-			else if(topologyIdentifier.equalsIgnoreCase("aamInternalSearch")){
-				returnStr = returnStr.replace("null", "");
-				String[] splitStr = returnStr.split(",");
-				returnStr = splitStr[2]+"', '"+splitStr[0]+"', '"+splitStr[1]+"', '"+splitStr[5];
-				replacedString = "['"+returnStr+"']";
-				splitStr = null;
-			}
-			else
-				replacedString = "['"+returnStr+"']";
-			LOGGER.info("Formatted String = " +replacedString);
-			returnStr = null;
-		}
-		
-		return replacedString;
-	}
+		  String replacedString = null;
+		  if(str!=null && !str.equals("")){
+		   String returnStr = str.replace("\u0001","', '").replace("\u0002","', '");
+		   //returnStr.replace(",", "',");
+		   if(topologyIdentifier.equalsIgnoreCase("aamTraits")){
+		    returnStr = returnStr.substring(0, returnStr.indexOf(",")+1)+" \"[" +returnStr.substring(returnStr.indexOf(",")+1, returnStr.length());
+		    returnStr = returnStr.substring(0, returnStr.length())+"']\"";
+		    replacedString = "['"+returnStr+"]";
+		   }
+		   else if(topologyIdentifier.equalsIgnoreCase("aamInternalSearch")){
+		    returnStr = returnStr.replace("null", "");
+		    String[] splitStr = returnStr.split(",");
+		    returnStr = splitStr[2]+"', '"+splitStr[0]+"', '"+splitStr[1]+"', '"+splitStr[5];
+		    replacedString = "['"+returnStr+"']";
+		    splitStr = null;
+		   }
+		   else
+		    replacedString = "['"+returnStr+"']";
+		   LOGGER.info("Formatted String = " +replacedString);
+		   returnStr = null;
+		  }
+		  
+		  return replacedString;
+		 }
 
 }

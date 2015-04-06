@@ -14,6 +14,7 @@ import org.junit.Test;
 
 import analytics.util.DBConnection;
 import analytics.util.FakeMongo;
+import analytics.util.SystemPropertyUtility;
 import analytics.util.dao.MemberMDTagsDao;
 
 import com.github.fakemongo.Fongo;
@@ -25,18 +26,17 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
 public class PersistBoltOccassionTest {
-	static DB db;
+	//static DB db;
 	DBCollection memberMDTagsColl;
 	MemberMDTagsDao memberMDTagsDao;
 
 	@Before
 	public void initialize() throws ConfigurationException {
-		System.setProperty("rtseprod", "test");
-		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));
-		db = DBConnection.getDBConnection();
+		
+		SystemPropertyUtility.setSystemProperty();
 
 		// fake memberMDTags collection
-		memberMDTagsColl = db.getCollection("memberMdTags");
+		memberMDTagsColl = SystemPropertyUtility.getDb().getCollection("memberMdTags");
 		BasicDBList list = new BasicDBList();
 		list.add("HACKS2010");
 
@@ -112,7 +112,7 @@ public class PersistBoltOccassionTest {
 
 	@Test
 	public void getMemberMDTagsTest() {
-		memberMDTagsDao.getMemberMDTagsForVariables("OccassionTopologyTestingl_id");
+		memberMDTagsDao.getMemberMDTags("OccassionTopologyTestingl_id");
 		DBCursor cursor = memberMDTagsColl.find(new BasicDBObject("l_id",
 				"OccassionTopologyTestingl_id"));
 		Assert.assertEquals(1, cursor.size());
@@ -128,7 +128,7 @@ public class PersistBoltOccassionTest {
 
 	@AfterClass
 	public static void teardown() {
-		db.dropDatabase();
+		SystemPropertyUtility.dropDatabase();
 	}
-
 }
+

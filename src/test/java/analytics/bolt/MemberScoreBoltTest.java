@@ -20,6 +20,7 @@ import analytics.util.DBConnection;
 import analytics.util.FakeMongo;
 import analytics.util.ListenerThread;
 import analytics.util.MongoNameConstants;
+import analytics.util.SystemPropertyUtility;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.utils.Utils;
 
@@ -29,16 +30,20 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 
 public class MemberScoreBoltTest {
-	static Map<String,String> conf;
-	static DB conn;
+	//static Map<String,String> conf;
+	/*static DB db;
+	static Map<String, String> stormConf;*/
 	@BeforeClass
 	public static void initializeFakeMongo() throws ConfigurationException{
-		System.setProperty("rtseprod", "test");
+		/*System.setProperty("rtseprod", "test");
 		conf = new HashMap<String, String>();
         conf.put("rtseprod", "test");
+        stormConf = new HashMap<String, String>();
+		stormConf.put("nimbus.host", "test");
 		//Below line ensures an empty DB rather than reusing a DB with values in it
         FakeMongo.setDBConn(new Fongo("test db").getDB("test"));	
-        conn = DBConnection.getDBConnection();
+        db = DBConnection.getDBConnection();*/
+		SystemPropertyUtility.setSystemProperty();
 	}
 	
 	@Ignore("This is just a test of redis publish. We should ideally find an inmemory redis")
@@ -49,7 +54,7 @@ public class MemberScoreBoltTest {
         int port = 6379;
         //This sets the one set by fake mongo already
         
-		DBCollection memberZip = conn.getCollection("memberZip");
+		DBCollection memberZip = SystemPropertyUtility.getDb().getCollection("memberZip");
 		
 		memberZip.insert(new BasicDBObject(MongoNameConstants.ZIP,"11111").append(MongoNameConstants.L_ID, input));
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
@@ -57,7 +62,8 @@ public class MemberScoreBoltTest {
 		//Publish to a test db in REDIS
         MemberPublishBolt boltUnderTest = new MemberPublishBolt(redisHost, port,"member_test");
    
-        boltUnderTest.prepare(conf, null, outputCollector);
+        //TODO: This will fail when we enable the test
+        boltUnderTest.prepare(SystemPropertyUtility.getStormConf(), null, outputCollector);
         Tuple tuple = StormTestUtils.mockMemberTuple(input,"unit_test_source");
         
         //initialize subscriber
@@ -67,6 +73,7 @@ public class MemberScoreBoltTest {
         pool = new JedisPool(new JedisPoolConfig(),redisHost, port);
         ListenerThread listener = new ListenerThread(queue,pool,"member_test");
         listener.start();
+        
         
         //call the bolt method
         boltUnderTest.execute(tuple);
@@ -82,7 +89,11 @@ public class MemberScoreBoltTest {
 	
 	@AfterClass
 	public static void cleanUp(){
-		conn.dropDatabase();
+		/*if(db.toString().equalsIgnoreCase("FongoDB.test"))
+			db.dropDatabase();
+		  else
+		   Assert.fail("Something went wrong. Tests connected to " + db.toString());
+		db.dropDatabase();*/
+		SystemPropertyUtility.dropDatabase();
 	}
-	
 }

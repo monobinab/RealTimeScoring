@@ -16,6 +16,7 @@ import analytics.util.MQConnectionConfig;
 import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
 import analytics.util.RedisConnection;
+import analytics.util.SystemUtility;
 import analytics.util.WebsphereMQCredential;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
@@ -38,15 +39,16 @@ public class RealTimeScoringTellurideTopology {
 	public static void main(String[] args) throws ConfigurationException {
 		LOGGER.info("Starting telluride real time scoring topology");
 		// Configure logger
-		System.clearProperty(MongoNameConstants.IS_PROD);
-		if (args.length > 0) {
-			System.setProperty(MongoNameConstants.IS_PROD, "true");
+		if (!SystemUtility.setEnvironment(args)) {
+			System.out
+					.println("Please pass the environment variable argument- 'PROD' or 'QA' or 'LOCAL'");
+			System.exit(0);
 		}
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 
 		MQConnectionConfig mqConnection = new MQConnectionConfig();
 		WebsphereMQCredential mqCredential = mqConnection
-				.getWebsphereMQCredential("Telluride");
+				.getWebsphereMQCredential(System.getProperty(MongoNameConstants.IS_PROD), "Telluride");
 		if(mqCredential==null){
 			LOGGER.error("Unable to get a MQ connections");
 			return;
@@ -69,11 +71,11 @@ public class RealTimeScoringTellurideTopology {
 										.getQueueName()), 3);
 
 		// create definition of main spout for queue 1
-		topologyBuilder.setBolt("parsingBolt", new TellurideParsingBoltPOS(), 12).localOrShuffleGrouping("telluride1").localOrShuffleGrouping("telluride2");
-        topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(AuthPropertiesReader
+		topologyBuilder.setBolt("parsingBolt", new TellurideParsingBoltPOS(System.getProperty(MongoNameConstants.IS_PROD)), 12).localOrShuffleGrouping("telluride1").localOrShuffleGrouping("telluride2");
+        topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System.getProperty(MongoNameConstants.IS_PROD), AuthPropertiesReader
 				.getProperty(Constants.TELLURIDE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
 				.getProperty(Constants.TELLURIDE_REDIS_SERVER_PORT))), 12).localOrShuffleGrouping("parsingBolt");
-        topologyBuilder.setBolt("loggingBolt", new LoggingBolt(), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
+        topologyBuilder.setBolt("loggingBolt", new LoggingBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
 		//Redis publish to server 1
         //topologyBuilder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 3).localOrShuffleGrouping("strategyScoringBolt", "score_stream");
         //topologyBuilder.setBolt("memberPublishBolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 3).localOrShuffleGrouping("strategyScoringBolt", "member_stream");
@@ -83,8 +85,11 @@ public class RealTimeScoringTellurideTopology {
 		conf.put("metrics_topology", "Telluride");
 		conf.registerMetricsConsumer(MetricsListener.class, 3);
 		conf.setDebug(false);
-		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
-		if (args.length > 0) {
+		conf.put("topology_environment", System.getProperty(MongoNameConstants.IS_PROD));
+		if (System.getProperty(MongoNameConstants.IS_PROD)
+				.equalsIgnoreCase("PROD")
+				|| System.getProperty(MongoNameConstants.IS_PROD)
+						.equalsIgnoreCase("QA")) {
 			try {
                 conf.setNumAckers(5);
                 conf.setMessageTimeoutSecs(300);
@@ -109,7 +114,6 @@ public class RealTimeScoringTellurideTopology {
 				LOGGER.error(e.getClass() + ": " +  e.getMessage(), e);
 			}
 			cluster.shutdown();
-
 		}
 	}
 }

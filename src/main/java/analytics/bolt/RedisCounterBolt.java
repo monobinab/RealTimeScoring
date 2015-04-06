@@ -3,6 +3,7 @@
  */
 package analytics.bolt;
 
+import analytics.util.HostPortUtility;
 import analytics.util.MongoNameConstants;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -37,7 +38,8 @@ public class RedisCounterBolt extends BaseRichBolt {
          */
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
-        System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+     //   System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+		   HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
         jedis = new Jedis(host, port);
         this.outputCollector = collector;
     }

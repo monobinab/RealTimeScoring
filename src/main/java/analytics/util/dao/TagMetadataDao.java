@@ -18,11 +18,12 @@ public class TagMetadataDao extends AbstractDao {
 	DBCollection tagMetadataCollection;
 
 	/**
-	 * 
+	 * t,b,s,po
 	 */
 	public TagMetadataDao() {
 		super();
 		tagMetadataCollection = db.getCollection("tagsMetadata");
+		LOGGER.info("colelction in tagMetadataDao: " + tagMetadataCollection.getFullName());
 	}
 
 	public TagMetadata getDetails(String tag){

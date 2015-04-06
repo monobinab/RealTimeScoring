@@ -1,4 +1,4 @@
-package analytics.bolt;
+/*package analytics.bolt;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.spout.TwitterRedisSpout;
+import analytics.util.HostPortUtility;
 import analytics.util.MongoNameConstants;
 import analytics.util.dao.FacebookLoyaltyIdDao;
 import analytics.util.dao.SocialVariableDao;
@@ -27,9 +28,9 @@ import com.google.gson.Gson;
 public class SocialBolt extends BaseRichBolt {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(SocialBolt.class);
-	/**
+	*//**
 	 * 
-	 */
+	 *//*
 	private static final long serialVersionUID = 1L;
 	private OutputCollector collector;
 	private FacebookLoyaltyIdDao facebookLoyaltyIdDao;
@@ -39,7 +40,8 @@ public class SocialBolt extends BaseRichBolt {
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
 		this.collector = collector;
-        System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+      //  System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+		   HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
 		twitterLoyaltyIdDao = new TwitterLoyaltyIdDao();
 		facebookLoyaltyIdDao = new FacebookLoyaltyIdDao();
 		socialVariableDao = new SocialVariableDao();
@@ -98,3 +100,4 @@ public class SocialBolt extends BaseRichBolt {
 	}
 
 }
+*/

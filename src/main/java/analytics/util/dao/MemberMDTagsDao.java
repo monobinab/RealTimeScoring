@@ -20,8 +20,10 @@ public class MemberMDTagsDao extends AbstractDao {
 	DBCollection memberMDTagsCollection;
 
 	public MemberMDTagsDao() {
-		super();
+		super("server2");
 		memberMDTagsCollection = db.getCollection("memberMdTags");
+		LOGGER.info("colelction in tagMetadataDao: " + memberMDTagsCollection.getFullName());
+	
 	}
 
 	public List<String> getMemberMDTagsForVariables(String l_id) {
@@ -69,6 +71,7 @@ public class MemberMDTagsDao extends AbstractDao {
 			mdTagsList.add(tag);
 		}
 		tagstoUpdate.put("tags", mdTagsList);
+		LOGGER.info("tags are getting updated in " +  memberMDTagsCollection.getDB().getName());
 		memberMDTagsCollection.update(new BasicDBObject(
 				MongoNameConstants.L_ID, l_id), tagstoUpdate, true, false);
 	

@@ -12,6 +12,7 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 
 import analytics.util.JsonUtils;
+import analytics.util.MongoNameConstants;
 import analytics.util.dao.MemberTraitsDao;
 import analytics.util.dao.TraitVariablesDao;
 import backtype.storm.task.OutputCollector;
@@ -37,6 +38,14 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
          * @see backtype.storm.task.IBolt#prepare(java.util.Map,
          * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
          */
+    public ParsingBoltWebTraits(){
+    	
+    }
+    
+    public ParsingBoltWebTraits (String systemProperty, String topic) {
+		super(systemProperty, topic);
+	
+	}
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
 		super.prepare(stormConf, context, collector);

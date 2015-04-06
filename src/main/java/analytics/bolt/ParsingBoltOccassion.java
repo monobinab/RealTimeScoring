@@ -1,3 +1,4 @@
+
 package analytics.bolt;
 
 import java.text.SimpleDateFormat;
@@ -20,6 +21,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
+import analytics.util.HostPortUtility;
 import analytics.util.JsonUtils;
 import analytics.util.MongoNameConstants;
 import analytics.util.SecurityUtils;
@@ -37,7 +39,7 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
-public class ParsingBoltOccassion extends BaseRichBolt {
+public class ParsingBoltOccassion extends EnvironmentBolt {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ParsingBoltOccassion.class);
 	private OutputCollector outputCollector;
@@ -74,13 +76,16 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 		 modelPercDao = new ModelPercentileDao();
 	 }
 
+	 public ParsingBoltOccassion(String systemProperty){
+		 super(systemProperty);
+		
+	 }
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
+		super.prepare(stormConf, context, collector);
 		this.outputCollector = collector;
-		 System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
 		tagMetadataDao = new TagMetadataDao();
-	//	System.out.println(tagMetadataDao.getDetails("HACKS2010"));
 		tagVariableDao = new TagVariableDao();
 		memberTagDao = new MemberMDTagsDao();
 		modelPercDao = new ModelPercentileDao();
@@ -94,12 +99,13 @@ public class ParsingBoltOccassion extends BaseRichBolt {
 	@Override
 	public void execute(Tuple input) {
 		//System.out.println("IN PARSING BOLT: " + input);
+		LOGGER.info("~~~~~~~~~~~Incoming tuple in ParsingboltOccasion: " + input);
 		countMetric.scope("incoming_tuples").incr();
 		Map<String, String> variableValueTagsMap = new HashMap<String, String>();
 		JsonParser parser = new JsonParser();
 		JsonElement jsonElement= null;
 		try{
-			jsonElement = getParsedJson(input, parser);
+		jsonElement = getParsedJson(input, parser);
 		}
 		catch(Exception e){
 			LOGGER.error("exception in parsing: " + e);

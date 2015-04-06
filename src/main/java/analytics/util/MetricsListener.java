@@ -24,6 +24,7 @@ public class MetricsListener implements IMetricsConsumer {
 	@Override
 	public void prepare(Map stormConf, Object registrationArgument,
 			TopologyContext context, IErrorReporter errorReporter) {
+		String isProd = stormConf.get("topology_environment").toString();
 		try {
 			prop.load(MetricsListener.class.getClassLoader().getResourceAsStream("resources/redis_server_metrics.properties"));
 		} catch (IOException e) {
@@ -32,13 +33,15 @@ public class MetricsListener implements IMetricsConsumer {
 		int port = Integer.parseInt(prop.getProperty("port"));
         JedisPoolConfig poolConfig = new JedisPoolConfig();
         poolConfig.setMaxActive(100);
-		if("true".equals(stormConf.get("rtseprod"))){
+		if("PROD".equals(isProd)){
 	        jedisPool = new JedisPool(poolConfig,prop.getProperty("prod"), port, 1000);
 		}
-		else{
+		else if("QA".equals(isProd)){
 	        jedisPool = new JedisPool(poolConfig,prop.getProperty("qa"), port, 1000);
 		}
-
+		else if("LOCAL".equals(isProd)){
+	        jedisPool = new JedisPool(poolConfig,prop.getProperty("qa"), port, 1000);
+		}
 		topologyName = (String) stormConf.get("metrics_topology");
 	}
 

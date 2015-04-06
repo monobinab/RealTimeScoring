@@ -41,11 +41,11 @@ public class SywApiCalls {
 	 */
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(SywApiCalls.class);
-	private static final String APPSECRET = "70370867e53649b994b5f0175c107189";
-	private static final String BASEURI = "http://platform.shopyourway.com";
-	private static final String BASEURI_HTTPS = "https://platform.shopyourway.com";
-	private static final Long APPID = (long) 	11875 ;
-	private static final Long USERID = (long)6875997;
+	private String APPSECRET;
+	private String BASEURI;
+	private String BASEURI_HTTPS;
+	private Long APPID;
+	private Long USERID;
 	
 	public static final String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss";
 	public static final String TOKEN_REQUEST_PATTERN = "/auth/get-token?userId=%d&appId=%d&signature=%s&timestamp=%s";
@@ -64,6 +64,29 @@ public class SywApiCalls {
 	 * @throws Exception
 	 */
 	public SywApiCalls()  {
+		LOGGER.info("~~~~~~~~~~~~~~~DBCONNECTION CLASS~~~~~~~: " + System.getProperty(MongoNameConstants.IS_PROD));
+		String environment = System.getProperty(MongoNameConstants.IS_PROD);
+		if(environment.equals("PROD")){
+			APPSECRET = "70370867e53649b994b5f0175c107189";
+			BASEURI = "http://platform.shopyourway.com";
+			BASEURI_HTTPS = "https://platform.shopyourway.com";
+			APPID = (long) 	11875 ;
+			USERID = (long)6875997;
+		}
+		else if(environment.equals("QA")||environment.equals("LOCAL")){
+			APPSECRET = "7d7bdd89350c4ceda2d3ca2d0884b2a7";
+			BASEURI = "http://sandboxplatform.shopyourway.com";
+			BASEURI_HTTPS = "https://sandboxplatform.shopyourway.com";
+			APPID = (long) 	16735 ;
+			USERID = (long)5643226;
+		}
+		else if(environment.equals("test")){
+			APPSECRET = "7d7bdd89350c4ceda2d3ca2d0884b2a7";
+			BASEURI = "http://sandboxplatform.shopyourway.com";
+			BASEURI_HTTPS = "https://sandboxplatform.shopyourway.com";
+			APPID = (long) 	16735 ;
+			USERID = (long)5643226;
+		}
 		try {
 			token = getOfflineToken();
 			hash = getHash(token);
@@ -72,6 +95,7 @@ public class SywApiCalls {
 		} catch (UnsupportedEncodingException e) {
 			LOGGER.warn("Unable to get SYW offline token and hash", e);
 		}
+		
 	}
 	
 	/**
@@ -187,6 +211,11 @@ public class SywApiCalls {
 		/*sourceProductId":"05771769000P","numberOfBuyingOptions":0,"itemId":"05771769000"*/
 	}
 	
+	/**
+	 * Get catalog type - like, want, or have
+	 * @param i
+	 * @return
+	 */
 	public String getCatalogType(int i){
 		String requestURL = BASEURI + "/catalogs/get?ids="+i;
 		JsonElement element = makeGetRequestToSywAPI(requestURL);

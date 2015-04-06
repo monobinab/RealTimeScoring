@@ -1,5 +1,6 @@
 package analytics.bolt;
 
+import analytics.util.HostPortUtility;
 import analytics.util.MongoNameConstants;
 import analytics.util.SywApiCalls;
 import analytics.util.dao.BoostDao;
@@ -37,7 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class ProcessSYWInteractions extends BaseRichBolt {
+public class ProcessSYWInteractions extends EnvironmentBolt {
 	/**
 	 * 
 	 */
@@ -58,6 +59,10 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 	Map<String, List<String>> boostListMap;
 	private Map sywBoostModelMap;
 	private MultiCountMetric countMetric;
+	
+	 public ProcessSYWInteractions(String systemProperty){
+		 super(systemProperty);
+		 }
 
 	void initMetrics(TopologyContext context) {
 		countMetric = new MultiCountMetric();
@@ -66,7 +71,9 @@ public class ProcessSYWInteractions extends BaseRichBolt {
 
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
-		System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+	//	System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+		super.prepare(stormConf, context, collector);
+	 //   HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
 		this.outputCollector = collector;
 		sywApiCalls = new SywApiCalls();
 

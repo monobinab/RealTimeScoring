@@ -1,4 +1,4 @@
-package analytics.bolt;
+/*package analytics.bolt;
 
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
@@ -27,3 +27,4 @@ public class StrategyScoringBoltTest {
 	}
 
 }
+*/

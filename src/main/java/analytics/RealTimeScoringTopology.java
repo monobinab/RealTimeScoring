@@ -1,4 +1,4 @@
-package analytics;
+/*package analytics;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ public class RealTimeScoringTopology {
 			.getLogger(RealTimeScoringTopology.class);
 
 	public static void main(String[] args) throws ConfigurationException {
-		System.clearProperty(MongoNameConstants.IS_PROD);
+		//System.clearProperty(MongoNameConstants.IS_PROD);
 		if (args.length > 0) {
 			System.setProperty(MongoNameConstants.IS_PROD, "true");
 		}
@@ -65,7 +65,7 @@ public class RealTimeScoringTopology {
 		topologyBuilder.setBolt("score_publish_bolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 2).shuffleGrouping("strategy_bolt","score_stream");
 		Config conf = new Config();
 		conf.setDebug(false);
-		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
+	//	conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
 		if (args.length > 0) {
 			try {
 				StormSubmitter.submitTopology(args[0], conf,
@@ -87,7 +87,7 @@ public class RealTimeScoringTopology {
 				LOGGER.error(e.getClass() + ": " + e.getMessage(), e);
 			}
 			cluster.shutdown();
-
 		}
 	}
 }
+*/

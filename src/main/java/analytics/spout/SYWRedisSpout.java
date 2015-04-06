@@ -23,18 +23,17 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 
 public class SYWRedisSpout extends RedisPubSubSpout {
-	public SYWRedisSpout(String host, int port, String pattern) {
-		super(host, port, pattern);
-	}
-
+	public SYWRedisSpout(int number, String pattern, String systemProperty) {
+		super(number, pattern, systemProperty)	;
+		}
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(SYWRedisSpout.class);
-	/*
-	 * Read the redis lines for SYW events (non-Javadoc)
-	 * 
-	 * @see analytics.spout.RedisPubSubSpout#emit(java.lang.String)
-	 */
+	
+	 /* Read the redis lines for SYW events (non-Javadoc)
+	  
+	 @see analytics.spout.RedisPubSubSpout#emit(java.lang.String)*/
+	 
 	@Override
 	protected void emit(String ret) {
 		// TODO: Find why there was a sleep?? Copied form AAMTopology

@@ -1,4 +1,4 @@
-package analytics.bolt;
+/*package analytics.bolt;
 
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +16,7 @@ import analytics.StormTestUtils;
 import analytics.util.DBConnection;
 import analytics.util.FakeMongo;
 import analytics.util.MongoNameConstants;
+import analytics.util.SystemPropertyUtility;
 import backtype.storm.tuple.Tuple;
 
 import com.github.fakemongo.Fongo;
@@ -32,9 +33,12 @@ public class SocialBoltMockTest {
 		System.setProperty("rtseprod", "test");
 		conf = new HashMap<String, String>();
         conf.put("rtseprod", "test");
+        conf.put("nimbus.host", "test");
 		//Below line ensures an empty DB rather than reusing a DB with values in it
 		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));	
 		conn = DBConnection.getDBConnection();
+		
+		SystemPropertyUtility.setSystemProperty();
 		
 	}
 	
@@ -45,7 +49,7 @@ public class SocialBoltMockTest {
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
         SocialBolt boltUnderTest = new SocialBolt();
        
-        boltUnderTest.prepare(conf, null, outputCollector);
+        boltUnderTest.prepare(SystemPropertyUtility.getStormConf(), null, outputCollector);
         String input = "8/1/2014 7:07,1123404212,[0.0],[0.0],dishwasher";
         String expectedLid = "2gpsDmSmaKudbyxsGUbpDeTU1Q=";
         String expectedBoostVar = "{\"BOOST_DISHWASHER_SOCIAL\":\"0.0\"}";//postive score is only considered here
@@ -54,7 +58,7 @@ public class SocialBoltMockTest {
         Tuple tuple = StormTestUtils.mockTuple(input, source);
         
         //Pass the collections that need to be looked up by the bolt
-        /* Use reflection to set if we can not get handle to DB after some refactoring again
+         Use reflection to set if we can not get handle to DB after some refactoring again
          * FacebookLoyaltyIdDao dao = new FacebookLoyaltyIdDao();
   	    Field fbLoyalty = FacebookLoyaltyIdDao.class.getDeclaredField("fbLoyaltyCollection");
   	    fbLoyalty.setAccessible(true);
@@ -65,11 +69,11 @@ public class SocialBoltMockTest {
         Field fbCollection = SocialBolt.class.getDeclaredField("facebookLoyaltyIdDao");
         fbCollection.setAccessible(true);
         fbCollection.set(boltUnderTest, dao);
-        */
-		DBCollection fbLoyaltyCollection = conn.getCollection("fbLoyaltyIds");
+        
+		DBCollection fbLoyaltyCollection = SystemPropertyUtility.getDb().getCollection("fbLoyaltyIds");
         fbLoyaltyCollection.insert(new BasicDBObject(MongoNameConstants.L_ID, expectedLid).append(MongoNameConstants.SOCIAL_ID,"1123404212"));
         
-		DBCollection socialVariable = conn.getCollection("socialVariable");
+		DBCollection socialVariable = SystemPropertyUtility.getDb().getCollection("socialVariable");
 		socialVariable.insert(new BasicDBObject(MongoNameConstants.SOCIAL_KEYWORD, "dishwasher").append(MongoNameConstants.SOCIAL_VARIABLE,"BOOST_DISHWASHER_SOCIAL"));
 		
         boltUnderTest.execute(tuple);
@@ -83,7 +87,12 @@ public class SocialBoltMockTest {
 	}
 	@AfterClass
 	public static void cleanUp(){
-		conn.dropDatabase();
+		if(conn.toString().equalsIgnoreCase("FongoDB.test"))
+			   conn.dropDatabase();
+			  else
+			   Assert.fail("Something went wrong. Tests connected to " + conn.toString());
+		SystemPropertyUtility.dropDatabase();
 	}
 	
 }
+*/

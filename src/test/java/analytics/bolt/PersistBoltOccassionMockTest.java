@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,6 +17,7 @@ import analytics.StormTestUtils;
 import analytics.util.DBConnection;
 import analytics.util.FakeMongo;
 import analytics.util.SecurityUtils;
+import analytics.util.SystemPropertyUtility;
 import analytics.util.dao.MemberMDTagsDao;
 import analytics.util.dao.MemberTraitsDao;
 import backtype.storm.task.TopologyContext;
@@ -31,21 +33,17 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
 public class PersistBoltOccassionMockTest {
-	static Map<String,String> conf;
-	static DB db;
+	
 	DBCollection memberMDTagsColl;
 	MemberMDTagsDao memberMDTagsDao;
 
 	@Before
 	public void initialize() throws ConfigurationException {
-		System.setProperty("rtseprod", "test");
-		conf = new HashMap<String, String>();
-		conf.put("rtseprod", "test");
-		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));
-		db = DBConnection.getDBConnection();
+		
+		SystemPropertyUtility.setSystemProperty();
 
 		// fake memberMDTags collection
-		memberMDTagsColl = db.getCollection("memberMdTags");
+		memberMDTagsColl = SystemPropertyUtility.getDb().getCollection("memberMdTags");
 		BasicDBList list = new BasicDBList();
 		list.add("HACKS2010");
 
@@ -66,7 +64,7 @@ public class PersistBoltOccassionMockTest {
 		DBObject dbObjBefore = memberMDTagsColl.findOne(new BasicDBObject("l_id", "iFTsBvgexZasfSxbq2nOtwAj4bc="));
 		BasicDBList listBefore = (BasicDBList) dbObjBefore.get("tags");
 		Assert.assertEquals("memberMdTags coll before adding incoming member tags", 1, listBefore.size());
-		PersistOccasionBolt boltUnderTest =  new PersistOccasionBolt();
+		PersistOccasionBolt boltUnderTest =  new PersistOccasionBolt(System.getProperty("rtseprod"));
 		List<Object> emitToPersist = new ArrayList<Object>();
 		StringBuilder tags = new StringBuilder();
 		tags.append("HACKS2010");
@@ -77,7 +75,8 @@ public class PersistBoltOccassionMockTest {
 		Tuple tuple = StormTestUtils.mockTupleList(emitToPersist, "PurchaseOccassion");
 		TopologyContext context = new MockTopologyContext();
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
-		boltUnderTest.prepare(conf, context, outputCollector);
+		
+		boltUnderTest.prepare(SystemPropertyUtility.getStormConf(), context, outputCollector);
 		boltUnderTest.execute(tuple);
 		DBObject dbObj = memberMDTagsColl.findOne(new BasicDBObject("l_id", "iFTsBvgexZasfSxbq2nOtwAj4bc="));
 		BasicDBList list = (BasicDBList) dbObj.get("tags");
@@ -93,7 +92,7 @@ public class PersistBoltOccassionMockTest {
 		DBObject dbObjBefore = memberMDTagsColl.findOne(new BasicDBObject("l_id", "jnJgNqJpVI3Lt4olN7uCUH0Zcuc="));
 		BasicDBList listBefore = (BasicDBList) dbObjBefore.get("tags");
 		Assert.assertEquals("memberMdTags coll before adding incoming member tags", 2, listBefore.size());
-		PersistOccasionBolt boltUnderTest =  new PersistOccasionBolt();
+		PersistOccasionBolt boltUnderTest =  new PersistOccasionBolt(System.getProperty("rtseprod"));
 		List<Object> emitToPersist = new ArrayList<Object>();
 		StringBuilder tags = new StringBuilder();
 		emitToPersist.add("jnJgNqJpVI3Lt4olN7uCUH0Zcuc=");
@@ -101,10 +100,21 @@ public class PersistBoltOccassionMockTest {
 		Tuple tuple = StormTestUtils.mockTupleList(emitToPersist, "PurchaseOccassion");
 		TopologyContext context = new MockTopologyContext();
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
-		boltUnderTest.prepare(conf, context, outputCollector);
+
+		boltUnderTest.prepare(SystemPropertyUtility.getStormConf(), context, outputCollector);
 		boltUnderTest.execute(tuple);
 		DBObject dbObj = memberMDTagsColl.findOne(new BasicDBObject("l_id", "jnJgNqJpVI3Lt4olN7uCUH0Zcuc="));
 		Assert.assertEquals(null, dbObj);
 	}
+	
+	@AfterClass
+	public static void cleanUp(){
+		/*if(db.toString().equalsIgnoreCase("FongoDB.test"))
+			   db.dropDatabase();
+			  else
+			   Assert.fail("Something went wrong. Tests connected to " + db.toString());*/
+		SystemPropertyUtility.dropDatabase();
+	}
+
 
 }

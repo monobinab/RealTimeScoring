@@ -9,6 +9,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import analytics.util.HostPortUtility;
 import analytics.util.JsonUtils;
 import analytics.util.MongoNameConstants;
 import analytics.util.SecurityUtils;
@@ -22,13 +23,10 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
-public abstract class ParseAAMFeeds  extends BaseRichBolt {
+public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 
 	static final Logger LOGGER = LoggerFactory
 			.getLogger(ParseAAMFeeds.class);
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	protected OutputCollector outputCollector;
 
@@ -41,6 +39,7 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 	protected MemberUUIDDao memberDao;
 	protected ModelVariablesDao modelVariablesDao;
 	protected MultiCountMetric countMetric;
+		
     public ParseAAMFeeds() {
 	}
 	 void initMetrics(TopologyContext context){
@@ -48,11 +47,11 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 	     context.registerMetric("custom_metrics", countMetric, 60);
 	    }
 
-	// Overloaded Paramterized constructor to get the topic to which the spout
-	// is listening to
-	public ParseAAMFeeds(String topic) {
+	// Overloaded Paramterized constructor to get the topic to which the spout is listening to
+	public ParseAAMFeeds( String systemProperty, String topic) {
+		super(systemProperty);
 		this.topic = topic;
-	}
+		}
 	
     public void setOutputCollector(OutputCollector outputCollector) {
         this.outputCollector = outputCollector;
@@ -61,32 +60,16 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         this.outputCollector = collector;
-        System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
-	    initMetrics(context);
-        
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see backtype.storm.task.IBolt#prepare(java.util.Map,
-	 * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
-	 */
-        memberDao = new MemberUUIDDao();
+        initMetrics(context);
+        super.prepare(stormConf, context, collector);
+	    memberDao = new MemberUUIDDao();
         modelVariablesDao =  new ModelVariablesDao(); 
         modelVariablesList = new ArrayList<String>();
-        
-        //this.currentUUID=null;
-        //l_idToValueCollectionMap = new HashMap<String,Collection<String>>();
-        
-
+     
 		//POPULATE MODEL VARIABLES LIST
         modelVariablesList =modelVariablesDao.getVariableList();
     }
 
-	/*
-     * (non-Javadoc)
-     *
-     * @see backtype.storm.task.IBolt#execute(backtype.storm.tuple.Tuple)
-     */
 	@Override
 	public void execute(Tuple input) {
 		
@@ -156,16 +139,8 @@ public abstract class ParseAAMFeeds  extends BaseRichBolt {
         
 	}
 
-
 	protected abstract Map<String, String> processList(String current_l_id);
 
-	/*
-     * (nn-Javadoc)
-     *
-     * @see
-     * backtype.storm.topology.IComponent#declareOutputFields(backtype.storm.
-     * topology.OutputFieldsDeclarer)
-     */
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		declarer.declare(new Fields("l_id","lineItemAsJsonString","source"));

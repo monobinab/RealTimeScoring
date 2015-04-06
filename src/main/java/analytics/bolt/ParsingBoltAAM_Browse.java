@@ -37,16 +37,8 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 	private PidMatchUtils pidMatchUtil;
 	private List<String> boostList;
 	
-	private String topologyIdentifier;
-	
-	public ParsingBoltAAM_Browse ( String topic) {
-		super(topic);
-			
-	}
-	
-	public ParsingBoltAAM_Browse (String systemProperty, String topic, String topologyIdentifier) {
-		super(topic);
-		this.topologyIdentifier = topologyIdentifier;
+	public ParsingBoltAAM_Browse (String systemProperty, String topic) {
+		super(systemProperty, topic);
 			
 	}
 	/*

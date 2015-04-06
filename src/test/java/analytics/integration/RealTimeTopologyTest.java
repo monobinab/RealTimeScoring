@@ -1,4 +1,4 @@
-package analytics.integration;
+/*package analytics.integration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,6 +14,7 @@ import analytics.bolt.ParsingBoltPOS;
 import analytics.bolt.ScorePublishBolt;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.util.DBConnection;
+import analytics.util.HostPortUtility;
 import analytics.util.MongoNameConstants;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
@@ -40,6 +41,7 @@ public class RealTimeTopologyTest {
 		conf.setDebug(false);
 		conf.setMaxTaskParallelism(3);
 		conf.put(MongoNameConstants.IS_PROD, "test");
+		conf.put("nimbus.host", "test");
 		LocalCluster cluster = new LocalCluster();
 		cluster.submitTopology("realtimescoring_topology", conf,
 				topologyBuilder.createTopology());
@@ -58,6 +60,10 @@ public class RealTimeTopologyTest {
 	@After
 	public void cleanUp() throws ConfigurationException{
 		DB db = DBConnection.getDBConnection();
-		db.dropDatabase();
+		if(db.toString().equalsIgnoreCase("FongoDB.test"))
+			   db.dropDatabase();
+			  else
+			   Assert.fail("Something went wrong. Tests connected to " + db.toString());
 	}
 }
+*/

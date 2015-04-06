@@ -3,6 +3,7 @@
  */
 package analytics.bolt;
 
+import analytics.util.HostPortUtility;
 import analytics.util.MongoNameConstants;
 import analytics.util.dao.MemberScoreDao;
 import analytics.util.dao.MemberZipDao;
@@ -57,7 +58,8 @@ public class RankPublishBolt extends BaseRichBolt {
          */
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
-        System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+      //  System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+		   HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
 		memberZipDao = new MemberZipDao();
 		memberScoreDao = new MemberScoreDao();
         jedis = new Jedis(host, port);

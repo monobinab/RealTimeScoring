@@ -23,13 +23,16 @@ import analytics.util.strategies.StrategyTurnOnFlag;
 
 public class StrategyMapperTest {
 
-	static DB db;
+	//static DB db;
 	@BeforeClass
 	public static void setup() throws ConfigurationException {
-		System.setProperty("rtseprod", "test");
+		/*System.setProperty("rtseprod", "test");
 		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));
-		db = DBConnection.getDBConnection();
-		DBCollection varColl = db.getCollection("Variables");
+		db = DBConnection.getDBConnection();*/
+		
+		SystemPropertyUtility.setSystemProperty();
+		
+		DBCollection varColl = SystemPropertyUtility.getDb().getCollection("Variables");
 		varColl.insert(new BasicDBObject("name", "v1").append("VID", 1).append("strategy","StrategyCountTransactions"));
 		varColl.insert(new BasicDBObject("name", "v2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
 		varColl.insert(new BasicDBObject("name", "v3").append("VID", 3).append("strategy","StrategyCountTraits"));
@@ -41,7 +44,12 @@ public class StrategyMapperTest {
 	
 	@AfterClass
 	public static void cleanUp(){
-		db.dropDatabase();
+		/*if(db.toString().equalsIgnoreCase("FongoDB.test"))
+			   db.dropDatabase();
+			  else
+			   Assert.fail("Something went wrong. Tests connected to " + db.toString());*/
+		
+		SystemPropertyUtility.dropDatabase();
 	}
 	
 	@Test

@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.util.Constants;
+import analytics.util.HostPortUtility;
 import analytics.util.JsonUtils;
 import analytics.util.MongoNameConstants;
 import analytics.util.SecurityUtils;
@@ -38,7 +39,7 @@ import backtype.storm.tuple.Tuple;
 import com.ibm.jms.JMSBytesMessage;
 import com.ibm.jms.JMSMessage;
 
-public class TellurideParsingBoltPOS extends BaseRichBolt {
+public class TellurideParsingBoltPOS extends EnvironmentBolt {
 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(TellurideParsingBoltPOS.class);
@@ -55,6 +56,10 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 	private Map<String, List<String>> divCatVariablesMap;
 	private String requestorID = "";
 	private MultiCountMetric countMetric;
+	 public TellurideParsingBoltPOS(String systemProperty){
+		 super(systemProperty);
+		
+	 }
 	public void setOutputCollector(OutputCollector outputCollector) {
 		this.outputCollector = outputCollector;
 	}
@@ -69,10 +74,11 @@ public class TellurideParsingBoltPOS extends BaseRichBolt {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
-		
+		super.prepare(stormConf, context, collector);
 		this.outputCollector = collector;
 	     initMetrics(context);
-        System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+     //   System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+	 //    HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
 		LOGGER.info("Preparing telluride parsing bolt");
 
 		LOGGER.debug("Getting mongo collections");

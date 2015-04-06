@@ -1,4 +1,4 @@
-package analytics.util;
+/*package analytics.util;
 
 import com.ibm.mq.jms.*;
 
@@ -15,6 +15,9 @@ import java.nio.charset.Charset;
 
 public class MqSender {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MqSender.class);
+	public static void main(String[] args){
+		initJMS("POS");
+	}
 
 	static int counter = 0;
 	public static void initJMS(String feed) {
@@ -24,7 +27,7 @@ public class MqSender {
 			
 			MQConnectionConfig mqConnection = new MQConnectionConfig();
 			WebsphereMQCredential mqCredential = mqConnection
-					.getWebsphereMQCredential(feed);
+					.getWebsphereMQCredential("LOCAL", feed);
 			cf1.setHostName(mqCredential.getHostOneName());
 			cf1.setPort(mqCredential.getPort());
 			cf1.setTransportType(JMSC.MQJMS_TP_CLIENT_MQ_TCPIP);
@@ -65,7 +68,7 @@ public class MqSender {
 
 			String sCurrentLine;
 			BufferedReader br = null;
-			FileReader fr = new FileReader("resources/PROCTRAN3.txt");
+			FileReader fr = new FileReader("resources/RTS_TELLURIDE_TEST.txt");
 			br = new BufferedReader(fr);
 			while ((sCurrentLine = br.readLine()) != null && counter<=1) {
 				BytesMessage message = (BytesMessage)session.createBytesMessage();
@@ -79,7 +82,7 @@ public class MqSender {
 			// Receive the reply message.
 			// NOTE: This method blocks until a message is received.
 			
-			/*Message replyJMSMessage = consumer.receive();
+			Message replyJMSMessage = consumer.receive();
 			// The message format should be a bytes message.
 			if (replyJMSMessage != null && replyJMSMessage instanceof javax.jms.BytesMessage)
 			{
@@ -93,7 +96,7 @@ public class MqSender {
 			    // the JMS correlation ID can be used to match a sent message with a response message 
 			    String jmsCorrelationID = replyJMSMessage.getJMSCorrelationID();
 			    logger.info("   reply message ID = " + jmsCorrelationID);
-			}*/
+			}
 			// After the message is sent, get the message ID.
 			// You would keep the message ID around somewhere so you can match it to a reply later.
 			//String messageID = message.getJMSMessageID();
@@ -118,4 +121,4 @@ public class MqSender {
 
 	}
 
-}
+}*/
