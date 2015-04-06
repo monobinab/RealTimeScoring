@@ -10,8 +10,11 @@ import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.StormSubmitter;
 import analytics.bolt.ParsingBoltOccassion;
 import analytics.bolt.PersistOccasionBolt;
+import analytics.bolt.ResponseBolt;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.spout.OccassionRedisSpout;
+import analytics.util.AuthPropertiesReader;
+import analytics.util.Constants;
 import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
 import analytics.util.RedisConnection;
@@ -24,26 +27,34 @@ public class PurchaseOccassionTopology{
 	public static void main(String[] args)  throws Exception{
 		LOGGER.info("starting purchase occassion topology");
 		System.clearProperty(MongoNameConstants.IS_PROD);
-		/*if (args.length > 0) {
+		if (args.length > 0) {
 			System.setProperty(MongoNameConstants.IS_PROD, "true");
-		}*/
+		}
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 		String[] servers = RedisConnection.getServers();
 		String topic = TopicConstants.OCCASSION;
 		
 		topologyBuilder.setSpout("occassionSpout1", new OccassionRedisSpout(
-				"rtsapp401p.prod.ch4.s.com", TopicConstants.PORT, "kkr"), 1);
-		/*topologyBuilder.setSpout("occassionSpout2", new OccassionRedisSpout(
-				"rtsapp402p.prod.ch4.s.com", TopicConstants.PORT, topic), 1);
+				servers[0], TopicConstants.PORT, topic), 1);
+		topologyBuilder.setSpout("occassionSpout2", new OccassionRedisSpout(
+				servers[1], TopicConstants.PORT, topic), 1);
 		topologyBuilder.setSpout("occassionSpout3", new OccassionRedisSpout(
-				"rtsapp403p.prod.ch4.s.com", TopicConstants.PORT, topic), 1);*/
+				servers[2], TopicConstants.PORT, topic), 1);
 		
-		topologyBuilder.setBolt("parseOccassionBolt", new ParsingBoltOccassion(), 1)
+		topologyBuilder.setBolt("parseOccassionBolt", new ParsingBoltOccassion(AuthPropertiesReader
+				.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
+				.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 1)
 		.shuffleGrouping("occassionSpout1");//.shuffleGrouping("occassionSpout2").shuffleGrouping("occassionSpout3");
 		topologyBuilder.setBolt("persistOccasionBolt", new PersistOccasionBolt(), 1)
 		.shuffleGrouping("parseOccassionBolt", "persist_stream");
 		topologyBuilder.setBolt("strategy_bolt", new StrategyScoringBolt(), 1)
 		.shuffleGrouping("parseOccassionBolt");
+		
+		//Sree. Added the new bolt for Responses
+		topologyBuilder.setBolt("responses_bolt", new ResponseBolt(AuthPropertiesReader
+				.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
+				.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 2)
+		.shuffleGrouping("strategy_bolt", "response_stream");
 		
 		Config conf = new Config();
 		conf.put("metrics_topology", "PurchaseOccasion");

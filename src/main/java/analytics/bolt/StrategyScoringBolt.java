@@ -11,6 +11,9 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
 import analytics.exception.RealTimeScoringException;
 import analytics.util.Constants;
 import analytics.util.JsonUtils;
@@ -32,9 +35,13 @@ import backtype.storm.tuple.Tuple;
  *         apply strategy on each model and rescore each model
  *
  */
-public class StrategyScoringBolt extends BaseRichBolt {
+public class StrategyScoringBolt extends BaseRichBolt { 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(StrategyScoringBolt.class);
+	
+	private String host;
+	private int port;
+	private JedisPool jedisPool;
 
 	/**
 	 * 
@@ -43,6 +50,16 @@ public class StrategyScoringBolt extends BaseRichBolt {
 	private OutputCollector outputCollector;
 	private MultiCountMetric countMetric;
 
+	public StrategyScoringBolt(String host, int port) {
+		super();
+		this.host = host;
+		this.port = port;
+	}
+	
+	public StrategyScoringBolt() {
+		super();
+	}
+	
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
@@ -51,6 +68,14 @@ public class StrategyScoringBolt extends BaseRichBolt {
 	     //TODO: ALL BOLTS SHOULD HAVE THIS LINE - ADD TO SUPER CLASS
         System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
 		this.outputCollector = collector;
+		
+		//Configure the Redis Server.
+		if(host!=null && !host.equalsIgnoreCase("")){
+			JedisPoolConfig poolConfig = new JedisPoolConfig();
+	        poolConfig.setMaxActive(100);
+	        jedisPool = new JedisPool(poolConfig,host, port, 100);
+		}
+		
 	}
 	 void initMetrics(TopologyContext context){
 	     countMetric = new MultiCountMetric();
@@ -81,6 +106,10 @@ public class StrategyScoringBolt extends BaseRichBolt {
 		countMetric.scope("incoming_tuples").incr();
 		String lId = input.getStringByField("l_id");
 		String source = input.getStringByField("source");
+		String lyl_id_no = "";
+		if (input.contains("lyl_id_no")) {
+			lyl_id_no = input.getStringByField("lyl_id_no");
+		}
 		String messageID = "";
 		if (input.contains("messageID")) {
 			messageID = input.getStringByField("messageID");
@@ -143,6 +172,16 @@ public class StrategyScoringBolt extends BaseRichBolt {
 			LOGGER.debug("new score before boost var: " + newScore);
 
 			newScore = newScore + ScoringSingleton.getInstance().getBoostScore(allChanges, modelId );
+			
+			//Persisting to Redis to be retrieved quicker than getting from Mongo.
+			//Perform the below operation only when the Redis is configured
+			if(jedisPool!=null){
+				Jedis jedis = jedisPool.getResource();
+				jedis.hset("RTS:Telluride:"+lId, ""+modelId, ""+newScore);
+				jedis.expire("RTS:Telluride:"+lId,600);
+				jedisPool.returnResource(jedis);
+			}
+			
 
 			// 9) Emit the new score
 			Map<String, Date> minMaxMap = ScoringSingleton.getInstance().getMinMaxExpiry(modelId, allChanges);
@@ -194,6 +233,13 @@ public class StrategyScoringBolt extends BaseRichBolt {
 		listToEmit.add(messageID);
 		this.outputCollector.emit("member_stream", listToEmit);
 		countMetric.scope("member_scored_successfully").incr();
+		
+		if(lyl_id_no!=null){
+			listToEmit = new ArrayList<Object>();
+			listToEmit.add(lyl_id_no);
+			this.outputCollector.emit("response_stream", listToEmit);
+		}
+		
 		this.outputCollector.ack(input);
 	}
 
@@ -201,6 +247,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		declarer.declareStream("score_stream",new Fields("l_id", "newScore", "model","source", "messageID", "minExpiry", "maxExpiry"));
 		declarer.declareStream("member_stream", new Fields("l_id", "source","messageID"));
+		declarer.declareStream("response_stream", new Fields("lyl_id_no"));
 
 	}
 

@@ -18,7 +18,7 @@ public class TagMetadataDao extends AbstractDao {
 	DBCollection tagMetadataCollection;
 
 	/**
-	 * t,b,s,po
+	 * 
 	 */
 	public TagMetadataDao() {
 		super();

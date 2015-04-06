@@ -112,7 +112,7 @@ public class PersistBoltOccassionTest {
 
 	@Test
 	public void getMemberMDTagsTest() {
-		memberMDTagsDao.getMemberMDTags("OccassionTopologyTestingl_id");
+		memberMDTagsDao.getMemberMDTagsForVariables("OccassionTopologyTestingl_id");
 		DBCursor cursor = memberMDTagsColl.find(new BasicDBObject("l_id",
 				"OccassionTopologyTestingl_id"));
 		Assert.assertEquals(1, cursor.size());

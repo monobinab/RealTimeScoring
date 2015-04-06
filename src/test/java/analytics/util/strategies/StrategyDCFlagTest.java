@@ -33,7 +33,7 @@ public class StrategyDCFlagTest {
 	@Test
 	public void sumIsPositive(){
 		RealTimeScoringContext context =  new RealTimeScoringContext();
-		context.setValue("{2015-02-03=7.0, 2015-02-04=8.0, 2015-02-05=5.0}");
+		context.setValue("{2015-02-03=7.0, 2999-04-04=8.0, 2999-04-05=5.0}");
 		Change change = dcStrategy.execute(context);
 		int val = (Integer) change.getValue();
 		assertEquals(1, val);
@@ -60,7 +60,7 @@ public class StrategyDCFlagTest {
 	@Test
 	public void invalidValues1(){
 		RealTimeScoringContext context =  new RealTimeScoringContext();
-		context.setValue("{2015-02-03=s, 2015-02-04=4.0}");
+		context.setValue("{2015-02-03=s, 2999-02-04=4.0}");
 		Change change = dcStrategy.execute(context);
 		int val = (Integer) change.getValue();
 		assertEquals(1, val);
@@ -69,7 +69,7 @@ public class StrategyDCFlagTest {
 	@Test
 	public void invalidValues2(){
 		RealTimeScoringContext context =  new RealTimeScoringContext();
-		context.setValue("{2015-02-03=s, asas=asdsad, 2015-02-04=4.0}");
+		context.setValue("{2015-02-03=s, asas=asdsad, 2999-02-04=4.0}");
 		Change change = dcStrategy.execute(context);
 		int val = (Integer) change.getValue();
 		assertEquals(1, val);

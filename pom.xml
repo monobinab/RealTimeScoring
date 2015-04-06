@@ -135,6 +135,8 @@
                 </exclusion>
             </exclusions>
 			</dependency>
+			
+
 			<dependency>
 			<groupId>org.apache.flume</groupId>
 			<artifactId>flume-ng-node</artifactId>
@@ -287,10 +289,11 @@
             <!--<version>${slf4j-version}</version>-->
         <!--</dependency>-->
         <dependency>
-	<groupId>org.slf4j</groupId>
-	<artifactId>slf4j-api</artifactId>
-	<version>1.7.7</version>
-</dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.7</version>
+		</dependency>
+		
 <!-- dependency>
 	<groupId>org.slf4j</groupId>
 	<artifactId>slf4j-log4j12</artifactId>
@@ -342,8 +345,29 @@
 			<artifactId>storm-kafka</artifactId>
 			<version>0.9.2-incubating</version>
 			
-		</dependency> 
-		
+		</dependency>
+
+		 <dependency>
+		 	<groupId>org.json</groupId>
+		 	<artifactId>json</artifactId>
+		 	<version>20090211</version>
+		 </dependency>
+		 
+		 <dependency>
+		 	<groupId>org.codehaus.jettison</groupId>
+		 	<artifactId>jettison</artifactId>
+		 	<version>1.1</version>
+		 </dependency>
+        <dependency>
+		   <groupId>xerces</groupId>
+		   <artifactId>xercesImpl</artifactId>
+		   <version>2.9.0</version>
+		</dependency>
+        <dependency>
+		    <groupId>org.apache.hadoop</groupId>
+		    <artifactId>hadoop-client</artifactId>
+		    <version>2.2.0</version>
+		</dependency>
     </dependencies>
 
 	<build>

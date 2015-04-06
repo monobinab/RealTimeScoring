@@ -41,19 +41,22 @@ public class PersistOccasionBolt extends BaseRichBolt{
 	@SuppressWarnings("unchecked")
 	@Override
 	public void execute(Tuple input) {
-		System.out.println("IN PERSIST BOLT: " + input);
+	//	System.out.println("IN PERSIST BOLT: " + input);
+		countMetric.scope("incoming_tuples").incr();
 		List<String> tags = new ArrayList<String>();
 		String l_id = input.getString(0);
 		try {
 			String tag = input.getString(1);
 			if(tag != null && !tag.isEmpty()){
-			String[] tagsArray = tag.split(",");
-			tags = Arrays.asList(tagsArray);
-			memberMDTagsDao.addMemberMDTags(l_id, tags);
-			countMetric.scope("persisted_occasionTags").incr();
+				String[] tagsArray = tag.split(",");
+				tags = Arrays.asList(tagsArray);
+				memberMDTagsDao.addMemberMDTags(l_id, tags);
+				LOGGER.info("PERSIST OCCATION UPDATE: " + l_id + "~"+tags);
+				countMetric.scope("persisted_occasionTags").incr();
 			}
 			else{
 				memberMDTagsDao.deleteMemberMDTags(l_id);
+				LOGGER.info("PERSIST OCCATION DELETE: " + l_id);
 			}
 		} catch (Exception e) {
 			LOGGER.error("Json Exception ", e);

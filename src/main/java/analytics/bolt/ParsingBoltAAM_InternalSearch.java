@@ -107,6 +107,9 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
     	Set<String> pidSet = new HashSet<String>();
     	Collection<String> searchStringsCollection = l_idToValueCollectionMap.get(current_l_id);
     	
+    	if(searchStringsCollection==null || searchStringsCollection.isEmpty()|| (searchStringsCollection.toArray())[0].toString().trim().equalsIgnoreCase(""))
+    		return null;
+    	
     	for(String searchString : searchStringsCollection) {
 	    	String[] search = splitKeyWords(searchString);
 	    	

@@ -10,6 +10,8 @@ import analytics.bolt.ScorePublishBolt;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.bolt.TellurideParsingBoltPOS;
 import analytics.spout.WebsphereMQSpout;
+import analytics.util.AuthPropertiesReader;
+import analytics.util.Constants;
 import analytics.util.MQConnectionConfig;
 import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
@@ -68,7 +70,9 @@ public class RealTimeScoringTellurideTopology {
 
 		// create definition of main spout for queue 1
 		topologyBuilder.setBolt("parsingBolt", new TellurideParsingBoltPOS(), 12).localOrShuffleGrouping("telluride1").localOrShuffleGrouping("telluride2");
-        topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(), 12).localOrShuffleGrouping("parsingBolt");
+        topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(AuthPropertiesReader
+				.getProperty(Constants.TELLURIDE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
+				.getProperty(Constants.TELLURIDE_REDIS_SERVER_PORT))), 12).localOrShuffleGrouping("parsingBolt");
         topologyBuilder.setBolt("loggingBolt", new LoggingBolt(), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
 		//Redis publish to server 1
         //topologyBuilder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 3).localOrShuffleGrouping("strategyScoringBolt", "score_stream");
