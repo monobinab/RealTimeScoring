@@ -47,14 +47,18 @@ public class PurchaseOccassionTopology {
 					new OccassionRedisSpout(2, topic, System
 							.getProperty(MongoNameConstants.IS_PROD)), 1);
 
-			topologyBuilder
-					.setBolt(
-							"parseOccassionBolt",
-							new ParsingBoltOccassion(System
-									.getProperty(MongoNameConstants.IS_PROD)),
-							1).shuffleGrouping("occassionSpout1")
+			/*topologyBuilder.setBolt("parseOccassionBolt", new ParsingBoltOccassion(
+					System.getProperty(MongoNameConstants.IS_PROD)),1)
+					.shuffleGrouping("occassionSpout1")
 					.shuffleGrouping("occassionSpout2")
-					.shuffleGrouping("occassionSpout3");
+					.shuffleGrouping("occassionSpout3");*/
+			
+			topologyBuilder.setBolt("parseOccassionBolt", new ParsingBoltOccassion(System.getProperty(MongoNameConstants.IS_PROD),
+					AuthPropertiesReader.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
+					.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 1)
+			.shuffleGrouping("occassionSpout1");//.shuffleGrouping("occassionSpout2").shuffleGrouping("occassionSpout3");
+
+			
 			topologyBuilder.setBolt(
 					"persistOccasionBolt",
 					new PersistOccasionBolt(System

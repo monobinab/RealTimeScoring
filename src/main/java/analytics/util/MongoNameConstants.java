@@ -97,6 +97,7 @@ public class MongoNameConstants {
 	public static final String FEED_TO_BOOST_COLLECTION="feedBoosts";
 	public static final String FB_BOOSTS="b";
 	public static final String FB_FEED="f";
+	public static final String BROWSE_BOOST_PREFIX="BOOST_BROWSE";
 
 	//Sources
 	public static final String SOURCES_S="s";

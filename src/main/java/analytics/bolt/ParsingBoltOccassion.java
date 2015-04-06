@@ -52,7 +52,8 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 	private String host;
 	private int port;
 	
-	public ParsingBoltOccassion(String host, int port) {
+	public ParsingBoltOccassion(String systemProperty, String host, int port) {
+		super(systemProperty);
 		this.host = host;
 		this.port = port;
 	}
