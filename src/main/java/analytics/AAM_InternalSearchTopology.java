@@ -8,6 +8,7 @@ import analytics.bolt.StrategyScoringBolt;
 import analytics.spout.AAMRedisPubSubSpout;
 import analytics.spout.WebHDFSSpout;
 import analytics.util.Constants;
+import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
 import analytics.util.RedisConnection;
 import analytics.util.SystemUtility;
@@ -24,7 +25,7 @@ public class AAM_InternalSearchTopology {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(AAM_InternalSearchTopology.class);
 
-	public static void main(String[] args) {
+public static void main(String[] args) {
 		
 		if (!SystemUtility.setEnvironment(args)) {
 			System.out
@@ -38,30 +39,18 @@ public class AAM_InternalSearchTopology {
 		String[] servers = RedisConnection.getServers("PROD");
 
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
-
-		/*topologyBuilder.setSpout("AAM_CDF_InternalSearch1",
-				new AAMRedisPubSubSpout(servers[0], port, topic), 1);
-		topologyBuilder.setSpout("AAM_CDF_InternalSearch2",
-				new AAMRedisPubSubSpout(servers[1], port, topic), 1);
-		topologyBuilder.setSpout("AAM_CDF_InternalSearch3",
-				new AAMRedisPubSubSpout(servers[2], port, topic), 1);*/
 		
 		//Sree. Spout that wakes up every 5 mins and process the Traits
 		topologyBuilder.setSpout("internalSearchSpout", new WebHDFSSpout(servers[1], TopicConstants.PORT, Constants.AAM_INTERNAL_SEARCH_PATH, "aamInternalSearch"), 1);
 		topologyBuilder.setBolt("ParsingBoltAAM_InternalSearch",new ParsingBoltAAM_InternalSearch(System.getProperty(MongoNameConstants.IS_PROD), "aamInternalSearch")).shuffleGrouping("internalSearchSpout");
-		
-		/*topologyBuilder
-				.setBolt("ParsingBoltAAM_InternalSearch",
-						new ParsingBoltAAM_InternalSearch())
-				.shuffleGrouping("AAM_CDF_InternalSearch1")
-				.shuffleGrouping("AAM_CDF_InternalSearch2")
-				.shuffleGrouping("AAM_CDF_InternalSearch3");
-*/
+
 		topologyBuilder.setBolt("strategy_bolt", new StrategyScoringBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1)
 				.shuffleGrouping("ParsingBoltAAM_InternalSearch");
 		Config conf = new Config();
-		conf.put("metrics_topology", "Internal_Search");
+		conf.put("metrics_topology", "InternalSearch");
+		//stormconf is set with system's property as MetricsListener needs it
 		conf.put("topology_environment", System.getProperty(MongoNameConstants.IS_PROD));
+		conf.registerMetricsConsumer(MetricsListener.class, 3);
 		if (System.getProperty(MongoNameConstants.IS_PROD)
 				.equalsIgnoreCase("PROD")
 				|| System.getProperty(MongoNameConstants.IS_PROD)
@@ -87,7 +76,7 @@ public class AAM_InternalSearchTopology {
 			}
 			cluster.shutdown();
 
-		}
+			}
 		}
 	}
 }

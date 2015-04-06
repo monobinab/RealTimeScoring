@@ -62,29 +62,14 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
         this.outputCollector = collector;
         initMetrics(context);
         super.prepare(stormConf, context, collector);
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see backtype.storm.task.IBolt#prepare(java.util.Map,
-	 * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
-	 */
-        memberDao = new MemberUUIDDao();
+	    memberDao = new MemberUUIDDao();
         modelVariablesDao =  new ModelVariablesDao(); 
         modelVariablesList = new ArrayList<String>();
-        
-        //this.currentUUID=null;
-        //l_idToValueCollectionMap = new HashMap<String,Collection<String>>();
-        
-
+     
 		//POPULATE MODEL VARIABLES LIST
         modelVariablesList =modelVariablesDao.getVariableList();
     }
 
-	/*
-     * (non-Javadoc)
-     *
-     * @see backtype.storm.task.IBolt#execute(backtype.storm.tuple.Tuple)
-     */
 	@Override
 	public void execute(Tuple input) {
 		
@@ -154,16 +139,8 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
         
 	}
 
-
 	protected abstract Map<String, String> processList(String current_l_id);
 
-	/*
-     * (nn-Javadoc)
-     *
-     * @see
-     * backtype.storm.topology.IComponent#declareOutputFields(backtype.storm.
-     * topology.OutputFieldsDeclarer)
-     */
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		declarer.declare(new Fields("l_id","lineItemAsJsonString","source"));

@@ -50,6 +50,7 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
 		super(systemProperty, topic);
 	
 	}
+	
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
