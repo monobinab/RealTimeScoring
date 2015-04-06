@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import analytics.bolt.FlumeRPCBolt;
 import analytics.bolt.ParsingBoltAAM_ATC;
 import analytics.bolt.StrategyScoringBolt;
-import analytics.spout.TraitsSpout;
+//import analytics.spout.TraitsSpout;
 import analytics.util.Constants;
 import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
