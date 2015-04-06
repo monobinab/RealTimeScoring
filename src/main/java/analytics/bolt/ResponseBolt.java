@@ -115,7 +115,11 @@ public class ResponseBolt extends BaseRichBolt{
 				String scoreInfoJsonString = callRtsAPI(lyl_id_no);
 				String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no);
 				
-				//Get the Difference Tags from Redis for an lid
+				//4-2-2015.Recent update to send responses only for 1 tag irrespective of 
+				//how many tags we receive in the difference. This occasion tag 
+				//for which the response has to be sent is taken from the 1st ranks occasion tags from the API call
+				
+				/*//Get the Difference Tags from Redis for an lid
 				Jedis jedis = jedisPool.getResource();
 				//Add Date as part of key so incase the Tags are not scored for the member
 				//atleast we know we have to cleanup from Redis...			
@@ -135,11 +139,15 @@ public class ResponseBolt extends BaseRichBolt{
 						getResponseServiceResult(scoreInfoJsonString,lyl_id_no,tag);
 						countMetric.scope("responses").incr();
 					}
-				}
-				//Delete the lid from redis after processing
+				}*/
+				
+				getResponseServiceResult(scoreInfoJsonString,lyl_id_no);
+				countMetric.scope("responses").incr();
+
+				/*//Delete the lid from redis after processing
 				jedis = jedisPool.getResource();
 				jedis.del("Responses:"+lId_Date);
-				jedisPool.returnResource(jedis);
+				jedisPool.returnResource(jedis);*/
 			}
 			outputCollector.ack(input);
 			
@@ -214,7 +222,7 @@ public class ResponseBolt extends BaseRichBolt{
 	 * @return
 	 * @throws Exception
 	 */
-	public String getResponseServiceResult(String input, String lyl_l_id, String tag) throws Exception {
+	public String getResponseServiceResult(String input, String lyl_l_id) throws Exception {
 		LOGGER.info(" Testing - Entering the getResponseServiceResult method");
 		StringBuffer strBuff = new StringBuffer();
 		BufferedReader in = null;
@@ -253,7 +261,8 @@ public class ResponseBolt extends BaseRichBolt{
 			
 			//Get the necessary variables for populating in the response xml
 			String eid = memberInfoDao.getMemberInfoEId(SecurityUtils.hashLoyaltyId(lyl_l_id));
-			TagMetadata tagMetaData = getTagMetaData(tag);
+			//TagMetadata tagMetaData = getTagMetaData(tag);
+			TagMetadata tagMetaData = getTagMetaDataInfo(input);
 			String custEventName = occationCustomeEventDao.getCustomeEventName(tagMetaData.getPurchaseOccasion());
 			
 			//Generate the Custome Xml to be sent to Oracle
@@ -428,7 +437,7 @@ public class ResponseBolt extends BaseRichBolt{
 		
 		//eventName element inside of listName
 		Element objectName = doc.createElement("objectName");
-		objectName.appendChild(doc.createTextNode("CONTACTS_LIST_TEST"));
+		objectName.appendChild(doc.createTextNode("CONTACTS_LIST"));
 		listName.appendChild(objectName);	
 		
 		//customerId element inside of recipient
@@ -530,30 +539,27 @@ public class ResponseBolt extends BaseRichBolt{
 		return tagMetaData;
 	}
 	
-	/**
-	 * A Test JSONObject create method which would no longer be used since the
-	 * requirement was changed to send XML instead of Json.
-	 * @param scoreInfo
-	 * @return JSONObject
-	 * @throws JSONException
-	 */
-	public JSONObject creatXml4Resp(JSONObject scoreInfo) throws JSONException{
-		JSONObject obj = new JSONObject();
-		obj.put("priorityLevel", "2");
-		obj.put("customEvent", new JSONObject().put("eventName","TEST_EVENT_NAME"));
-
-		JSONArray optionalInfo = new JSONArray();
-		JSONObject optInfo = null;
-		for(int i=0; i< 2; i++){
-			optInfo = new JSONObject();
-			optInfo.put("name", "myvar"+i);
-			optInfo.put("value", "1234"+i);
-			optionalInfo.put(optInfo);
+	private TagMetadata getTagMetaDataInfo(String jsonStr){
+		TagMetadata tagMetaData = null;
+		
+		try {
+			org.json.JSONObject obj = new org.json.JSONObject(jsonStr);
+			tagMetaData = new TagMetadata();
+			System.out.println(((org.json.JSONObject) obj.getJSONArray("scoresInfo").get(0)).get("occassion"));
+			tagMetaData.setPurchaseOccassion(((org.json.JSONObject) obj.getJSONArray("scoresInfo").get(0)).get("occassion")!= null ? 
+					((org.json.JSONObject) obj.getJSONArray("scoresInfo").get(0)).get("occassion").toString() : null);
+			tagMetaData.setBusinessUnit(((org.json.JSONObject) obj.getJSONArray("scoresInfo").get(0)).get("businessUnit")!= null ? 
+					((org.json.JSONObject) obj.getJSONArray("scoresInfo").get(0)).get("businessUnit").toString() : null);
+			tagMetaData.setSubBusinessUnit(((org.json.JSONObject) obj.getJSONArray("scoresInfo").get(0)).get("subBusinessUnit")!= null ? 
+					((org.json.JSONObject) obj.getJSONArray("scoresInfo").get(0)).get("subBusinessUnit").toString() : null);
+			tagMetaData.setMdTags(((org.json.JSONObject) obj.getJSONArray("scoresInfo").get(0)).get("mdTag")!= null ? 
+					((org.json.JSONObject) obj.getJSONArray("scoresInfo").get(0)).get("mdTag").toString() : null);
+			
+		} catch (org.json.JSONException e) {
+			LOGGER.info(e.getMessage());
 		}
-		obj.put("recipientData", new JSONObject()
-		.put("recipient",new JSONObject().put("listName",new JSONObject().put("folderName","TestApp")
-				.put("objectName", "ApiTestList")).put("emailAddress", "test@test.com")).put("optionalData", optionalInfo));
-		return obj;
+		
+		return tagMetaData;
 	}
 
 }

@@ -4,7 +4,7 @@ public class Constants {
 	public static final int METRICS_INTERVAL = 60;
 	//public static final String SCORING_API_PRE = "http://realtimescoring.intra.searshc.com/rtsapi/v1/top/categories/";
 	public static final String SCORING_API_PRE = "http://rtsapi301p.qa.ch3.s.com:8180/rtsapi/v1/top/categories/";
-	public static final String SCORING_API_POST = "?key=rtsTeam&tags=models"; 
+	public static final String SCORING_API_POST = "?key=za4n47bd&tags=models"; 
 	public static final String AUTH_PROPERTY_FILE = "authentication.properties";
 	public static final String RESP_URL_USER_NAME = "responseWebserviceUsrname";
 	public static final String RESP_URL_PASSWORD = "responseWebservicePassword";
@@ -25,9 +25,14 @@ public class Constants {
 	public static final String AAM_BROWSER_PATH="/smith/adobe/rts/out/products";
 	public static final String AAM_INTERNAL_SEARCH_PATH="/smith/adobe/rts/out/is";
 	//public static final String AAM_INTERNAL_SEARCH_PATH="/user/spannal/internalSearch/is";
-	public static final String HADOOP_WEBHDFS_URL="http://151.149.131.21:14000/webhdfs/v1<HDFS_LOCATION>?user.name=spannal&op=LISTSTATUS";
-	public static final String CONTENT_SUMMARY_URL = "http://151.149.131.21:14000/webhdfs/v1<HDFS_LOCATION>/<PATH>?user.name=spannal&op=GETCONTENTSUMMARY";
-	public static final String FILE_READ_URL = "http://151.149.131.21:14000/webhdfs/v1<HDFS_LOCATION>/<PATH>?user.name=spannal&op=OPEN";
+	public static final String LIST_STATUS_WEBHDFS_URL="http://151.149.131.21:14000/webhdfs/v1<HDFS_LOCATION>?user.name=spannal&op=LISTSTATUS";
+	public static final String CONTENT_SUMMARY_WEBHDFS_URL = "http://151.149.131.21:14000/webhdfs/v1<HDFS_LOCATION>/<PATH>?user.name=spannal&op=GETCONTENTSUMMARY";
+	public static final String FILE_READ_WEBHDFS_URL = "http://151.149.131.21:14000/webhdfs/v1<HDFS_LOCATION>/<PATH>?user.name=spannal&op=OPEN";
+	public static final String FILE_STATUS_WEBHDFS_URL = "http://151.149.131.21:14000/webhdfs/v1<HDFS_LOCATION>/<PATH>?user.name=spannal&op=GETFILESTATUS";
+	public static final String WEBHDFS_URL = "http://151.149.131.21:14000";
+	public static final String WEBHDFS_USERNAME = "webhdfs_grp_username";
+	public static final String WEBHDFS_PASSWORD = "webhdfs_grp_password";
+	
 	
 	public static final String RESPONSE_REDIS_SERVER_HOST="respRedisServerHost";
 	public static final String RESPONSE_REDIS_SERVER_PORT="respRedisServerPort";

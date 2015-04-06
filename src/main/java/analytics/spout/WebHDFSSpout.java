@@ -73,7 +73,7 @@ public class WebHDFSSpout extends BaseRichSpout{
 			latestPrefix =  Long.parseLong( jedis.get(topologyIdentifier))  ;
 			jedisPool.returnResource(jedis);
 			
-			String hdfsUrl = Constants.HADOOP_WEBHDFS_URL.replace("<HDFS_LOCATION>", hdfsPath);
+			String hdfsUrl = Constants.LIST_STATUS_WEBHDFS_URL.replace("<HDFS_LOCATION>", hdfsPath);
 			
 			JSONArray arr = (HttpClientUtils.httpGetCall(hdfsUrl)
 					.getJSONObject("FileStatuses").getJSONArray("FileStatus"));
@@ -93,7 +93,7 @@ public class WebHDFSSpout extends BaseRichSpout{
 			while(iter.hasNext()){
 				
 				String path = (iter.next()).toString();
-				String currentURL = Constants.HADOOP_WEBHDFS_URL.replace("<HDFS_LOCATION>", hdfsPath+"/"+path);
+				String currentURL = Constants.LIST_STATUS_WEBHDFS_URL.replace("<HDFS_LOCATION>", hdfsPath+"/"+path);
 				JSONArray filesArray = (HttpClientUtils.httpGetCall(currentURL)
 						.getJSONObject("FileStatuses").getJSONArray("FileStatus"));
 				
@@ -106,21 +106,10 @@ public class WebHDFSSpout extends BaseRichSpout{
 				System.out.println("# of File to process = "+files.size());
 				
 				for(int i=0;i<files.size();i++){
-					currentURL = Constants.FILE_READ_URL.replace("<PATH>", files.get(i)).replace("<HDFS_LOCATION>", hdfsPath+"/"+path);
+					currentURL = Constants.FILE_READ_WEBHDFS_URL.replace("<PATH>", files.get(i)).replace("<HDFS_LOCATION>", hdfsPath+"/"+path);
 					System.out.println("File being Processed = " + currentURL);
 					readURLAndStoreData(currentURL);
 				}
-				
-				
-				/*String currentURL = Constants.CONTENT_SUMMARY_URL.replace("<PATH>", path).replace("<HDFS_LOCATION>", hdfsPath);
-				Integer fileCount = HttpClientUtils.httpGetCall(currentURL).getJSONObject("ContentSummary").getInt("fileCount");
-				for(int i=0;i<fileCount;i++){
-					if(topologyIdentifier.equalsIgnoreCase("aamTraits") || topologyIdentifier.equalsIgnoreCase("aamBrowser"))
-						currentURL = Constants.FILE_READ_URL.replace("<PATH>", path+"/00000"+i+"_0").replace("<HDFS_LOCATION>", hdfsPath);
-					else
-						currentURL = Constants.FILE_READ_URL.replace("<PATH>", path+"/part-m-0000"+i+"_0").replace("<HDFS_LOCATION>", hdfsPath);
-					readURLAndStoreData(currentURL);
-				}*/
 				
 				//Write back to reds that the files in the directory are processed so 
 				//the next run would not pick it up to process
@@ -172,10 +161,12 @@ public class WebHDFSSpout extends BaseRichSpout{
 				String[] splitStr = returnStr.split(",");
 				returnStr = splitStr[2]+"', '"+splitStr[0]+"', '"+splitStr[1]+"', '"+splitStr[5];
 				replacedString = "['"+returnStr+"']";
+				splitStr = null;
 			}
 			else
 				replacedString = "['"+returnStr+"']";
 			LOGGER.info("Formatted String = " +replacedString);
+			returnStr = null;
 		}
 		
 		return replacedString;

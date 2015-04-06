@@ -7,6 +7,7 @@ import analytics.bolt.FlumeRPCBolt;
 import analytics.bolt.ParsingBoltWebTraits;
 import analytics.bolt.PersistTraitsBolt;
 import analytics.bolt.StrategyScoringBolt;
+import analytics.bolt.Write2HDFSBolt;
 import analytics.spout.WebHDFSSpout;
 import analytics.spout.Write2HDFSSpout;
 import analytics.util.Constants;
@@ -17,8 +18,6 @@ import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
 import backtype.storm.topology.TopologyBuilder;
-
-
 
 public class TraitsTopology{
 	private static final Logger LOGGER = LoggerFactory
@@ -36,11 +35,11 @@ public class TraitsTopology{
 		String[] servers = RedisConnection.getServers();
 		
 		//Spout that wakes up every 5 mins and process the Traits
-		builder.setSpout("traitsSpout", new Write2HDFSSpout(servers[1], TopicConstants.PORT, Constants.AAM_TRAITS_PATH, 
-					"aamTraits","/user/spannal/test/temp.txt"), 1);
+		builder.setSpout("write2HdfsSpout", new Write2HDFSSpout(servers[1], TopicConstants.PORT, Constants.AAM_TRAITS_PATH, 
+					"aamTraits"), 1);
 		
-		builder.setBolt("parsingBoltWebTraits", new ParsingBoltWebTraits(), 1)
-	    .shuffleGrouping("traitsSpout");
+		builder.setBolt("write2HdfsBolt", new Write2HDFSBolt("/user/spannal/logs/log","log.txt",1000000L), 3)
+	    .shuffleGrouping("write2HdfsSpout");
 		
 		
 		Config conf = new Config();

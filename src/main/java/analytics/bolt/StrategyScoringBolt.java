@@ -178,7 +178,7 @@ public class StrategyScoringBolt extends BaseRichBolt {
 			if(jedisPool!=null){
 				Jedis jedis = jedisPool.getResource();
 				jedis.hset("RTS:Telluride:"+lId, ""+modelId, ""+newScore);
-				jedis.expire("RTS:Telluride:"+lId,3000);
+				jedis.expire("RTS:Telluride:"+lId,600);
 				jedisPool.returnResource(jedis);
 			}
 			

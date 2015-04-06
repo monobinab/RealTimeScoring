@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.bolt.FlumeRPCBolt;
-import analytics.bolt.ParsingBoltAAM_ATC;
+import analytics.bolt.ParsingBoltAAM_Browse;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.spout.WebHDFSSpout;
 import analytics.util.Constants;
@@ -47,13 +47,13 @@ public class AAM_BrowseTopology {
 		
 		//Sree. Spout that wakes up every 5 mins and process the Traits
 		topologyBuilder.setSpout("browseSpout", new WebHDFSSpout(servers[1], TopicConstants.PORT, Constants.AAM_BROWSER_PATH, "aamBrowser"), 1);
-		topologyBuilder.setBolt("parsingBoltBrowse", new ParsingBoltAAM_ATC(topic), 3)
+		topologyBuilder.setBolt("parsingBoltBrowse", new ParsingBoltAAM_Browse(topic), 3)
 	  		.shuffleGrouping("browseSpout");
 
 		
 		topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(), 3)
 				.localOrShuffleGrouping("parsingBoltBrowse");
-		topologyBuilder.setBolt("flumeLoggingBolt", new FlumeRPCBolt(), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
+		/*topologyBuilder.setBolt("flumeLoggingBolt", new FlumeRPCBolt(), 1).shuffleGrouping("strategyScoringBolt", "score_stream");*/
 		
 //		 topologyBuilder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 3).localOrShuffleGrouping("strategyScoringBolt", "score_stream");
 	//        topologyBuilder.setBolt("memberPublishBolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 3).localOrShuffleGrouping("strategyScoringBolt", "member_stream");
