@@ -60,7 +60,7 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
 
-public class ResponseBolt extends BaseRichBolt{
+public class ResponseBolt extends EnvironmentBolt{
 	/**
 	 * 
 	 */
@@ -78,7 +78,8 @@ public class ResponseBolt extends BaseRichBolt{
 	private OccationCustomeEventDao occationCustomeEventDao;
 	private OccasionResponsesDao occasionResponsesDao;
 	
-	public ResponseBolt(String host, int port) {
+	public ResponseBolt(String systemProperty, String host, int port) {
+		super(systemProperty);
 		this.host = host;
 		this.port = port;
 	}
@@ -86,6 +87,7 @@ public class ResponseBolt extends BaseRichBolt{
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
+		super.prepare(stormConf, context, collector);
 		initMetrics(context);
 		memberInfoDao = new MemberInfoDao();
 		tagMetadataDao = new TagMetadataDao();

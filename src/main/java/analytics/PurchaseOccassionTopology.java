@@ -71,7 +71,8 @@ public class PurchaseOccassionTopology {
 					.shuffleGrouping("parseOccassionBolt");
 
 		//Sree. Added the new bolt for Responses
-		topologyBuilder.setBolt("responses_bolt", new ResponseBolt(AuthPropertiesReader
+		topologyBuilder.setBolt("responses_bolt", new ResponseBolt(System
+				.getProperty(MongoNameConstants.IS_PROD), AuthPropertiesReader
 				.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
 				.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 2)
 		.shuffleGrouping("strategy_bolt", "response_stream");
