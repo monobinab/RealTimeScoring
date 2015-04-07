@@ -40,7 +40,7 @@ public class AAMTopology {
 		int port = TopicConstants.PORT;
 		TopologyBuilder builder = new TopologyBuilder();
 
-	   	String[] servers = RedisConnection.getServers("PROD");
+	   	String[] servers = RedisConnection.getServers(System.getProperty(MongoNameConstants.IS_PROD));
 	   	//Sree. Commented to disable the spouts since we have the webhdfs. 
 	    /*builder.setSpout("AAM_CDF_Traits1", new AAMRedisPubSubSpout(servers[0], port, topic), 1);
 	    builder.setSpout("AAM_CDF_Traits2", new AAMRedisPubSubSpout(servers[1], port, topic), 1);
@@ -50,6 +50,9 @@ public class AAMTopology {
 	  	builder.setSpout("traitsSpout", new WebHDFSSpout(servers[1], TopicConstants.PORT, Constants.AAM_TRAITS_PATH, "aamTraits"), 1);
 	  	builder.setBolt("parsingBoltWebTraits", new ParsingBoltWebTraits(System.getProperty(MongoNameConstants.IS_PROD), "aamTraits"), 1)
 	  		.shuffleGrouping("traitsSpout");
+	  	builder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System.getProperty(MongoNameConstants.IS_PROD)),1).shuffleGrouping("parsingBoltWebTraits");
+	    builder.setBolt("persistTraits" , new PersistTraitsBolt(), 1).shuffleGrouping("parsingBoltWebTraits");
+	    builder.setBolt("flumeLoggingBolt", new FlumeRPCBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
 
 	    //builder.setBolt("parsingBoltWebTraits", new ParsingBoltWebTraits(), 1)
 	    //.shuffleGrouping("AAM_CDF_Traits1").shuffleGrouping("AAM_CDF_Traits2").shuffleGrouping("AAM_CDF_Traits3");

@@ -32,20 +32,14 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
     private MemberTraitsDao memberTraitsDao;
     private TraitVariablesDao traitVariablesDao;
     
-    /*
-         * (non-Javadoc)
-         *
-         * @see backtype.storm.task.IBolt#prepare(java.util.Map,
-         * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
-         */
     public ParsingBoltWebTraits(){
     	
     }
     
     public ParsingBoltWebTraits (String systemProperty, String topic) {
 		super(systemProperty, topic);
-	
 	}
+    
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
