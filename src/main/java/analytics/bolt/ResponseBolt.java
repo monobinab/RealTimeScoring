@@ -262,7 +262,8 @@ public class ResponseBolt extends EnvironmentBolt{
 			String xmlWithoutExpo = removeExponentialFromXml(json2XmlString);
 			
 			//Get the necessary variables for populating in the response xml
-			String eid = memberInfoDao.getMemberInfoEId(SecurityUtils.hashLoyaltyId(lyl_l_id));
+			String l_id = SecurityUtils.hashLoyaltyId(lyl_l_id);
+			String eid = memberInfoDao.getMemberInfoEId(l_id);
 			//TagMetadata tagMetaData = getTagMetaData(tag);
 			TagMetadata tagMetaData = getTagMetaDataInfo(input);
 			String custEventName = occationCustomeEventDao.getCustomeEventName(tagMetaData.getPurchaseOccasion());
@@ -284,7 +285,7 @@ public class ResponseBolt extends EnvironmentBolt{
 			
 			//Persist info to Mongo after successfully transmission of message to Oracle.
 			LOGGER.info(lyl_l_id+"~~~"+xmlWithoutBOM);
-			occasionResponsesDao.addOccasionResponse(lyl_l_id, eid, custEventName, tagMetaData.getPurchaseOccasion(), tagMetaData.getBusinessUnit(), tagMetaData.getSubBusinessUnit());
+			occasionResponsesDao.addOccasionResponse(l_id, eid, custEventName, tagMetaData.getPurchaseOccasion(), tagMetaData.getBusinessUnit(), tagMetaData.getSubBusinessUnit());
 			
 			xmlWithoutBOM = null;
 			xmlWithoutExpo = null;
