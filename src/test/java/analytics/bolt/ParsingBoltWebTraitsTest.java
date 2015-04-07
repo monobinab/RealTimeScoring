@@ -45,7 +45,7 @@ public class ParsingBoltWebTraitsTest {
 		assertNull("Case 2: Should have returned null.", result);
 	}
 	
-		//Case 3
+	/*	//Case 3
     @Test
     public void splitRectTestCase3(){
     	testVal = "58452933496186656922631844021025043285,['206658','270775']";
@@ -62,7 +62,7 @@ public class ParsingBoltWebTraitsTest {
 			assertEquals(result[0], "58452933496186656922631844021025043285");
 			assertEquals(result[1], "206658");
 			assertEquals(result[2], "270775");
-    }
+    }*/
 	
 
 }

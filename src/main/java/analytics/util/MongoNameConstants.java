@@ -134,5 +134,11 @@ public class MongoNameConstants {
      public static final String BUSINESS_UNIT= "BU_";
      public static final String SEG = "SEG";
 
+     //Member Info Collection
+     public static final String E_ID = "eid";
+     
+     //Occasion Custome Event Collection
+     public static final String OCCASION = "occasion";
+     public static final String INTERACT_CUSTOME_EVENT = "intCustEvent";
 
 }

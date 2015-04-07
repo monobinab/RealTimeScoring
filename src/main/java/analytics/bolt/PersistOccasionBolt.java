@@ -58,10 +58,12 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 			String[] tagsArray = tag.split(",");
 			tags = Arrays.asList(tagsArray);
 			memberMDTagsDao.addMemberMDTags(l_id, tags);
+			LOGGER.info("PERSIST OCCATION UPDATE: " + l_id + "~"+tags);
 			countMetric.scope("persisted_occasionTags").incr();
 			}
 			else{
 				memberMDTagsDao.deleteMemberMDTags(l_id);
+				LOGGER.info("PERSIST OCCATION DELETE: " + l_id);
 			}
 			outputCollector.ack(input);
 		} catch (Exception e) {

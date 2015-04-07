@@ -113,6 +113,10 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		countMetric.scope("incoming_tuples").incr();
 		String lId = input.getStringByField("l_id");
 		String source = input.getStringByField("source");
+		String lyl_id_no = "";
+		if (input.contains("lyl_id_no")) {
+			lyl_id_no = input.getStringByField("lyl_id_no");
+		}
 		String messageID = "";
 		if (input.contains("messageID")) {
 			messageID = input.getStringByField("messageID");
@@ -249,6 +253,13 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		listToEmit.add(messageID);
 		this.outputCollector.emit("member_stream", listToEmit);
 		countMetric.scope("member_scored_successfully").incr();
+		
+		if(lyl_id_no!=null){
+			listToEmit = new ArrayList<Object>();
+			listToEmit.add(lyl_id_no);
+			this.outputCollector.emit("response_stream", listToEmit);
+		}
+		
 		this.outputCollector.ack(input);
 	}
 
@@ -256,6 +267,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		declarer.declareStream("score_stream",new Fields("l_id", "newScore", "model","source", "messageID", "minExpiry", "maxExpiry"));
 		declarer.declareStream("member_stream", new Fields("l_id", "source","messageID"));
+		declarer.declareStream("response_stream", new Fields("lyl_id_no"));
 
 	}
 

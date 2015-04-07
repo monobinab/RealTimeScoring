@@ -9,11 +9,15 @@ import backtype.storm.StormSubmitter;
 import backtype.storm.topology.TopologyBuilder;
 import analytics.bolt.ParsingBoltOccassion;
 import analytics.bolt.PersistOccasionBolt;
+import analytics.bolt.ResponseBolt;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.spout.OccassionRedisSpout;
+import analytics.util.AuthPropertiesReader;
+import analytics.util.Constants;
 import analytics.util.HostPortUtility;
 import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
+import analytics.util.RedisConnection;
 import analytics.util.SystemUtility;
 import analytics.util.TopicConstants;
 
@@ -43,14 +47,18 @@ public class PurchaseOccassionTopology {
 					new OccassionRedisSpout(2, topic, System
 							.getProperty(MongoNameConstants.IS_PROD)), 1);
 
-			topologyBuilder
-					.setBolt(
-							"parseOccassionBolt",
-							new ParsingBoltOccassion(System
-									.getProperty(MongoNameConstants.IS_PROD)),
-							1).shuffleGrouping("occassionSpout1")
+			/*topologyBuilder.setBolt("parseOccassionBolt", new ParsingBoltOccassion(
+					System.getProperty(MongoNameConstants.IS_PROD)),1)
+					.shuffleGrouping("occassionSpout1")
 					.shuffleGrouping("occassionSpout2")
-					.shuffleGrouping("occassionSpout3");
+					.shuffleGrouping("occassionSpout3");*/
+			
+			topologyBuilder.setBolt("parseOccassionBolt", new ParsingBoltOccassion(System.getProperty(MongoNameConstants.IS_PROD),
+					AuthPropertiesReader.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
+					.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 1)
+			.shuffleGrouping("occassionSpout1");//.shuffleGrouping("occassionSpout2").shuffleGrouping("occassionSpout3");
+
+			
 			topologyBuilder.setBolt(
 					"persistOccasionBolt",
 					new PersistOccasionBolt(System
@@ -62,6 +70,11 @@ public class PurchaseOccassionTopology {
 							.getProperty(MongoNameConstants.IS_PROD)), 1)
 					.shuffleGrouping("parseOccassionBolt");
 
+		//Sree. Added the new bolt for Responses
+		topologyBuilder.setBolt("responses_bolt", new ResponseBolt(AuthPropertiesReader
+				.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
+				.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 2)
+		.shuffleGrouping("strategy_bolt", "response_stream");
 			Config conf = new Config();
 			conf.put("metrics_topology", "PurchaseOccasion");
 			//stormconf is set with system's property as MetricsListener needs it

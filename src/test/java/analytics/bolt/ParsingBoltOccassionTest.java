@@ -47,6 +47,7 @@ static OccasionVariableDao occasionVariableDao;
 static ModelPercentileDao modelPercDao;
 	
 @BeforeClass
+
 public static void intialize() throws Exception{
 		
 		//get the fakeMongoColl from ParsingBoltOccassionFakeMonogColl
@@ -93,7 +94,7 @@ public void getMemberTagsNullTest(){
 //test to check the mdTags for a specific l_id
 @Test
 public void getMemberTagsTest(){
-	List<String> mdTagsActual = memberMDTagsDao.getMemberMDTags("OccassionTopologyTestingl_id");
+	List<String> mdTagsActual = memberMDTagsDao.getMemberMDTagsForVariables("OccassionTopologyTestingl_id");
 	List<String> mdTagsExpected = new ArrayList<String>();
 	mdTagsExpected.add("HACKS");
 	mdTagsExpected.add("HARFS");

@@ -131,3 +131,4 @@ public class PersistBoltOccassionTest {
 		SystemPropertyUtility.dropDatabase();
 	}
 }
+

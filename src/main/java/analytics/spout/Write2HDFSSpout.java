@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.TreeSet;
 
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,10 +28,18 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 
-public class WebHDFSSpout extends BaseRichSpout{
+public class Write2HDFSSpout extends BaseRichSpout{
 	
 	private static final long serialVersionUID = 1L;
-	private static final Logger LOGGER = LoggerFactory.getLogger(WebHDFSSpout.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(Write2HDFSSpout.class);
+	static String LISTSTATUS_WEBHDFS_URL="http://151.149.131.21:14000/webhdfs/v1<HDFS_LOCATION>?user.name=spannal&op=LISTSTATUS";
+	static String CONTENT_SUMMARY_URL = "http://151.149.131.21:14000/webhdfs/v1<HDFS_LOCATION>/<PATH>?user.name=spannal&op=GETCONTENTSUMMARY";
+	static String FILE_READ_URL = "http://151.149.131.21:14000/webhdfs/v1<HDFS_LOCATION>/<PATH>?user.name=spannal&op=OPEN";
+	static String FILE_WRITE_URL = "http://151.149.131.21:14000/webhdfs/v1<PATH>?user.name=spannal&op=CREATE";
+	static String FILE_APPEND_URL = "http://151.149.131.21:14000/webhdfs/v1<PATH>?user.name=spannal&op=APPEND";
+	static String FILE_STATUS_URL = "http://151.149.131.21:14000/webhdfs/v1<PATH>?user.name=spannal&op=GETFILESTATUS";
+	static String WEBHDFS_URL = "http://151.149.131.21:14000";
+	static String UNIVERSAL_USER = "rtsadmin";
 
     private SpoutOutputCollector collector;
 	private JedisPool jedisPool;
@@ -37,17 +47,16 @@ public class WebHDFSSpout extends BaseRichSpout{
 	private int port;
 	private String hdfsPath;
 	private String topologyIdentifier;
+	private String write2HdfsPath;
+	private String write2HdfsFile;
 	
-	public WebHDFSSpout(String host, int port, String hdfsPath, String topologyIdentifier) {
+	public Write2HDFSSpout(String host, int port, String hdfsPath, String topologyIdentifier) {
 		this.host = host;
 		this.port = port;
 		this.hdfsPath = hdfsPath;
 		this.topologyIdentifier = topologyIdentifier;
 	}
 	
-	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("message"));
-	}
 
 	@Override
 	public void open(Map conf, TopologyContext context,
@@ -68,12 +77,12 @@ public class WebHDFSSpout extends BaseRichSpout{
 		TreeSet<Long> sortedSubSet = new TreeSet<Long>();
 		try{
 			
+			
 			Jedis jedis = jedisPool.getResource();
-			//jedis.set(topologyIdentifier, latestPrefix.toString());
 			latestPrefix =  Long.parseLong( jedis.get(topologyIdentifier))  ;
 			jedisPool.returnResource(jedis);
 			
-			String hdfsUrl = Constants.LIST_STATUS_WEBHDFS_URL.replace("<HDFS_LOCATION>", hdfsPath);
+			String hdfsUrl = LISTSTATUS_WEBHDFS_URL.replace("<HDFS_LOCATION>", hdfsPath);
 			
 			JSONArray arr = (HttpClientUtils.httpGetCall(hdfsUrl)
 					.getJSONObject("FileStatuses").getJSONArray("FileStatus"));
@@ -91,8 +100,8 @@ public class WebHDFSSpout extends BaseRichSpout{
 			Iterator iter = sortedSubSet.iterator();
 			//Process Individual files from the timestamped(prefixed) directory.
 			while(iter.hasNext()){
-				
 				String path = (iter.next()).toString();
+				//String currentURL = CONTENT_SUMMARY_URL.replace("<PATH>", path).replace("<HDFS_LOCATION>", hdfsPath);
 				String currentURL = Constants.LIST_STATUS_WEBHDFS_URL.replace("<HDFS_LOCATION>", hdfsPath+"/"+path);
 				JSONArray filesArray = (HttpClientUtils.httpGetCall(currentURL)
 						.getJSONObject("FileStatuses").getJSONArray("FileStatus"));
@@ -108,28 +117,23 @@ public class WebHDFSSpout extends BaseRichSpout{
 				for(int i=0;i<files.size();i++){
 					currentURL = Constants.FILE_READ_WEBHDFS_URL.replace("<PATH>", files.get(i)).replace("<HDFS_LOCATION>", hdfsPath+"/"+path);
 					System.out.println("File being Processed = " + currentURL);
-					readURLAndStoreData(currentURL);
+					readURLAndWriteToHDFS(currentURL);
 				}
-				
-				
-				/*String currentURL = Constants.CONTENT_SUMMARY_URL.replace("<PATH>", path).replace("<HDFS_LOCATION>", hdfsPath);
-				Integer fileCount = HttpClientUtils.httpGetCall(currentURL).getJSONObject("ContentSummary").getInt("fileCount");
-				for(int i=0;i<fileCount;i++){
-					if(topologyIdentifier.equalsIgnoreCase("aamTraits") || topologyIdentifier.equalsIgnoreCase("aamBrowser"))
-						currentURL = Constants.FILE_READ_URL.replace("<PATH>", path+"/00000"+i+"_0").replace("<HDFS_LOCATION>", hdfsPath);
-					else
-						currentURL = Constants.FILE_READ_URL.replace("<PATH>", path+"/part-m-0000"+i+"_0").replace("<HDFS_LOCATION>", hdfsPath);
-					readURLAndStoreData(currentURL);
-				}*/
 				
 				//Write back to reds that the files in the directory are processed so 
 				//the next run would not pick it up to process
 				jedis = jedisPool.getResource();
-				jedis.set(topologyIdentifier, path);
+				jedis.set(topologyIdentifier, latestPrefix.toString());
 				jedisPool.returnResource(jedis);
+				
+				files = null;
+				filesArray = null;
+				currentURL = null;
+				path = null;
 			}
+			iter = null;
 			//Sleep for 5 mins before starting the next process
-			Thread.sleep(300000);
+			//Thread.sleep(300000);
 		}
 		catch(Exception e){
 			LOGGER.error("Error in communication with webhdfs ["+hdfsPath+"]");
@@ -141,8 +145,9 @@ public class WebHDFSSpout extends BaseRichSpout{
 	 *  Call the bolt to process the records
 	 * @param url
 	 * @throws IOException
+	 * @throws JSONException 
 	 */
-	public void readURLAndStoreData(String url) throws IOException{
+	public void readURLAndWriteToHDFS(String url) throws IOException, JSONException{
 		URL oracle = new URL(url);
         BufferedReader in = new BufferedReader(
         new InputStreamReader(oracle.openStream()));
@@ -151,36 +156,66 @@ public class WebHDFSSpout extends BaseRichSpout{
         while ((inputLine = in.readLine()) != null){
         	String str = formatRecordsToFitRespectiveBolts(inputLine);
         	
-        	//Time to call the BOLT
         	 collector.emit(tuple(str));
+        	 str = null;
+        	 inputLine = null;
         }
         in.close();
 	}
 	
 	public String formatRecordsToFitRespectiveBolts(String str){
-		  String replacedString = null;
-		  if(str!=null && !str.equals("")){
-		   String returnStr = str.replace("\u0001","', '").replace("\u0002","', '");
-		   //returnStr.replace(",", "',");
-		   if(topologyIdentifier.equalsIgnoreCase("aamTraits")){
-		    returnStr = returnStr.substring(0, returnStr.indexOf(",")+1)+" \"[" +returnStr.substring(returnStr.indexOf(",")+1, returnStr.length());
-		    returnStr = returnStr.substring(0, returnStr.length())+"']\"";
-		    replacedString = "['"+returnStr+"]";
-		   }
-		   else if(topologyIdentifier.equalsIgnoreCase("aamInternalSearch")){
-		    returnStr = returnStr.replace("null", "");
-		    String[] splitStr = returnStr.split(",");
-		    returnStr = splitStr[2]+"', '"+splitStr[0]+"', '"+splitStr[1]+"', '"+splitStr[5];
-		    replacedString = "['"+returnStr+"']";
-		    splitStr = null;
-		   }
-		   else
-		    replacedString = "['"+returnStr+"']";
-		   LOGGER.info("Formatted String = " +replacedString);
-		   returnStr = null;
-		  }
-		  
-		  return replacedString;
-		 }
+		String replacedString = null;
+		if(str!=null && !str.equals("")){
+			String returnStr = str.replace("\u0001","', '").replace("\u0002","', '");
+			//returnStr.replace(",", "',");
+			if(topologyIdentifier.equalsIgnoreCase("aamTraits")){
+				returnStr = returnStr.substring(0, returnStr.indexOf(",")+1)+" \"[" +returnStr.substring(returnStr.indexOf(",")+1, returnStr.length());
+				returnStr = returnStr.substring(0, returnStr.length())+"']\"";
+				replacedString = "['"+returnStr+"]";
+			}
+			else if(topologyIdentifier.equalsIgnoreCase("aamInternalSearch")){
+				returnStr = returnStr.replace("null", "");
+				String[] splitStr = returnStr.split(",");
+				returnStr = splitStr[2]+"', '"+splitStr[0]+"', '"+splitStr[1]+"', '"+splitStr[5];
+				replacedString = "['"+returnStr+"']";
+				splitStr = null;
+			}
+			else
+				replacedString = "['"+returnStr+"']";
+			LOGGER.info("Formatted String = " +replacedString);
+			returnStr = null;
+		}
+		
+		return replacedString;
+	}
+	
+	public void write2HDFS(String inputString) throws JSONException{
+		//Check If the file already exists
+		String fileStatusURL = FILE_STATUS_URL.replace("<PATH>", write2HdfsFile);
+		
+		try{
+			JSONObject obj= HttpClientUtils.httpGetCall(fileStatusURL);
+			if(!obj.has("FileStatus")){
+				String fileCreate = FILE_WRITE_URL.replace("<PATH>", write2HdfsFile);
+			
+				ProcessBuilder pb = new ProcessBuilder(
+		            "curl",
+		            "-i",
+		            "-X POST "+fileCreate);
+			
+				
+
+			}
+			
+		}catch (Exception e){
+			System.out.println("Exception Occurred. File does not exist" );
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public void declareOutputFields(OutputFieldsDeclarer declarer) {
+		declarer.declare(new Fields("logger_message"));
+	}
 
 }
