@@ -65,8 +65,12 @@ public class AAMTopology {
 	    conf.registerMetricsConsumer(MetricsListener.class, 3);
 		conf.setDebug(false);
 		conf.setNumWorkers(3);
-		conf.put(MongoNameConstants.IS_PROD, System.getProperty(MongoNameConstants.IS_PROD));
-		if (args.length > 0) {
+		//stormconf is set with system's property as MetricsListener needs it
+		conf.put("topology_environment", System.getProperty(MongoNameConstants.IS_PROD));
+		if (System.getProperty(MongoNameConstants.IS_PROD)
+				.equalsIgnoreCase("PROD")
+				|| System.getProperty(MongoNameConstants.IS_PROD)
+						.equalsIgnoreCase("QA")) {
 			try {
 				StormSubmitter.submitTopology(args[0], conf,
 						builder.createTopology());
