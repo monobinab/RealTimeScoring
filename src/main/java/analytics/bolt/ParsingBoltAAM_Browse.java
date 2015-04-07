@@ -1,3 +1,4 @@
+
 package analytics.bolt;
 
 import java.lang.reflect.Type;
@@ -67,12 +68,13 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 		
 		//populate divLnBoostvariablesMap & Boost list
 		divLnBoostVariblesMap = divLnVariableDao.getDivLnVariable();
-		//boostList = boostDao.getBoosts(sourceTopic);
+		boostList = new ArrayList<String>();
 		List<Variable> variableList = variableDao.getVariables();
 		boostMap = new HashMap<String, Variable>();
 		for(Variable v: variableList) {
 			if(v.getName().contains(MongoNameConstants.BROWSE_BOOST_PREFIX)) {
 				boostMap.put(v.getName(),v);
+				boostList.add(v.getName());
 			}
 //			if(boostList.contains(v.getName())) {
 //				boostMap.put(v.getName(),v);
