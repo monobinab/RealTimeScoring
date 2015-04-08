@@ -115,7 +115,6 @@ public class ResponseBolt extends EnvironmentBolt{
 			if(input != null && input.contains("lyl_id_no")){
 				lyl_id_no = input.getString(0);
 				String scoreInfoJsonString = callRtsAPI(lyl_id_no);
-				String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no);
 				
 				//4-2-2015.Recent update to send responses only for 1 tag irrespective of 
 				//how many tags we receive in the difference. This occasion tag 
@@ -269,7 +268,7 @@ public class ResponseBolt extends EnvironmentBolt{
 			String custEventName = occationCustomeEventDao.getCustomeEventName(tagMetaData.getPurchaseOccasion());
 			
 			//Generate the Custome Xml to be sent to Oracle
-			String customXml = createCustomXml(xmlWithoutExpo,eid,custEventName,tagMetaData);
+			String customXml = createCustomXml(xmlWithoutExpo,eid,custEventName,tagMetaData,lyl_l_id);
 			
 			//BOM = Byte-Order-Mark
 			//Remove the BOM to make the XML valid
@@ -397,7 +396,8 @@ public class ResponseBolt extends EnvironmentBolt{
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	public String createCustomXml(String xml, String emailId, String custEventNm, TagMetadata tagMetaData) throws ParserConfigurationException, TransformerException, SAXException, IOException{
+	public String createCustomXml(String xml, String emailId, String custEventNm, TagMetadata tagMetaData, String lyl_l_id) 
+			throws ParserConfigurationException, TransformerException, SAXException, IOException{
 		
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -499,6 +499,15 @@ public class ResponseBolt extends EnvironmentBolt{
 		optionalData4.appendChild(value4);
 		if(tagMetaData!=null && tagMetaData.getSubBusinessUnit()!=null && !tagMetaData.getSubBusinessUnit().equals(""))
 			value4.appendChild(doc.createTextNode(tagMetaData.getSubBusinessUnit()));
+		
+		Element optionalData5 = doc.createElement("optionalData");
+		recipientData.appendChild(optionalData5);
+		Element name5 = doc.createElement("name");
+		name5.appendChild(doc.createTextNode("MEMBERID"));
+		optionalData5.appendChild(name5);
+		Element value5 = doc.createElement("value");
+		optionalData5.appendChild(value5);
+		value5.appendChild(doc.createTextNode(lyl_l_id));
 	
 		//Generate the String from the xml document.
 		Transformer transformer = TransformerFactory.newInstance().newTransformer();
