@@ -742,7 +742,7 @@ public class ScoringSingletonTest {
 	// which needs re-scoring
 	// in executeStrategy(), changedMemberVariables map gets updated with new
 	// values, dates etc
-	@Ignore
+	
 	@Test
 	public void executeStrategyWithEmptyChangedMemberVariablesTest() throws SecurityException,
 			NoSuchFieldException, IllegalArgumentException,
@@ -1108,7 +1108,6 @@ public class ScoringSingletonTest {
 	
 	@SuppressWarnings("unchecked")
 	@Test(expected = RealTimeScoringException.class)
-	@Ignore
 	public void updateChangedMemberScoreNullMinMaxDatesTest() throws SecurityException,
 			NoSuchFieldException, IllegalArgumentException,
 			IllegalAccessException, ParseException, ConfigurationException, RealTimeScoringException {
@@ -1249,7 +1248,7 @@ public class ScoringSingletonTest {
 		Assert.assertEquals(expected.getValue(), score);
 	}
 
-	// to check if modelId is null. Seems like modelId DOES NOT HAVE ANY WFFECT
+	// to check if modelId is null. Seems like modelId DOES NOT HAVE ANY EFFECT
 	// WHEN UPDATING CHANGEDMEMBER VARIABLES
 	@SuppressWarnings("unchecked")
 	@Test
