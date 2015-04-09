@@ -742,7 +742,6 @@ public class ScoringSingletonTest {
 	// which needs re-scoring
 	// in executeStrategy(), changedMemberVariables map gets updated with new
 	// values, dates etc
-	@Ignore
 	@Test
 	public void executeStrategyWithEmptyChangedMemberVariablesTest() throws SecurityException,
 			NoSuchFieldException, IllegalArgumentException,
@@ -1105,9 +1104,9 @@ public class ScoringSingletonTest {
 				changedMemScores46.get("minEx"));
 	}
 
-	@Ignore
+	
 	@SuppressWarnings("unchecked")
-	@Test(expected = RealTimeScoringException.class)
+	@Test
 	public void updateChangedMemberScoreNullMinMaxDatesTest() throws SecurityException,
 			NoSuchFieldException, IllegalArgumentException,
 			IllegalAccessException, ParseException, ConfigurationException, RealTimeScoringException {
@@ -1181,6 +1180,16 @@ public class ScoringSingletonTest {
 		HashMap<String, ChangedMemberScore> changedMemScores51 = (HashMap<String, ChangedMemberScore>) dbObj
 				.get("51");
 		
+		
+		String today = simpleDateFormat.format(new Date());
+		Map<String,Date> minMaxExpiryMap = scoringSingletonObj.getMinMaxExpiry(51, allChanges);
+		//The Min and Max dates have been intentionally passed as null to updatechangedMemeberScore and the output
+		//should have the min ,max and eff dates set to today if nulls are passed in the input.
+		//if(minMaxExpiryMap.get("minExpiry") == null){
+			Assert.assertEquals(changedMemScores51.get("minEx"), today);
+			Assert.assertEquals(changedMemScores51.get("maxEx"), today);
+		//}
+		
 	}
 
 	
@@ -1248,7 +1257,7 @@ public class ScoringSingletonTest {
 		Assert.assertEquals(expected.getValue(), score);
 	}
 
-	// to check if modelId is null. Seems like modelId DOES NOT HAVE ANY EFFECT
+	// to check if modelId is null. Seems like modelId DOES NOT HAVE ANY WFFECT
 	// WHEN UPDATING CHANGEDMEMBER VARIABLES
 	@SuppressWarnings("unchecked")
 	@Test
