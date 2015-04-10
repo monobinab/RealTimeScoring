@@ -36,7 +36,7 @@ public class TraitsTopology{
 		
 		//Spout that wakes up every 5 mins and process the Traits
 		builder.setSpout("write2HdfsSpout", new Write2HDFSSpout(servers[1], TopicConstants.PORT, Constants.AAM_TRAITS_PATH, 
-					"aamTraits"), 1);
+					"webhdfsWrite"), 1);
 		
 		builder.setBolt("write2HdfsBolt", new Write2HDFSBolt("/user/spannal/logs/log","log.txt",1000000L), 3)
 	    .shuffleGrouping("write2HdfsSpout");
