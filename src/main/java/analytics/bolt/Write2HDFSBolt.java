@@ -79,26 +79,28 @@ public class Write2HDFSBolt extends BaseRichBolt{
 	@Override
 	public void execute(Tuple input) {
 		
-		/*PseudoWebHDFSConnection pConn = null;
-		if(input != null && input.contains("logger_message")){
+		PseudoWebHDFSConnection pConn = null;
+		
+		//if(input != null && input.contains("logger_message")){
 			sb.append(input.getString(0)+"\n");
 			count ++;
-		}
+		//}
 		if(count == 100){
 			
 			pConn = new PseudoWebHDFSConnection(Constants.WEBHDFS_URL, AuthPropertiesReader
 					.getProperty(Constants.WEBHDFS_USERNAME), AuthPropertiesReader
 					.getProperty(Constants.WEBHDFS_PASSWORD));
 			
-			System.out.println("Writing to logs");
+			//System.out.println("Writing to logs");
 			writeLogs(sb.toString(), pConn);
 			sb = null;
 			sb = new StringBuilder();
 			count =0;
-		}*/
+			pConn = null;
+		}
 		
 		
-		write2File(input.getString(0), "log.txt");
+		//write2File(input.getString(0), "log.txt");
 		
 		outputCollector.ack(input);
 	}
@@ -107,7 +109,10 @@ public class Write2HDFSBolt extends BaseRichBolt{
 		try {
 			String tempFileName = outputFileName+".0";
 			
-			if(logMessage != null && !"".equals(logMessage)){
+			InputStream stream = new ByteArrayInputStream(logMessage.getBytes());
+			pConn.append(outputDirectory+"/"+tempFileName, stream);
+			
+			/*if(logMessage != null && !"".equals(logMessage)){
 				InputStream stream = new ByteArrayInputStream(logMessage.getBytes());
 				Boolean file_directory_Status = pConn.isExists(outputDirectory);
 				
@@ -144,8 +149,8 @@ public class Write2HDFSBolt extends BaseRichBolt{
 							//the numeric digit at the end of the files respectively
 							if(latestFileSize >=fileSize){
 								
-								Long fileAppeneder = new Long(latestFileName.substring(latestFileName.lastIndexOf(".")+1, latestFileName.length()));
-								pConn.create(outputDirectory+"/"+outputFileName+"."+(fileAppeneder+1), stream);
+								Long fileAppeneder = new Long(latestFileName.substring(latestFileName.lastIndexOf(".")+1, latestFileName.length())) + 1;
+								pConn.create(outputDirectory+"/"+outputFileName+"."+(fileAppeneder), stream);
 								
 							}
 							//The file exists but it is not over the filesize limit
@@ -156,6 +161,7 @@ public class Write2HDFSBolt extends BaseRichBolt{
 							hm = null;
 							obj = null;
 							arr = null;
+							file_directory_List_Status = null;
 						}
 					}
 					
@@ -163,7 +169,7 @@ public class Write2HDFSBolt extends BaseRichBolt{
 					System.out.println("Exception Occurred. execute method of Write2HDFS" );
 					e.printStackTrace();
 				}
-			}
+			}*/
 		} catch (Exception e) {
 			LOGGER.error("Json Exception ", e);
 			countMetric.scope("responses_failed").incr();
@@ -208,10 +214,10 @@ public class Write2HDFSBolt extends BaseRichBolt{
 		    if(file.exists()){
 		    	double bytes = file.length();
 		    	double kilobytes = (bytes / 1024);
-				double megabytes = (bytes / 1024 / 1024);
-				double size = 1000;
+				double megabytes = (kilobytes / 1024);
+				//double size = 1000;
 				
-				if(megabytes > 10){
+				if(kilobytes > 1000){
 					Long fileAppeneder = new Long(fileNm.substring(fileNm.lastIndexOf(".")+1, fileNm.length())) + 1;
 					InputStream stream = (new FileInputStream(file));
 					//Create New file
@@ -251,8 +257,10 @@ public class Write2HDFSBolt extends BaseRichBolt{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}finally{
-			if(out != null)
+			if(out != null){
 				out.close();
+				out = null;
+			}
 		}
 		
 	}
