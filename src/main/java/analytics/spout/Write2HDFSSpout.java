@@ -154,11 +154,11 @@ public class Write2HDFSSpout extends BaseRichSpout{
 
         String inputLine;
         while ((inputLine = in.readLine()) != null){
-        	String str = formatRecordsToFitRespectiveBolts(inputLine);
+        	//String str = formatRecordsToFitRespectiveBolts(inputLine);
         	
-        	 collector.emit(tuple(str));
-        	 str = null;
+        	 collector.emit(tuple(inputLine));
         	 inputLine = null;
+        	 //inputLine = null;
         }
         in.close();
 	}

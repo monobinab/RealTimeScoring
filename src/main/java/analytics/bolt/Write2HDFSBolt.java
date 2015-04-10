@@ -190,6 +190,7 @@ public class Write2HDFSBolt extends BaseRichBolt{
 			    for (File file : files) {
 			        if (file.isFile()) {
 			        	fileNames.add(file.getName());
+			        	file = null;
 			        }
 			    }
 		    }
@@ -210,7 +211,7 @@ public class Write2HDFSBolt extends BaseRichBolt{
 				double megabytes = (bytes / 1024 / 1024);
 				double size = 1000;
 				
-				if(kilobytes > 100){
+				if(megabytes > 10){
 					Long fileAppeneder = new Long(fileNm.substring(fileNm.lastIndexOf(".")+1, fileNm.length())) + 1;
 					InputStream stream = (new FileInputStream(file));
 					//Create New file
@@ -226,6 +227,8 @@ public class Write2HDFSBolt extends BaseRichBolt{
 
 					pConn.create(outputDirectory+"/"+fileNames.get(fileNames.size()-1), stream);
 					
+					pConn = null;
+					
 					//TODO ..delete the file after writing to hdfs
 					
 				}
@@ -237,7 +240,9 @@ public class Write2HDFSBolt extends BaseRichBolt{
 		    	file.createNewFile();
 				out = new PrintWriter(new BufferedWriter(new FileWriter(fileNm, true)));
 		    }
-
+		    
+		    file = null;
+		    fileNames.clear();
 		    out.println(logMessage);
 		    
 		} catch (IOException e) {
