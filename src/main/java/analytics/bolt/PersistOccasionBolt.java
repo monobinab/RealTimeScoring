@@ -55,22 +55,25 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 		try {
 			String tag = input.getString(1);
 			if(tag != null && !tag.isEmpty()){
-			String[] tagsArray = tag.split(",");
-			tags = Arrays.asList(tagsArray);
-			memberMDTagsDao.addMemberMDTags(l_id, tags);
-			LOGGER.info("PERSIST OCCATION UPDATE: " + l_id + "~"+tags);
-			countMetric.scope("persisted_occasionTags").incr();
+				String[] tagsArray = tag.split(",");
+				tags = Arrays.asList(tagsArray);
+				memberMDTagsDao.addMemberMDTags(l_id, tags);
+				LOGGER.info("PERSIST OCCATION UPDATE: " + l_id + "~"+tags);
+				countMetric.scope("persisted_occasionTags").incr();
 			}
 			else{
 				memberMDTagsDao.deleteMemberMDTags(l_id);
 				LOGGER.info("PERSIST OCCATION DELETE: " + l_id);
 			}
+			
+			//Emit the tuples to scoring bolt only if there are changes to the Variables
 			if(input.getString(2)!=null && input.getString(2).trim().length()>0){
 				List<Object> listToEmit = new ArrayList<Object>();
 					listToEmit.add(l_id);
 					listToEmit.add(input.getString(2));
-				    	listToEmit.add(input.getString(3));
-				    	listToEmit.add(input.getString(4));
+			    	listToEmit.add(input.getString(3));
+			    	listToEmit.add(input.getString(4));
+			    	outputCollector.emit(listToEmit);
 			}
 			outputCollector.ack(input);
 		} catch (Exception e) {

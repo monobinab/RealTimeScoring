@@ -196,7 +196,7 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 		{
 			List<Object> listToEmit = new ArrayList<Object>();
 	    	listToEmit.add(l_id);
-	   listToEmit.add(tagsString.toString());
+	    	listToEmit.add(tagsString.toString());
 	    	listToEmit.add(JsonUtils.createJsonFromStringStringMap(variableValueTagsMap));
 	    	listToEmit.add("PurchaseOccasion");
 	    	listToEmit.add(lyl_id_no.getAsString());
@@ -210,6 +210,7 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 			listToEmit.add("");
 			listToEmit.add("");
 			listToEmit.add("");
+			this.outputCollector.emit(listToEmit);
 	    	countMetric.scope("no_variables_affected").incr();			
 		}
     	outputCollector.ack(input);

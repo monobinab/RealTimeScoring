@@ -48,15 +48,17 @@ public class TraitsTopology{
 		
 		if (args != null && args.length > 0) {
 			conf.setNumWorkers(6);
+			conf.setMaxSpoutPending(12);
 			StormSubmitter.submitTopology(args[0], conf,
 					builder.createTopology());
 		} else {
 			conf.setDebug(false);
 			conf.setMaxTaskParallelism(3);
+			conf.setMaxSpoutPending(12);
 			LocalCluster cluster = new LocalCluster();
 			cluster.submitTopology("traits_topology", conf,
 					builder.createTopology());
-			Thread.sleep(1000000);
+			//Thread.sleep(1000000);
 			cluster.shutdown();
 		}
 

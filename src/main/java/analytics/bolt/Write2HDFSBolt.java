@@ -91,7 +91,7 @@ public class Write2HDFSBolt extends BaseRichBolt{
 					.getProperty(Constants.WEBHDFS_USERNAME), AuthPropertiesReader
 					.getProperty(Constants.WEBHDFS_PASSWORD));
 			
-			//System.out.println("Writing to logs");
+			System.out.println("Writing to logs");
 			writeLogs(sb.toString(), pConn);
 			sb = null;
 			sb = new StringBuilder();
