@@ -8,9 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import scala.actors.threadpool.Arrays;
-
-
 import analytics.util.HostPortUtility;
+import analytics.util.JsonUtils;
 import analytics.util.MongoNameConstants;
 import analytics.util.dao.MemberMDTagsDao;
 import backtype.storm.metric.api.MultiCountMetric;
@@ -18,6 +17,7 @@ import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
 public class PersistOccasionBolt extends EnvironmentBolt{
@@ -65,6 +65,13 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 				memberMDTagsDao.deleteMemberMDTags(l_id);
 				LOGGER.info("PERSIST OCCATION DELETE: " + l_id);
 			}
+			if(input.getString(2)!=null && input.getString(2).trim().length()>0){
+				List<Object> listToEmit = new ArrayList<Object>();
+					listToEmit.add(l_id);
+					listToEmit.add(input.getString(2));
+				    	listToEmit.add(input.getString(3));
+				    	listToEmit.add(input.getString(4));
+			}
 			outputCollector.ack(input);
 		} catch (Exception e) {
 			LOGGER.error("Json Exception ", e);
@@ -74,7 +81,7 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		// TODO Auto-generated method stub
+			declarer.declare(new Fields("l_id", "lineItemAsJsonString","source","lyl_id_no"));
 		}
 
 }
