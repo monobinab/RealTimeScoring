@@ -63,12 +63,12 @@ public class PurchaseOccassionTopology {
 					"persistOccasionBolt",
 					new PersistOccasionBolt(System
 							.getProperty(MongoNameConstants.IS_PROD)), 1)
-					.shuffleGrouping("parseOccassionBolt", "persist_stream");
+					.shuffleGrouping("parseOccassionBolt");
 			topologyBuilder.setBolt(
 					"strategy_bolt",
 					new StrategyScoringBolt(System
 							.getProperty(MongoNameConstants.IS_PROD)), 1)
-					.shuffleGrouping("parseOccassionBolt");
+					.shuffleGrouping("persistOccasionBolt");
 
 		//Sree. Added the new bolt for Responses
 		topologyBuilder.setBolt("responses_bolt", new ResponseBolt(System
