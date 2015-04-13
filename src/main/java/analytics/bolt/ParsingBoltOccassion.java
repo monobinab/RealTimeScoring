@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.mozilla.javascript.tools.debugger.treetable.JTreeTable.ListToTreeSelectionModelWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -160,11 +161,11 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 		//reset the variableValueMap to 0 before persisting new incoming tags
 		resetVariableValuesMap(variableValueTagsMap, l_id);
 			
-		List<Object> emitToPersist = new ArrayList<Object>();
+		//List<Object> emitToPersist = new ArrayList<Object>();
 		persistTagsToMemberTagsColl(l_id, tagsString, tags);
-		emitToPersist.add(l_id);
-		emitToPersist.add(tagsString.toString());
-		this.outputCollector.emit("persist_stream", emitToPersist);
+		//emitToPersist.add(l_id);
+		//emitToPersist.add(tagsString.toString());
+		//this.outputCollector.emit("persist_stream", emitToPersist);
 		LOGGER.debug("Scoring for " + l_id);
 			
 		if (tags != null && tags.size() != 0) {
@@ -195,6 +196,7 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 		{
 			List<Object> listToEmit = new ArrayList<Object>();
 	    	listToEmit.add(l_id);
+	   listToEmit.add(tagsString.toString());
 	    	listToEmit.add(JsonUtils.createJsonFromStringStringMap(variableValueTagsMap));
 	    	listToEmit.add("PurchaseOccasion");
 	    	listToEmit.add(lyl_id_no.getAsString());
@@ -202,6 +204,12 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 	    	this.outputCollector.emit(listToEmit);
 		}
 		else{
+			List<Object> listToEmit = new ArrayList<Object>();
+			listToEmit.add(l_id);
+			listToEmit.add(tagsString.toString());
+			listToEmit.add("");
+			listToEmit.add("");
+			listToEmit.add("");
 	    	countMetric.scope("no_variables_affected").incr();			
 		}
     	outputCollector.ack(input);
@@ -302,8 +310,7 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("l_id","lineItemAsJsonString","source","lyl_id_no"));
-		declarer.declareStream("persist_stream", new Fields("l_id", "tags"));
+		declarer.declare(new Fields("l_id", "tags", "lineItemAsJsonString","source","lyl_id_no"));
 	}
 
 }
