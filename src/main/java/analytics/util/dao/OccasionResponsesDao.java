@@ -27,7 +27,8 @@ public class OccasionResponsesDao extends AbstractDao {
 	}
 
 
-	public void addOccasionResponse(String l_id, String eid, String custEvent, String purOcca, String businessUnit, String subBusUnit) {
+	public void addOccasionResponse(String l_id, String eid, String custEvent, String purOcca, String businessUnit, 
+			String subBusUnit, String successFlag, String tag) {
 		
 		DBObject occObj = new BasicDBObject();
 		occObj.put(MongoNameConstants.L_ID, l_id);
@@ -40,6 +41,8 @@ public class OccasionResponsesDao extends AbstractDao {
 		occObj.put("purchaseOccasion", purOcca);
 		occObj.put("businessUnit", businessUnit);
 		occObj.put("subBusinessUnit", subBusUnit);
+		occObj.put("successFlag", successFlag);
+		occObj.put("tag", tag);
 		
 		BasicDBObject keyObj = new BasicDBObject();
 		keyObj.append(MongoNameConstants.L_ID, l_id);

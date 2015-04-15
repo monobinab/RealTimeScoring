@@ -140,5 +140,8 @@ public class MongoNameConstants {
      //Occasion Custome Event Collection
      public static final String OCCASION = "occasion";
      public static final String INTERACT_CUSTOME_EVENT = "intCustEvent";
+     
+     //Vibes Collection
+     public static final String PROCESSED_FLAG = "processed";
 
 }

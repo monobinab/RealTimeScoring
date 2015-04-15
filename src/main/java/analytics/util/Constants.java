@@ -3,8 +3,9 @@ package analytics.util;
 public class Constants {
 	public static final int METRICS_INTERVAL = 60;
 	//public static final String SCORING_API_PRE = "http://realtimescoring.intra.searshc.com/rtsapi/v1/top/categories/";
-	//public static final String SCORING_API_PRE = "http://rtsapi301p.qa.ch3.s.com:8180/rtsapi/v1/top/categories/";
-	public static final String SCORING_API_PRE = "http://realtimescoring.intra.searshc.com/rtsapi/v1/top/categories/";
+	public static final String SCORING_API_PRE = "http://rtsapi301p.qa.ch3.s.com:8180/rtsapi/v1/top/categories/";
+	//public static final String SCORING_API_PRE = "hfdvrtsejboss1.vm.itg.corp.us.shldcorp.com:8180/rtsapi/v1/top/categories/";
+	//public static final String SCORING_API_PRE = "http://realtimescoring.intra.searshc.com/rtsapi/v1/top/categories/";
 	public static final String SCORING_API_POST = "?key=za4n47bd&tags=models"; 
 	public static final String AUTH_PROPERTY_FILE = "authentication.properties";
 	public static final String RESP_URL_USER_NAME = "responseWebserviceUsrname";
@@ -40,4 +41,7 @@ public class Constants {
 	
 	public static final String TELLURIDE_REDIS_SERVER_HOST="tellurideRedisServerHost";
 	public static final String TELLURIDE_REDIS_SERVER_PORT="tellurideRedisServerPort";
+	
+	public static final String YES="Y";
+	public static final String NO = "N";
 }
