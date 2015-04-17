@@ -366,6 +366,7 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
 					listToEmit.add(JsonUtils.createJsonFromStringStringMap(varAmountMap));
 					listToEmit.add(requestorID);
 					listToEmit.add(messageID);
+					listToEmit.add(lyl_id_no);
 					LOGGER.debug(requestorID + " Point of SALE is touched...");
 					LOGGER.debug(" *** telluride parsing bolt emitting: "
 						+ listToEmit.toString());
