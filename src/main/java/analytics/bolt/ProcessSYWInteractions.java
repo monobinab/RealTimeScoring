@@ -261,6 +261,7 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 			listToEmit2.add(lId);
 			listToEmit2.add(gson.toJson(map, varValueType));
 			listToEmit2.add(feedType);
+			listToEmit2.add(lyl_id_no);
 			this.outputCollector.emit("score_stream", listToEmit2);
 			countMetric.scope("successful").incr();
 
