@@ -185,6 +185,7 @@ public class ResponsysUtil {
 			//BOM = Byte-Order-Mark
 			//Remove the BOM to make the XML valid
 			String xmlWithoutBOM = removeUTF8BOM(customXml);
+			System.out.println(xmlWithoutBOM);
 			out.write(xmlWithoutBOM);
 			out.close();
 

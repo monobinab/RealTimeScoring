@@ -62,7 +62,7 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 				String tag = "CETVS123123123";
 					//Send response for every new tag scored
 					//length -1 because the last element would be the datestring set in the parsing bolt.
-			    responsysUtil.getResponseServiceResult(scoreInfoJsonString,lyl_id_no,tag);
+			    responsysUtil.getResponseXMLServiceResult(scoreInfoJsonString,lyl_id_no,tag);
 			    countMetric.scope("responses").incr();
 				
 				/*getResponseServiceResult(scoreInfoJsonString,lyl_id_no);
