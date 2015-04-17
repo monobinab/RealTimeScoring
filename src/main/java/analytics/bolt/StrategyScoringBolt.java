@@ -265,7 +265,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declareStream("score_stream",new Fields("l_id", "newScore", "model","source", "messageID", "minExpiry", "maxExpiry"));
+		declarer.declareStream("score_stream",new Fields("l_id", "newScore", "model","source", "messageID", "minExpiry", "maxExpiry", "lyl_id_no"));
 		declarer.declareStream("member_stream", new Fields("l_id", "source","messageID"));
 		declarer.declareStream("response_stream", new Fields("lyl_id_no"));
 

@@ -111,6 +111,8 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 		//lId = "a7V7rU68LLBethrQ3W5+xTff7fo=";
 		JsonParser parser = new JsonParser();
 		JsonObject interactionObject = parser.parse(input.getStringByField("message")).getAsJsonObject();
+		//TODO: Add a if exists
+		String lyl_id_no = input.getStringByField("lyl_id_no");
 		/*
 		 * JsonObject interactionObject = (JsonObject) input
 		 * .getValueByField("message");
@@ -388,7 +390,7 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declareStream("score_stream", new Fields("l_id", "lineItemAsJsonString", "source"));
+		declarer.declareStream("score_stream", new Fields("l_id", "lineItemAsJsonString", "source","lyl_id_no"));;
 		declarer.declareStream("persist_stream", new Fields("l_id", "lineItemAsJsonString", "source"));
 	}
 
