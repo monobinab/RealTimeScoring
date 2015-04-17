@@ -228,7 +228,7 @@ public class ResponsysUtil {
 		return strBuff.toString();
 	}
 	
-	public String getResponseXMLServiceResult(String input, String lyl_l_id, String tag) throws Exception {
+	public String getResponseXMLServiceResult(String input, String lyl_l_id) throws Exception {
 		LOGGER.info(" Testing - Entering the getResponseServiceResult method");
 		StringBuffer strBuff = new StringBuffer();
 		BufferedReader in = null;
@@ -261,8 +261,8 @@ public class ResponsysUtil {
 			//Get the necessary variables for populating in the response xml
 			String l_id = SecurityUtils.hashLoyaltyId(lyl_l_id);
 			String eid = memberInfoDao.getMemberInfoEId(l_id);
-			TagMetadata tagMetaData = getTagMetaData(tag);
-			String custEventName = occationCustomeEventDao.getCustomeEventName(tagMetaData.getPurchaseOccasion());
+			/*TagMetadata tagMetaData = getTagMetaData(tag);
+			String custEventName = occationCustomeEventDao.getCustomeEventName(tagMetaData.getPurchaseOccasion());*/
 			
 
 			//4-15-2015. Check if the Tag is among the top 5 mdtags from the API Call.
@@ -292,7 +292,7 @@ public class ResponsysUtil {
 			String xmlWithoutExpo = removeExponentialFromXml(json2XmlString);
 			
 			//Generate the Custome Xml to be sent to Oracle
-			String customXml = createCustomXml(xmlWithoutExpo,eid, custEventName, tagMetaData,lyl_l_id);
+			String customXml = createCustomXmlModelId(xmlWithoutExpo, lyl_l_id);
 			
 			//BOM = Byte-Order-Mark
 			//Remove the BOM to make the XML valid
@@ -308,13 +308,13 @@ public class ResponsysUtil {
 			
 			//Persist info to Mongo after successfully transmission of message to Oracle.
 			LOGGER.info(lyl_l_id+"~~~"+xmlWithoutBOM);
-			occasionResponsesDao.addOccasionResponse(l_id, eid, custEventName, tagMetaData.getPurchaseOccasion(), tagMetaData.getBusinessUnit(), tagMetaData.getSubBusinessUnit(), 
+		/*	occasionResponsesDao.addOccasionResponse(l_id, eid, custEventName, tagMetaData.getPurchaseOccasion(), tagMetaData.getBusinessUnit(), tagMetaData.getSubBusinessUnit(), 
 					strBuff.toString().contains("<success>true</success>") ? "Y" : "N", tag);
-			
+			*/
 			xmlWithoutBOM = null;
 			xmlWithoutExpo = null;
 			json2XmlString = null;
-			tagMetaData = null;
+			//tagMetaData = null;
 			o = null;
 			customXml = null;
 			
@@ -561,6 +561,144 @@ public class ResponsysUtil {
 		return finalXmlStr;
 	}
 	
+	public String createCustomXmlModelId(String xml, String lyl_l_id) 
+			throws ParserConfigurationException, TransformerException, SAXException, IOException{
+		
+		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+ 
+		// root elements
+		Document doc = docBuilder.newDocument();
+		Element rootElement = doc.createElement("ns2:triggerCustomEvent");
+		doc.appendChild(rootElement);
+		
+		rootElement.setAttribute("xmlns", "http://ws.services.responsys.com");
+		rootElement.setAttribute("xmlns:ns2", "http://rest.ws.services.responsys.com");
+		rootElement.setAttribute("priorityLevel", "2");
+		
+		// customEvent elements
+		Element customEvent = doc.createElement("ns2:customEvent");
+		rootElement.appendChild(customEvent);
+		
+		/*//eventName element inside of customEvent
+		Element eventName = doc.createElement("eventName");
+		if(custEventNm!=null && !custEventNm.equals(""))
+			eventName.appendChild(doc.createTextNode(custEventNm));
+		customEvent.appendChild(eventName);*/
+		
+		// recipientData elements
+		Element recipientData = doc.createElement("ns2:recipientData");
+		rootElement.appendChild(recipientData);
+		
+		//recipient element inside of recipientData
+		Element recipient = doc.createElement("recipient");
+		recipientData.appendChild(recipient);
+		
+		//listName element inside of recipient
+		Element listName = doc.createElement("listName");
+		recipient.appendChild(listName);
+		
+		//eventName element inside of listName
+		Element folderName = doc.createElement("folderName");
+		folderName.appendChild(doc.createTextNode("!MasterData"));
+		listName.appendChild(folderName);
+		
+		//eventName element inside of listName
+		Element objectName = doc.createElement("objectName");
+		objectName.appendChild(doc.createTextNode("CONTACTS_LIST"));
+		listName.appendChild(objectName);	
+		
+		//customerId element inside of recipient
+		/*Element customerId = doc.createElement("customerId");
+		if(emailId!=null && !emailId.equals(""))
+			customerId.appendChild(doc.createTextNode(emailId));
+		recipient.appendChild(customerId);*/
+		
+		//matchColumnName1 element inside of recipient
+		Element matchColumnName1 = doc.createElement("matchColumnName1");
+		matchColumnName1.appendChild(doc.createTextNode("CUSTOMER_ID_"));
+		recipient.appendChild(matchColumnName1);
+		
+		//optionalData element inside of recipientData
+		Element optionalData = doc.createElement("optionalData");
+		recipientData.appendChild(optionalData);
+		
+		//name element inside of optionalData
+		Element name = doc.createElement("name");
+		name.appendChild(doc.createTextNode("variable1"));
+		optionalData.appendChild(name);
+		
+		//value element inside of optionalData
+		Element value = doc.createElement("value");
+		optionalData.appendChild(value);
+		value.appendChild(doc.createCDATASection("RTS_DATA"));
+		
+		//Optional Data for adding the MDTag, BU and SUB_BU
+		//optionalData element inside of recipientData
+		/*Element optionalData2 = doc.createElement("optionalData");
+		recipientData.appendChild(optionalData2);
+		Element name2 = doc.createElement("name");
+		name2.appendChild(doc.createTextNode("mdTag"));
+		optionalData2.appendChild(name2);
+		Element value2 = doc.createElement("value");
+		optionalData2.appendChild(value2);
+		if(tagMetaData!=null && tagMetaData.getMdTags()!=null && !tagMetaData.getMdTags().equals(""))
+			value2.appendChild(doc.createTextNode(tagMetaData.getMdTags()));*/
+
+		Element optionalData3 = doc.createElement("optionalData");
+		recipientData.appendChild(optionalData3);
+		Element name3 = doc.createElement("name");
+		name3.appendChild(doc.createTextNode("businessUnit"));
+		optionalData3.appendChild(name3);
+		Element value3 = doc.createElement("value");
+		optionalData3.appendChild(value3);
+		/*if(tagMetaData!=null && tagMetaData.getBusinessUnit()!=null && !tagMetaData.getBusinessUnit().equals(""))
+			value3.appendChild(doc.createTextNode(tagMetaData.getBusinessUnit()));*/
+		value3.appendChild(doc.createTextNode("Home Appliances"));
+		Element optionalData4 = doc.createElement("optionalData");
+		recipientData.appendChild(optionalData4);
+		Element name4 = doc.createElement("name");
+		name4.appendChild(doc.createTextNode("subBusinessUnit"));
+		optionalData4.appendChild(name4);
+		Element value4 = doc.createElement("value");
+		optionalData4.appendChild(value4);
+		/*if(tagMetaData!=null && tagMetaData.getSubBusinessUnit()!=null && !tagMetaData.getSubBusinessUnit().equals(""))
+			value4.appendChild(doc.createTextNode(tagMetaData.getSubBusinessUnit()));*/
+		value4.appendChild(doc.createTextNode("Refrigerator"));
+		
+		Element optionalData5 = doc.createElement("optionalData");
+		recipientData.appendChild(optionalData5);
+		Element name5 = doc.createElement("name");
+		name5.appendChild(doc.createTextNode("MEMBERID"));
+		optionalData5.appendChild(name5);
+		Element value5 = doc.createElement("value");
+		optionalData5.appendChild(value5);
+		value5.appendChild(doc.createTextNode(lyl_l_id));
+	
+		//Generate the String from the xml document.
+		Transformer transformer = TransformerFactory.newInstance().newTransformer();
+		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+
+		//Write it to a String to return
+		StreamResult result = new StreamResult(new StringWriter());
+		DOMSource source = new DOMSource(doc);
+		transformer.transform(source, result);
+
+		String xmlString = result.getWriter().toString();
+		
+		//Not an efficient way to perform this in this method but since Oracle wants new tags like element in place of scoresInfo
+		//and scoresInfo to be upgraded as parent node with element nodes inside them. The requirement itself is very customized.
+		String interminStr = xmlString.replace("RTS_DATA", "<RTS> " +xml+ " </RTS>");
+		interminStr = interminStr.replace("<start>", "").replace("</start>", "");
+		interminStr = interminStr.replace("scoresInfo", "element");
+		String finalXmlStr = interminStr.substring(0, interminStr.indexOf("<element>"))+" <scoresInfo> "  
+				+ interminStr.substring(interminStr.indexOf("<element>"),interminStr.lastIndexOf("</element>")+10)  
+					+ " </scoresInfo> " + interminStr.substring(interminStr.lastIndexOf("</element>")+10,interminStr.length());
+		System.out.println("customXml =  "+finalXmlStr);
+		
+		interminStr = null;
+		return finalXmlStr;
+	}
 	/**
 	 * 
 	 * @param s
