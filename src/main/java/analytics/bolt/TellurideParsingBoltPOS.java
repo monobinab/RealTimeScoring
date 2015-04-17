@@ -399,7 +399,7 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
 	 */
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("l_id", "lineItemAsJsonString", "source","messageID"));
+		declarer.declare(new Fields("l_id", "lineItemAsJsonString", "source","messageID", "lyl_id_no"));
 	}
 
 	private final String getDivCategoryFromCollection(String item) {

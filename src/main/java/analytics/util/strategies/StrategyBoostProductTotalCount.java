@@ -26,7 +26,7 @@ public class StrategyBoostProductTotalCount implements Strategy {
 	@Override
 	public Change execute(RealTimeScoringContext context) {
 		
-    	Map<String, List<String>> dateValuesMap = JsonUtils.restoreDateTraitsMapFromJson((String) context.getValue());
+    /*	Map<String, List<String>> dateValuesMap = JsonUtils.restoreDateTraitsMapFromJson((String) context.getValue());
     	SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
     	int totalPidCount = 0;
     	
@@ -49,7 +49,7 @@ public class StrategyBoostProductTotalCount implements Strategy {
 	    	}
 			
 			return new Change((Object) totalPidCount, calculateExpirationDate());
-    	}
+    	}*/
     	return new Change();
 	}
     

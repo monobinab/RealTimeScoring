@@ -56,14 +56,14 @@ public class ResponsysUtil {
 	private MemberInfoDao memberInfoDao;
 	
 	private static final String UTF8_BOM = "\uFEFF";
-	List modelArray;
+	List<String> modelArray = new ArrayList<String>();
 	
 	public ResponsysUtil() {
 		memberInfoDao = new MemberInfoDao();
 		tagMetadataDao = new TagMetadataDao();
 		occationCustomeEventDao = new OccationCustomeEventDao();
 		occasionResponsesDao = new OccasionResponsesDao();
-				
+		modelArray.add("35");
 	}
 	/**
 	 * Invokes the web intelligence web service that returns a token identifier and a status code in
