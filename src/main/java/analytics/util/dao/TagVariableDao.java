@@ -49,4 +49,26 @@ public class TagVariableDao extends AbstractDao{
 	    	}
 	    	return tagVariablesList;
 	    }
+	    
+	    public Map<Integer, String> getTagModelIds(List<String> tagsList){
+	    	Map<Integer, String> tagModelMap = new HashMap<Integer, String>();
+	    	for(String tag:tagsList){
+	    		BasicDBObject query = new BasicDBObject();
+		    	query.put(MongoNameConstants.TAG_VAR_MDTAG, tag);
+		    	DBObject dbObj = tagVariablesCollection.findOne(query);
+		    	if(dbObj != null){
+		    		tagModelMap.put((Integer) dbObj.get(MongoNameConstants.TAG_VAR_MODEL), "" + dbObj.get(MongoNameConstants.TAG_VAR_MDTAG));
+		    	}
+	    	}
+	    	/*BasicDBObject query = new BasicDBObject();
+	    	query.put(MongoNameConstants.TAG_VAR_MDTAG, new BasicDBObject("$in", list));
+	    	DBCursor tagModelsCursor = tagVariablesCollection.find(query);
+	    	//List<String> tagModelsList = new ArrayList<String>();
+	    	//Map<Integer, String> tagModelMap = new HashMap<Integer, String>();
+	    	while(tagModelsCursor.hasNext()){
+	    		//tagModelsList.add("" + tagModelsCursor.next().get(MongoNameConstants.TAG_VAR_MODEL));
+	    		tagModelMap.put((Integer) tagModelsCursor.next().get(MongoNameConstants.TAG_VAR_MODEL), "" + tagModelsCursor.next().get(MongoNameConstants.TAG_VAR_MDTAG));
+	    	}*/
+	    	return tagModelMap;
+	    }
 }

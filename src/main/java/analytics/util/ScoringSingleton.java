@@ -411,10 +411,10 @@ public class ScoringSingleton {
 					minDate = exprDate;
 					maxDate = exprDate;
 				} else {
-					if (exprDate.before(minDate)) {
+					if (exprDate != null && exprDate.before(minDate)) {
 						minDate = exprDate;
 					}
-					if (exprDate.after(maxDate)) {
+					if (exprDate != null && exprDate.after(maxDate)) {
 						maxDate = exprDate;
 					}
 				}
@@ -474,7 +474,7 @@ public class ScoringSingleton {
 		// 11) Write changedMemberVariables with expiry
 		if (allChanges != null && !allChanges.isEmpty()) {
 			// upsert document
-			changedVariablesDao.upsertUpdateChangedVariables(lId, allChanges, variableNameToVidMap);
+		//	changedVariablesDao.upsertUpdateChangedVariables(lId, allChanges, variableNameToVidMap);
 		}
 
 	}

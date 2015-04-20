@@ -1,5 +1,7 @@
 package analytics.util.dao;
 
+import java.util.regex.Pattern;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +40,24 @@ public class TagMetadataDao extends AbstractDao {
 			metaDataObj.setSubBusinessUnit((String)dbObj.get(MongoNameConstants.SUB_BUSINESS_UNIT));
 			metaDataObj.setPurchaseOccassion((String)dbObj.get(MongoNameConstants.PURCHASE_OCCASSION));
 		}
+		return metaDataObj;
+	}
+	
+	public TagMetadata getBuSubBu(String tag){
+		Pattern namesRegex = Pattern.compile("^.*");
+       /* BasicDBObject query = new BasicDBObject("name", namesRegex);*/
+		BasicDBObject query = new BasicDBObject();
+		query.put(Constants.SEG, tag+"0101001403");
+		DBObject dbObj = tagMetadataCollection.findOne(query);
+		TagMetadata metaDataObj = null;
+		if(dbObj != null){
+			metaDataObj = new TagMetadata();
+		//	if(dbObj.get(MongoNameConstants.OCCASION) != null && dbObj.get(MongoNameConstants.OCCASION).toString().equalsIgnoreCase("Unknown")){
+			metaDataObj.setBusinessUnit((String)dbObj.get(MongoNameConstants.BUSINESS_UNIT));
+			metaDataObj.setSubBusinessUnit((String)dbObj.get(MongoNameConstants.SUB_BUSINESS_UNIT));
+			metaDataObj.setPurchaseOccassion((String)dbObj.get(MongoNameConstants.PURCHASE_OCCASSION));
+	//	}
+	}
 		return metaDataObj;
 	}
 }

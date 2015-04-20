@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -45,6 +46,8 @@ import analytics.util.dao.MemberInfoDao;
 import analytics.util.dao.OccasionResponsesDao;
 import analytics.util.dao.OccationCustomeEventDao;
 import analytics.util.dao.TagMetadataDao;
+import analytics.util.dao.TagResponsysActiveDao;
+import analytics.util.dao.TagVariableDao;
 import analytics.util.objects.TagMetadata;
 
 public class ResponsysUtil {
@@ -54,16 +57,18 @@ public class ResponsysUtil {
 	private OccationCustomeEventDao occationCustomeEventDao;
 	private OccasionResponsesDao occasionResponsesDao;
 	private MemberInfoDao memberInfoDao;
+	private TagResponsysActiveDao tagResponsysActiveDao;
+	private TagVariableDao tagVariableDao;
 	
 	private static final String UTF8_BOM = "\uFEFF";
-	List<String> modelArray = new ArrayList<String>();
 	
 	public ResponsysUtil() {
 		memberInfoDao = new MemberInfoDao();
 		tagMetadataDao = new TagMetadataDao();
 		occationCustomeEventDao = new OccationCustomeEventDao();
 		occasionResponsesDao = new OccasionResponsesDao();
-		modelArray.add("35");
+		tagResponsysActiveDao =  new TagResponsysActiveDao();
+		tagVariableDao = new TagVariableDao();
 	}
 	/**
 	 * Invokes the web intelligence web service that returns a token identifier and a status code in
@@ -197,8 +202,8 @@ public class ResponsysUtil {
 			
 			//Persist info to Mongo after successfully transmission of message to Oracle.
 			LOGGER.info(lyl_l_id+"~~~"+xmlWithoutBOM);
-			occasionResponsesDao.addOccasionResponse(l_id, eid, custEventName, tagMetaData.getPurchaseOccasion(), tagMetaData.getBusinessUnit(), tagMetaData.getSubBusinessUnit(), 
-					strBuff.toString().contains("<success>true</success>") ? "Y" : "N", tag);
+			/*occasionResponsesDao.addOccasionResponse(l_id, eid, custEventName, tagMetaData.getPurchaseOccasion(), tagMetaData.getBusinessUnit(), tagMetaData.getSubBusinessUnit(), 
+					strBuff.toString().contains("<success>true</success>") ? "Y" : "N", tag);*/
 			
 			xmlWithoutBOM = null;
 			xmlWithoutExpo = null;
@@ -248,19 +253,39 @@ public class ResponsysUtil {
 			out.write(xmlWithoutBOM);
 			out.close();*/
 			
+			//get the list of models
+			List<String> activeTags = tagResponsysActiveDao.tagsResponsysList();
+			//List<String> modelArray = tagVariableDao.getTagModelIds(activeTags);
+			Map<Integer, String> tagModelsMap = tagVariableDao.getTagModelIds(activeTags);
+			
+			TagMetadata tagMetadata = null;
 			org.json.JSONObject o = new org.json.JSONObject(input);
 			org.json.JSONObject objToSend = null;
 			org.json.JSONArray arr = o.getJSONArray("scoresInfo");
 			for(int i=0; i<arr.length(); i++){
 				String modelId = ((org.json.JSONObject)arr.get(i)).getString("modelId");
 				Double percentile = Double.valueOf(((org.json.JSONObject)arr.get(i)).getString("percentile"));
-				if(modelArray.contains(modelId) && percentile >= 95){
+				//if((tagModelsMap != null && tagModelsMap.containsKey(modelId) && percentile >= 95)){
+				for(Map.Entry<Integer, String> entry : tagModelsMap.entrySet()){
+					if((entry.getKey() +"").equals(modelId) && percentile >= 95){
 					objToSend = (org.json.JSONObject)arr.get(i);
+					tagMetadata = tagMetadataDao.getBuSubBu(entry.getValue());
+					break;
 				}
 			}
-			//Get the necessary variables for populating in the response xml
+		}
+			if(objToSend == null)
+				return null;
+			o.remove("scoresInfo");
+			o.append("scoresInfo", objToSend);
+			
 			String l_id = SecurityUtils.hashLoyaltyId(lyl_l_id);
 			String eid = memberInfoDao.getMemberInfoEId(l_id);
+			String custEventName = occationCustomeEventDao.getCustomeEventName(tagMetadata.getPurchaseOccasion());
+			
+			//Get the necessary variables for populating in the response xml
+			//String l_id = SecurityUtils.hashLoyaltyId(lyl_l_id);
+			//String eid = memberInfoDao.getMemberInfoEId(l_id);
 			/*TagMetadata tagMetaData = getTagMetaData(tag);
 			String custEventName = occationCustomeEventDao.getCustomeEventName(tagMetaData.getPurchaseOccasion());*/
 			
@@ -276,7 +301,7 @@ public class ResponsysUtil {
 				return strBuff.toString();
 			}*/
 			
-			String json2XmlString = org.json.XML.toString(objToSend);
+			String json2XmlString = org.json.XML.toString(o);
 			//Adding the start tag(root tag) to make the xml valid so we can parse it.
 			json2XmlString="<start>"+json2XmlString+"</start>";
 			
@@ -290,9 +315,9 @@ public class ResponsysUtil {
 			
 			//Convert Exponential values to Plain text in the XML
 			String xmlWithoutExpo = removeExponentialFromXml(json2XmlString);
-			
+						
 			//Generate the Custome Xml to be sent to Oracle
-			String customXml = createCustomXmlModelId(xmlWithoutExpo, lyl_l_id);
+			String customXml = createCustomXmlModelId(xmlWithoutExpo, eid, custEventName, tagMetadata,lyl_l_id);
 			
 			//BOM = Byte-Order-Mark
 			//Remove the BOM to make the XML valid
@@ -365,8 +390,11 @@ public class ResponsysUtil {
 	       NodeList name = element.getElementsByTagName("score");
            Element line = (Element) name.item(0);
            System.out.println("Score: " + getCharacterDataFromElement(line));
-           
            Node node = name.item(0);
+      
+           System.out.println(node.getTextContent());
+           System.out.println(node.getNodeName());
+         
 		   // get the score element, and update the value
 		   if ("score".equals(node.getNodeName())) {
 			   if(node.getTextContent().contains("E")){
@@ -561,7 +589,7 @@ public class ResponsysUtil {
 		return finalXmlStr;
 	}
 	
-	public String createCustomXmlModelId(String xml, String lyl_l_id) 
+	public String createCustomXmlModelId(String xml, String emailId, String custEventNm, TagMetadata tagMetaData, String lyl_l_id) 
 			throws ParserConfigurationException, TransformerException, SAXException, IOException{
 		
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -580,11 +608,11 @@ public class ResponsysUtil {
 		Element customEvent = doc.createElement("ns2:customEvent");
 		rootElement.appendChild(customEvent);
 		
-		/*//eventName element inside of customEvent
+		//eventName element inside of customEvent
 		Element eventName = doc.createElement("eventName");
 		if(custEventNm!=null && !custEventNm.equals(""))
 			eventName.appendChild(doc.createTextNode(custEventNm));
-		customEvent.appendChild(eventName);*/
+		customEvent.appendChild(eventName);
 		
 		// recipientData elements
 		Element recipientData = doc.createElement("ns2:recipientData");
@@ -635,7 +663,7 @@ public class ResponsysUtil {
 		
 		//Optional Data for adding the MDTag, BU and SUB_BU
 		//optionalData element inside of recipientData
-		/*Element optionalData2 = doc.createElement("optionalData");
+		Element optionalData2 = doc.createElement("optionalData");
 		recipientData.appendChild(optionalData2);
 		Element name2 = doc.createElement("name");
 		name2.appendChild(doc.createTextNode("mdTag"));
@@ -643,7 +671,7 @@ public class ResponsysUtil {
 		Element value2 = doc.createElement("value");
 		optionalData2.appendChild(value2);
 		if(tagMetaData!=null && tagMetaData.getMdTags()!=null && !tagMetaData.getMdTags().equals(""))
-			value2.appendChild(doc.createTextNode(tagMetaData.getMdTags()));*/
+			value2.appendChild(doc.createTextNode(tagMetaData.getMdTags()));
 
 		Element optionalData3 = doc.createElement("optionalData");
 		recipientData.appendChild(optionalData3);
@@ -652,9 +680,9 @@ public class ResponsysUtil {
 		optionalData3.appendChild(name3);
 		Element value3 = doc.createElement("value");
 		optionalData3.appendChild(value3);
-		/*if(tagMetaData!=null && tagMetaData.getBusinessUnit()!=null && !tagMetaData.getBusinessUnit().equals(""))
-			value3.appendChild(doc.createTextNode(tagMetaData.getBusinessUnit()));*/
-		value3.appendChild(doc.createTextNode("Home Appliances"));
+		if(tagMetaData!=null && tagMetaData.getBusinessUnit()!=null && !tagMetaData.getBusinessUnit().equals(""))
+			value3.appendChild(doc.createTextNode(tagMetaData.getBusinessUnit()));
+		//value3.appendChild(doc.createTextNode("Home Appliances"));
 		Element optionalData4 = doc.createElement("optionalData");
 		recipientData.appendChild(optionalData4);
 		Element name4 = doc.createElement("name");
@@ -662,9 +690,9 @@ public class ResponsysUtil {
 		optionalData4.appendChild(name4);
 		Element value4 = doc.createElement("value");
 		optionalData4.appendChild(value4);
-		/*if(tagMetaData!=null && tagMetaData.getSubBusinessUnit()!=null && !tagMetaData.getSubBusinessUnit().equals(""))
-			value4.appendChild(doc.createTextNode(tagMetaData.getSubBusinessUnit()));*/
-		value4.appendChild(doc.createTextNode("Refrigerator"));
+		if(tagMetaData!=null && tagMetaData.getSubBusinessUnit()!=null && !tagMetaData.getSubBusinessUnit().equals(""))
+			value4.appendChild(doc.createTextNode(tagMetaData.getSubBusinessUnit()));
+		//value4.appendChild(doc.createTextNode("Refrigerator"));
 		
 		Element optionalData5 = doc.createElement("optionalData");
 		recipientData.appendChild(optionalData5);
@@ -691,6 +719,8 @@ public class ResponsysUtil {
 		String interminStr = xmlString.replace("RTS_DATA", "<RTS> " +xml+ " </RTS>");
 		interminStr = interminStr.replace("<start>", "").replace("</start>", "");
 		interminStr = interminStr.replace("scoresInfo", "element");
+		System.out.println(interminStr.substring(0, interminStr.indexOf("<element>")));
+		System.out.println(interminStr.lastIndexOf("</element>"));
 		String finalXmlStr = interminStr.substring(0, interminStr.indexOf("<element>"))+" <scoresInfo> "  
 				+ interminStr.substring(interminStr.indexOf("<element>"),interminStr.lastIndexOf("</element>")+10)  
 					+ " </scoresInfo> " + interminStr.substring(interminStr.lastIndexOf("</element>")+10,interminStr.length());
