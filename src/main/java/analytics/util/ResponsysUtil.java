@@ -12,6 +12,7 @@ import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.Map.Entry;
@@ -31,6 +32,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.CharacterData;
@@ -125,7 +127,7 @@ public class ResponsysUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public String getResponseServiceResult(String input, String lyl_l_id, ArrayList<TagMetadata> tags, String l_id) throws Exception {
+	public String getResponseServiceResult(String input, String lyl_l_id, LinkedHashSet<TagMetadata> tags, String l_id) throws Exception {
 		LOGGER.info(" Testing - Entering the getResponseServiceResult method");
 		StringBuffer strBuff = new StringBuffer();
 		BufferedReader in = null;
@@ -196,14 +198,14 @@ public class ResponsysUtil {
 				//BOM = Byte-Order-Mark
 				//Remove the BOM to make the XML valid
 				String xmlWithoutBOM = removeUTF8BOM(customXml);
-				/*out.write(xmlWithoutBOM);
+				out.write(xmlWithoutBOM);
 				out.close();
 	
 				in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 				int c;
 				while ((c = in.read()) != -1) {
 					strBuff.append((char) c); 
-				}*/
+				}
 				
 				//Persist info to Mongo after successfully transmission of message to Oracle.
 				LOGGER.info(lyl_l_id+"~~~"+xmlWithoutBOM);
@@ -520,8 +522,8 @@ public class ResponsysUtil {
 	}
 	
 	
-	public ArrayList<TagMetadata> getReadyToProcessTags(ArrayList<TagMetadata> tagsMetaList){
-		ArrayList<TagMetadata> metaDataList = new ArrayList<TagMetadata>();
+	public LinkedHashSet<TagMetadata> getReadyToProcessTags(ArrayList<TagMetadata> tagsMetaList){
+		LinkedHashSet<TagMetadata> metaDataList = new LinkedHashSet<TagMetadata>();
 		HashMap<String, String> activeTags = tagResponsysActiveDao.getResponsysActiveTagsList();
 		
 		for(TagMetadata tagMeta : tagsMetaList){
@@ -615,7 +617,7 @@ public class ResponsysUtil {
 	}
 	
 	
-	public TagMetadata determineUnknownWinner(org.json.JSONObject obj, ArrayList<TagMetadata> tags){
+	public TagMetadata determineUnknownWinner(org.json.JSONObject obj, LinkedHashSet<TagMetadata> tags){
 		TreeMap<Integer, TagMetadata> winnerMap = new TreeMap<Integer, TagMetadata>();
 		TagMetadata winnerTag = null;
 		try {
@@ -626,17 +628,7 @@ public class ResponsysUtil {
 					!((org.json.JSONObject)arr.get(0)).get("occassion").toString().equalsIgnoreCase("Unknown"))
 				return null;
 			
-			for(TagMetadata tag : tags){
-				for(int i=0; (i< arr.length() || i < 15); i++){
-					if(((org.json.JSONObject)arr.get(i)).has("mdTag") && ((org.json.JSONObject)arr.get(i)).has("occassion") &&
-							((org.json.JSONObject)arr.get(i)).get("mdTag").toString().equalsIgnoreCase(tag.getMdTags())){
-						Integer rank = (Integer) ((org.json.JSONObject)arr.get(i)).get("rank");
-						//Add the percentile into MetaData Tag DTO
-						tag.setPercentile((Double) ((org.json.JSONObject)arr.get(i)).getDouble("percentile"));
-						winnerMap.put(rank, tag);
-					}
-				}
-			}
+			getWinnerMap(tags, winnerMap, arr);
 			
 			//Check if the winning tags are all Unknown tags, pick the one with the percetile of 95%\
 			if(winnerMap.size() > 0){
@@ -644,36 +636,7 @@ public class ResponsysUtil {
 				Integer winnerRank = entry.getKey();
 				winnerTag = entry.getValue();
 				
-				if(winnerMap.size() ==1 && winnerTag.getPurchaseOccasion().contains("Unknown")){
-					//If there is only 1 unknown tag and it is haveing % less than 95, nothing should happen 
-					if(winnerTag.getPercentile() < 95)
-						return null;
-					else {
-						swapJSONObjects(arr, winnerRank);
-						return winnerTag;
-					}
-				}
-				//If the first entry has unknown and the winner map's size is > 1
-				else if (winnerTag.getPurchaseOccasion().contains("Unknown")){
-					Iterator it = winnerMap.entrySet().iterator();
-					while (it.hasNext()) {
-				        Map.Entry pair = (Map.Entry)it.next();
-				        winnerTag = (TagMetadata) pair.getValue();
-				        if(winnerTag.getPurchaseOccasion().contains("Unknown")){
-							
-				        	if(winnerTag.getPercentile() >= 95){
-								
-								winnerRank = (Integer) pair.getKey();
-								// Simple swap
-								swapJSONObjects(arr, winnerRank);
-								
-								return winnerTag;
-							}
-						}
-				    }
-					//Return null because all the tags are unknown and non has % > 95
-					return null;
-				}
+				swapJSONObjects(arr, winnerRank);
 			}
 		}catch (org.json.JSONException e) {
 			e.printStackTrace();
@@ -681,6 +644,24 @@ public class ResponsysUtil {
 		}
 
 		return winnerTag;
+	}
+	private void getWinnerMap(LinkedHashSet<TagMetadata> tags,
+			TreeMap<Integer, TagMetadata> winnerMap, org.json.JSONArray arr)
+			throws JSONException {
+		for(TagMetadata tag : tags){
+			for(int i=0; (i< arr.length() || i < 15); i++){
+				if(((org.json.JSONObject)arr.get(i)).has("mdTag") && ((org.json.JSONObject)arr.get(i)).has("occassion") &&
+						((org.json.JSONObject)arr.get(i)).get("mdTag").toString().equalsIgnoreCase(tag.getMdTags())){
+					Integer rank = (Integer) ((org.json.JSONObject)arr.get(i)).get("rank");
+					//Add the percentile into MetaData Tag DTO
+					if(((org.json.JSONObject)arr.get(i)).getDouble("percentile") >= 95){
+						tag.setPercentile((Double) ((org.json.JSONObject)arr.get(i)).getDouble("percentile"));
+						winnerMap.put(rank, tag);
+						return;
+					}
+				}
+			}
+		}
 	}
 	
 	

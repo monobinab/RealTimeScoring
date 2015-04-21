@@ -137,11 +137,22 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 				
 		/**
 		 * Sree. Get the Difference in Tags (Input vs Existing)
-		 */
+		 *//*
 		ArrayList<String> diffTags = findDiffTags(l_id, tags);
 		String diffTagsString = "";
 		if(diffTags!= null && diffTags.size()>0){
 			diffTagsString = getStringFromArray(diffTags); 
+		}*/
+		
+		/**
+		 * 4-21-2015. Sree. Get all tags from input and put it on Redis
+		 */
+		String diffTagsString = "";
+		if(tags.size()>0){
+			for(int i=0; i< tags.size(); i++){
+				diffTagsString= diffTagsString + tags.get(i).getAsString()+",";
+			}
+			diffTagsString = diffTagsString.substring(0,diffTagsString.length()-1);
 		}
 
 		System.out.println(l_id +" ---- " +diffTagsString);

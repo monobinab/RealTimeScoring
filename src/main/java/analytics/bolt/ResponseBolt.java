@@ -1,6 +1,7 @@
 package analytics.bolt;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -104,7 +105,7 @@ public class ResponseBolt extends EnvironmentBolt{
 					//Get the metadata info for all the tags
 					ArrayList<TagMetadata> list = responsysUtil.getTagMetaDataList(diffTags);
 					//Check if Occasions are ready for Reponsys Team to process
-					ArrayList<TagMetadata> readyToProcessTags = responsysUtil.getReadyToProcessTags(list);
+					LinkedHashSet<TagMetadata> readyToProcessTags = responsysUtil.getReadyToProcessTags(list);
 					
 					if( readyToProcessTags.size()>0){
 						responsysUtil.getResponseServiceResult(scoreInfoJsonString,lyl_id_no,readyToProcessTags,l_id);
