@@ -143,17 +143,11 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 		if(diffTags!= null && diffTags.size()>0){
 			diffTagsString = getStringFromArray(diffTags); 
 		}
-		//Set the id will null value on Redis so Response Bolt would not fail with
-		//null pointer exception while reading redis key for this l_id
-		//Add Date as part of key so incase the Tags are not scored for the member
-		//atleast we know we have to cleanup from Redis...			
-		Date dNow = new Date( );
-		SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd");
-		String lId_Date = l_id +"~~~"+ft.format(dNow);
-		System.out.println(lId_Date +" ---- " +diffTagsString);
+
+		System.out.println(l_id +" ---- " +diffTagsString);
 		Jedis jedis = jedisPool.getResource();
-		jedis.set("Responses:"+lId_Date, diffTagsString);
-		jedis.expire("Responses:"+lId_Date, 300);
+		jedis.set("Responses:"+l_id, diffTagsString);
+		jedis.expire("Responses:"+l_id, 300);
 		jedisPool.returnResource(jedis);
 		
 		//Changes for adding the difference tags ends here.

@@ -143,5 +143,7 @@ public class MongoNameConstants {
      
      //Vibes Collection
      public static final String PROCESSED_FLAG = "processed";
+     
+     public static final String ACTIVE_BUSINESS_UNIT= "BU";
 
 }

@@ -1,64 +1,26 @@
 package analytics.bolt;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.math.BigDecimal;
-import java.net.HttpURLConnection;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.Map;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.CharacterData;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
-import analytics.util.AuthPropertiesReader;
-import analytics.util.Constants;
-import analytics.util.HttpClientUtils;
 import analytics.util.ResponsysUtil;
 import analytics.util.SecurityUtils;
 import analytics.util.dao.MemberInfoDao;
 import analytics.util.dao.OccasionResponsesDao;
 import analytics.util.dao.OccationCustomeEventDao;
 import analytics.util.dao.TagMetadataDao;
+import analytics.util.dao.TagResponsysActiveDao;
 import analytics.util.objects.TagMetadata;
 import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
 
 public class ResponseBolt extends EnvironmentBolt{
@@ -70,9 +32,15 @@ public class ResponseBolt extends EnvironmentBolt{
 			.getLogger(ResponseBolt.class);
 	private MultiCountMetric countMetric;
 	private OutputCollector outputCollector;
+	private static final String UTF8_BOM = "\uFEFF";
+	private MemberInfoDao memberInfoDao;
 	private String host;
 	private int port;
 	private JedisPool jedisPool;
+	private TagMetadataDao tagMetadataDao;
+	private TagResponsysActiveDao tagResponsysActiveDao;
+	private OccationCustomeEventDao occationCustomeEventDao;
+	private OccasionResponsesDao occasionResponsesDao;
 	private ResponsysUtil responsysUtil;
 	
 	public ResponseBolt(String systemProperty, String host, int port) {
@@ -86,8 +54,9 @@ public class ResponseBolt extends EnvironmentBolt{
 			OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
 		initMetrics(context);
-		this.outputCollector = collector;
 		responsysUtil = new ResponsysUtil();
+		this.outputCollector = collector;
+		
 		JedisPoolConfig poolConfig = new JedisPoolConfig();
         poolConfig.setMaxActive(100);
         jedisPool = new JedisPool(poolConfig,host, port, 100);
@@ -116,33 +85,33 @@ public class ResponseBolt extends EnvironmentBolt{
 				
 				//Get the Difference Tags from Redis for an lid
 				Jedis jedis = jedisPool.getResource();
-				//Add Date as part of key so incase the Tags are not scored for the member
-				//atleast we know we have to cleanup from Redis...			
-				Date dNow = new Date( );
-				SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd");
-				String lId_Date = l_id +"~~~"+ft.format(dNow);
-				
-				String diffTags =  jedis.get("Responses:"+lId_Date).toString() ;
+				String diffTags = null;
+				if(jedis.exists("Responses:"+l_id))
+					diffTags = jedis.get("Responses:"+l_id).toString() ;
 				jedisPool.returnResource(jedis);
 				
-				if(diffTags!=null && !"".equals(diffTags)){
+				/*if(diffTags!=null && !"".equals(diffTags)){
 					String[] tags = diffTags.split(",");
 					//Send response for every new tag scored
-					//length -1 because the last element would be the datestring set in the parsing bolt.
 					for(int i=0 ;i<tags.length ;i++){
 						String tag = tags[i];
-						responsysUtil.getResponseServiceResult(scoreInfoJsonString,lyl_id_no,tag);
+						getResponseServiceResult(scoreInfoJsonString,lyl_id_no,tag);
+						countMetric.scope("responses").incr();
+					}
+				}*/
+				
+				if(diffTags!=null && !"".equals(diffTags)){
+					//Get the metadata info for all the tags
+					ArrayList<TagMetadata> list = responsysUtil.getTagMetaDataList(diffTags);
+					//Check if Occasions are ready for Reponsys Team to process
+					ArrayList<TagMetadata> readyToProcessTags = responsysUtil.getReadyToProcessTags(list);
+					
+					if( readyToProcessTags.size()>0){
+						responsysUtil.getResponseServiceResult(scoreInfoJsonString,lyl_id_no,readyToProcessTags,l_id);
 						countMetric.scope("responses").incr();
 					}
 				}
-				
-				/*getResponseServiceResult(scoreInfoJsonString,lyl_id_no);
-				countMetric.scope("responses").incr();*/
 
-				/*//Delete the lid from redis after processing
-				jedis = jedisPool.getResource();
-				jedis.del("Responses:"+lId_Date);
-				jedisPool.returnResource(jedis);*/
 			}
 			outputCollector.ack(input);
 			
@@ -158,4 +127,5 @@ public class ResponseBolt extends EnvironmentBolt{
 		
 	}
 	
+
 }

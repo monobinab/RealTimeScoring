@@ -9,6 +9,25 @@ public class TagMetadata implements Serializable {
 	private String businessUnit;
 	private String subBusinessUnit;
 	private String purchaseOccasion;
+	private String first5CharMdTag;
+	private Double percentile;
+	
+
+	public Double getPercentile() {
+		return percentile;
+	}
+
+	public void setPercentile(Double percentile) {
+		this.percentile = percentile;
+	}
+
+	public String getFirst5CharMdTag() {
+		return first5CharMdTag;
+	}
+
+	public void setFirst5CharMdTag(String first5CharMdTag) {
+		this.first5CharMdTag = first5CharMdTag;
+	}
 
 	public String getMdTags() {
 		return mdTags;
