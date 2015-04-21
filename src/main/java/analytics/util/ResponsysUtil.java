@@ -151,7 +151,7 @@ public class ResponsysUtil {
 			//TagMetadata winningTag = determineWinningTag(obj,tags);
 			TagMetadata winningTag = determineUnknownWinner(obj,tags);
 			
-			if(!winningTag.getPurchaseOccasion().equalsIgnoreCase("Unknown")){
+			if(winningTag== null || !winningTag.getPurchaseOccasion().equalsIgnoreCase("Unknown")){
 				winningTag = getTagMetaDataInfo(obj);
 			}
 			
@@ -620,10 +620,15 @@ public class ResponsysUtil {
 		TagMetadata winnerTag = null;
 		try {
 			org.json.JSONArray arr = obj.getJSONArray("scoresInfo");
+			//If the first element in the array is NOT unknown occasion... then get out of this method
+			//and return the first element from the array.
+			if(((org.json.JSONObject)arr.get(0)).has("mdTag") && ((org.json.JSONObject)arr.get(0)).has("occassion") &&
+					!((org.json.JSONObject)arr.get(0)).get("occassion").toString().equalsIgnoreCase("Unknown"))
+				return null;
 			
 			for(TagMetadata tag : tags){
 				for(int i=0; (i< arr.length() || i < 15); i++){
-					if(((org.json.JSONObject)arr.get(i)).has("mdTag") &&
+					if(((org.json.JSONObject)arr.get(i)).has("mdTag") && ((org.json.JSONObject)arr.get(i)).has("occassion") &&
 							((org.json.JSONObject)arr.get(i)).get("mdTag").toString().equalsIgnoreCase(tag.getMdTags())){
 						Integer rank = (Integer) ((org.json.JSONObject)arr.get(i)).get("rank");
 						//Add the percentile into MetaData Tag DTO
