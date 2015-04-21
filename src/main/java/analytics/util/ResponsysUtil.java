@@ -255,7 +255,6 @@ public class ResponsysUtil {
 			
 			//get the list of models
 			List<String> activeTags = tagResponsysActiveDao.tagsResponsysList();
-			//List<String> modelArray = tagVariableDao.getTagModelIds(activeTags);
 			Map<Integer, String> tagModelsMap = tagVariableDao.getTagModelIds(activeTags);
 			
 			TagMetadata tagMetadata = null;
@@ -265,14 +264,16 @@ public class ResponsysUtil {
 			for(int i=0; i<arr.length(); i++){
 				String modelId = ((org.json.JSONObject)arr.get(i)).getString("modelId");
 				Double percentile = Double.valueOf(((org.json.JSONObject)arr.get(i)).getString("percentile"));
-				//if((tagModelsMap != null && tagModelsMap.containsKey(modelId) && percentile >= 95)){
 				for(Map.Entry<Integer, String> entry : tagModelsMap.entrySet()){
 					if((entry.getKey() +"").equals(modelId) && percentile >= 95){
 					objToSend = (org.json.JSONObject)arr.get(i);
 					tagMetadata = tagMetadataDao.getBuSubBu(entry.getValue());
 					break;
 				}
+					
 			}
+				if(objToSend != null)
+					break;
 		}
 			if(objToSend == null)
 				return null;
@@ -317,7 +318,7 @@ public class ResponsysUtil {
 			String xmlWithoutExpo = removeExponentialFromXml(json2XmlString);
 						
 			//Generate the Custome Xml to be sent to Oracle
-			String customXml = createCustomXmlModelId(xmlWithoutExpo, eid, custEventName, tagMetadata,lyl_l_id);
+			String customXml = createCustomXml(xmlWithoutExpo, eid, custEventName, tagMetadata,lyl_l_id);
 			
 			//BOM = Byte-Order-Mark
 			//Remove the BOM to make the XML valid
@@ -339,7 +340,7 @@ public class ResponsysUtil {
 			xmlWithoutBOM = null;
 			xmlWithoutExpo = null;
 			json2XmlString = null;
-			//tagMetaData = null;
+			tagMetadata = null;
 			o = null;
 			customXml = null;
 			
@@ -637,10 +638,10 @@ public class ResponsysUtil {
 		listName.appendChild(objectName);	
 		
 		//customerId element inside of recipient
-		/*Element customerId = doc.createElement("customerId");
+		Element customerId = doc.createElement("customerId");
 		if(emailId!=null && !emailId.equals(""))
 			customerId.appendChild(doc.createTextNode(emailId));
-		recipient.appendChild(customerId);*/
+		recipient.appendChild(customerId);
 		
 		//matchColumnName1 element inside of recipient
 		Element matchColumnName1 = doc.createElement("matchColumnName1");
