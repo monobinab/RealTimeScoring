@@ -7,6 +7,7 @@ import analytics.bolt.FlumeRPCBolt;
 import analytics.bolt.ParsingBoltSYW;
 import analytics.bolt.PersistBoostsBolt;
 import analytics.bolt.ProcessSYWInteractions;
+import analytics.bolt.ResponsysUnknownCallsBolt;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.spout.SYWRedisSpout;
 import analytics.util.MetricsListener;
@@ -63,6 +64,7 @@ public class SYWEventsTopology {
 		if(System.getProperty(MongoNameConstants.IS_PROD).equals("PROD")){
 		topologyBuilder.setBolt("flumeLoggingBolt", new FlumeRPCBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
 		}	
+		topologyBuilder.setBolt("responsysBolt", new ResponsysUnknownCallsBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
 		//topologyBuilder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
 		//topologyBuilder.setBolt("memberPublishBolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 2).shuffleGrouping("strategyScoringBolt", "member_stream");
 		Config conf = new Config();

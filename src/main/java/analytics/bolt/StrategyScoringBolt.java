@@ -223,7 +223,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		//Persisting to Redis to be retrieved quicker than getting from Mongo.
 		//Perform the below operation only when the Redis is configured
 		Long timeBefore = System.currentTimeMillis();
-		if(jedisPool!=null){
+		/*if(jedisPool!=null){
 			Jedis jedis = jedisPool.getResource();
 			jedis.hmset("RTS:Telluride:"+lId, modelIdScoreStringMap);
 			//jedis.hset("RTS:Telluride:"+lId, ""+modelId, ""+BigDecimal.valueOf(newScore).toPlainString());
@@ -232,7 +232,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			jedisPool.returnResource(jedis);
 			
 		}
-		Long timeAfter = System.currentTimeMillis();
+		Long timeAfter = System.currentTimeMillis();*/
 	//	LOGGER.info("~~~~TIME TAKEN FOR REDIS~~~: " +  (timeAfter - timeBefore));
 			
 		
@@ -243,7 +243,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		timeBefore = System.currentTimeMillis();
 		// Write changes to changedMemberScores
 		ScoringSingleton.getInstance().updateChangedMemberScore(lId, modelIdList, modelIdToExpiryMap, modelIdScoreMap,source);
-		timeAfter = System.currentTimeMillis();
+		//timeAfter = System.currentTimeMillis();
 	//	LOGGER.info("~~~~~TIME TAKED FOR MONGO~~~: " + (timeAfter - timeBefore) );
 		LOGGER.info("TIME:" + messageID + "- Scoring complete-" + System.currentTimeMillis());
 		

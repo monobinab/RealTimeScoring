@@ -3,10 +3,13 @@ package analytics.util.dao;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import scala.util.matching.Regex;
 import analytics.util.Constants;
 import analytics.util.MongoNameConstants;
 import analytics.util.objects.TagMetadata;
@@ -45,7 +48,7 @@ public class TagMetadataDao extends AbstractDao {
 		}
 		return metaDataObj;
 	}
-	
+
 	public ArrayList<TagMetadata> getDetailsList(String tags){
 		BasicDBList list = new BasicDBList();
 		String[] tagsArr = tags.split(",");
@@ -73,5 +76,31 @@ public class TagMetadataDao extends AbstractDao {
 			}
 		}
 		return tagMetaDataList;
+	}
+	public TagMetadata getBuSubBu(String tag){
+		
+       /* BasicDBObject query = new BasicDBObject("name", namesRegex);*/
+		char[] charArr = tag.toCharArray();
+		System.out.println(charArr[0]);
+		
+		//query.put(Constants.SEG, tag+"0101001403");
+		String str = "^.";
+		String str2 = "*";
+		Pattern namesRegex = Pattern.compile("^"+charArr[0]+charArr[1]+charArr[2]+charArr[3]+charArr[4]+".*");
+		BasicDBObject query = new BasicDBObject(Constants.SEG, namesRegex);
+		//query.put(Constants.SEG, namesRegex);
+		DBObject dbObj = tagMetadataCollection.findOne(query);
+		TagMetadata metaDataObj = null;
+		if(dbObj != null){
+			metaDataObj = new TagMetadata();
+			//zeros added to indicate Unknown
+			//needs to be replaced when proper collection is created 
+			metaDataObj.setMdTags(tag+"0000000000");
+			metaDataObj.setBusinessUnit((String)dbObj.get(MongoNameConstants.BUSINESS_UNIT));
+			metaDataObj.setSubBusinessUnit((String)dbObj.get(MongoNameConstants.SUB_BUSINESS_UNIT));
+			metaDataObj.setPurchaseOccassion((String)dbObj.get(MongoNameConstants.PURCHASE_OCCASSION));
+		}
+		return metaDataObj;
+
 	}
 }
