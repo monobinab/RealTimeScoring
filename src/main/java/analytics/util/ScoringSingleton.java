@@ -276,13 +276,13 @@ public class ScoringSingleton {
 			Change value = entry.getValue();
 			if (ch.startsWith(MongoNameConstants.BLACKOUT_VAR_PREFIX)) {
 				blackFlag = Integer.valueOf(value.getValue().toString());
-			//	boosts = calculateBoostValue(boosts, blackFlag, value, blackout);
+				boosts = calculateBoostValue(boosts, blackFlag, value, blackout);
 			}
 			if (ch.substring(0, MongoNameConstants.BOOST_VAR_PREFIX.length()).toUpperCase().equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
 				Boost boost;
 				if (varMap.get(ch) instanceof Boost) {
 					boost = (Boost) varMap.get(ch);
-			//		boosts = calculateBoostValue(boosts, blackFlag, value, boost);
+					boosts = calculateBoostValue(boosts, blackFlag, value, boost);
 				}
 			}
 		}
@@ -411,10 +411,10 @@ public class ScoringSingleton {
 					minDate = exprDate;
 					maxDate = exprDate;
 				} else {
-					if (exprDate != null && exprDate.before(minDate)) {
+					if (exprDate.before(minDate)) {
 						minDate = exprDate;
 					}
-					if (exprDate != null && exprDate.after(maxDate)) {
+					if (exprDate.after(maxDate)) {
 						maxDate = exprDate;
 					}
 				}
@@ -474,7 +474,7 @@ public class ScoringSingleton {
 		// 11) Write changedMemberVariables with expiry
 		if (allChanges != null && !allChanges.isEmpty()) {
 			// upsert document
-		//	changedVariablesDao.upsertUpdateChangedVariables(lId, allChanges, variableNameToVidMap);
+			changedVariablesDao.upsertUpdateChangedVariables(lId, allChanges, variableNameToVidMap);
 		}
 
 	}

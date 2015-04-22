@@ -12,6 +12,7 @@ import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.Map.Entry;
@@ -33,6 +34,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONException;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +55,7 @@ import analytics.util.dao.OccationCustomeEventDao;
 import analytics.util.dao.TagMetadataDao;
 import analytics.util.dao.TagResponsysActiveDao;
 import analytics.util.dao.TagVariableDao;
+import analytics.util.objects.Responsys;
 import analytics.util.objects.TagMetadata;
 
 public class ResponsysUtil {
@@ -135,12 +138,12 @@ public class ResponsysUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public String getResponseServiceResult(String input, String lyl_l_id, ArrayList<TagMetadata> tags, String l_id) throws Exception {
+	public String getResponseServiceResult(String input, String lyl_l_id, LinkedHashSet<TagMetadata> tags, String l_id) throws Exception {
 		LOGGER.info(" Testing - Entering the getResponseServiceResult method");
 		StringBuffer strBuff = new StringBuffer();
-		BufferedReader in = null;
+		/*BufferedReader in = null;
 		OutputStreamWriter out = null;
-		HttpURLConnection connection = null;
+		HttpURLConnection connection = null;*/
 		try {
 
 			//Only for Testing purpose
@@ -154,27 +157,26 @@ public class ResponsysUtil {
 			String xmlWithoutBOM = removeUTF8BOM(xml);
 			out.write(xmlWithoutBOM);
 			out.close();*/
-			
+
 			org.json.JSONObject obj = new org.json.JSONObject(input);
-			
+
 			//Determine the winner tag to send to Responsys
 			//TagMetadata winningTag = determineWinningTag(obj,tags);
 			TagMetadata winningTag = determineUnknownWinner(obj,tags);
-			
+
 			if(winningTag== null || !winningTag.getPurchaseOccasion().equalsIgnoreCase("Unknown")){
 				winningTag = getTagMetaDataInfo(obj);
 			}
-			
 
 			if(winningTag!=null){
 				//Get the necessary variables for populating in the response xml
 				String eid = memberInfoDao.getMemberInfoEId(l_id);
-				
-				
+
+
 				//TagMetadata tagMetaData = getTagMetaData(tag);
 				String custEventName = occationCustomeEventDao.getCustomeEventName(winningTag.getPurchaseOccasion());
-				
-	
+
+
 				/*//4-15-2015. Check if the Tag is among the top 5 mdtags from the API Call.
 				//Send the XML to responses only when the input tag is among the top 5.
 				if(!isMdTagPresentAmongTop5TagsFromAPI(obj,tag)){
@@ -185,56 +187,56 @@ public class ResponsysUtil {
 					obj = null;
 					return strBuff.toString();
 				}*/
-				
+
 				String json2XmlString = org.json.XML.toString(obj);
 				//Adding the start tag(root tag) to make the xml valid so we can parse it.
 				json2XmlString="<start>"+json2XmlString+"</start>";
-				
-				
-				
+
+				LOGGER.debug("After Creating outWriter");
+
 				//Convert Exponential values to Plain text in the XML
 				String xmlWithoutExpo = removeExponentialFromXml(json2XmlString);
-				
+
 				//Generate the Custome Xml to be sent to Oracle
 				String customXml = createCustomXml(xmlWithoutExpo,eid,custEventName,winningTag,lyl_l_id);
-				
+
 				//BOM = Byte-Order-Mark
 				//Remove the BOM to make the XML valid
 				String xmlWithoutBOM = removeUTF8BOM(customXml);
 				
-				//get the api connection and send the response
-				connection = HttpClientUtils.getConnectionWithBasicAuthentication(AuthPropertiesReader
+				sendResponse(xmlWithoutBOM);
+				/*connection = HttpClientUtils.getConnectionWithBasicAuthentication(AuthPropertiesReader
 						.getProperty(Constants.RESP_URL),"application/xml", "POST",AuthPropertiesReader
 						.getProperty(Constants.RESP_URL_USER_NAME), AuthPropertiesReader
 						.getProperty(Constants.RESP_URL_PASSWORD));
-				
+
 				out = new OutputStreamWriter(connection.getOutputStream());
-				LOGGER.debug("After Creating outWriter");
 				out.write(xmlWithoutBOM);
 				out.close();
-	
+
 				in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 				int c;
 				while ((c = in.read()) != -1) {
 					strBuff.append((char) c); 
-				}
-				
+				}*/
+
 				//Persist info to Mongo after successfully transmission of message to Oracle.
 				LOGGER.info(lyl_l_id+"~~~"+xmlWithoutBOM);
 				occasionResponsesDao.addOccasionResponse(l_id, eid, custEventName, winningTag.getPurchaseOccasion(), winningTag.getBusinessUnit(), winningTag.getSubBusinessUnit(), 
 						strBuff.toString().contains("<success>true</success>") ? "Y" : "N", winningTag.getMdTags());
-				
-				xmlWithoutBOM = null;
+
+				/*xmlWithoutBOM = null;
 				xmlWithoutExpo = null;
 				json2XmlString = null;
 				winningTag = null;
 				obj = null;
-				customXml = null;
+				customXml = null;*/
+				nullifyObjects(xmlWithoutBOM, xmlWithoutExpo, json2XmlString, winningTag, obj, customXml);
 			}
 		} catch (Exception t) {
 			t.printStackTrace();
 			LOGGER.error("Exception occured in getResponseServiceResult ", t);
-		} finally {
+		} /*finally {
 			try {
 				if(out!=null) 
 					out.close(); 
@@ -247,17 +249,15 @@ public class ResponsysUtil {
 				LOGGER.error("Exception occured in getResponseServiceResult: finally: catch block ", e);
 			}
 		}
-		System.out.println("Response String ====>" + strBuff.toString());
+		System.out.println("Response String ====>" + strBuff.toString());*/
 		LOGGER.info(" exiting the method getResponseServiceResult");
-		return strBuff.toString();
+		return null;
 	}
+
 	
-	public String getResponseXMLServiceResult(String input, String lyl_l_id) throws Exception {
+	/*public String getResponseUnknownServiceResult(String input, String lyl_l_id, LinkedHashSet<TagMetadata> tags, String l_id) throws Exception {
 		LOGGER.info(" Testing - Entering the getResponseXMLServiceResult method");
-		StringBuffer strBuff = new StringBuffer();
-		BufferedReader in = null;
-		OutputStreamWriter out = null;
-		HttpURLConnection connection = null;
+		
 		try {
 			
 			//get the list of models
@@ -287,9 +287,8 @@ public class ResponsysUtil {
 			o.remove("scoresInfo");
 			o.append("scoresInfo", objToSend);
 			
-			String l_id = SecurityUtils.hashLoyaltyId(lyl_l_id);
 			String eid = memberInfoDao.getMemberInfoEId(l_id);
-			String custEventName = occationCustomeEventDao.getCustomeEventName(tagMetadata.getPurchaseOccasion());
+		//	String custEventName = occationCustomeEventDao.getCustomeEventName(tagMetadata.getPurchaseOccasion());
 					
 			String json2XmlString = org.json.XML.toString(o);
 			//Adding the start tag(root tag) to make the xml valid so we can parse it.
@@ -299,59 +298,85 @@ public class ResponsysUtil {
 			String xmlWithoutExpo = removeExponentialFromXml(json2XmlString);
 						
 			//Generate the Custome Xml to be sent to Oracle
-			String customXml = createCustomXml(xmlWithoutExpo, eid, custEventName, tagMetadata,lyl_l_id);
+			String customXml = createCustomXml(xmlWithoutExpo, eid, "RTS_Unknown", tagMetadata, lyl_l_id);
 			
 			//BOM = Byte-Order-Mark
 			//Remove the BOM to make the XML valid
 			String xmlWithoutBOM = removeUTF8BOM(customXml);
 			
-			connection = HttpClientUtils.getConnectionWithBasicAuthentication(AuthPropertiesReader
-					.getProperty(Constants.RESP_URL),"application/xml", "POST",AuthPropertiesReader
-					.getProperty(Constants.RESP_URL_USER_NAME), AuthPropertiesReader
-					.getProperty(Constants.RESP_URL_PASSWORD));
-			
-			out = new OutputStreamWriter(connection.getOutputStream());
-			LOGGER.debug("After Creating outWriter");
-			out.write(xmlWithoutBOM);
-			out.close();
-
-			in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-			int c;
-			while ((c = in.read()) != -1) {
-				strBuff.append((char) c); 
-			}
-			
+			StringBuffer strBuff = sendResponse(xmlWithoutBOM);
+				
 			//Persist info to Mongo after successfully transmission of message to Oracle.
 			LOGGER.info(lyl_l_id+"~~~"+xmlWithoutBOM);
-		/*	occasionResponsesDao.addOccasionResponse(l_id, eid, custEventName, tagMetaData.getPurchaseOccasion(), tagMetaData.getBusinessUnit(), tagMetaData.getSubBusinessUnit(), 
-					strBuff.toString().contains("<success>true</success>") ? "Y" : "N", tag);
-			*/
-			xmlWithoutBOM = null;
-			xmlWithoutExpo = null;
-			json2XmlString = null;
-			tagMetadata = null;
-			o = null;
-			customXml = null;
-			
+			occasionResponsesDao.addOccasionResponseUnknown(l_id, eid, "RTS_Unknown", tagMetadata.getPurchaseOccasion(), tagMetadata.getBusinessUnit(), tagMetadata.getSubBusinessUnit(), 
+					strBuff.toString().contains("<success>true</success>") ? "Y" : "N", tagMetadata.getMdTags());
+					
+			nullifyObjects(xmlWithoutBOM, xmlWithoutExpo, json2XmlString, tagMetadata, o, customXml);
 		} catch (Exception t) {
 			t.printStackTrace();
 			LOGGER.error("Exception occured in getResponseServiceResult ", t);
-		} finally {
-			try {
-				if(out!=null) 
-					out.close(); 
-				if (in != null) 
-					in.close();
-				if (connection != null) 
-					connection.disconnect();
-			} catch (IOException e) {
-				e.printStackTrace();
-				LOGGER.error("Exception occured in getResponseServiceResult: finally: catch block ", e);
-			}
 		}
-		System.out.println("Response String ====>" + strBuff.toString());
-		LOGGER.info(" exiting the method getResponseServiceResult");
-		return strBuff.toString();
+			LOGGER.info(" exiting the method getResponseServiceResult");
+			return null;
+	}*/
+	
+	public String getResponseUnknownServiceResult(Responsys responsysObj) throws Exception {
+		LOGGER.info(" Testing - Entering the getResponseUnknownServiceResult method");
+		
+		try {
+		
+			//retrieve the properties form responsys object
+			String eid = null;
+			TagMetadata tagMetadata = null;
+			String lyl_l_id = null;
+			org.json.JSONObject o = null;
+			String customEventName = null;
+			String l_id = null;
+			String topologyName = null;
+			if(responsysObj.getEid() != null)
+				 eid = responsysObj.getEid();
+			if(responsysObj.getTagMetadata() != null)
+				tagMetadata = responsysObj.getTagMetadata();
+			if(responsysObj.getLyl_id_no() != null)
+				lyl_l_id = responsysObj.getLyl_id_no();
+			if(responsysObj.getJsonObj() != null)
+				o = responsysObj.getJsonObj();
+			if(responsysObj.getL_id() != null)
+				l_id = responsysObj.getL_id();
+			if(responsysObj.getCustomEventName() != null)
+				customEventName = responsysObj.getCustomEventName();
+			if(responsysObj.getTopologyName() != null)
+				topologyName = responsysObj.getTopologyName();
+			
+			String json2XmlString = org.json.XML.toString(responsysObj.getJsonObj());
+			//Adding the start tag(root tag) to make the xml valid so we can parse it.
+			json2XmlString="<start>"+json2XmlString+"</start>";
+			
+			//Convert Exponential values to Plain text in the XML
+			String xmlWithoutExpo = removeExponentialFromXml(json2XmlString);
+						
+			//Generate the Custome Xml to be sent to Oracle
+			String customXml = createCustomXml(xmlWithoutExpo, eid, customEventName, tagMetadata, lyl_l_id);
+			
+			//BOM = Byte-Order-Mark
+			//Remove the BOM to make the XML valid
+			String xmlWithoutBOM = removeUTF8BOM(customXml);
+			
+			StringBuffer strBuff = sendResponse(xmlWithoutBOM);
+				
+			//Persist info to Mongo after successfully transmission of message to Oracle.
+			LOGGER.info(lyl_l_id+"~~~"+xmlWithoutBOM);
+			occasionResponsesDao.addOccasionResponseUnknown(l_id, eid, customEventName, tagMetadata.getPurchaseOccasion(), tagMetadata.getBusinessUnit(), tagMetadata.getSubBusinessUnit(), 
+					strBuff.toString().contains("<success>true</success>") ? "Y" : "N", tagMetadata.getMdTags(), topologyName);
+			
+			//nullify the objects
+			nullifyObjects(xmlWithoutBOM, xmlWithoutExpo, json2XmlString, tagMetadata, o, customXml);
+		} catch (Exception t) {
+			t.printStackTrace();
+			LOGGER.error("Exception occured in getResponseServiceResult ", t);
+		}
+			LOGGER.info(" exiting the method getResponseServiceResult");
+			return null;
 	}
 	
 	/**
@@ -463,8 +488,9 @@ public class ResponsysUtil {
 		//eventName element inside of customEvent
 		Element eventName = doc.createElement("eventName");
 		if(custEventNm!=null && !custEventNm.equals(""))
-			eventName.appendChild(doc.createTextNode(custEventNm));
-		customEvent.appendChild(eventName);
+				eventName.appendChild(doc.createTextNode(custEventNm));
+			customEvent.appendChild(eventName);
+			
 		
 		// recipientData elements
 		Element recipientData = doc.createElement("ns2:recipientData");
@@ -639,10 +665,10 @@ public class ResponsysUtil {
 	}
 	
 	
-	public ArrayList<TagMetadata> getReadyToProcessTags(ArrayList<TagMetadata> tagsMetaList){
-		ArrayList<TagMetadata> metaDataList = new ArrayList<TagMetadata>();
+	public LinkedHashSet<TagMetadata> getReadyToProcessTags(ArrayList<TagMetadata> tagsMetaList){
+		LinkedHashSet<TagMetadata> metaDataList = new LinkedHashSet<TagMetadata>();
 		HashMap<String, String> activeTags = tagResponsysActiveDao.getResponsysActiveTagsList();
-		
+
 		for(TagMetadata tagMeta : tagsMetaList){
 			if( activeTags.get(tagMeta.getFirst5CharMdTag())!= null &&
 					activeTags.get(tagMeta.getFirst5CharMdTag()).contains(tagMeta.getPurchaseOccasion())){
@@ -734,7 +760,7 @@ public class ResponsysUtil {
 	}
 	
 	
-	public TagMetadata determineUnknownWinner(org.json.JSONObject obj, ArrayList<TagMetadata> tags){
+	public TagMetadata determineUnknownWinner(org.json.JSONObject obj, LinkedHashSet<TagMetadata> tags){
 		TreeMap<Integer, TagMetadata> winnerMap = new TreeMap<Integer, TagMetadata>();
 		TagMetadata winnerTag = null;
 		try {
@@ -744,55 +770,16 @@ public class ResponsysUtil {
 			if(((org.json.JSONObject)arr.get(0)).has("mdTag") && ((org.json.JSONObject)arr.get(0)).has("occassion") &&
 					!((org.json.JSONObject)arr.get(0)).get("occassion").toString().equalsIgnoreCase("Unknown"))
 				return null;
-			
-			for(TagMetadata tag : tags){
-				for(int i=0; (i< arr.length() || i < 15); i++){
-					if(((org.json.JSONObject)arr.get(i)).has("mdTag") && ((org.json.JSONObject)arr.get(i)).has("occassion") &&
-							((org.json.JSONObject)arr.get(i)).get("mdTag").toString().equalsIgnoreCase(tag.getMdTags())){
-						Integer rank = (Integer) ((org.json.JSONObject)arr.get(i)).get("rank");
-						//Add the percentile into MetaData Tag DTO
-						tag.setPercentile((Double) ((org.json.JSONObject)arr.get(i)).getDouble("percentile"));
-						winnerMap.put(rank, tag);
-					}
-				}
-			}
-			
+
+			getWinnerMap(tags, winnerMap, arr);
+
 			//Check if the winning tags are all Unknown tags, pick the one with the percetile of 95%\
 			if(winnerMap.size() > 0){
 				Map.Entry<Integer, TagMetadata> entry = (Entry<Integer, TagMetadata>) winnerMap.entrySet().iterator().next();
 				Integer winnerRank = entry.getKey();
 				winnerTag = entry.getValue();
-				
-				if(winnerMap.size() ==1 && winnerTag.getPurchaseOccasion().contains("Unknown")){
-					//If there is only 1 unknown tag and it is haveing % less than 95, nothing should happen 
-					if(winnerTag.getPercentile() < 95)
-						return null;
-					else {
-						swapJSONObjects(arr, winnerRank);
-						return winnerTag;
-					}
-				}
-				//If the first entry has unknown and the winner map's size is > 1
-				else if (winnerTag.getPurchaseOccasion().contains("Unknown")){
-					Iterator it = winnerMap.entrySet().iterator();
-					while (it.hasNext()) {
-				        Map.Entry pair = (Map.Entry)it.next();
-				        winnerTag = (TagMetadata) pair.getValue();
-				        if(winnerTag.getPurchaseOccasion().contains("Unknown")){
-							
-				        	if(winnerTag.getPercentile() >= 95){
-								
-								winnerRank = (Integer) pair.getKey();
-								// Simple swap
-								swapJSONObjects(arr, winnerRank);
-								
-								return winnerTag;
-							}
-						}
-				    }
-					//Return null because all the tags are unknown and non has % > 95
-					return null;
-				}
+
+				swapJSONObjects(arr, winnerRank);
 			}
 		}catch (org.json.JSONException e) {
 			e.printStackTrace();
@@ -801,7 +788,26 @@ public class ResponsysUtil {
 
 		return winnerTag;
 	}
-	
+	private void getWinnerMap(LinkedHashSet<TagMetadata> tags,
+			TreeMap<Integer, TagMetadata> winnerMap, org.json.JSONArray arr)
+			throws JSONException {
+		for(TagMetadata tag : tags){
+			for(int i=0; (i< arr.length() || i < 15); i++){
+				if(((org.json.JSONObject)arr.get(i)).has("mdTag") && ((org.json.JSONObject)arr.get(i)).has("occassion") &&
+						((org.json.JSONObject)arr.get(i)).get("mdTag").toString().equalsIgnoreCase(tag.getMdTags())){
+					Integer rank = (Integer) ((org.json.JSONObject)arr.get(i)).get("rank");
+					//Add the percentile into MetaData Tag DTO
+					if(((org.json.JSONObject)arr.get(i)).getDouble("percentile") >= 95){
+						tag.setPercentile((Double) ((org.json.JSONObject)arr.get(i)).getDouble("percentile"));
+						winnerMap.put(rank, tag);
+						return;
+					}
+				}
+			}
+		}
+	}
+
+
 	
 	private void swapJSONObjects(org.json.JSONArray arr, Integer winnerRank)
 			throws org.json.JSONException {
@@ -826,10 +832,11 @@ public class ResponsysUtil {
 		return tagMetaDataList;
 	}
 	
-	public void sendResponse(String xmlWithoutBOM){
+	public StringBuffer sendResponse(String xmlWithoutBOM){
 		HttpURLConnection connection = null;
 		BufferedReader in = null;
 		OutputStreamWriter out = null;
+		StringBuffer strBuff = new StringBuffer();
 		try {
 			connection = HttpClientUtils.getConnectionWithBasicAuthentication(AuthPropertiesReader
 					.getProperty(Constants.RESP_URL),"application/xml", "POST",AuthPropertiesReader
@@ -838,13 +845,34 @@ public class ResponsysUtil {
 			
 			out = new OutputStreamWriter(connection.getOutputStream());
 			out.write(xmlWithoutBOM);
+			out.close();
+		
 			LOGGER.debug("After Creating outWriter");
-			
+			in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+			int c;
+			while ((c = in.read()) != -1) {
+				strBuff.append((char) c); 
+			}
+			System.out.println("Response String ====>" + strBuff.toString());
 		}catch (IOException e) {
 			e.printStackTrace();
 			LOGGER.error("Exception occured in sendResponse ", e);
 		}
-		
+		finally {
+			try {
+				if(out!=null) 
+					out.close(); 
+				if (in != null) 
+					in.close();
+				if (connection != null) 
+					connection.disconnect();
+			} catch (IOException e) {
+				e.printStackTrace();
+				LOGGER.error("Exception occured in getResponseServiceResult: finally: catch block ", e);
+			}
+		}
+		return strBuff;
+				
 	}
 	
 	public void nullifyObjects(String xmlWithoutBOM, String xmlWithoutExpo, String json2XmlString, TagMetadata tagMetadata, org.json.JSONObject o, String customXml ){
@@ -854,5 +882,42 @@ public class ResponsysUtil {
 		tagMetadata = null;
 		o = null;
 		customXml = null;
+	}
+	
+	public org.json.JSONObject getJsonObjForUnknown(String input){
+		//get the list of models
+		List<String> activeTags = tagResponsysActiveDao.tagsResponsysList();
+		Map<Integer, String> tagModelsMap = tagVariableDao.getTagModelIds(activeTags);
+		
+	//	TagMetadata tagMetadata = null;
+		org.json.JSONObject o = null;
+		try{
+		 o = new org.json.JSONObject(input);
+		org.json.JSONObject objToSend = null;
+		org.json.JSONArray arr = o.getJSONArray("scoresInfo");
+		for(int i=0; i<arr.length(); i++){
+			String modelId = ((org.json.JSONObject)arr.get(i)).getString("modelId");
+			Double percentile = Double.valueOf(((org.json.JSONObject)arr.get(i)).getString("percentile"));
+			for(Map.Entry<Integer, String> entry : tagModelsMap.entrySet()){
+				if((entry.getKey() +"").equals(modelId) && percentile >= 95){
+				objToSend = (org.json.JSONObject)arr.get(i);
+		//		tagMetadata = tagMetadataDao.getBuSubBu(entry.getValue());
+				break;
+			}
+				
+		}
+			if(objToSend != null)
+				break;
+	}
+		if(objToSend == null)
+			return null;
+		o.remove("scoresInfo");
+		o.append("scoresInfo", objToSend);
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			LOGGER.error("Exception in getJsonObjForUnknown", e);
+		}
+		return o;
 	}
 }
