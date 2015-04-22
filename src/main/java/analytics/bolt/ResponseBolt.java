@@ -43,7 +43,7 @@ public class ResponseBolt extends EnvironmentBolt{
 	private OccationCustomeEventDao occationCustomeEventDao;
 	private OccasionResponsesDao occasionResponsesDao;
 	private ResponsysUtil responsysUtil;
-
+	
 	public ResponseBolt(String systemProperty, String host, int port) {
 		super(systemProperty);
 		this.host = host;
@@ -57,7 +57,7 @@ public class ResponseBolt extends EnvironmentBolt{
 		initMetrics(context);
 		responsysUtil = new ResponsysUtil();
 		this.outputCollector = collector;
-
+		
 		JedisPoolConfig poolConfig = new JedisPoolConfig();
         poolConfig.setMaxActive(100);
         jedisPool = new JedisPool(poolConfig,host, port, 100);
@@ -72,25 +72,25 @@ public class ResponseBolt extends EnvironmentBolt{
 	@Override
 	public void execute(Tuple input) {
 		String lyl_id_no = null; 
-
+		
 		try {
-
+			
 			if(input != null && input.contains("lyl_id_no")){
 				lyl_id_no = input.getString(0);
 				String scoreInfoJsonString = responsysUtil.callRtsAPI(lyl_id_no);
 				String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no);
-
+				
 				//4-2-2015.Recent update to send responses only for 1 tag irrespective of 
 				//how many tags we receive in the difference. This occasion tag 
 				//for which the response has to be sent is taken from the 1st ranks occasion tags from the API call
-
+				
 				//Get the Difference Tags from Redis for an lid
 				Jedis jedis = jedisPool.getResource();
 				String diffTags = null;
 				if(jedis.exists("Responses:"+l_id))
 					diffTags = jedis.get("Responses:"+l_id).toString() ;
 				jedisPool.returnResource(jedis);
-
+				
 				/*if(diffTags!=null && !"".equals(diffTags)){
 					String[] tags = diffTags.split(",");
 					//Send response for every new tag scored
@@ -105,7 +105,6 @@ public class ResponseBolt extends EnvironmentBolt{
 					//Get the metadata info for all the tags
 					ArrayList<TagMetadata> list = responsysUtil.getTagMetaDataList(diffTags);
 					//Check if Occasions are ready for Reponsys Team to process
-
 					LinkedHashSet<TagMetadata> readyToProcessTags = responsysUtil.getReadyToProcessTags(list);
 					
 					if( readyToProcessTags.size()>0){
