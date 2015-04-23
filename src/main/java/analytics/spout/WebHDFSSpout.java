@@ -141,18 +141,24 @@ public class WebHDFSSpout extends BaseRichSpout{
 	 *  Call the bolt to process the records
 	 * @param url
 	 * @throws IOException
+	 * @throws InterruptedException 
 	 */
-	public void readURLAndStoreData(String url) throws IOException{
+	public void readURLAndStoreData(String url) throws IOException, InterruptedException{
 		URL oracle = new URL(url);
         BufferedReader in = new BufferedReader(
         new InputStreamReader(oracle.openStream()));
 
         String inputLine;
+        int count =0;
         while ((inputLine = in.readLine()) != null){
         	String str = formatRecordsToFitRespectiveBolts(inputLine);
-        	
+        	count++;
         	//Time to call the BOLT
         	 collector.emit(tuple(str));
+        	 if(count >= 100){
+        		 Thread.sleep(30000);
+        		 count =0;
+        	 }
         	 str = null;
         	 inputLine = null;
         }
