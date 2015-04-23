@@ -24,9 +24,6 @@ import org.json.JSONException;
 
 public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ResponsysUnknownCallsBolt.class);
@@ -111,7 +108,7 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 				responsysObj.setTopologyName(topologyName);
 				
 				responsysUtil.getResponseUnknownServiceResult(responsysObj);
-			    countMetric.scope("responses").incr();
+			    countMetric.scope("data_to_responses").incr();
 		}
 			outputCollector.ack(input);
 	} catch (Exception e) {
