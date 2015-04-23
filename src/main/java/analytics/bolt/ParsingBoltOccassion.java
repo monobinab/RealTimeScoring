@@ -181,7 +181,8 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 					Map<String, String> tagVariable = getTagVariable(tag);
 					String tagVariableValue = getTagVarValue(tagVariable.get(tagVariable.keySet().iterator().next()));
 					
-					if(tagVariable!=null && tagVariableValue!=null &&!tagVariable.isEmpty() )
+					if(tagVariable!=null && tagVariableValue!=null &&!tagVariable.isEmpty() && 
+							(!(tag.toString().charAt(6) == '0') && !(tag.toString().charAt(6) == '7') && !(tag.toString().charAt(6) == '8')) )
 					{
 						populateVariableValueTagsMap(variableValueTagsMap,
 								tagVariableValue, tagVariable.keySet().iterator().next());

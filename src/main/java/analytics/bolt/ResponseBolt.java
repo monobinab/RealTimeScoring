@@ -107,7 +107,7 @@ public class ResponseBolt extends EnvironmentBolt{
 					//Check if Occasions are ready for Reponsys Team to process
 					LinkedHashSet<TagMetadata> readyToProcessTags = responsysUtil.getReadyToProcessTags(list);
 					
-					if( readyToProcessTags.size()>0){
+					//if( readyToProcessTags.size()>0){
 						TagMetadata tagMetadata = responsysUtil.getResponseServiceResult(scoreInfoJsonString,lyl_id_no,readyToProcessTags,l_id);
 						if(tagMetadata!=null && tagMetadata.getPurchaseOccasion()!=null){
 							
@@ -117,7 +117,7 @@ public class ResponseBolt extends EnvironmentBolt{
 							
 							countMetric.scope("responses").incr();
 						}
-					}
+					//}
 				}
 
 			}

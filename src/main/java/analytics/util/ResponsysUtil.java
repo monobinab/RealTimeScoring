@@ -783,8 +783,10 @@ public class ResponsysUtil {
 	private void getWinnerMap(LinkedHashSet<TagMetadata> tags,
 			TreeMap<Integer, TagMetadata> winnerMap, org.json.JSONArray arr)
 			throws JSONException {
-		for(TagMetadata tag : tags){
-			for(int i=0; (i< arr.length() || i < 15); i++){
+		
+		for(int i=0; (i< arr.length() || i < 15); i++){
+			for(int j =0 ; j < tags.size(); j++){
+				TagMetadata tag = tags.iterator().next();
 				if(((org.json.JSONObject)arr.get(i)).has("mdTag") && ((org.json.JSONObject)arr.get(i)).has("occassion") &&
 						((org.json.JSONObject)arr.get(i)).get("mdTag").toString().equalsIgnoreCase(tag.getMdTags())){
 					Integer rank = (Integer) ((org.json.JSONObject)arr.get(i)).get("rank");
@@ -797,6 +799,7 @@ public class ResponsysUtil {
 				}
 			}
 		}
+		
 	}
 
 
