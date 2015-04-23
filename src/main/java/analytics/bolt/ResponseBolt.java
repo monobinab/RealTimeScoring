@@ -112,7 +112,7 @@ public class ResponseBolt extends EnvironmentBolt{
 						if(tagMetadata!=null && tagMetadata.getPurchaseOccasion()!=null){
 							
 							jedis = jedisPool.getResource();
-							jedis.append("Responses:"+l_id, tagMetadata.getPurchaseOccasion());
+							jedis.append("Vibes:"+l_id, tagMetadata.getPurchaseOccasion());
 							jedisPool.returnResource(jedis);
 							
 							countMetric.scope("responses").incr();
