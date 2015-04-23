@@ -79,13 +79,7 @@ public class TagMetadataDao extends AbstractDao {
 	}
 	public TagMetadata getBuSubBu(String tag){
 		
-       /* BasicDBObject query = new BasicDBObject("name", namesRegex);*/
-		char[] charArr = tag.toCharArray();
-		System.out.println(charArr[0]);
-		
-		//query.put(Constants.SEG, tag+"0101001403");
-		String str = "^.";
-		String str2 = "*";
+      	char[] charArr = tag.toCharArray();
 		Pattern namesRegex = Pattern.compile("^"+charArr[0]+charArr[1]+charArr[2]+charArr[3]+charArr[4]+".*");
 		BasicDBObject query = new BasicDBObject(Constants.SEG, namesRegex);
 		//query.put(Constants.SEG, namesRegex);
@@ -102,6 +96,5 @@ public class TagMetadataDao extends AbstractDao {
 			metaDataObj.setPurchaseOccassion((String)dbObj.get(MongoNameConstants.PURCHASE_OCCASSION));
 		}
 		return metaDataObj;
-
 	}
 }

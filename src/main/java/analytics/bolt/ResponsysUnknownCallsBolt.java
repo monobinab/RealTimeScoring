@@ -78,20 +78,18 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 				//get the top jsonObject from api satisfying the condition
 				org.json.JSONObject o = new org.json.JSONObject(scoreInfoJsonString);
 				org.json.JSONObject objToSend = null;
-				objToSend = getJsonForResponsys(tagModelsMap, o, objToSend);
+				objToSend = getJsonForResponsys2(tagModelsMap, o, objToSend);
 				if(objToSend == null){
 					countMetric.scope("no_data_to_responsys").incr();
 					return;
 				}
 				
-				//get tagMetadata information
+				//get tagMetadata information and set the mdTag with zeros
 				TagMetadata tagMetadata = null;
 				String tag = tagModelsMap.get(Integer.parseInt((String) objToSend.get("modelId")));
 				tagMetadata = tagMetadataDao.getBuSubBu(tag);
-				if(!objToSend.has("occassion") ){
-					tagMetadata = new TagMetadata();
-					tagMetadata.setMdTags(tag+"0000000000000");
-				}
+				tagMetadata.setMdTags(tag+"0000000000000");
+				
 				
 				//preparing the jsonObject with only first model, which satisfied the above conditions
 				o.remove("scoresInfo");
@@ -116,30 +114,54 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 			countMetric.scope("responses_failed").incr();
 		}
 	}
-	private org.json.JSONObject getJsonForResponsys(
+		
+	private org.json.JSONObject getJsonForResponsys2(
 			Map<Integer, String> tagModelsMap, org.json.JSONObject o,
 			org.json.JSONObject objToSend) throws JSONException {
 		org.json.JSONArray arr = o.getJSONArray("scoresInfo");
 		for(int i=0; i<arr.length(); i++){
 			String modelId = ((org.json.JSONObject)arr.get(i)).getString("modelId");
 			Double percentile = Double.valueOf(((org.json.JSONObject)arr.get(i)).getString("percentile"));
-			for(Map.Entry<Integer, String> entry : tagModelsMap.entrySet()){
-				if((entry.getKey() +"").equals(modelId) && percentile >= 95){
-					if(((org.json.JSONObject) arr.get(i)).has("occassion") ){
-						if(((org.json.JSONObject) arr.get(i)).getString("occassion").equalsIgnoreCase("Unknown")){
-						objToSend = (org.json.JSONObject)arr.get(i);
-						return objToSend;
+			if(!((org.json.JSONObject) arr.get(i)).has("mdTag") ){
+					for(Map.Entry<Integer, String> entry : tagModelsMap.entrySet()){
+						if((entry.getKey() +"").equals(modelId) && percentile >= 95){
+							objToSend = (org.json.JSONObject)arr.get(i);
+							return objToSend;
 						}
 					}
-					else{
-						objToSend = (org.json.JSONObject)arr.get(i);
-						return objToSend;
+				}
+			else
+				return null;
+			}
+		return null;
+	}
+	
+	//This method was used by Telluride for responsys as the logic has been changed
+		@Deprecated
+		private org.json.JSONObject getJsonForResponsys(
+				Map<Integer, String> tagModelsMap, org.json.JSONObject o,
+				org.json.JSONObject objToSend) throws JSONException {
+			org.json.JSONArray arr = o.getJSONArray("scoresInfo");
+			for(int i=0; i<arr.length(); i++){
+				String modelId = ((org.json.JSONObject)arr.get(i)).getString("modelId");
+				Double percentile = Double.valueOf(((org.json.JSONObject)arr.get(i)).getString("percentile"));
+				for(Map.Entry<Integer, String> entry : tagModelsMap.entrySet()){
+					if((entry.getKey() +"").equals(modelId) && percentile >= 95){
+						if(((org.json.JSONObject) arr.get(i)).has("occassion") ){
+							if(((org.json.JSONObject) arr.get(i)).getString("occassion").equalsIgnoreCase("Unknown")){
+							objToSend = (org.json.JSONObject)arr.get(i);
+							return objToSend;
+							}
+						}
+						else{
+							objToSend = (org.json.JSONObject)arr.get(i);
+							return objToSend;
+						}
 					}
 				}
 			}
+			return null;
 		}
-		return null;
-	}
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
