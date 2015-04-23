@@ -1,6 +1,5 @@
 package analytics.bolt;
 
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +20,7 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Tuple;
 
-import org.json.JSONObject;
+import org.json.JSONException;
 
 public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 
@@ -68,7 +67,6 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 	public void execute(Tuple input) {
 		countMetric.scope("incoming_tuples").incr();
 		String lyl_id_no = null; 
-		LinkedHashSet<TagMetadata> tags = null;
 		Responsys responsysObj = new Responsys();
 		try {
 			if(input != null && input.contains("lyl_id_no")){
@@ -80,27 +78,25 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 				List<String> activeTags = tagResponsysActiveDao.tagsResponsysList();
 				Map<Integer, String> tagModelsMap = tagVariableDao.getTagModelIds(activeTags);
 				
-				TagMetadata tagMetadata = null;
+				//get the top jsonObject from api satisfying the condition
 				org.json.JSONObject o = new org.json.JSONObject(scoreInfoJsonString);
 				org.json.JSONObject objToSend = null;
-				org.json.JSONArray arr = o.getJSONArray("scoresInfo");
-				for(int i=0; i<arr.length(); i++){
-					String modelId = ((org.json.JSONObject)arr.get(i)).getString("modelId");
-					Double percentile = Double.valueOf(((org.json.JSONObject)arr.get(i)).getString("percentile"));
-					for(Map.Entry<Integer, String> entry : tagModelsMap.entrySet()){
-						if((entry.getKey() +"").equals(modelId) && percentile >= 95){
-						objToSend = (org.json.JSONObject)arr.get(i);
-						tagMetadata = tagMetadataDao.getBuSubBu(entry.getValue());
-						break;
-					}
-				}
-					if(objToSend != null)
-						break;
-			}
+				objToSend = getJsonForResponsys(tagModelsMap, o, objToSend);
 				if(objToSend == null){
 					countMetric.scope("no_data_to_responsys").incr();
 					return;
 				}
+				
+				//get tagMetadata information
+				TagMetadata tagMetadata = null;
+				String tag = tagModelsMap.get(Integer.parseInt((String) objToSend.get("modelId")));
+				tagMetadata = tagMetadataDao.getBuSubBu(tag);
+				if(!objToSend.has("occassion") ){
+					tagMetadata = new TagMetadata();
+					tagMetadata.setMdTags(tag+"0000000000000");
+				}
+				
+				//preparing the jsonObject with only first model, which satisfied the above conditions
 				o.remove("scoresInfo");
 				o.append("scoresInfo", objToSend);
 				String eid = memberInfoDao.getMemberInfoEId(l_id);
@@ -111,7 +107,7 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 				responsysObj.setJsonObj(o);
 				responsysObj.setTagMetadata(tagMetadata);
 				responsysObj.setEid(eid);
-				responsysObj.setCustomEventName("");
+				responsysObj.setCustomEventName("RTS_Unknown");
 				responsysObj.setTopologyName(topologyName);
 				
 				responsysUtil.getResponseUnknownServiceResult(responsysObj);
@@ -122,6 +118,30 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 			LOGGER.error("Exception in ResponsysUnknownCallsBolt", e);
 			countMetric.scope("responses_failed").incr();
 		}
+	}
+	private org.json.JSONObject getJsonForResponsys(
+			Map<Integer, String> tagModelsMap, org.json.JSONObject o,
+			org.json.JSONObject objToSend) throws JSONException {
+		org.json.JSONArray arr = o.getJSONArray("scoresInfo");
+		for(int i=0; i<arr.length(); i++){
+			String modelId = ((org.json.JSONObject)arr.get(i)).getString("modelId");
+			Double percentile = Double.valueOf(((org.json.JSONObject)arr.get(i)).getString("percentile"));
+			for(Map.Entry<Integer, String> entry : tagModelsMap.entrySet()){
+				if((entry.getKey() +"").equals(modelId) && percentile >= 95){
+					if(((org.json.JSONObject) arr.get(i)).has("occassion") ){
+						if(((org.json.JSONObject) arr.get(i)).getString("occassion").equalsIgnoreCase("Unknown")){
+						objToSend = (org.json.JSONObject)arr.get(i);
+						return objToSend;
+						}
+					}
+					else{
+						objToSend = (org.json.JSONObject)arr.get(i);
+						return objToSend;
+					}
+				}
+			}
+		}
+		return null;
 	}
 
 	@Override
