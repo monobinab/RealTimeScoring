@@ -108,8 +108,15 @@ public class ResponseBolt extends EnvironmentBolt{
 					LinkedHashSet<TagMetadata> readyToProcessTags = responsysUtil.getReadyToProcessTags(list);
 					
 					if( readyToProcessTags.size()>0){
-						responsysUtil.getResponseServiceResult(scoreInfoJsonString,lyl_id_no,readyToProcessTags,l_id);
-						countMetric.scope("responses").incr();
+						TagMetadata tagMetadata = responsysUtil.getResponseServiceResult(scoreInfoJsonString,lyl_id_no,readyToProcessTags,l_id);
+						if(tagMetadata!=null && tagMetadata.getPurchaseOccasion()!=null){
+							
+							jedis = jedisPool.getResource();
+							jedis.append("Responses:"+l_id, tagMetadata.getPurchaseOccasion());
+							jedisPool.returnResource(jedis);
+							
+							countMetric.scope("responses").incr();
+						}
 					}
 				}
 

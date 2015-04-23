@@ -40,12 +40,17 @@ public class VibesSpout extends BaseRichSpout{
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = LoggerFactory.getLogger(VibesSpout.class);
 	private VibesDao vibesDao;
+	private String host;
+	private int port;
+	private JedisPool jedisPool;
 
     private SpoutOutputCollector collector;
 	
-	public VibesSpout(String systemProperty) {
+	public VibesSpout(String systemProperty, String redisServer, Integer redisPort) {
 			LOGGER.info("~~~~~~~~~~~~~~~ENVIRONMENT BOLT~~~~~~~: " + System.getProperty(MongoNameConstants.IS_PROD));
 			System.setProperty(MongoNameConstants.IS_PROD, systemProperty);
+			this.host = redisServer;
+			this.port = redisPort;
 	}
 	
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
@@ -57,6 +62,9 @@ public class VibesSpout extends BaseRichSpout{
 			SpoutOutputCollector collector) {
 		this.collector = collector;
 		vibesDao = new VibesDao();
+		JedisPoolConfig poolConfig = new JedisPoolConfig();
+        poolConfig.setMaxActive(100);
+        jedisPool = new JedisPool(poolConfig,host, port, 100);
 	}
 
 	@Override
@@ -75,12 +83,18 @@ public class VibesSpout extends BaseRichSpout{
 			//Perform Vibes Text Processing between 10:00AM and 4:00PM CST
 			if(date.after(startTimeToday) && date.before(endTimeToday)){
 			
-				List<DBObject> vibesLst = vibesDao.getVibes(Constants.NO);
-				Iterator<DBObject> iter = vibesLst.iterator();
+				//List<DBObject> vibesLst = vibesDao.getVibes(Constants.NO);
+				//Iterator<DBObject> iter = vibesLst.iterator();
+				
+				Jedis jedis = jedisPool.getResource();
+				String diffTags = null;
+				/*if(jedis.exists("Vibes:"+l_id))
+					diffTags = jedis.get("Vibes:"+l_id).toString() ;
+				jedisPool.returnResource(jedis);
 				
 				while(iter.hasNext()){
 					collector.emit(tuple(iter.next()));
-				}
+				}*/
 			}
 			//Sleep for 3 mins before starting the next batch
 			Thread.sleep(180000);

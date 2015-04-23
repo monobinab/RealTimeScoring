@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 
 import analytics.bolt.VibesBolt;
 import analytics.spout.VibesSpout;
+import analytics.util.AuthPropertiesReader;
+import analytics.util.Constants;
 import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
 import analytics.util.RedisConnection;
@@ -30,7 +32,9 @@ public class VibesTopology{
 		String[] servers = RedisConnection.getServers("LOCAL");
 		
 		//Spout that wakes up every 5 mins and process the Traits
-		builder.setSpout("vibesSpout", new VibesSpout(System.getProperty(MongoNameConstants.IS_PROD)), 1);
+		builder.setSpout("vibesSpout", new VibesSpout(System.getProperty(MongoNameConstants.IS_PROD),
+				AuthPropertiesReader.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
+						.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 1);
 		builder.setBolt("vibesBolt",new VibesBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1)
 				.shuffleGrouping("vibesSpout");
 

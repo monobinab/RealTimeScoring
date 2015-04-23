@@ -45,13 +45,13 @@ public class AAM_BrowseTopology {
 	  		.shuffleGrouping("browseSpout");
 
 		
-		topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System
+		/*topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System
 				.getProperty(MongoNameConstants.IS_PROD)), 3)
 				.localOrShuffleGrouping("parsingBoltBrowse");
 		
 		if(System.getProperty(MongoNameConstants.IS_PROD).equals("PROD")){
 			topologyBuilder.setBolt("flumeLoggingBolt", new FlumeRPCBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
-		}
+		}*/
 		
 //		 topologyBuilder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 3).localOrShuffleGrouping("strategyScoringBolt", "score_stream");
 	//        topologyBuilder.setBolt("memberPublishBolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 3).localOrShuffleGrouping("strategyScoringBolt", "member_stream");
@@ -59,6 +59,7 @@ public class AAM_BrowseTopology {
 		Config conf = new Config();
 		conf.put("metrics_topology", "Product_Browse");
 		conf.registerMetricsConsumer(MetricsListener.class, 3);
+		conf.setMaxSpoutPending(30);
 		//stormconf is set with system's property as MetricsListener needs it
 		conf.put("topology_environment", System.getProperty(MongoNameConstants.IS_PROD));
 		if (System.getProperty(MongoNameConstants.IS_PROD)
