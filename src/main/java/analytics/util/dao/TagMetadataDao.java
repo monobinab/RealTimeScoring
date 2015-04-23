@@ -95,7 +95,8 @@ public class TagMetadataDao extends AbstractDao {
 			metaDataObj = new TagMetadata();
 			//zeros added to indicate Unknown
 			//needs to be replaced when proper collection is created 
-			metaDataObj.setMdTags(tag+"0000000000");
+			//metaDataObj.setMdTags(tag+"0000000000");
+			metaDataObj.setMdTags((String)dbObj.get(MongoNameConstants.SEG));
 			metaDataObj.setBusinessUnit((String)dbObj.get(MongoNameConstants.BUSINESS_UNIT));
 			metaDataObj.setSubBusinessUnit((String)dbObj.get(MongoNameConstants.SUB_BUSINESS_UNIT));
 			metaDataObj.setPurchaseOccassion((String)dbObj.get(MongoNameConstants.PURCHASE_OCCASSION));
