@@ -153,6 +153,8 @@ public class WebHDFSSpout extends BaseRichSpout{
         	
         	//Time to call the BOLT
         	 collector.emit(tuple(str));
+        	 str = null;
+        	 inputLine = null;
         }
         in.close();
 	}
@@ -176,7 +178,8 @@ public class WebHDFSSpout extends BaseRichSpout{
 		   }
 		   else
 		    replacedString = "['"+returnStr+"']";
-		   LOGGER.info("Formatted String = " +replacedString);
+		   //LOGGER.info("Formatted String = " +replacedString);
+		   System.out.println("Formatted String = " +replacedString);
 		   returnStr = null;
 		  }
 		  

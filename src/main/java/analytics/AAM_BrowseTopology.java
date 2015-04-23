@@ -59,6 +59,7 @@ public class AAM_BrowseTopology {
 		Config conf = new Config();
 		conf.put("metrics_topology", "Product_Browse");
 		conf.registerMetricsConsumer(MetricsListener.class, 3);
+		conf.setMaxSpoutPending(30);
 		//stormconf is set with system's property as MetricsListener needs it
 		conf.put("topology_environment", System.getProperty(MongoNameConstants.IS_PROD));
 		if (System.getProperty(MongoNameConstants.IS_PROD)

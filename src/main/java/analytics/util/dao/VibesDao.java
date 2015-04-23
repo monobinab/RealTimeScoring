@@ -19,7 +19,7 @@ public class VibesDao extends AbstractDao {
 
 	public VibesDao() {
 		super();
-		vibesCollection = db.getCollection("vibes");
+		vibesCollection = db.getCollection("vibesTextMsgs");
 		LOGGER.info("colelction in tagMetadataDao: " + vibesCollection.getFullName());
 
 	}

@@ -44,4 +44,8 @@ public class Constants {
 	
 	public static final String YES="Y";
 	public static final String NO = "N";
+	
+	public static final String VIBES_USER_NAME = "vibesWebserviceUsrname";
+	public static final String VIBES_PASSWORD = "vibesWebservicePassword";
+	public static final String VIBES_URL = "vibesWebserviceURL";
 }
