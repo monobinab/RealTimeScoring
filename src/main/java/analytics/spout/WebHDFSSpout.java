@@ -155,7 +155,7 @@ public class WebHDFSSpout extends BaseRichSpout{
         	count++;
         	//Time to call the BOLT
         	 collector.emit(tuple(str));
-        	 if(count >= 100){
+        	 if(count >= 500){
         		 Thread.sleep(30000);
         		 count =0;
         	 }
