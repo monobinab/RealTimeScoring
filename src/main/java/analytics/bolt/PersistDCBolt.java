@@ -1,11 +1,13 @@
 package analytics.bolt;
 
 import java.util.Map;
+
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import analytics.util.dao.MemberDCDao;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -14,7 +16,7 @@ import backtype.storm.tuple.Tuple;
 public class PersistDCBolt extends EnvironmentBolt{
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(PersistTraitsBolt.class);
-   // private MemberDCDao memberDCDao;
+    private MemberDCDao memberDCDao;
 	private OutputCollector outputCollector;
 	
 	public PersistDCBolt(String systemProperty){
@@ -29,12 +31,10 @@ public class PersistDCBolt extends EnvironmentBolt{
 		try {
 			JSONObject obj = new JSONObject(input.getString(1));
 			memberDCDao.addDateDC(l_id, obj.toString());
-    		//countMetric.scope("persisted_dc").incr();
     		redisCountIncr("persisted_dc");
     		outputCollector.ack(input);
 		} catch (JSONException e) {
 			LOGGER.error("unable to persist dc",e);
-    		//countMetric.scope("persist_failed").incr();
     		redisCountIncr("persist_failed");
     		outputCollector.fail(input);
 		}
@@ -43,11 +43,9 @@ public class PersistDCBolt extends EnvironmentBolt{
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
-		//	systemPropertySet();
-		//	memberDCDao = new MemberDCDao();
+			memberDCDao = new MemberDCDao();
 			this.outputCollector = collector;
-		//	initMetrics(context);
-		
+			
 	}
 	
 	@Override

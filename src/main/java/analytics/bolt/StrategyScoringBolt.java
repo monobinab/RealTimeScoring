@@ -16,17 +16,12 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import analytics.exception.RealTimeScoringException;
-import analytics.util.Constants;
 import analytics.util.JsonUtils;
-import analytics.util.MongoNameConstants;
 import analytics.util.ScoringSingleton;
-import analytics.util.dao.MemberScoreDao;
 import analytics.util.objects.Change;
-import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 

@@ -21,10 +21,7 @@ public class EnvironmentBolt extends BaseRichBolt {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(EnvironmentBolt.class);
 	private String environment;
-	protected DCDao dc;
-	protected MemberDCDao memberDCDao;
-	protected MemberScoreDao memberScoreDao;
-
+	
 	public EnvironmentBolt() {
 	}
 
@@ -41,12 +38,11 @@ public class EnvironmentBolt extends BaseRichBolt {
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
 		System.setProperty(MongoNameConstants.IS_PROD, environment);
-		//initMetrics(context);
+		
+		//initializing the metrics
 		countMetric = new MultiCountMetric();
 		context.registerMetric("custom_metrics", countMetric, 60);
-		memberDCDao = new MemberDCDao();
-		dc = new DCDao();
-		memberScoreDao = new MemberScoreDao();
+	
 	}
 
 	@Override
@@ -61,13 +57,5 @@ public class EnvironmentBolt extends BaseRichBolt {
 
 	}
 
-/*	public void systemPropertySet() {
-		System.setProperty(MongoNameConstants.IS_PROD, environment);
-	}*/
-
-/*	void initMetrics(TopologyContext context) {
-		countMetric = new MultiCountMetric();
-		context.registerMetric("custom_metrics", countMetric, 60);
-	}*/
 
 }
