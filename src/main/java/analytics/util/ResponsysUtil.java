@@ -98,7 +98,7 @@ public class ResponsysUtil {
 			LOGGER.debug("WI Response String: " + responseString);
 			InputStream instream = response.getEntity().getContent();
 			jsonRespString = read(instream);
-			LOGGER.info(jsonRespString);	
+			//LOGGER.info(jsonRespString);	
 
 		} catch (IOException e3) {
 			e3.printStackTrace();
@@ -133,7 +133,7 @@ public class ResponsysUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public TagMetadata getResponseServiceResult(String input, String lyl_l_id, LinkedHashSet<TagMetadata> tags, String l_id) throws Exception {
+	public TagMetadata getResponseServiceResult(String input, String lyl_l_id, ArrayList<TagMetadata> inputTags, String l_id) throws Exception {
 		LOGGER.info(" Testing - Entering the getResponseServiceResult method");
 		StringBuffer strBuff = new StringBuffer();
 		BufferedReader in = null;
@@ -158,9 +158,9 @@ public class ResponsysUtil {
 			
 			//Determine the winner tag to send to Responsys
 			//TagMetadata winningTag = determineWinningTag(obj,tags);
-			winningTag = determineUnknownWinner(obj,tags);
+			winningTag = determineUnknownWinner(obj,inputTags);
 			
-			if(winningTag== null || !winningTag.getPurchaseOccasion().equalsIgnoreCase("Unknown")){
+			if(winningTag == null || !winningTag.getPurchaseOccasion().equalsIgnoreCase("Unknown")){
 				winningTag = getTagMetaDataInfo(obj);
 			}
 			
@@ -224,6 +224,9 @@ public class ResponsysUtil {
 				json2XmlString = null;
 				obj = null;
 				customXml = null;
+			}
+			else{
+				LOGGER.info("No Winning Tag found - Not sending to Responsys for Lid " + lyl_l_id );
 			}
 		} catch (Exception t) {
 			t.printStackTrace();
@@ -619,6 +622,12 @@ public class ResponsysUtil {
 		TagMetadata tagMetaData = null;
 
 		try {
+			
+			//If it gets here, it means that the Responsys is not ready with the Unknown Tags or there is no Unknown tag with % > 95
+			if(((org.json.JSONObject) obj.getJSONArray("scoresInfo").get(0)).has("mdTag") && ((org.json.JSONObject) obj.getJSONArray("scoresInfo").get(0)).has("occassion") &&
+					((org.json.JSONObject)obj.getJSONArray("scoresInfo").get(0)).get("occassion").toString().equalsIgnoreCase("Unknown"))
+				return null;
+			
 			//org.json.JSONObject obj = new org.json.JSONObject(jsonStr);
 			tagMetaData = new TagMetadata();
 			System.out.println(((org.json.JSONObject) obj.getJSONArray("scoresInfo").get(0)).get("occassion"));
@@ -657,8 +666,8 @@ public class ResponsysUtil {
 	}
 
 
-	public LinkedHashSet<TagMetadata> getReadyToProcessTags(ArrayList<TagMetadata> tagsMetaList){
-		LinkedHashSet<TagMetadata> metaDataList = new LinkedHashSet<TagMetadata>();
+	public ArrayList<TagMetadata> getReadyToProcessTags(ArrayList<TagMetadata> tagsMetaList){
+		ArrayList<TagMetadata> metaDataList = new ArrayList<TagMetadata>();
 		HashMap<String, String> activeTags = tagResponsysActiveDao.getResponsysActiveTagsList();
 
 		for(TagMetadata tagMeta : tagsMetaList){
@@ -752,18 +761,24 @@ public class ResponsysUtil {
 	}
 
 
-	public TagMetadata determineUnknownWinner(org.json.JSONObject obj, LinkedHashSet<TagMetadata> tags){
+	public TagMetadata determineUnknownWinner(org.json.JSONObject obj, ArrayList<TagMetadata> inputTags){
 		TreeMap<Integer, TagMetadata> winnerMap = new TreeMap<Integer, TagMetadata>();
 		TagMetadata winnerTag = null;
 		try {
 			org.json.JSONArray arr = obj.getJSONArray("scoresInfo");
-			//If the first element in the array is NOT unknown occasion... then get out of this method
-			//and return the first element from the array.
-			if(((org.json.JSONObject)arr.get(0)).has("mdTag") && ((org.json.JSONObject)arr.get(0)).has("occassion") &&
-					!((org.json.JSONObject)arr.get(0)).get("occassion").toString().equalsIgnoreCase("Unknown"))
-				return null;
-
-			getWinnerMap(tags, winnerMap, arr);
+			
+			//Check if Occasions are ready for Reponsys Team to process
+			ArrayList<TagMetadata> readyToProcessTags = getReadyToProcessTags(inputTags);
+			
+			if(readyToProcessTags!=null && readyToProcessTags.size()>0){
+				//If the first element in the array is NOT unknown occasion... then get out of this method
+				//and return the first element from the array.
+				if(((org.json.JSONObject)arr.get(0)).has("mdTag") && ((org.json.JSONObject)arr.get(0)).has("occassion") &&
+						!((org.json.JSONObject)arr.get(0)).get("occassion").toString().equalsIgnoreCase("Unknown"))
+					return null;
+	
+				getWinnerMap(readyToProcessTags, winnerMap, arr);
+			}
 
 			//Check if the winning tags are all Unknown tags, pick the one with the percetile of 95%\
 			if(winnerMap.size() > 0){
@@ -780,7 +795,7 @@ public class ResponsysUtil {
 
 		return winnerTag;
 	}
-	private void getWinnerMap(LinkedHashSet<TagMetadata> tags,
+	private void getWinnerMap(ArrayList<TagMetadata> tags,
 			TreeMap<Integer, TagMetadata> winnerMap, org.json.JSONArray arr)
 			throws JSONException {
 		

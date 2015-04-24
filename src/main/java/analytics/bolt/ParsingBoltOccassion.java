@@ -155,7 +155,7 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 			diffTagsString = diffTagsString.substring(0,diffTagsString.length()-1);
 		}
 
-		System.out.println(l_id +" ---- " +diffTagsString);
+		//System.out.println(l_id +" ---- " +diffTagsString);
 		Jedis jedis = jedisPool.getResource();
 		jedis.set("Responses:"+l_id, diffTagsString);
 		jedis.expire("Responses:"+l_id, 300);

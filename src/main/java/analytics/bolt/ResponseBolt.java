@@ -104,16 +104,15 @@ public class ResponseBolt extends EnvironmentBolt{
 				if(diffTags!=null && !"".equals(diffTags)){
 					//Get the metadata info for all the tags
 					ArrayList<TagMetadata> list = responsysUtil.getTagMetaDataList(diffTags);
-					//Check if Occasions are ready for Reponsys Team to process
-					LinkedHashSet<TagMetadata> readyToProcessTags = responsysUtil.getReadyToProcessTags(list);
+					
 					
 					//if( readyToProcessTags.size()>0){
-						TagMetadata tagMetadata = responsysUtil.getResponseServiceResult(scoreInfoJsonString,lyl_id_no,readyToProcessTags,l_id);
+						TagMetadata tagMetadata = responsysUtil.getResponseServiceResult(scoreInfoJsonString,lyl_id_no,list,l_id);
 						if(tagMetadata!=null && tagMetadata.getPurchaseOccasion()!=null){
 							
-							jedis = jedisPool.getResource();
+							/*jedis = jedisPool.getResource();
 							jedis.append("Vibes:"+l_id, tagMetadata.getPurchaseOccasion());
-							jedisPool.returnResource(jedis);
+							jedisPool.returnResource(jedis);*/
 							
 							countMetric.scope("responses").incr();
 						}
