@@ -46,7 +46,7 @@ public class MetricsListener implements IMetricsConsumer {
 		topologyName = (String) stormConf.get("metrics_topology");
 		//System.out.println("~~~~~~~~~redis taken in MetricsListener~~~~~" + jedisPool.getResource().getClient().getHost());
 		
-		LOGGER.info("~~~~~~~~~redis taken in MetricsListener~~~~~" + jedisPool.getResource().getClient().getHost());
+	//	LOGGER.info("~~~~~~~~~redis taken in MetricsListener~~~~~" + jedisPool.getResource().getClient().getHost());
 	}
 
 	@Override
