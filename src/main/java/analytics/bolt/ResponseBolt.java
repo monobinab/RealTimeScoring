@@ -12,7 +12,6 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import analytics.util.ResponsysUtil;
 import analytics.util.SecurityUtils;
-import analytics.util.dao.MemberInfoDao;
 import analytics.util.dao.OccasionResponsesDao;
 import analytics.util.dao.OccationCustomeEventDao;
 import analytics.util.dao.TagMetadataDao;
@@ -34,7 +33,6 @@ public class ResponseBolt extends EnvironmentBolt{
 	private MultiCountMetric countMetric;
 	private OutputCollector outputCollector;
 	private static final String UTF8_BOM = "\uFEFF";
-	private MemberInfoDao memberInfoDao;
 	private String host;
 	private int port;
 	private JedisPool jedisPool;
@@ -116,12 +114,11 @@ public class ResponseBolt extends EnvironmentBolt{
 					
 					//if( readyToProcessTags.size()>0){
 						TagMetadata tagMetadata = responsysUtil.getResponseServiceResult(scoreInfoJsonString,lyl_id_no,list,l_id, messageID);
-						if(tagMetadata!=null && tagMetadata.getPurchaseOccasion()!=null){
-							
-							/*jedis = jedisPool.getResource();
-							jedis.append("Vibes:"+l_id, tagMetadata.getPurchaseOccasion());
-							jedisPool.returnResource(jedis);*/
-							
+						if(tagMetadata!=null && tagMetadata.getPurchaseOccasion()!=null && tagMetadata.getEmailOptIn()!=null && tagMetadata.getEmailOptIn().equals("N")){
+								jedis = jedisPool.getResource();
+								//TODO: Should we just do a put??
+								jedis.append("Vibes:"+l_id, tagMetadata.getPurchaseOccasion());
+								jedisPool.returnResource(jedis);
 							countMetric.scope("responses").incr();
 						}
 					//}

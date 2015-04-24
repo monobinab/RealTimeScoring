@@ -49,6 +49,7 @@ import analytics.util.dao.OccationCustomeEventDao;
 import analytics.util.dao.TagMetadataDao;
 import analytics.util.dao.TagResponsysActiveDao;
 import analytics.util.dao.TagVariableDao;
+import analytics.util.objects.MemberInfo;
 import analytics.util.objects.Responsys;
 import analytics.util.objects.TagMetadata;
 
@@ -169,7 +170,7 @@ public class ResponsysUtil {
 			if(winningTag!=null){
 				//Get the necessary variables for populating in the response xml
 				//LOGGER.info("TIME:" + messageID + "- Getting EID -" + System.currentTimeMillis());
-				String eid = memberInfoDao.getMemberInfoEId(l_id);
+				MemberInfo memberInfo  = memberInfoDao.getMemberInfo(l_id);
 				//LOGGER.info("TIME:" + messageID + "- Got EID -" + System.currentTimeMillis());
 				
 				
@@ -203,7 +204,7 @@ public class ResponsysUtil {
 				String xmlWithoutExpo = removeExponentialFromXml(json2XmlString);
 				
 				//Generate the Custome Xml to be sent to Oracle
-				String customXml = createCustomXml(xmlWithoutExpo,eid,custEventName,winningTag,lyl_l_id);
+				String customXml = createCustomXml(xmlWithoutExpo,memberInfo.getEid(),custEventName,winningTag,lyl_l_id);
 				
 				//BOM = Byte-Order-Mark
 				//Remove the BOM to make the XML valid
@@ -221,11 +222,11 @@ public class ResponsysUtil {
 				
 				//Persist info to Mongo after successfully transmission of message to Oracle.
 				LOGGER.info(lyl_l_id+"~~~"+xmlWithoutBOM);
-				occasionResponsesDao.addOccasionResponse(l_id, eid, custEventName, winningTag.getPurchaseOccasion(), winningTag.getBusinessUnit(), winningTag.getSubBusinessUnit(), 
+				occasionResponsesDao.addOccasionResponse(l_id, memberInfo.getEid(), custEventName, winningTag.getPurchaseOccasion(), winningTag.getBusinessUnit(), winningTag.getSubBusinessUnit(), 
 						strBuff.toString().contains("<success>true</success>") ? "Y" : "N", winningTag.getMdTags());
 				
 				//LOGGER.info("TIME:" + messageID + "- Persisting sent data to Mongo -" + System.currentTimeMillis());
-				
+				winningTag.setEmailOptIn(memberInfo.getEmailOptIn());
 				xmlWithoutBOM = null;
 				xmlWithoutExpo = null;
 				json2XmlString = null;
