@@ -14,22 +14,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.xml.sax.Attributes;
-
-import analytics.util.Constants;
 import analytics.util.DCParserHandler;
-import analytics.util.HostPortUtility;
 import analytics.util.JsonUtils;
-import analytics.util.MongoNameConstants;
 import analytics.util.SecurityUtils;
 import analytics.util.dao.DCDao;
-import analytics.util.dao.MemberDCDao;
-import analytics.util.objects.TransactionLineItem;
-import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
@@ -40,20 +31,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
-
 import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
-import com.mongodb.DB;
 
 public class ParsingBoltDC extends EnvironmentBolt {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ParsingBoltDC.class);
 	private static final long serialVersionUID = 1L;
 	private OutputCollector outputCollector;
-	private DCDao dc;
-	private MemberDCDao memberDCDao;
+	/*private DCDao dc;
+	private MemberDCDao memberDCDao;*/
 	private Type varValueType;
-	private MultiCountMetric countMetric;
 	//needs to be removed after development is completed and moved to prod
 	private static final boolean isTestL_ID = false;
 	private static final boolean isDemoXML = false;
@@ -61,41 +47,33 @@ public class ParsingBoltDC extends EnvironmentBolt {
 	
 	 public ParsingBoltDC(String systemProperty){
 		 super(systemProperty);
-		  }
+	 }
 
 	@Override
 	public void execute(Tuple input) {
-		countMetric.scope("incoming_tuples").incr();
+		//countMetric.scope("incoming_tuples").incr();
+		redisCountIncr("incoming_tuples");
 		// UpdateMemberPrompts
 		String message = (String) input.getValueByField("str");
 		if (message.contains("GetMemberPromptsReply")) {
-			// System.out.println("Got a response: ");
-			// System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-			countMetric.scope("prompts_reply").incr();
+			//countMetric.scope("prompts_reply").incr();
+			redisCountIncr("prompts_reply");
 			try {
 				parseIncomingMessage(message);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			 //emitFakeData();
-
 		}
 		outputCollector.ack(input);
-	}
-
-	void initMetrics(TopologyContext context) {
-		countMetric = new MultiCountMetric();
-		context.registerMetric("custom_metrics", countMetric, Constants.METRICS_INTERVAL);
 	}
 
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
 		this.outputCollector = collector;
-		//HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
-		memberDCDao = new MemberDCDao();
-		dc = new DCDao();
-		initMetrics(context);
+		//memberDCDao = new MemberDCDao();
+		//dc = new DCDao();
 		LOGGER.info("DC Bolt Preparing to Launch");
 		varValueType = new TypeToken<Map<String, String>>() {
 			private static final long serialVersionUID = 1L;
@@ -195,9 +173,9 @@ public class ParsingBoltDC extends EnvironmentBolt {
 		listToEmit_s.add(JsonUtils.createJsonFromStringStringMap(map));
 		listToEmit_s.add("DC");
 		outputCollector.emit("score_stream", listToEmit_s);
-		countMetric.scope("emitted_to_scoring").incr();
+		//countMetric.scope("emitted_to_scoring").incr();
+		redisCountIncr("emitted_to_scoring");
 		LOGGER.info("Emitted message to score stream");
-		
 	}
 	
 	protected void setToTestMode(){

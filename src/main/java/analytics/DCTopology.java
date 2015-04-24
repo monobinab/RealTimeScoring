@@ -44,10 +44,7 @@ public class DCTopology {
 		// use topology Id as part of the consumer ID to make it unique
 		SpoutConfig kafkaConfig = new SpoutConfig(hosts, "telprod_reqresp_log_output", "", "RTSConsumer"+topologyId);
 		kafkaConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
-		if(isLocal){
-			//default is false, only set to true for developing or testing locally
-			//kafkaConfig.forceFromStart = true;
-		}
+		
 		builder.setSpout("kafkaSpout", new KafkaSpout(kafkaConfig), 2);
 		builder.setBolt("dcParsingBolt", new ParsingBoltDC(System
 				.getProperty(MongoNameConstants.IS_PROD)), 2).localOrShuffleGrouping("kafkaSpout");
@@ -63,7 +60,7 @@ public class DCTopology {
 		//builder.setBolt("memberPublishBolt", new MemberPublishBolt(RedisConnection.getServers()[0], redis_port,"member"), partition_num).localOrShuffleGrouping("strategyScoringBolt", "member_stream");
 		Config conf = new Config();
 		conf.put("metrics_topology", "DC");
-		conf.registerMetricsConsumer(MetricsListener.class, partition_num);
+		conf.registerMetricsConsumer(MetricsListener.class, System.getProperty(MongoNameConstants.IS_PROD), partition_num);
 		conf.setDebug(false);
 		conf.put("topology_environment", System.getProperty(MongoNameConstants.IS_PROD));
 		if (System.getProperty(MongoNameConstants.IS_PROD)
