@@ -12,7 +12,6 @@ import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -50,6 +49,7 @@ import analytics.util.dao.OccationCustomeEventDao;
 import analytics.util.dao.TagMetadataDao;
 import analytics.util.dao.TagResponsysActiveDao;
 import analytics.util.dao.TagVariableDao;
+import analytics.util.objects.MemberInfo;
 import analytics.util.objects.Responsys;
 import analytics.util.objects.TagMetadata;
 
@@ -64,6 +64,9 @@ public class ResponsysUtil {
 
 	private static final String UTF8_BOM = "\uFEFF";
 	private TagResponsysActiveDao tagResponsysActiveDao;
+	private static final String validUnownTags = "Top 5% of MSM,Browse,Unknown";
+	
+	ArrayList<TagMetadata> metaDataList = new ArrayList<TagMetadata>();
 
 	public ResponsysUtil() {
 		memberInfoDao = new MemberInfoDao();
@@ -98,7 +101,7 @@ public class ResponsysUtil {
 			LOGGER.debug("WI Response String: " + responseString);
 			InputStream instream = response.getEntity().getContent();
 			jsonRespString = read(instream);
-			LOGGER.info(jsonRespString);	
+			//LOGGER.info(jsonRespString);	
 
 		} catch (IOException e3) {
 			e3.printStackTrace();
@@ -133,7 +136,7 @@ public class ResponsysUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public TagMetadata getResponseServiceResult(String input, String lyl_l_id, LinkedHashSet<TagMetadata> tags, String l_id) throws Exception {
+	public TagMetadata getResponseServiceResult(String input, String lyl_l_id, ArrayList<TagMetadata> inputTags, String l_id, String messageID) throws Exception {
 		LOGGER.info(" Testing - Entering the getResponseServiceResult method");
 		StringBuffer strBuff = new StringBuffer();
 		BufferedReader in = null;
@@ -158,15 +161,17 @@ public class ResponsysUtil {
 			
 			//Determine the winner tag to send to Responsys
 			//TagMetadata winningTag = determineWinningTag(obj,tags);
-			winningTag = determineUnknownWinner(obj,tags);
+			winningTag = determineUnknownWinner(obj,inputTags);
 			
-			if(winningTag== null || !winningTag.getPurchaseOccasion().equalsIgnoreCase("Unknown")){
+			if(winningTag == null || !winningTag.getPurchaseOccasion().equalsIgnoreCase("Unknown")){
 				winningTag = getTagMetaDataInfo(obj);
 			}
 			
 			if(winningTag!=null){
 				//Get the necessary variables for populating in the response xml
-				String eid = memberInfoDao.getMemberInfoEId(l_id);
+				//LOGGER.info("TIME:" + messageID + "- Getting EID -" + System.currentTimeMillis());
+				MemberInfo memberInfo  = memberInfoDao.getMemberInfo(l_id);
+				//LOGGER.info("TIME:" + messageID + "- Got EID -" + System.currentTimeMillis());
 				
 				
 				//TagMetadata tagMetaData = getTagMetaData(tag);
@@ -194,19 +199,20 @@ public class ResponsysUtil {
 						.getProperty(Constants.RESP_URL_PASSWORD));
 				
 				out = new OutputStreamWriter(connection.getOutputStream());
-				LOGGER.debug("After Creating outWriter");
 				
 				//Convert Exponential values to Plain text in the XML
 				String xmlWithoutExpo = removeExponentialFromXml(json2XmlString);
 				
 				//Generate the Custome Xml to be sent to Oracle
-				String customXml = createCustomXml(xmlWithoutExpo,eid,custEventName,winningTag,lyl_l_id);
+				String customXml = createCustomXml(xmlWithoutExpo,memberInfo.getEid(),custEventName,winningTag,lyl_l_id);
 				
 				//BOM = Byte-Order-Mark
 				//Remove the BOM to make the XML valid
 				String xmlWithoutBOM = removeUTF8BOM(customXml);
 				out.write(xmlWithoutBOM);
 				out.close();
+				
+				//LOGGER.info("TIME:" + messageID + "- Sending XML to responsys complete-" + System.currentTimeMillis());
 	
 				in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 				int c;
@@ -216,15 +222,22 @@ public class ResponsysUtil {
 				
 				//Persist info to Mongo after successfully transmission of message to Oracle.
 				LOGGER.info(lyl_l_id+"~~~"+xmlWithoutBOM);
-				occasionResponsesDao.addOccasionResponse(l_id, eid, custEventName, winningTag.getPurchaseOccasion(), winningTag.getBusinessUnit(), winningTag.getSubBusinessUnit(), 
+				occasionResponsesDao.addOccasionResponse(l_id, memberInfo.getEid(), custEventName, winningTag.getPurchaseOccasion(), winningTag.getBusinessUnit(), winningTag.getSubBusinessUnit(), 
 						strBuff.toString().contains("<success>true</success>") ? "Y" : "N", winningTag.getMdTags());
 				
+				//LOGGER.info("TIME:" + messageID + "- Persisting sent data to Mongo -" + System.currentTimeMillis());
+				winningTag.setEmailOptIn(memberInfo.getEmailOptIn());
 				xmlWithoutBOM = null;
 				xmlWithoutExpo = null;
 				json2XmlString = null;
 				obj = null;
 				customXml = null;
 			}
+			//Just Log the message for the Lid ...
+			else{
+				LOGGER.info("No Winning Tag found - Not sending to Responsys for Lid " + lyl_l_id );
+			}
+			
 		} catch (Exception t) {
 			t.printStackTrace();
 			LOGGER.error("Exception occured in getResponseServiceResult ", t);
@@ -619,6 +632,12 @@ public class ResponsysUtil {
 		TagMetadata tagMetaData = null;
 
 		try {
+			
+			//If it gets here, it means that the Responsys is not ready with the Unknown Tags or there is no Unknown tag with % > 95
+			if(((org.json.JSONObject) obj.getJSONArray("scoresInfo").get(0)).has("mdTag") && ((org.json.JSONObject) obj.getJSONArray("scoresInfo").get(0)).has("occassion") &&
+					((org.json.JSONObject)obj.getJSONArray("scoresInfo").get(0)).get("occassion").toString().equalsIgnoreCase("Unknown"))
+				return null;
+			
 			//org.json.JSONObject obj = new org.json.JSONObject(jsonStr);
 			tagMetaData = new TagMetadata();
 			System.out.println(((org.json.JSONObject) obj.getJSONArray("scoresInfo").get(0)).get("occassion"));
@@ -657,14 +676,16 @@ public class ResponsysUtil {
 	}
 
 
-	public LinkedHashSet<TagMetadata> getReadyToProcessTags(ArrayList<TagMetadata> tagsMetaList){
-		LinkedHashSet<TagMetadata> metaDataList = new LinkedHashSet<TagMetadata>();
-		HashMap<String, String> activeTags = tagResponsysActiveDao.getResponsysActiveTagsList();
+	public ArrayList<TagMetadata> getReadyToProcessTags(ArrayList<TagMetadata> tagsMetaList){
+		
+		if(metaDataList.isEmpty()){
+			HashMap<String, String> activeTags = tagResponsysActiveDao.getResponsysActiveTagsList();
 
-		for(TagMetadata tagMeta : tagsMetaList){
-			if( activeTags.get(tagMeta.getFirst5CharMdTag())!= null &&
-					activeTags.get(tagMeta.getFirst5CharMdTag()).contains(tagMeta.getPurchaseOccasion())){
-				metaDataList.add(tagMeta);
+			for(TagMetadata tagMeta : tagsMetaList){
+				if( activeTags.get(tagMeta.getFirst5CharMdTag())!= null &&
+						activeTags.get(tagMeta.getFirst5CharMdTag()).contains(tagMeta.getPurchaseOccasion())){
+					metaDataList.add(tagMeta);
+				}
 			}
 		}
 		return metaDataList;
@@ -752,18 +773,18 @@ public class ResponsysUtil {
 	}
 
 
-	public TagMetadata determineUnknownWinner(org.json.JSONObject obj, LinkedHashSet<TagMetadata> tags){
+	public TagMetadata determineUnknownWinner(org.json.JSONObject obj, ArrayList<TagMetadata> inputTags){
 		TreeMap<Integer, TagMetadata> winnerMap = new TreeMap<Integer, TagMetadata>();
 		TagMetadata winnerTag = null;
+		ArrayList<TagMetadata> readyToProcessTags = new ArrayList<TagMetadata>();
 		try {
 			org.json.JSONArray arr = obj.getJSONArray("scoresInfo");
-			//If the first element in the array is NOT unknown occasion... then get out of this method
-			//and return the first element from the array.
-			if(((org.json.JSONObject)arr.get(0)).has("mdTag") && ((org.json.JSONObject)arr.get(0)).has("occassion") &&
-					!((org.json.JSONObject)arr.get(0)).get("occassion").toString().equalsIgnoreCase("Unknown"))
-				return null;
-
-			getWinnerMap(tags, winnerMap, arr);
+			
+			//Hit the mongo only if it an unknown tag
+			if(validUnownTags.contains(((org.json.JSONObject)arr.get(0)).get("occassion").toString())){
+				readyToProcessTags = getReadyToProcessTags(inputTags);
+				getWinnerMap(readyToProcessTags, winnerMap, arr);
+			}
 
 			//Check if the winning tags are all Unknown tags, pick the one with the percetile of 95%\
 			if(winnerMap.size() > 0){
@@ -780,11 +801,13 @@ public class ResponsysUtil {
 
 		return winnerTag;
 	}
-	private void getWinnerMap(LinkedHashSet<TagMetadata> tags,
+	private void getWinnerMap(ArrayList<TagMetadata> tags,
 			TreeMap<Integer, TagMetadata> winnerMap, org.json.JSONArray arr)
 			throws JSONException {
-		for(TagMetadata tag : tags){
-			for(int i=0; (i< arr.length() || i < 15); i++){
+		
+		for(int i=0; (i< arr.length() || i < 15); i++){
+			for(int j =0 ; j < tags.size(); j++){
+				TagMetadata tag = tags.get(j);
 				if(((org.json.JSONObject)arr.get(i)).has("mdTag") && ((org.json.JSONObject)arr.get(i)).has("occassion") &&
 						((org.json.JSONObject)arr.get(i)).get("mdTag").toString().equalsIgnoreCase(tag.getMdTags())){
 					Integer rank = (Integer) ((org.json.JSONObject)arr.get(i)).get("rank");
@@ -797,6 +820,7 @@ public class ResponsysUtil {
 				}
 			}
 		}
+		
 	}
 
 

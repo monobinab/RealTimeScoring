@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.derby.iapi.services.classfile.CONSTANT_Index_info;
@@ -88,13 +89,14 @@ public class VibesSpout extends BaseRichSpout{
 				
 				Jedis jedis = jedisPool.getResource();
 				String diffTags = null;
-				/*if(jedis.exists("Vibes:"+l_id))
-					diffTags = jedis.get("Vibes:"+l_id).toString() ;
-				jedisPool.returnResource(jedis);
+				Set<String> names=jedis.keys("Vibes:*");
 				
-				while(iter.hasNext()){
-					collector.emit(tuple(iter.next()));
-				}*/
+				Iterator<String> it = names.iterator();
+			    while (it.hasNext()) {
+			        String s = it.next();
+			      
+			    }
+				
 			}
 			//Sleep for 3 mins before starting the next batch
 			Thread.sleep(180000);

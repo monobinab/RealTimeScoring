@@ -16,11 +16,8 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import analytics.exception.RealTimeScoringException;
-import analytics.util.Constants;
 import analytics.util.JsonUtils;
-import analytics.util.MongoNameConstants;
 import analytics.util.ScoringSingleton;
-import analytics.util.dao.MemberScoreDao;
 import analytics.util.objects.Change;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -43,17 +40,11 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	private JedisPool jedisPool;
 	private Jedis jedis;
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private OutputCollector outputCollector;
-//	private MultiCountMetric countMetric;
-	//private String environment;
 	
 	public StrategyScoringBolt(String systemProperty, String host, int port) {
 		super(systemProperty);
-		//environment = systemProperty;
 		this.host = host;
 		this.port = port;
 	}
@@ -67,18 +58,14 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
-	//	System.setProperty(MongoNameConstants.IS_PROD, environment);
-	//	systemPropertySet();
 		LOGGER.info("PREPARING STRATEGY SCORING BOLT");	
-	//     initMetrics(context);
 	  	this.outputCollector = collector;
 		//Configure the Redis Server.
 		if(host!=null && !host.equalsIgnoreCase("")){
 			JedisPoolConfig poolConfig = new JedisPoolConfig();
 	        poolConfig.setMaxActive(100);
 	        jedisPool = new JedisPool(poolConfig,host, port, 100);
-	    //    jedis = jedisPool.getResource();
-	  
+	   
 		}
 		
 	}
@@ -125,7 +112,6 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		Set<Integer> modelIdList = ScoringSingleton.getInstance().getModelIdList(newChangesVarValueMap);
 		if(modelIdList==null||modelIdList.isEmpty()){
 			LOGGER.info("No models affected");
-			//countMetric.scope("no_models_affected").incr();
 			redisCountIncr("no_models_affected");
 			outputCollector.ack(input);
 			return;
@@ -141,7 +127,6 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		}
 		if(memberVariablesMap==null){
 			LOGGER.warn("Unable to find member variables for " + lId);
-			//countMetric.scope("no_member_variables").incr();
 			redisCountIncr("no_member_variables");
 			outputCollector.ack(input);
 			return;
@@ -211,7 +196,6 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 					+ System.currentTimeMillis() + " and the message ID is ..."
 					+ messageID);
 			this.outputCollector.emit("score_stream",listToEmit);
-			//countMetric.scope("model_scored").incr();
 			redisCountIncr("model_scored");
 			} catch (RealTimeScoringException e) {
 				e.printStackTrace();
@@ -230,19 +214,13 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			jedisPool.returnResource(jedis);
 			
 		}
-		//Long timeAfter = System.currentTimeMillis();
-	//	LOGGER.info("~~~~TIME TAKEN FOR REDIS~~~: " +  (timeAfter - timeBefore));
-			
-		
+				
 		// 10) Write changedMemberVariableswith expiry
 		ScoringSingleton.getInstance().updateChangedVariables(lId, allChanges);
 		LOGGER.info("TIME:" + messageID + "-Score updates complete-" + System.currentTimeMillis());
-		
-		//timeBefore = System.currentTimeMillis();
-		// Write changes to changedMemberScores
+	
 		ScoringSingleton.getInstance().updateChangedMemberScore(lId, modelIdList, modelIdToExpiryMap, modelIdScoreMap,source);
-		//timeAfter = System.currentTimeMillis();
-		//LOGGER.info("~~~~~TIME TAKED FOR MONGO~~~: " + (timeAfter - timeBefore) );
+		
 		LOGGER.info("TIME:" + messageID + "- Scoring complete-" + System.currentTimeMillis());
 		
 		List<Object> listToEmit = new ArrayList<Object>();
@@ -250,7 +228,6 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		listToEmit.add(source);
 		listToEmit.add(messageID);
 		this.outputCollector.emit("member_stream", listToEmit);
-		//countMetric.scope("member_scored_successfully").incr();
 		redisCountIncr("member_scored_successfully");
 		if(lyl_id_no!=null){
 			listToEmit = new ArrayList<Object>();
@@ -271,3 +248,5 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	}
 
 }
+
+

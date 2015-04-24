@@ -12,6 +12,7 @@ import analytics.util.dao.MemberInfoDao;
 import analytics.util.dao.TagMetadataDao;
 import analytics.util.dao.TagResponsysActiveDao;
 import analytics.util.dao.TagVariableDao;
+import analytics.util.objects.MemberInfo;
 import analytics.util.objects.Responsys;
 import analytics.util.objects.TagMetadata;
 import backtype.storm.metric.api.MultiCountMetric;
@@ -94,8 +95,8 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 				//preparing the jsonObject with only first model, which satisfied the above conditions
 				o.remove("scoresInfo");
 				o.append("scoresInfo", objToSend);
-				String eid = memberInfoDao.getMemberInfoEId(l_id);
-				
+				MemberInfo memberInfo = memberInfoDao.getMemberInfo(l_id);
+				String eid = memberInfo.getEid();
 				//set the responsys object
 				responsysObj.setLyl_id_no(lyl_id_no);
 				responsysObj.setL_id(l_id);

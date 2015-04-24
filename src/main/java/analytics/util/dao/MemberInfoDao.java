@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.util.MongoNameConstants;
+import analytics.util.objects.MemberInfo;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
@@ -20,17 +21,14 @@ public class MemberInfoDao extends AbstractDao {
 		memberInfoCollection = db.getCollection("memberInfo");
 	}
 
-	public String getMemberInfoEId(String l_id) {
+	public MemberInfo getMemberInfo(String l_id) {
 		BasicDBObject query = new BasicDBObject();
 		query.put(MongoNameConstants.L_ID, l_id);
-		DBCursor cursor = memberInfoCollection.find(query);
-		if (cursor.hasNext()) {
-			DBObject obj = cursor.next();
-			Object eid = obj.get(MongoNameConstants.E_ID);
-			if(eid!=null)					
-				return eid.toString();
-		}
-		return null;
+		DBObject obj = memberInfoCollection.findOne(query);
+		MemberInfo info = new MemberInfo();
+		info.setEid(obj.get(MongoNameConstants.E_ID)==null?null:obj.get(MongoNameConstants.E_ID).toString());
+		info.setEid(obj.get(MongoNameConstants.E_ID)==null?null:obj.get(MongoNameConstants.E_ID).toString());
+		return info;
 	}
 
 }

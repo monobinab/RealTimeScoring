@@ -2,6 +2,8 @@ package analytics.spout;
 
 import static backtype.storm.utils.Utils.tuple;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -29,12 +31,21 @@ public class OccassionRedisSpout extends RedisPubSubSpout{
 		}
 		if (ret != null) {
 		//	System.out.println(ret);
-			_collector.emit(tuple(ret));
+			
+			String messageID = new Double(Math.random()).toString();
+			
+			
+			List<Object> listToEmit = new ArrayList<Object>();
+			listToEmit.add(ret);
+			listToEmit.add(messageID);
+			
+			//_collector.emit(tuple(ret));
+			_collector.emit(listToEmit);
 		}
 	}
 
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("message"));
+		declarer.declare(new Fields("message", "messageID"));
 	}
 
 

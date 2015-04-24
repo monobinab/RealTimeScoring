@@ -11,6 +11,7 @@ public class TagMetadata implements Serializable {
 	private String purchaseOccasion;
 	private String first5CharMdTag;
 	private Double percentile;
+	private String emailOptIn;
 	
 
 	public Double getPercentile() {
@@ -59,5 +60,14 @@ public class TagMetadata implements Serializable {
 
 	public void setPurchaseOccassion(String purchaseOccasion) {
 		this.purchaseOccasion = purchaseOccasion;
+	}
+
+	public void setEmailOptIn(String emailOptIn) {
+		this.emailOptIn = emailOptIn;
+		
+	}
+	
+	public String getEmailOptIn(){
+		return emailOptIn;
 	}
 }

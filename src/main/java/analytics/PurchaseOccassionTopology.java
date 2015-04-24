@@ -55,26 +55,26 @@ public class PurchaseOccassionTopology {
 			
 			topologyBuilder.setBolt("parseOccassionBolt", new ParsingBoltOccassion(System.getProperty(MongoNameConstants.IS_PROD),
 					AuthPropertiesReader.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
-					.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 2)
+					.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 3)
 			.shuffleGrouping("occassionSpout1").shuffleGrouping("occassionSpout2").shuffleGrouping("occassionSpout3");
 
 			
 			topologyBuilder.setBolt(
 					"persistOccasionBolt",
 					new PersistOccasionBolt(System
-							.getProperty(MongoNameConstants.IS_PROD)), 1)
+							.getProperty(MongoNameConstants.IS_PROD)), 3)
 					.shuffleGrouping("parseOccassionBolt");
 			topologyBuilder.setBolt(
 					"strategy_bolt",
 					new StrategyScoringBolt(System
-							.getProperty(MongoNameConstants.IS_PROD)), 1)
+							.getProperty(MongoNameConstants.IS_PROD)), 3)
 					.shuffleGrouping("persistOccasionBolt");
 
 		//Sree. Added the new bolt for Responses
 		topologyBuilder.setBolt("responses_bolt", new ResponseBolt(System
 				.getProperty(MongoNameConstants.IS_PROD), AuthPropertiesReader
 				.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
-				.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 4)
+				.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 12)
 		.shuffleGrouping("strategy_bolt", "response_stream");
 			Config conf = new Config();
 			conf.put("metrics_topology", "PurchaseOccasion");
