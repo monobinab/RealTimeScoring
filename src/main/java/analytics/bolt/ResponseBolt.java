@@ -72,7 +72,7 @@ public class ResponseBolt extends EnvironmentBolt{
 				String scoreInfoJsonString = responsysUtil.callRtsAPI(lyl_id_no);
 				String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no);
 				
-				//LOGGER.info("TIME:" + messageID + "-Calling API complete-" + System.currentTimeMillis());
+				LOGGER.info("TIME:" + messageID + "-Calling API complete-" + System.currentTimeMillis());
 				
 				//4-2-2015.Recent update to send responses only for 1 tag irrespective of 
 				//how many tags we receive in the difference. This occasion tag 
@@ -99,21 +99,23 @@ public class ResponseBolt extends EnvironmentBolt{
 					//Get the metadata info for all the tags
 					ArrayList<TagMetadata> list = responsysUtil.getTagMetaDataList(diffTags);
 					
-					
+					LOGGER.info("TIME:" + messageID + "-Making responsys call-" + System.currentTimeMillis());
 					//if( readyToProcessTags.size()>0){
 						TagMetadata tagMetadata = responsysUtil.getResponseServiceResult(scoreInfoJsonString,lyl_id_no,list,l_id, messageID);
+						LOGGER.info("TIME:" + messageID + "-Completed responsys call-" + System.currentTimeMillis());
 						if(tagMetadata!=null && tagMetadata.getPurchaseOccasion()!=null && tagMetadata.getEmailOptIn()!=null && tagMetadata.getEmailOptIn().equals("N")){
 								jedis = jedisPool.getResource();
 								//TODO: Should we just do a put??
 								jedis.append("Vibes:"+l_id, tagMetadata.getPurchaseOccasion());
 								jedisPool.returnResource(jedis);
-							countMetric.scope("responses").incr();
+							
 						}
+						countMetric.scope("responses").incr();
 					//}
 				}
 
 			}
-			//LOGGER.info("TIME:" + messageID + "-Completed Response bolt-" + System.currentTimeMillis());
+			LOGGER.info("TIME:" + messageID + "-Completed Response bolt-" + System.currentTimeMillis());
 			outputCollector.ack(input);
 			
 		} catch (Exception e) {

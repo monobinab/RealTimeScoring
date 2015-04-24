@@ -28,7 +28,7 @@ public class MemberInfoDao extends AbstractDao {
 			return null;
 		MemberInfo info = new MemberInfo();
 		info.setEid(obj.get(MongoNameConstants.E_ID)==null?null:obj.get(MongoNameConstants.E_ID).toString());
-		info.setEid(obj.get(MongoNameConstants.EMAIL_OPT_IN)==null?null:obj.get(MongoNameConstants.EMAIL_OPT_IN).toString());
+		info.setEmailOptIn(obj.get(MongoNameConstants.EMAIL_OPT_IN)==null?null:obj.get(MongoNameConstants.EMAIL_OPT_IN).toString());
 		return info;
 	}
 
