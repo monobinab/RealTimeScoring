@@ -121,7 +121,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		if (input.contains("messageID")) {
 			messageID = input.getStringByField("messageID");
 		}
-		LOGGER.info("TIME:" + messageID + "-Entering scoring bolt-" + System.currentTimeMillis());
+		//LOGGER.info("TIME:" + messageID + "-Entering scoring bolt-" + System.currentTimeMillis());
 		// 2) Create map of new changes from the input
 		Map<String, String> newChangesVarValueMap = JsonUtils
 				.restoreVariableListFromJson(input.getString(1));
@@ -238,14 +238,14 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		
 		// 10) Write changedMemberVariableswith expiry
 		ScoringSingleton.getInstance().updateChangedVariables(lId, allChanges);
-		LOGGER.info("TIME:" + messageID + "-Score updates complete-" + System.currentTimeMillis());
+		//LOGGER.info("TIME:" + messageID + "-Score updates complete-" + System.currentTimeMillis());
 		
 		timeBefore = System.currentTimeMillis();
 		// Write changes to changedMemberScores
 		ScoringSingleton.getInstance().updateChangedMemberScore(lId, modelIdList, modelIdToExpiryMap, modelIdScoreMap,source);
 		//timeAfter = System.currentTimeMillis();
 	//	LOGGER.info("~~~~~TIME TAKED FOR MONGO~~~: " + (timeAfter - timeBefore) );
-		LOGGER.info("TIME:" + messageID + "- Scoring complete-" + System.currentTimeMillis());
+		//LOGGER.info("TIME:" + messageID + "- Scoring complete-" + System.currentTimeMillis());
 		
 		List<Object> listToEmit = new ArrayList<Object>();
 		listToEmit.add(lId);
