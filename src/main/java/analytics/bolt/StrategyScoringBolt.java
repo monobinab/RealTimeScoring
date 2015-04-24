@@ -257,6 +257,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		if(lyl_id_no!=null){
 			listToEmit = new ArrayList<Object>();
 			listToEmit.add(lyl_id_no);
+			listToEmit.add(messageID);
 			this.outputCollector.emit("response_stream", listToEmit);
 		}
 		
@@ -267,7 +268,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		declarer.declareStream("score_stream",new Fields("l_id", "newScore", "model","source", "messageID", "minExpiry", "maxExpiry"));
 		declarer.declareStream("member_stream", new Fields("l_id", "source","messageID"));
-		declarer.declareStream("response_stream", new Fields("lyl_id_no"));
+		declarer.declareStream("response_stream", new Fields("lyl_id_no","messageID"));
 
 	}
 

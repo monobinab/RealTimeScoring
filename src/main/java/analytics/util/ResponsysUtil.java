@@ -135,7 +135,7 @@ public class ResponsysUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public TagMetadata getResponseServiceResult(String input, String lyl_l_id, ArrayList<TagMetadata> inputTags, String l_id) throws Exception {
+	public TagMetadata getResponseServiceResult(String input, String lyl_l_id, ArrayList<TagMetadata> inputTags, String l_id, String messageID) throws Exception {
 		LOGGER.info(" Testing - Entering the getResponseServiceResult method");
 		StringBuffer strBuff = new StringBuffer();
 		BufferedReader in = null;
@@ -168,7 +168,9 @@ public class ResponsysUtil {
 			
 			if(winningTag!=null){
 				//Get the necessary variables for populating in the response xml
+				//LOGGER.info("TIME:" + messageID + "- Getting EID -" + System.currentTimeMillis());
 				String eid = memberInfoDao.getMemberInfoEId(l_id);
+				//LOGGER.info("TIME:" + messageID + "- Got EID -" + System.currentTimeMillis());
 				
 				
 				//TagMetadata tagMetaData = getTagMetaData(tag);
@@ -196,7 +198,6 @@ public class ResponsysUtil {
 						.getProperty(Constants.RESP_URL_PASSWORD));
 				
 				out = new OutputStreamWriter(connection.getOutputStream());
-				LOGGER.debug("After Creating outWriter");
 				
 				//Convert Exponential values to Plain text in the XML
 				String xmlWithoutExpo = removeExponentialFromXml(json2XmlString);
@@ -209,6 +210,8 @@ public class ResponsysUtil {
 				String xmlWithoutBOM = removeUTF8BOM(customXml);
 				out.write(xmlWithoutBOM);
 				out.close();
+				
+				//LOGGER.info("TIME:" + messageID + "- Sending XML to responsys complete-" + System.currentTimeMillis());
 	
 				in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 				int c;
@@ -220,6 +223,8 @@ public class ResponsysUtil {
 				LOGGER.info(lyl_l_id+"~~~"+xmlWithoutBOM);
 				occasionResponsesDao.addOccasionResponse(l_id, eid, custEventName, winningTag.getPurchaseOccasion(), winningTag.getBusinessUnit(), winningTag.getSubBusinessUnit(), 
 						strBuff.toString().contains("<success>true</success>") ? "Y" : "N", winningTag.getMdTags());
+				
+				//LOGGER.info("TIME:" + messageID + "- Persisting sent data to Mongo -" + System.currentTimeMillis());
 				
 				xmlWithoutBOM = null;
 				xmlWithoutExpo = null;

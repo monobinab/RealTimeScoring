@@ -48,7 +48,13 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 	@Override
 	public void execute(Tuple input) {
 	//	System.out.println("IN PERSIST BOLT: " + input);
-		LOGGER.info("~~~~~~~~~~Incoming tuple in PersistOccasionbolt: " + input);
+		String messageID = "";
+		if (input.contains("messageID")) {
+			messageID = input.getStringByField("messageID");
+		}
+		LOGGER.info("TIME:" + messageID + "-Entering PersistOccasionbolt-" + System.currentTimeMillis());
+		
+		//LOGGER.info("~~~~~~~~~~Incoming tuple in PersistOccasionbolt: " + input);
 		countMetric.scope("incoming_tuples").incr();
 		List<String> tags = new ArrayList<String>();
 		String l_id = input.getString(0);
@@ -73,9 +79,12 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 					listToEmit.add(input.getString(2));
 			    	listToEmit.add(input.getString(3));
 			    	listToEmit.add(input.getString(4));
+			    	listToEmit.add(messageID);
 			    	outputCollector.emit(listToEmit);
 			}
+			//LOGGER.info("TIME:" + messageID + "-Exiting PersistOccasionbolt-" + System.currentTimeMillis());
 			outputCollector.ack(input);
+			
 		} catch (Exception e) {
 			LOGGER.error("Json Exception ", e);
 			countMetric.scope("persist_failed").incr();
@@ -84,7 +93,7 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-			declarer.declare(new Fields("l_id", "lineItemAsJsonString","source","lyl_id_no"));
+			declarer.declare(new Fields("l_id", "lineItemAsJsonString","source","lyl_id_no", "messageID"));
 		}
 
 }

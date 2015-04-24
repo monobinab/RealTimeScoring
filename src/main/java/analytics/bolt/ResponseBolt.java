@@ -75,10 +75,18 @@ public class ResponseBolt extends EnvironmentBolt{
 		
 		try {
 			
+			String messageID = "";
+			if (input.contains("messageID")) {
+				messageID = input.getStringByField("messageID");
+			}
+			LOGGER.info("TIME:" + messageID + "-Entering Response bolt-" + System.currentTimeMillis());
+			
 			if(input != null && input.contains("lyl_id_no")){
 				lyl_id_no = input.getString(0);
 				String scoreInfoJsonString = responsysUtil.callRtsAPI(lyl_id_no);
 				String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no);
+				
+				//LOGGER.info("TIME:" + messageID + "-Calling API complete-" + System.currentTimeMillis());
 				
 				//4-2-2015.Recent update to send responses only for 1 tag irrespective of 
 				//how many tags we receive in the difference. This occasion tag 
@@ -107,7 +115,7 @@ public class ResponseBolt extends EnvironmentBolt{
 					
 					
 					//if( readyToProcessTags.size()>0){
-						TagMetadata tagMetadata = responsysUtil.getResponseServiceResult(scoreInfoJsonString,lyl_id_no,list,l_id);
+						TagMetadata tagMetadata = responsysUtil.getResponseServiceResult(scoreInfoJsonString,lyl_id_no,list,l_id, messageID);
 						if(tagMetadata!=null && tagMetadata.getPurchaseOccasion()!=null){
 							
 							/*jedis = jedisPool.getResource();
@@ -120,6 +128,7 @@ public class ResponseBolt extends EnvironmentBolt{
 				}
 
 			}
+			//LOGGER.info("TIME:" + messageID + "-Completed Response bolt-" + System.currentTimeMillis());
 			outputCollector.ack(input);
 			
 		} catch (Exception e) {

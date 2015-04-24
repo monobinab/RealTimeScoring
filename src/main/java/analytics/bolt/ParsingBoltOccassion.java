@@ -1,4 +1,3 @@
-
 package analytics.bolt;
 
 import java.text.SimpleDateFormat;
@@ -52,36 +51,39 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 	private JedisPool jedisPool;
 	private String host;
 	private int port;
-	
+
 	public ParsingBoltOccassion(String systemProperty, String host, int port) {
 		super(systemProperty);
 		this.host = host;
 		this.port = port;
 	}
-	
-	 void initMetrics(TopologyContext context){
-	     countMetric = new MultiCountMetric();
-	     context.registerMetric("custom_metrics", countMetric, 60);
-	    }
-	 
-	 public void setMemberTagsDao(){
-		 memberTagDao = new MemberMDTagsDao();
-	 }
-	 public void setTagMetadataDao(){
-		 tagMetadataDao = new TagMetadataDao();
-	 }
-	 public void setTagVariableDao(){
-		 tagVariableDao = new TagVariableDao();
-	 }
-		 
-	 public void setModelPercDao(){
-		 modelPercDao = new ModelPercentileDao();
-	 }
 
-	 public ParsingBoltOccassion(String systemProperty){
-		 super(systemProperty);
-		
-	 }
+	void initMetrics(TopologyContext context) {
+		countMetric = new MultiCountMetric();
+		context.registerMetric("custom_metrics", countMetric, 60);
+	}
+
+	public void setMemberTagsDao() {
+		memberTagDao = new MemberMDTagsDao();
+	}
+
+	public void setTagMetadataDao() {
+		tagMetadataDao = new TagMetadataDao();
+	}
+
+	public void setTagVariableDao() {
+		tagVariableDao = new TagVariableDao();
+	}
+
+	public void setModelPercDao() {
+		modelPercDao = new ModelPercentileDao();
+	}
+
+	public ParsingBoltOccassion(String systemProperty) {
+		super(systemProperty);
+
+	}
+
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
@@ -92,151 +94,167 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 		memberTagDao = new MemberMDTagsDao();
 		modelPercDao = new ModelPercentileDao();
 		initMetrics(context);
-		
+
 		JedisPoolConfig poolConfig = new JedisPoolConfig();
-        poolConfig.setMaxActive(100);
-        jedisPool = new JedisPool(poolConfig,host, port, 100);
+		poolConfig.setMaxActive(100);
+		jedisPool = new JedisPool(poolConfig, host, port, 100);
 	}
 
 	@Override
 	public void execute(Tuple input) {
-		//System.out.println("IN PARSING BOLT: " + input);
-		LOGGER.info("~~~~~~~~~~~Incoming tuple in ParsingboltOccasion: " + input);
+		// System.out.println("IN PARSING BOLT: " + input);
+		
+		String messageID = "";
+		if (input.contains("messageID")) {
+			messageID = input.getStringByField("messageID");
+		}
+		LOGGER.info("TIME:" + messageID + "-Entering ParsingboltOccasion-" + System.currentTimeMillis());
+		
+		//LOGGER.info("~~~~~~~~~~~Incoming tuple in ParsingboltOccasion: " + input);
 		countMetric.scope("incoming_tuples").incr();
 		Map<String, String> variableValueTagsMap = new HashMap<String, String>();
 		JsonParser parser = new JsonParser();
-		JsonElement jsonElement= null;
-		try{
-		jsonElement = getParsedJson(input, parser);
-		}
-		catch(Exception e){
+		JsonElement jsonElement = null;
+		try {
+			jsonElement = getParsedJson(input, parser);
+		} catch (Exception e) {
 			LOGGER.error("exception in parsing: " + e);
 		}
 		
-		//Fetch l_id from json
+		// Fetch l_id from json
 		JsonElement lyl_id_no = null;
-		if(jsonElement.getAsJsonObject().get("lyl_id_no") != null){
-		 lyl_id_no = jsonElement.getAsJsonObject().get("lyl_id_no");
-		}
-		else{
+		if (jsonElement.getAsJsonObject().get("lyl_id_no") != null) {
+			lyl_id_no = jsonElement.getAsJsonObject().get("lyl_id_no");
+		} else {
 			LOGGER.error("Invalid incoming json");
 			return;
 		}
-		if (lyl_id_no == null || lyl_id_no.getAsString().length()!=16) {
+		if (lyl_id_no == null || lyl_id_no.getAsString().length() != 16) {
 			countMetric.scope("empty_lid").incr();
 			outputCollector.ack(input);
 			return;
-		} 
+		}
 		String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no.getAsString());
-		//System.out.println(l_id);
-		
-		//Get list of tags from json
+		// System.out.println(l_id);
+
+		// Get list of tags from json
 		StringBuilder tagsString = new StringBuilder();
 		JsonArray tags = null;
 		tags = getTagsFromInput(jsonElement);
-				
+
 		/**
 		 * Sree. Get the Difference in Tags (Input vs Existing)
-		 *//*
-		ArrayList<String> diffTags = findDiffTags(l_id, tags);
-		String diffTagsString = "";
-		if(diffTags!= null && diffTags.size()>0){
-			diffTagsString = getStringFromArray(diffTags); 
-		}*/
-		
+		 */
+		/*
+		 * ArrayList<String> diffTags = findDiffTags(l_id, tags); String
+		 * diffTagsString = ""; if(diffTags!= null && diffTags.size()>0){
+		 * diffTagsString = getStringFromArray(diffTags); }
+		 */
+
 		/**
 		 * 4-21-2015. Sree. Get all tags from input and put it on Redis
 		 */
 		String diffTagsString = "";
-		if(tags.size()>0){
-			for(int i=0; i< tags.size(); i++){
-				diffTagsString= diffTagsString + tags.get(i).getAsString()+",";
+		if (tags.size() > 0) {
+			for (int i = 0; i < tags.size(); i++) {
+				diffTagsString = diffTagsString + tags.get(i).getAsString()
+						+ ",";
 			}
-			diffTagsString = diffTagsString.substring(0,diffTagsString.length()-1);
+			diffTagsString = diffTagsString.substring(0,
+					diffTagsString.length() - 1);
 		}
 
-		//System.out.println(l_id +" ---- " +diffTagsString);
+		// System.out.println(l_id +" ---- " +diffTagsString);
 		Jedis jedis = jedisPool.getResource();
-		jedis.set("Responses:"+l_id, diffTagsString);
-		jedis.expire("Responses:"+l_id, 300);
+		jedis.set("Responses:" + l_id, diffTagsString);
+		jedis.expire("Responses:" + l_id, 300);
 		jedisPool.returnResource(jedis);
-		
-		//Changes for adding the difference tags ends here.
-		
-		//reset the variableValueMap to 0 before persisting new incoming tags
+
+		// Changes for adding the difference tags ends here.
+
+		// reset the variableValueMap to 0 before persisting new incoming tags
 		resetVariableValuesMap(variableValueTagsMap, l_id);
-			
-		//List<Object> emitToPersist = new ArrayList<Object>();
+
+		// List<Object> emitToPersist = new ArrayList<Object>();
 		persistTagsToMemberTagsColl(l_id, tagsString, tags);
-		//emitToPersist.add(l_id);
-		//emitToPersist.add(tagsString.toString());
-		//this.outputCollector.emit("persist_stream", emitToPersist);
+		// emitToPersist.add(l_id);
+		// emitToPersist.add(tagsString.toString());
+		// this.outputCollector.emit("persist_stream", emitToPersist);
 		LOGGER.debug("Scoring for " + l_id);
-			
+
 		if (tags != null && tags.size() != 0) {
 			for (JsonElement tag : tags) {
 				TagMetadata tagMetaData = getTagMetaData(tag);
-				if (tagMetaData != null) {//TODO: Add list of tagMetadatas you can process. Egh- ignore unwanted
-							
+				if (tagMetaData != null) {// TODO: Add list of tagMetadatas you
+											// can process. Egh- ignore unwanted
+
 					Map<String, String> tagVariable = getTagVariable(tag);
-					String tagVariableValue = getTagVarValue(tagVariable.get(tagVariable.keySet().iterator().next()));
-					
-					if(tagVariable!=null && tagVariableValue!=null &&!tagVariable.isEmpty() && 
-							(!(tag.toString().charAt(6) == '0') && !(tag.toString().charAt(6) == '7') && !(tag.toString().charAt(6) == '8')) )
-					{
+					String tagVariableValue = getTagVarValue(tagVariable
+							.get(tagVariable.keySet().iterator().next()));
+
+					if (tagVariable != null
+							&& tagVariableValue != null
+							&& !tagVariable.isEmpty()
+							&& (!(tag.toString().charAt(6) == '0')
+									&& !(tag.toString().charAt(6) == '7') && !(tag
+									.toString().charAt(6) == '8'))) {
 						populateVariableValueTagsMap(variableValueTagsMap,
-								tagVariableValue, tagVariable.keySet().iterator().next());
+								tagVariableValue, tagVariable.keySet()
+										.iterator().next());
 						countMetric.scope("tag_variable_added").incr();
-					}
-					else{
+					} else {
 						countMetric.scope("no_tag_variable").incr();
 					}
-				}
-				else{
+				} else {
 					countMetric.scope("unwanted_tag_metadata").incr();
 				}
 			}
-		} 
-		//Even if there are no new tags and the list is null, we need to process the deletes
-		if(variableValueTagsMap!=null && !variableValueTagsMap.isEmpty())
-		{
-			List<Object> listToEmit = new ArrayList<Object>();
-	    	listToEmit.add(l_id);
-	    	listToEmit.add(tagsString.toString());
-	    	listToEmit.add(JsonUtils.createJsonFromStringStringMap(variableValueTagsMap));
-	    	listToEmit.add("PurchaseOccasion");
-	    	listToEmit.add(lyl_id_no.getAsString());
-	    	countMetric.scope("emitted_to_scoring").incr();
-	    	this.outputCollector.emit(listToEmit);
 		}
-		else{
+		// Even if there are no new tags and the list is null, we need to
+		// process the deletes
+		if (variableValueTagsMap != null && !variableValueTagsMap.isEmpty()) {
+			List<Object> listToEmit = new ArrayList<Object>();
+			listToEmit.add(l_id);
+			listToEmit.add(tagsString.toString());
+			listToEmit.add(JsonUtils
+					.createJsonFromStringStringMap(variableValueTagsMap));
+			listToEmit.add("PurchaseOccasion");
+			listToEmit.add(lyl_id_no.getAsString());
+			listToEmit.add(messageID);
+			countMetric.scope("emitted_to_scoring").incr();
+			this.outputCollector.emit(listToEmit);
+		} else {
 			List<Object> listToEmit = new ArrayList<Object>();
 			listToEmit.add(l_id);
 			listToEmit.add(tagsString.toString());
 			listToEmit.add("");
 			listToEmit.add("");
 			listToEmit.add("");
+			listToEmit.add(messageID);
 			this.outputCollector.emit(listToEmit);
-	    	countMetric.scope("no_variables_affected").incr();			
+			countMetric.scope("no_variables_affected").incr();
 		}
-    	outputCollector.ack(input);
+		//LOGGER.info("TIME:" + messageID + "-Exiting ParsingboltOccasion-" + System.currentTimeMillis());
+		outputCollector.ack(input);
 	}
 
 	/**
 	 * Sree.
+	 * 
 	 * @param diffTags
 	 * @return comma separated string with the elements in the arraylist.
 	 */
 	private String getStringFromArray(ArrayList<String> diffTags) {
 		StringBuilder string = new StringBuilder();
-		for(Object str:diffTags){
+		for (Object str : diffTags) {
 			string.append(str.toString());
 			string.append(",");
 		}
-		return (string.toString().substring(0, string.toString().length()-1));
+		return (string.toString().substring(0, string.toString().length() - 1));
 	}
 
-	public JsonElement getParsedJson(Tuple input, JsonParser parser) throws JsonSyntaxException{
+	public JsonElement getParsedJson(Tuple input, JsonParser parser)
+			throws JsonSyntaxException {
 		JsonElement jsonElement = parser.parse(input
 				.getStringByField("message"));
 		return jsonElement;
@@ -260,64 +278,67 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 	}
 
 	public String getTagVarValue(String modelId) {
-		String tagVariableValue = modelPercDao.getSingleModelPercentile(modelId);
-				
+		String tagVariableValue = modelPercDao
+				.getSingleModelPercentile(modelId);
+
 		return tagVariableValue;
 	}
 
 	public TagMetadata getTagMetaData(JsonElement tag) {
-		TagMetadata tagMetaData = tagMetadataDao.getDetails(tag
-				.getAsString());
+		TagMetadata tagMetaData = tagMetadataDao.getDetails(tag.getAsString());
 		return tagMetaData;
 	}
 
 	public void persistTagsToMemberTagsColl(String l_id,
 			StringBuilder tagsString, JsonArray tags) {
-		for(int i=0; i<tags.size(); i++){
+		for (int i = 0; i < tags.size(); i++) {
 			tagsString.append(tags.get(i).getAsString());
-			if(i != tags.size()-1)
+			if (i != tags.size() - 1)
 				tagsString.append(",");
 		}
-		//return tagsString.toString();
+		// return tagsString.toString();
 	}
 
 	public void resetVariableValuesMap(
 			Map<String, String> variableValueTagsMap, String l_id) {
-		//Reset all variables to 0
-				List<String> memberTags = memberTagDao.getMemberMDTagsForVariables(l_id);
-				if(memberTags != null){
-				List<String> tagVarList= tagVariableDao.getTagVariablesList(memberTags);
-				if(!tagVarList.isEmpty()){
-					for(String var:tagVarList){
-						variableValueTagsMap.put(var, "0");
-					}
+		// Reset all variables to 0
+		List<String> memberTags = memberTagDao
+				.getMemberMDTagsForVariables(l_id);
+		if (memberTags != null) {
+			List<String> tagVarList = tagVariableDao
+					.getTagVariablesList(memberTags);
+			if (!tagVarList.isEmpty()) {
+				for (String var : tagVarList) {
+					variableValueTagsMap.put(var, "0");
 				}
-				}
+			}
+		}
 	}
-	
-	
+
 	/**
-	 * Get the Difference between the Input Tags and the Already existing Tags in the DB
+	 * Get the Difference between the Input Tags and the Already existing Tags
+	 * in the DB
+	 * 
 	 * @param l_id
 	 * @param newTags
 	 * @return List of only new tags...
 	 */
-	public ArrayList<String> findDiffTags(String l_id, JsonArray newTags){
+	public ArrayList<String> findDiffTags(String l_id, JsonArray newTags) {
 		List<String> memberTags = memberTagDao.getMemberMDTags(l_id);
-		
-		ArrayList<String> diffTags= new ArrayList<String>();
-		for(int i=0; i < newTags.size(); i++){
-			if(memberTags == null || !memberTags.contains(newTags.get(i).getAsString()))
+
+		ArrayList<String> diffTags = new ArrayList<String>();
+		for (int i = 0; i < newTags.size(); i++) {
+			if (memberTags == null
+					|| !memberTags.contains(newTags.get(i).getAsString()))
 				diffTags.add(newTags.get(i).getAsString());
 		}
 		return diffTags;
 	}
-	
-	
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("l_id", "tags", "lineItemAsJsonString","source","lyl_id_no"));
+		declarer.declare(new Fields("l_id", "tags", "lineItemAsJsonString",
+				"source", "lyl_id_no", "messageID"));
 	}
 
 }

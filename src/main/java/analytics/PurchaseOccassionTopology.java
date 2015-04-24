@@ -74,7 +74,7 @@ public class PurchaseOccassionTopology {
 		topologyBuilder.setBolt("responses_bolt", new ResponseBolt(System
 				.getProperty(MongoNameConstants.IS_PROD), AuthPropertiesReader
 				.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
-				.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 6)
+				.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 12)
 		.shuffleGrouping("strategy_bolt", "response_stream");
 			Config conf = new Config();
 			conf.put("metrics_topology", "PurchaseOccasion");
