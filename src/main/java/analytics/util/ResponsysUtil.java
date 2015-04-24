@@ -12,7 +12,6 @@ import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -65,6 +64,8 @@ public class ResponsysUtil {
 	private static final String UTF8_BOM = "\uFEFF";
 	private TagResponsysActiveDao tagResponsysActiveDao;
 	private static final String validUnownTags = "Top 5% of MSM,Browse,Unknown";
+	
+	ArrayList<TagMetadata> metaDataList = new ArrayList<TagMetadata>();
 
 	public ResponsysUtil() {
 		memberInfoDao = new MemberInfoDao();
@@ -670,13 +671,15 @@ public class ResponsysUtil {
 
 
 	public ArrayList<TagMetadata> getReadyToProcessTags(ArrayList<TagMetadata> tagsMetaList){
-		ArrayList<TagMetadata> metaDataList = new ArrayList<TagMetadata>();
-		HashMap<String, String> activeTags = tagResponsysActiveDao.getResponsysActiveTagsList();
+		
+		if(metaDataList.isEmpty()){
+			HashMap<String, String> activeTags = tagResponsysActiveDao.getResponsysActiveTagsList();
 
-		for(TagMetadata tagMeta : tagsMetaList){
-			if( activeTags.get(tagMeta.getFirst5CharMdTag())!= null &&
-					activeTags.get(tagMeta.getFirst5CharMdTag()).contains(tagMeta.getPurchaseOccasion())){
-				metaDataList.add(tagMeta);
+			for(TagMetadata tagMeta : tagsMetaList){
+				if( activeTags.get(tagMeta.getFirst5CharMdTag())!= null &&
+						activeTags.get(tagMeta.getFirst5CharMdTag()).contains(tagMeta.getPurchaseOccasion())){
+					metaDataList.add(tagMeta);
+				}
 			}
 		}
 		return metaDataList;
