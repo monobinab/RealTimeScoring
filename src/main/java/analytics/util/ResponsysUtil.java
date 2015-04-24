@@ -64,6 +64,7 @@ public class ResponsysUtil {
 
 	private static final String UTF8_BOM = "\uFEFF";
 	private TagResponsysActiveDao tagResponsysActiveDao;
+	private static final String validUnownTags = "Top 5% of MSM,Browse,Unknown";
 
 	public ResponsysUtil() {
 		memberInfoDao = new MemberInfoDao();
@@ -225,9 +226,11 @@ public class ResponsysUtil {
 				obj = null;
 				customXml = null;
 			}
+			//Just Log the message for the Lid ...
 			else{
 				LOGGER.info("No Winning Tag found - Not sending to Responsys for Lid " + lyl_l_id );
 			}
+			
 		} catch (Exception t) {
 			t.printStackTrace();
 			LOGGER.error("Exception occured in getResponseServiceResult ", t);
@@ -764,19 +767,13 @@ public class ResponsysUtil {
 	public TagMetadata determineUnknownWinner(org.json.JSONObject obj, ArrayList<TagMetadata> inputTags){
 		TreeMap<Integer, TagMetadata> winnerMap = new TreeMap<Integer, TagMetadata>();
 		TagMetadata winnerTag = null;
+		ArrayList<TagMetadata> readyToProcessTags = new ArrayList<TagMetadata>();
 		try {
 			org.json.JSONArray arr = obj.getJSONArray("scoresInfo");
 			
-			//Check if Occasions are ready for Reponsys Team to process
-			ArrayList<TagMetadata> readyToProcessTags = getReadyToProcessTags(inputTags);
-			
-			if(readyToProcessTags!=null && readyToProcessTags.size()>0){
-				//If the first element in the array is NOT unknown occasion... then get out of this method
-				//and return the first element from the array.
-				if(((org.json.JSONObject)arr.get(0)).has("mdTag") && ((org.json.JSONObject)arr.get(0)).has("occassion") &&
-						!((org.json.JSONObject)arr.get(0)).get("occassion").toString().equalsIgnoreCase("Unknown"))
-					return null;
-	
+			//Hit the mongo only if it an unknown tag
+			if(validUnownTags.contains(((org.json.JSONObject)arr.get(0)).get("occassion").toString())){
+				readyToProcessTags = getReadyToProcessTags(inputTags);
 				getWinnerMap(readyToProcessTags, winnerMap, arr);
 			}
 
@@ -801,7 +798,7 @@ public class ResponsysUtil {
 		
 		for(int i=0; (i< arr.length() || i < 15); i++){
 			for(int j =0 ; j < tags.size(); j++){
-				TagMetadata tag = tags.iterator().next();
+				TagMetadata tag = tags.get(j);
 				if(((org.json.JSONObject)arr.get(i)).has("mdTag") && ((org.json.JSONObject)arr.get(i)).has("occassion") &&
 						((org.json.JSONObject)arr.get(i)).get("mdTag").toString().equalsIgnoreCase(tag.getMdTags())){
 					Integer rank = (Integer) ((org.json.JSONObject)arr.get(i)).get("rank");
