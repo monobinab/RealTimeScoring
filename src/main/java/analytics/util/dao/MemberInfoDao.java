@@ -8,7 +8,6 @@ import analytics.util.objects.MemberInfo;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
 public class MemberInfoDao extends AbstractDao {
