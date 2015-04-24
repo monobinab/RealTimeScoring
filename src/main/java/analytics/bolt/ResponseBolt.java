@@ -30,16 +30,10 @@ public class ResponseBolt extends EnvironmentBolt{
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ResponseBolt.class);
-	private MultiCountMetric countMetric;
 	private OutputCollector outputCollector;
-	private static final String UTF8_BOM = "\uFEFF";
 	private String host;
 	private int port;
 	private JedisPool jedisPool;
-	private TagMetadataDao tagMetadataDao;
-	private TagResponsysActiveDao tagResponsysActiveDao;
-	private OccationCustomeEventDao occationCustomeEventDao;
-	private OccasionResponsesDao occasionResponsesDao;
 	private ResponsysUtil responsysUtil;
 	
 	public ResponseBolt(String systemProperty, String host, int port) {
@@ -52,7 +46,6 @@ public class ResponseBolt extends EnvironmentBolt{
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
-		initMetrics(context);
 		responsysUtil = new ResponsysUtil();
 		this.outputCollector = collector;
 		
@@ -60,12 +53,7 @@ public class ResponseBolt extends EnvironmentBolt{
         poolConfig.setMaxActive(100);
         jedisPool = new JedisPool(poolConfig,host, port, 100);
 	}
-	void initMetrics(TopologyContext context){
-	     countMetric = new MultiCountMetric();
-	     context.registerMetric("custom_metrics", countMetric, 60);
-	    }
-
-
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public void execute(Tuple input) {
