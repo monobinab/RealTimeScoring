@@ -41,7 +41,6 @@ public class FlumeRPCBolt extends EnvironmentBolt {
 	private OutputCollector collector;
 	private RpcClient client;
 	private MemberScoreDao memberScoreDao;
-	private MultiCountMetric countMetric;
 	
 	public FlumeRPCBolt(String systemProperty){
 		 super(systemProperty);
@@ -50,7 +49,7 @@ public class FlumeRPCBolt extends EnvironmentBolt {
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
 			String isProd = System.getProperty(MongoNameConstants.IS_PROD);
-		initMetrics(context);
+	
 		memberScoreDao = new MemberScoreDao();
 		String[] hostArray = new String[1];
 		this.collector = collector;
@@ -85,13 +84,6 @@ public class FlumeRPCBolt extends EnvironmentBolt {
 		this.client = RpcClientFactory.getInstance(sinkProperties);
 		
 	}
-	
-    
-
- void initMetrics(TopologyContext context){
-     countMetric = new MultiCountMetric();
-     context.registerMetric("custom_metrics", countMetric, Constants.METRICS_INTERVAL);
-    }
 
 	@Override
 	public void execute(Tuple input) {

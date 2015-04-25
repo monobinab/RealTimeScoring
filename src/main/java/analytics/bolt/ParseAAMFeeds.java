@@ -38,8 +38,7 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 	protected String sourceTopic;
 	protected MemberUUIDDao memberDao;
 	protected ModelVariablesDao modelVariablesDao;
-	protected MultiCountMetric countMetric;
-		
+			
     public ParseAAMFeeds() {
 	}
 
