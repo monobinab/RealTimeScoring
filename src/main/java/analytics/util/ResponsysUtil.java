@@ -169,7 +169,7 @@ public class ResponsysUtil {
 			
 			if(winningTag!=null){
 				//Get the necessary variables for populating in the response xml
-				//LOGGER.info("TIME:" + messageID + "- Getting EID -" + System.currentTimeMillis());
+				LOGGER.info("TIME:" + messageID + "- Getting EID -" + System.currentTimeMillis());
 				MemberInfo memberInfo  = memberInfoDao.getMemberInfo(l_id);
 				//LOGGER.info("TIME:" + messageID + "- Got EID -" + System.currentTimeMillis());
 				
@@ -212,7 +212,7 @@ public class ResponsysUtil {
 				out.write(xmlWithoutBOM);
 				out.close();
 				
-				//LOGGER.info("TIME:" + messageID + "- Sending XML to responsys complete-" + System.currentTimeMillis());
+				LOGGER.info("TIME:" + messageID + "- Sending XML to responsys complete-" + System.currentTimeMillis());
 	
 				in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 				int c;
@@ -225,7 +225,7 @@ public class ResponsysUtil {
 				occasionResponsesDao.addOccasionResponse(l_id, memberInfo.getEid(), custEventName, winningTag.getPurchaseOccasion(), winningTag.getBusinessUnit(), winningTag.getSubBusinessUnit(), 
 						strBuff.toString().contains("<success>true</success>") ? "Y" : "N", winningTag.getMdTags());
 				
-				//LOGGER.info("TIME:" + messageID + "- Persisting sent data to Mongo -" + System.currentTimeMillis());
+				LOGGER.info("TIME:" + messageID + "- Persisting sent data to Mongo -" + System.currentTimeMillis());
 				winningTag.setEmailOptIn(memberInfo.getEmailOptIn());
 				xmlWithoutBOM = null;
 				xmlWithoutExpo = null;

@@ -136,6 +136,7 @@ public class MongoNameConstants {
 
      //Member Info Collection
      public static final String E_ID = "eid";
+     public static final String EMAIL_OPT_IN = "eml_opt_in";
      
      //Occasion Custome Event Collection
      public static final String OCCASION = "occasion";
