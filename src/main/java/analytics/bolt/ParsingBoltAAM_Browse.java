@@ -67,7 +67,9 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 		memberBoostsDao = new MemberBoostsDao();
 		
 		//populate divLnBoostvariablesMap & Boost list
-		divLnBoostVariblesMap = divLnVariableDao.getDivLnVariable();
+		divLnBoostVariblesMap = divLnVariableDao.getDivLnBoostVariable();
+		System.out.println(divLnBoostVariblesMap);
+		
 		boostList = new ArrayList<String>();
 		List<Variable> variableList = variableDao.getVariables();
 		boostMap = new HashMap<String, Variable>();

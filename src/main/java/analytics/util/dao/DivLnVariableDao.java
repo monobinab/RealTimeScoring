@@ -17,9 +17,11 @@ public class DivLnVariableDao extends AbstractDao{
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(DivLnVariableDao.class);
     DBCollection divLnVariableCollection;
+    DBCollection divLnBoostCollection;
     public DivLnVariableDao(){
     	super();
 		divLnVariableCollection = db.getCollection("divLnVariable");
+		divLnBoostCollection = db.getCollection("divLnBoost");
     }
     public HashMap<String, List<String>> getDivLnVariable(){
     	HashMap<String, List<String>> divLnVariablesMap = new HashMap<String, List<String>>();
@@ -39,5 +41,25 @@ public class DivLnVariableDao extends AbstractDao{
             }
         }
     	return divLnVariablesMap;
+    }
+    
+    public HashMap<String, List<String>> getDivLnBoostVariable(){
+    	HashMap<String, List<String>> divLnBoostVariablesMap = new HashMap<String, List<String>>();
+    	DBCursor divLnVarCursor = divLnBoostCollection.find();
+    	for(DBObject divLnDBObject: divLnVarCursor) {
+            if (divLnBoostVariablesMap.get(divLnDBObject.get(MongoNameConstants.DLV_DIV)) == null)
+            {
+                List<String> varColl = new ArrayList<String>();
+                varColl.add(divLnDBObject.get(MongoNameConstants.DLB_BOOST).toString());
+                divLnBoostVariablesMap.put(divLnDBObject.get(MongoNameConstants.DLV_DIV).toString(), varColl);
+            }
+            else
+            {
+                List<String> varColl = divLnBoostVariablesMap.get(divLnDBObject.get(MongoNameConstants.DLV_DIV).toString());
+                varColl.add(divLnDBObject.get(MongoNameConstants.DLB_BOOST).toString().toUpperCase());
+                divLnBoostVariablesMap.put(divLnDBObject.get(MongoNameConstants.DLV_DIV).toString(), varColl);
+            }
+        }
+    	return divLnBoostVariablesMap;
     }
 }

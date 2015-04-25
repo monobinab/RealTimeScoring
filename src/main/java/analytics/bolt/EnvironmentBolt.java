@@ -31,7 +31,7 @@ public class EnvironmentBolt extends BaseRichBolt {
 	
 	public void redisCountIncr(String scope){
 		countMetric.scope(scope).incr();
-		LOGGER.info("~~~~in redisCoutnIncr of Environment bolt~~");
+		LOGGER.info("~~~~in redisCountIncr of Environment bolt~~");
 	}
 
 	@Override

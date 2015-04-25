@@ -30,7 +30,7 @@ public class AAM_BrowseTopology {
 			System.out
 					.println("Please pass the environment variable argument- 'PROD' or 'QA' or 'LOCAL'");
 			System.exit(0);
-		} else {
+		} 
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 
 		String topic = TopicConstants.AAM_BROWSE_PRODUCTS;
@@ -58,10 +58,8 @@ public class AAM_BrowseTopology {
 
 		Config conf = new Config();
 		conf.put("metrics_topology", "Product_Browse");
-		conf.registerMetricsConsumer(MetricsListener.class, 3);
+		conf.registerMetricsConsumer(MetricsListener.class, System.getProperty(MongoNameConstants.IS_PROD), 3);
 		conf.setMaxSpoutPending(30);
-		//stormconf is set with system's property as MetricsListener needs it
-		conf.put("topology_environment", System.getProperty(MongoNameConstants.IS_PROD));
 		if (System.getProperty(MongoNameConstants.IS_PROD)
 				.equalsIgnoreCase("PROD")
 				|| System.getProperty(MongoNameConstants.IS_PROD)
@@ -87,6 +85,5 @@ public class AAM_BrowseTopology {
 			}
 			cluster.shutdown();
 		}
-	}
 	}
 }
