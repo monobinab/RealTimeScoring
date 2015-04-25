@@ -111,7 +111,6 @@ public class ResponseBolt extends EnvironmentBolt{
 							
 						}
 							countMetric.scope("responses").incr();
-					//}
 				}
 
 			}

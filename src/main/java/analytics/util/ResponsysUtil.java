@@ -171,7 +171,7 @@ public class ResponsysUtil {
 				//Get the necessary variables for populating in the response xml
 				LOGGER.info("TIME:" + messageID + "- Getting EID -" + System.currentTimeMillis());
 				MemberInfo memberInfo  = memberInfoDao.getMemberInfo(l_id);
-				//LOGGER.info("TIME:" + messageID + "- Got EID -" + System.currentTimeMillis());
+				LOGGER.info("TIME:" + messageID + "- Got EID -" + System.currentTimeMillis());
 				
 				
 				//TagMetadata tagMetaData = getTagMetaData(tag);
