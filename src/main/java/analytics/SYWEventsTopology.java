@@ -64,12 +64,10 @@ public class SYWEventsTopology {
 		if(System.getProperty(MongoNameConstants.IS_PROD).equals("PROD")){
 		topologyBuilder.setBolt("flumeLoggingBolt", new FlumeRPCBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
 		}	
-		topologyBuilder.setBolt("responsysBolt", new ResponsysUnknownCallsBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
 		//topologyBuilder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
 		//topologyBuilder.setBolt("memberPublishBolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 2).shuffleGrouping("strategyScoringBolt", "member_stream");
 		Config conf = new Config();
 		conf.put("metrics_topology", "Syw");
-		conf.put("topology_environment", System.getProperty(MongoNameConstants.IS_PROD));
 	    conf.registerMetricsConsumer(MetricsListener.class, 3);
 	
 	    if (System.getProperty(MongoNameConstants.IS_PROD)
