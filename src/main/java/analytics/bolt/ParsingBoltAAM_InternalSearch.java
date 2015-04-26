@@ -17,9 +17,6 @@ import org.codehaus.jettison.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import analytics.util.HostPortUtility;
-import analytics.util.MongoNameConstants;
-import analytics.util.dao.DivLnBoostDao;
 import analytics.util.dao.DivLnVariableDao;
 import analytics.util.dao.PidDivLnDao;
 import analytics.util.objects.DivLn;
@@ -54,13 +51,6 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see backtype.storm.task.IBolt#prepare(java.util.Map,
-	 * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
-	 */
-	//	HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
 		divLnVariableDao = new DivLnVariableDao();
 		pidDivLnDao = new PidDivLnDao();
 		sourceTopic = "InternalSearch";

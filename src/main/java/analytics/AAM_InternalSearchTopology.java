@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 
 import analytics.bolt.ParsingBoltAAM_InternalSearch;
 import analytics.bolt.StrategyScoringBolt;
-import analytics.spout.AAMRedisPubSubSpout;
 import analytics.spout.WebHDFSSpout;
 import analytics.util.Constants;
 import analytics.util.MetricsListener;
@@ -31,10 +30,8 @@ public static void main(String[] args) {
 			System.out
 					.println("Please pass the environment variable argument- 'PROD' or 'QA' or 'LOCAL'");
 			System.exit(0);
-		} else {
-		String topic = TopicConstants.AAM_CDF_INTERNALSEARCH;
-		int port = TopicConstants.PORT;
-
+		} 
+		
 		//RedisConnection redisConnection = new RedisConnection();
 		String[] servers = RedisConnection.getServers("PROD");
 
@@ -48,9 +45,8 @@ public static void main(String[] args) {
 				.shuffleGrouping("ParsingBoltAAM_InternalSearch");
 		Config conf = new Config();
 		conf.put("metrics_topology", "InternalSearch");
-		//stormconf is set with system's property as MetricsListener needs it
-		conf.put("topology_environment", System.getProperty(MongoNameConstants.IS_PROD));
-		conf.registerMetricsConsumer(MetricsListener.class, 3);
+		
+		conf.registerMetricsConsumer(MetricsListener.class, System.getProperty(MongoNameConstants.IS_PROD), 3);
 		if (System.getProperty(MongoNameConstants.IS_PROD)
 				.equalsIgnoreCase("PROD")
 				|| System.getProperty(MongoNameConstants.IS_PROD)
@@ -79,4 +75,4 @@ public static void main(String[] args) {
 			}
 		}
 	}
-}
+
