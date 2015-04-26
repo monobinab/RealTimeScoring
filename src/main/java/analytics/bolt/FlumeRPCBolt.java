@@ -14,15 +14,11 @@ import org.apache.flume.event.EventBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.util.Constants;
-import analytics.util.MongoNameConstants;
 import analytics.util.RedisConnection;
 import analytics.util.dao.MemberScoreDao;
-import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
 
 /**
@@ -44,12 +40,11 @@ public class FlumeRPCBolt extends EnvironmentBolt {
 	
 	public FlumeRPCBolt(String systemProperty){
 		 super(systemProperty);
-		 }
+	 }
+	
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
-			String isProd = System.getProperty(MongoNameConstants.IS_PROD);
-	
 		memberScoreDao = new MemberScoreDao();
 		String[] hostArray = new String[1];
 		this.collector = collector;
@@ -87,7 +82,8 @@ public class FlumeRPCBolt extends EnvironmentBolt {
 
 	@Override
 	public void execute(Tuple input) {
-		countMetric.scope("incoming_tuples").incr();
+		//countMetric.scope("incoming_tuples").incr();
+		redisCountIncr("incoming_tuples");
 		// System.out.println(" %%% scorepublishbolt :" + input);
 		String l_id = input.getStringByField("l_id");
 		String modelId = input.getStringByField("model");
@@ -118,7 +114,8 @@ public class FlumeRPCBolt extends EnvironmentBolt {
 		} catch(NullPointerException e){
 			e.printStackTrace();
 		}
-		countMetric.scope("score_logged").incr();
+		//countMetric.scope("score_logged").incr();
+		redisCountIncr("score_logged");
 		this.collector.ack(input);	
 	}
 
