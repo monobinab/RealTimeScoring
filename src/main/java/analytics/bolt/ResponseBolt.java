@@ -106,7 +106,7 @@ public class ResponseBolt extends EnvironmentBolt{
 						if(tagMetadata!=null && tagMetadata.getPurchaseOccasion()!=null && tagMetadata.getEmailOptIn()!=null && tagMetadata.getEmailOptIn().equals("N")){
 								jedis = jedisPool.getResource();
 								//TODO: Should we just do a put??
-								jedis.append("Vibes:"+l_id, tagMetadata.getPurchaseOccasion());
+								jedis.append("Vibes:"+lyl_id_no, tagMetadata.getPurchaseOccasion());
 								jedisPool.returnResource(jedis);
 							
 						}

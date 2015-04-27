@@ -1,35 +1,19 @@
 package analytics.spout;
 
-import static backtype.storm.utils.Utils.tuple;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
-import org.apache.derby.iapi.services.classfile.CONSTANT_Index_info;
-import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.mongodb.DBObject;
-
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
-import analytics.util.Constants;
-import analytics.util.HttpClientUtils;
 import analytics.util.MongoNameConstants;
-import analytics.util.dao.MemberMDTagsDao;
 import analytics.util.dao.VibesDao;
+import analytics.util.objects.Vibes;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -43,12 +27,10 @@ public class VibesSpout extends BaseRichSpout{
 	private VibesDao vibesDao;
 	private String host;
 	private int port;
-	private JedisPool jedisPool;
 
     private SpoutOutputCollector collector;
 	
 	public VibesSpout(String systemProperty, String redisServer, Integer redisPort) {
-			LOGGER.info("~~~~~~~~~~~~~~~ENVIRONMENT BOLT~~~~~~~: " + System.getProperty(MongoNameConstants.IS_PROD));
 			System.setProperty(MongoNameConstants.IS_PROD, systemProperty);
 			this.host = redisServer;
 			this.port = redisPort;
@@ -63,14 +45,11 @@ public class VibesSpout extends BaseRichSpout{
 			SpoutOutputCollector collector) {
 		this.collector = collector;
 		vibesDao = new VibesDao();
-		JedisPoolConfig poolConfig = new JedisPoolConfig();
-        poolConfig.setMaxActive(100);
-        jedisPool = new JedisPool(poolConfig,host, port, 100);
 	}
 
 	@Override
 	public void nextTuple() {
-
+		Jedis jedis = null;
 		try{
 			
 			Date date = new Date();
@@ -87,14 +66,31 @@ public class VibesSpout extends BaseRichSpout{
 				//List<DBObject> vibesLst = vibesDao.getVibes(Constants.NO);
 				//Iterator<DBObject> iter = vibesLst.iterator();
 				
-				Jedis jedis = jedisPool.getResource();
-				String diffTags = null;
+				jedis = new Jedis(host,port,900);
 				Set<String> names=jedis.keys("Vibes:*");
+				Vibes vibesObj = null;
 				
 				Iterator<String> it = names.iterator();
 			    while (it.hasNext()) {
-			        String s = it.next();
-			      
+			        
+			    	String s = it.next();
+			        String subStr = s.substring(s.indexOf("Vibes:")+6, s.length());
+			        
+			        vibesObj = new Vibes();
+			        vibesObj.setLyl_id_no(subStr);
+			        vibesObj.setEvent_type(jedis.get(s));
+			        ArrayList<Object> listToEmit = new ArrayList<Object>();
+			        listToEmit.add(vibesObj);
+			        
+					this.collector.emit(listToEmit);
+					
+					jedis.del(s);
+					
+					s = null;
+					listToEmit = null;
+					vibesObj = null;
+					subStr = null;
+					
 			    }
 				
 			}
@@ -103,7 +99,11 @@ public class VibesSpout extends BaseRichSpout{
 		}
 		catch(Exception e){
 			LOGGER.error("Error in Vibes Spout ");
+		}finally{
+			if(jedis !=null)
+				jedis.disconnect();
 		}
 	}
+	
 	
 }
