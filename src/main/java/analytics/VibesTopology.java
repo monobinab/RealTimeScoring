@@ -29,20 +29,22 @@ public class VibesTopology{
 		} else {
 		
 		TopologyBuilder builder = new TopologyBuilder();
-		String[] servers = RedisConnection.getServers("LOCAL");
+		//String[] servers = RedisConnection.getServers(System.getProperty(MongoNameConstants.IS_PROD));
 		
-		//Spout that wakes up every 5 mins and process the Traits
+		//Spout that wakes up every 5 mins and process the Vibes Text Messages
 		builder.setSpout("vibesSpout", new VibesSpout(System.getProperty(MongoNameConstants.IS_PROD),
 				AuthPropertiesReader.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
-						.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 1);
-		builder.setBolt("vibesBolt",new VibesBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1)
+						.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 3);
+		
+		builder.setBolt("vibesBolt",new VibesBolt(System.getProperty(MongoNameConstants.IS_PROD),
+				AuthPropertiesReader.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
+						.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 3)
 				.shuffleGrouping("vibesSpout");
 
 		Config conf = new Config();
-			conf.put("metrics_topology", "PurchaseOccasion");
+			conf.put("metrics_topology", "Vibes");
 			//stormconf is set with system's property as MetricsListener needs it
-			conf.put("topology_environment", System.getProperty(MongoNameConstants.IS_PROD));
-			conf.registerMetricsConsumer(MetricsListener.class, 3);
+			conf.registerMetricsConsumer(MetricsListener.class,System.getProperty(MongoNameConstants.IS_PROD), 3);
 			if (System.getProperty(MongoNameConstants.IS_PROD)
 					.equalsIgnoreCase("PROD")
 					|| System.getProperty(MongoNameConstants.IS_PROD)
@@ -54,7 +56,7 @@ public class VibesTopology{
 				conf.setDebug(false);
 				conf.setMaxTaskParallelism(3);
 				LocalCluster cluster = new LocalCluster();
-				cluster.submitTopology("occassion_topology", conf,
+				cluster.submitTopology("vibes_topology", conf,
 						builder.createTopology());
 				Thread.sleep(10000000);
 				cluster.shutdown();

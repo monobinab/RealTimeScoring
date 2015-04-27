@@ -5,8 +5,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,22 +18,25 @@ import analytics.util.AuthPropertiesReader;
 import analytics.util.Constants;
 import analytics.util.HttpClientUtils;
 import analytics.util.dao.VibesDao;
+import analytics.util.objects.Vibes;
 import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Tuple;
 
-import com.mongodb.DBObject;
-
 public class VibesBolt extends EnvironmentBolt{
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(VibesBolt.class);
 	private VibesDao vibesDao;
-	private MultiCountMetric countMetric;
 	private OutputCollector outputCollector;
-	 public VibesBolt(String systemProperty){
+	private String host;
+	private int port;
+	
+	 public VibesBolt(String systemProperty, String redisServer, Integer redisPort){
 		 super(systemProperty);
+		 this.host = redisServer;
+		 this.port = redisPort;
 	 }
 
 	@Override
@@ -37,35 +44,36 @@ public class VibesBolt extends EnvironmentBolt{
 			OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
 		this.outputCollector = collector;
-		vibesDao = new VibesDao();
-		initMetrics(context);
+		//vibesDao = new VibesDao();
 	}
 	
-	void initMetrics(TopologyContext context){
-		countMetric = new MultiCountMetric();
-		context.registerMetric("custom_metrics", countMetric, 60);
-	}
-
-
 	@Override
 	public void execute(Tuple input) {
 		LOGGER.info("~~~~~~~~~~Incoming tuple in Vibesbolt: " + input);
-		countMetric.scope("incoming_tuples").incr();
-		DBObject obj = (DBObject) input.getValueByField("vibesDBObject");
-		String l_id = null;
+		
+		redisCountIncr("incoming_tuples");
+		Vibes vibes = (Vibes) input.getValueByField("vibesDBObject");
+		String lyl_id_no = null;
+		String event_type = null;
+
 		try {
-			l_id = (String) obj.get("l_id");
-			LOGGER.info("PROCESSING L_Id: " + l_id );
+			lyl_id_no = (String) vibes.getLyl_id_no();
+			event_type = (String) vibes.getEvent_type();
+			LOGGER.info("PROCESSING L_Id: " + lyl_id_no +" for Event Type " + event_type);
 			
-			//TODO .. PROCESS THE LID HERE
+			JSONObject vibesJson = generateJson(lyl_id_no,event_type);
 			
-			vibesDao.updateVibes(l_id);
-			countMetric.scope("success_vibes").incr();
+			sendMessageToVibes(vibesJson.toString());
+			
+			//vibesDao.updateVibes(l_id);
+			
+			redisCountIncr("success_vibes");
 			outputCollector.ack(input);
 		} catch (Exception e) {
-			LOGGER.error("Exception Occured at Vibes Bolt for Lid" + l_id );
+			LOGGER.error("Exception Occured at Vibes Bolt for Lid" + lyl_id_no );
 			e.printStackTrace();
-			countMetric.scope("failure_vibes").incr();
+			
+			redisCountIncr("failure_vibes");
 		}
 	}
 
@@ -99,9 +107,10 @@ public class VibesBolt extends EnvironmentBolt{
 			}
 			
 			System.out.println("Vibes Response ==> " + strBuff.toString());
+			
 		}catch (Exception t) {
 			t.printStackTrace();
-			LOGGER.error("Exception occured in sendMessageToVibes ", t);
+			LOGGER.error("Exception occured in sendMessageToVibes for Lid+EventType = " + jsonString);
 		} finally {
 			try {
 				if(out!=null) 
@@ -116,6 +125,28 @@ public class VibesBolt extends EnvironmentBolt{
 			}
 		}
 		
+	}
+	
+	public JSONObject generateJson(String lyl_id_no, String event_type){
+		
+		JSONObject obj = new JSONObject();
+		
+		try {
+			obj.put("event_id", lyl_id_no+"~"+event_type);
+			obj.put("event_type", event_type);
+			obj.put("event_date", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(new Date()));
+			
+			JSONObject memberObj = new JSONObject();
+			memberObj.put("external_person_id", lyl_id_no);
+			
+			obj.put("event_data", memberObj);
+			
+		} catch (JSONException e) {
+			e.printStackTrace();
+			LOGGER.info("Exception in generateJson in Vibes Bolt for Lid+EventType = " + lyl_id_no+"~"+event_type);
+		}
+		
+		return obj;
 	}
 
 }
