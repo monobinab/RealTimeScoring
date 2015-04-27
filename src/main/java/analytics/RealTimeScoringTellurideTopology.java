@@ -118,4 +118,3 @@ public class RealTimeScoringTellurideTopology {
 		}
 	}
 }
->>>>>>> 42576bf49b3e130864ead40af9674e2e353c0379
