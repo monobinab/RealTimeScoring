@@ -204,7 +204,7 @@ public class ResponsysUtil {
 				String xmlWithoutExpo = removeExponentialFromXml(json2XmlString);
 				
 				//Generate the Custome Xml to be sent to Oracle
-				String customXml = createCustomXml(xmlWithoutExpo,memberInfo.getEid(),custEventName,winningTag,lyl_l_id);
+				String customXml = createCustomXml(xmlWithoutExpo,memberInfo != null?memberInfo.getEid():null,custEventName,winningTag,lyl_l_id);
 				
 				//BOM = Byte-Order-Mark
 				//Remove the BOM to make the XML valid
@@ -222,7 +222,7 @@ public class ResponsysUtil {
 				
 				//Persist info to Mongo after successfully transmission of message to Oracle.
 				LOGGER.info(lyl_l_id+"~~~"+xmlWithoutBOM);
-				occasionResponsesDao.addOccasionResponse(l_id, memberInfo.getEid(), custEventName, winningTag.getPurchaseOccasion(), winningTag.getBusinessUnit(), winningTag.getSubBusinessUnit(), 
+				occasionResponsesDao.addOccasionResponse(l_id, memberInfo != null?memberInfo.getEid():null, custEventName, winningTag.getPurchaseOccasion(), winningTag.getBusinessUnit(), winningTag.getSubBusinessUnit(), 
 						strBuff.toString().contains("<success>true</success>") ? "Y" : "N", winningTag.getMdTags());
 				
 				LOGGER.info("TIME:" + messageID + "- Persisting sent data to Mongo -" + System.currentTimeMillis());
