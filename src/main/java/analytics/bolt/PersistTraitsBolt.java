@@ -28,6 +28,10 @@ public class PersistTraitsBolt extends EnvironmentBolt {
     private MemberTraitsDao memberTraitsDao;
 	private OutputCollector outputCollector;
 	
+	 public PersistTraitsBolt(String systemProperty){
+		 super(systemProperty);
+	 }
+	
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {	
