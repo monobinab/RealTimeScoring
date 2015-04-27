@@ -15,7 +15,6 @@ import com.google.gson.Gson;
 import analytics.util.MongoNameConstants;
 import analytics.util.PidMatchUtils;
 import analytics.util.dao.BoostDao;
-import analytics.util.dao.DivLnBoostDao;
 import analytics.util.dao.DivLnVariableDao;
 import analytics.util.dao.MemberBoostsDao;
 import analytics.util.dao.VariableDao;
@@ -30,7 +29,6 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 	 * Created by Rock Wasserman 6/19/2014
 	 */
 	private DivLnVariableDao divLnVariableDao;
-	private BoostDao boostDao;
 	private VariableDao variableDao;
 	private MemberBoostsDao memberBoostsDao;
 	private HashMap<String, List<String>> divLnBoostVariblesMap;
@@ -67,7 +65,8 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 		memberBoostsDao = new MemberBoostsDao();
 		
 		//populate divLnBoostvariablesMap & Boost list
-		divLnBoostVariblesMap = divLnVariableDao.getDivLnVariable();
+		divLnBoostVariblesMap = divLnVariableDao.getDivLnBoostVariable();
+			
 		boostList = new ArrayList<String>();
 		List<Variable> variableList = variableDao.getVariables();
 		boostMap = new HashMap<String, Variable>();

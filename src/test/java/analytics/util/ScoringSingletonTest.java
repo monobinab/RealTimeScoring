@@ -1374,12 +1374,6 @@ public class ScoringSingletonTest {
 	}
 	@AfterClass
 	public static void cleanUp(){
-	/*	if(conn.toString().equalsIgnoreCase("FongoDB.test"))
-			conn.dropDatabase();
-			  else
-			   Assert.fail("Something went wrong. Tests connected to " + conn.toString());*/
 		SystemPropertyUtility.dropDatabase();
-		
 	}
-	
 }

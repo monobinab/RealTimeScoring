@@ -24,7 +24,6 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(PersistOccasionBolt.class);
 	private MemberMDTagsDao memberMDTagsDao;
-	private MultiCountMetric countMetric;
 	private OutputCollector outputCollector;
 	 public PersistOccasionBolt(String systemProperty){
 		 super(systemProperty);
@@ -36,13 +35,7 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 		super.prepare(stormConf, context, collector);
 		this.outputCollector = collector;
 		memberMDTagsDao = new MemberMDTagsDao();
-		initMetrics(context);
 	}
-	void initMetrics(TopologyContext context){
-	     countMetric = new MultiCountMetric();
-	     context.registerMetric("custom_metrics", countMetric, 60);
-	    }
-
 
 	@SuppressWarnings("unchecked")
 	@Override

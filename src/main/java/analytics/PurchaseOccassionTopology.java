@@ -80,7 +80,7 @@ public class PurchaseOccassionTopology {
 			conf.put("metrics_topology", "PurchaseOccasion");
 			//stormconf is set with system's property as MetricsListener needs it
 			conf.put("topology_environment", System.getProperty(MongoNameConstants.IS_PROD));
-			conf.registerMetricsConsumer(MetricsListener.class, 3);
+			conf.registerMetricsConsumer(MetricsListener.class,  System.getProperty(MongoNameConstants.IS_PROD), 3);
 			if (System.getProperty(MongoNameConstants.IS_PROD)
 					.equalsIgnoreCase("PROD")
 					|| System.getProperty(MongoNameConstants.IS_PROD)

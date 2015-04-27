@@ -62,7 +62,6 @@ public class DCTopology {
 		conf.put("metrics_topology", "DC");
 		conf.registerMetricsConsumer(MetricsListener.class, System.getProperty(MongoNameConstants.IS_PROD), partition_num);
 		conf.setDebug(false);
-		conf.put("topology_environment", System.getProperty(MongoNameConstants.IS_PROD));
 		if (System.getProperty(MongoNameConstants.IS_PROD)
 				.equalsIgnoreCase("PROD")
 				|| System.getProperty(MongoNameConstants.IS_PROD)

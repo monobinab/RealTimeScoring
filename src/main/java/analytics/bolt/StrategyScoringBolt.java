@@ -94,7 +94,6 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		// 11) Write changedMemberVariables with expiry
 
 		// 1) PULL OUT HASHED LOYALTY ID FROM THE FIRST RECORD IN lineItemList
-		//countMetric.scope("incoming_tuples").incr();
 		redisCountIncr("incoming_tuples");
 		String lId = input.getStringByField("l_id");
 		String source = input.getStringByField("source");

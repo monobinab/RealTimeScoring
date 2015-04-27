@@ -9,17 +9,13 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.util.HostPortUtility;
 import analytics.util.JsonUtils;
-import analytics.util.MongoNameConstants;
 import analytics.util.SecurityUtils;
 import analytics.util.dao.MemberUUIDDao;
 import analytics.util.dao.ModelVariablesDao;
-import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
@@ -38,14 +34,9 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 	protected String sourceTopic;
 	protected MemberUUIDDao memberDao;
 	protected ModelVariablesDao modelVariablesDao;
-	protected MultiCountMetric countMetric;
-		
+			
     public ParseAAMFeeds() {
 	}
-	 void initMetrics(TopologyContext context){
-	     countMetric = new MultiCountMetric();
-	     context.registerMetric("custom_metrics", countMetric, 60);
-	    }
 
 	// Overloaded Paramterized constructor to get the topic to which the spout is listening to
 	public ParseAAMFeeds( String systemProperty, String topic) {
@@ -60,7 +51,6 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         this.outputCollector = collector;
-        initMetrics(context);
         super.prepare(stormConf, context, collector);
 	    memberDao = new MemberUUIDDao();
         modelVariablesDao =  new ModelVariablesDao(); 
@@ -74,14 +64,16 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 	public void execute(Tuple input) {
 		
 		LOGGER.debug("PARSING DOCUMENT -- WEB TRAIT RECORD ");
-		countMetric.scope("incoming_tuples").incr();
+		redisCountIncr("incoming_tuples");
+		//countMetric.scope("incoming_tuples").incr();
 		// 1) SPLIT INPUT STRING
 		
         String interactionRec = input.getString(0);
         String splitRecArray[] = splitRec(interactionRec);
         
         if(splitRecArray == null || splitRecArray.length==0) {
-    		countMetric.scope("invalid_record").incr();
+    		//countMetric.scope("invalid_record").incr();
+    		redisCountIncr("invalid_record");
     		outputCollector.ack(input);
         	return;
         }
@@ -91,7 +83,8 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
         this.loyalty_id = splitRecArray[0].trim();
         if(loyalty_id.length()!=16 || !loyalty_id.startsWith("7081")){
         	LOGGER.info("Could not find Lid: " + this.loyalty_id);
-        	countMetric.scope("no_lids").incr();
+        	//countMetric.scope("no_lids").incr();
+        	redisCountIncr("no_lids");
         	outputCollector.ack(input);
         	return;
         }
@@ -113,14 +106,17 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 	        	listToEmit.add(variableValueJSON);
 	        	listToEmit.add(sourceTopic);
 	        	this.outputCollector.emit(listToEmit);
-	        	countMetric.scope("processed_lid").incr();
+	        	//countMetric.scope("processed_lid").incr();
+	        	redisCountIncr("processed_lid");
 	        	LOGGER.debug(" *** PARSING BOLT EMITTING: " + listToEmit);
         	}
         	else {
         		LOGGER.debug(" *** NO VARIABLES FOUND - NOTHING TO EMIT");
-        		countMetric.scope("no_variables_affected").incr();
+        		redisCountIncr("no_variables_affected");
+        		//countMetric.scope("no_variables_affected").incr();
         	}
-        	countMetric.scope("total_processing").incr();
+        	//countMetric.scope("total_processing").incr();
+        	redisCountIncr("total_processing");
         	
         //}
         
@@ -133,7 +129,8 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 			logger.debug("Can not parse date",e);
 		}*/
         
-		countMetric.scope("unique_uuids_processed").incr();
+		//countMetric.scope("unique_uuids_processed").incr();
+        	redisCountIncr("unique_uuids_processed");
 		outputCollector.ack(input);
     	return;
         

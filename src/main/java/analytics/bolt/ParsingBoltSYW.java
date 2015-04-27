@@ -2,7 +2,6 @@ package analytics.bolt;
 
 import analytics.util.SecurityUtils;
 import analytics.util.SywApiCalls;
-import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -29,20 +28,15 @@ public class ParsingBoltSYW extends EnvironmentBolt {
 	private OutputCollector outputCollector;
 	private List<String> listOfInteractionsForRTS;
 	SywApiCalls sywApiCalls;
-	private MultiCountMetric countMetric;
-	
+
 	 public ParsingBoltSYW(String systemProperty){
 		 super(systemProperty);
 		 }
-	 void initMetrics(TopologyContext context){
-	     countMetric = new MultiCountMetric();
-	     context.registerMetric("custom_metrics", countMetric, 60);
-	    }
+	
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
-	//   HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
 		sywApiCalls = new SywApiCalls();
 		this.outputCollector = collector;
 		listOfInteractionsForRTS = new ArrayList<String>();
@@ -53,14 +47,14 @@ public class ParsingBoltSYW extends EnvironmentBolt {
 		//listOfInteractionsForRTS.add("Want");
 		//listOfInteractionsForRTS.add("Own");
 		listOfInteractionsForRTS.add("AddToCatalog"); 
-		initMetrics(context);
+	
 	}
 
 	@Override
 	public void execute(Tuple input) {
 		//Read the JSON message from the spout
-		countMetric.scope("incoming_tuples").incr();
-	
+		//countMetric.scope("incoming_tuples").incr();
+		redisCountIncr("incoming_tuples");
 		JsonParser parser = new JsonParser();
 		JsonArray interactionArray = parser.parse(input.getStringByField("message")).getAsJsonArray();
 
@@ -78,7 +72,8 @@ public class ParsingBoltSYW extends EnvironmentBolt {
 			*/
 
 			if (l_id == null) {
-				countMetric.scope("null_lid").incr();
+				//countMetric.scope("null_lid").incr();
+				redisCountIncr("null_lid");
 				//LOGGER.warn("Unable to get member information" + input);
 				outputCollector.fail(input);
 				//could not process record
@@ -93,11 +88,13 @@ public class ParsingBoltSYW extends EnvironmentBolt {
 			if (listOfInteractionsForRTS.contains(interactionTypeString)) {
 				// Create a SYW Interaction object
 					outputCollector.emit(tuple(l_id, interactionObject.toString(),interactionTypeString, lyl_id_no));
-					countMetric.scope("sent_to_process").incr();
+					//countMetric.scope("sent_to_process").incr();
+					redisCountIncr("sent_to_process");
 			} else {
 				//We should look into either processing this request type or not subscribing to it
 				LOGGER.info("Ignore interaction type" + interactionType.getAsString());
-				countMetric.scope("unwanted_interaction_type").incr();
+				//countMetric.scope("unwanted_interaction_type").incr();
+				redisCountIncr("unwanted_interaction_type");
 			}
 		}
 		outputCollector.ack(input);

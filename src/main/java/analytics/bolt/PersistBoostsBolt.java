@@ -1,16 +1,13 @@
 package analytics.bolt;
 
-import analytics.util.HostPortUtility;
 import analytics.util.JsonUtils;
 import analytics.util.MongoNameConstants;
 import analytics.util.dao.MemberBoostsDao;
 import analytics.util.dao.VariableDao;
 import analytics.util.objects.Variable;
-import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
 
 import org.slf4j.Logger;
@@ -26,11 +23,6 @@ public class PersistBoostsBolt extends EnvironmentBolt {
     private MemberBoostsDao memberBoostsDao;
     private VariableDao variableDao;
     private Map<String, String> variablesStrategyMap;
-	private MultiCountMetric countMetric;
-	 void initMetrics(TopologyContext context){
-	     countMetric = new MultiCountMetric();
-	     context.registerMetric("custom_metrics", countMetric, 60);
-	    }
 	 
 	 public PersistBoostsBolt(String systemProperty){
 		 super(systemProperty);
@@ -39,9 +31,7 @@ public class PersistBoostsBolt extends EnvironmentBolt {
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
-     //   System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
-		   HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
-		memberBoostsDao = new MemberBoostsDao();
+    	memberBoostsDao = new MemberBoostsDao();
 		variableDao = new VariableDao();
 		variablesStrategyMap = new HashMap<String, String>();
 		
@@ -51,13 +41,13 @@ public class PersistBoostsBolt extends EnvironmentBolt {
 				variablesStrategyMap.put(v.getName(), v.getStrategy());
 			}
 		}
-		initMetrics(context);
 	}
 
 	@Override
 	public void execute(Tuple input) {
 
-		countMetric.scope("incoming_record").incr();
+		//countMetric.scope("incoming_record").incr();
+		redisCountIncr("incoming_record");
         Map<String, Map<String, List<String>>> memberBoostValuesMap = new HashMap<String, Map<String, List<String>>>();
 
         LOGGER.debug("Persisting boost + values in mongo");
@@ -106,7 +96,8 @@ public class PersistBoostsBolt extends EnvironmentBolt {
 
 
         new MemberBoostsDao().writeMemberBoostValues(l_id, memberBoostValuesMap);
-		countMetric.scope("persisted_boost").incr();
+		//countMetric.scope("persisted_boost").incr();
+        redisCountIncr("persisted_boost");
 	}
 
 	private List<String> getTotalCount(Map<String, List<String>> dateValuesMap) {

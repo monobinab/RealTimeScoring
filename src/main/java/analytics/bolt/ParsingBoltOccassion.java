@@ -45,7 +45,6 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 	private OutputCollector outputCollector;
 	private TagMetadataDao tagMetadataDao;
 	private TagVariableDao tagVariableDao;
-	private MultiCountMetric countMetric;
 	private MemberMDTagsDao memberTagDao;
 	private ModelPercentileDao modelPercDao;
 	private JedisPool jedisPool;
@@ -56,11 +55,6 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 		super(systemProperty);
 		this.host = host;
 		this.port = port;
-	}
-
-	void initMetrics(TopologyContext context) {
-		countMetric = new MultiCountMetric();
-		context.registerMetric("custom_metrics", countMetric, 60);
 	}
 
 	public void setMemberTagsDao() {
@@ -93,8 +87,6 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 		tagVariableDao = new TagVariableDao();
 		memberTagDao = new MemberMDTagsDao();
 		modelPercDao = new ModelPercentileDao();
-		initMetrics(context);
-
 		JedisPoolConfig poolConfig = new JedisPoolConfig();
 		poolConfig.setMaxActive(100);
 		jedisPool = new JedisPool(poolConfig, host, port, 100);

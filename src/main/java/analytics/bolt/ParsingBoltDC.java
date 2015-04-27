@@ -53,12 +53,10 @@ public class ParsingBoltDC extends EnvironmentBolt {
 
 	@Override
 	public void execute(Tuple input) {
-		//countMetric.scope("incoming_tuples").incr();
 		redisCountIncr("incoming_tuples");
 		// UpdateMemberPrompts
 		String message = (String) input.getValueByField("str");
 		if (message.contains("GetMemberPromptsReply")) {
-			//countMetric.scope("prompts_reply").incr();
 			redisCountIncr("prompts_reply");
 			try {
 				parseIncomingMessage(message);
@@ -175,7 +173,6 @@ public class ParsingBoltDC extends EnvironmentBolt {
 		listToEmit_s.add(JsonUtils.createJsonFromStringStringMap(map));
 		listToEmit_s.add("DC");
 		outputCollector.emit("score_stream", listToEmit_s);
-		//countMetric.scope("emitted_to_scoring").incr();
 		redisCountIncr("emitted_to_scoring");
 		LOGGER.info("Emitted message to score stream");
 	}

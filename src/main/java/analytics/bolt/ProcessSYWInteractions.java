@@ -1,7 +1,5 @@
 package analytics.bolt;
 
-import analytics.util.HostPortUtility;
-import analytics.util.MongoNameConstants;
 import analytics.util.SywApiCalls;
 import analytics.util.dao.BoostDao;
 import analytics.util.dao.ChangedMemberScoresDao;
@@ -15,11 +13,9 @@ import analytics.util.objects.ChangedMemberScore;
 import analytics.util.objects.DivLn;
 import analytics.util.objects.SYWEntity;
 import analytics.util.objects.SYWInteraction;
-import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
@@ -58,18 +54,12 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 	private ModelSywBoostDao modelBoostDao;
 	Map<String, List<String>> boostListMap;
 	private Map sywBoostModelMap;
-	private MultiCountMetric countMetric;
 	
 	 public ProcessSYWInteractions(String systemProperty){
 		 super(systemProperty);
 		 }
 
-	void initMetrics(TopologyContext context) {
-		countMetric = new MultiCountMetric();
-		context.registerMetric("custom_metrics", countMetric, 60);
-	}
-
-	@Override
+	 @Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
 	//	System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
 		super.prepare(stormConf, context, collector);
@@ -94,12 +84,12 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 		feeds.add("SYW_OWN");
 		feeds.add("SYW_WANT");
 		boostListMap = boostDao.getBoostsMap(feeds);// Feed prefix
-		initMetrics(context);
 	}
 
 	@Override
 	public void execute(Tuple input) {
-		countMetric.scope("incoming_tuples").incr();
+		//countMetric.scope("incoming_tuples").incr();
+		redisCountIncr("incoming_tuples");
 		String feedType = null;
 		// Get l_id", "message", "InteractionType" from parsing bolt
 		/*
@@ -157,7 +147,8 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 
 		if (feedType == null) {
 			LOGGER.info("We process only own, like and want catalogs & SYW Likes");
-			countMetric.scope("customer_catalog").incr();
+			//countMetric.scope("customer_catalog").incr();
+			redisCountIncr("customer_catalog");
 			outputCollector.fail(input);
 			return;
 		}
@@ -263,10 +254,12 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 			listToEmit2.add(feedType);
 			listToEmit2.add(lyl_id_no);
 			this.outputCollector.emit("score_stream", listToEmit2);
-			countMetric.scope("successful").incr();
+			//countMetric.scope("successful").incr();
+			redisCountIncr("successful");
 
 		} else {
-			countMetric.scope("empty_var_map").incr();
+			//countMetric.scope("empty_var_map").incr();
+			redisCountIncr("empty_var_map");
 		}
 		this.outputCollector.ack(input);
 	}
@@ -305,9 +298,11 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 						val = 0.0;
 					varValToScore.put(variableName, String.valueOf(val));
 					if("SYW_LIKE".equals(feedType))
-							countMetric.scope("type_like").incr();
+							//countMetric.scope("type_like").incr();
+							redisCountIncr("type_like");
 					if("SYW_WANT".equals(feedType))
-						countMetric.scope("type_want").incr();
+						//countMetric.scope("type_want").incr();
+						redisCountIncr("type_want");
 				} else if ("SYW_OWN".equals(feedType)) {
 					double greater = memberScore;
 					double changedMemberScore = 0.0;
@@ -321,7 +316,8 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 						val = percentileScore - greater;//This will be negative
 					}
 					varValToScore.put(variableName, String.valueOf(val));
-					countMetric.scope("type_own").incr();
+					//countMetric.scope("type_own").incr();
+					redisCountIncr("type_own");
 				}
 			}
 		}
