@@ -15,10 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.util.Constants;
-import analytics.util.HostPortUtility;
 import analytics.util.JsonUtils;
-import analytics.util.MongoNameConstants;
 import analytics.util.SecurityUtils;
 import analytics.util.XMLParser;
 import analytics.util.dao.DivCatKsnDao;
@@ -28,11 +25,9 @@ import analytics.util.dao.DivLnVariableDao;
 import analytics.util.objects.LineItem;
 import analytics.util.objects.ProcessTransaction;
 import analytics.util.objects.TransactionLineItem;
-import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
@@ -55,7 +50,7 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
 	private Map<String, List<String>> divLnVariablesMap;
 	private Map<String, List<String>> divCatVariablesMap;
 	private String requestorID = "";
-	private MultiCountMetric countMetric;
+		
 	 public TellurideParsingBoltPOS(String systemProperty){
 		 super(systemProperty);
 		
@@ -76,9 +71,6 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
 			OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
 		this.outputCollector = collector;
-	     initMetrics(context);
-     //   System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
-	 //    HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
 		LOGGER.info("Preparing telluride parsing bolt");
 
 		LOGGER.debug("Getting mongo collections");
@@ -96,10 +88,6 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
 		divCatVariablesMap = divCatVariableDao.getDivCatVariable();
 	}
 
-	 void initMetrics(TopologyContext context){
-	     countMetric = new MultiCountMetric();
-	     context.registerMetric("custom_metrics", countMetric, Constants.METRICS_INTERVAL);
-	    }
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -109,7 +97,8 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
 	public void execute(Tuple input) {
 		if(LOGGER.isDebugEnabled())
 			LOGGER.debug("The time it enters inside Telluride parsing bolt execute method"+System.currentTimeMillis()+" and the message ID is ..."+input.getMessageId());
-		countMetric.scope("incoming_tuples").incr();
+		//countMetric.scope("incoming_tuples").incr();
+		redisCountIncr("incoming_tuples");
 		String lyl_id_no = "";
 		ProcessTransaction processTransaction = null;
 		String messageID = "";
@@ -130,7 +119,8 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
 			LOGGER.error("Unable to read message from MQ",e);
 		}
 		if ( StringUtils.isEmpty(transactionXmlAsString)) {
-			countMetric.scope("empty_message").incr();
+			//countMetric.scope("empty_message").incr();
+			redisCountIncr("empty_message");
 			outputCollector.ack(input);
 			return;
 		}
@@ -175,7 +165,8 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
 
 
 			if (lyl_id_no==null || StringUtils.isEmpty(lyl_id_no)) {
-				countMetric.scope("empty_lid").incr();
+				//countMetric.scope("empty_lid").incr();
+				redisCountIncr("empty_lid");
 				outputCollector.ack(input);
 				return;
 			}
@@ -370,7 +361,8 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
 					LOGGER.debug(requestorID + " Point of SALE is touched...");
 					LOGGER.debug(" *** telluride parsing bolt emitting: "
 						+ listToEmit.toString());
-					countMetric.scope("successful").incr();
+					//countMetric.scope("successful").incr();
+					redisCountIncr("successful");
 					outputCollector.ack(input);
 				// 9) EMIT VARIABLES TO VALUES MAP IN JSON DOCUMENT
 				if (listToEmit != null && !listToEmit.isEmpty()) {
@@ -379,13 +371,15 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
 				}
 			}
 			else{
-				countMetric.scope("empty_line_item").incr();
+				//countMetric.scope("empty_line_item").incr();
+				redisCountIncr("empty_line_item");
 				outputCollector.ack(input);
 				return;
 			}
 		}
 		else{
-			countMetric.scope("empty_xml").incr();
+			//countMetric.scope("empty_xml").incr();
+			redisCountIncr("empty_xml");
 			outputCollector.ack(input);
 			return;
 		}
