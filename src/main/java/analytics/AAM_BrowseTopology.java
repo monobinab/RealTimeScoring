@@ -40,14 +40,12 @@ public class AAM_BrowseTopology {
 		
 		//Sree. Spout that wakes up every 5 mins and process the Traits
 		topologyBuilder.setSpout("browseSpout", new WebHDFSSpout(servers[1], TopicConstants.PORT, Constants.AAM_BROWSER_PATH, "aamBrowser"), 3);
-		topologyBuilder.setBolt("parsingBoltBrowse", new ParsingBoltAAM_Browse(System
-				.getProperty(MongoNameConstants.IS_PROD), topic), 3)
-	  		.shuffleGrouping("browseSpout");
+		topologyBuilder.setBolt("parsingBoltBrowse", new ParsingBoltAAM_Browse(System.getProperty(MongoNameConstants.IS_PROD), topic), 3).shuffleGrouping("browseSpout");
 
 		
-		/*topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System
+		topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System
 				.getProperty(MongoNameConstants.IS_PROD)), 3)
-				.localOrShuffleGrouping("parsingBoltBrowse");*/
+				.localOrShuffleGrouping("parsingBoltBrowse");
 		
 		if(System.getProperty(MongoNameConstants.IS_PROD).equals("PROD")){
 			topologyBuilder.setBolt("flumeLoggingBolt", new FlumeRPCBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
