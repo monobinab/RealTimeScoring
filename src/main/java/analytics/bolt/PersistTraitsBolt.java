@@ -13,43 +13,38 @@ import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.util.HostPortUtility;
-import analytics.util.MongoNameConstants;
 import analytics.util.dao.MemberTraitsDao;
-import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 
-public class PersistTraitsBolt extends BaseRichBolt {
+public class PersistTraitsBolt extends EnvironmentBolt {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(PersistTraitsBolt.class);
     private MemberTraitsDao memberTraitsDao;
-	private MultiCountMetric countMetric;
 	private OutputCollector outputCollector;
+	
+	 public PersistTraitsBolt(String systemProperty){
+		 super(systemProperty);
+	 }
+	
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {	
-     //   System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
-		   HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
-		memberTraitsDao = new MemberTraitsDao();
 		this.outputCollector = collector;
-		initMetrics(context);
+		super.prepare(stormConf, context, collector);
 	}
-	 void initMetrics(TopologyContext context){
-	     countMetric = new MultiCountMetric();
-	     context.registerMetric("custom_metrics", countMetric, 60);
-	    }
+	
 	 
 	@Override
 	public void execute(Tuple input) {
 		LOGGER.debug("Persisting trait date map in mongo");
-		countMetric.scope("incoming_record").incr();
+		//countMetric.scope("incoming_record").incr();
+		redisCountIncr("incoming_record");
 		//Get the encrypted loyalty id
 		String l_id = input.getString(0);
 		//The data comes as below
@@ -81,11 +76,13 @@ public class PersistTraitsBolt extends BaseRichBolt {
 				}
 			}
 			memberTraitsDao.addDateTrait(l_id, dateTraitMap);
-    		countMetric.scope("persisted_traits").incr();
+    		//countMetric.scope("persisted_traits").incr();
+			redisCountIncr("persisted_traits");
     		outputCollector.ack(input);
 		} catch (JSONException e) {
 			LOGGER.error("unable to persist trait",e);
-    		countMetric.scope("persist_failed").incr();
+    		//countMetric.scope("persist_failed").incr();
+			redisCountIncr("persist_failed");
     		outputCollector.fail(input);
 		}
 	}

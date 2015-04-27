@@ -33,7 +33,7 @@ public static void main(String[] args) {
 		} 
 		
 		//RedisConnection redisConnection = new RedisConnection();
-		String[] servers = RedisConnection.getServers("PROD");
+		String[] servers = RedisConnection.getServers(System.getProperty(MongoNameConstants.IS_PROD));
 
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 		

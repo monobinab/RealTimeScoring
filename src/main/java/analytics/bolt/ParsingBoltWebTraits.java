@@ -12,7 +12,6 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 
 import analytics.util.JsonUtils;
-import analytics.util.MongoNameConstants;
 import analytics.util.dao.MemberTraitsDao;
 import analytics.util.dao.TraitVariablesDao;
 import backtype.storm.task.OutputCollector;
@@ -23,11 +22,7 @@ import com.google.gson.Gson;
 
 
 public class ParsingBoltWebTraits extends ParseAAMFeeds {
-	/**
-	 * Created by Rock Wasserman 4/18/2014
-	 */
-
-    private Map<String,List<String>> traitVariablesMap;
+	private Map<String,List<String>> traitVariablesMap;
     private Map<String,List<String>> variableTraitsMap;
     private MemberTraitsDao memberTraitsDao;
     private TraitVariablesDao traitVariablesDao;
