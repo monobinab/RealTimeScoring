@@ -226,7 +226,7 @@ public class ResponsysUtil {
 						strBuff.toString().contains("<success>true</success>") ? "Y" : "N", winningTag.getMdTags());
 				
 				LOGGER.info("TIME:" + messageID + "- Persisting sent data to Mongo -" + System.currentTimeMillis());
-				winningTag.setEmailOptIn(memberInfo.getEmailOptIn());
+				winningTag.setEmailOptIn( memberInfo != null?memberInfo.getEmailOptIn():null);
 				xmlWithoutBOM = null;
 				xmlWithoutExpo = null;
 				json2XmlString = null;
