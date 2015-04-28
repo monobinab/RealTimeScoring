@@ -34,7 +34,7 @@ public class OccassionRedisSpout extends RedisPubSubSpout{
 			
 			String messageID = new Double(Math.random()).toString();
 			
-			
+			LOGGER.info("Message == " + ret);
 			List<Object> listToEmit = new ArrayList<Object>();
 			listToEmit.add(ret);
 			listToEmit.add(messageID);
