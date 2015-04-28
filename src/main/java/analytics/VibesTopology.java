@@ -36,9 +36,7 @@ public class VibesTopology{
 				AuthPropertiesReader.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
 						.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 3);
 		
-		builder.setBolt("vibesBolt",new VibesBolt(System.getProperty(MongoNameConstants.IS_PROD),
-				AuthPropertiesReader.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
-						.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 3)
+		builder.setBolt("vibesBolt",new VibesBolt(System.getProperty(MongoNameConstants.IS_PROD)), 3)
 				.shuffleGrouping("vibesSpout");
 
 		Config conf = new Config();

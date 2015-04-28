@@ -87,17 +87,19 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 		tagVariableDao = new TagVariableDao();
 		memberTagDao = new MemberMDTagsDao();
 		modelPercDao = new ModelPercentileDao();
-		JedisPoolConfig poolConfig = new JedisPoolConfig();
-		poolConfig.setMaxActive(100);
-		jedisPool = new JedisPool(poolConfig, host, port, 100);
+		//JedisPoolConfig poolConfig = new JedisPoolConfig();
+		//poolConfig.setMaxActive(100);
+		//jedisPool = new JedisPool(poolConfig, host, port, 100);
 	}
 
 	@Override
 	public void execute(Tuple input) {
 		// System.out.println("IN PARSING BOLT: " + input);
-		Jedis jedis = jedisPool.getResource();
+		Jedis jedis = null;
 		try {
-
+			
+			
+			
 			String messageID = "";
 			if (input.contains("messageID")) {
 				messageID = input.getStringByField("messageID");
@@ -122,6 +124,7 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 				return;
 			}
 			if (lyl_id_no == null || lyl_id_no.getAsString().length() != 16) {
+				LOGGER.error("empty_lid");
 				countMetric.scope("empty_lid").incr();
 				outputCollector.ack(input);
 				return;
@@ -154,11 +157,17 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 				}
 				diffTagsString = diffTagsString.substring(0,
 						diffTagsString.length() - 1);
+				
+				jedis = new Jedis(host, port, 1800);
+				jedis.connect();
+				jedis.set("Responses:" + l_id, diffTagsString);
+				jedis.expire("Responses:" + l_id, 300);
+				jedis.disconnect();
+				
 			}
-
-			// System.out.println(l_id +" ---- " +diffTagsString);
-			jedis.set("Responses:" + l_id, diffTagsString);
-			jedis.expire("Responses:" + l_id, 300);
+			else{
+				LOGGER.info("Empty Input Tags for Lid " + lyl_id_no);
+			}
 
 			// reset the variableValueMap to 0 before persisting new incoming
 			// tags
@@ -194,9 +203,11 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 											.iterator().next());
 							countMetric.scope("tag_variable_added").incr();
 						} else {
+							LOGGER.info("No Tag Variable for lid "+ lyl_id_no +" for tag " + tag);
 							countMetric.scope("no_tag_variable").incr();
 						}
 					} else {
+						LOGGER.info("Unwanted tag metadata for lid "+ lyl_id_no +" for tag " + tag);
 						countMetric.scope("unwanted_tag_metadata").incr();
 					}
 				}
@@ -228,7 +239,9 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 		} catch (Exception e) {
 			LOGGER.error("exception in parsing: " + e);
 		} finally {
-			jedisPool.returnResource(jedis);
+			//jedisPool.returnResource(jedis);
+			if(jedis!=null)
+				jedis.disconnect();
 		}
 		// LOGGER.info("TIME:" + messageID + "-Exiting ParsingboltOccasion-" +
 		// System.currentTimeMillis());
@@ -308,7 +321,8 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 				for (String var : tagVarList) {
 					variableValueTagsMap.put(var, "0");
 				}
-			}
+			}else
+				LOGGER.info("No reset Variable values for lid " + l_id +"~~"+ memberTags);
 		}
 	}
 

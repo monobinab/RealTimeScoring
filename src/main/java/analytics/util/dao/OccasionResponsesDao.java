@@ -39,8 +39,8 @@ public class OccasionResponsesDao extends AbstractDao {
 		occObj.put("eid", eid);
 		occObj.put("custEvent", custEvent);
 		occObj.put("purchaseOccasion", purOcca);
-		occObj.put("businessUnit", businessUnit);
-		occObj.put("subBusinessUnit", subBusUnit);
+		//occObj.put("businessUnit", businessUnit);
+		//occObj.put("subBusinessUnit", subBusUnit);
 		occObj.put("successFlag", successFlag);
 		occObj.put("tag", tag);
 		
@@ -49,6 +49,7 @@ public class OccasionResponsesDao extends AbstractDao {
 		keyObj.append(MongoNameConstants.TIMESTAMP, ft.format(dNow));
 		
 		occasionResonsesCollection.update(keyObj, occObj, true, false);
+		//occasionResonsesCollection.insert(occObj);
 	
 	}
 	

@@ -33,7 +33,7 @@ public class ResponseBolt extends EnvironmentBolt{
 	private OutputCollector outputCollector;
 	private String host;
 	private int port;
-	private JedisPool jedisPool;
+	//private JedisPool jedisPool;
 	private ResponsysUtil responsysUtil;
 	
 	public ResponseBolt(String systemProperty, String host, int port) {
@@ -49,15 +49,16 @@ public class ResponseBolt extends EnvironmentBolt{
 		responsysUtil = new ResponsysUtil();
 		this.outputCollector = collector;
 		
-		JedisPoolConfig poolConfig = new JedisPoolConfig();
-        poolConfig.setMaxActive(100);
-        jedisPool = new JedisPool(poolConfig,host, port, 100);
+		//JedisPoolConfig poolConfig = new JedisPoolConfig();
+        //poolConfig.setMaxActive(100);
+        //jedisPool = new JedisPool(poolConfig,host, port, 100);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public void execute(Tuple input) {
 		String lyl_id_no = null; 
+		Jedis jedis = null;
 		
 		try {
 			
@@ -79,11 +80,16 @@ public class ResponseBolt extends EnvironmentBolt{
 				//for which the response has to be sent is taken from the 1st ranks occasion tags from the API call
 				
 				//Get the Difference Tags from Redis for an lid
-				Jedis jedis = jedisPool.getResource();
+				jedis = new Jedis(host, port, 1800);
+				jedis.connect();
 				String diffTags = null;
 				if(jedis.exists("Responses:"+l_id))
 					diffTags = jedis.get("Responses:"+l_id).toString() ;
-				jedisPool.returnResource(jedis);
+				else
+					LOGGER.info("No Tags found for lyl_id_no " + lyl_id_no);
+				
+				jedis.disconnect();
+				//jedisPool.returnResource(jedis);
 				
 				/*if(diffTags!=null && !"".equals(diffTags)){
 					String[] tags = diffTags.split(",");
@@ -103,10 +109,13 @@ public class ResponseBolt extends EnvironmentBolt{
 					//if( readyToProcessTags.size()>0){
 						TagMetadata tagMetadata = responsysUtil.getResponseServiceResult(scoreInfoJsonString,lyl_id_no,list,l_id, messageID);
 						LOGGER.info("TIME:" + messageID + "-Completed responsys call-" + System.currentTimeMillis());
-						if(tagMetadata!=null && tagMetadata.getPurchaseOccasion()!=null && tagMetadata.getEmailOptIn()!=null && tagMetadata.getEmailOptIn().equals("N")){
-								jedis = jedisPool.getResource();
+						if(tagMetadata!=null && tagMetadata.getPurchaseOccasion()!=null && 
+								tagMetadata.getEmailOptIn()!=null && tagMetadata.getEmailOptIn().equals("N")){
+								jedis = new Jedis(host, port, 1800);
+								jedis.connect();
 								jedis.set("Vibes:"+lyl_id_no, tagMetadata.getPurchaseOccasion());
-								jedisPool.returnResource(jedis);
+								jedis.disconnect();
+								//jedisPool.returnResource(jedis);
 							
 						}
 							countMetric.scope("responses").incr();
@@ -119,6 +128,9 @@ public class ResponseBolt extends EnvironmentBolt{
 		} catch (Exception e) {
 			LOGGER.error("Json Exception ", e);
 			countMetric.scope("responses_failed").incr();
+		}finally{
+			if(jedis!=null)
+				jedis.disconnect();
 		}
 	}
 

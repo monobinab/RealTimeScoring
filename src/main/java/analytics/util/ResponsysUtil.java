@@ -200,11 +200,15 @@ public class ResponsysUtil {
 				
 				out = new OutputStreamWriter(connection.getOutputStream());
 				
+				LOGGER.info("TIME:" + messageID + "- Remove Exponential -" + System.currentTimeMillis());
 				//Convert Exponential values to Plain text in the XML
 				String xmlWithoutExpo = removeExponentialFromXml(json2XmlString);
+				LOGGER.info("TIME:" + messageID + "- Remove Exponential Complete-" + System.currentTimeMillis());
 				
+				LOGGER.info("TIME:" + messageID + "- Custome Xml start -" + System.currentTimeMillis());
 				//Generate the Custome Xml to be sent to Oracle
-				String customXml = createCustomXml(xmlWithoutExpo,memberInfo.getEid(),custEventName,winningTag,lyl_l_id);
+				String customXml = createCustomXml(xmlWithoutExpo,memberInfo!=null ? memberInfo.getEid() : null,custEventName,winningTag,lyl_l_id);
+				LOGGER.info("TIME:" + messageID + "- Custome Xml end -" + System.currentTimeMillis());
 				
 				//BOM = Byte-Order-Mark
 				//Remove the BOM to make the XML valid
@@ -221,12 +225,15 @@ public class ResponsysUtil {
 				}
 				
 				//Persist info to Mongo after successfully transmission of message to Oracle.
-				LOGGER.info(lyl_l_id+"~~~"+xmlWithoutBOM);
-				occasionResponsesDao.addOccasionResponse(l_id, memberInfo.getEid(), custEventName, winningTag.getPurchaseOccasion(), winningTag.getBusinessUnit(), winningTag.getSubBusinessUnit(), 
-						strBuff.toString().contains("<success>true</success>") ? "Y" : "N", winningTag.getMdTags());
+				//LOGGER.info(lyl_l_id+"~~~"+xmlWithoutBOM);
 				
-				LOGGER.info("TIME:" + messageID + "- Persisting sent data to Mongo -" + System.currentTimeMillis());
-				winningTag.setEmailOptIn(memberInfo.getEmailOptIn());
+				LOGGER.info("TIME:" + messageID + "- Insert Occasion Response Start -" + System.currentTimeMillis());
+				occasionResponsesDao.addOccasionResponse(l_id, memberInfo!=null ? memberInfo.getEid() : null, custEventName, winningTag.getPurchaseOccasion(), winningTag.getBusinessUnit(), winningTag.getSubBusinessUnit(), 
+						strBuff.toString().contains("<success>true</success>") ? "Y" : "N", winningTag.getMdTags());
+				LOGGER.info("TIME:" + messageID + "- Insert Occasion Response end -" + System.currentTimeMillis());
+				
+				winningTag.setEmailOptIn(memberInfo!=null ? memberInfo.getEmailOptIn() : null);
+				
 				xmlWithoutBOM = null;
 				xmlWithoutExpo = null;
 				json2XmlString = null;
@@ -409,11 +416,11 @@ public class ResponsysUtil {
 	       Element element = (Element) scoresInfoList.item(i);
 	       NodeList name = element.getElementsByTagName("score");
            Element line = (Element) name.item(0);
-           System.out.println("Score: " + getCharacterDataFromElement(line));
+           //System.out.println("Score: " + getCharacterDataFromElement(line));
            Node node = name.item(0);
       
-           System.out.println(node.getTextContent());
-           System.out.println(node.getNodeName());
+           //System.out.println(node.getTextContent());
+           //System.out.println(node.getNodeName());
          
 		   // get the score element, and update the value
 		   if ("score".equals(node.getNodeName())) {
@@ -448,7 +455,7 @@ public class ResponsysUtil {
 		transformer.transform(source, result);
 
 		String xmlString = result.getWriter().toString();
-		System.out.println("xmlWithoutExpo = " +xmlString);
+		//System.out.println("xmlWithoutExpo = " +xmlString);
 
 		return xmlString;
 	}
@@ -604,7 +611,7 @@ public class ResponsysUtil {
 		String finalXmlStr = interminStr.substring(0, interminStr.indexOf("<element>"))+" <scoresInfo> "  
 				+ interminStr.substring(interminStr.indexOf("<element>"),interminStr.lastIndexOf("</element>")+10)  
 					+ " </scoresInfo> " + interminStr.substring(interminStr.lastIndexOf("</element>")+10,interminStr.length());
-		System.out.println("customXml =  "+finalXmlStr);
+		//System.out.println("customXml =  "+finalXmlStr);
 
 		interminStr = null;
 		return finalXmlStr;

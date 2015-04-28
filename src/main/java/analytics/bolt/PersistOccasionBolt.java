@@ -75,7 +75,7 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 			    	listToEmit.add(messageID);
 			    	outputCollector.emit(listToEmit);
 			}
-			//LOGGER.info("TIME:" + messageID + "-Exiting PersistOccasionbolt-" + System.currentTimeMillis());
+			LOGGER.info("TIME:" + messageID + "-Exiting PersistOccasionbolt-" + System.currentTimeMillis());
 			outputCollector.ack(input);
 			
 		} catch (Exception e) {

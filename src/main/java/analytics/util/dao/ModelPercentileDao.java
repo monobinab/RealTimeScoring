@@ -63,9 +63,10 @@ public class ModelPercentileDao extends AbstractDao{
 		andQuery.put("$and", query);
 		DBObject dbObj = modelPercentileCollection.findOne(andQuery);
 		if(dbObj != null){
-		return dbObj.get(MongoNameConstants.MAX_SCORE).toString();
+			return dbObj.get(MongoNameConstants.MAX_SCORE).toString();
 		}
 		else{
+			LOGGER.info("No maxscore found for model " + modelId + " with 99 %");
 			return null;
 		}
 	}

@@ -40,7 +40,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	
 	private String host;
 	private int port;
-	private JedisPool jedisPool;
+	//private JedisPool jedisPool;
 	private Jedis jedis;
 
 	private static final long serialVersionUID = 1L;
@@ -65,9 +65,9 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	  	this.outputCollector = collector;
 		//Configure the Redis Server.
 		if(host!=null && !host.equalsIgnoreCase("")){
-			JedisPoolConfig poolConfig = new JedisPoolConfig();
-	        poolConfig.setMaxActive(100);
-	        jedisPool = new JedisPool(poolConfig,host, port, 100);
+			//JedisPoolConfig poolConfig = new JedisPoolConfig();
+	        //poolConfig.setMaxActive(100);
+	        //jedisPool = new JedisPool(poolConfig,host, port, 100);
 	   
 		}
 		
@@ -75,6 +75,9 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	
 	@Override
 	public void execute(Tuple input) {
+		
+		
+		
 		if(LOGGER.isDebugEnabled()){
 		LOGGER.debug("The time it enters inside Strategy Bolt execute method "
 				+ System.currentTimeMillis());
@@ -92,12 +95,15 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		// 9) Emit the score
 		// 10) Write changedMemberScores with expiry
 		// 11) Write changedMemberVariables with expiry
+		
+		Jedis jedis = null;
 
 		// 1) PULL OUT HASHED LOYALTY ID FROM THE FIRST RECORD IN lineItemList
 		redisCountIncr("incoming_tuples");
 		String lId = input.getStringByField("l_id");
 		String source = input.getStringByField("source");
 		String lyl_id_no = "";
+		try{
 		if (input.contains("lyl_id_no")) {
 			lyl_id_no = input.getStringByField("lyl_id_no");
 		}
@@ -113,7 +119,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		// 3) Find all models affected by the changes
 		Set<Integer> modelIdList = ScoringSingleton.getInstance().getModelIdList(newChangesVarValueMap);
 		if(modelIdList==null||modelIdList.isEmpty()){
-			LOGGER.info("No models affected");
+			LOGGER.info("No models affected for " +lyl_id_no);
 			redisCountIncr("no_models_affected");
 			outputCollector.ack(input);
 			return;
@@ -128,7 +134,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			LOGGER.error("Can not create member variable map", e1);
 		}
 		if(memberVariablesMap==null){
-			LOGGER.warn("Unable to find member variables for " + lId);
+			LOGGER.info("Unable to find member variables for " + lId);
 			redisCountIncr("no_member_variables");
 			outputCollector.ack(input);
 			return;
@@ -207,13 +213,16 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		//Persisting to Redis to be retrieved quicker than getting from Mongo.
 		//Perform the below operation only when the Redis is configured
 		//Long timeBefore = System.currentTimeMillis();
-		if(jedisPool!=null){
-			Jedis jedis = jedisPool.getResource();
+		//if(jedisPool!=null){
+		if(host!=null){
+			jedis = new Jedis(host, port, 1800);
+			jedis.connect();
 			jedis.hmset("RTS:Telluride:"+lId, modelIdScoreStringMap);
 			//jedis.hset("RTS:Telluride:"+lId, ""+modelId, ""+BigDecimal.valueOf(newScore).toPlainString());
 			
 			jedis.expire("RTS:Telluride:"+lId, 600);
-			jedisPool.returnResource(jedis);
+			jedis.disconnect();
+			//jedisPool.returnResource(jedis);
 			
 		}
 				
@@ -239,6 +248,13 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		}
 		
 		this.outputCollector.ack(input);
+		}catch(Exception e){
+			e.printStackTrace();
+			LOGGER.info("Exception scoring lId " +lId );
+		}finally{
+			if(jedis!=null)
+				jedis.disconnect();
+		}
 	}
 
 	@Override

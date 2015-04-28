@@ -31,6 +31,8 @@ public class TagVariableDao extends AbstractDao{
 	    		Map<String, String> tagVarMap = new HashMap<String, String>();
 	    		tagVarMap.put((String)tagVariable.get(MongoNameConstants.TAG_VAR_VAR), tagVariable.get(MongoNameConstants.TAG_VAR_MODEL)+"");
 	    		return tagVarMap;
+	    	}else{
+	    		LOGGER.info("No Tag Variable for tag " + tag);
 	    	}
 	    	return null;
 	    }

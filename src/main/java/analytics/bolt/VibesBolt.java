@@ -30,13 +30,9 @@ public class VibesBolt extends EnvironmentBolt{
 			.getLogger(VibesBolt.class);
 	private VibesDao vibesDao;
 	private OutputCollector outputCollector;
-	private String host;
-	private int port;
 	
-	 public VibesBolt(String systemProperty, String redisServer, Integer redisPort){
+	 public VibesBolt(String systemProperty){
 		 super(systemProperty);
-		 this.host = redisServer;
-		 this.port = redisPort;
 	 }
 
 	@Override
