@@ -74,6 +74,15 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 			    	listToEmit.add(input.getString(4));
 			    	listToEmit.add(messageID);
 			    	outputCollector.emit(listToEmit);
+			}else{
+				if (input.contains("lyl_id_no")) {
+					String lyl_id_no = input.getStringByField("lyl_id_no");
+					List<Object> listToEmit = new ArrayList<Object>();
+					listToEmit = new ArrayList<Object>();
+					listToEmit.add(lyl_id_no);
+					listToEmit.add(messageID);
+					this.outputCollector.emit("response_stream_from_persist", listToEmit);
+				}
 			}
 			LOGGER.info("TIME:" + messageID + "-Exiting PersistOccasionbolt-" + System.currentTimeMillis());
 			outputCollector.ack(input);
@@ -87,6 +96,7 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 			declarer.declare(new Fields("l_id", "lineItemAsJsonString","source","lyl_id_no", "messageID"));
+			declarer.declareStream("response_stream_from_persist", new Fields("lyl_id_no","messageID"));
 		}
 
 }

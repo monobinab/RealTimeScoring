@@ -173,6 +173,12 @@ public class ResponsysUtil {
 				MemberInfo memberInfo  = memberInfoDao.getMemberInfo(l_id);
 				LOGGER.info("TIME:" + messageID + "- Got EID -" + System.currentTimeMillis());
 				
+				//Send to Responsys only when there is member info or when there is an non zero eid
+				if(memberInfo==null || memberInfo.getEid() == null || memberInfo.getEid().equals("0")){
+					LOGGER.info("No Member Info available for Lid " + lyl_l_id );
+					return null;
+				}
+				
 				
 				//TagMetadata tagMetaData = getTagMetaData(tag);
 				String custEventName = occationCustomeEventDao.getCustomeEventName(winningTag.getPurchaseOccasion());
@@ -611,7 +617,7 @@ public class ResponsysUtil {
 		String finalXmlStr = interminStr.substring(0, interminStr.indexOf("<element>"))+" <scoresInfo> "  
 				+ interminStr.substring(interminStr.indexOf("<element>"),interminStr.lastIndexOf("</element>")+10)  
 					+ " </scoresInfo> " + interminStr.substring(interminStr.lastIndexOf("</element>")+10,interminStr.length());
-		//System.out.println("customXml =  "+finalXmlStr);
+		LOGGER.info("customXml =  "+finalXmlStr);
 
 		interminStr = null;
 		return finalXmlStr;
@@ -788,7 +794,7 @@ public class ResponsysUtil {
 			org.json.JSONArray arr = obj.getJSONArray("scoresInfo");
 			
 			//Hit the mongo only if it an unknown tag
-			if(validUnownTags.contains(((org.json.JSONObject)arr.get(0)).get("occassion").toString())){
+			if(((org.json.JSONObject)arr.get(0)).has("occassion")  && validUnownTags.contains(((org.json.JSONObject)arr.get(0)).get("occassion").toString())){
 				readyToProcessTags = getReadyToProcessTags(inputTags);
 				getWinnerMap(readyToProcessTags, winnerMap, arr);
 			}

@@ -158,16 +158,15 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 				diffTagsString = diffTagsString.substring(0,
 						diffTagsString.length() - 1);
 				
-				jedis = new Jedis(host, port, 1800);
-				jedis.connect();
-				jedis.set("Responses:" + l_id, diffTagsString);
-				jedis.expire("Responses:" + l_id, 300);
-				jedis.disconnect();
-				
 			}
 			else{
 				LOGGER.info("Empty Input Tags for Lid " + lyl_id_no);
 			}
+			jedis = new Jedis(host, port, 1800);
+			jedis.connect();
+			jedis.set("Responses:" + l_id, diffTagsString);
+			jedis.expire("Responses:" + l_id, 300);
+			jedis.disconnect();
 
 			// reset the variableValueMap to 0 before persisting new incoming
 			// tags
@@ -203,7 +202,7 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 											.iterator().next());
 							countMetric.scope("tag_variable_added").incr();
 						} else {
-							LOGGER.info("No Tag Variable for lid "+ lyl_id_no +" for tag " + tag);
+							LOGGER.info("No Tag Variable or Tag belongs to 'Unknown/browse/top5%' for lid "+ lyl_id_no +" for tag " + tag);
 							countMetric.scope("no_tag_variable").incr();
 						}
 					} else {
@@ -226,12 +225,13 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 				countMetric.scope("emitted_to_scoring").incr();
 				this.outputCollector.emit(listToEmit);
 			} else {
+				LOGGER.info("variableValueTagsMap is null or empty or lid " + lyl_id_no);
 				List<Object> listToEmit = new ArrayList<Object>();
 				listToEmit.add(l_id);
 				listToEmit.add(tagsString.toString());
 				listToEmit.add("");
 				listToEmit.add("");
-				listToEmit.add("");
+				listToEmit.add(lyl_id_no.getAsString());
 				listToEmit.add(messageID);
 				this.outputCollector.emit(listToEmit);
 				countMetric.scope("no_variables_affected").incr();
