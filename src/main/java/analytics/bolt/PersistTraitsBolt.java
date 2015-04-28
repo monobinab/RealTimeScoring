@@ -37,6 +37,7 @@ public class PersistTraitsBolt extends EnvironmentBolt {
 			OutputCollector collector) {	
 		this.outputCollector = collector;
 		super.prepare(stormConf, context, collector);
+		memberTraitsDao = new MemberTraitsDao();
 	}
 	
 	 

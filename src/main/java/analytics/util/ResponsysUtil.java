@@ -213,9 +213,10 @@ public class ResponsysUtil {
 				
 				LOGGER.info("TIME:" + messageID + "- Custome Xml start -" + System.currentTimeMillis());
 				//Generate the Custome Xml to be sent to Oracle
+
 				String customXml = createCustomXml(xmlWithoutExpo,memberInfo!=null ? memberInfo.getEid() : null,custEventName,winningTag,lyl_l_id);
 				LOGGER.info("TIME:" + messageID + "- Custome Xml end -" + System.currentTimeMillis());
-				
+
 				//BOM = Byte-Order-Mark
 				//Remove the BOM to make the XML valid
 				String xmlWithoutBOM = removeUTF8BOM(customXml);
@@ -235,11 +236,12 @@ public class ResponsysUtil {
 				
 				LOGGER.info("TIME:" + messageID + "- Insert Occasion Response Start -" + System.currentTimeMillis());
 				occasionResponsesDao.addOccasionResponse(l_id, memberInfo!=null ? memberInfo.getEid() : null, custEventName, winningTag.getPurchaseOccasion(), winningTag.getBusinessUnit(), winningTag.getSubBusinessUnit(), 
+
 						strBuff.toString().contains("<success>true</success>") ? "Y" : "N", winningTag.getMdTags());
 				LOGGER.info("TIME:" + messageID + "- Insert Occasion Response end -" + System.currentTimeMillis());
 				
-				winningTag.setEmailOptIn(memberInfo!=null ? memberInfo.getEmailOptIn() : null);
-				
+				winningTag.setEmailOptIn( memberInfo != null?memberInfo.getEmailOptIn():null);
+
 				xmlWithoutBOM = null;
 				xmlWithoutExpo = null;
 				json2XmlString = null;
