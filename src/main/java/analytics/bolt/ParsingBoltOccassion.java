@@ -81,7 +81,8 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 		memberTagDao = new MemberMDTagsDao();
 		modelPercDao = new ModelPercentileDao();
 		
-		
+		getTagVariableMap();
+		getModelScoreMap();
 		//JedisPoolConfig poolConfig = new JedisPoolConfig();
 		//poolConfig.setMaxActive(100);
 		//jedisPool = new JedisPool(poolConfig, host, port, 100);
@@ -208,10 +209,10 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 			
 			
 			for(JsonElement tag : tags){
-				TagVariable tagVar = getTagVariableMap().get(tag.getAsString().substring(0, 5));
+				TagVariable tagVar = tagVariablesMap.get(tag.getAsString().substring(0, 5));
 				
 				if(tagVar !=null){
-					String score = getModelScoreMap().get(tagVar.getModelId());
+					String score = modelScoreMap.get(tagVar.getModelId());
 					if(score!=null){
 						//ModelScore modelScore = new ModelScore();
 						//modelScore.setModelId(new Integer (tagVar.getModelId()));
