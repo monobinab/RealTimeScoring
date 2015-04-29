@@ -110,7 +110,7 @@ public class ResponseBolt extends EnvironmentBolt{
 					
 					LOGGER.info("TIME:" + messageID + "-Making responsys call-" + System.currentTimeMillis());
 					//if( readyToProcessTags.size()>0){
-						TagMetadata tagMetadata = responsysUtil.getResponseServiceResult(scoreInfoJsonString,lyl_id_no,list,l_id, messageID);
+						TagMetadata tagMetadata = responsysUtil.getResponseServiceResult(scoreInfoJsonString,lyl_id_no,list,l_id, messageID, countMetric);
 						LOGGER.info("TIME:" + messageID + "-Completed responsys call-" + System.currentTimeMillis());
 						if(tagMetadata!=null && tagMetadata.getPurchaseOccasion()!=null && 
 								tagMetadata.getEmailOptIn()!=null && tagMetadata.getEmailOptIn().equals("N")){
