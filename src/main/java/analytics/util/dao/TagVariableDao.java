@@ -29,12 +29,19 @@ public class TagVariableDao extends AbstractDao {
 	}
 	
 	public Map<String, TagVariable> getTagVariables(){
+		Map<String, TagVariable> tagVariablesMap = new HashMap<String, TagVariable>();
 		DBCursor tagVariables = tagVariablesCollection.find();
 		while(tagVariables.hasNext()){
 			DBObject tagVariableObject = tagVariables.next();
-			
+			if(tagVariableObject!=null)
+			{
+				tagVariablesMap.put(tagVariableObject.get(MongoNameConstants.TAG_VAR_MDTAG).toString(), 
+						new TagVariable(tagVariableObject.get(MongoNameConstants.TAG_VAR_MDTAG).toString(),
+								tagVariableObject.get(MongoNameConstants.TAG_VAR_MODEL).toString(),
+										tagVariableObject.get(MongoNameConstants.TAG_VAR_VAR).toString()));
+			}
 		}
-		return null;
+		return tagVariablesMap;
 	}
 
 	public Map<String, String> getTagVariable(String tag) {

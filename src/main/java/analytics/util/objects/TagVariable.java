@@ -2,9 +2,9 @@ package analytics.util.objects;
 
 public class TagVariable {
 private String tag;
-private int modelId;
+private String modelId;
 private String variable;
-TagVariable(String tag, int modelId, String variable){
+public TagVariable(String tag, String modelId, String variable){
 	this.tag = tag;
 	this.modelId = modelId;
 	this.variable = variable;
@@ -15,10 +15,10 @@ public String getTag() {
 public void setTag(String tag) {
 	this.tag = tag;
 }
-public int getModelId() {
+public String getModelId() {
 	return modelId;
 }
-public void setModelId(int modelId) {
+public void setModelId(String modelId) {
 	this.modelId = modelId;
 }
 public String getVariable() {
