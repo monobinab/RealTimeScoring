@@ -187,7 +187,7 @@ public void getTagMetaDataNullTest(){
 @Test
 public void getVariableValueTest(){
 	
-	String tagVarValue = parsingBoltOccassion.getTagVarValue("68");
+	String tagVarValue = parsingBoltOccassion.getTagVarValue("35");
 	Assert.assertEquals("0.11", tagVarValue);
 }
 
