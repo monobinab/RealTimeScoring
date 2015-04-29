@@ -78,10 +78,10 @@ public class ParsingBoltOccassionFakeMonogColl {
 		
 		//fake modelPerc collection
 		modelPercColl = SystemPropertyUtility.getDb().getCollection("modelPercentile");
-		modelPercColl.insert(new BasicDBObject("modelId", "68").append("modelName", "S_SCR_TEST").append("percentile", "99").append("maxScore", 0.11));
-		modelPercColl.insert(new BasicDBObject("modelId", "35").append("modelName", "S_SCR_TEST2").append("percentile", "99").append("maxScore", 0.11));
-		modelPercColl.insert(new BasicDBObject("modelId", "39").append("modelName", "S_SCR_TEST3").append("percentile", "99").append("maxScore", 0.11));
-		modelPercColl.insert(new BasicDBObject("modelId", "46").append("modelName", "S_SCR_TEST4").append("percentile", "99").append("maxScore", 0.11));
+		modelPercColl.insert(new BasicDBObject("modelId", "68").append("modelName", "S_SCR_TEST").append("percentile", "98").append("maxScore", 0.11));
+		modelPercColl.insert(new BasicDBObject("modelId", "35").append("modelName", "S_SCR_TEST2").append("percentile", "98").append("maxScore", 0.11));
+		modelPercColl.insert(new BasicDBObject("modelId", "39").append("modelName", "S_SCR_TEST3").append("percentile", "98").append("maxScore", 0.11));
+		modelPercColl.insert(new BasicDBObject("modelId", "46").append("modelName", "S_SCR_TEST4").append("percentile", "98").append("maxScore", 0.11));
 		
 		setTagMetadataColl(tagMetadataColl);
 		setMemberMDTagsColl(memberMDTagsColl);
