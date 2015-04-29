@@ -45,6 +45,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import backtype.storm.metric.api.MultiCountMetric;
 import analytics.util.dao.MemberInfoDao;
 import analytics.util.dao.OccasionResponsesDao;
 import analytics.util.dao.OccationCustomeEventDao;
@@ -135,10 +136,11 @@ public class ResponsysUtil {
 	/**
 	 * Hit the Url and get the response back from Oracle
 	 * @param input
+	 * @param countMetric 
 	 * @return
 	 * @throws Exception
 	 */
-	public TagMetadata getResponseServiceResult(String input, String lyl_l_id, ArrayList<TagMetadata> inputTags, String l_id, String messageID) throws Exception {
+	public TagMetadata getResponseServiceResult(String input, String lyl_l_id, ArrayList<TagMetadata> inputTags, String l_id, String messageID, MultiCountMetric countMetric) throws Exception {
 		LOGGER.info(" Testing - Entering the getResponseServiceResult method");
 		StringBuffer strBuff = new StringBuffer();
 		BufferedReader in = null;
@@ -177,6 +179,7 @@ public class ResponsysUtil {
 				
 				//Send to Responsys only when there is member info or when there is an non zero eid
 				if(memberInfo==null || memberInfo.getEid() == null || memberInfo.getEid().equals("0")){
+					countMetric.scope("null_memberinfo").incr();
 					LOGGER.info("No Member Info available for Lid " + lyl_l_id );
 					return null;
 				}
@@ -221,7 +224,8 @@ public class ResponsysUtil {
 
 				String customXml = createCustomXml(xmlWithoutExpo,memberInfo!=null ? memberInfo.getEid() : null,custEventName,winningTag,lyl_l_id);
 				LOGGER.info("TIME:" + messageID + "- Custome Xml end -" + System.currentTimeMillis());
-
+				
+				countMetric.scope("calling_responsys_api").incr();
 				//BOM = Byte-Order-Mark
 				//Remove the BOM to make the XML valid
 				String xmlWithoutBOM = removeUTF8BOM(customXml);
