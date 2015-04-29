@@ -59,7 +59,7 @@ public class ResponseBolt extends EnvironmentBolt{
 	public void execute(Tuple input) {
 		String lyl_id_no = null; 
 		Jedis jedis = null;
-		
+		countMetric.scope("entering_responsys_bolt").incr();
 		try {
 			
 			String messageID = "";
@@ -104,6 +104,7 @@ public class ResponseBolt extends EnvironmentBolt{
 				}*/
 				
 				if(diffTags!=null && !"".equals(diffTags)){
+					countMetric.scope("making_responsys_call").incr();
 					//Get the metadata info for all the tags
 					ArrayList<TagMetadata> list = responsysUtil.getTagMetaDataList(diffTags);
 					
@@ -118,11 +119,17 @@ public class ResponseBolt extends EnvironmentBolt{
 								jedis.set("Vibes:"+lyl_id_no, tagMetadata.getPurchaseOccasion());
 								jedis.disconnect();
 								//jedisPool.returnResource(jedis);
-							
+								countMetric.scope("adding_to_vibes_call").incr();
 						}
-							countMetric.scope("responses").incr();
+						countMetric.scope("responsys_call_completed").incr();
+				}
+				else{
+					countMetric.scope("no_diff_tags").incr();
 				}
 
+			}
+			else{
+				countMetric.scope("no_lid").incr();
 			}
 			LOGGER.info("TIME:" + messageID + "-Completed Response bolt-" + System.currentTimeMillis());
 			outputCollector.ack(input);
