@@ -74,6 +74,7 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 			    	listToEmit.add(input.getString(4));
 			    	listToEmit.add(messageID);
 			    	outputCollector.emit(listToEmit);
+			    	countMetric.scope("tags_without_rescoring").incr();
 			}else{
 				if (input.contains("lyl_id_no")) {
 					String lyl_id_no = input.getStringByField("lyl_id_no");
@@ -82,10 +83,15 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 					listToEmit.add(lyl_id_no);
 					listToEmit.add(messageID);
 					this.outputCollector.emit("response_stream_from_persist", listToEmit);
+					countMetric.scope("tags_without_rescoring").incr();
+				}
+				else{
+					countMetric.scope("no_lyl_id_no").incr();
 				}
 			}
 			LOGGER.info("TIME:" + messageID + "-Exiting PersistOccasionbolt-" + System.currentTimeMillis());
 			outputCollector.ack(input);
+			countMetric.scope("persisted_successfully").incr();
 			
 		} catch (Exception e) {
 			LOGGER.error("Json Exception ", e);
