@@ -225,7 +225,7 @@ public class ResponsysUtil {
 				String customXml = createCustomXml(xmlWithoutExpo,memberInfo!=null ? memberInfo.getEid() : null,custEventName,winningTag,lyl_l_id);
 				LOGGER.info("TIME:" + messageID + "- Custome Xml end -" + System.currentTimeMillis());
 				
-				countMetric.scope("calling_responsys").incr();
+				countMetric.scope("calling_responsys_api").incr();
 				//BOM = Byte-Order-Mark
 				//Remove the BOM to make the XML valid
 				String xmlWithoutBOM = removeUTF8BOM(customXml);
