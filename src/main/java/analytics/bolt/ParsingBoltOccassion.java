@@ -1,43 +1,33 @@
 package analytics.bolt;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.mozilla.javascript.tools.debugger.treetable.JTreeTable.ListToTreeSelectionModelWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
+import analytics.util.JsonUtils;
+import analytics.util.SecurityUtils;
+import analytics.util.dao.MemberMDTagsDao;
+import analytics.util.dao.ModelPercentileDao;
+import analytics.util.dao.TagMetadataDao;
+import analytics.util.dao.TagVariableDao;
+import analytics.util.objects.TagMetadata;
+import analytics.util.objects.TagVariable;
+import backtype.storm.task.OutputCollector;
+import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.OutputFieldsDeclarer;
+import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Tuple;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
-
-import analytics.util.HostPortUtility;
-import analytics.util.JsonUtils;
-import analytics.util.MongoNameConstants;
-import analytics.util.SecurityUtils;
-import analytics.util.dao.MemberMDTagsDao;
-import analytics.util.dao.ModelPercentileDao;
-import analytics.util.dao.OccasionVariableDao;
-import analytics.util.dao.TagMetadataDao;
-import analytics.util.dao.TagVariableDao;
-import analytics.util.objects.TagMetadata;
-import backtype.storm.metric.api.MultiCountMetric;
-import backtype.storm.task.OutputCollector;
-import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
-import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Tuple;
 
 public class ParsingBoltOccassion extends EnvironmentBolt {
 	private static final Logger LOGGER = LoggerFactory
@@ -50,6 +40,9 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 	private JedisPool jedisPool;
 	private String host;
 	private int port;
+	Map<String, TagVariable> tagVariablesMap = new HashMap<String, TagVariable>();
+	Map<String, String> modelScoreMap = new HashMap<String, String>();
+	
 
 	public ParsingBoltOccassion(String systemProperty, String host, int port) {
 		super(systemProperty);
@@ -87,6 +80,8 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 		tagVariableDao = new TagVariableDao();
 		memberTagDao = new MemberMDTagsDao();
 		modelPercDao = new ModelPercentileDao();
+		
+		
 		//JedisPoolConfig poolConfig = new JedisPoolConfig();
 		//poolConfig.setMaxActive(100);
 		//jedisPool = new JedisPool(poolConfig, host, port, 100);
@@ -97,8 +92,6 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 		// System.out.println("IN PARSING BOLT: " + input);
 		Jedis jedis = null;
 		try {
-			
-			
 			
 			String messageID = "";
 			if (input.contains("messageID")) {
@@ -165,7 +158,7 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 			jedis = new Jedis(host, port, 1800);
 			jedis.connect();
 			jedis.set("Responses:" + l_id, diffTagsString);
-			jedis.expire("Responses:" + l_id, 300);
+			jedis.expire("Responses:" + l_id, 172800);
 			jedis.disconnect();
 
 			// reset the variableValueMap to 0 before persisting new incoming
@@ -179,7 +172,7 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 			// this.outputCollector.emit("persist_stream", emitToPersist);
 			LOGGER.debug("Scoring for " + l_id);
 
-			if (tags != null && tags.size() != 0) {
+			/*if (tags != null && tags.size() != 0) {
 				for (JsonElement tag : tags) {
 					TagMetadata tagMetaData = getTagMetaData(tag);
 					if (tagMetaData != null) {// TODO: Add list of tagMetadatas
@@ -210,7 +203,32 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 						countMetric.scope("unwanted_tag_metadata").incr();
 					}
 				}
+			}*/
+			
+			
+			
+			for(JsonElement tag : tags){
+				TagVariable tagVar = getTagVariableMap().get(tag.getAsString().substring(0, 5));
+				
+				if(tagVar !=null){
+					String score = getModelScoreMap().get(tagVar.getModelId());
+					if(score!=null){
+						//ModelScore modelScore = new ModelScore();
+						//modelScore.setModelId(new Integer (tagVar.getModelId()));
+						//modelScore.setScore(score);
+						
+						populateVariableValueTagsMap(variableValueTagsMap,
+								score, tagVar.getVariable());
+						
+					}
+				}
+					//tagVarsArr.add(tagVar);
 			}
+			
+			
+			
+			
+			
 			// Even if there are no new tags and the list is null, we need to
 			// process the deletes
 			if (variableValueTagsMap != null && !variableValueTagsMap.isEmpty()) {
@@ -248,6 +266,26 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 		outputCollector.ack(input);
 	}
 
+	
+	public Map<String, TagVariable> getTagVariableMap(){
+		
+		if(tagVariablesMap.isEmpty()){
+			tagVariablesMap = tagVariableDao.getTagVariables();
+			
+		}
+		return tagVariablesMap;
+	}
+	
+	public Map<String, String> getModelScoreMap(){
+		
+		if(modelScoreMap.isEmpty()){
+			modelScoreMap = modelPercDao.getModelWith98Percentile();
+			
+		}
+		return modelScoreMap;
+	}
+	
+	
 	/**
 	 * Sree.
 	 * 

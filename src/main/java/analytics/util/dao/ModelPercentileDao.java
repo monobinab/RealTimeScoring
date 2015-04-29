@@ -21,8 +21,12 @@ import org.slf4j.LoggerFactory;
 
 
 
+
+
 import scala.Array;
 import analytics.util.MongoNameConstants;
+import analytics.util.objects.MemberInfo;
+import analytics.util.objects.TagVariable;
 import clojure.main;
 
 import com.mongodb.BasicDBObject;
@@ -58,7 +62,7 @@ public class ModelPercentileDao extends AbstractDao{
 		
 		List<BasicDBObject> query = new ArrayList<BasicDBObject>();
 		query.add(new BasicDBObject(MongoNameConstants.MODEL_ID, modelId));
-		query.add(new BasicDBObject(MongoNameConstants.MODEL_PERC, "99"));
+		query.add(new BasicDBObject(MongoNameConstants.MODEL_PERC, "98"));
 		BasicDBObject andQuery = new BasicDBObject();
 		andQuery.put("$and", query);
 		DBObject dbObj = modelPercentileCollection.findOne(andQuery);
@@ -66,10 +70,27 @@ public class ModelPercentileDao extends AbstractDao{
 			return dbObj.get(MongoNameConstants.MAX_SCORE).toString();
 		}
 		else{
-			LOGGER.info("No maxscore found for model " + modelId + " with 99 %");
+			LOGGER.info("No maxscore found for model " + modelId + " with 98 %");
 			return null;
 		}
 	}
+	
+	public HashMap<String,String> getModelWith98Percentile(){
+		HashMap <String,String> modelPercentile = new HashMap<String, String>();
+		BasicDBObject query = new BasicDBObject();
+		query.put(MongoNameConstants.MODEL_PERC, "98");
+		
+		DBCursor modelScoreCursor = modelPercentileCollection.find(query);
+		while(modelScoreCursor.hasNext()){
+			DBObject modelScore = modelScoreCursor.next();
+			if(modelScore!=null)
+			{
+				modelPercentile.put(modelScore.get(MongoNameConstants.MODEL_ID).toString(), modelScore.get(MongoNameConstants.MAX_SCORE).toString());
+			}
+		}
+		return modelPercentile;
+	}
+	
 	/*
 	public static void main(String[] args){
 		ModelPercentileDao dao = new ModelPercentileDao();

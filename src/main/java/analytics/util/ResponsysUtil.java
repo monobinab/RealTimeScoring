@@ -32,7 +32,9 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.CharacterData;
@@ -182,6 +184,9 @@ public class ResponsysUtil {
 				
 				//TagMetadata tagMetaData = getTagMetaData(tag);
 				String custEventName = occationCustomeEventDao.getCustomeEventName(winningTag.getPurchaseOccasion());
+				
+				//Get only 1st Rank from the API to send to Responsys
+				//getOnlyRankOneOccasion(obj);
 				
 	
 				/*//4-15-2015. Check if the Tag is among the top 5 mdtags from the API Call.
@@ -950,5 +955,21 @@ public class ResponsysUtil {
 			LOGGER.error("Exception in getJsonObjForUnknown", e);
 		}
 		return o;
+	}
+	
+	private void getOnlyRankOneOccasion(JSONObject obj){
+		try {
+			JSONArray arr = obj.getJSONArray("scoresInfo");
+			JSONObject newObj = arr.getJSONObject(0);
+			
+			JSONArray newArr = new JSONArray();
+			newArr.put(newObj);
+			
+			obj.put("scoresInfo", newArr);
+			
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

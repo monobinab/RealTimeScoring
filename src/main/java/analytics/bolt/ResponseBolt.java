@@ -83,8 +83,10 @@ public class ResponseBolt extends EnvironmentBolt{
 				jedis = new Jedis(host, port, 1800);
 				jedis.connect();
 				String diffTags = null;
-				if(jedis.exists("Responses:"+l_id))
+				if(jedis.exists("Responses:"+l_id)){
 					diffTags = jedis.get("Responses:"+l_id).toString() ;
+					jedis.del("Responses:"+l_id);
+				}
 				else
 					LOGGER.info("No Tags found for lyl_id_no " + lyl_id_no);
 				
