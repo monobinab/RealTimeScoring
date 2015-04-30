@@ -6,7 +6,7 @@ public class Constants {
 	//public static final String SCORING_API_PRE = "http://rtsapi301p.qa.ch3.s.com:8180/rtsapi/v1/top/categories/";
 	//public static final String SCORING_API_PRE = "hfdvrtsejboss1.vm.itg.corp.us.shldcorp.com:8180/rtsapi/v1/top/categories/";
 	public static final String SCORING_API_PRE = "http://realtimescoring.intra.searshc.com/rtsapi/v1/top/categories/";
-	public static final String SCORING_API_POST = "/10?key=za4n47bd&tags=models"; 
+	public static final String SCORING_API_POST = "/20?key=za4n47bd&tags=models"; 
 	public static final String AUTH_PROPERTY_FILE = "authentication.properties";
 	public static final String RESP_URL_USER_NAME = "responseWebserviceUsrname";
 	public static final String RESP_URL_PASSWORD = "responseWebservicePassword";

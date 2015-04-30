@@ -165,9 +165,11 @@ public class ResponsysUtil {
 			
 			//Determine the winner tag to send to Responsys
 			//TagMetadata winningTag = determineWinningTag(obj,tags);
-			winningTag = determineUnknownWinner(obj,inputTags);
-			
-			if(winningTag == null || !winningTag.getPurchaseOccasion().equalsIgnoreCase("Unknown")){
+			org.json.JSONArray arr = obj.getJSONArray("scoresInfo");
+			if(((org.json.JSONObject)arr.get(0)).has("occassion")  && 
+					validUnownTags.contains(((org.json.JSONObject)arr.get(0)).get("occassion").toString())){
+				winningTag = determineUnknownWinner(arr,inputTags);	
+			}else{
 				winningTag = getTagMetaDataInfo(obj);
 			}
 			
@@ -706,8 +708,9 @@ public class ResponsysUtil {
 			HashMap<String, String> activeTags = tagResponsysActiveDao.getResponsysActiveTagsList();
 
 			for(TagMetadata tagMeta : tagsMetaList){
-				if( activeTags.get(tagMeta.getFirst5CharMdTag())!= null &&
-						activeTags.get(tagMeta.getFirst5CharMdTag()).contains(tagMeta.getPurchaseOccasion())){
+				if( activeTags.get(tagMeta.getFirst5CharMdTag())!= null 
+						//&& activeTags.get(tagMeta.getFirst5CharMdTag()).contains(tagMeta.getPurchaseOccasion())
+						){
 					metaDataList.add(tagMeta);
 				}
 			}
@@ -797,18 +800,16 @@ public class ResponsysUtil {
 	}
 
 
-	public TagMetadata determineUnknownWinner(org.json.JSONObject obj, ArrayList<TagMetadata> inputTags){
+	public TagMetadata determineUnknownWinner(org.json.JSONArray arr, ArrayList<TagMetadata> inputTags){
 		TreeMap<Integer, TagMetadata> winnerMap = new TreeMap<Integer, TagMetadata>();
 		TagMetadata winnerTag = null;
 		ArrayList<TagMetadata> readyToProcessTags = new ArrayList<TagMetadata>();
 		try {
-			org.json.JSONArray arr = obj.getJSONArray("scoresInfo");
 			
 			//Hit the mongo only if it an unknown tag
-			if(((org.json.JSONObject)arr.get(0)).has("occassion")  && validUnownTags.contains(((org.json.JSONObject)arr.get(0)).get("occassion").toString())){
-				readyToProcessTags = getReadyToProcessTags(inputTags);
-				getWinnerMap(readyToProcessTags, winnerMap, arr);
-			}
+			readyToProcessTags = getReadyToProcessTags(inputTags);
+			getWinnerMap(readyToProcessTags, winnerMap, arr);
+			
 
 			//Check if the winning tags are all Unknown tags, pick the one with the percetile of 95%\
 			if(winnerMap.size() > 0){
@@ -829,7 +830,7 @@ public class ResponsysUtil {
 			TreeMap<Integer, TagMetadata> winnerMap, org.json.JSONArray arr)
 			throws JSONException {
 		
-		for(int i=0; (i< arr.length() || i < 15); i++){
+		for(int i=0; i< arr.length() ; i++){
 			for(int j =0 ; j < tags.size(); j++){
 				TagMetadata tag = tags.get(j);
 				if(((org.json.JSONObject)arr.get(i)).has("mdTag") && ((org.json.JSONObject)arr.get(i)).has("occassion") &&

@@ -74,7 +74,7 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 			    	listToEmit.add(input.getString(4));
 			    	listToEmit.add(messageID);
 			    	outputCollector.emit(listToEmit);
-			    	countMetric.scope("tags_without_rescoring").incr();
+			    	countMetric.scope("tags_with_rescoring").incr();
 			}else{
 				if (input.contains("lyl_id_no")) {
 					String lyl_id_no = input.getStringByField("lyl_id_no");

@@ -42,6 +42,7 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 	private int port;
 	Map<String, TagVariable> tagVariablesMap = new HashMap<String, TagVariable>();
 	Map<String, String> modelScoreMap = new HashMap<String, String>();
+	private static String unknownTagDigits = "0,7,8";
 	
 
 	public ParsingBoltOccassion(String systemProperty, String host, int port) {
@@ -209,26 +210,23 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 			
 			
 			for(JsonElement tag : tags){
+				
+				//If the Tag belongs to custom Unknown tag recognized by the 6th digit, then just don't score. 
+				if(unknownTagDigits.contains(tag.getAsString().substring(5, 6)))
+					continue;
+				
 				TagVariable tagVar = tagVariablesMap.get(tag.getAsString().substring(0, 5));
 				
 				if(tagVar !=null){
 					String score = modelScoreMap.get(tagVar.getModelId());
 					if(score!=null){
-						//ModelScore modelScore = new ModelScore();
-						//modelScore.setModelId(new Integer (tagVar.getModelId()));
-						//modelScore.setScore(score);
-						
+			
 						populateVariableValueTagsMap(variableValueTagsMap,
 								score, tagVar.getVariable());
 						
 					}
 				}
-					//tagVarsArr.add(tagVar);
 			}
-			
-			
-			
-			
 			
 			// Even if there are no new tags and the list is null, we need to
 			// process the deletes
