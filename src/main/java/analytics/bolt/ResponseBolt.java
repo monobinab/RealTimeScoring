@@ -1,27 +1,18 @@
 package analytics.bolt;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
 import analytics.util.ResponsysUtil;
 import analytics.util.SecurityUtils;
-import analytics.util.dao.OccasionResponsesDao;
-import analytics.util.dao.OccationCustomeEventDao;
-import analytics.util.dao.TagMetadataDao;
-import analytics.util.dao.TagResponsysActiveDao;
 import analytics.util.objects.TagMetadata;
-import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Tuple;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import redis.clients.jedis.Jedis;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 public class ResponseBolt extends EnvironmentBolt{
 	/**
@@ -66,14 +57,14 @@ public class ResponseBolt extends EnvironmentBolt{
 			if (input.contains("messageID")) {
 				messageID = input.getStringByField("messageID");
 			}
-			LOGGER.info("TIME:" + messageID + "-Entering Response bolt-" + System.currentTimeMillis());
+			LOGGER.debug("TIME:" + messageID + "-Entering Response bolt-" + System.currentTimeMillis());
 			
 			if(input != null && input.contains("lyl_id_no")){
 				lyl_id_no = input.getString(0);
 				String scoreInfoJsonString = responsysUtil.callRtsAPI(lyl_id_no);
 				String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no);
 				
-				LOGGER.info("TIME:" + messageID + "-Calling API complete-" + System.currentTimeMillis());
+				LOGGER.debug("TIME:" + messageID + "-Calling API complete-" + System.currentTimeMillis());
 				
 				//4-2-2015.Recent update to send responses only for 1 tag irrespective of 
 				//how many tags we receive in the difference. This occasion tag 
@@ -88,7 +79,7 @@ public class ResponseBolt extends EnvironmentBolt{
 					jedis.del("Responses:"+l_id);
 				}
 				else
-					LOGGER.info("No Tags found for lyl_id_no " + lyl_id_no);
+					LOGGER.debug("No Tags found for lyl_id_no " + lyl_id_no);
 				
 				jedis.disconnect();
 				//jedisPool.returnResource(jedis);
@@ -108,10 +99,10 @@ public class ResponseBolt extends EnvironmentBolt{
 					//Get the metadata info for all the tags
 					ArrayList<TagMetadata> list = responsysUtil.getTagMetaDataList(diffTags);
 					
-					LOGGER.info("TIME:" + messageID + "-Making responsys call-" + System.currentTimeMillis());
+					LOGGER.debug("TIME:" + messageID + "-Making responsys call-" + System.currentTimeMillis());
 					//if( readyToProcessTags.size()>0){
 						TagMetadata tagMetadata = responsysUtil.getResponseServiceResult(scoreInfoJsonString,lyl_id_no,list,l_id, messageID, countMetric);
-						LOGGER.info("TIME:" + messageID + "-Completed responsys call-" + System.currentTimeMillis());
+						LOGGER.debug("TIME:" + messageID + "-Completed responsys call-" + System.currentTimeMillis());
 						if(tagMetadata!=null && tagMetadata.getPurchaseOccasion()!=null && 
 								tagMetadata.getEmailOptIn()!=null && tagMetadata.getEmailOptIn().equals("N")){
 								jedis = new Jedis(host, port, 1800);
@@ -131,7 +122,7 @@ public class ResponseBolt extends EnvironmentBolt{
 			else{
 				countMetric.scope("no_lid").incr();
 			}
-			LOGGER.info("TIME:" + messageID + "-Completed Response bolt-" + System.currentTimeMillis());
+			LOGGER.debug("TIME:" + messageID + "-Completed Response bolt-" + System.currentTimeMillis());
 			outputCollector.ack(input);
 			
 		} catch (Exception e) {

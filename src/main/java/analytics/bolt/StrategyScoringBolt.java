@@ -1,32 +1,21 @@
 package analytics.bolt;
 
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
 import analytics.exception.RealTimeScoringException;
-import analytics.util.Constants;
 import analytics.util.JsonUtils;
-import analytics.util.MongoNameConstants;
 import analytics.util.ScoringSingleton;
-import analytics.util.dao.MemberScoreDao;
 import analytics.util.objects.Change;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import redis.clients.jedis.Jedis;
+
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * 
@@ -111,7 +100,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		if (input.contains("messageID")) {
 			messageID = input.getStringByField("messageID");
 		}
-		LOGGER.info("TIME:" + messageID + "-Entering scoring bolt-" + System.currentTimeMillis());
+		LOGGER.debug("TIME:" + messageID + "-Entering scoring bolt-" + System.currentTimeMillis());
 		// 2) Create map of new changes from the input
 		Map<String, String> newChangesVarValueMap = JsonUtils
 				.restoreVariableListFromJson(input.getString(1));
@@ -119,7 +108,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		// 3) Find all models affected by the changes
 		Set<Integer> modelIdList = ScoringSingleton.getInstance().getModelIdList(newChangesVarValueMap);
 		if(modelIdList==null||modelIdList.isEmpty()){
-			LOGGER.info("No models affected for " +lyl_id_no);
+			LOGGER.debug("No models affected for " +lyl_id_no);
 			redisCountIncr("no_models_affected");
 			outputCollector.ack(input);
 			return;
@@ -134,7 +123,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			LOGGER.error("Can not create member variable map", e1);
 		}
 		if(memberVariablesMap==null){
-			LOGGER.info("Unable to find member variables for " + lId);
+			LOGGER.debug("Unable to find member variables for " + lId);
 			redisCountIncr("no_member_variables");
 			outputCollector.ack(input);
 			return;
@@ -228,11 +217,11 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 				
 		// 10) Write changedMemberVariableswith expiry
 		ScoringSingleton.getInstance().updateChangedVariables(lId, allChanges);
-		LOGGER.info("TIME:" + messageID + "-Score updates complete-" + System.currentTimeMillis());
+		LOGGER.debug("TIME:" + messageID + "-Score updates complete-" + System.currentTimeMillis());
 	
 		ScoringSingleton.getInstance().updateChangedMemberScore(lId, modelIdList, modelIdToExpiryMap, modelIdScoreMap,source);
 		
-		LOGGER.info("TIME:" + messageID + "- Scoring complete-" + System.currentTimeMillis());
+		LOGGER.debug("TIME:" + messageID + "- Scoring complete-" + System.currentTimeMillis());
 		
 		List<Object> listToEmit = new ArrayList<Object>();
 		listToEmit.add(lId);
