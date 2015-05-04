@@ -21,7 +21,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import analytics.exception.RealTimeScoringException;
@@ -29,9 +28,8 @@ import analytics.util.objects.Change;
 import analytics.util.objects.Model;
 import analytics.util.objects.Variable;
 
-import com.github.fakemongo.Fongo;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
+
 import com.mongodb.DBCollection;
 
 public class ScoringSingletonIntegrationTest {
@@ -75,7 +73,6 @@ public class ScoringSingletonIntegrationTest {
 	
 	//This integration test is check the re-scored value for modelIds 35  (a positive case)
 	@Test
-	@Ignore
 	public void executeScoringSingletonBasicPositiveCaseTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, RealTimeScoringException, ConfigurationException, ParseException{
 		
 		//Fake memberVariables collection
@@ -620,7 +617,6 @@ public class ScoringSingletonIntegrationTest {
 	//S_DSL_APP_INT_ACC is expired and S_DSL_APP_INT_ACC2 is not expired but both variables present in newChangesVariableValueMap
 	//So, both variables value and date will get updated with newChangesVarValuesMap based on their strategy
 	@Test
-	@Ignore
 	public void executeScoringSingletonOneVarExpOneVarNotExpBothPresentinNewChangesVarValueMap() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, RealTimeScoringException, ConfigurationException, ParseException{
 		
 		//Fake memberVariables collection

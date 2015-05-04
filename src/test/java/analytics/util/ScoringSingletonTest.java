@@ -24,7 +24,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import analytics.exception.RealTimeScoringException;
@@ -743,7 +742,6 @@ public class ScoringSingletonTest {
 	// in executeStrategy(), changedMemberVariables map gets updated with new
 	// values, dates etc
 	@Test
-	@Ignore
 	public void executeStrategyWithEmptyChangedMemberVariablesTest() throws SecurityException,
 			NoSuchFieldException, IllegalArgumentException,
 			IllegalAccessException, ParseException, ConfigurationException {
@@ -818,7 +816,7 @@ public class ScoringSingletonTest {
 	// This is to check executeStrategy() method (positive case)
 	//Note for variables S_DSL_APP_INT_ACC_FTWR_TRS and S_DSL_APP_INT_ACC_FTWR_MEM, exp date and value updated based on strategy
 	//for variable S_DSL_APP_INT_ACC_FTWR_ALL, expiration date and value are from changedMemVariables
-	/*@Test
+	@Test
 	public void executeStrategyPositiveCaseTest() throws SecurityException,
 			NoSuchFieldException, IllegalArgumentException,
 			IllegalAccessException, ParseException, ConfigurationException {
@@ -911,7 +909,7 @@ public class ScoringSingletonTest {
 
 
 	}
-*/
+
 	// This test case is checked with null modelIdScoreMap, 
 	//i.e., if there is no re-scored value for the modelIdList, the original value and dates will be re-stored
 	//In this test we can see that model id 51, changedMemScore value and dates are restored
