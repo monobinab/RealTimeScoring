@@ -63,6 +63,14 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	  	    add("14");
 	  	    add("16");
 	  	    add("50");
+	  	    add("47");
+	  	    add("48");
+	  	    add("49");
+	  	    add("73");
+	  	    add("72");
+	  	    add("51");
+	  	    add("54");
+	  	    add("55");
 	  	}};
 	}
 	

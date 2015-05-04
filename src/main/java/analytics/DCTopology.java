@@ -26,19 +26,15 @@ import backtype.storm.spout.SchemeAsMultiScheme;
 
 public class DCTopology {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ParsingBoltDC.class);
-	private static final long serialVersionUID = 1L;
 	private static final int partition_num = 3;
-	private static final int redis_port = 6379;
-
 	public static void main(String[] args) {
-		boolean isLocal = true;
+	
 		String topologyId = "";
 		if (!SystemUtility.setEnvironment(args)) {
 			System.out
 					.println("Please pass the environment variable argument- 'PROD' or 'QA' or 'LOCAL'");
 			System.exit(0);
-		} else {
-
+		}
 		TopologyBuilder builder = new TopologyBuilder();
 		BrokerHosts hosts = new ZkHosts("trprtelpacmapp1.vm.itg.corp.us.shldcorp.com:2181");
 		// use topology Id as part of the consumer ID to make it unique
@@ -65,7 +61,8 @@ public class DCTopology {
 		if (System.getProperty(MongoNameConstants.IS_PROD)
 				.equalsIgnoreCase("PROD")
 				|| System.getProperty(MongoNameConstants.IS_PROD)
-						.equalsIgnoreCase("QA")) {			try {
+						.equalsIgnoreCase("QA")) {	
+			try {
 				StormSubmitter.submitTopology(args[0], conf, builder.createTopology());
 			} catch (AlreadyAliveException e) {
 				LOGGER.error(e.getClass() + ": " + e.getMessage(), e);
@@ -84,7 +81,7 @@ public class DCTopology {
 			}
 			cluster.shutdown();
 		}
-		}
+		
 	}
 
 }

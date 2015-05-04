@@ -27,7 +27,7 @@ public class RegionalFactorDao extends AbstractDao {
 	public RegionalFactorDao() {
 		super();
 		regionalFactorColl = db.getCollection("regionalAdjustmentFactors"); 
-	}
+		}
 
 	public  void populateRegionalFactors(){
 		DBCursor cursor = regionalFactorColl.find();
