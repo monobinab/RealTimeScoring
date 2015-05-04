@@ -181,7 +181,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 				newScore = newScore * regionalFactor;
 				if(newScore > 1)
 					newScore = 1;
-				LOGGER.debug("new score after regional factor: " + newScore);
+				LOGGER.info("new score after regional factor for lId " +  lId + "for model " + modelId + ": " + newScore);
 			}
 			// 9) Emit the new score
 			Map<String, Date> minMaxMap = ScoringSingleton.getInstance().getMinMaxExpiry(modelId, allChanges);

@@ -1,10 +1,6 @@
 package analytics.bolt;
 
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import analytics.util.MongoNameConstants;
 import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
@@ -15,8 +11,8 @@ import backtype.storm.tuple.Tuple;
 
 public class EnvironmentBolt extends BaseRichBolt {
 	protected MultiCountMetric countMetric;
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(EnvironmentBolt.class);
+	/*private static final Logger LOGGER = LoggerFactory
+			.getLogger(EnvironmentBolt.class);*/
 	private String environment;
 	
 	public EnvironmentBolt() {
