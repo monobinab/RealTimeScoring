@@ -137,6 +137,7 @@ public class MongoNameConstants {
      //Member Info Collection
      public static final String E_ID = "eid";
      public static final String EMAIL_OPT_IN = "eml_opt_in";
+     public static final String STATE = "st_cd";
      
      //Occasion Custome Event Collection
      public static final String OCCASION = "occasion";
@@ -146,5 +147,10 @@ public class MongoNameConstants {
      public static final String PROCESSED_FLAG = "processed";
      
      public static final String ACTIVE_BUSINESS_UNIT= "BU";
+     
+     //regionalFactors collection
+     public static final String MODELID = "modelId";
+     public static final String FACTOR = "factor";
+     public static final String REGIONAL_STATE = "state";
 
 }

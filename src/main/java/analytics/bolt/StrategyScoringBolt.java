@@ -3,14 +3,17 @@ package analytics.bolt;
 import analytics.exception.RealTimeScoringException;
 import analytics.util.JsonUtils;
 import analytics.util.ScoringSingleton;
+import analytics.util.dao.MemberInfoDao;
 import analytics.util.objects.Change;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import redis.clients.jedis.Jedis;
 
 import java.math.BigDecimal;
@@ -29,11 +32,12 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	
 	private String host;
 	private int port;
-	//private JedisPool jedisPool;
-	private Jedis jedis;
-
+	
+	private MemberInfoDao memberInfoDao;
 	private static final long serialVersionUID = 1L;
 	private OutputCollector outputCollector;
+	
+	List<String> modelIdsWithRegFactor;
 	
 	public StrategyScoringBolt(String systemProperty, String host, int port) {
 		super(systemProperty);
@@ -52,21 +56,19 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		super.prepare(stormConf, context, collector);
 		LOGGER.info("PREPARING STRATEGY SCORING BOLT");	
 	  	this.outputCollector = collector;
-		//Configure the Redis Server.
-		if(host!=null && !host.equalsIgnoreCase("")){
-			//JedisPoolConfig poolConfig = new JedisPoolConfig();
-	        //poolConfig.setMaxActive(100);
-	        //jedisPool = new JedisPool(poolConfig,host, port, 100);
-	   
-		}
-		
+	  	memberInfoDao = new MemberInfoDao();
+	  	modelIdsWithRegFactor = new ArrayList<String>() {
+			private static final long serialVersionUID = 1L;
+		{
+	  	    add("14");
+	  	    add("16");
+	  	    add("50");
+	  	}};
 	}
 	
 	@Override
 	public void execute(Tuple input) {
-		
-		
-		
+			
 		if(LOGGER.isDebugEnabled()){
 		LOGGER.debug("The time it enters inside Strategy Bolt execute method "
 				+ System.currentTimeMillis());
@@ -148,10 +150,15 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		Map<String, String> modelIdScoreStringMap = new HashMap<String, String>();
 		Map<Integer,Map<String,Date>> modelIdToExpiryMap = new HashMap<Integer, Map<String,Date>>();
 		
+		//get the state for the memberId to get the regionalFactor for scoring
+		String state = memberInfoDao.getMemberInfoState(lId);
+
+		
 		for (Integer modelId : modelIdList) {// Score and emit for all modelIds
 												// before mongo inserts
 			// recalculate score for model
 			double newScore;
+			double regionalFactor;
 			try {
 				newScore = ScoringSingleton.getInstance().calcScore(memberVariablesMap, allChanges,
 						modelId);
@@ -160,6 +167,14 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 
 			newScore = newScore + ScoringSingleton.getInstance().getBoostScore(allChanges, modelId );
 			
+			//weigh the score with regional factor
+			if(modelIdsWithRegFactor.contains(modelId+"")){
+				regionalFactor = ScoringSingleton.getInstance().calcRegionalFactor(modelId, state);
+				newScore = newScore * regionalFactor;
+				if(newScore > 1)
+					newScore = 1;
+				LOGGER.debug("new score after regional factor: " + newScore);
+			}
 			// 9) Emit the new score
 			Map<String, Date> minMaxMap = ScoringSingleton.getInstance().getMinMaxExpiry(modelId, allChanges);
 			modelIdToExpiryMap.put(modelId, minMaxMap);
