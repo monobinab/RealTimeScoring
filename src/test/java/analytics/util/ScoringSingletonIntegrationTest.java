@@ -75,6 +75,7 @@ public class ScoringSingletonIntegrationTest {
 	
 	//This integration test is check the re-scored value for modelIds 35  (a positive case)
 	@Test
+	@Ignore
 	public void executeScoringSingletonBasicPositiveCaseTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, RealTimeScoringException, ConfigurationException, ParseException{
 		
 		//Fake memberVariables collection
