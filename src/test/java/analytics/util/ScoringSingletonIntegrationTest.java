@@ -619,6 +619,7 @@ public class ScoringSingletonIntegrationTest {
 	//S_DSL_APP_INT_ACC is expired and S_DSL_APP_INT_ACC2 is not expired but both variables present in newChangesVariableValueMap
 	//So, both variables value and date will get updated with newChangesVarValuesMap based on their strategy
 	@Test
+	@Ignore
 	public void executeScoringSingletonOneVarExpOneVarNotExpBothPresentinNewChangesVarValueMap() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, RealTimeScoringException, ConfigurationException, ParseException{
 		
 		//Fake memberVariables collection
