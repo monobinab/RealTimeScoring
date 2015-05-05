@@ -1,5 +1,7 @@
 package analytics.bolt;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +15,7 @@ import analytics.util.dao.TagMetadataDao;
 import analytics.util.dao.TagResponsysActiveDao;
 import analytics.util.dao.TagVariableDao;
 import analytics.util.objects.MemberInfo;
-import analytics.util.objects.Responsys;
+import analytics.util.objects.ResponsysPayload;
 import analytics.util.objects.TagMetadata;
 import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
@@ -23,13 +25,14 @@ import backtype.storm.tuple.Tuple;
 
 import org.json.JSONException;
 
+import scala.Array;
+
 public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ResponsysUnknownCallsBolt.class);
 	
-	private MultiCountMetric countMetric;
 	private OutputCollector outputCollector;
 	private ResponsysUtil responsysUtil;
 	private TagResponsysActiveDao tagResponsysActiveDao;
@@ -41,10 +44,6 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 	public ResponsysUnknownCallsBolt(String systemProperty) {
 		super(systemProperty);
 	}
-	void initMetrics(TopologyContext context){
-	     countMetric = new MultiCountMetric();
-	     context.registerMetric("custom_metrics", countMetric, 60);
-	    }
 
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
@@ -57,15 +56,14 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 		tagMetadataDao = new TagMetadataDao();
 		memberInfoDao = new MemberInfoDao();
 		topologyName = (String) stormConf.get("metrics_topology");
-		initMetrics(context);
-  }
+	 }
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public void execute(Tuple input) {
 		countMetric.scope("incoming_tuples").incr();
 		String lyl_id_no = null; 
-		Responsys responsysObj = new Responsys();
+		ResponsysPayload responsysObj = new ResponsysPayload();
 		try {
 			if(input != null && input.contains("lyl_id_no")){
 				lyl_id_no = input.getString(0);
@@ -73,7 +71,13 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 				String scoreInfoJsonString = responsysUtil.callRtsAPI(lyl_id_no);
 					
 				//get the list of models
-				List<String> activeTags = tagResponsysActiveDao.tagsResponsysList();
+				Map<String, String> activeTagMap = tagResponsysActiveDao.getResponsysActiveTagsList();
+				List<String> activeTags = new ArrayList<String>();
+				for (Map.Entry<String,String> entry : activeTagMap.entrySet()) {
+					activeTags.add(entry.getKey());
+				}
+
+			//	List<String> activeTags = tagResponsysActiveDao.tagsResponsysList();
 				Map<Integer, String> tagModelsMap = tagVariableDao.getTagModelIds(activeTags);
 				
 				//get the top jsonObject from api satisfying the condition
@@ -108,12 +112,14 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 				responsysObj.setTopologyName(topologyName);
 				
 				responsysUtil.getResponseUnknownServiceResult(responsysObj);
-			    countMetric.scope("data_to_responses").incr();
+			    redisCountIncr("data_to_responsys");
 		}
+			else{
+				redisCountIncr("no_lyl_id_no");
+			}
 			outputCollector.ack(input);
 	} catch (Exception e) {
 			LOGGER.error("Exception in ResponsysUnknownCallsBolt", e);
-			countMetric.scope("responses_failed").incr();
 		}
 	}
 		

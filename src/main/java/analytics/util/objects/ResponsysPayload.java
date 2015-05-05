@@ -1,6 +1,6 @@
 package analytics.util.objects;
 
-public class Responsys {
+public class ResponsysPayload{
 
 	private String lyl_id_no;
 	private String l_id;
