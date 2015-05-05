@@ -17,6 +17,8 @@ import org.slf4j.LoggerFactory;
 import analytics.util.AuthPropertiesReader;
 import analytics.util.Constants;
 import analytics.util.HttpClientUtils;
+import analytics.util.SecurityUtils;
+import analytics.util.dao.VibesDao;
 import analytics.util.objects.Vibes;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -28,7 +30,7 @@ public class VibesBolt extends EnvironmentBolt{
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(VibesBolt.class);
-	//private VibesDao vibesDao;
+	private VibesDao vibesDao;
 	private OutputCollector outputCollector;
 	
 	 public VibesBolt(String systemProperty){
@@ -40,7 +42,7 @@ public class VibesBolt extends EnvironmentBolt{
 			OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
 		this.outputCollector = collector;
-		//vibesDao = new VibesDao();
+		vibesDao = new VibesDao();
 	}
 	
 	@Override
@@ -57,10 +59,14 @@ public class VibesBolt extends EnvironmentBolt{
 			event_type = (String) vibes.getEvent_type();
 			LOGGER.info("PROCESSING L_Id: " + lyl_id_no +" for Event Type " + event_type);
 			
+			String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no);
+			
 			JSONObject vibesJson = generateJson(lyl_id_no,event_type);
 			
-			sendMessageToVibes(vibesJson.toString());
-			
+			if(sendMessageToVibes(vibesJson.toString())){
+				vibesDao.addVibesResponse(l_id, event_type,"Y");
+
+			}
 			//vibesDao.updateVibes(l_id);
 			
 			redisCountIncr("success_vibes");
@@ -77,7 +83,7 @@ public class VibesBolt extends EnvironmentBolt{
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 	}
 	
-	public void sendMessageToVibes(String jsonString) throws IOException{
+	public Boolean sendMessageToVibes(String jsonString) throws IOException{
 		
 		BufferedReader in = null;
 		OutputStreamWriter out = null;
@@ -120,7 +126,7 @@ public class VibesBolt extends EnvironmentBolt{
 				LOGGER.error("Exception occured in sendMessageToVibes: finally: catch block ", e);
 			}
 		}
-		
+		return (!strBuff.toString().isEmpty());
 	}
 	
 	public JSONObject generateJson(String lyl_id_no, String event_type){

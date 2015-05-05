@@ -1,16 +1,15 @@
 package analytics.util.dao;
 
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.util.Constants;
 import analytics.util.MongoNameConstants;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
 public class VibesDao extends AbstractDao {
@@ -19,12 +18,12 @@ public class VibesDao extends AbstractDao {
 
 	public VibesDao() {
 		super();
-		vibesCollection = db.getCollection("vibesTextMsgs");
+		vibesCollection = db.getCollection("vibesResponses");
 		LOGGER.info("colelction in tagMetadataDao: " + vibesCollection.getFullName());
 
 	}
 
-	public List<DBObject> getVibes(String fetchInd) {
+	/*public List<DBObject> getVibes(String fetchInd) {
 
 		List<DBObject> vibesList = null;
 		DBCursor cursor = vibesCollection.find(
@@ -47,6 +46,21 @@ public class VibesDao extends AbstractDao {
 				new BasicDBObject(MongoNameConstants.L_ID, l_id),
 				new BasicDBObject(MongoNameConstants.PROCESSED_FLAG, Constants.YES), true, false);
 
+	}*/
+	
+	public void addVibesResponse(String l_id, String occasion, String successFlag) {
+		
+		DBObject vibesObj = new BasicDBObject();
+		vibesObj.put(MongoNameConstants.L_ID, l_id);
+		
+		Date dNow = new Date( );
+		SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss.SSS");
+		vibesObj.put(MongoNameConstants.TIMESTAMP, ft.format(dNow));
+		vibesObj.put("occasion", occasion);
+		vibesObj.put("successFlag", successFlag);
+		
+		vibesCollection.insert(vibesObj);
+	
 	}
 
 }
