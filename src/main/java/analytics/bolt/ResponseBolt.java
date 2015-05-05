@@ -31,7 +31,7 @@ public class ResponseBolt extends EnvironmentBolt{
 	//private JedisPool jedisPool;
 	private ResponsysUtil responsysUtil;
 	private EventsVibesActiveDao eventsVibesActiveDao;
-	TreeMap<String, TreeMap<String, String>> eventVibesActiveMap = new TreeMap<String, TreeMap<String, String>>(String.CASE_INSENSITIVE_ORDER);
+	HashMap<String, HashMap<String, String>> eventVibesActiveMap = new HashMap<String, HashMap<String, String>>();
 	
 	public ResponseBolt(String systemProperty, String host, int port) {
 		super(systemProperty);

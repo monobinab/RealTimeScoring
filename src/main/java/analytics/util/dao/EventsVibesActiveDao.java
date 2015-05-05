@@ -1,19 +1,12 @@
 package analytics.util.dao;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
-import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.util.Constants;
 import analytics.util.MongoNameConstants;
-import analytics.util.objects.TagMetadata;
 
-import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
@@ -30,20 +23,30 @@ public class EventsVibesActiveDao extends AbstractDao {
 		LOGGER.info("collection in EventsVibesActiveDao: " + eventsVibesActiveCollection.getFullName());
 	}
 
-	public TreeMap<String, TreeMap<String, String>> getVibesActiveEventsList(){
+	public HashMap<String, HashMap<String, String>> getVibesActiveEventsList(){
 
 		DBCursor dbCursor = eventsVibesActiveCollection.find();
 		DBObject record = null;
-		TreeMap<String, TreeMap<String, String>> activeEventsMap = new TreeMap<String, TreeMap<String, String>>();
-		TreeMap<String, String> buCustEventsMap = new TreeMap<String, String>();
+		HashMap<String, HashMap<String, String>> activeEventsMap = new HashMap<String, HashMap<String, String>>();
+		//HashMap<String, String> buCustEventsMap = null;
 		
 		while (dbCursor.hasNext()) {
 			record = dbCursor.next();
 			if(record!=null){
-				buCustEventsMap.put((String)record.get(MongoNameConstants.ACTIVE_BUSINESS_UNIT), (String)record.get(MongoNameConstants.CUST_VIBES_EVENT));
-				activeEventsMap.put((String)record.get(MongoNameConstants.PURCHASE_OCCASSION), buCustEventsMap);
+				
+				if(activeEventsMap.get((String)record.get(MongoNameConstants.PURCHASE_OCCASSION))!=null){
+					HashMap<String, String> map = activeEventsMap.get((String)record.get(MongoNameConstants.PURCHASE_OCCASSION));
+					map.put((String)record.get(MongoNameConstants.ACTIVE_BUSINESS_UNIT), (String)record.get(MongoNameConstants.CUST_VIBES_EVENT));
+				}
+				else{	
+					HashMap<String, String> map = new HashMap<String, String>(); 
+					map.put((String)record.get(MongoNameConstants.ACTIVE_BUSINESS_UNIT), (String)record.get(MongoNameConstants.CUST_VIBES_EVENT));
+					activeEventsMap.put((String)record.get(MongoNameConstants.PURCHASE_OCCASSION), map);
+				}
 			}
 		}
+		
+		System.out.println(activeEventsMap);
 		return activeEventsMap;
 	}
 	
