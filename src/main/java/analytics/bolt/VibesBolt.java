@@ -17,18 +17,18 @@ import org.slf4j.LoggerFactory;
 import analytics.util.AuthPropertiesReader;
 import analytics.util.Constants;
 import analytics.util.HttpClientUtils;
-import analytics.util.dao.VibesDao;
 import analytics.util.objects.Vibes;
-import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Tuple;
 
 public class VibesBolt extends EnvironmentBolt{
+
+	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(VibesBolt.class);
-	private VibesDao vibesDao;
+	//private VibesDao vibesDao;
 	private OutputCollector outputCollector;
 	
 	 public VibesBolt(String systemProperty){

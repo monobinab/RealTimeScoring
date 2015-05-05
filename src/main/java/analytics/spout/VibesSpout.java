@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import redis.clients.jedis.Jedis;
 import analytics.util.MongoNameConstants;
-import analytics.util.dao.VibesDao;
 import analytics.util.objects.Vibes;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -24,7 +23,7 @@ public class VibesSpout extends BaseRichSpout{
 	
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = LoggerFactory.getLogger(VibesSpout.class);
-	private VibesDao vibesDao;
+	//private VibesDao vibesDao;
 	private String host;
 	private int port;
 
@@ -44,7 +43,7 @@ public class VibesSpout extends BaseRichSpout{
 	public void open(Map conf, TopologyContext context,
 			SpoutOutputCollector collector) {
 		this.collector = collector;
-		vibesDao = new VibesDao();
+		//vibesDao = new VibesDao();
 	}
 
 	@Override
