@@ -11,6 +11,10 @@ import java.io.Serializable;
  */
 public class Vibes implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	String lyl_id_no;
 	String event_type;
 	

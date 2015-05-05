@@ -83,7 +83,7 @@ public class VibesSpout extends BaseRichSpout{
 			        
 					this.collector.emit(listToEmit);
 					
-					jedis.del(s);
+					//jedis.del(s);
 					
 					s = null;
 					listToEmit = null;
