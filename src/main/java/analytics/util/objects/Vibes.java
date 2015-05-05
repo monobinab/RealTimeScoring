@@ -9,6 +9,8 @@ package analytics.util.objects;
  */
 public class Vibes {
 	
+	private static final long serialVersionUID = 1L;
+	
 	String lyl_id_no;
 	String event_type;
 	
