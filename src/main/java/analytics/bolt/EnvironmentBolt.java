@@ -1,14 +1,7 @@
 package analytics.bolt;
 
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import analytics.util.MongoNameConstants;
-import analytics.util.dao.DCDao;
-import analytics.util.dao.MemberDCDao;
-import analytics.util.dao.MemberScoreDao;
 import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -18,8 +11,8 @@ import backtype.storm.tuple.Tuple;
 
 public class EnvironmentBolt extends BaseRichBolt {
 	protected MultiCountMetric countMetric;
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(EnvironmentBolt.class);
+	/*private static final Logger LOGGER = LoggerFactory
+			.getLogger(EnvironmentBolt.class);*/
 	private String environment;
 	
 	public EnvironmentBolt() {
@@ -31,7 +24,6 @@ public class EnvironmentBolt extends BaseRichBolt {
 	
 	public void redisCountIncr(String scope){
 		countMetric.scope(scope).incr();
-		LOGGER.info("~~~~in redisCountIncr of Environment bolt~~");
 	}
 
 	@Override

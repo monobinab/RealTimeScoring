@@ -41,7 +41,6 @@ public class ParsingBoltDC extends EnvironmentBolt {
 	private OutputCollector outputCollector;
 	private DCDao dc;
 	private MemberDCDao memberDCDao;
-	private Type varValueType;
 	//needs to be removed after development is completed and moved to prod
 	private static final boolean isTestL_ID = false;
 	private static final boolean isDemoXML = false;
@@ -75,9 +74,6 @@ public class ParsingBoltDC extends EnvironmentBolt {
 		memberDCDao = new MemberDCDao();
 		dc = new DCDao();
 		LOGGER.info("DC Bolt Preparing to Launch");
-		varValueType = new TypeToken<Map<String, String>>() {
-			private static final long serialVersionUID = 1L;
-		}.getType();
 	}
 
 	@Override

@@ -32,4 +32,15 @@ public class MemberInfoDao extends AbstractDao {
 		return info;
 	}
 
-}
+	public String getMemberInfoState(String l_id) {
+		BasicDBObject query = new BasicDBObject();
+		query.put(MongoNameConstants.L_ID, l_id);
+		DBObject dbObj = memberInfoCollection.findOne(query);
+		String state = (String) dbObj.get(MongoNameConstants.STATE);
+			if(state!=null)	{				
+				return state;
+			}else{
+				return null;
+			}
+		}
+	}

@@ -34,7 +34,7 @@ public class SYWEventsTopology {
 			System.out
 					.println("Please pass the environment variable argument- 'PROD' or 'QA' or 'LOCAL'");
 			System.exit(0);
-		} else {
+		} 
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 		String topic = TopicConstants.SYW;
  
@@ -85,7 +85,6 @@ public class SYWEventsTopology {
 					topologyBuilder.createTopology());
 			Thread.sleep(10000000);
 			cluster.shutdown();
-		}
 		}
 	}
 }

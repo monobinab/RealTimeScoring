@@ -1,16 +1,13 @@
 package analytics.spout;
 
-import static backtype.storm.utils.Utils.tuple;
+import backtype.storm.topology.OutputFieldsDeclarer;
+import backtype.storm.tuple.Fields;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.tuple.Fields;
 
 public class OccassionRedisSpout extends RedisPubSubSpout{
 	public OccassionRedisSpout(int number, String pattern, String systemProperty) {
@@ -34,7 +31,7 @@ public class OccassionRedisSpout extends RedisPubSubSpout{
 			
 			String messageID = new Double(Math.random()).toString();
 			
-			LOGGER.info("Message == " + ret);
+			LOGGER.debug("Message == " + ret);
 			List<Object> listToEmit = new ArrayList<Object>();
 			listToEmit.add(ret);
 			listToEmit.add(messageID);

@@ -1,24 +1,18 @@
 package analytics.bolt;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import scala.actors.threadpool.Arrays;
-import analytics.util.HostPortUtility;
-import analytics.util.JsonUtils;
-import analytics.util.MongoNameConstants;
 import analytics.util.dao.MemberMDTagsDao;
-import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import scala.actors.threadpool.Arrays;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class PersistOccasionBolt extends EnvironmentBolt{
 	private static final Logger LOGGER = LoggerFactory
@@ -45,7 +39,7 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 		if (input.contains("messageID")) {
 			messageID = input.getStringByField("messageID");
 		}
-		LOGGER.info("TIME:" + messageID + "-Entering PersistOccasionbolt-" + System.currentTimeMillis());
+		LOGGER.debug("TIME:" + messageID + "-Entering PersistOccasionbolt-" + System.currentTimeMillis());
 		
 		//LOGGER.info("~~~~~~~~~~Incoming tuple in PersistOccasionbolt: " + input);
 		countMetric.scope("incoming_tuples").incr();
@@ -89,7 +83,7 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 					countMetric.scope("no_lyl_id_no").incr();
 				}
 			}
-			LOGGER.info("TIME:" + messageID + "-Exiting PersistOccasionbolt-" + System.currentTimeMillis());
+			LOGGER.debug("TIME:" + messageID + "-Exiting PersistOccasionbolt-" + System.currentTimeMillis());
 			outputCollector.ack(input);
 			countMetric.scope("persisted_successfully").incr();
 			

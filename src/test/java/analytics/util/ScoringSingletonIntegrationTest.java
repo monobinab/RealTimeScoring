@@ -21,7 +21,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import analytics.exception.RealTimeScoringException;
@@ -29,9 +28,8 @@ import analytics.util.objects.Change;
 import analytics.util.objects.Model;
 import analytics.util.objects.Variable;
 
-import com.github.fakemongo.Fongo;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
+
 import com.mongodb.DBCollection;
 
 public class ScoringSingletonIntegrationTest {

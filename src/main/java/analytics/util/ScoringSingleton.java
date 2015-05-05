@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +21,7 @@ import analytics.util.dao.MemberVariablesDao;
 import analytics.util.dao.MemberBoostsDao;
 import analytics.util.dao.ModelSywBoostDao;
 import analytics.util.dao.ModelVariablesDao;
+import analytics.util.dao.RegionalFactorDao;
 import analytics.util.dao.SourcesDao;
 import analytics.util.dao.VariableDao;
 import analytics.util.objects.Boost;
@@ -38,6 +40,7 @@ public class ScoringSingleton {
 	private Map<String, String> variableVidToNameMap;
 	private Map<String, String> variableNameToVidMap;
 	private Map<String, String> variableNameToStrategyMap;
+	private Map<String, Double> regionalFactorsMap;
 	private Map<String, String> sourcesMap;
 	private MemberVariablesDao memberVariablesDao;
 	private SourcesDao sourcesDao;
@@ -45,6 +48,7 @@ public class ScoringSingleton {
 	private ChangedMemberVariablesDao changedVariablesDao;
 	private VariableDao variableDao;
 	private ModelVariablesDao modelVariablesDao;
+	private RegionalFactorDao regionalFactorDao;
 	private static ScoringSingleton instance = null;
 
 	ModelSywBoostDao modelSywBoostDao;
@@ -95,6 +99,10 @@ public class ScoringSingleton {
 
 		modelSywBoostDao = new ModelSywBoostDao();
 		memberBoostsDao = new MemberBoostsDao();
+		
+		regionalFactorDao = new RegionalFactorDao();
+		regionalFactorDao.populateRegionalFactors();
+		regionalFactorsMap = regionalFactorDao.getRegionalFactorMap();
 
 	}
 
@@ -391,6 +399,17 @@ public class ScoringSingleton {
 			}
 		}
 		return val;
+	}
+	
+	public double calcRegionalFactor(Integer modelId, String state){
+
+		if(StringUtils.isNotEmpty(state)){
+			String key = modelId+"" + state;
+			if(regionalFactorsMap != null  && !regionalFactorsMap.isEmpty() && regionalFactorsMap.containsKey(key)){
+					return  regionalFactorsMap.get(key);
+				}
+			}
+			return 1;
 	}
 
 	public Map<String, Date> getMinMaxExpiry(Integer modelId, Map<String, Change> allChanges) {

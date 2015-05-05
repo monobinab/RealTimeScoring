@@ -1,15 +1,5 @@
 package analytics.bolt;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
 import analytics.util.JsonUtils;
 import analytics.util.SecurityUtils;
 import analytics.util.dao.MemberMDTagsDao;
@@ -23,11 +13,19 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ParsingBoltOccassion extends EnvironmentBolt {
 	private static final Logger LOGGER = LoggerFactory
@@ -99,7 +97,7 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 			if (input.contains("messageID")) {
 				messageID = input.getStringByField("messageID");
 			}
-			LOGGER.info("TIME:" + messageID + "-Entering ParsingboltOccasion-"
+			LOGGER.debug("TIME:" + messageID + "-Entering ParsingboltOccasion-"
 					+ System.currentTimeMillis());
 
 			// LOGGER.info("~~~~~~~~~~~Incoming tuple in ParsingboltOccasion: "
@@ -242,7 +240,7 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 				countMetric.scope("emitted_to_scoring").incr();
 				this.outputCollector.emit(listToEmit);
 			} else {
-				LOGGER.info("variableValueTagsMap is null or empty or lid " + lyl_id_no);
+				LOGGER.debug("variableValueTagsMap is null or empty or lid " + lyl_id_no);
 				List<Object> listToEmit = new ArrayList<Object>();
 				listToEmit.add(l_id);
 				listToEmit.add(tagsString.toString());
