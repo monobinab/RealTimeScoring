@@ -53,7 +53,7 @@ import analytics.util.dao.TagMetadataDao;
 import analytics.util.dao.TagResponsysActiveDao;
 import analytics.util.dao.TagVariableDao;
 import analytics.util.objects.MemberInfo;
-import analytics.util.objects.Responsys;
+import analytics.util.objects.ResponsysPayload;
 import analytics.util.objects.TagMetadata;
 
 public class ResponsysUtil {
@@ -351,7 +351,7 @@ public class ResponsysUtil {
 			return null;
 	}*/
 
-	public String getResponseUnknownServiceResult(Responsys responsysObj) throws Exception {
+	public String getResponseUnknownServiceResult(ResponsysPayload responsysObj) throws Exception {
 		LOGGER.info(" Testing - Entering the getResponseUnknownServiceResult method");
 
 		try {
@@ -887,7 +887,7 @@ public class ResponsysUtil {
 			out = new OutputStreamWriter(connection.getOutputStream());
 			out.write(xmlWithoutBOM);
 			out.close();
-
+			System.out.println("xml to be send ====>" + xmlWithoutBOM);
 			LOGGER.debug("After Creating outWriter");
 			in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 			int c;
