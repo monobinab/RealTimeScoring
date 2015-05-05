@@ -45,7 +45,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import backtype.storm.metric.api.MultiCountMetric;
 import analytics.util.dao.MemberInfoDao;
 import analytics.util.dao.OccasionResponsesDao;
 import analytics.util.dao.OccationCustomeEventDao;
@@ -55,6 +54,7 @@ import analytics.util.dao.TagVariableDao;
 import analytics.util.objects.MemberInfo;
 import analytics.util.objects.ResponsysPayload;
 import analytics.util.objects.TagMetadata;
+import backtype.storm.metric.api.MultiCountMetric;
 
 public class ResponsysUtil {
 	private static final Logger LOGGER = LoggerFactory
@@ -101,7 +101,7 @@ public class ResponsysUtil {
 			LOGGER.debug("executing request " + httpget.getRequestLine());
 			HttpResponse response = httpclient.execute(httpget);
 			String responseString = response.getStatusLine().toString();
-			LOGGER.debug("WI Response String: " + responseString);
+			LOGGER.debug("RTS API Response : " + responseString);
 			InputStream instream = response.getEntity().getContent();
 			jsonRespString = read(instream);
 			//LOGGER.info(jsonRespString);	
@@ -175,9 +175,9 @@ public class ResponsysUtil {
 			
 			if(winningTag!=null){
 				//Get the necessary variables for populating in the response xml
-				LOGGER.info("TIME:" + messageID + "- Getting EID -" + System.currentTimeMillis());
+				LOGGER.debug("TIME:" + messageID + "- Getting EID -" + System.currentTimeMillis());
 				MemberInfo memberInfo  = memberInfoDao.getMemberInfo(l_id);
-				LOGGER.info("TIME:" + messageID + "- Got EID -" + System.currentTimeMillis());
+				LOGGER.debug("TIME:" + messageID + "- Got EID -" + System.currentTimeMillis());
 				
 				//Send to Responsys only when there is member info or when there is an non zero eid
 				if(memberInfo==null || memberInfo.getEid() == null || memberInfo.getEid().equals("0")){
@@ -216,16 +216,14 @@ public class ResponsysUtil {
 				
 				out = new OutputStreamWriter(connection.getOutputStream());
 				
-				LOGGER.info("TIME:" + messageID + "- Remove Exponential -" + System.currentTimeMillis());
+				LOGGER.debug("TIME:" + messageID + "- Remove Exponential -" + System.currentTimeMillis());
 				//Convert Exponential values to Plain text in the XML
 				String xmlWithoutExpo = removeExponentialFromXml(json2XmlString);
-				LOGGER.info("TIME:" + messageID + "- Remove Exponential Complete-" + System.currentTimeMillis());
-				
-				LOGGER.info("TIME:" + messageID + "- Custome Xml start -" + System.currentTimeMillis());
+
 				//Generate the Custome Xml to be sent to Oracle
 
 				String customXml = createCustomXml(xmlWithoutExpo,memberInfo!=null ? memberInfo.getEid() : null,custEventName,winningTag,lyl_l_id);
-				LOGGER.info("TIME:" + messageID + "- Custome Xml end -" + System.currentTimeMillis());
+				LOGGER.debug("TIME:" + messageID + "- Custome Xml end -" + System.currentTimeMillis());
 				
 				countMetric.scope("calling_responsys_api").incr();
 				//BOM = Byte-Order-Mark
@@ -234,7 +232,7 @@ public class ResponsysUtil {
 				out.write(xmlWithoutBOM);
 				out.close();
 				
-				LOGGER.info("TIME:" + messageID + "- Sending XML to responsys complete-" + System.currentTimeMillis());
+				LOGGER.debug("TIME:" + messageID + "- Sending XML to responsys complete-" + System.currentTimeMillis());
 	
 				in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 				int c;
@@ -245,11 +243,11 @@ public class ResponsysUtil {
 				//Persist info to Mongo after successfully transmission of message to Oracle.
 				//LOGGER.info(lyl_l_id+"~~~"+xmlWithoutBOM);
 				
-				LOGGER.info("TIME:" + messageID + "- Insert Occasion Response Start -" + System.currentTimeMillis());
+				LOGGER.debug("TIME:" + messageID + "- Insert Occasion Response Start -" + System.currentTimeMillis());
 				occasionResponsesDao.addOccasionResponse(l_id, memberInfo!=null ? memberInfo.getEid() : null, custEventName, winningTag.getPurchaseOccasion(), winningTag.getBusinessUnit(), winningTag.getSubBusinessUnit(), 
 
 						strBuff.toString().contains("<success>true</success>") ? "Y" : "N", winningTag.getMdTags());
-				LOGGER.info("TIME:" + messageID + "- Insert Occasion Response end -" + System.currentTimeMillis());
+				LOGGER.debug("TIME:" + messageID + "- Insert Occasion Response end -" + System.currentTimeMillis());
 				
 				winningTag.setEmailOptIn( memberInfo != null?memberInfo.getEmailOptIn():null);
 
@@ -666,7 +664,7 @@ public class ResponsysUtil {
 			
 			//org.json.JSONObject obj = new org.json.JSONObject(jsonStr);
 			tagMetaData = new TagMetadata();
-			System.out.println(((org.json.JSONObject) obj.getJSONArray("scoresInfo").get(0)).get("occassion"));
+			//System.out.println(((org.json.JSONObject) obj.getJSONArray("scoresInfo").get(0)).get("occassion"));
 			tagMetaData.setPurchaseOccassion(((org.json.JSONObject) obj.getJSONArray("scoresInfo").get(0)).get("occassion")!= null ? 
 					((org.json.JSONObject) obj.getJSONArray("scoresInfo").get(0)).get("occassion").toString() : null);
 			tagMetaData.setBusinessUnit(((org.json.JSONObject) obj.getJSONArray("scoresInfo").get(0)).get("businessUnit")!= null ? 
@@ -887,7 +885,7 @@ public class ResponsysUtil {
 			out = new OutputStreamWriter(connection.getOutputStream());
 			out.write(xmlWithoutBOM);
 			out.close();
-			System.out.println("xml to be send ====>" + xmlWithoutBOM);
+
 			LOGGER.debug("After Creating outWriter");
 			in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 			int c;
