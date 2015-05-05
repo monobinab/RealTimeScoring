@@ -1,23 +1,17 @@
 package analytics.bolt;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
 import analytics.util.ResponsysUtil;
 import analytics.util.SecurityUtils;
-import analytics.util.dao.OccasionResponsesDao;
-import analytics.util.dao.OccationCustomeEventDao;
-import analytics.util.dao.TagMetadataDao;
-import analytics.util.dao.TagResponsysActiveDao;
+import analytics.util.dao.EventsVibesActiveDao;
 import analytics.util.objects.TagMetadata;
-import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -35,6 +29,8 @@ public class ResponseBolt extends EnvironmentBolt{
 	private int port;
 	//private JedisPool jedisPool;
 	private ResponsysUtil responsysUtil;
+	private EventsVibesActiveDao eventsVibesActiveDao;
+	HashMap<String, HashMap<String, String>> eventVibesActiveMap = new HashMap<String, HashMap<String, String>>();
 	
 	public ResponseBolt(String systemProperty, String host, int port) {
 		super(systemProperty);
@@ -48,6 +44,8 @@ public class ResponseBolt extends EnvironmentBolt{
 		super.prepare(stormConf, context, collector);
 		responsysUtil = new ResponsysUtil();
 		this.outputCollector = collector;
+		eventsVibesActiveDao = new EventsVibesActiveDao();
+		eventVibesActiveMap = eventsVibesActiveDao.getVibesActiveEventsList();
 		
 		//JedisPoolConfig poolConfig = new JedisPoolConfig();
         //poolConfig.setMaxActive(100);
@@ -112,11 +110,13 @@ public class ResponseBolt extends EnvironmentBolt{
 					//if( readyToProcessTags.size()>0){
 						TagMetadata tagMetadata = responsysUtil.getResponseServiceResult(scoreInfoJsonString,lyl_id_no,list,l_id, messageID, countMetric);
 						LOGGER.info("TIME:" + messageID + "-Completed responsys call-" + System.currentTimeMillis());
+						StringBuilder custVibesEvent = new StringBuilder();
 						if(tagMetadata!=null && tagMetadata.getPurchaseOccasion()!=null && 
-								tagMetadata.getEmailOptIn()!=null && tagMetadata.getEmailOptIn().equals("N")){
+								tagMetadata.getEmailOptIn()!=null && tagMetadata.getEmailOptIn().equals("N") && 
+								isVibesActiveWithEvent(tagMetadata.getPurchaseOccasion(),tagMetadata.getFirst5CharMdTag(),custVibesEvent)){
 								jedis = new Jedis(host, port, 1800);
 								jedis.connect();
-								jedis.set("Vibes:"+lyl_id_no, tagMetadata.getPurchaseOccasion());
+								jedis.set("Vibes:"+lyl_id_no, custVibesEvent.toString());
 								jedis.disconnect();
 								//jedisPool.returnResource(jedis);
 								countMetric.scope("adding_to_vibes_call").incr();
@@ -143,6 +143,18 @@ public class ResponseBolt extends EnvironmentBolt{
 		}
 	}
 
+	private boolean isVibesActiveWithEvent(String occasion, String bussUnit, StringBuilder custVibesEvent){
+		
+		if(eventVibesActiveMap.get(occasion)!= null){
+			if(eventVibesActiveMap.get(occasion).get(bussUnit)!=null)
+				custVibesEvent.append(eventVibesActiveMap.get(occasion).get(bussUnit));
+			else
+				custVibesEvent.append(eventVibesActiveMap.get(occasion).get(null));
+		}
+		
+		return (!custVibesEvent.toString().isEmpty());
+	}
+	
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		// TODO Auto-generated method stub

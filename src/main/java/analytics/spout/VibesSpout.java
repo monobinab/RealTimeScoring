@@ -57,7 +57,7 @@ public class VibesSpout extends BaseRichSpout{
 			String startTime = (new SimpleDateFormat("yyyy-MM-dd").format(date))+" 10:00:00";
 			Date startTimeToday = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(startTime);
 			
-			String endTime = (new SimpleDateFormat("yyyy-MM-dd").format(date))+" 16:00:00";
+			String endTime = (new SimpleDateFormat("yyyy-MM-dd").format(date))+" 17:00:00";
 			Date endTimeToday = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(endTime);
 
 			//Perform Vibes Text Processing between 10:00AM and 4:00PM CST

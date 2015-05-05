@@ -45,7 +45,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import backtype.storm.metric.api.MultiCountMetric;
 import analytics.util.dao.MemberInfoDao;
 import analytics.util.dao.OccasionResponsesDao;
 import analytics.util.dao.OccationCustomeEventDao;
@@ -55,6 +54,7 @@ import analytics.util.dao.TagVariableDao;
 import analytics.util.objects.MemberInfo;
 import analytics.util.objects.Responsys;
 import analytics.util.objects.TagMetadata;
+import backtype.storm.metric.api.MultiCountMetric;
 
 public class ResponsysUtil {
 	private static final Logger LOGGER = LoggerFactory
@@ -64,6 +64,7 @@ public class ResponsysUtil {
 	private OccasionResponsesDao occasionResponsesDao;
 	private MemberInfoDao memberInfoDao;
 	private TagVariableDao tagVariableDao;
+	
 
 	private static final String UTF8_BOM = "\uFEFF";
 	private TagResponsysActiveDao tagResponsysActiveDao;
