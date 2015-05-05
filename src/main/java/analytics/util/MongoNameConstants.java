@@ -147,6 +147,7 @@ public class MongoNameConstants {
      public static final String PROCESSED_FLAG = "processed";
      
      public static final String ACTIVE_BUSINESS_UNIT= "BU";
+     public static final String CUST_VIBES_EVENT= "CUST_VIBES";
      
      //regionalFactors collection
      public static final String MODELID = "modelId";

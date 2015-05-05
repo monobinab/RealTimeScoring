@@ -118,7 +118,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		// 3) Find all models affected by the changes
 		Set<Integer> modelIdList = ScoringSingleton.getInstance().getModelIdList(newChangesVarValueMap);
 		if(modelIdList==null||modelIdList.isEmpty()){
-			LOGGER.debug("No models affected for " +lyl_id_no);
+			LOGGER.info("No models affected for " +lyl_id_no);
 			redisCountIncr("no_models_affected");
 			outputCollector.ack(input);
 			return;
@@ -133,7 +133,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			LOGGER.error("Can not create member variable map", e1);
 		}
 		if(memberVariablesMap==null){
-			LOGGER.debug("Unable to find member variables for " + lId);
+			LOGGER.info("Unable to find member variables for " + lId);
 			redisCountIncr("no_member_variables");
 			outputCollector.ack(input);
 			return;

@@ -3,11 +3,13 @@
  */
 package analytics.util.objects;
 
+import java.io.Serializable;
+
 /**
  * @author spannal
  *
  */
-public class Vibes {
+public class Vibes implements Serializable{
 	
 	String lyl_id_no;
 	String event_type;

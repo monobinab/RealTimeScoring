@@ -1,5 +1,7 @@
 package analytics.util.dao;
 
+import java.util.regex.Pattern;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +24,10 @@ public class OccationCustomeEventDao extends AbstractDao {
 
 	public String getCustomeEventName(String occasion) {
 		BasicDBObject query = new BasicDBObject();
-		query.put(MongoNameConstants.OCCASION, occasion);
+		//query.put(MongoNameConstants.OCCASION, occasion);
+		
+		query.put(MongoNameConstants.OCCASION, Pattern.compile(".*"+occasion+".*" , Pattern.CASE_INSENSITIVE));
+		
 		DBCursor cursor = occCustEventCollection.find(query);
 		if (cursor.hasNext()) {
 			DBObject obj = cursor.next();

@@ -64,6 +64,7 @@ public class ResponsysUtil {
 	private OccasionResponsesDao occasionResponsesDao;
 	private MemberInfoDao memberInfoDao;
 	private TagVariableDao tagVariableDao;
+	
 
 	private static final String UTF8_BOM = "\uFEFF";
 	private TagResponsysActiveDao tagResponsysActiveDao;
@@ -221,7 +222,6 @@ public class ResponsysUtil {
 				String xmlWithoutExpo = removeExponentialFromXml(json2XmlString);
 
 				//Generate the Custome Xml to be sent to Oracle
-
 				String customXml = createCustomXml(xmlWithoutExpo,memberInfo!=null ? memberInfo.getEid() : null,custEventName,winningTag,lyl_l_id);
 				LOGGER.debug("TIME:" + messageID + "- Custome Xml end -" + System.currentTimeMillis());
 				
