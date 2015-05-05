@@ -83,7 +83,7 @@ public class VibesSpout extends BaseRichSpout{
 			        
 					this.collector.emit(listToEmit);
 					
-					//jedis.del(s);
+					jedis.del(s);
 					
 					s = null;
 					listToEmit = null;
@@ -91,6 +91,7 @@ public class VibesSpout extends BaseRichSpout{
 					subStr = null;
 					
 			    }
+			    jedis.disconnect();
 				
 			}
 			//Sleep for 3 mins before starting the next batch
