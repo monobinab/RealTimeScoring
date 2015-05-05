@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,12 +30,12 @@ public class EventsVibesActiveDao extends AbstractDao {
 		LOGGER.info("collection in EventsVibesActiveDao: " + eventsVibesActiveCollection.getFullName());
 	}
 
-	public HashMap<String, HashMap<String, String>> getVibesActiveEventsList(){
+	public TreeMap<String, TreeMap<String, String>> getVibesActiveEventsList(){
 
 		DBCursor dbCursor = eventsVibesActiveCollection.find();
 		DBObject record = null;
-		HashMap<String, HashMap<String, String>> activeEventsMap = new HashMap<String, HashMap<String, String>>();
-		HashMap<String, String> buCustEventsMap = new HashMap<String, String>();
+		TreeMap<String, TreeMap<String, String>> activeEventsMap = new TreeMap<String, TreeMap<String, String>>();
+		TreeMap<String, String> buCustEventsMap = new TreeMap<String, String>();
 		
 		while (dbCursor.hasNext()) {
 			record = dbCursor.next();

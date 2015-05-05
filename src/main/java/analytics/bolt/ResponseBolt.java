@@ -3,6 +3,7 @@ package analytics.bolt;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +31,7 @@ public class ResponseBolt extends EnvironmentBolt{
 	//private JedisPool jedisPool;
 	private ResponsysUtil responsysUtil;
 	private EventsVibesActiveDao eventsVibesActiveDao;
-	HashMap<String, HashMap<String, String>> eventVibesActiveMap = new HashMap<String, HashMap<String, String>>();
+	TreeMap<String, TreeMap<String, String>> eventVibesActiveMap = new TreeMap<String, TreeMap<String, String>>(String.CASE_INSENSITIVE_ORDER);
 	
 	public ResponseBolt(String systemProperty, String host, int port) {
 		super(systemProperty);
