@@ -46,7 +46,7 @@ public class EventsVibesActiveDao extends AbstractDao {
 			}
 		}
 		
-		System.out.println(activeEventsMap);
+		//System.out.println(activeEventsMap);
 		return activeEventsMap;
 	}
 	
