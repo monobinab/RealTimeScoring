@@ -45,6 +45,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import analytics.util.dao.EventsVibesActiveDao;
 import analytics.util.dao.MemberInfoDao;
 import analytics.util.dao.OccasionResponsesDao;
 import analytics.util.dao.OccationCustomeEventDao;
@@ -70,6 +71,9 @@ public class ResponsysUtil {
 	private TagResponsysActiveDao tagResponsysActiveDao;
 	private static final String validUnownTags = "Top 5% of MSM,Browse,Unknown";
 	
+	private EventsVibesActiveDao eventsVibesActiveDao;
+	HashMap<String, HashMap<String, String>> eventVibesActiveMap = new HashMap<String, HashMap<String, String>>();
+	
 	ArrayList<TagMetadata> metaDataList = new ArrayList<TagMetadata>();
 
 	public ResponsysUtil() {
@@ -79,7 +83,8 @@ public class ResponsysUtil {
 		occasionResponsesDao = new OccasionResponsesDao();
 		tagResponsysActiveDao =  new TagResponsysActiveDao();
 		tagVariableDao = new TagVariableDao();
-
+		eventsVibesActiveDao = new EventsVibesActiveDao();
+		eventVibesActiveMap = eventsVibesActiveDao.getVibesActiveEventsList();
 	}
 	/**
 	 * Invokes the web intelligence web service that returns a token identifier and a status code in
@@ -883,6 +888,7 @@ public class ResponsysUtil {
 					.getProperty(Constants.RESP_URL_PASSWORD));
 
 			out = new OutputStreamWriter(connection.getOutputStream());
+			System.out.println(xmlWithoutBOM);
 			out.write(xmlWithoutBOM);
 			out.close();
 
@@ -974,5 +980,22 @@ public class ResponsysUtil {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+//method to check whether vibes is ready with the bus
+public boolean isVibesActiveWithEvent(String occasion, String bussUnit, StringBuilder custVibesEvent){
+		
+		if(eventVibesActiveMap.get(occasion)!= null){
+			if(eventVibesActiveMap.get(occasion).get(bussUnit)!=null)
+				custVibesEvent.append(eventVibesActiveMap.get(occasion).get(bussUnit));
+			else
+				custVibesEvent.append(eventVibesActiveMap.get(occasion).get(null));
+		}
+		
+		//Log the info incase Vibes isn;t ready with the occasion and BU
+		if(custVibesEvent.toString().isEmpty())
+			LOGGER.info("Vibes is not ready for Occasion "+occasion+ " for BU "+bussUnit);
+		
+		return (!custVibesEvent.toString().isEmpty());
 	}
 }

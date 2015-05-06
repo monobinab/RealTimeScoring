@@ -1,7 +1,6 @@
 package analytics.bolt;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +16,6 @@ import analytics.util.dao.TagVariableDao;
 import analytics.util.objects.MemberInfo;
 import analytics.util.objects.ResponsysPayload;
 import analytics.util.objects.TagMetadata;
-import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -25,7 +23,7 @@ import backtype.storm.tuple.Tuple;
 
 import org.json.JSONException;
 
-import scala.Array;
+import redis.clients.jedis.Jedis;
 
 public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 
@@ -40,9 +38,14 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 	private TagMetadataDao tagMetadataDao;
 	private MemberInfoDao memberInfoDao;
 	private String topologyName;
+	private String host;
+	private int port;
+	Jedis jedis = null;
 	
-	public ResponsysUnknownCallsBolt(String systemProperty) {
+	public ResponsysUnknownCallsBolt(String systemProperty, String host, int port) {
 		super(systemProperty);
+		this.host = host;
+		this.port = port;
 	}
 
 	@Override
@@ -56,9 +59,9 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 		tagMetadataDao = new TagMetadataDao();
 		memberInfoDao = new MemberInfoDao();
 		topologyName = (String) stormConf.get("metrics_topology");
+		jedis = new Jedis(host, port, 1800);
 	 }
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void execute(Tuple input) {
 		countMetric.scope("incoming_tuples").incr();
@@ -83,7 +86,7 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 				//get the top jsonObject from api satisfying the condition
 				org.json.JSONObject o = new org.json.JSONObject(scoreInfoJsonString);
 				org.json.JSONObject objToSend = null;
-				objToSend = getJsonForResponsys2(tagModelsMap, o, objToSend);
+				objToSend = getJsonForResponsys(tagModelsMap, o, objToSend);
 				if(objToSend == null){
 					countMetric.scope("no_data_to_responsys").incr();
 					return;
@@ -101,7 +104,7 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 				o.append("scoresInfo", objToSend);
 				MemberInfo memberInfo = memberInfoDao.getMemberInfo(l_id);
 			    String eid = memberInfo.getEid();
-				
+			 
 				//set the responsys object
 				responsysObj.setLyl_id_no(lyl_id_no);
 				responsysObj.setL_id(l_id);
@@ -113,7 +116,18 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 				
 				responsysUtil.getResponseUnknownServiceResult(responsysObj);
 			    redisCountIncr("data_to_responsys");
-		}
+			    
+			    StringBuilder custVibesEvent = new StringBuilder();
+			    if(memberInfo.getEmailOptIn() != null && memberInfo.getEmailOptIn().equalsIgnoreCase("N") ){
+			    	if(responsysUtil.isVibesActiveWithEvent("Top 5% of MSM", tag, custVibesEvent)){
+			    	jedis.connect();
+					jedis.set("Vibes:"+lyl_id_no, custVibesEvent.toString());
+					jedis.disconnect();
+					redisCountIncr("adding_to_vibes_call");
+					custVibesEvent = null;
+			    	}
+			    }
+			}
 			else{
 				redisCountIncr("no_lyl_id_no");
 			}
@@ -123,7 +137,7 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 		}
 	}
 		
-	private org.json.JSONObject getJsonForResponsys2(
+	private org.json.JSONObject getJsonForResponsys(
 			Map<Integer, String> tagModelsMap, org.json.JSONObject o,
 			org.json.JSONObject objToSend) throws JSONException {
 		org.json.JSONArray arr = o.getJSONArray("scoresInfo");
@@ -145,7 +159,7 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 	}
 	
 	//This method was used by Telluride for responsys as the logic has been changed
-		@Deprecated
+	/*	@Deprecated
 		private org.json.JSONObject getJsonForResponsys(
 				Map<Integer, String> tagModelsMap, org.json.JSONObject o,
 				org.json.JSONObject objToSend) throws JSONException {
@@ -170,7 +184,7 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 			}
 			return null;
 		}
-
+*/
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		
