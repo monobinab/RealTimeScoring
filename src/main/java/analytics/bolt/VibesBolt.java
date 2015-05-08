@@ -134,7 +134,12 @@ public class VibesBolt extends EnvironmentBolt{
 		JSONObject obj = new JSONObject();
 		
 		try {
-			obj.put("event_id", lyl_id_no+"~"+event_type);
+			
+			String str = (lyl_id_no+"~"+event_type);
+			if(str.length()>= 40)
+				str = str.substring(0, 40);
+			
+			obj.put("event_id", str);
 			obj.put("event_type", event_type);
 			obj.put("event_date", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(new Date()));
 			
@@ -142,6 +147,8 @@ public class VibesBolt extends EnvironmentBolt{
 			memberObj.put("external_person_id", lyl_id_no);
 			
 			obj.put("event_data", memberObj);
+			
+			str = null;
 			
 		} catch (JSONException e) {
 			e.printStackTrace();
