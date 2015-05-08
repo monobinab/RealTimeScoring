@@ -129,7 +129,7 @@ public class WebHDFSSpout extends BaseRichSpout{
 				jedisPool.returnResource(jedis);
 			}
 			//Sleep for 5 mins before starting the next process
-			Thread.sleep(300000);
+			Thread.sleep(60000);
 		}
 		catch(Exception e){
 			LOGGER.error("Error in communication with webhdfs ["+hdfsPath+"]");
