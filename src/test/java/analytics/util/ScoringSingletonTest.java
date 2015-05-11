@@ -293,6 +293,7 @@ public class ScoringSingletonTest {
 		// if memberVariablesMap will be populated with all the  avai variables associated with modelLists to be scored,
 		// it wont be populated in the memberVariables map
 		@Test
+		@Ignore
 		public void createMemberVariableValueMapPositiveCaseTest2()
 				throws ConfigurationException, SecurityException,
 				NoSuchFieldException, IllegalArgumentException,
