@@ -157,10 +157,10 @@ public class ResponseBolt extends EnvironmentBolt{
 		}
 		
 		//Log the info incase Vibes isn;t ready with the occasion and BU
-		if(custVibesEvent.toString().isEmpty())
+		if(custVibesEvent.toString().isEmpty() || custVibesEvent.toString().equals("null"))
 			LOGGER.info("Vibes is not ready for Occasion "+occasion+ " for BU "+bussUnit);
 		
-		return (!custVibesEvent.toString().isEmpty());
+		return (!custVibesEvent.toString().equals("null") && !custVibesEvent.toString().isEmpty());
 	}
 	
 	@Override
