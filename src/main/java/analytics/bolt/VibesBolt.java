@@ -55,18 +55,20 @@ public class VibesBolt extends EnvironmentBolt{
 		String event_type = null;
 
 		try {
-			lyl_id_no = (String) vibes.getLyl_id_no();
-			event_type = (String) vibes.getEvent_type();
-			LOGGER.info("PROCESSING L_Id: " + lyl_id_no +" for Event Type " + event_type);
-			
-			String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no);
-			
-			JSONObject vibesJson = generateJson(lyl_id_no,event_type);
-			
-			if(sendMessageToVibes(vibesJson.toString())){
-				vibesDao.addVibesResponse(l_id, event_type,"Y");
-
-			}
+				lyl_id_no = (String) vibes.getLyl_id_no();
+				event_type = (String) vibes.getEvent_type();
+				LOGGER.info("PROCESSING L_Id: " + lyl_id_no +" for Event Type " + event_type);
+				
+				if(lyl_id_no != null && event_type != null){
+					String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no);
+					
+					JSONObject vibesJson = generateJson(lyl_id_no,event_type);
+					
+					if(sendMessageToVibes(vibesJson.toString())){
+						vibesDao.addVibesResponse(l_id, event_type,"Y");
+					}
+				}else
+					LOGGER.info("Either L_Id is null or Event Type is null. No sending to Vibes");
 			//vibesDao.updateVibes(l_id);
 			
 			redisCountIncr("success_vibes");
