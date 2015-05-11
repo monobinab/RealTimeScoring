@@ -10,19 +10,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import analytics.cache.RegionalFactorCache;
 import analytics.exception.RealTimeScoringException;
 import analytics.util.dao.ChangedMemberScoresDao;
 import analytics.util.dao.ChangedMemberVariablesDao;
+import analytics.util.dao.MemberInfoDao;
 import analytics.util.dao.MemberVariablesDao;
 import analytics.util.dao.MemberBoostsDao;
 import analytics.util.dao.ModelSywBoostDao;
 import analytics.util.dao.ModelVariablesDao;
 import analytics.util.dao.RegionalFactorDao;
-import analytics.util.dao.SourcesDao;
 import analytics.util.dao.VariableDao;
 import analytics.util.objects.Boost;
 import analytics.util.objects.Change;
@@ -40,16 +40,18 @@ public class ScoringSingleton {
 	private Map<String, String> variableVidToNameMap;
 	private Map<String, String> variableNameToVidMap;
 	private Map<String, String> variableNameToStrategyMap;
-	private Map<String, Double> regionalFactorsMap;
-	private Map<String, String> sourcesMap;
+	//private Map<String, String> sourcesMap;
 	private MemberVariablesDao memberVariablesDao;
-	private SourcesDao sourcesDao;
+	//private SourcesDao sourcesDao;
 	private ChangedMemberScoresDao changedMemberScoresDao;
 	private ChangedMemberVariablesDao changedVariablesDao;
 	private VariableDao variableDao;
 	private ModelVariablesDao modelVariablesDao;
 	private RegionalFactorDao regionalFactorDao;
+	private MemberInfoDao memberInfoDao;
+	private RegionalFactorCache regionalFactorCache;
 	private static ScoringSingleton instance = null;
+	Set<String> modelIdsWithRegionalFactors;
 
 	ModelSywBoostDao modelSywBoostDao;
 	MemberBoostsDao memberBoostsDao;
@@ -72,9 +74,9 @@ public class ScoringSingleton {
 		changedVariablesDao = new ChangedMemberVariablesDao();
 		memberVariablesDao = new MemberVariablesDao();
 		changedMemberScoresDao = new ChangedMemberScoresDao();
-		sourcesDao = new SourcesDao();
+		//sourcesDao = new SourcesDao();
 		// populate the variableVidToNameMap
-		sourcesMap = sourcesDao.getSources();
+		//sourcesMap = sourcesDao.getSources();
 		variableNameToStrategyMap = new HashMap<String, String>();
 		variableVidToNameMap = new HashMap<String, String>();
 		variableNameToVidMap = new HashMap<String, String>();
@@ -102,7 +104,8 @@ public class ScoringSingleton {
 		
 		regionalFactorDao = new RegionalFactorDao();
 		regionalFactorDao.populateRegionalFactors();
-		regionalFactorsMap = regionalFactorDao.getRegionalFactorMap();
+		memberInfoDao = new MemberInfoDao();
+		regionalFactorCache = new RegionalFactorCache();
 
 	}
 
@@ -229,6 +232,7 @@ public class ScoringSingleton {
 				}
 
 				Strategy strategy = StrategyMapper.getInstance().getStrategy(variableNameToStrategyMap.get(variableName));
+				System.out.println("STRATEGY~~~~~~~" + strategy);
 				if (strategy == null) {
 					LOGGER.error("Unable to obtain strategy for " + variableName);
 					continue;
@@ -401,18 +405,24 @@ public class ScoringSingleton {
 		return val;
 	}
 	
-	public double calcRegionalFactor(Integer modelId, String state){
-
-		if(StringUtils.isNotEmpty(state)){
-			String key = modelId+"" + state;
-			if(regionalFactorsMap != null  && !regionalFactorsMap.isEmpty() && regionalFactorsMap.containsKey(key)){
-					return  regionalFactorsMap.get(key);
-				}
-			}
-			return 1;
+	//get the state for the memberId to get the regionalFactor for scoring
+	public String getMemberState(String lId){
+		return memberInfoDao.getMemberInfoState(lId);
 	}
-
-	public Map<String, Date> getMinMaxExpiry(Integer modelId, Map<String, Change> allChanges) {
+		
+	//populate the list of modelIds with regionalFactor from cache, if the member has state associated with him
+	public void populateModelsWithRegFactors(){
+		regionalFactorCache.populateModelIdsWithRegFactors();
+		modelIdsWithRegionalFactors = regionalFactorCache.getModelIdsWithRegionalFactor();
+	}
+	
+	public double getRegionalFactor(String modelId, String state){
+		if(modelIdsWithRegionalFactors != null && !modelIdsWithRegionalFactors.isEmpty() && modelIdsWithRegionalFactors.contains(modelId)){
+			return regionalFactorCache.getRegionalFactor(modelId, state);
+		}
+		return 1.0;
+	}
+		public Map<String, Date> getMinMaxExpiry(Integer modelId, Map<String, Change> allChanges) {
 		Date minDate = null;
 		Date maxDate = null;
 		Map<String, Date> minMaxMap = new HashMap<String, Date>();
