@@ -114,7 +114,7 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
 	    	//CONSTRUCT URL - queries Solr
 			//String URL1 = "http://solrx308p.stress.ch3.s.com:8180/search/select?qt=search&wt=json&q=";
 	    	String URL1 = "http://solrx-prod.prod.ch4.s.com:80/search/select?qt=search&wt=json&clientID=sywAnalytics&q=";
-			String URL2 = "&start=0&rows=50&fq=catalogs:%28%2212605%22%29&sort=instock%20desc,score%20desc,revenue%20desc&sortPrefix=L6;S4;10153&globalPrefix=L6,S4,10153&spuAvailability=S4&lmpAvailability=L6&fvCutoff=22&fqx=!%28storeAttributes:%28%2210153_DEFAULT_FULFILLMENT=SPU%22%29%20AND%20storeOrigin:%28%22Kmart%22%29%29&site=prod";
+			String URL2 = "&start=0&rows=10&fq=catalogs:%28%2212605%22%29&sort=instock%20desc,score%20desc,revenue%20desc&sortPrefix=L6;S4;10153&globalPrefix=L6,S4,10153&spuAvailability=S4&lmpAvailability=L6&fvCutoff=22&fqx=!%28storeAttributes:%28%2210153_DEFAULT_FULFILLMENT=SPU%22%29%20AND%20storeOrigin:%28%22Kmart%22%29%29&site=prod";
 			String query = new String();
 			
 			query = URL1;
