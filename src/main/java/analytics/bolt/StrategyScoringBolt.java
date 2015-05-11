@@ -1,9 +1,9 @@
 package analytics.bolt;
 
+import analytics.cache.RegionalFactorCache;
 import analytics.exception.RealTimeScoringException;
 import analytics.util.JsonUtils;
 import analytics.util.ScoringSingleton;
-import analytics.util.dao.MemberInfoDao;
 import analytics.util.objects.Change;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -11,6 +11,7 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,12 +33,10 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	
 	private String host;
 	private int port;
-	
-	private MemberInfoDao memberInfoDao;
 	private static final long serialVersionUID = 1L;
 	private OutputCollector outputCollector;
-	
-	List<String> modelIdsWithRegFactor;
+	String topologyName;
+	RegionalFactorCache regionalFactorCache;
 	
 	public StrategyScoringBolt(String systemProperty, String host, int port) {
 		super(systemProperty);
@@ -56,23 +55,9 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		super.prepare(stormConf, context, collector);
 		LOGGER.info("PREPARING STRATEGY SCORING BOLT");	
 	  	this.outputCollector = collector;
-	  	memberInfoDao = new MemberInfoDao();
-	  	modelIdsWithRegFactor = new ArrayList<String>() {
-			private static final long serialVersionUID = 1L;
-		{
-	  	    add("14");
-	  	    add("16");
-	  	    add("50");
-	  	    add("47");
-	  	    add("48");
-	  	    add("49");
-	  	    add("73");
-	  	    add("72");
-	  	    add("51");
-	  	    add("54");
-	  	    add("55");
-	  	}};
-	}
+	  	topologyName = (String) stormConf.get("metrics_topology");
+	  	regionalFactorCache = new RegionalFactorCache();
+	  }
 	
 	@Override
 	public void execute(Tuple input) {
@@ -159,14 +144,16 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		Map<Integer,Map<String,Date>> modelIdToExpiryMap = new HashMap<Integer, Map<String,Date>>();
 		
 		//get the state for the memberId to get the regionalFactor for scoring
-		String state = memberInfoDao.getMemberInfoState(lId);
+		String state = ScoringSingleton.getInstance().getMemberState(lId);
 
+		if(StringUtils.isNotEmpty(state))
+			ScoringSingleton.getInstance().populateModelsWithRegFactors();
 		
 		for (Integer modelId : modelIdList) {// Score and emit for all modelIds
 												// before mongo inserts
 			// recalculate score for model
 			double newScore;
-			double regionalFactor;
+			double regionalFactor = 0.0;
 			try {
 				newScore = ScoringSingleton.getInstance().calcScore(memberVariablesMap, allChanges,
 						modelId);
@@ -175,14 +162,14 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 
 			newScore = newScore + ScoringSingleton.getInstance().getBoostScore(allChanges, modelId );
 			
-			//weigh the score with regional factor
-			if(modelIdsWithRegFactor.contains(modelId+"")){
-				regionalFactor = ScoringSingleton.getInstance().calcRegionalFactor(modelId, state);
-				newScore = newScore * regionalFactor;
-				if(newScore > 1)
-					newScore = 1;
-				LOGGER.info("new score after regional factor for lId " +  lId + "for model " + modelId + ": " + newScore);
+			//get the score weighed with regionalFactor only if the member has state
+			if(StringUtils.isNotEmpty(state)){
+				regionalFactor = ScoringSingleton.getInstance().getRegionalFactor(modelId+"", state);
+				newScore = newScore*regionalFactor;
+				LOGGER.info("newScore for modelId " + modelId + " with regional factor " + regionalFactor + " " + newScore + "-- lId " + lId + " " + topologyName);
 			}
+			
+			
 			// 9) Emit the new score
 			Map<String, Date> minMaxMap = ScoringSingleton.getInstance().getMinMaxExpiry(modelId, allChanges);
 			modelIdToExpiryMap.put(modelId, minMaxMap);
@@ -268,7 +255,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 				jedis.disconnect();
 		}
 	}
-
+	
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		declarer.declareStream("score_stream",new Fields("l_id", "newScore", "model","source", "messageID", "minExpiry", "maxExpiry"));
