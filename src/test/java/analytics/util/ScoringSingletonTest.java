@@ -248,7 +248,6 @@ public class ScoringSingletonTest {
 
 	// This test is to check the memberVariablesMap creation (positive case)
 	@Test
-	@Ignore
 	public void createMemberVariableValueMapPositiveCaseTest()
 			throws ConfigurationException, SecurityException,
 			NoSuchFieldException, IllegalArgumentException,
