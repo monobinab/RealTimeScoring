@@ -60,7 +60,7 @@ public class ScoringSingletonIntegrationTest {
 		varColl.insert(new BasicDBObject("name", "v9").append("VID", 9).append("strategy","StrategyPurchaseOccasions"));
 		varColl.insert(new BasicDBObject("name", "v10").append("VID", 10).append("strategy","StrategySumSales"));
 		
-		//regionalFactor data is cached, so populated before the execution of test cases
+		/*//regionalFactor data is cached, so populated before the execution of test cases
 		DBCollection regionalFactorsCollection = db.getCollection("regionalAdjustmentFactors");
 		regionalFactorsCollection.insert(new BasicDBObject("modelName", "model_regFactor").append("modelId", "100").append("state", "TN").append("factor", 0.2));
 		scoringSingletonObj.populateModelsWithRegFactors();
@@ -68,7 +68,7 @@ public class ScoringSingletonIntegrationTest {
 		modelIdsWithRegionalFactorsContents.add("100");
 		Field modelIdsWithRegionalFactors = ScoringSingleton.class
 				.getDeclaredField("modelIdsWithRegionalFactors");
-		modelIdsWithRegionalFactors.set(scoringSingletonObj,modelIdsWithRegionalFactorsContents);
+		modelIdsWithRegionalFactors.set(scoringSingletonObj,modelIdsWithRegionalFactorsContents);*/
 	}
 
 	@AfterClass
@@ -795,7 +795,7 @@ public class ScoringSingletonIntegrationTest {
 			variableNameToStrategyMap.setAccessible(false);
 		}
 
-		//This integration test is check the scored value with Regional factors for modelIds 35 and 48 (a positive case)
+	/*	//This integration test is check the scored value with Regional factors for modelIds 35 and 48 (a positive case)
 		@Test
 		public void executeScoringSingletonBasicPositiveCaseWithRegioanlFactorTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, RealTimeScoringException, ConfigurationException, ParseException{
 			
@@ -900,6 +900,6 @@ public class ScoringSingletonIntegrationTest {
 			modelsMap.setAccessible(false);
 			variableNameToVidMap.setAccessible(false);
 			variableNameToStrategyMap.setAccessible(false);
-		}
+		}*/
 
 }

@@ -1,6 +1,5 @@
 package analytics.bolt;
 
-import analytics.cache.RegionalFactorCache;
 import analytics.exception.RealTimeScoringException;
 import analytics.util.JsonUtils;
 import analytics.util.ScoringSingleton;
@@ -35,9 +34,6 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	private int port;
 	private static final long serialVersionUID = 1L;
 	private OutputCollector outputCollector;
-	String topologyName;
-	RegionalFactorCache regionalFactorCache;
-	private Set<String> modelIdsWithRegFactors;
 	
 	public StrategyScoringBolt(String systemProperty, String host, int port) {
 		super(systemProperty);
@@ -56,8 +52,6 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		super.prepare(stormConf, context, collector);
 		LOGGER.info("PREPARING STRATEGY SCORING BOLT");	
 	  	this.outputCollector = collector;
-	  	topologyName = (String) stormConf.get("metrics_topology");
-	  	regionalFactorCache = new RegionalFactorCache();
 	  }
 	
 	@Override
@@ -147,10 +141,8 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		//get the state for the memberId to get the regionalFactor for scoring
 		String state = ScoringSingleton.getInstance().getMemberState(lId);
 
-		//get the modelIds with regionalFactors 
-		if(StringUtils.isNotEmpty(state)){
-			modelIdsWithRegFactors = ScoringSingleton.getInstance().populateModelsWithRegFactors();
-		}
+		if(StringUtils.isNotEmpty(state))
+			ScoringSingleton.getInstance().populateModelsWithRegFactors();
 		
 		for (Integer modelId : modelIdList) {// Score and emit for all modelIds
 												// before mongo inserts
@@ -166,10 +158,10 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			newScore = newScore + ScoringSingleton.getInstance().getBoostScore(allChanges, modelId );
 			
 			//get the score weighed with regionalFactor only if the member has state
-			if(StringUtils.isNotEmpty(state) && modelIdsWithRegFactors != null && !modelIdsWithRegFactors.isEmpty() && modelIdsWithRegFactors.contains(modelId+"")){
+			if(StringUtils.isNotEmpty(state)){
 				regionalFactor = ScoringSingleton.getInstance().getRegionalFactor(modelId+"", state);
 				newScore = newScore*regionalFactor;
-				LOGGER.info("newScore for modelId " + modelId + " with regional factor " + regionalFactor + " " + newScore + "-- lId " + lId + " " + topologyName);
+				LOGGER.info("newScore for modelId " + modelId + "with regional factor " + regionalFactor + " " + newScore + "-- lId " + lId + " -- BROWSE");
 			}
 			
 			
