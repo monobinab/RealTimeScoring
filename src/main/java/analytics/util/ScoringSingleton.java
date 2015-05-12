@@ -47,7 +47,7 @@ public class ScoringSingleton {
 	private ChangedMemberVariablesDao changedVariablesDao;
 	private VariableDao variableDao;
 	private ModelVariablesDao modelVariablesDao;
-	private RegionalFactorDao regionalFactorDao;
+//	private RegionalFactorDao regionalFactorDao;
 	private MemberInfoDao memberInfoDao;
 	private RegionalFactorCache regionalFactorCache;
 	private static ScoringSingleton instance = null;
@@ -102,8 +102,8 @@ public class ScoringSingleton {
 		modelSywBoostDao = new ModelSywBoostDao();
 		memberBoostsDao = new MemberBoostsDao();
 		
-		regionalFactorDao = new RegionalFactorDao();
-		regionalFactorDao.populateRegionalFactors();
+		/*regionalFactorDao = new RegionalFactorDao();
+		regionalFactorDao.populateRegionalFactors();*/
 		memberInfoDao = new MemberInfoDao();
 		regionalFactorCache = new RegionalFactorCache();
 
