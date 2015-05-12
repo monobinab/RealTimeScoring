@@ -44,7 +44,7 @@ public class ScoringSingletonTest {
 	@BeforeClass
 	public static void initializeFakeMongo() throws InstantiationException,
 			IllegalAccessException, IllegalArgumentException,
-			InvocationTargetException, ParseException, ConfigurationException {
+			InvocationTargetException, ParseException, ConfigurationException, SecurityException, NoSuchFieldException {
 		
 		//this utility sets the system property and get the Db
 		SystemPropertyUtility.setSystemProperty();
@@ -68,6 +68,17 @@ public class ScoringSingletonTest {
 		varColl.insert(new BasicDBObject("name", "v8").append("VID", 8).append("strategy","StrategyDCFlag"));
 		varColl.insert(new BasicDBObject("name", "v9").append("VID", 9).append("strategy","StrategyPurchaseOccasions"));
 		varColl.insert(new BasicDBObject("name", "v10").append("VID", 10).append("strategy","StrategySumSales"));
+		
+		
+		//regionalFactor data is cached, so populated before the execution of test cases
+		DBCollection regionalFactorsCollection = db.getCollection("regionalAdjustmentFactors");
+		regionalFactorsCollection.insert(new BasicDBObject("modelName", "model_regFactor").append("modelId", "100").append("state", "TN").append("factor", 0.2));
+		scoringSingletonObj.populateModelsWithRegFactors();
+		Set<String> modelIdsWithRegionalFactorsContents = new HashSet<String>();
+		modelIdsWithRegionalFactorsContents.add("100");
+		Field modelIdsWithRegionalFactors = ScoringSingleton.class
+				.getDeclaredField("modelIdsWithRegionalFactors");
+		modelIdsWithRegionalFactors.set(scoringSingletonObj,modelIdsWithRegionalFactorsContents);
 	}
 
 	// This test is to check whether changedMemberVariablesMap is getting populated
@@ -1600,6 +1611,24 @@ public class ScoringSingletonTest {
 				var333Map.get("e"));
 	
 		changedMemberVar.remove(new BasicDBObject("l_id", l_id));
+	}
+	
+	@Test
+	public void regionalFactorTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
+		double regionalFactor = scoringSingletonObj.getRegionalFactor("100", "TN");
+		Assert.assertEquals(0.2, regionalFactor);
+	}
+	
+	@Test
+	public void regionalFactorWithNoModelIdTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
+		double regionalFactor = scoringSingletonObj.getRegionalFactor("101", "TN");
+		Assert.assertEquals(1.0, regionalFactor);
+	}
+	
+	@Test
+	public void regionalFactorWithNoStateTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
+		double regionalFactor = scoringSingletonObj.getRegionalFactor("101", "IL");
+		Assert.assertEquals(1.0, regionalFactor);
 	}
 	@AfterClass
 	public static void cleanUp(){

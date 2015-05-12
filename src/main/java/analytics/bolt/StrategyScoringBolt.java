@@ -37,6 +37,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	private OutputCollector outputCollector;
 	String topologyName;
 	RegionalFactorCache regionalFactorCache;
+	private Set<String> modelIdsWithRegFactors;
 	
 	public StrategyScoringBolt(String systemProperty, String host, int port) {
 		super(systemProperty);
@@ -146,8 +147,10 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		//get the state for the memberId to get the regionalFactor for scoring
 		String state = ScoringSingleton.getInstance().getMemberState(lId);
 
-		if(StringUtils.isNotEmpty(state))
-			ScoringSingleton.getInstance().populateModelsWithRegFactors();
+		//get the modelIds with regionalFactors 
+		if(StringUtils.isNotEmpty(state)){
+			modelIdsWithRegFactors = ScoringSingleton.getInstance().populateModelsWithRegFactors();
+		}
 		
 		for (Integer modelId : modelIdList) {// Score and emit for all modelIds
 												// before mongo inserts
@@ -163,7 +166,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			newScore = newScore + ScoringSingleton.getInstance().getBoostScore(allChanges, modelId );
 			
 			//get the score weighed with regionalFactor only if the member has state
-			if(StringUtils.isNotEmpty(state)){
+			if(StringUtils.isNotEmpty(state) && modelIdsWithRegFactors != null && !modelIdsWithRegFactors.isEmpty() && modelIdsWithRegFactors.contains(modelId+"")){
 				regionalFactor = ScoringSingleton.getInstance().getRegionalFactor(modelId+"", state);
 				newScore = newScore*regionalFactor;
 				LOGGER.info("newScore for modelId " + modelId + " with regional factor " + regionalFactor + " " + newScore + "-- lId " + lId + " " + topologyName);
