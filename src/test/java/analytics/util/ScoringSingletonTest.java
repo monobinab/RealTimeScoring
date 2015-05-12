@@ -70,7 +70,7 @@ public class ScoringSingletonTest {
 		varColl.insert(new BasicDBObject("name", "v10").append("VID", 10).append("strategy","StrategySumSales"));
 		
 		
-		/*//regionalFactor data is cached, so populated before the execution of test cases
+		//regionalFactor data is cached, so populated before the execution of test cases
 		DBCollection regionalFactorsCollection = db.getCollection("regionalAdjustmentFactors");
 		regionalFactorsCollection.insert(new BasicDBObject("modelName", "model_regFactor").append("modelId", "100").append("state", "TN").append("factor", 0.2));
 		scoringSingletonObj.populateModelsWithRegFactors();
@@ -78,7 +78,7 @@ public class ScoringSingletonTest {
 		modelIdsWithRegionalFactorsContents.add("100");
 		Field modelIdsWithRegionalFactors = ScoringSingleton.class
 				.getDeclaredField("modelIdsWithRegionalFactors");
-		modelIdsWithRegionalFactors.set(scoringSingletonObj,modelIdsWithRegionalFactorsContents);*/
+		modelIdsWithRegionalFactors.set(scoringSingletonObj,modelIdsWithRegionalFactorsContents);
 	}
 
 	// This test is to check whether changedMemberVariablesMap is getting populated
@@ -1613,7 +1613,7 @@ public class ScoringSingletonTest {
 		changedMemberVar.remove(new BasicDBObject("l_id", l_id));
 	}
 	
-	/*@Test
+	@Test
 	public void regionalFactorTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
 		double regionalFactor = scoringSingletonObj.getRegionalFactor("100", "TN");
 		Assert.assertEquals(0.2, regionalFactor);
@@ -1629,7 +1629,7 @@ public class ScoringSingletonTest {
 	public void regionalFactorWithNoStateTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
 		double regionalFactor = scoringSingletonObj.getRegionalFactor("101", "IL");
 		Assert.assertEquals(1.0, regionalFactor);
-	}*/
+	}
 	@AfterClass
 	public static void cleanUp(){
 		SystemPropertyUtility.dropDatabase();
