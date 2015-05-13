@@ -34,6 +34,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	private int port;
 	private static final long serialVersionUID = 1L;
 	private OutputCollector outputCollector;
+	private String topologyName;
 	
 	public StrategyScoringBolt(String systemProperty, String host, int port) {
 		super(systemProperty);
@@ -52,6 +53,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		super.prepare(stormConf, context, collector);
 		LOGGER.info("PREPARING STRATEGY SCORING BOLT");	
 	  	this.outputCollector = collector;
+	  	topologyName = (String) stormConf.get("metrics_topology");
 	  }
 	
 	@Override
@@ -161,7 +163,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			if(StringUtils.isNotEmpty(state)){
 				regionalFactor = ScoringSingleton.getInstance().getRegionalFactor(modelId+"", state);
 				newScore = newScore*regionalFactor;
-				LOGGER.info("newScore for modelId " + modelId + "with regional factor " + regionalFactor + " " + newScore + "-- lId " + lId + " -- BROWSE");
+				LOGGER.info("newScore for modelId " + modelId + " with regional factor " + regionalFactor + " " + newScore + "-- lId " + lId + " " + topologyName);
 			}
 			
 			

@@ -795,9 +795,9 @@ public class ScoringSingletonIntegrationTest {
 			variableNameToStrategyMap.setAccessible(false);
 		}
 
-		//This integration test is check the scored value with Regional factors for modelIds 35 and 48 (a positive case)
+		//This integration test is check the scored value with Regional factors for modelId 100(a positive case)
 		@Test
-		public void executeScoringSingletonBasicPositiveCaseWithRegioanlFactorTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, RealTimeScoringException, ConfigurationException, ParseException{
+		public void executeScoringSingletonBasicPositiveCaseWithRegionalFactorTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, RealTimeScoringException, ConfigurationException, ParseException{
 			
 			String l_id = "SearsTesting";
 			//Fake memberVariables collection
