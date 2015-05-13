@@ -678,6 +678,8 @@ public class ResponsysUtil {
 					((org.json.JSONObject) obj.getJSONArray("scoresInfo").get(0)).get("subBusinessUnit").toString() : null);
 			tagMetaData.setMdTags(((org.json.JSONObject) obj.getJSONArray("scoresInfo").get(0)).get("mdTag")!= null ? 
 					((org.json.JSONObject) obj.getJSONArray("scoresInfo").get(0)).get("mdTag").toString() : null);
+			tagMetaData.setFirst5CharMdTag(((org.json.JSONObject) obj.getJSONArray("scoresInfo").get(0)).get("mdTag")!= null ? 
+					((org.json.JSONObject) obj.getJSONArray("scoresInfo").get(0)).get("mdTag").toString().substring(0,5) : null);
 
 		} catch (org.json.JSONException e) {
 			LOGGER.info(e.getMessage());
