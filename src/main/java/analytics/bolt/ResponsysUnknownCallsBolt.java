@@ -117,7 +117,7 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 				responsysUtil.getResponseUnknownServiceResult(responsysObj);
 			    redisCountIncr("data_to_responsys");
 			    
-			    StringBuilder custVibesEvent = new StringBuilder();
+			    /*StringBuilder custVibesEvent = new StringBuilder();
 			    if(memberInfo.getEmailOptIn() != null && memberInfo.getEmailOptIn().equalsIgnoreCase("N") ){
 			    	if(responsysUtil.isVibesActiveWithEvent("Top 5% of MSM", tag, custVibesEvent)){
 			    	jedis.connect();
@@ -126,7 +126,7 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 					redisCountIncr("adding_to_vibes_call");
 					custVibesEvent = null;
 			    	}
-			    }
+			    }*/
 			}
 			else{
 				redisCountIncr("no_lyl_id_no");

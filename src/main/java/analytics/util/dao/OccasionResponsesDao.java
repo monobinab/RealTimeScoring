@@ -64,8 +64,8 @@ public class OccasionResponsesDao extends AbstractDao {
 		occObj.put(MongoNameConstants.TIMESTAMP, ft.format(dNow));
 		occObj.put("eid", eid);
 		occObj.put("custEvent", custEvent);
-		occObj.put("businessUnit", businessUnit);
-		occObj.put("subBusinessUnit", subBusUnit);
+		/*occObj.put("businessUnit", businessUnit);
+		occObj.put("subBusinessUnit", subBusUnit);*/
 		occObj.put("successFlag", successFlag);
 		occObj.put("tag", tag);
 		occObj.put("topology", topologyName);
