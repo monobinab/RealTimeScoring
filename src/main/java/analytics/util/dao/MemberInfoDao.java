@@ -29,18 +29,8 @@ public class MemberInfoDao extends AbstractDao {
 		MemberInfo info = new MemberInfo();
 		info.setEid(obj.get(MongoNameConstants.E_ID)==null?null:obj.get(MongoNameConstants.E_ID).toString());
 		info.setEmailOptIn(obj.get(MongoNameConstants.EMAIL_OPT_IN)==null?null:obj.get(MongoNameConstants.EMAIL_OPT_IN).toString());
+		info.setState(obj.get(MongoNameConstants.STATE)==null?null:obj.get(MongoNameConstants.STATE).toString());
 		return info;
 	}
 
-	public String getMemberInfoState(String l_id) {
-		BasicDBObject query = new BasicDBObject();
-		query.put(MongoNameConstants.L_ID, l_id);
-		DBObject dbObj = memberInfoCollection.findOne(query);
-		String state = (String) dbObj.get(MongoNameConstants.STATE);
-			if(state!=null)	{				
-				return state;
-			}else{
-				return null;
-			}
-		}
-	}
+}

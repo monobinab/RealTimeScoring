@@ -38,7 +38,8 @@ public class RegionalFactorDao extends AbstractDao {
 			DBObject dbObj = cursor.next();
 			if(dbObj != null){
 				String key = (String) dbObj.get(MongoNameConstants.MODEL_ID) + "-" + (String)dbObj.get(MongoNameConstants.REGIONAL_STATE);
-				regionalFactorMap.put(key, (Double) dbObj.get(MongoNameConstants.FACTOR));
+				Double factor = Double.parseDouble((String)dbObj.get(MongoNameConstants.FACTOR));
+				regionalFactorMap.put(key, factor);
 			}
 		}
 			LOGGER.info("regionalFactor is refreshed on : " + new Date() + " and size is " + regionalFactorMap.size());

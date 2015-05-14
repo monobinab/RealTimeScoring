@@ -49,8 +49,6 @@ public class ScoringSingleton {
 	private VariableDao variableDao;
 	private ModelVariablesDao modelVariablesDao;
 	private RegionalFactorDao regionalFactorDao;
-	private MemberInfoDao memberInfoDao;
-
 	private static ScoringSingleton instance = null;
 	Set<String> modelIdsWithRegionalFactors;
 
@@ -106,9 +104,6 @@ public class ScoringSingleton {
 		regionalFactorDao = new RegionalFactorDao();
 		regionalFactorDao.populateRegionalFactors();
 		regionalFactorsMap = regionalFactorDao.getRegionalFactorMap();
-		memberInfoDao = new MemberInfoDao();
-	
-
 	}
 
 	// TODO: Replace this method. Its for backward compatibility. Bad coding

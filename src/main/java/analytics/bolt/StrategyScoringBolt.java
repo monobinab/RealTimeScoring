@@ -5,13 +5,13 @@ import analytics.util.JsonUtils;
 import analytics.util.ScoringSingleton;
 import analytics.util.dao.MemberInfoDao;
 import analytics.util.objects.Change;
+import analytics.util.objects.MemberInfo;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -144,7 +144,9 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		Map<Integer,Map<String,Date>> modelIdToExpiryMap = new HashMap<Integer, Map<String,Date>>();
 		
 		//get the state for the memberId to get the regionalFactor for scoring
-		String state = memberInfoDao.getMemberInfoState(lId);
+		
+		MemberInfo memberInfo = memberInfoDao.getMemberInfo(lId);
+		String state = memberInfo.getState();
 		
 		for (Integer modelId : modelIdList) {// Score and emit for all modelIds
 												// before mongo inserts

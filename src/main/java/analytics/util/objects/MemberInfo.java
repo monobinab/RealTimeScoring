@@ -4,6 +4,14 @@ public class MemberInfo {
 	
 		private String eid;
 		private String emailOptIn;
+		private String state;
+		
+		public String getState() {
+			return state;
+		}
+		public void setState(String state) {
+			this.state = state;
+		}
 		public String getEmailOptIn() {
 			return emailOptIn;
 		}
