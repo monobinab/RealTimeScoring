@@ -3,6 +3,7 @@ package analytics.bolt;
 import analytics.exception.RealTimeScoringException;
 import analytics.util.JsonUtils;
 import analytics.util.ScoringSingleton;
+import analytics.util.dao.MemberInfoDao;
 import analytics.util.objects.Change;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -35,6 +36,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	private static final long serialVersionUID = 1L;
 	private OutputCollector outputCollector;
 	private String topologyName;
+	private MemberInfoDao memberInfoDao;
 	
 	public StrategyScoringBolt(String systemProperty, String host, int port) {
 		super(systemProperty);
@@ -54,6 +56,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		LOGGER.info("PREPARING STRATEGY SCORING BOLT");	
 	  	this.outputCollector = collector;
 	  	topologyName = (String) stormConf.get("metrics_topology");
+	  	memberInfoDao = new MemberInfoDao();
 	  }
 	
 	@Override
@@ -141,10 +144,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		Map<Integer,Map<String,Date>> modelIdToExpiryMap = new HashMap<Integer, Map<String,Date>>();
 		
 		//get the state for the memberId to get the regionalFactor for scoring
-		String state = ScoringSingleton.getInstance().getMemberState(lId);
-
-		if(StringUtils.isNotEmpty(state))
-			ScoringSingleton.getInstance().populateModelsWithRegFactors();
+		String state = memberInfoDao.getMemberInfoState(lId);
 		
 		for (Integer modelId : modelIdList) {// Score and emit for all modelIds
 												// before mongo inserts
@@ -160,12 +160,12 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			newScore = newScore + ScoringSingleton.getInstance().getBoostScore(allChanges, modelId );
 			
 			//get the score weighed with regionalFactor only if the member has state
-			if(StringUtils.isNotEmpty(state)){
-				regionalFactor = ScoringSingleton.getInstance().getRegionalFactor(modelId+"", state);
-				newScore = newScore*regionalFactor;
-				LOGGER.info("newScore for modelId " + modelId + " with regional factor " + regionalFactor + " " + newScore + "-- lId " + lId + " " + topologyName);
-			}
-			
+			regionalFactor = ScoringSingleton.getInstance().calcRegionalFactor(modelId, state);
+			newScore = newScore * regionalFactor;
+			if(newScore > 1)
+				newScore = 1;
+			LOGGER.debug("new score after regional factor with regional factor " + regionalFactor + " "+ newScore + " " + topologyName);
+
 			
 			// 9) Emit the new score
 			Map<String, Date> minMaxMap = ScoringSingleton.getInstance().getMinMaxExpiry(modelId, allChanges);

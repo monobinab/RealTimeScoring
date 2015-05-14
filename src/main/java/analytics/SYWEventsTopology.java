@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.bolt.FlumeRPCBolt;
+import analytics.bolt.LoggingBolt;
 import analytics.bolt.ParsingBoltSYW;
 import analytics.bolt.PersistBoostsBolt;
 import analytics.bolt.ProcessSYWInteractions;
@@ -62,7 +63,7 @@ public class SYWEventsTopology {
 		topologyBuilder.setBolt("persistBolt", new PersistBoostsBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("processSYWEvents", "persist_stream");
 		
 		if(System.getProperty(MongoNameConstants.IS_PROD).equals("PROD")){
-		topologyBuilder.setBolt("flumeLoggingBolt", new FlumeRPCBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
+			topologyBuilder.setBolt("loggingBolt", new LoggingBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
 		}	
 		//topologyBuilder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
 		//topologyBuilder.setBolt("memberPublishBolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 2).shuffleGrouping("strategyScoringBolt", "member_stream");
