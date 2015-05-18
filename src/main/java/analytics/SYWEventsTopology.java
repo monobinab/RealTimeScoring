@@ -3,17 +3,14 @@ package analytics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.bolt.FlumeRPCBolt;
 import analytics.bolt.LoggingBolt;
 import analytics.bolt.ParsingBoltSYW;
 import analytics.bolt.PersistBoostsBolt;
 import analytics.bolt.ProcessSYWInteractions;
-import analytics.bolt.ResponsysUnknownCallsBolt;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.spout.SYWRedisSpout;
 import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
-import analytics.util.RedisConnection;
 import analytics.util.SystemUtility;
 import analytics.util.TopicConstants;
 import backtype.storm.Config;

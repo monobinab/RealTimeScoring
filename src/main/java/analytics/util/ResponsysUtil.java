@@ -736,43 +736,6 @@ public class ResponsysUtil {
 		customXml = null;
 	}
 
-	public org.json.JSONObject getJsonObjForUnknown(String input){
-		//get the list of models
-		List<String> activeTags = tagResponsysActiveDao.tagsResponsysList();
-		Map<Integer, String> tagModelsMap = tagVariableDao.getTagModelIds(activeTags);
-
-	//	TagMetadata tagMetadata = null;
-		org.json.JSONObject o = null;
-		try{
-		 o = new org.json.JSONObject(input);
-		org.json.JSONObject objToSend = null;
-		org.json.JSONArray arr = o.getJSONArray("scoresInfo");
-		for(int i=0; i<arr.length(); i++){
-			String modelId = ((org.json.JSONObject)arr.get(i)).getString("modelId");
-			Double percentile = Double.valueOf(((org.json.JSONObject)arr.get(i)).getString("percentile"));
-			for(Map.Entry<Integer, String> entry : tagModelsMap.entrySet()){
-				if((entry.getKey() +"").equals(modelId) && percentile >= 95){
-				objToSend = (org.json.JSONObject)arr.get(i);
-		//		tagMetadata = tagMetadataDao.getBuSubBu(entry.getValue());
-				break;
-			}
-
-		}
-			if(objToSend != null)
-				break;
-	}
-		if(objToSend == null)
-			return null;
-		o.remove("scoresInfo");
-		o.append("scoresInfo", objToSend);
-		}
-		catch(Exception e){
-			e.printStackTrace();
-			LOGGER.error("Exception in getJsonObjForUnknown", e);
-		}
-		return o;
-	}
-	
 	
 	/**
 	 * Method to check whether vibes is ready with the BU/SubBU

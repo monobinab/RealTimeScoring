@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import analytics.exception.RealTimeScoringException;
 import analytics.util.dao.ChangedMemberScoresDao;
 import analytics.util.dao.ChangedMemberVariablesDao;
-import analytics.util.dao.MemberInfoDao;
 import analytics.util.dao.MemberVariablesDao;
 import analytics.util.dao.MemberBoostsDao;
 import analytics.util.dao.ModelSywBoostDao;
@@ -49,6 +48,7 @@ public class ScoringSingleton {
 	private VariableDao variableDao;
 	private ModelVariablesDao modelVariablesDao;
 	private RegionalFactorDao regionalFactorDao;
+	
 	private static ScoringSingleton instance = null;
 	Set<String> modelIdsWithRegionalFactors;
 
@@ -102,8 +102,7 @@ public class ScoringSingleton {
 		memberBoostsDao = new MemberBoostsDao();
 		
 		regionalFactorDao = new RegionalFactorDao();
-		regionalFactorDao.populateRegionalFactors();
-		regionalFactorsMap = regionalFactorDao.getRegionalFactorMap();
+		regionalFactorsMap = regionalFactorDao.populateRegionalFactors();
 	}
 
 	// TODO: Replace this method. Its for backward compatibility. Bad coding
@@ -404,12 +403,12 @@ public class ScoringSingleton {
 	public double calcRegionalFactor(Integer modelId, String state){
 
 		if(StringUtils.isNotEmpty(state)){
-			String key = modelId+"" + state;
+			String key = modelId+ "-" + state;
 			if(regionalFactorsMap != null  && !regionalFactorsMap.isEmpty() && regionalFactorsMap.containsKey(key)){
 					return  regionalFactorsMap.get(key);
 				}
 			}
-			return 1;
+			return 1.0;
 	}
 	
 		public Map<String, Date> getMinMaxExpiry(Integer modelId, Map<String, Change> allChanges) {

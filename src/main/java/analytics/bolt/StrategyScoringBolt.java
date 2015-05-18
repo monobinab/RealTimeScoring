@@ -12,6 +12,7 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -144,15 +145,14 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		Map<Integer,Map<String,Date>> modelIdToExpiryMap = new HashMap<Integer, Map<String,Date>>();
 		
 		//get the state for the memberId to get the regionalFactor for scoring
-		
-		MemberInfo memberInfo = memberInfoDao.getMemberInfo(lId);
-		String state = memberInfo.getState();
+		MemberInfo memberIfo = memberInfoDao.getMemberInfo(lId);
+		String state = memberIfo.getState();
 		
 		for (Integer modelId : modelIdList) {// Score and emit for all modelIds
 												// before mongo inserts
 			// recalculate score for model
 			double newScore;
-			double regionalFactor = 0.0;
+			double regionalFactor = 1.0;
 			try {
 				newScore = ScoringSingleton.getInstance().calcScore(memberVariablesMap, allChanges,
 						modelId);
@@ -162,11 +162,13 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			newScore = newScore + ScoringSingleton.getInstance().getBoostScore(allChanges, modelId );
 			
 			//get the score weighed with regionalFactor only if the member has state
-			regionalFactor = ScoringSingleton.getInstance().calcRegionalFactor(modelId, state);
+			if(StringUtils.isNotEmpty(state)){
+				regionalFactor = ScoringSingleton.getInstance().calcRegionalFactor(modelId, state);
+			}
 			newScore = newScore * regionalFactor;
-			if(newScore > 1)
-				newScore = 1;
-			LOGGER.debug("new score after regional factor with regional factor " + regionalFactor + " "+ newScore + " " + topologyName);
+			if(newScore > 1.0)
+				newScore = 1.0;
+			LOGGER.info("new score after regional factor with regional factor " + regionalFactor + " "+ newScore + " " + topologyName);
 
 			
 			// 9) Emit the new score
@@ -233,10 +235,11 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		LOGGER.debug("TIME:" + messageID + "- Scoring complete-" + System.currentTimeMillis());
 		
 		List<Object> listToEmit = new ArrayList<Object>();
-		listToEmit.add(lId);
+		//member_stream is commented as MemberPublish bolt to redis is not in use now
+		/*listToEmit.add(lId);
 		listToEmit.add(source);
 		listToEmit.add(messageID);
-		this.outputCollector.emit("member_stream", listToEmit);
+		this.outputCollector.emit("member_stream", listToEmit);*/
 		redisCountIncr("member_scored_successfully");
 		if(lyl_id_no!=null){
 			listToEmit = new ArrayList<Object>();
@@ -258,7 +261,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		declarer.declareStream("score_stream",new Fields("l_id", "newScore", "model","source", "messageID", "minExpiry", "maxExpiry"));
-		declarer.declareStream("member_stream", new Fields("l_id", "source","messageID"));
+	//	declarer.declareStream("member_stream", new Fields("l_id", "source","messageID"));
 		declarer.declareStream("response_stream", new Fields("lyl_id_no","messageID"));
 
 	}

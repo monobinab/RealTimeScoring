@@ -1,6 +1,5 @@
 package analytics.util.dao;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,16 +15,7 @@ import com.mongodb.DBObject;
 public class RegionalFactorDao extends AbstractDao {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RegionalFactorDao.class);
 	DBCollection regionalFactorColl;
-	private Map<String, Double> regionalFactorMap;
-
-	public Map<String, Double> getRegionalFactorMap() {
-		return regionalFactorMap;
-	}
-
-	public void setRegionalFactorMap(Map<String, Double> regionalFactorMap) {
-		this.regionalFactorMap = regionalFactorMap;
-	}
-
+	
 	public RegionalFactorDao() {
 		super();
 		regionalFactorColl = db.getCollection("regionalAdjustmentFactors"); 
@@ -42,7 +32,7 @@ public class RegionalFactorDao extends AbstractDao {
 				regionalFactorMap.put(key, factor);
 			}
 		}
-			LOGGER.info("regionalFactor is refreshed on : " + new Date() + " and size is " + regionalFactorMap.size());
+			LOGGER.info("regionalFactor size is " + regionalFactorMap.size());
 			return regionalFactorMap;
 		}
 }

@@ -34,6 +34,7 @@ public class OccasionResponsesDao extends AbstractDao {
 		occObj.put(MongoNameConstants.TIMESTAMP, ft.format(dNow));
 		occObj.put("eid", eid);
 		occObj.put("custEvent", custEvent);
+		occObj.put("topology", topologyName);
 		if(!topologyName.equalsIgnoreCase("Telluride"))
 			occObj.put("purchaseOccasion", purOcca);
 		//occObj.put("businessUnit", businessUnit);

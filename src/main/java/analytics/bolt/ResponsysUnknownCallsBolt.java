@@ -1,8 +1,10 @@
 package analytics.bolt;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,14 +40,9 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 	private TagMetadataDao tagMetadataDao;
 	private MemberInfoDao memberInfoDao;
 	private String topologyName;
-	private String host;
-	private int port;
-	Jedis jedis = null;
 	
 	public ResponsysUnknownCallsBolt(String systemProperty, String host, int port) {
 		super(systemProperty);
-		this.host = host;
-		this.port = port;
 	}
 
 	@Override
@@ -59,7 +56,7 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 		tagMetadataDao = new TagMetadataDao();
 		memberInfoDao = new MemberInfoDao();
 		topologyName = (String) stormConf.get("metrics_topology");
-		jedis = new Jedis(host, port, 1800);
+		//jedis = new Jedis(host, port, 1800);
 	 }
 
 	@Override
@@ -75,10 +72,9 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 					
 				//get the list of models
 				Map<String, String> activeTagMap = tagResponsysActiveDao.getResponsysActiveTagsList();
-				List<String> activeTags = new ArrayList<String>();
-				for (Map.Entry<String,String> entry : activeTagMap.entrySet()) {
-					activeTags.add(entry.getKey());
-				}
+				Set<String> activeTags = new HashSet<String>();
+				activeTags.addAll(activeTagMap.keySet());
+				
 
 			//	List<String> activeTags = tagResponsysActiveDao.tagsResponsysList();
 				Map<Integer, String> tagModelsMap = tagVariableDao.getTagModelIds(activeTags);
@@ -131,20 +127,22 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 			Map<Integer, String> tagModelsMap, org.json.JSONObject o,
 			org.json.JSONObject objToSend) throws JSONException {
 		org.json.JSONArray arr = o.getJSONArray("scoresInfo");
+		
+		if(((org.json.JSONObject) arr.get(0)).has("mdTag"))
+			return null;
+		
 		for(int i=0; i<arr.length(); i++){
-			String modelId = ((org.json.JSONObject)arr.get(i)).getString("modelId");
-			Double percentile = Double.valueOf(((org.json.JSONObject)arr.get(i)).getString("percentile"));
 			if(!((org.json.JSONObject) arr.get(i)).has("mdTag") ){
-					for(Map.Entry<Integer, String> entry : tagModelsMap.entrySet()){
-						if((entry.getKey() +"").equals(modelId) && percentile >= 95){
-							objToSend = (org.json.JSONObject)arr.get(i);
-							return objToSend;
-						}
+				String modelId = ((org.json.JSONObject)arr.get(i)).getString("modelId");
+				Double percentile = Double.valueOf(((org.json.JSONObject)arr.get(i)).getString("percentile"));
+				for(Map.Entry<Integer, String> entry : tagModelsMap.entrySet()){
+					if((entry.getKey() +"").equals(modelId) && percentile >= 95){
+						objToSend = (org.json.JSONObject)arr.get(i);
+						return objToSend;
 					}
 				}
-			else
-				return null;
 			}
+		}
 		return null;
 	}
 	

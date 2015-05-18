@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,7 +80,7 @@ public class TagVariableDao extends AbstractDao {
 		return tagVariablesList;
 	}
 
-	public Map<Integer, String> getTagModelIds(List<String> tagsList) {
+	public Map<Integer, String> getTagModelIds(Set<String> tagsList) {
 		Map<Integer, String> tagModelMap = new HashMap<Integer, String>();
 		for (String tag : tagsList) {
 			BasicDBObject query = new BasicDBObject();
