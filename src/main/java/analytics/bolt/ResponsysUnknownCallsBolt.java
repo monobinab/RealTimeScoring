@@ -85,6 +85,7 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 				objToSend = getJsonForResponsys(tagModelsMap, o, objToSend);
 				if(objToSend == null){
 					countMetric.scope("no_data_to_responsys").incr();
+					outputCollector.ack(input);
 					return;
 				}
 				
@@ -92,7 +93,7 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 				TagMetadata tagMetadata = null;
 				String tag = tagModelsMap.get(Integer.parseInt((String) objToSend.get("modelId")));
 				tagMetadata = tagMetadataDao.getBuSubBu(tag);
-				tagMetadata.setMdTags(tag+"0000000000000");
+				tagMetadata.setMdTags(tag+"8000000000000");
 				
 				
 				//preparing the jsonObject with only first model, which satisfied the above conditions

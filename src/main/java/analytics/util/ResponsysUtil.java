@@ -707,7 +707,7 @@ public class ResponsysUtil {
 				strBuff.append((char) c); 
 			}
 			System.out.println("time take for Resposys = " + (System.currentTimeMillis() - time));
-			System.out.println("Response String ====>" + strBuff.toString());
+		//	System.out.println("Response String ====>" + strBuff.toString());
 		}catch (IOException e) {
 			e.printStackTrace();
 			LOGGER.error("Exception occured in sendResponse ", e);
