@@ -40,7 +40,7 @@ public class VibesTopology{
 				.shuffleGrouping("vibesSpout");
 
 		Config conf = new Config();
-			conf.put("metrics_topology", "Vibes");
+			conf.put("metrics_topology", "VibesMetrics");
 			//stormconf is set with system's property as MetricsListener needs it
 			conf.registerMetricsConsumer(MetricsListener.class,System.getProperty(MongoNameConstants.IS_PROD), 3);
 			if (System.getProperty(MongoNameConstants.IS_PROD)

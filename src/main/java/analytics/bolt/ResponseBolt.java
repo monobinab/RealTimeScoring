@@ -90,18 +90,7 @@ public class ResponseBolt extends EnvironmentBolt{
 					LOGGER.info("No Tags found for lyl_id_no " + lyl_id_no);
 				
 				jedis.disconnect();
-				//jedisPool.returnResource(jedis);
-				
-				/*if(diffTags!=null && !"".equals(diffTags)){
-					String[] tags = diffTags.split(",");
-					//Send response for every new tag scored
-					for(int i=0 ;i<tags.length ;i++){
-						String tag = tags[i];
-						getResponseServiceResult(scoreInfoJsonString,lyl_id_no,tag);
-						countMetric.scope("responses").incr();
-					}
-				}*/
-				
+
 				if(diffTags!=null && !"".equals(diffTags)){
 					countMetric.scope("making_responsys_call").incr();
 					//Get the metadata info for all the tags
@@ -169,5 +158,4 @@ public class ResponseBolt extends EnvironmentBolt{
 		
 	}
 	
-
 }

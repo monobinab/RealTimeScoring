@@ -117,7 +117,7 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 				responsysUtil.getResponseUnknownServiceResult(responsysObj);
 			    redisCountIncr("data_to_responsys");
 			    
-			    StringBuilder custVibesEvent = new StringBuilder();
+			   /* StringBuilder custVibesEvent = new StringBuilder();
 			    if(memberInfo.getEmailOptIn() != null && memberInfo.getEmailOptIn().equalsIgnoreCase("N") ){
 			    	if(responsysUtil.isVibesActiveWithEvent("Top 5% of MSM", tag, custVibesEvent)){
 			    	jedis.connect();
@@ -126,7 +126,7 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 					redisCountIncr("adding_to_vibes_call");
 					custVibesEvent = null;
 			    	}
-			    }
+			    }*/
 			}
 			else{
 				redisCountIncr("no_lyl_id_no");
@@ -158,33 +158,7 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 		return null;
 	}
 	
-	//This method was used by Telluride for responsys as the logic has been changed
-	/*	@Deprecated
-		private org.json.JSONObject getJsonForResponsys(
-				Map<Integer, String> tagModelsMap, org.json.JSONObject o,
-				org.json.JSONObject objToSend) throws JSONException {
-			org.json.JSONArray arr = o.getJSONArray("scoresInfo");
-			for(int i=0; i<arr.length(); i++){
-				String modelId = ((org.json.JSONObject)arr.get(i)).getString("modelId");
-				Double percentile = Double.valueOf(((org.json.JSONObject)arr.get(i)).getString("percentile"));
-				for(Map.Entry<Integer, String> entry : tagModelsMap.entrySet()){
-					if((entry.getKey() +"").equals(modelId) && percentile >= 95){
-						if(((org.json.JSONObject) arr.get(i)).has("occassion") ){
-							if(((org.json.JSONObject) arr.get(i)).getString("occassion").equalsIgnoreCase("Unknown")){
-							objToSend = (org.json.JSONObject)arr.get(i);
-							return objToSend;
-							}
-						}
-						else{
-							objToSend = (org.json.JSONObject)arr.get(i);
-							return objToSend;
-						}
-					}
-				}
-			}
-			return null;
-		}
-*/
+
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		
