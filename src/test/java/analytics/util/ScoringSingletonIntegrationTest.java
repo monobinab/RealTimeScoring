@@ -793,19 +793,8 @@ public class ScoringSingletonIntegrationTest {
 			String l_id = "TestingLid";
 
 			//Fake memberVariables collection
-			DBCollection memVarColl = SystemPropertyUtility.getDb().getCollection("memberVariables");
+			DBCollection memVarColl = db.getCollection("memberVariables");
 			memVarColl.insert(new BasicDBObject("l_id", l_id).append("2269", 1).append("2270",0.4));
-
-			DBCollection varColl = SystemPropertyUtility.getDb().getCollection("Variables");
-			varColl.insert(new BasicDBObject("name", "v1").append("VID", 1).append("strategy","StrategyCountTransactions"));
-			varColl.insert(new BasicDBObject("name", "v2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
-			varColl.insert(new BasicDBObject("name", "v3").append("VID", 3).append("strategy","StrategyCountTraits"));
-			varColl.insert(new BasicDBObject("name", "v4").append("VID", 4).append("strategy","StrategyDaysSinceLast"));
-			varColl.insert(new BasicDBObject("name", "v5").append("VID", 5).append("strategy","StrategyTurnOnFlag"));
-			varColl.insert(new BasicDBObject("name", "v6").append("VID", 6).append("strategy","StrategyBoostProductTotalCount"));
-			varColl.insert(new BasicDBObject("name", "v7").append("VID", 7).append("strategy","StrategySumSales"));
-			varColl.insert(new BasicDBObject("name", "v8").append("VID", 8).append("strategy","StrategyTurnOffFlag"));
-
 
 			//fake changedMemberVariables Collection
 			DBCollection changedMemberVar = SystemPropertyUtility.getDb().getCollection("changedMemberVariables");
@@ -895,7 +884,7 @@ public class ScoringSingletonIntegrationTest {
 
 			//preparing regionalFactorsMap
 			Map<String, Double> regionalFactorsMapContents = new HashMap<String, Double>();
-			regionalFactorsMapContents.put("35"+"TN", 0.2);
+			regionalFactorsMapContents.put("35"+"-"+"TN", 0.2);
 			Field regionalFactorsMap = ScoringSingleton.class
 					.getDeclaredField("regionalFactorsMap");
 			regionalFactorsMap.setAccessible(true);
@@ -927,7 +916,7 @@ public class ScoringSingletonIntegrationTest {
 			String l_id = "TestingLid2";
 
 			//Fake memberVariables collection
-			DBCollection memVarColl = SystemPropertyUtility.getDb().getCollection("memberVariables");
+			DBCollection memVarColl = db.getCollection("memberVariables");
 			memVarColl.insert(new BasicDBObject("l_id", l_id).append("2269", 1).append("2270",0.4));
 
 			DBCollection varColl = SystemPropertyUtility.getDb().getCollection("Variables");
@@ -1050,7 +1039,7 @@ public class ScoringSingletonIntegrationTest {
 			String l_id = "TestingLid3";
 
 			//Fake memberVariables collection
-			DBCollection memVarColl = SystemPropertyUtility.getDb().getCollection("memberVariables");
+			DBCollection memVarColl = db.getCollection("memberVariables");
 			memVarColl.insert(new BasicDBObject("l_id", l_id).append("2269", 1).append("2270",0.4));
 
 			DBCollection varColl = SystemPropertyUtility.getDb().getCollection("Variables");
@@ -1174,7 +1163,7 @@ public class ScoringSingletonIntegrationTest {
 			String l_id = "TestingLid6";
 
 			//Fake memberVariables collection
-			DBCollection memVarColl = SystemPropertyUtility.getDb().getCollection("memberVariables");
+			DBCollection memVarColl = db.getCollection("memberVariables");
 			memVarColl.insert(new BasicDBObject("l_id", l_id).append("2269", 1).append("2270",0.4));
 
 			DBCollection varColl = SystemPropertyUtility.getDb().getCollection("Variables");
@@ -1308,7 +1297,7 @@ public class ScoringSingletonIntegrationTest {
 			String l_id = "TestingLid4";
 
 			//Fake memberVariables collection
-			DBCollection memVarColl = SystemPropertyUtility.getDb().getCollection("memberVariables");
+			DBCollection memVarColl = db.getCollection("memberVariables");
 			memVarColl.insert(new BasicDBObject("l_id", l_id).append("2269", 1).append("2270",0.4));
 
 			DBCollection varColl = SystemPropertyUtility.getDb().getCollection("Variables");
