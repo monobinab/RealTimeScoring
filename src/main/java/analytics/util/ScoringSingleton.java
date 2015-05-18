@@ -10,10 +10,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.cache.RegionalFactorCache;
 import analytics.exception.RealTimeScoringException;
 import analytics.util.dao.ChangedMemberScoresDao;
 import analytics.util.dao.ChangedMemberVariablesDao;
@@ -40,6 +40,7 @@ public class ScoringSingleton {
 	private Map<String, String> variableVidToNameMap;
 	private Map<String, String> variableNameToVidMap;
 	private Map<String, String> variableNameToStrategyMap;
+	private Map<String, Double> regionalFactorsMap;
 	//private Map<String, String> sourcesMap;
 	private MemberVariablesDao memberVariablesDao;
 	//private SourcesDao sourcesDao;
@@ -47,9 +48,7 @@ public class ScoringSingleton {
 	private ChangedMemberVariablesDao changedVariablesDao;
 	private VariableDao variableDao;
 	private ModelVariablesDao modelVariablesDao;
-//	private RegionalFactorDao regionalFactorDao;
-	private MemberInfoDao memberInfoDao;
-	private RegionalFactorCache regionalFactorCache;
+	private RegionalFactorDao regionalFactorDao;
 	private static ScoringSingleton instance = null;
 	Set<String> modelIdsWithRegionalFactors;
 
@@ -102,11 +101,9 @@ public class ScoringSingleton {
 		modelSywBoostDao = new ModelSywBoostDao();
 		memberBoostsDao = new MemberBoostsDao();
 		
-		/*regionalFactorDao = new RegionalFactorDao();
-		regionalFactorDao.populateRegionalFactors();*/
-		memberInfoDao = new MemberInfoDao();
-		regionalFactorCache = new RegionalFactorCache();
-
+		regionalFactorDao = new RegionalFactorDao();
+		regionalFactorDao.populateRegionalFactors();
+		regionalFactorsMap = regionalFactorDao.getRegionalFactorMap();
 	}
 
 	// TODO: Replace this method. Its for backward compatibility. Bad coding
@@ -404,23 +401,17 @@ public class ScoringSingleton {
 		return val;
 	}
 	
-	//get the state for the memberId to get the regionalFactor for scoring
-	public String getMemberState(String lId){
-		return memberInfoDao.getMemberInfoState(lId);
-	}
-		
-	//populate the list of modelIds with regionalFactor from cache, if the member has state associated with him
-	public void populateModelsWithRegFactors(){
-		regionalFactorCache.populateModelIdsWithRegFactors();
-		modelIdsWithRegionalFactors = regionalFactorCache.getModelIdsWithRegionalFactor();
+	public double calcRegionalFactor(Integer modelId, String state){
+
+		if(StringUtils.isNotEmpty(state)){
+			String key = modelId+"" + state;
+			if(regionalFactorsMap != null  && !regionalFactorsMap.isEmpty() && regionalFactorsMap.containsKey(key)){
+					return  regionalFactorsMap.get(key);
+				}
+			}
+			return 1;
 	}
 	
-	public double getRegionalFactor(String modelId, String state){
-		if(modelIdsWithRegionalFactors != null && !modelIdsWithRegionalFactors.isEmpty() && modelIdsWithRegionalFactors.contains(modelId)){
-			return regionalFactorCache.getRegionalFactor(modelId, state);
-		}
-		return 1.0;
-	}
 		public Map<String, Date> getMinMaxExpiry(Integer modelId, Map<String, Change> allChanges) {
 		Date minDate = null;
 		Date maxDate = null;

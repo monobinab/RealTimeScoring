@@ -69,17 +69,7 @@ public class ScoringSingletonTest {
 		varColl.insert(new BasicDBObject("name", "v9").append("VID", 9).append("strategy","StrategyPurchaseOccasions"));
 		varColl.insert(new BasicDBObject("name", "v10").append("VID", 10).append("strategy","StrategySumSales"));
 		
-		
-		//regionalFactor data is cached, so populated before the execution of test cases
-		DBCollection regionalFactorsCollection = db.getCollection("regionalAdjustmentFactors");
-		regionalFactorsCollection.insert(new BasicDBObject("modelName", "model_regFactor").append("modelId", "100").append("state", "TN").append("factor", 0.2));
-		scoringSingletonObj.populateModelsWithRegFactors();
-		Set<String> modelIdsWithRegionalFactorsContents = new HashSet<String>();
-		modelIdsWithRegionalFactorsContents.add("100");
-		Field modelIdsWithRegionalFactors = ScoringSingleton.class
-				.getDeclaredField("modelIdsWithRegionalFactors");
-		modelIdsWithRegionalFactors.set(scoringSingletonObj,modelIdsWithRegionalFactorsContents);
-	}
+		}
 
 	// This test is to check whether changedMemberVariablesMap is getting populated
 	// (positive case)
@@ -1612,23 +1602,65 @@ public class ScoringSingletonTest {
 	
 		changedMemberVar.remove(new BasicDBObject("l_id", l_id));
 	}
-	
 	@Test
-	public void regionalFactorTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
-		double regionalFactor = scoringSingletonObj.getRegionalFactor("100", "TN");
-		Assert.assertEquals(0.2, regionalFactor);
+	public void calcRegionalFactorPositiveCaseTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
+
+		//preparing regionalFactorsMap
+		Map<String, Double> regionalFactorsMapContents = new HashMap<String, Double>();
+		regionalFactorsMapContents.put("35"+"TN", 0.2);
+		Field regionalFactorsMap = ScoringSingleton.class
+				.getDeclaredField("regionalFactorsMap");
+		regionalFactorsMap.setAccessible(true);
+		regionalFactorsMap.set(scoringSingletonObj, regionalFactorsMapContents);
+		Double factor = scoringSingletonObj.calcRegionalFactor(35, "TN");
+		Assert.assertEquals(0.2, factor);
 	}
-	
+
 	@Test
-	public void regionalFactorWithNoModelIdTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
-		double regionalFactor = scoringSingletonObj.getRegionalFactor("101", "TN");
-		Assert.assertEquals(1.0, regionalFactor);
+	public void calcRegionalFactorWithEmptyRegionalFactorTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
+
+		//preparing regionalFactorsMap
+		Map<String, Double> regionalFactorsMapContents = new HashMap<String, Double>();
+		Field regionalFactorsMap = ScoringSingleton.class
+				.getDeclaredField("regionalFactorsMap");
+		regionalFactorsMap.setAccessible(true);
+		regionalFactorsMap.set(scoringSingletonObj, regionalFactorsMapContents);
+		Double factor = scoringSingletonObj.calcRegionalFactor( 35, "TN");
+		Assert.assertEquals(1.0, factor);
 	}
-	
+
 	@Test
-	public void regionalFactorWithNoStateTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
-		double regionalFactor = scoringSingletonObj.getRegionalFactor("101", "IL");
-		Assert.assertEquals(1.0, regionalFactor);
+	public void calcRegionalWithNoRequiredModelIdTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
+
+		//preparing regionalFactorsMap
+		Map<String, Double> regionalFactorsMapContents = new HashMap<String, Double>();
+		regionalFactorsMapContents.put("35"+"TN", 0.2);
+		Field regionalFactorsMap = ScoringSingleton.class
+				.getDeclaredField("regionalFactorsMap");
+		regionalFactorsMap.setAccessible(true);
+		regionalFactorsMap.set(scoringSingletonObj, regionalFactorsMapContents);
+		Double factor = scoringSingletonObj.calcRegionalFactor( 46, "TN");
+		Assert.assertEquals(1.0, factor);
+	}
+
+	@Test
+	public void calcRegionalWithNoRequiredStateTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
+
+		//preparing regionalFactorsMap
+		Map<String, Double> regionalFactorsMapContents = new HashMap<String, Double>();
+		regionalFactorsMapContents.put("35"+"IL", 0.2);
+		Field regionalFactorsMap = ScoringSingleton.class
+				.getDeclaredField("regionalFactorsMap");
+		regionalFactorsMap.setAccessible(true);
+		regionalFactorsMap.set(scoringSingletonObj, regionalFactorsMapContents);
+		Double factor = scoringSingletonObj.calcRegionalFactor( 35, "TN");
+		Assert.assertEquals(1.0, factor);
+	}
+
+	@Test
+	public void calcRegionalWithNoStateForMemberTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
+		Double factor = scoringSingletonObj.calcRegionalFactor(35, null);
+		Assert.assertEquals(1.0, factor);
 	}
 	@AfterClass
 	public static void cleanUp(){
