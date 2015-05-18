@@ -80,7 +80,7 @@ public class RealTimeScoringTellurideTopology {
        
         topologyBuilder.setBolt("responsysBolt", new ResponsysUnknownCallsBolt(System.getProperty(MongoNameConstants.IS_PROD), AuthPropertiesReader
 				.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
-				.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 3).shuffleGrouping("strategyScoringBolt", "response_stream");
+				.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 12).shuffleGrouping("strategyScoringBolt", "response_stream");
 		//Redis publish to server 1
         //topologyBuilder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 3).localOrShuffleGrouping("strategyScoringBolt", "score_stream");
         //topologyBuilder.setBolt("memberPublishBolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 3).localOrShuffleGrouping("strategyScoringBolt", "member_stream");
