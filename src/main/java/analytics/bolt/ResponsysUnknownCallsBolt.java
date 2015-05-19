@@ -1,8 +1,6 @@
 package analytics.bolt;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -24,8 +22,6 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Tuple;
 
 import org.json.JSONException;
-
-import redis.clients.jedis.Jedis;
 
 public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 
