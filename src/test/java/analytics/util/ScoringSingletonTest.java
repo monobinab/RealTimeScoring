@@ -1533,18 +1533,19 @@ public class ScoringSingletonTest {
 	// for a positive case, testing upsert, i.e new id is getting inserted (VID 333) and already existing one is getting updated (VID 222)
 	@SuppressWarnings("unchecked")
 	@Test
+	@Ignore
 	public void updateChangedVariablesPositiveCaseTest() throws ConfigurationException,
 			SecurityException, NoSuchFieldException, IllegalArgumentException,
 			IllegalAccessException, ParseException {
 
-		DBCollection changedMemberVar2 = db.getCollection("changedMemberVariables");
+		DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
 		String l_id = "Example";
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Change expected = new Change("222", 12.0,
 				simpleDateFormat.parse("2999-09-23"),
 				simpleDateFormat.parse("2014-09-01"));
 	
-		changedMemberVar2.insert(new BasicDBObject("l_id", l_id).append(
+		changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
 				"222",
 				new BasicDBObject("v", expected.getValue()).append("e",
 						expected.getExpirationDateAsString()).append("f",
@@ -1569,7 +1570,7 @@ public class ScoringSingletonTest {
 		variableNameToVidMap.set(scoringSingletonObj,
 				variableNameToVidMapContents);
 		
-		DBObject dbObject2 = changedMemberVar2.findOne(new BasicDBObject("l_id",
+		DBObject dbObject2 = changedMemberVar.findOne(new BasicDBObject("l_id",
 				l_id));
 			
 		System.out.println("changedMemberVar before update" + dbObject2);
@@ -1578,7 +1579,7 @@ public class ScoringSingletonTest {
 		scoringSingletonObj.updateChangedVariables(l_id,
 				allchanges);
 
-		DBObject dbObject = changedMemberVar2.findOne(new BasicDBObject("l_id",
+		DBObject dbObject = changedMemberVar.findOne(new BasicDBObject("l_id",
 				l_id));
 			
 		System.out.println("changedMemberVar after update" + dbObject);
@@ -1600,7 +1601,7 @@ public class ScoringSingletonTest {
 		Assert.assertEquals(change2.getExpirationDateAsString(),
 				var333Map.get("e"));
 	
-		changedMemberVar2.remove(new BasicDBObject("l_id", l_id));
+		changedMemberVar.remove(new BasicDBObject("l_id", l_id));
 	}
 	@Test
 	public void calcRegionalFactorPositiveCaseTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
