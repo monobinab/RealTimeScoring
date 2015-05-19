@@ -40,8 +40,11 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 	private TagMetadataDao tagMetadataDao;
 	private MemberInfoDao memberInfoDao;
 	private String topologyName;
+	private Map<String, String> activeTagMap;
+	private Set<String> activeTags;
+	private Map<Integer, String> tagModelsMap;
 	
-	public ResponsysUnknownCallsBolt(String systemProperty, String host, int port) {
+	public ResponsysUnknownCallsBolt(String systemProperty) {
 		super(systemProperty);
 	}
 
@@ -56,6 +59,14 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 		tagMetadataDao = new TagMetadataDao();
 		memberInfoDao = new MemberInfoDao();
 		topologyName = (String) stormConf.get("metrics_topology");
+		//get the list of models
+		activeTagMap = tagResponsysActiveDao.getResponsysActiveTagsList();
+		activeTags = new HashSet<String>();
+		activeTags.addAll(activeTagMap.keySet());
+		
+
+	//	List<String> activeTags = tagResponsysActiveDao.tagsResponsysList();
+		tagModelsMap = tagVariableDao.getTagModelIds(activeTags);
 		//jedis = new Jedis(host, port, 1800);
 	 }
 
@@ -70,15 +81,6 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 				String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no);
 				String scoreInfoJsonString = responsysUtil.callRtsAPI(lyl_id_no);
 					
-				//get the list of models
-				Map<String, String> activeTagMap = tagResponsysActiveDao.getResponsysActiveTagsList();
-				Set<String> activeTags = new HashSet<String>();
-				activeTags.addAll(activeTagMap.keySet());
-				
-
-			//	List<String> activeTags = tagResponsysActiveDao.tagsResponsysList();
-				Map<Integer, String> tagModelsMap = tagVariableDao.getTagModelIds(activeTags);
-				
 				//get the top jsonObject from api satisfying the condition
 				org.json.JSONObject o = new org.json.JSONObject(scoreInfoJsonString);
 				org.json.JSONObject objToSend = null;
