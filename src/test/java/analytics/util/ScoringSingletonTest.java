@@ -238,7 +238,6 @@ public class ScoringSingletonTest {
 
 	// This test is to check the memberVariablesMap creation (positive case)
 	@Test
-	@Ignore
 	public void createMemberVariableValueMapPositiveCaseTest()
 			throws ConfigurationException, SecurityException,
 			NoSuchFieldException, IllegalArgumentException,
@@ -295,7 +294,6 @@ public class ScoringSingletonTest {
 		// if memberVariablesMap will be populated with all the  avai variables associated with modelLists to be scored,
 		// it wont be populated in the memberVariables map
 		@Test
-		@Ignore
 		public void createMemberVariableValueMapPositiveCaseTest2()
 				throws ConfigurationException, SecurityException,
 				NoSuchFieldException, IllegalArgumentException,
@@ -1603,7 +1601,6 @@ public class ScoringSingletonTest {
 	// for a positive case, testing upsert, i.e new id is getting inserted (VID 333) and already existing one is getting updated (VID 222)
 	@SuppressWarnings("unchecked")
 	@Test
-	@Ignore
 	public void updateChangedVariablesPositiveCaseTest() throws ConfigurationException,
 			SecurityException, NoSuchFieldException, IllegalArgumentException,
 			IllegalAccessException, ParseException {
