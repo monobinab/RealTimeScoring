@@ -57,7 +57,7 @@ public class ScoringSingletonTest {
 		constructor.setAccessible(true);
 		scoringSingletonObj = constructor.newInstance();
 		
-		DBCollection varColl = db.getCollection("Variables");
+		/*DBCollection varColl = db.getCollection("Variables");
 		varColl.insert(new BasicDBObject("name", "v1").append("VID", 1).append("strategy","StrategyCountTransactions"));
 		varColl.insert(new BasicDBObject("name", "v2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
 		varColl.insert(new BasicDBObject("name", "v3").append("VID", 3).append("strategy","StrategyCountTraits"));
@@ -67,7 +67,7 @@ public class ScoringSingletonTest {
 		varColl.insert(new BasicDBObject("name", "v7").append("VID", 7).append("strategy","StrategyBoostProductTotalCount"));
 		varColl.insert(new BasicDBObject("name", "v8").append("VID", 8).append("strategy","StrategyDCFlag"));
 		varColl.insert(new BasicDBObject("name", "v9").append("VID", 9).append("strategy","StrategyPurchaseOccasions"));
-		varColl.insert(new BasicDBObject("name", "v10").append("VID", 10).append("strategy","StrategySumSales"));
+		varColl.insert(new BasicDBObject("name", "v10").append("VID", 10).append("strategy","StrategySumSales"));*/
 		
 		}
 
@@ -111,7 +111,7 @@ public class ScoringSingletonTest {
 				actual.getExpirationDate());
 		Assert.assertEquals(expected.getChangeVariable(),
 				actual.getChangeVariable());
-		changedMemberVar.drop();
+		changedMemberVar.remove(new BasicDBObject("l_id",l_id));
 		varIdToNameMap.setAccessible(false);
 	}
 
@@ -124,9 +124,9 @@ public class ScoringSingletonTest {
 		assertTrue(modelList.isEmpty());
 	}
 
-	//if none of the variables in newChangesVarValueMap is found in variableModelsMap, modelLists. which needs to be scored will be empty
+	//if none of the variables in newChangesVarValueMap is found in variableModelsMap, modelLists which needs to be scored will be empty
 	@Test
-	public void getModelIdListNullNullNewChangesVarValueMapTest2() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+	public void getModelIdListNullNewChangesVarValueMapTest2() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
 		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
 		newChangesVarValueMap.put("key", "value");
 		List<Integer> modelLists = new ArrayList<Integer>();
@@ -408,7 +408,7 @@ public class ScoringSingletonTest {
 		}
 
 		Assert.assertNotNull(realTimeScoreExc);
-		memberVariables.drop();
+		memberVariables.remove(new BasicDBObject("l_id", lId));
 		modelsMap.setAccessible(false);
 		variableNameToVidMap.setAccessible(false);
 	}
@@ -419,7 +419,8 @@ public class ScoringSingletonTest {
 			SecurityException, NoSuchFieldException, IllegalArgumentException,
 			IllegalAccessException {
 		double boost = scoringSingletonObj.getBoostScore(null, null);
-		Assert.assertEquals(0.0, boost);
+		int compare = (new Double(0.0)).compareTo(new Double(boost));
+		Assert.assertEquals(compare, 0);
 	}
 
 	// This test case is for testing the boost returned for non month modelId
@@ -456,13 +457,12 @@ public class ScoringSingletonTest {
 		modelsMap.setAccessible(true);
 		modelsMap.set(scoringSingletonObj, modelsMapContentBoost);
 		double boost = scoringSingletonObj.getBoostScore(allChanges, 35);
-		Assert.assertEquals(0.138, boost);
+		int comapreVal = new Double(0.138).compareTo(new Double(boost));
+		Assert.assertEquals(comapreVal, 0);
 		modelsMap.setAccessible(false);
 	}
 
-	// If the model not a month model and does not contain the incoming boost variables
-	// ideally this should not happen
-	// all variables in allChanges should be there in modelsMap
+	// If the non month model and does not contain the incoming boost variables
 	@Test
 	public void getBoostScoreBoostVarNotPresentInModelsMapWithMonth0Test()
 			throws ParseException, SecurityException, NoSuchFieldException,
@@ -489,7 +489,7 @@ public class ScoringSingletonTest {
 		modelsMap.setAccessible(true);
 		modelsMap.set(scoringSingletonObj, modelsMapContent);
 		double boost = scoringSingletonObj.getBoostScore(allChanges, 27);
-		Assert.assertEquals(0.0, boost);
+		Assert.assertEquals(new Double(0.0), new Double(boost));
 		modelsMap.setAccessible(false);
 	}
 	
@@ -523,7 +523,8 @@ public class ScoringSingletonTest {
 		modelsMap.setAccessible(true);
 		modelsMap.set(scoringSingletonObj, modelsMapContent);
 		double boost = scoringSingletonObj.getBoostScore(allChanges, 27);
-		Assert.assertEquals(2.024, boost);
+		int comapreVal = new Double(2.024).compareTo(new Double(boost));
+		Assert.assertEquals(comapreVal, 0);
 		modelsMap.setAccessible(false);
 	}
 
@@ -562,7 +563,8 @@ public class ScoringSingletonTest {
 		modelsMap.setAccessible(true);
 		modelsMap.set(scoringSingletonObj, modelsMapContentBoost4);
 		double boost = scoringSingletonObj.getBoostScore(allChanges, 27);
-		Assert.assertEquals(0.0, boost);
+		int comapreVal = new Double(0.0).compareTo(new Double(boost));
+		Assert.assertEquals(comapreVal, 0);
 		modelsMap.setAccessible(false);
 	}
 
@@ -594,7 +596,8 @@ public class ScoringSingletonTest {
 		modelsMapBlk.setAccessible(true);
 		modelsMapBlk.set(scoringSingletonObj, modelsMapContentBoost);
 		double boost = scoringSingletonObj.getBoostScore(allChanges, 35);
-		Assert.assertEquals(0.0, boost);
+		int comapreVal = new Double(0.0).compareTo(new Double(boost));
+		Assert.assertEquals(comapreVal, 0);
 	}
 
 	@Test
@@ -630,7 +633,8 @@ public class ScoringSingletonTest {
 		modelsMap.setAccessible(true);
 		modelsMap.set(scoringSingletonObj, modelsMapContentBoost);
 		double boost = scoringSingletonObj.getBoostScore(allChanges, 35);
-		Assert.assertEquals(0.0, boost);
+		int comapreVal = new Double(0.0).compareTo(new Double(boost));
+		Assert.assertEquals(comapreVal, 0);
 		modelsMap.setAccessible(false);
 	}
 	
@@ -658,7 +662,8 @@ public class ScoringSingletonTest {
 		modelsMap.setAccessible(true);
 		modelsMap.set(scoringSingletonObj, modelsMapContentBoost);
 		double boost = scoringSingletonObj.getBoostScore(allChanges, 35);
-		Assert.assertEquals(0.0, boost);
+		int comapreVal = new Double(0.0).compareTo(new Double(boost));
+		Assert.assertEquals(comapreVal, 0);
 		modelsMap.setAccessible(false);
 	}
 	
@@ -686,7 +691,8 @@ public class ScoringSingletonTest {
 		modelsMap.setAccessible(true);
 		modelsMap.set(scoringSingletonObj, modelsMapContentBoost);
 		double boost = scoringSingletonObj.getBoostScore(allChanges, null);
-		Assert.assertEquals(0.0, boost);
+		int comapreVal = new Double(0.0).compareTo(new Double(boost));
+		Assert.assertEquals(comapreVal, 0);
 		modelsMap.setAccessible(false);
 	}
 	
@@ -716,7 +722,8 @@ public class ScoringSingletonTest {
 		modelsMap.setAccessible(true);
 		modelsMap.set(scoringSingletonObj, modelsMapContent);
 		double boost = scoringSingletonObj.getBoostScore(allChanges, 35);
-		Assert.assertEquals(0.0, boost);
+		int comapreVal = new Double(0.0).compareTo(new Double(boost));
+		Assert.assertEquals(comapreVal, 0);
 		modelsMap.setAccessible(false);
 	}
 
@@ -765,7 +772,8 @@ public class ScoringSingletonTest {
 				variableNameToVidMapContents);
 		double newScore = scoringSingletonObj.calcScore(memVariables,
 				allChanges, 35);
-		Assert.assertEquals(0.9935028049029226, newScore);
+		int comapreVal = new Double(0.9935028049029226).compareTo(new Double(newScore));
+		Assert.assertEquals(comapreVal, 0);
 		modelsMap.setAccessible(false);
 	}
 
@@ -798,12 +806,14 @@ public class ScoringSingletonTest {
 		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
 		modelsMap.setAccessible(true);
 		modelsMap.set(scoringSingletonObj, modelsMapContent);
-		Field varNameToVidMapContents = ScoringSingleton.class
+		Field varNameToVidMap = ScoringSingleton.class
 				.getDeclaredField("variableNameToVidMap");
-		varNameToVidMapContents.setAccessible(true);
-		varNameToVidMapContents.set(scoringSingletonObj,
+		varNameToVidMap.setAccessible(true);
+		varNameToVidMap.set(scoringSingletonObj,
 				variableNameToVidMapContents);
 		scoringSingletonObj.calcScore(null, allChanges, 35);
+		modelsMap.setAccessible(false);
+		varNameToVidMap.setAccessible(false);
 	}
 
 	// If memberVariables as well as changedMemberVariables is null, expected to throw RealTimeScoringException
@@ -826,12 +836,15 @@ public class ScoringSingletonTest {
 		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
 		modelsMap.setAccessible(true);
 		modelsMap.set(scoringSingletonObj, modelsMapContent);
-		Field varNameToVidMapContents = ScoringSingleton.class
+		Field varNameToVidMap = ScoringSingleton.class
 				.getDeclaredField("variableNameToVidMap");
-		varNameToVidMapContents.setAccessible(true);
-		varNameToVidMapContents.set(scoringSingletonObj,
+		varNameToVidMap.setAccessible(true);
+		varNameToVidMap.set(scoringSingletonObj,
 				variableNameToVidMapContents);
 		scoringSingletonObj.calcBaseScore(null, null, 35);
+		modelsMap.setAccessible(false);
+		varNameToVidMap.setAccessible(false);
+		
 	}
 
 	// tests the baseScore for non-month model
@@ -846,11 +859,11 @@ public class ScoringSingletonTest {
 		memVariables.put("2271", 0.10455);
 
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd");
-		Change change2 = new Change("2271", 0.2,
+		Change change = new Change("2271", 0.2,
 				simpleDateFormat.parse("2999-10-21"),
 				simpleDateFormat.parse("2014-10-01"));
 		Map<String, Change> allChanges = new HashMap<String, Change>();
-		allChanges.put("S_HOME_6M_IND_ALL", change2);
+		allChanges.put("S_HOME_6M_IND_ALL", change);
 
 		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
 		variablesMap.put("S_DSL_APP_INT_ACC", new Variable("S_DSL_APP_INT_ACC",
@@ -872,15 +885,17 @@ public class ScoringSingletonTest {
 		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
 		modelsMap.setAccessible(true);
 		modelsMap.set(scoringSingletonObj, modelsMapContent);
-		Field varNameToVidMapContents = ScoringSingleton.class
+		Field varNameToVidMap = ScoringSingleton.class
 				.getDeclaredField("variableNameToVidMap");
-		varNameToVidMapContents.setAccessible(true);
-		varNameToVidMapContents.set(scoringSingletonObj,
+		varNameToVidMap.setAccessible(true);
+		varNameToVidMap.set(scoringSingletonObj,
 				variableNameToVidMapContents);
 		double baseScore = scoringSingletonObj.calcBaseScore(memVariables,
 				allChanges, 35);
-		Assert.assertEquals(5.0298663249999995, baseScore);
+		int comapreVal = new Double(5.0298663249999995).compareTo(new Double(baseScore));
+		Assert.assertEquals(comapreVal, 0);
 		modelsMap.setAccessible(false);
+		varNameToVidMap.setAccessible(false);
 	}
 
 	// tests the baseScore for current month model
@@ -921,15 +936,17 @@ public class ScoringSingletonTest {
 		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
 		modelsMap.setAccessible(true);
 		modelsMap.set(scoringSingletonObj, modelsMapContent);
-		Field varNameToVidMapContents = ScoringSingleton.class
+		Field varNameToVidMap = ScoringSingleton.class
 				.getDeclaredField("variableNameToVidMap");
-		varNameToVidMapContents.setAccessible(true);
-		varNameToVidMapContents.set(scoringSingletonObj,
+		varNameToVidMap.setAccessible(true);
+		varNameToVidMap.set(scoringSingletonObj,
 				variableNameToVidMapContents);
 		double baseScore = scoringSingletonObj.calcBaseScore(memVariables,
-				allChanges, 27);
-		Assert.assertEquals(3.0298663249999995, baseScore,5);
+				allChanges, 35);
+		int comapreVal = new Double(3.029866325).compareTo(new Double(baseScore));
+		Assert.assertEquals(0, comapreVal);
 		modelsMap.setAccessible(false);
+		varNameToVidMap.setAccessible(false);
 	}
 
 	/*********
@@ -945,7 +962,17 @@ public class ScoringSingletonTest {
 	public void strategyCountTransactionsTest() throws SecurityException,
 	NoSuchFieldException, IllegalArgumentException,
 	IllegalAccessException, ParseException, ConfigurationException {
-		
+		DBCollection varColl = db.getCollection("Variables");
+		varColl.insert(new BasicDBObject("name", "v1").append("VID", 1).append("strategy","StrategyCountTransactions"));
+		varColl.insert(new BasicDBObject("name", "v2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
+		varColl.insert(new BasicDBObject("name", "v3").append("VID", 3).append("strategy","StrategyCountTraits"));
+		varColl.insert(new BasicDBObject("name", "v4").append("VID", 4).append("strategy","StrategyDaysSinceLast"));
+		varColl.insert(new BasicDBObject("name", "v5").append("VID", 5).append("strategy","StrategyTurnOnFlag"));
+		varColl.insert(new BasicDBObject("name", "v6").append("VID", 6).append("strategy","StrategyTurnOffFlag"));
+		varColl.insert(new BasicDBObject("name", "v7").append("VID", 7).append("strategy","StrategyBoostProductTotalCount"));
+		varColl.insert(new BasicDBObject("name", "v8").append("VID", 8).append("strategy","StrategyDCFlag"));
+		varColl.insert(new BasicDBObject("name", "v9").append("VID", 9).append("strategy","StrategyPurchaseOccasions"));
+		varColl.insert(new BasicDBObject("name", "v10").append("VID", 10).append("strategy","StrategySumSales"));
 		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
 		newChangesVarValueMap.put("S_DSL_APP_INT_ACC_FTWR_TRS", "0.001");
 		
@@ -998,6 +1025,17 @@ public class ScoringSingletonTest {
 	NoSuchFieldException, IllegalArgumentException,
 	IllegalAccessException, ParseException, ConfigurationException {
 	
+		DBCollection varColl = db.getCollection("Variables");
+		varColl.insert(new BasicDBObject("name", "v1").append("VID", 1).append("strategy","StrategyCountTransactions"));
+		varColl.insert(new BasicDBObject("name", "v2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
+		varColl.insert(new BasicDBObject("name", "v3").append("VID", 3).append("strategy","StrategyCountTraits"));
+		varColl.insert(new BasicDBObject("name", "v4").append("VID", 4).append("strategy","StrategyDaysSinceLast"));
+		varColl.insert(new BasicDBObject("name", "v5").append("VID", 5).append("strategy","StrategyTurnOnFlag"));
+		varColl.insert(new BasicDBObject("name", "v6").append("VID", 6).append("strategy","StrategyTurnOffFlag"));
+		varColl.insert(new BasicDBObject("name", "v7").append("VID", 7).append("strategy","StrategyBoostProductTotalCount"));
+		varColl.insert(new BasicDBObject("name", "v8").append("VID", 8).append("strategy","StrategyDCFlag"));
+		varColl.insert(new BasicDBObject("name", "v9").append("VID", 9).append("strategy","StrategyPurchaseOccasions"));
+		varColl.insert(new BasicDBObject("name", "v10").append("VID", 10).append("strategy","StrategySumSales"));
 		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
 		newChangesVarValueMap.put("S_DSL_APP_INT_ACC_FTWR_TRS2", "0.001");
 		
@@ -1019,17 +1057,17 @@ public class ScoringSingletonTest {
 		variableNameToStrategyMap.set(scoringSingletonObj,variableNameToStrategyMapContents);
 		
 		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
-		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC_FTWR_TRS2", "2283");
+		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC_FTWR_TRS2", "2284");
 		Field variableNameToVidMap = ScoringSingleton.class
 				.getDeclaredField("variableNameToVidMap");
 		variableNameToVidMap.setAccessible(true);
 		variableNameToVidMap.set(scoringSingletonObj,variableNameToVidMapContents);
 		
 		Map<String, Object> memVariables = new HashMap<String, Object>();
-		memVariables.put("2283", 1);
+		memVariables.put("2284", 1);
 		
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		Change change = new Change("2283", 3,
+		Change change = new Change("2284", 3,
 				simpleDateFormat.parse("2999-10-21"),
 				simpleDateFormat.parse("2014-10-01"));
 		Map<String, Change> allChanges = new HashMap<String, Change>();
@@ -1049,6 +1087,17 @@ public class ScoringSingletonTest {
 	public void strategyTurnOnFlagTest() throws SecurityException,
 	NoSuchFieldException, IllegalArgumentException,
 	IllegalAccessException, ParseException, ConfigurationException {
+		DBCollection varColl = db.getCollection("Variables");
+		varColl.insert(new BasicDBObject("name", "v1").append("VID", 1).append("strategy","StrategyCountTransactions"));
+		varColl.insert(new BasicDBObject("name", "v2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
+		varColl.insert(new BasicDBObject("name", "v3").append("VID", 3).append("strategy","StrategyCountTraits"));
+		varColl.insert(new BasicDBObject("name", "v4").append("VID", 4).append("strategy","StrategyDaysSinceLast"));
+		varColl.insert(new BasicDBObject("name", "v5").append("VID", 5).append("strategy","StrategyTurnOnFlag"));
+		varColl.insert(new BasicDBObject("name", "v6").append("VID", 6).append("strategy","StrategyTurnOffFlag"));
+		varColl.insert(new BasicDBObject("name", "v7").append("VID", 7).append("strategy","StrategyBoostProductTotalCount"));
+		varColl.insert(new BasicDBObject("name", "v8").append("VID", 8).append("strategy","StrategyDCFlag"));
+		varColl.insert(new BasicDBObject("name", "v9").append("VID", 9).append("strategy","StrategyPurchaseOccasions"));
+		varColl.insert(new BasicDBObject("name", "v10").append("VID", 10).append("strategy","StrategySumSales"));
 		
 		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
 		newChangesVarValueMap.put("S_DSL_APP_INT_ACC_FTWR_TRS2", "0.001");
@@ -1102,6 +1151,17 @@ public class ScoringSingletonTest {
 	NoSuchFieldException, IllegalArgumentException,
 	IllegalAccessException, ParseException, ConfigurationException {
 		
+		DBCollection varColl = db.getCollection("Variables");
+		varColl.insert(new BasicDBObject("name", "v1").append("VID", 1).append("strategy","StrategyCountTransactions"));
+		varColl.insert(new BasicDBObject("name", "v2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
+		varColl.insert(new BasicDBObject("name", "v3").append("VID", 3).append("strategy","StrategyCountTraits"));
+		varColl.insert(new BasicDBObject("name", "v4").append("VID", 4).append("strategy","StrategyDaysSinceLast"));
+		varColl.insert(new BasicDBObject("name", "v5").append("VID", 5).append("strategy","StrategyTurnOnFlag"));
+		varColl.insert(new BasicDBObject("name", "v6").append("VID", 6).append("strategy","StrategyTurnOffFlag"));
+		varColl.insert(new BasicDBObject("name", "v7").append("VID", 7).append("strategy","StrategyBoostProductTotalCount"));
+		varColl.insert(new BasicDBObject("name", "v8").append("VID", 8).append("strategy","StrategyDCFlag"));
+		varColl.insert(new BasicDBObject("name", "v9").append("VID", 9).append("strategy","StrategyPurchaseOccasions"));
+		varColl.insert(new BasicDBObject("name", "v10").append("VID", 10).append("strategy","StrategySumSales"));
 		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
 		newChangesVarValueMap.put("S_DSL_APP_INT_ACC_FTWR_TRS2", "0.001");
 		
@@ -1155,6 +1215,17 @@ public class ScoringSingletonTest {
 	NoSuchFieldException, IllegalArgumentException,
 	IllegalAccessException, ParseException, ConfigurationException {
 		
+		DBCollection varColl = db.getCollection("Variables");
+		varColl.insert(new BasicDBObject("name", "v1").append("VID", 1).append("strategy","StrategyCountTransactions"));
+		varColl.insert(new BasicDBObject("name", "v2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
+		varColl.insert(new BasicDBObject("name", "v3").append("VID", 3).append("strategy","StrategyCountTraits"));
+		varColl.insert(new BasicDBObject("name", "v4").append("VID", 4).append("strategy","StrategyDaysSinceLast"));
+		varColl.insert(new BasicDBObject("name", "v5").append("VID", 5).append("strategy","StrategyTurnOnFlag"));
+		varColl.insert(new BasicDBObject("name", "v6").append("VID", 6).append("strategy","StrategyTurnOffFlag"));
+		varColl.insert(new BasicDBObject("name", "v7").append("VID", 7).append("strategy","StrategyBoostProductTotalCount"));
+		varColl.insert(new BasicDBObject("name", "v8").append("VID", 8).append("strategy","StrategyDCFlag"));
+		varColl.insert(new BasicDBObject("name", "v9").append("VID", 9).append("strategy","StrategyPurchaseOccasions"));
+		varColl.insert(new BasicDBObject("name", "v10").append("VID", 10).append("strategy","StrategySumSales"));
 		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
 		newChangesVarValueMap.put("S_DSL_APP_INT_ACC_FTWR_TRS2", "0.001");
 		
@@ -1261,7 +1332,6 @@ public class ScoringSingletonTest {
 		Assert.assertEquals(0.02, changedMemScores51.get("s"));
 		Assert.assertEquals(changedMemScore.getMinDate(),
 				changedMemScores51.get("minEx"));
-		
 		modelsMap.setAccessible(false);
 		changedMemberScore.remove(new BasicDBObject("l_id", lId));
 	}
@@ -1602,6 +1672,7 @@ public class ScoringSingletonTest {
 				var333Map.get("e"));
 	
 		changedMemberVar.remove(new BasicDBObject("l_id", l_id));
+		variableNameToVidMap.setAccessible(false);
 	}
 	@Test
 	public void calcRegionalFactorPositiveCaseTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
@@ -1615,6 +1686,7 @@ public class ScoringSingletonTest {
 		regionalFactorsMap.set(scoringSingletonObj, regionalFactorsMapContents);
 		Double factor = scoringSingletonObj.calcRegionalFactor(35, "TN");
 		Assert.assertEquals(0.2, factor);
+		regionalFactorsMap.setAccessible(false);
 	}
 
 	@Test
@@ -1628,6 +1700,7 @@ public class ScoringSingletonTest {
 		regionalFactorsMap.set(scoringSingletonObj, regionalFactorsMapContents);
 		Double factor = scoringSingletonObj.calcRegionalFactor( 35, "TN");
 		Assert.assertEquals(1.0, factor);
+		regionalFactorsMap.setAccessible(false);
 	}
 
 	@Test
@@ -1635,13 +1708,14 @@ public class ScoringSingletonTest {
 
 		//preparing regionalFactorsMap
 		Map<String, Double> regionalFactorsMapContents = new HashMap<String, Double>();
-		regionalFactorsMapContents.put("35"+"TN", 0.2);
+		regionalFactorsMapContents.put("35"+"-"+"TN", 0.2);
 		Field regionalFactorsMap = ScoringSingleton.class
 				.getDeclaredField("regionalFactorsMap");
 		regionalFactorsMap.setAccessible(true);
 		regionalFactorsMap.set(scoringSingletonObj, regionalFactorsMapContents);
 		Double factor = scoringSingletonObj.calcRegionalFactor( 46, "TN");
 		Assert.assertEquals(1.0, factor);
+		regionalFactorsMap.setAccessible(false);
 	}
 
 	@Test
@@ -1649,13 +1723,14 @@ public class ScoringSingletonTest {
 
 		//preparing regionalFactorsMap
 		Map<String, Double> regionalFactorsMapContents = new HashMap<String, Double>();
-		regionalFactorsMapContents.put("35"+"IL", 0.2);
+		regionalFactorsMapContents.put("35"+"-"+"IL", 0.2);
 		Field regionalFactorsMap = ScoringSingleton.class
 				.getDeclaredField("regionalFactorsMap");
 		regionalFactorsMap.setAccessible(true);
 		regionalFactorsMap.set(scoringSingletonObj, regionalFactorsMapContents);
 		Double factor = scoringSingletonObj.calcRegionalFactor( 35, "TN");
 		Assert.assertEquals(1.0, factor);
+		regionalFactorsMap.setAccessible(false);
 	}
 
 	@Test
