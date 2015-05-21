@@ -39,10 +39,15 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	private String topologyName;
 	private MemberInfoDao memberInfoDao;
 	
-	public StrategyScoringBolt(String systemProperty, String host, int port) {
+	private String respHost;
+	private int respPort;
+	
+	public StrategyScoringBolt(String systemProperty, String host, int port, String respHost, int respPort) {
 		super(systemProperty);
 		this.host = host;
 		this.port = port;
+		this.respHost = respHost;
+		this.respPort = respPort;
 	}
 	
 	 public StrategyScoringBolt(String systemProperty){
@@ -170,6 +175,13 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 				newScore = 1.0;
 			LOGGER.info("new score after regional factor with regional factor " + regionalFactor + " "+ newScore + " " + topologyName);
 
+			//persisting the loyalty id to redis for UnknownResponsys topology to pick up the loyalty id
+			if(host != null){
+				jedis = new Jedis(respHost, respPort, 1800);
+				jedis.connect();
+				jedis.set("Unknown:"+lyl_id_no,"");
+				jedis.disconnect();
+			}
 			
 			// 9) Emit the new score
 			Map<String, Date> minMaxMap = ScoringSingleton.getInstance().getMinMaxExpiry(modelId, allChanges);
@@ -227,25 +239,25 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		}
 				
 		// 10) Write changedMemberVariableswith expiry
-		ScoringSingleton.getInstance().updateChangedVariables(lId, allChanges);
+    	ScoringSingleton.getInstance().updateChangedVariables(lId, allChanges);
 		LOGGER.debug("TIME:" + messageID + "-Score updates complete-" + System.currentTimeMillis());
 	
 		ScoringSingleton.getInstance().updateChangedMemberScore(lId, modelIdList, modelIdToExpiryMap, modelIdScoreMap,source);
 		
 		LOGGER.debug("TIME:" + messageID + "- Scoring complete-" + System.currentTimeMillis());
 		
-		List<Object> listToEmit = new ArrayList<Object>();
+		/*List<Object> listToEmit = new ArrayList<Object>();
 		//member_stream is commented as MemberPublish bolt to redis is not in use now
-		/*listToEmit.add(lId);
+		listToEmit.add(lId);
 		listToEmit.add(source);
 		listToEmit.add(messageID);
 		this.outputCollector.emit("member_stream", listToEmit);*/
 		redisCountIncr("member_scored_successfully");
 		if(lyl_id_no!=null){
-			listToEmit = new ArrayList<Object>();
+			List<Object> listToEmit = new ArrayList<Object>();
 			listToEmit.add(lyl_id_no);
 			listToEmit.add(messageID);
-			this.outputCollector.emit("response_stream", listToEmit);
+			this.outputCollector.emit("response_stream", listToEmit);//response_stream_unknown
 		}
 		
 		this.outputCollector.ack(input);
@@ -263,7 +275,6 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		declarer.declareStream("score_stream",new Fields("l_id", "newScore", "model","source", "messageID", "minExpiry", "maxExpiry"));
 	//	declarer.declareStream("member_stream", new Fields("l_id", "source","messageID"));
 		declarer.declareStream("response_stream", new Fields("lyl_id_no","messageID"));
-
 	}
 
 }

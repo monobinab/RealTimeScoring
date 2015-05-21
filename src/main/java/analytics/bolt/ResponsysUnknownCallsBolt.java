@@ -1,8 +1,6 @@
 package analytics.bolt;
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,8 +9,6 @@ import analytics.util.ResponsysUtil;
 import analytics.util.SecurityUtils;
 import analytics.util.dao.MemberInfoDao;
 import analytics.util.dao.TagMetadataDao;
-import analytics.util.dao.TagResponsysActiveDao;
-import analytics.util.dao.TagVariableDao;
 import analytics.util.objects.MemberInfo;
 import analytics.util.objects.ResponsysPayload;
 import analytics.util.objects.TagMetadata;
@@ -31,13 +27,9 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 	
 	private OutputCollector outputCollector;
 	private ResponsysUtil responsysUtil;
-	private TagResponsysActiveDao tagResponsysActiveDao;
-	private TagVariableDao tagVariableDao;
 	private TagMetadataDao tagMetadataDao;
 	private MemberInfoDao memberInfoDao;
 	private String topologyName;
-	private Map<String, String> activeTagMap;
-	private Set<String> activeTags;
 	private Map<Integer, String> tagModelsMap;
 	
 	public ResponsysUnknownCallsBolt(String systemProperty) {
@@ -48,27 +40,18 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
+		LOGGER.info("PREPARING RESPONSYSUNKNOWNCALLS BOLT");	
 		this.outputCollector = collector;
 		responsysUtil = new ResponsysUtil();
-		tagResponsysActiveDao =  new TagResponsysActiveDao();
-		tagVariableDao = new TagVariableDao();
-		tagMetadataDao = new TagMetadataDao();
-		memberInfoDao = new MemberInfoDao();
 		topologyName = (String) stormConf.get("metrics_topology");
-		//get the list of models
-		activeTagMap = tagResponsysActiveDao.getResponsysActiveTagsList();
-		activeTags = new HashSet<String>();
-		activeTags.addAll(activeTagMap.keySet());
-		
-
-	//	List<String> activeTags = tagResponsysActiveDao.tagsResponsysList();
-		tagModelsMap = tagVariableDao.getTagModelIds(activeTags);
-		//jedis = new Jedis(host, port, 1800);
+		tagModelsMap = responsysUtil.getTagModelsMap();
+		tagMetadataDao = responsysUtil.getTagMetadataDao();
+		memberInfoDao = responsysUtil.getMemberInfoDao();
 	 }
 
 	@Override
 	public void execute(Tuple input) {
-		countMetric.scope("incoming_tuples").incr();
+		redisCountIncr("incoming_tuples");
 		String lyl_id_no = null; 
 		ResponsysPayload responsysObj = new ResponsysPayload();
 		try {
@@ -76,13 +59,13 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 				lyl_id_no = input.getString(0);
 				String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no);
 				String scoreInfoJsonString = responsysUtil.callRtsAPI(lyl_id_no);
-					
+		
 				//get the top jsonObject from api satisfying the condition
 				org.json.JSONObject o = new org.json.JSONObject(scoreInfoJsonString);
 				org.json.JSONObject objToSend = null;
 				objToSend = getJsonForResponsys(tagModelsMap, o, objToSend);
 				if(objToSend == null){
-					countMetric.scope("no_data_to_responsys").incr();
+					redisCountIncr("no_data_to_responsys");
 					outputCollector.ack(input);
 					return;
 				}
@@ -111,17 +94,18 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 				
 				responsysUtil.getResponseUnknownServiceResult(responsysObj);
 			    redisCountIncr("data_to_responsys");
-			    
+				 
 			}
 			else{
 				redisCountIncr("no_lyl_id_no");
 			}
 			outputCollector.ack(input);
 	} catch (Exception e) {
-			LOGGER.error("Exception in ResponsysUnknownCallsBolt", e);
+			LOGGER.error("Exception in ResponsysUnknownCallsBolt for lid " + lyl_id_no, e);
 		}
 	}
 		
+
 	private org.json.JSONObject getJsonForResponsys(
 			Map<Integer, String> tagModelsMap, org.json.JSONObject o,
 			org.json.JSONObject objToSend) throws JSONException {
@@ -144,7 +128,6 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 		}
 		return null;
 	}
-	
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {

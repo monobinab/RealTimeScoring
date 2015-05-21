@@ -11,9 +11,11 @@ import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
@@ -65,6 +67,9 @@ public class ResponsysUtil {
 	private OccasionResponsesDao occasionResponsesDao;
 	private MemberInfoDao memberInfoDao;
 	private TagVariableDao tagVariableDao;
+	private Map<String, String> activeTagMap;
+	private Map<Integer, String> tagModelsMap;
+	private Set<String> activeTags;
 	
 
 	private static final String UTF8_BOM = "\uFEFF";
@@ -77,14 +82,75 @@ public class ResponsysUtil {
 	ArrayList<TagMetadata> metaDataList = new ArrayList<TagMetadata>();
 
 	public ResponsysUtil() {
-		memberInfoDao = new MemberInfoDao();
+		//
+		
 		tagMetadataDao = new TagMetadataDao();
+		
 		occationCustomeEventDao = new OccationCustomeEventDao();
 		occasionResponsesDao = new OccasionResponsesDao();
 		tagResponsysActiveDao =  new TagResponsysActiveDao();
 		tagVariableDao = new TagVariableDao();
 		eventsVibesActiveDao = new EventsVibesActiveDao();
 		eventVibesActiveMap = eventsVibesActiveDao.getVibesActiveEventsList();
+		memberInfoDao = new MemberInfoDao();
+		tagVariableDao = new TagVariableDao();
+		tagResponsysActiveDao =  new TagResponsysActiveDao();
+		activeTagMap = tagResponsysActiveDao.getResponsysActiveTagsList();
+		activeTags = new HashSet<String>();
+		activeTags.addAll(activeTagMap.keySet());
+		tagModelsMap = tagVariableDao.getTagModelIds(activeTags);
+		
+	}
+	
+	
+	public  Map<String, String> getActiveTagMap(){
+		return activeTagMap;
+	}
+	public  Map<Integer, String> getTagModelsMap(){
+		return tagModelsMap;
+	}
+	public TagMetadataDao getTagMetadataDao() {
+		return tagMetadataDao;
+	}
+	public void setTagMetadataDao(TagMetadataDao tagMetadataDao) {
+		this.tagMetadataDao = tagMetadataDao;
+	}
+	public OccationCustomeEventDao getOccationCustomeEventDao() {
+		return occationCustomeEventDao;
+	}
+	public void setOccationCustomeEventDao(
+			OccationCustomeEventDao occationCustomeEventDao) {
+		this.occationCustomeEventDao = occationCustomeEventDao;
+	}
+	public OccasionResponsesDao getOccasionResponsesDao() {
+		return occasionResponsesDao;
+	}
+	public void setOccasionResponsesDao(OccasionResponsesDao occasionResponsesDao) {
+		this.occasionResponsesDao = occasionResponsesDao;
+	}
+	public MemberInfoDao getMemberInfoDao() {
+		return memberInfoDao;
+	}
+	public void setMemberInfoDao(MemberInfoDao memberInfoDao) {
+		this.memberInfoDao = memberInfoDao;
+	}
+	public TagVariableDao getTagVariableDao() {
+		return tagVariableDao;
+	}
+	public void setTagVariableDao(TagVariableDao tagVariableDao) {
+		this.tagVariableDao = tagVariableDao;
+	}
+	public TagResponsysActiveDao getTagResponsysActiveDao() {
+		return tagResponsysActiveDao;
+	}
+	public void setTagResponsysActiveDao(TagResponsysActiveDao tagResponsysActiveDao) {
+		this.tagResponsysActiveDao = tagResponsysActiveDao;
+	}
+	public EventsVibesActiveDao getEventsVibesActiveDao() {
+		return eventsVibesActiveDao;
+	}
+	public void setEventsVibesActiveDao(EventsVibesActiveDao eventsVibesActiveDao) {
+		this.eventsVibesActiveDao = eventsVibesActiveDao;
 	}
 	/**
 	 * Invokes the RTS web service that returns scores...

@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.bolt.LoggingBolt;
-import analytics.bolt.ResponsysUnknownCallsBolt;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.bolt.TellurideParsingBoltPOS;
 import analytics.spout.WebsphereMQSpout;
@@ -69,21 +68,18 @@ public class RealTimeScoringTellurideTopology {
 										.getQueueName()), 3);
 
 		// create definition of main spout for queue 1
-		topologyBuilder.setBolt("parsingBolt", new TellurideParsingBoltPOS(System.getProperty(MongoNameConstants.IS_PROD)), 12).localOrShuffleGrouping("telluride1").localOrShuffleGrouping("telluride2");
+		topologyBuilder.setBolt("parsingBolt", new TellurideParsingBoltPOS(System.getProperty(MongoNameConstants.IS_PROD)), 12).shuffleGrouping("telluride1").shuffleGrouping("telluride2");
         topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System.getProperty(MongoNameConstants.IS_PROD), AuthPropertiesReader
 				.getProperty(Constants.TELLURIDE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
-				.getProperty(Constants.TELLURIDE_REDIS_SERVER_PORT))), 12).localOrShuffleGrouping("parsingBolt");
+				.getProperty(Constants.TELLURIDE_REDIS_SERVER_PORT)),
+				AuthPropertiesReader
+				.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST),new Integer (AuthPropertiesReader
+						.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 12).shuffleGrouping("parsingBolt");
         if(System.getProperty(MongoNameConstants.IS_PROD).equalsIgnoreCase("PROD")){
         	topologyBuilder.setBolt("loggingBolt", new LoggingBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
         }
        
-        //topologyBuilder.setBolt("responsysBolt", new ResponsysUnknownCallsBolt(System.getProperty(MongoNameConstants.IS_PROD)), 12).shuffleGrouping("strategyScoringBolt", "response_stream");
-		//Redis publish to server 1
-        //topologyBuilder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 3).localOrShuffleGrouping("strategyScoringBolt", "score_stream");
-        //topologyBuilder.setBolt("memberPublishBolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 3).localOrShuffleGrouping("strategyScoringBolt", "member_stream");
-
-
-		Config conf = new Config();
+ 		Config conf = new Config();
 		conf.put("metrics_topology", "Telluride");
 		conf.registerMetricsConsumer(MetricsListener.class, System.getProperty(MongoNameConstants.IS_PROD), 3);
 		conf.setDebug(false);
@@ -94,8 +90,8 @@ public class RealTimeScoringTellurideTopology {
 						.equalsIgnoreCase("QA")) {
 			try {
                 conf.setNumAckers(5);
-           //     conf.setMessageTimeoutSecs(300);
-          //     conf.setStatsSampleRate(1.0);
+                conf.setMessageTimeoutSecs(300);
+                conf.setStatsSampleRate(1.0);
                 conf.setNumWorkers(48);
 				StormSubmitter.submitTopology(args[0], conf,
 						topologyBuilder.createTopology());
