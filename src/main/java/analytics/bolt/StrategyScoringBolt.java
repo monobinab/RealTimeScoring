@@ -151,7 +151,9 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		
 		//get the state for the memberId to get the regionalFactor for scoring
 		MemberInfo memberIfo = memberInfoDao.getMemberInfo(lId);
-		String state = memberIfo.getState();
+		String state = null;
+		if(memberIfo != null && memberIfo.getState() != null)
+			state = memberIfo.getState();
 		
 		for (Integer modelId : modelIdList) {// Score and emit for all modelIds
 												// before mongo inserts
