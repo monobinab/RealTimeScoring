@@ -37,7 +37,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	private static final long serialVersionUID = 1L;
 	private OutputCollector outputCollector;
 	private String topologyName;
-	private MemberInfoDao memberInfoDao;
+	ScoringSingleton scoringSingleton;
 	
 	private String respHost;
 	private int respPort;
@@ -62,7 +62,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		LOGGER.info("PREPARING STRATEGY SCORING BOLT");	
 	  	this.outputCollector = collector;
 	  	topologyName = (String) stormConf.get("metrics_topology");
-	  	memberInfoDao = new MemberInfoDao();
+	  	scoringSingleton = ScoringSingleton.getInstance();
 	  }
 	
 	@Override
@@ -107,7 +107,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 				.restoreVariableListFromJson(input.getString(1));
 
 		// 3) Find all models affected by the changes
-		Set<Integer> modelIdList = ScoringSingleton.getInstance().getModelIdList(newChangesVarValueMap);
+		Set<Integer> modelIdList = scoringSingleton.getModelIdList(newChangesVarValueMap);
 		if(modelIdList==null||modelIdList.isEmpty()){
 			LOGGER.info("No models affected for " +lyl_id_no);
 			redisCountIncr("no_models_affected");
@@ -119,7 +119,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		// 5) Create a map of variable values, fetched from from memberVariables
 		Map<String, Object> memberVariablesMap = new HashMap<String, Object>();
 		try {
-			memberVariablesMap = ScoringSingleton.getInstance().createMemberVariableValueMap(lId, modelIdList);
+			memberVariablesMap = scoringSingleton.createMemberVariableValueMap(lId, modelIdList);
 		} catch (RealTimeScoringException e1) {
 			LOGGER.error("Can not create member variable map", e1);
 		}
@@ -135,13 +135,13 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		
 		// 6.1) CREATE MAP FROM CHANGED VARIABLES TO VALUE AND EXPIRATION DATE
 		// (CHANGE CLASS) and store in allChanges
-		Map<String, Change> changedMemberVariables = ScoringSingleton.getInstance().createChangedVariablesMap(lId);
+		Map<String, Change> changedMemberVariables = scoringSingleton.createChangedVariablesMap(lId);
 		
 		
 		// 6) For each variable in new changes, execute strategy and store in
 		// allChanges
 		// allChanges will contain newChanges and the changedMemberVariables
-		Map<String, Change> allChanges = ScoringSingleton.getInstance().executeStrategy(changedMemberVariables, newChangesVarValueMap, memberVariablesMap);
+		Map<String, Change> allChanges = scoringSingleton.executeStrategy(changedMemberVariables, newChangesVarValueMap, memberVariablesMap);
 		
 		// 8) Rescore - arbitrate between all changes and memberVariables
 		// Score each model in a loop
@@ -150,10 +150,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		Map<Integer,Map<String,Date>> modelIdToExpiryMap = new HashMap<Integer, Map<String,Date>>();
 		
 		//get the state for the memberId to get the regionalFactor for scoring
-		MemberInfo memberIfo = memberInfoDao.getMemberInfo(lId);
-		String state = null;
-		if(memberIfo != null && memberIfo.getState() != null)
-			state = memberIfo.getState();
+		String state = scoringSingleton.getState(lId);
 		
 		for (Integer modelId : modelIdList) {// Score and emit for all modelIds
 												// before mongo inserts
@@ -161,16 +158,16 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			double newScore;
 			double regionalFactor = 1.0;
 			try {
-				newScore = ScoringSingleton.getInstance().calcScore(memberVariablesMap, allChanges,
+				newScore = scoringSingleton.calcScore(memberVariablesMap, allChanges,
 						modelId);
 
 			LOGGER.debug("new score before boost var: " + newScore);
 
-			newScore = newScore + ScoringSingleton.getInstance().getBoostScore(allChanges, modelId );
+			newScore = newScore + scoringSingleton.getBoostScore(allChanges, modelId );
 			
 			//get the score weighed with regionalFactor only if the member has state
 			if(StringUtils.isNotEmpty(state)){
-				regionalFactor = ScoringSingleton.getInstance().calcRegionalFactor(modelId, state);
+				regionalFactor = scoringSingleton.calcRegionalFactor(modelId, state);
 			}
 			newScore = newScore * regionalFactor;
 			if(newScore > 1.0)
@@ -186,7 +183,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			}
 			
 			// 9) Emit the new score
-			Map<String, Date> minMaxMap = ScoringSingleton.getInstance().getMinMaxExpiry(modelId, allChanges);
+			Map<String, Date> minMaxMap = scoringSingleton.getMinMaxExpiry(modelId, allChanges);
 			modelIdToExpiryMap.put(modelId, minMaxMap);
 			Date minExpiryDate = minMaxMap.get("minExpiry");
 			Date maxExpiryDate = minMaxMap.get("maxExpiry");
@@ -241,10 +238,10 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		}
 				
 		// 10) Write changedMemberVariableswith expiry
-    	ScoringSingleton.getInstance().updateChangedVariables(lId, allChanges);
+    	scoringSingleton.updateChangedVariables(lId, allChanges);
 		LOGGER.debug("TIME:" + messageID + "-Score updates complete-" + System.currentTimeMillis());
 	
-		ScoringSingleton.getInstance().updateChangedMemberScore(lId, modelIdList, modelIdToExpiryMap, modelIdScoreMap,source);
+		scoringSingleton.updateChangedMemberScore(lId, modelIdList, modelIdToExpiryMap, modelIdScoreMap,source);
 		
 		LOGGER.debug("TIME:" + messageID + "- Scoring complete-" + System.currentTimeMillis());
 		

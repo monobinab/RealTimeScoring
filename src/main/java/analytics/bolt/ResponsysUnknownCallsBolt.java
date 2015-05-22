@@ -99,7 +99,7 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 				responsysObj.setCustomEventName("RTS_Unknown");
 				responsysObj.setTopologyName(topologyName);
 				
-		//		responsysUtil.getResponseUnknownServiceResult(responsysObj);
+				responsysUtil.getResponseUnknownServiceResult(responsysObj);
 			    redisCountIncr("data_to_responsys");
 				 
 			}

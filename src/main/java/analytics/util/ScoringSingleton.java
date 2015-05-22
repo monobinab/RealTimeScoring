@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import analytics.exception.RealTimeScoringException;
 import analytics.util.dao.ChangedMemberScoresDao;
 import analytics.util.dao.ChangedMemberVariablesDao;
+import analytics.util.dao.MemberInfoDao;
 import analytics.util.dao.MemberVariablesDao;
 import analytics.util.dao.MemberBoostsDao;
 import analytics.util.dao.ModelSywBoostDao;
@@ -26,6 +27,7 @@ import analytics.util.dao.VariableDao;
 import analytics.util.objects.Boost;
 import analytics.util.objects.Change;
 import analytics.util.objects.ChangedMemberScore;
+import analytics.util.objects.MemberInfo;
 import analytics.util.objects.Model;
 import analytics.util.objects.RealTimeScoringContext;
 import analytics.util.objects.StrategyMapper;
@@ -48,6 +50,7 @@ public class ScoringSingleton {
 	private VariableDao variableDao;
 	private ModelVariablesDao modelVariablesDao;
 	private RegionalFactorDao regionalFactorDao;
+	private MemberInfoDao memberInfoDao;
 	
 	private static ScoringSingleton instance = null;
 	Set<String> modelIdsWithRegionalFactors;
@@ -103,6 +106,8 @@ public class ScoringSingleton {
 		
 		regionalFactorDao = new RegionalFactorDao();
 		regionalFactorsMap = regionalFactorDao.populateRegionalFactors();
+		
+		memberInfoDao = new MemberInfoDao();
 	}
 
 	// TODO: Replace this method. Its for backward compatibility. Bad coding
@@ -198,6 +203,15 @@ public class ScoringSingleton {
 			}
 		}
 		return changedMemberVariablesMap;
+	}
+	
+	
+	public String getState(String lId){
+		MemberInfo memberIfo = memberInfoDao.getMemberInfo(lId);
+		String state = null;
+		if(memberIfo != null && memberIfo.getState() != null)
+			state = memberIfo.getState();
+		return state;
 	}
 
 	/**
