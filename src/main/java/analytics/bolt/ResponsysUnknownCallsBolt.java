@@ -108,7 +108,7 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 			}
 			outputCollector.ack(input);
 	} catch (Exception e) {
-			LOGGER.error("Exception in ResponsysUnknownCallsBolt", e);
+			LOGGER.error("Exception in ResponsysUnknownCallsBolt for lid " + lyl_id_no, e);
 		}
 	}
 		
