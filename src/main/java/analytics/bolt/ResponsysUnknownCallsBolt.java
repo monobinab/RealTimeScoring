@@ -17,6 +17,7 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Tuple;
 
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 
 public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
@@ -59,6 +60,12 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 				lyl_id_no = input.getString(0);
 				String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no);
 				String scoreInfoJsonString = responsysUtil.callRtsAPI(lyl_id_no);
+				
+				if(StringUtils.isEmpty(scoreInfoJsonString) || !scoreInfoJsonString.startsWith("{")){
+					LOGGER.error("empty string from api");
+					outputCollector.ack(input);
+					return;
+				}
 		
 				//get the top jsonObject from api satisfying the condition
 				org.json.JSONObject o = new org.json.JSONObject(scoreInfoJsonString);
@@ -101,7 +108,7 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 			}
 			outputCollector.ack(input);
 	} catch (Exception e) {
-			LOGGER.error("Exception in ResponsysUnknownCallsBolt for lid " + lyl_id_no, e);
+			LOGGER.error("Exception in ResponsysUnknownCallsBolt", e);
 		}
 	}
 		
@@ -109,7 +116,11 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 	private org.json.JSONObject getJsonForResponsys(
 			Map<Integer, String> tagModelsMap, org.json.JSONObject o,
 			org.json.JSONObject objToSend) throws JSONException {
-		org.json.JSONArray arr = o.getJSONArray("scoresInfo");
+		org.json.JSONArray arr = null;
+		if(o.has("org.json.JSONArray arr"))
+			arr = o.getJSONArray("scoresInfo");
+		else
+			return null;
 		
 		if(((org.json.JSONObject) arr.get(0)).has("mdTag"))
 			return null;
