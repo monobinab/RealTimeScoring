@@ -61,8 +61,8 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 				String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no);
 				String scoreInfoJsonString = responsysUtil.callRtsAPI(lyl_id_no);
 				
-				if(StringUtils.isEmpty(scoreInfoJsonString) || !scoreInfoJsonString.startsWith("{")){
-					LOGGER.error("empty string from api");
+				if(StringUtils.isEmpty(scoreInfoJsonString) || (!StringUtils.isEmpty(scoreInfoJsonString) && !scoreInfoJsonString.startsWith("{"))){
+					LOGGER.error("Exception occured in api " + scoreInfoJsonString);
 					outputCollector.ack(input);
 					return;
 				}
@@ -99,7 +99,7 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 				responsysObj.setCustomEventName("RTS_Unknown");
 				responsysObj.setTopologyName(topologyName);
 				
-				responsysUtil.getResponseUnknownServiceResult(responsysObj);
+		//		responsysUtil.getResponseUnknownServiceResult(responsysObj);
 			    redisCountIncr("data_to_responsys");
 				 
 			}
