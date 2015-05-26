@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import analytics.util.JsonUtils;
 import analytics.util.SecurityUtils;
-import analytics.util.dao.MemberUUIDDao;
 import analytics.util.dao.ModelVariablesDao;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -32,7 +31,7 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
     
     protected String topic;
 	protected String sourceTopic;
-	protected MemberUUIDDao memberDao;
+//	protected MemberUUIDDao memberDao;
 	protected ModelVariablesDao modelVariablesDao;
 			
     public ParseAAMFeeds() {
@@ -52,7 +51,7 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         this.outputCollector = collector;
         super.prepare(stormConf, context, collector);
-	    memberDao = new MemberUUIDDao();
+	//    memberDao = new MemberUUIDDao();
         modelVariablesDao =  new ModelVariablesDao(); 
         modelVariablesList = new ArrayList<String>();
      
