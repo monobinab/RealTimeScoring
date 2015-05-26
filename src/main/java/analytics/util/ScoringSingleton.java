@@ -117,17 +117,22 @@ public class ScoringSingleton {
 			modelIdList.add(Integer.parseInt(model));
 		}
 		// Contains a VID to object mapping, not var name
-		Map<String, Object> memberVariablesMap = ScoringSingleton.getInstance().createMemberVariableValueMap(loyaltyId, modelIdList);
+		Map<String, Object> memberVariablesMap = this.createMemberVariableValueMap(loyaltyId, modelIdList);
 		if (memberVariablesMap == null) {
 			LOGGER.warn("Unable to find member variables");
 			return null;
 
 		}
-		Map<String, Change> allChanges = ScoringSingleton.getInstance().createChangedVariablesMap(loyaltyId);
+		Map<String, Change> allChanges = this.createChangedVariablesMap(loyaltyId);
 		Map<Integer, Double> modelIdScoreMap = new HashMap<Integer, Double>();
+		String state = this.getState(loyaltyId);
 		Map<Integer,Map<String,Date>> modelIdToExpiryMap = new HashMap<Integer, Map<String,Date>>();
 		for (Integer modelId : modelIdList) {
-			double score = ScoringSingleton.getInstance().calcScore(memberVariablesMap, allChanges, modelId);
+			double score = this.calcScore(memberVariablesMap, allChanges, modelId);
+			double regionalFactor = this.calcRegionalFactor(modelId, state);
+			score = score * regionalFactor;
+			if (score > 1)
+				score = 1.0;
 			modelIdScoreMap.put(modelId, score);
 			modelIdToExpiryMap.put(modelId, getMinMaxExpiry(modelId, allChanges));
 			
