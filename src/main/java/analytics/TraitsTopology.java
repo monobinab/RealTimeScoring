@@ -3,12 +3,7 @@ package analytics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.bolt.FlumeRPCBolt;
-import analytics.bolt.ParsingBoltWebTraits;
-import analytics.bolt.PersistTraitsBolt;
-import analytics.bolt.StrategyScoringBolt;
 import analytics.bolt.Write2HDFSBolt;
-import analytics.spout.WebHDFSSpout;
 import analytics.spout.Write2HDFSSpout;
 import analytics.util.Constants;
 import analytics.util.MongoNameConstants;

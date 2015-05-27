@@ -7,6 +7,7 @@ import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
 import backtype.storm.topology.TopologyBuilder;
+import analytics.bolt.LoggingBolt;
 import analytics.bolt.ParsingBoltOccassion;
 import analytics.bolt.PersistOccasionBolt;
 import analytics.bolt.ResponseBolt;
@@ -77,6 +78,11 @@ public class PurchaseOccassionTopology {
 				.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 24)
 		.shuffleGrouping("strategy_bolt", "response_stream")
 		.shuffleGrouping("persistOccasionBolt", "response_stream_from_persist");
+		
+		if(System.getProperty(MongoNameConstants.IS_PROD).equals("PROD")){
+			//topologyBuilder.setBolt("flumeLoggingBolt", new FlumeRPCBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
+			topologyBuilder.setBolt("loggingBolt", new LoggingBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategy_bolt", "score_stream");
+		}
 		
 			Config conf = new Config();
 			conf.put("metrics_topology", "PurchaseOccasion");
