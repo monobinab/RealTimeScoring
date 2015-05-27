@@ -3,14 +3,10 @@ package analytics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.bolt.FlumeRPCBolt;
 import analytics.bolt.LoggingBolt;
-import analytics.bolt.MemberPublishBolt;
 import analytics.bolt.ParsingBoltWebTraits;
 import analytics.bolt.PersistTraitsBolt;
-import analytics.bolt.ScorePublishBolt;
 import analytics.bolt.StrategyScoringBolt;
-import analytics.spout.AAMRedisPubSubSpout;
 import analytics.spout.WebHDFSSpout;
 import analytics.util.Constants;
 import analytics.util.MetricsListener;
