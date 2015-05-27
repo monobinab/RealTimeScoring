@@ -356,7 +356,7 @@ public class ResponsysUtil {
 		StringBuffer strBuff = sendToResponsys(xmlWithoutBOM);
 		
 		//Persist info to Mongo after successfully transmission of message to Oracle.
-		occasionResponsesDao.addOccasionResponse(l_id, eid, customEventName, tagMetadata.getPurchaseOccasion(), tagMetadata.getBusinessUnit(), tagMetadata.getSubBusinessUnit(), 
+		occasionResponsesDao.addOccasionResponse(l_id, eid, customEventName, !topologyName.equalsIgnoreCase("unknownOccasions")?tagMetadata.getPurchaseOccasion():"Unknown", tagMetadata.getBusinessUnit(), tagMetadata.getSubBusinessUnit(), 
 				strBuff.toString().contains("<success>true</success>") ? "Y" : "N", tagMetadata.getMdTags(), topologyName);
 	
 		nullifyObjects(xmlWithoutBOM, xmlWithoutExpo, json2XmlString, customXml);
