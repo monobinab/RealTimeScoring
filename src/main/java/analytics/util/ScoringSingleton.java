@@ -111,11 +111,14 @@ public class ScoringSingleton {
 	}
 
 	// TODO: Replace this method. Its for backward compatibility. Bad coding
-	public HashMap<String, Double> execute(String loyaltyId, ArrayList<String> modelIdArrayList, String source) throws RealTimeScoringException {
+	public HashMap<String, Double> execute(String loyaltyId, ArrayList<String> modelIdArrayList, String source) {
 		Set<Integer> modelIdList = new HashSet<Integer>();
+		HashMap<String, Double> modelIdStringScoreMap =  new HashMap<String, Double>();
 		for (String model : modelIdArrayList) {
 			modelIdList.add(Integer.parseInt(model));
 		}
+		
+		try{
 		// Contains a VID to object mapping, not var name
 		Map<String, Object> memberVariablesMap = this.createMemberVariableValueMap(loyaltyId, modelIdList);
 		if (memberVariablesMap == null) {
@@ -128,6 +131,7 @@ public class ScoringSingleton {
 		String state = this.getState(loyaltyId);
 		Map<Integer,Map<String,Date>> modelIdToExpiryMap = new HashMap<Integer, Map<String,Date>>();
 		for (Integer modelId : modelIdList) {
+			try{
 			double score = this.calcScore(memberVariablesMap, allChanges, modelId);
 			double regionalFactor = this.calcRegionalFactor(modelId, state);
 			score = score * regionalFactor;
@@ -135,21 +139,30 @@ public class ScoringSingleton {
 				score = 1.0;
 			modelIdScoreMap.put(modelId, score);
 			modelIdToExpiryMap.put(modelId, getMinMaxExpiry(modelId, allChanges));
-			
+			}
+			catch(RealTimeScoringException e){
+				LOGGER.error("Exception in rescoring " + modelId +" " + loyaltyId);
+			}
 		}
 		updateChangedMemberScore(loyaltyId, modelIdList, modelIdToExpiryMap, modelIdScoreMap, source);
 		// TODO: This is a very bad way of defining, but a very temp fix before
 		// fixing other topologies
-		HashMap<String, Double> modelIdStringScoreMap = new HashMap<String, Double>();
 		for (Map.Entry<Integer, Double> entry : modelIdScoreMap.entrySet()) {
+			
 			modelIdStringScoreMap.put(entry.getKey().toString(), entry.getValue());
+		}
+		}
+		catch(Exception e){
+			LOGGER.error("Exception occured in rescoring " + loyaltyId + " ", e);
 		}
 		return modelIdStringScoreMap;
 	}
 
-	public Map<String, Object> createMemberVariableValueMap(String loyaltyId, Set<Integer> modelIdList) throws RealTimeScoringException {
+	public Map<String, Object> createMemberVariableValueMap(String loyaltyId, Set<Integer> modelIdList)  {
 		List<String> variableFilter = new ArrayList<String>();
+		
 		for (Integer modId : modelIdList) {
+			try{
 			int month;
 			if (modelsMap.get(modId).containsKey(0)) {
 				month = 0;
@@ -160,7 +173,6 @@ public class ScoringSingleton {
 				for (String var : modelsMap.get(modId).get(month).getVariables().keySet()) {
 					if (variableNameToVidMap.get(var) == null) {
 						LOGGER.error("VID is null for variable " + var);
-						throw new RealTimeScoringException("VID is null for variable " + var);
 					} else {
 						variableFilter.add(variableNameToVidMap.get(var));
 					}
@@ -168,9 +180,12 @@ public class ScoringSingleton {
 			} else {
 				LOGGER.error("Unable to find the model for " + modId);
 			}
+			}
+			catch(Exception e){
+				LOGGER.error("Exception in createMemberVariableValueMap method ", e);
+			}
 		}
 		return memberVariablesDao.getMemberVariablesFiltered(loyaltyId, variableFilter);
-
 	}
 
 	public Set<Integer> getModelIdList(Map<String, String> newChangesVarValueMap) {

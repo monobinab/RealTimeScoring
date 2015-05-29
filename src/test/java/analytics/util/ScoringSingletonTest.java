@@ -291,8 +291,8 @@ public class ScoringSingletonTest {
 		variableNameToVidMap.setAccessible(false);
 	}
 	
-		// if memberVariablesMap will be populated with all the  avai variables associated with modelLists to be scored,
-		// it wont be populated in the memberVariables map
+		//if variables assocaited with a modelId, which needs to be scored is not there in memberVar collection,
+		//it wont be populated in the memberVariablrs map
 		@Test
 		public void createMemberVariableValueMapPositiveCaseTest2()
 				throws ConfigurationException, SecurityException,
@@ -359,7 +359,7 @@ public class ScoringSingletonTest {
 	// Code is refactored and caught the custom exception with NULL VID information
 	// Pls note: This was the reason for getting variableId as NULL, like null=1
 	// (faced with Eddie's lid)
-	@Test
+	/*@Test
 	public void createVariableValueMapForNullVIDTest()
 			throws ConfigurationException, SecurityException,
 			NoSuchFieldException, IllegalArgumentException,
@@ -409,7 +409,7 @@ public class ScoringSingletonTest {
 		memberVariables.remove(new BasicDBObject("l_id", lId));
 		modelsMap.setAccessible(false);
 		variableNameToVidMap.setAccessible(false);
-	}
+	}*/
 
 	//testing the method with nulls
 	@Test

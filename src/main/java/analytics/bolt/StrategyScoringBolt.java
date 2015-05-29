@@ -117,12 +117,8 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		// 4) Find all variables for models
 
 		// 5) Create a map of variable values, fetched from from memberVariables
-		Map<String, Object> memberVariablesMap = new HashMap<String, Object>();
-		try {
-			memberVariablesMap = scoringSingleton.createMemberVariableValueMap(lId, modelIdList);
-		} catch (RealTimeScoringException e1) {
-			LOGGER.error("Can not create member variable map", e1);
-		}
+		Map<String, Object> memberVariablesMap = scoringSingleton.createMemberVariableValueMap(lId, modelIdList);
+		
 		if(memberVariablesMap==null){
 			LOGGER.info("Unable to find member variables for " + lId);
 			redisCountIncr("no_member_variables");
