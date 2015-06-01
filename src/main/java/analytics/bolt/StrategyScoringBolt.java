@@ -169,7 +169,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			LOGGER.info("new score after regional factor with regional factor " + regionalFactor + " "+ newScore + " " + topologyName);
 
 			//persisting the loyalty id to redis for UnknownResponsys topology to pick up the loyalty id
-			if(host != null){
+			if(respHost != null){
 				jedis = new Jedis(respHost, respPort, 1800);
 				jedis.connect();
 				jedis.set("Unknown:"+lyl_id_no,"");
