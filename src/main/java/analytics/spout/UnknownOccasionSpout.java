@@ -54,7 +54,7 @@ public class UnknownOccasionSpout extends BaseRichSpout{
 			        ArrayList<Object> listToEmit = new ArrayList<Object>();
 			        listToEmit.add(loyaltyId);
 			        this.collector.emit(listToEmit);
-					jedis.del(s);
+			        jedis.del(s);
 					loyaltyId = null;
 					s = null;
 					listToEmit = null;

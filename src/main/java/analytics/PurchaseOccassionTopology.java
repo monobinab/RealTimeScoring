@@ -15,10 +15,8 @@ import analytics.bolt.StrategyScoringBolt;
 import analytics.spout.OccassionRedisSpout;
 import analytics.util.AuthPropertiesReader;
 import analytics.util.Constants;
-import analytics.util.HostPortUtility;
 import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
-import analytics.util.RedisConnection;
 import analytics.util.SystemUtility;
 import analytics.util.TopicConstants;
 

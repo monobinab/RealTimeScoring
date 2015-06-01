@@ -117,7 +117,7 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 			Map<Integer, String> tagModelsMap, org.json.JSONObject o,
 			org.json.JSONObject objToSend) throws JSONException {
 		org.json.JSONArray arr = null;
-		if(o.has("org.json.JSONArray arr"))
+		if(o.has("scoresInfo"))
 			arr = o.getJSONArray("scoresInfo");
 		else
 			return null;
