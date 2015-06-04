@@ -69,8 +69,7 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 		
 				//get the top jsonObject from api satisfying the condition
 				org.json.JSONObject o = new org.json.JSONObject(scoreInfoJsonString);
-				org.json.JSONObject objToSend = null;
-				objToSend = getJsonForResponsys(tagModelsMap, o, objToSend);
+				org.json.JSONObject objToSend =  getJsonForResponsys(tagModelsMap, o);
 				if(objToSend == null){
 					redisCountIncr("no_data_to_responsys");
 					outputCollector.ack(input);
@@ -114,8 +113,8 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 		
 
 	private org.json.JSONObject getJsonForResponsys(
-			Map<Integer, String> tagModelsMap, org.json.JSONObject o,
-			org.json.JSONObject objToSend) throws JSONException {
+			Map<Integer, String> tagModelsMap, org.json.JSONObject o
+			) throws JSONException {
 		org.json.JSONArray arr = null;
 		if(o.has("scoresInfo"))
 			arr = o.getJSONArray("scoresInfo");
@@ -131,13 +130,12 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 				Double percentile = Double.valueOf(((org.json.JSONObject)arr.get(i)).getString("percentile"));
 				for(Map.Entry<Integer, String> entry : tagModelsMap.entrySet()){
 					if((entry.getKey() +"").equals(modelId) && percentile >= 95){
-						objToSend = (org.json.JSONObject)arr.get(i);
-						return objToSend;
+						return (org.json.JSONObject)arr.get(i);
 					}
 				}
 			}
 		}
-		return null;
+			return null;
 	}
 
 	@Override
