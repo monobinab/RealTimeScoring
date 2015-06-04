@@ -56,18 +56,25 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 		String lyl_id_no = null; 
 		ResponsysPayload responsysObj = new ResponsysPayload();
 		try {
-			if(input != null && input.contains("lyl_id_no")){
 				lyl_id_no = input.getString(0);
 				String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no);
+				
+				//responsys need eid in its xml, so checked for its nullness before rtsapi call
+				MemberInfo memberInfo = memberInfoDao.getMemberInfo(l_id);
+			    String eid = memberInfo.getEid();
+			    if(eid == null){
+			      	outputCollector.ack(input);
+					return;
+			    }
 				String scoreInfoJsonString = responsysUtil.callRtsAPI(lyl_id_no);
 				
 				if(StringUtils.isEmpty(scoreInfoJsonString) || (!StringUtils.isEmpty(scoreInfoJsonString) && !scoreInfoJsonString.startsWith("{"))){
 					LOGGER.error("Exception occured in api " + scoreInfoJsonString);
-					outputCollector.ack(input);
+					outputCollector.fail(input);
 					return;
 				}
 		
-				//get the top jsonObject from api satisfying the condition
+				//get the top jsonObject from api which are in ready tags and satisfying >95 percentile
 				org.json.JSONObject o = new org.json.JSONObject(scoreInfoJsonString);
 				org.json.JSONObject objToSend =  getJsonForResponsys(tagModelsMap, o);
 				if(objToSend == null){
@@ -86,9 +93,7 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 				//preparing the jsonObject with only first model, which satisfied the above conditions
 				o.remove("scoresInfo");
 				o.append("scoresInfo", objToSend);
-				MemberInfo memberInfo = memberInfoDao.getMemberInfo(l_id);
-			    String eid = memberInfo.getEid();
-			 
+						 
 				//set the responsys object
 				responsysObj.setLyl_id_no(lyl_id_no);
 				responsysObj.setL_id(l_id);
@@ -100,11 +105,7 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 				
 				responsysUtil.getResponseUnknownServiceResult(responsysObj);
 			    redisCountIncr("data_to_responsys");
-				 
-			}
-			else{
-				redisCountIncr("no_lyl_id_no");
-			}
+		
 			outputCollector.ack(input);
 	} catch (Exception e) {
 			LOGGER.error("Exception in ResponsysUnknownCallsBolt for lid " + lyl_id_no, e);
@@ -125,15 +126,15 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 			return null;
 		
 		for(int i=0; i<arr.length(); i++){
-			if(!((org.json.JSONObject) arr.get(i)).has("mdTag") ){
+		//	if(!((org.json.JSONObject) arr.get(i)).has("mdTag") ){
 				String modelId = ((org.json.JSONObject)arr.get(i)).getString("modelId");
 				Double percentile = Double.valueOf(((org.json.JSONObject)arr.get(i)).getString("percentile"));
 				for(Map.Entry<Integer, String> entry : tagModelsMap.entrySet()){
-					if((entry.getKey() +"").equals(modelId) && percentile >= 95){
+					if((String.valueOf(entry.getKey())).equals(modelId) && percentile > 95){
 						return (org.json.JSONObject)arr.get(i);
 					}
 				}
-			}
+		//	}
 		}
 			return null;
 	}

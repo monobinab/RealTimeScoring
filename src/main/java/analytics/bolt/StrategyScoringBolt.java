@@ -168,14 +168,6 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 				newScore = 1.0;
 			LOGGER.info("new score after regional factor with regional factor " + regionalFactor + " "+ newScore + " " + topologyName);
 
-			//persisting the loyalty id to redis for UnknownResponsys topology to pick up the loyalty id
-			if(respHost != null){
-				jedis = new Jedis(respHost, respPort, 1800);
-				jedis.connect();
-				jedis.set("Unknown:"+lyl_id_no,"");
-				jedis.disconnect();
-			}
-			
 			// 9) Emit the new score
 			Map<String, Date> minMaxMap = scoringSingleton.getMinMaxExpiry(modelId, allChanges);
 			modelIdToExpiryMap.put(modelId, minMaxMap);
@@ -238,6 +230,14 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		scoringSingleton.updateChangedMemberScore(lId, modelIdList, modelIdToExpiryMap, modelIdScoreMap,source);
 		
 		LOGGER.debug("TIME:" + messageID + "- Scoring complete-" + System.currentTimeMillis());
+		
+		//persisting the loyalty id to redis for UnknownOccasionsTopology to pick up the loyalty id
+		if(respHost != null){
+			jedis = new Jedis(respHost, respPort, 1800);
+			jedis.connect();
+			jedis.set("Unknown:"+lyl_id_no,"");
+			jedis.disconnect();
+		}
 		
 		/*List<Object> listToEmit = new ArrayList<Object>();
 		//member_stream is commented as MemberPublish bolt to redis is not in use now
