@@ -27,6 +27,7 @@ import org.junit.Test;
 
 import analytics.exception.RealTimeScoringException;
 import analytics.util.objects.Boost;
+import analytics.util.objects.BoosterModel;
 import analytics.util.objects.Change;
 import analytics.util.objects.ChangedMemberScore;
 import analytics.util.objects.Model;
@@ -1734,6 +1735,201 @@ public class ScoringSingletonTest {
 	public void calcRegionalWithNoStateForMemberTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
 		Double factor = scoringSingletonObj.calcRegionalFactor(35, null);
 		Assert.assertEquals(1.0, factor);
+	}
+	
+	@Test
+	public void calcBoosterScorePositiveCaseTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
+		Set<Integer> boosterModelIdContents = new HashSet<Integer>();
+		boosterModelIdContents.add(35);
+		Field boosterModelIds = ScoringSingleton.class
+				.getDeclaredField("boosterModelIds");
+		boosterModelIds.setAccessible(true);
+		boosterModelIds.set(scoringSingletonObj, boosterModelIdContents);
+		Map<Integer, BoosterModel> boosterModelVariablesMapContents = new HashMap<Integer, BoosterModel>();
+		Map<String, Double> boosterVariablesMap = new HashMap<String, Double>();
+		boosterVariablesMap.put("Booster_Var", 1.2);
+		boosterVariablesMap.put("MSM_SCORE", 0.5);
+		BoosterModel boosterModel = new BoosterModel();
+		boosterModel.setModelId(35);;
+		boosterModel.setModelName("Booster_Model");
+		boosterModel.setConstant(5);
+		boosterModel.setMonth(5);
+		boosterModel.setBoosterVariablesMap(boosterVariablesMap);
+		boosterModelVariablesMapContents.put(35, boosterModel);
+		Field boosterModelVariablesMap = ScoringSingleton.class
+				.getDeclaredField("boosterModelVariablesMap");
+		boosterModelVariablesMap.setAccessible(true);
+		boosterModelVariablesMap.set(scoringSingletonObj, boosterModelVariablesMapContents);
+		Map<String, String> boosterVariableNameToVidMapContents = new HashMap<String, String>();
+		boosterVariableNameToVidMapContents.put("Booster_Var", "100");
+		Field boosterVariableNameToVidMap = ScoringSingleton.class
+				.getDeclaredField("boosterVariableNameToVidMap");
+		boosterVariableNameToVidMap.setAccessible(true);
+		boosterVariableNameToVidMap.set(scoringSingletonObj, boosterVariableNameToVidMapContents);
+		Map<String, Object> mbrBoosterVarMap = new HashMap<String, Object>();
+		mbrBoosterVarMap.put("100", 1);
+		double boosterScore = scoringSingletonObj.calcBoosterScore(mbrBoosterVarMap, 35, 0.0064);//6.2
+		Assert.assertEquals(0.975337084392176, boosterScore);
+
+		boosterModelVariablesMap.setAccessible(false);
+		boosterVariableNameToVidMap.setAccessible(false);
+		boosterModelIds.setAccessible(false);
+	}
+
+	@Test
+	public void calcBoosterScoreNoReqBoosterVarInMemberTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
+		Set<Integer> boosterModelIdContents = new HashSet<Integer>();
+		boosterModelIdContents.add(35);
+		Field boosterModelIds = ScoringSingleton.class
+				.getDeclaredField("boosterModelIds");
+		boosterModelIds.setAccessible(true);
+		boosterModelIds.set(scoringSingletonObj, boosterModelIdContents);
+		Map<Integer, BoosterModel> boosterModelVariablesMapContents = new HashMap<Integer, BoosterModel>();
+		Map<String, Double> boosterVariablesMap = new HashMap<String, Double>();
+		boosterVariablesMap.put("Booster_Var", 1.2);
+		boosterVariablesMap.put("MSM_SCORE", 0.5);
+		BoosterModel boosterModel = new BoosterModel();
+		boosterModel.setModelId(35);;
+		boosterModel.setModelName("Booster_Model");
+		boosterModel.setConstant(5);
+		boosterModel.setMonth(5);
+		boosterModel.setBoosterVariablesMap(boosterVariablesMap);
+		boosterModelVariablesMapContents.put(35, boosterModel);
+		Field boosterModelVariablesMap = ScoringSingleton.class
+				.getDeclaredField("boosterModelVariablesMap");
+		boosterModelVariablesMap.setAccessible(true);
+		boosterModelVariablesMap.set(scoringSingletonObj, boosterModelVariablesMapContents);
+		Map<String, String> boosterVariableNameToVidMapContents = new HashMap<String, String>();
+		boosterVariableNameToVidMapContents.put("Booster_Var", "100");
+		Field boosterVariableNameToVidMap = ScoringSingleton.class
+				.getDeclaredField("boosterVariableNameToVidMap");
+		boosterVariableNameToVidMap.setAccessible(true);
+		boosterVariableNameToVidMap.set(scoringSingletonObj, boosterVariableNameToVidMapContents);
+		Map<String, Object> mbrBoosterVarMap = new HashMap<String, Object>();
+		mbrBoosterVarMap.put("101", 1);
+		double boosterScore = scoringSingletonObj.calcBoosterScore(mbrBoosterVarMap, 35, 0.0064);//6.2
+		Assert.assertEquals(0.0064, boosterScore);
+
+		boosterModelVariablesMap.setAccessible(false);
+		boosterVariableNameToVidMap.setAccessible(false);
+		boosterModelIds.setAccessible(false);
+	}
+
+	@Test
+	public void calcBoosterScoreReqModelNotInBoosterModeVarMapTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
+		Set<Integer> boosterModelIdContents = new HashSet<Integer>();
+		boosterModelIdContents.add(35);
+		Field boosterModelIds = ScoringSingleton.class
+				.getDeclaredField("boosterModelIds");
+		boosterModelIds.setAccessible(true);
+		boosterModelIds.set(scoringSingletonObj, boosterModelIdContents);
+		Map<Integer, BoosterModel> boosterModelVariablesMapContents = new HashMap<Integer, BoosterModel>();
+		Map<String, Double> boosterVariablesMap = new HashMap<String, Double>();
+		boosterVariablesMap.put("Booster_Var", 1.2);
+		boosterVariablesMap.put("MSM_SCORE", 0.5);
+		BoosterModel boosterModel = new BoosterModel();
+		boosterModel.setModelId(45);;
+		boosterModel.setModelName("Booster_Model");
+		boosterModel.setConstant(5);
+		boosterModel.setMonth(5);
+		boosterModel.setBoosterVariablesMap(boosterVariablesMap);
+		boosterModelVariablesMapContents.put(45, boosterModel);
+		Field boosterModelVariablesMap = ScoringSingleton.class
+				.getDeclaredField("boosterModelVariablesMap");
+		boosterModelVariablesMap.setAccessible(true);
+		boosterModelVariablesMap.set(scoringSingletonObj, boosterModelVariablesMapContents);
+		Map<String, String> boosterVariableNameToVidMapContents = new HashMap<String, String>();
+		boosterVariableNameToVidMapContents.put("Booster_Var", "100");
+		Field boosterVariableNameToVidMap = ScoringSingleton.class
+				.getDeclaredField("boosterVariableNameToVidMap");
+		boosterVariableNameToVidMap.setAccessible(true);
+		boosterVariableNameToVidMap.set(scoringSingletonObj, boosterVariableNameToVidMapContents);
+		Map<String, Object> mbrBoosterVarMap = new HashMap<String, Object>();
+		mbrBoosterVarMap.put("100", 1);
+		double boosterScore = scoringSingletonObj.calcBoosterScore(mbrBoosterVarMap, 35, 0.0064);//6.2
+		Assert.assertEquals(0.0064, boosterScore);
+
+		boosterModelVariablesMap.setAccessible(false);
+		boosterVariableNameToVidMap.setAccessible(false);
+		boosterModelIds.setAccessible(false);
+	}
+
+	@Test
+	public void calcBoosterScoreReqVarNotInBoosterVarNameToVIDMapTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
+		Set<Integer> boosterModelIdContents = new HashSet<Integer>();
+		boosterModelIdContents.add(35);
+		Field boosterModelIds = ScoringSingleton.class
+				.getDeclaredField("boosterModelIds");
+		boosterModelIds.setAccessible(true);
+		boosterModelIds.set(scoringSingletonObj, boosterModelIdContents);
+		Map<Integer, BoosterModel> boosterModelVariablesMapContents = new HashMap<Integer, BoosterModel>();
+		Map<String, Double> boosterVariablesMap = new HashMap<String, Double>();
+		boosterVariablesMap.put("Booster_Var", 1.2);
+		boosterVariablesMap.put("MSM_SCORE", 0.5);
+		BoosterModel boosterModel = new BoosterModel();
+		boosterModel.setModelId(35);;
+		boosterModel.setModelName("Booster_Model");
+		boosterModel.setConstant(5);
+		boosterModel.setMonth(5);
+		boosterModel.setBoosterVariablesMap(boosterVariablesMap);
+		boosterModelVariablesMapContents.put(35, boosterModel);
+		Field boosterModelVariablesMap = ScoringSingleton.class
+				.getDeclaredField("boosterModelVariablesMap");
+		boosterModelVariablesMap.setAccessible(true);
+		boosterModelVariablesMap.set(scoringSingletonObj, boosterModelVariablesMapContents);
+		Map<String, String> boosterVariableNameToVidMapContents = new HashMap<String, String>();
+		boosterVariableNameToVidMapContents.put("Booster_Var2", "100");
+		Field boosterVariableNameToVidMap = ScoringSingleton.class
+				.getDeclaredField("boosterVariableNameToVidMap");
+		boosterVariableNameToVidMap.setAccessible(true);
+		boosterVariableNameToVidMap.set(scoringSingletonObj, boosterVariableNameToVidMapContents);
+		Map<String, Object> mbrBoosterVarMap = new HashMap<String, Object>();
+		mbrBoosterVarMap.put("100", 1);
+		double boosterScore = scoringSingletonObj.calcBoosterScore(mbrBoosterVarMap, 35, 0.0064);//6.2
+		Assert.assertEquals(0.0064, boosterScore);
+
+		boosterModelVariablesMap.setAccessible(false);
+		boosterVariableNameToVidMap.setAccessible(false);
+		boosterModelIds.setAccessible(false);
+	}
+
+
+	@Test
+	public void calcBoosterScoreNullBoosterMemberVarEmptyTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
+		Set<Integer> boosterModelIdContents = new HashSet<Integer>();
+		boosterModelIdContents.add(35);
+		Field boosterModelIds = ScoringSingleton.class
+				.getDeclaredField("boosterModelIds");
+		boosterModelIds.setAccessible(true);
+		boosterModelIds.set(scoringSingletonObj, boosterModelIdContents);
+		Map<Integer, BoosterModel> boosterModelVariablesMapContents = new HashMap<Integer, BoosterModel>();
+		Map<String, Double> boosterVariablesMap = new HashMap<String, Double>();
+		boosterVariablesMap.put("Booster_Var", 1.2);
+		boosterVariablesMap.put("MSM_SCORE", 0.5);
+		BoosterModel boosterModel = new BoosterModel();
+		boosterModel.setModelId(35);;
+		boosterModel.setModelName("Booster_Model");
+		boosterModel.setConstant(5);
+		boosterModel.setMonth(5);
+		boosterModel.setBoosterVariablesMap(boosterVariablesMap);
+		boosterModelVariablesMapContents.put(35, boosterModel);
+		Field boosterModelVariablesMap = ScoringSingleton.class
+				.getDeclaredField("boosterModelVariablesMap");
+		boosterModelVariablesMap.setAccessible(true);
+		boosterModelVariablesMap.set(scoringSingletonObj, boosterModelVariablesMapContents);
+		Map<String, String> boosterVariableNameToVidMapContents = new HashMap<String, String>();
+		boosterVariableNameToVidMapContents.put("Booster_Var", "100");
+		Field boosterVariableNameToVidMap = ScoringSingleton.class
+				.getDeclaredField("boosterVariableNameToVidMap");
+		boosterVariableNameToVidMap.setAccessible(true);
+		boosterVariableNameToVidMap.set(scoringSingletonObj, boosterVariableNameToVidMapContents);
+		Map<String, Object> mbrBoosterVarMap = new HashMap<String, Object>();
+		double boosterScore = scoringSingletonObj.calcBoosterScore(mbrBoosterVarMap, 35, 0.0064);//6.2
+		Assert.assertEquals(0.0064, boosterScore);
+
+		boosterModelVariablesMap.setAccessible(false);
+		boosterVariableNameToVidMap.setAccessible(false);
+		boosterModelIds.setAccessible(false);
 	}
 	@AfterClass
 	public static void cleanUp(){

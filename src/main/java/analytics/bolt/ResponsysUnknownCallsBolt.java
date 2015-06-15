@@ -126,7 +126,7 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 			return null;
 		
 		for(int i=0; i<arr.length(); i++){
-		//	if(!((org.json.JSONObject) arr.get(i)).has("mdTag") ){
+			if(!((org.json.JSONObject) arr.get(i)).has("mdTag") ){
 				String modelId = ((org.json.JSONObject)arr.get(i)).getString("modelId");
 				Double percentile = Double.valueOf(((org.json.JSONObject)arr.get(i)).getString("percentile"));
 				for(Map.Entry<Integer, String> entry : tagModelsMap.entrySet()){
@@ -134,7 +134,7 @@ public class ResponsysUnknownCallsBolt  extends EnvironmentBolt{
 						return (org.json.JSONObject)arr.get(i);
 					}
 				}
-		//	}
+			}
 		}
 			return null;
 	}

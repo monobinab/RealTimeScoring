@@ -146,6 +146,9 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		//get the state for the memberId to get the regionalFactor for scoring
 		String state = scoringSingleton.getState(lId);
 		
+		//boosterMemberVariables map from boosterMemberVariables collection
+		Map<String, Object> boosterMemberVarMap = scoringSingleton.createBoosterMemberVariables(lId, modelIdList);
+		
 		for (Integer modelId : modelIdList) {// Score and emit for all modelIds
 												// before mongo inserts
 			// recalculate score for model
@@ -166,8 +169,13 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			newScore = newScore * regionalFactor;
 			if(newScore > 1.0)
 				newScore = 1.0;
-			LOGGER.info("new score after regional factor with regional factor " + regionalFactor + " "+ newScore + " " + topologyName);
-
+		
+			//get the boostedScore
+			newScore = scoringSingleton.calcBoosterScore(boosterMemberVarMap, modelId, newScore);
+			if(newScore > 1.0)
+				newScore = 1.0;
+			LOGGER.info("newScore for lid " + lId + " "+ newScore + " from " + topologyName);
+			
 			// 9) Emit the new score
 			Map<String, Date> minMaxMap = scoringSingleton.getMinMaxExpiry(modelId, allChanges);
 			modelIdToExpiryMap.put(modelId, minMaxMap);

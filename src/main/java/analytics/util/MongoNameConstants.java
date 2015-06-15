@@ -73,6 +73,9 @@ public class MongoNameConstants {
 	public static final String V_NAME = "name";
 	public static final String V_STRATEGY = "strategy";
 	
+	//boosterVariables collection
+	public static final String B_VID = "BVID";
+	
 	//Member variables collection
 	public static final String MV_EXPIRY_DATE = "e";
 	public static final String MV_EFFECTIVE_DATE = "f";

@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -15,6 +16,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.exception.RealTimeScoringException;
+import analytics.util.dao.BoosterMemberVariablesDao;
+import analytics.util.dao.BoosterModelVariablesDao;
+import analytics.util.dao.BoosterVariableDao;
 import analytics.util.dao.ChangedMemberScoresDao;
 import analytics.util.dao.ChangedMemberVariablesDao;
 import analytics.util.dao.MemberInfoDao;
@@ -25,6 +29,8 @@ import analytics.util.dao.ModelVariablesDao;
 import analytics.util.dao.RegionalFactorDao;
 import analytics.util.dao.VariableDao;
 import analytics.util.objects.Boost;
+import analytics.util.objects.BoosterModel;
+import analytics.util.objects.BoosterVariable;
 import analytics.util.objects.Change;
 import analytics.util.objects.ChangedMemberScore;
 import analytics.util.objects.MemberInfo;
@@ -57,6 +63,15 @@ public class ScoringSingleton {
 
 	ModelSywBoostDao modelSywBoostDao;
 	MemberBoostsDao memberBoostsDao;
+	
+	//for Booster models
+	private Set<Integer> boosterModelIds;
+	private BoosterModelVariablesDao boosterModelVariablesDao;
+	private BoosterVariableDao boosterVariablesDao;
+	private Map<Integer, BoosterModel> boosterModelVariablesMap;
+	private Map<String, String> boosterVariableNameToVidMap;
+	private BoosterMemberVariablesDao boosterMemberVariablesDao;
+
 
 	public static ScoringSingleton getInstance() {
 		if (instance == null) {
@@ -108,6 +123,20 @@ public class ScoringSingleton {
 		regionalFactorsMap = regionalFactorDao.populateRegionalFactors();
 		
 		memberInfoDao = new MemberInfoDao();
+		
+		boosterModelVariablesDao = new BoosterModelVariablesDao();
+		boosterVariablesDao = new BoosterVariableDao();
+		boosterMemberVariablesDao = new BoosterMemberVariablesDao();
+		boosterModelVariablesMap = new HashMap<Integer, BoosterModel>();
+		boosterModelIds = new HashSet<Integer>();
+		boosterModelVariablesDao.populateBoosterModelVariables(boosterModelIds, boosterModelVariablesMap);
+		List<BoosterVariable> boosterVariablesList = boosterVariablesDao.getBoosterVariables();
+		boosterVariableNameToVidMap = new HashMap<String, String>();
+		for (BoosterVariable boosterVariable : boosterVariablesList) {
+			if (boosterVariable.getName() != null && boosterVariable.getBvid() != null) {
+				boosterVariableNameToVidMap.put(boosterVariable.getName(), boosterVariable.getBvid());
+			}
+		}
 	}
 
 	// TODO: Replace this method. Its for backward compatibility. Bad coding
@@ -124,9 +153,10 @@ public class ScoringSingleton {
 		if (memberVariablesMap == null) {
 			LOGGER.warn("Unable to find member variables");
 			return null;
-
 		}
 		Map<String, Change> allChanges = this.createChangedVariablesMap(loyaltyId);
+		//boosterMemberVariables map from boosterMemberVariables collection
+		Map<String, Object> boosterMemberVarMap = this.createBoosterMemberVariables(loyaltyId, modelIdList);
 		Map<Integer, Double> modelIdScoreMap = new HashMap<Integer, Double>();
 		String state = this.getState(loyaltyId);
 		Map<Integer,Map<String,Date>> modelIdToExpiryMap = new HashMap<Integer, Map<String,Date>>();
@@ -136,6 +166,10 @@ public class ScoringSingleton {
 			double regionalFactor = this.calcRegionalFactor(modelId, state);
 			score = score * regionalFactor;
 			if (score > 1)
+				score = 1.0;
+			//get the boostedScore
+			score = this.calcBoosterScore(boosterMemberVarMap, modelId, score);
+			if(score > 1.0)
 				score = 1.0;
 			modelIdScoreMap.put(modelId, score);
 			modelIdToExpiryMap.put(modelId, getMinMaxExpiry(modelId, allChanges));
@@ -444,6 +478,79 @@ public class ScoringSingleton {
 			}
 			return 1.0;
 	}
+	
+	public Map<String, Object> createBoosterMemberVariables(String loyaltyId, Set<Integer> modelIdList) throws RealTimeScoringException{
+		//retain only the boostermodels which needs to be scored
+		boosterModelIds.retainAll(modelIdList);
+		List<String> variableFilter = new ArrayList<String>();
+		for(Integer modelId : boosterModelIds){
+			if(boosterModelVariablesMap.containsKey(modelId) && boosterModelVariablesMap.get(modelId).getBoosterVariablesMap() != null){
+				for(String var : boosterModelVariablesMap.get(modelId).getBoosterVariablesMap().keySet() ){
+					if(boosterVariableNameToVidMap.get(var) == null)
+						continue;
+					else
+						variableFilter.add(boosterVariableNameToVidMap.get(var));
+				}
+			}
+			else
+				LOGGER.error("Unable to find variables for booster model " + modelId);
+		}
+		return boosterMemberVariablesDao.getBoosterMemberVariablesFiltered(loyaltyId, variableFilter);
+	}
+
+	public double calcBoosterScore(Map<String, Object> mbrBoosterVarMap, int modelId, double newScore){
+
+		BoosterModel boosterModel = null;
+		if(boosterModelIds.contains(modelId) && boosterModelVariablesMap.containsKey(modelId) && boosterModelVariablesMap.get(modelId) != null){
+			boosterModel = boosterModelVariablesMap.get(modelId);
+		}
+		else{
+			return newScore;
+		}
+
+		if(mbrBoosterVarMap == null || mbrBoosterVarMap.isEmpty())
+			return newScore;
+
+		double boosterScore = boosterModel.getConstant();
+		Map<String, Double> variablesMap = boosterModel.getBoosterVariablesMap();
+
+		Set<String> commonVar = new HashSet<String>(mbrBoosterVarMap.keySet());
+		Map<String, String> varVIDToVarNameMap = new HashMap<String, String>();
+
+		for (Entry<String, Double> entry : variablesMap.entrySet()) {
+			String bVid = null;
+			Object variableValue = null;
+		    String varName = entry.getKey();
+		    Double coefficient = entry.getValue();
+		    if( boosterVariableNameToVidMap.get(varName) != null){
+		    	bVid = boosterVariableNameToVidMap.get(varName);
+		    }
+		    else if(!varName.equalsIgnoreCase(Constants.MSM_SCORE) && boosterVariableNameToVidMap.get(varName) == null){
+		    	LOGGER.error("variable not found in boosterVariables collection but present in modelBoosterVarCollection " + varName);
+		    	continue;
+		    }
+		     if(mbrBoosterVarMap.containsKey(bVid)){
+		    	variableValue = mbrBoosterVarMap.get(bVid);
+		    }
+		    else
+		    	continue;
+		    if (variableValue instanceof Integer) {
+		    	boosterScore =  boosterScore + ((Integer) variableValue * coefficient) ;
+		   	} else if (variableValue instanceof Double) {
+		   		boosterScore = boosterScore + ((Double) variableValue * coefficient) ;
+			} 
+		    varVIDToVarNameMap.put(bVid, varName);
+		}
+			//check whether mbrBoosterVarMap contains atleast one variable for this boostermodel modelId - to be scored
+			//if mbrBoosterVarMap does not contain any var of interest, return the newScore
+			commonVar.retainAll(varVIDToVarNameMap.keySet());
+			if(commonVar.size() == 0)
+				return newScore;
+
+			boosterScore = 1/(1+Math.exp(-(boosterScore + variablesMap.get(Constants.MSM_SCORE)*(Math.log((newScore +0.00000001)/(1-newScore+0.00000001))))));
+			return boosterScore;
+	}
+
 	
 		public Map<String, Date> getMinMaxExpiry(Integer modelId, Map<String, Change> allChanges) {
 		Date minDate = null;
