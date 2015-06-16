@@ -3,15 +3,9 @@ package analytics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import backtype.storm.Config;
-import backtype.storm.LocalCluster;
-import backtype.storm.StormSubmitter;
-import backtype.storm.topology.TopologyBuilder;
-import analytics.bolt.LoggingBolt;
 import analytics.bolt.ParsingBoltOccassion;
 import analytics.bolt.PersistOccasionBolt;
 import analytics.bolt.ResponseBolt;
-import analytics.bolt.StrategyScoringBolt;
 import analytics.spout.OccassionRedisSpout;
 import analytics.util.AuthPropertiesReader;
 import analytics.util.Constants;
@@ -19,6 +13,10 @@ import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
 import analytics.util.SystemUtility;
 import analytics.util.TopicConstants;
+import backtype.storm.Config;
+import backtype.storm.LocalCluster;
+import backtype.storm.StormSubmitter;
+import backtype.storm.topology.TopologyBuilder;
 
 public class PurchaseOccassionTopology {
 	private static final Logger LOGGER = LoggerFactory
@@ -63,24 +61,19 @@ public class PurchaseOccassionTopology {
 					new PersistOccasionBolt(System
 							.getProperty(MongoNameConstants.IS_PROD)), 3)
 					.shuffleGrouping("parseOccassionBolt");
-			topologyBuilder.setBolt(
+			/*topologyBuilder.setBolt(
 					"strategy_bolt",
 					new StrategyScoringBolt(System
 							.getProperty(MongoNameConstants.IS_PROD)), 3)
-					.shuffleGrouping("persistOccasionBolt");
+					.shuffleGrouping("persistOccasionBolt");*/
 
 		//Sree. Added the new bolt for Responses
 		topologyBuilder.setBolt("responses_bolt", new ResponseBolt(System
 				.getProperty(MongoNameConstants.IS_PROD), AuthPropertiesReader
 				.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
 				.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 24)
-		.shuffleGrouping("strategy_bolt", "response_stream")
+		//.shuffleGrouping("strategy_bolt", "response_stream")
 		.shuffleGrouping("persistOccasionBolt", "response_stream_from_persist");
-		
-		if(System.getProperty(MongoNameConstants.IS_PROD).equals("PROD")){
-			//topologyBuilder.setBolt("flumeLoggingBolt", new FlumeRPCBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
-			topologyBuilder.setBolt("loggingBolt", new LoggingBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategy_bolt", "score_stream");
-		}
 		
 			Config conf = new Config();
 			conf.put("metrics_topology", "PurchaseOccasion");

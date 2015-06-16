@@ -31,6 +31,7 @@ public class RedisPubSubSpout extends BaseRichSpout {
     JedisPool pool;
     final int number;
     String environment;
+    String[] redisServers;
 
     public RedisPubSubSpout( int number, String pattern, String systemProperty) {
         this.number = number;
@@ -39,12 +40,12 @@ public class RedisPubSubSpout extends BaseRichSpout {
     }
     class ListenerThread extends Thread {
         LinkedBlockingQueue<String> queue;
-        JedisPool pool;
+        //JedisPool pool;
         String pattern;
 
         public ListenerThread(LinkedBlockingQueue<String> queue, JedisPool pool, String pattern) {
             this.queue = queue;
-            this.pool = pool;
+            //this.pool = pool;
             this.pattern = pattern;
         }
 
@@ -87,11 +88,15 @@ public class RedisPubSubSpout extends BaseRichSpout {
                 }
             };
 
-            Jedis jedis = pool.getResource();
+            Jedis jedis = new Jedis(redisServers[number], 6379, 172800);
+			jedis.connect();
+
+            //Jedis jedis = pool.getResource();
             try {
                 jedis.psubscribe(listener, pattern);
             } finally {
-                pool.returnResource(jedis);
+                //pool.returnResource(jedis);
+            	//jedis.disconnect();
             }
         }
     };
@@ -101,8 +106,8 @@ public class RedisPubSubSpout extends BaseRichSpout {
         _collector = collector;
         queue = new LinkedBlockingQueue<String>(1000);
      //   HostPortUtility.getInstance(conf.get("nimbus.host").toString());
-        String[] redisServers = RedisConnection.getServers(environment);
-        pool = new JedisPool(new JedisPoolConfig(), redisServers[number], 6379);
+        redisServers = RedisConnection.getServers(environment);
+        //pool = new JedisPool(new JedisPoolConfig(), redisServers[number], 6379);
         System.out.println(redisServers[number]);
         ListenerThread listener = new ListenerThread(queue, pool, pattern);
         listener.start();

@@ -103,7 +103,7 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 			// LOGGER.info("~~~~~~~~~~~Incoming tuple in ParsingboltOccasion: "
 			// + input);
 			countMetric.scope("incoming_tuples").incr();
-			Map<String, String> variableValueTagsMap = new HashMap<String, String>();
+			//Map<String, String> variableValueTagsMap = new HashMap<String, String>();
 			JsonParser parser = new JsonParser();
 			JsonElement jsonElement = null;
 			jsonElement = getParsedJson(input, parser);
@@ -155,6 +155,9 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 			else{
 				LOGGER.info("Empty Input Tags for Lid " + lyl_id_no);
 			}
+			
+			LOGGER.info("PERSIST: Input Tags for Lid " + lyl_id_no + " : "+ diffTagsString);
+			
 			jedis = new Jedis(host, port, 1800);
 			jedis.connect();
 			jedis.set("Responses:" + l_id, diffTagsString);
@@ -163,7 +166,8 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 
 			// reset the variableValueMap to 0 before persisting new incoming
 			// tags
-			resetVariableValuesMap(variableValueTagsMap, l_id);
+			
+			//resetVariableValuesMap(variableValueTagsMap, l_id);
 
 			// List<Object> emitToPersist = new ArrayList<Object>();
 			persistTagsToMemberTagsColl(l_id, tagsString, tags);
@@ -207,7 +211,7 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 			
 			
 			
-			for(JsonElement tag : tags){
+			/*for(JsonElement tag : tags){
 				
 				//If the Tag belongs to custom Unknown tag recognized by the 6th digit, then just don't score. 
 				if(unknownTagDigits.contains(tag.getAsString().substring(5, 6)))
@@ -224,11 +228,11 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 						
 					}
 				}
-			}
+			}*/
 			
 			// Even if there are no new tags and the list is null, we need to
 			// process the deletes
-			if (variableValueTagsMap != null && !variableValueTagsMap.isEmpty()) {
+			/*if (variableValueTagsMap != null && !variableValueTagsMap.isEmpty()) {
 				List<Object> listToEmit = new ArrayList<Object>();
 				listToEmit.add(l_id);
 				listToEmit.add(tagsString.toString());
@@ -239,7 +243,7 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 				listToEmit.add(messageID);
 				countMetric.scope("emitted_to_scoring").incr();
 				this.outputCollector.emit(listToEmit);
-			} else {
+			} else {*/
 				LOGGER.debug("variableValueTagsMap is null or empty or lid " + lyl_id_no);
 				List<Object> listToEmit = new ArrayList<Object>();
 				listToEmit.add(l_id);
@@ -250,7 +254,7 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 				listToEmit.add(messageID);
 				this.outputCollector.emit(listToEmit);
 				countMetric.scope("no_variables_affected").incr();
-			}
+			//}
 		} catch (Exception e) {
 			LOGGER.error("exception in parsing: " + e);
 		} finally {

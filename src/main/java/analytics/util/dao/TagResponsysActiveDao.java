@@ -3,6 +3,7 @@ package analytics.util.dao;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -31,23 +32,16 @@ public class TagResponsysActiveDao extends AbstractDao {
 		LOGGER.info("colelction in tagMetadataDao: " + tagResponsysActiveCollection.getFullName());
 	}
 
-	public HashMap<String, String> getResponsysActiveTagsList(){
+	public HashSet<String> getResponsysActiveTagsList(){
 
 		DBCursor dbCursor = tagResponsysActiveCollection.find();
 		DBObject record = null;
-		HashMap<String, String> activeTagsList = new HashMap<String, String>();
+		HashSet<String> activeTagsList = new HashSet<String>();
 		
 		while (dbCursor.hasNext()) {
 			record = dbCursor.next();
 			if(record!=null){
-				
-				if(activeTagsList.get((String)record.get(MongoNameConstants.ACTIVE_BUSINESS_UNIT))== null ){		
-					activeTagsList.put((String)record.get(MongoNameConstants.ACTIVE_BUSINESS_UNIT), (String)record.get(MongoNameConstants.PURCHASE_OCCASSION));
-				}else{
-					String str = activeTagsList.get((String)record.get(MongoNameConstants.ACTIVE_BUSINESS_UNIT)) +","+ (String)record.get(MongoNameConstants.PURCHASE_OCCASSION);
-					activeTagsList.put((String)record.get(MongoNameConstants.ACTIVE_BUSINESS_UNIT), str);
-				}
-				
+				activeTagsList.add((String)record.get(MongoNameConstants.ACTIVE_BUSINESS_UNIT));
 			}
 		}
 		return activeTagsList;

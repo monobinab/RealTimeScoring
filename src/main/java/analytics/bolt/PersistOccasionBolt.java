@@ -60,7 +60,7 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 			}
 			
 			//Emit the tuples to scoring bolt only if there are changes to the Variables
-			if(input.getString(2)!=null && input.getString(2).trim().length()>0){
+			/*if(input.getString(2)!=null && input.getString(2).trim().length()>0){
 				List<Object> listToEmit = new ArrayList<Object>();
 					listToEmit.add(l_id);
 					listToEmit.add(input.getString(2));
@@ -69,7 +69,8 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 			    	listToEmit.add(messageID);
 			    	outputCollector.emit(listToEmit);
 			    	countMetric.scope("tags_with_rescoring").incr();
-			}else{
+			}else{*/
+				
 				if (input.contains("lyl_id_no")) {
 					String lyl_id_no = input.getStringByField("lyl_id_no");
 					List<Object> listToEmit = new ArrayList<Object>();
@@ -82,7 +83,8 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 				else{
 					countMetric.scope("no_lyl_id_no").incr();
 				}
-			}
+				
+			//}
 			LOGGER.debug("TIME:" + messageID + "-Exiting PersistOccasionbolt-" + System.currentTimeMillis());
 			outputCollector.ack(input);
 			countMetric.scope("persisted_successfully").incr();
@@ -95,7 +97,7 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-			declarer.declare(new Fields("l_id", "lineItemAsJsonString","source","lyl_id_no", "messageID"));
+			//declarer.declare(new Fields("l_id", "lineItemAsJsonString","source","lyl_id_no", "messageID"));
 			declarer.declareStream("response_stream_from_persist", new Fields("lyl_id_no","messageID"));
 		}
 

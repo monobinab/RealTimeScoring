@@ -86,19 +86,21 @@ public class ResponseBolt extends EnvironmentBolt{
 					diffTags = jedis.get("Responses:"+l_id).toString() ;
 					jedis.del("Responses:"+l_id);
 				}
-				else
-					LOGGER.info("No Tags found for lyl_id_no " + lyl_id_no);
+				else{
+					LOGGER.info("PERSIST: No Tags found for lyl_id_no " + lyl_id_no);
+				}
+				LOGGER.info("PERSIST: Input Tags for lyl_id_no " + lyl_id_no+ " : "+diffTags);
 				
 				jedis.disconnect();
 
 				if(diffTags!=null && !"".equals(diffTags)){
 					countMetric.scope("making_responsys_call").incr();
 					//Get the metadata info for all the tags
-					ArrayList<TagMetadata> list = responsysUtil.getTagMetaDataList(diffTags);
+					//ArrayList<TagMetadata> list = responsysUtil.getTagMetaDataList(diffTags);
 					
 					LOGGER.debug("TIME:" + messageID + "-Making responsys call-" + System.currentTimeMillis());
 					//if( readyToProcessTags.size()>0){
-						TagMetadata tagMetadata = responsysUtil.getResponseServiceResult(scoreInfoJsonString,lyl_id_no,list,l_id, messageID, countMetric);
+						TagMetadata tagMetadata = responsysUtil.getResponseServiceResult(scoreInfoJsonString,lyl_id_no,l_id, messageID, countMetric);
 
 						LOGGER.debug("TIME:" + messageID + "-Completed responsys call-" + System.currentTimeMillis());
 						StringBuilder custVibesEvent = new StringBuilder();
