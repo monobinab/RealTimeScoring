@@ -1,5 +1,5 @@
 import storm
-import SignalSpout
+#import SignalSpout
 				
 #SignalSpout.SignalSpoutBase().run()
 storm.emit(["hello"])
