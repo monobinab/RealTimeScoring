@@ -1515,7 +1515,7 @@ public class ScoringSingletonIntegrationTest {
 			modelsMap.set(scoringSingletonObj,modelsContentMap);
 		
 			Set<Integer> modelIdsList = scoringSingletonObj.getModelIdList(newChangesVarValueMap);
-			scoringSingletonObj.getScoringModelIdList(modelIdsList);
+			scoringSingletonObj.filterScoringModelIdList(modelIdsList);
 		
 			Set<Integer> expectedModelIdList = new HashSet<Integer>() {
 				private static final long serialVersionUID = 1L;
@@ -1617,7 +1617,7 @@ public class ScoringSingletonIntegrationTest {
 			variableNameToStrategyMap.set(scoringSingletonObj, variableNameToStrategyMapContentsMap);
 			
 			Set<Integer> modelIdsList = scoringSingletonObj.getModelIdList(newChangesVarValueMap);
-			scoringSingletonObj.getScoringModelIdList(modelIdsList);
+			scoringSingletonObj.filterScoringModelIdList(modelIdsList);
 			
 			Map<String, Object> memberVariablesMap = scoringSingletonObj.createMemberVariableValueMap(l_id, modelIdsList);
 			Map<String, Change> changedMemberVariablesMap = scoringSingletonObj.createChangedVariablesMap(l_id);
@@ -1730,7 +1730,7 @@ public class ScoringSingletonIntegrationTest {
 			variableNameToStrategyMap.set(scoringSingletonObj, variableNameToStrategyMapContentsMap);
 			
 			Set<Integer> modelIdsList = scoringSingletonObj.getModelIdList(newChangesVarValueMap);
-			scoringSingletonObj.getScoringModelIdList(modelIdsList);
+			scoringSingletonObj.filterScoringModelIdList(modelIdsList);
 			
 			Map<String, Object> memberVariablesMap = scoringSingletonObj.createMemberVariableValueMap(l_id, modelIdsList);
 			Map<String, Change> changedMemberVariablesMap = scoringSingletonObj.createChangedVariablesMap(l_id);

@@ -150,7 +150,7 @@ public class ScoringSingleton {
 		}
 		
 		//filter the models which needs to be scored
-		this.getScoringModelIdList(modelIdList);
+		this.filterScoringModelIdList(modelIdList);
 		try{
 		// Contains a VID to object mapping, not var name
 		Map<String, Object> memberVariablesMap = this.createMemberVariableValueMap(loyaltyId, modelIdList);
@@ -368,7 +368,7 @@ public class ScoringSingleton {
 		return boosts;
 	}
 	
-	public void getScoringModelIdList(Set<Integer> modelIdList){
+	public void filterScoringModelIdList(Set<Integer> modelIdList){
 		
 		Iterator<Integer> itr = modelIdList.iterator();
 		while(itr.hasNext()){

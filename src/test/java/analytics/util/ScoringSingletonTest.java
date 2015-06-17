@@ -22,7 +22,6 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.joda.time.LocalDate;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import analytics.exception.RealTimeScoringException;
@@ -591,12 +590,14 @@ public class ScoringSingletonTest {
 		Map<Integer, Map<Integer, Model>> modelsMapContentBoost = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContentBoost.put(35, monthModelMap);
 
-		Field modelsMapBlk = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMapBlk.setAccessible(true);
-		modelsMapBlk.set(scoringSingletonObj, modelsMapContentBoost);
+		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
+		modelsMap.setAccessible(true);
+		modelsMap.set(scoringSingletonObj, modelsMapContentBoost);
 		double boost = scoringSingletonObj.getBoostScore(allChanges, 35);
 		int comapreVal = new Double(0.0).compareTo(new Double(boost));
 		Assert.assertEquals(comapreVal, 0);
+		
+		modelsMap.setAccessible(false);
 	}
 
 	@Test
@@ -1931,6 +1932,106 @@ public class ScoringSingletonTest {
 		boosterVariableNameToVidMap.setAccessible(false);
 		boosterModelIds.setAccessible(false);
 	}
+	
+	@Test
+	public void filterScoringModelIdListTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
+			Set<Integer> modelIdList = new HashSet<Integer>() {
+			private static final long serialVersionUID = 1L;
+			{
+			  add(48);
+			}};
+			Set<Integer> expectedModelIdList = new HashSet<Integer>() {
+				private static final long serialVersionUID = 1L;
+				{
+				  add(48);
+				}};
+		
+			Map<String, Variable> variablesMap = new HashMap<String, Variable>();
+			variablesMap.put("VAR", new Variable(
+					"VAR", 0.0015));
+			Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
+			monthModelMap.put(
+					Calendar.getInstance().get(Calendar.MONTH) + 1,
+					new Model(48, "Model_Name", Calendar.getInstance().get(
+							Calendar.MONTH) + 1, 5, variablesMap));
+			Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
+			modelsMapContent.put(48, monthModelMap);
+			Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
+			modelsMap.setAccessible(true);
+			modelsMap.set(scoringSingletonObj, modelsMapContent);
+			
+			scoringSingletonObj.filterScoringModelIdList(modelIdList);
+			Assert.assertEquals(expectedModelIdList, modelIdList);
+			
+			modelsMap.setAccessible(false);
+	}
+	
+	
+	@Test
+	public void filterScoringModelIdListTest2() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
+			Set<Integer> modelIdList = new HashSet<Integer>() {
+			private static final long serialVersionUID = 1L;
+			{
+			  add(48);
+			}};
+			Set<Integer> expectedModelIdList = new HashSet<Integer>() {
+				private static final long serialVersionUID = 1L;
+				{
+				  add(48);
+				}};
+		
+			Map<String, Variable> variablesMap = new HashMap<String, Variable>();
+			variablesMap.put("VAR", new Variable(
+					"VAR", 0.0015));
+			Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
+			monthModelMap.put(
+					0,
+					new Model(48, "Model_Name", 0, 5, variablesMap));
+			Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
+			modelsMapContent.put(48, monthModelMap);
+			Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
+			modelsMap.setAccessible(true);
+			modelsMap.set(scoringSingletonObj, modelsMapContent);
+			
+			scoringSingletonObj.filterScoringModelIdList(modelIdList);
+			Assert.assertEquals(expectedModelIdList, modelIdList);
+			
+			modelsMap.setAccessible(false);
+	}
+	
+
+	@Test
+	public void filteScoringModelIdListTest3() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
+			Set<Integer> modelIdList = new HashSet<Integer>() {
+			private static final long serialVersionUID = 1L;
+			{
+			  add(48);
+			}};
+			Set<Integer> expectedModelIdList = new HashSet<Integer>() {
+				private static final long serialVersionUID = 1L;
+				{
+				 
+				}};
+		
+			Map<String, Variable> variablesMap = new HashMap<String, Variable>();
+			variablesMap.put("VAR", new Variable(
+					"VAR", 0.0015));
+			Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
+			monthModelMap.put(
+					13,
+					new Model(48, "Model_Name", 13, 5, variablesMap));
+			Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
+			modelsMapContent.put(48, monthModelMap);
+			Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
+			modelsMap.setAccessible(true);
+			modelsMap.set(scoringSingletonObj, modelsMapContent);
+			
+			scoringSingletonObj.filterScoringModelIdList(modelIdList);
+			Assert.assertEquals(expectedModelIdList, modelIdList);
+			
+			modelsMap.setAccessible(false);
+	}
+	
 	@AfterClass
 	public static void cleanUp(){
 		SystemPropertyUtility.dropDatabase();
