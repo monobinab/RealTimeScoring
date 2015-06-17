@@ -106,6 +106,10 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 
 		// 3) Find all models affected by the changes
 		Set<Integer> modelIdList = scoringSingleton.getModelIdList(newChangesVarValueMap);
+		
+		//filter the models which needs to be scored
+		scoringSingleton.getScoringModelIdList(modelIdList);
+		
 		if(modelIdList==null||modelIdList.isEmpty()){
 			LOGGER.info("No models affected for " +lyl_id_no);
 			redisCountIncr("no_models_affected");
