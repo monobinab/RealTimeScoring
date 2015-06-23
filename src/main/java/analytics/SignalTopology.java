@@ -45,7 +45,7 @@ public class SignalTopology {
 
       @Override
       public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-          outputFieldsDeclarer.declare(new Fields("channel", "product", "time", "uuid", "sywrID"));
+          outputFieldsDeclarer.declare(new Fields("channel","product","searchTerm","signalTime","source","taxonomy","type","uuid"));
           //"515 Sandstone Trce","Prattville","autauga-county","AL","36066","1","3\/27\/2013","4","3","2980","0.440","249000"
       }
 
