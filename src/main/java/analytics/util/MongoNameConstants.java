@@ -156,5 +156,11 @@ public class MongoNameConstants {
      public static final String MODELID = "modelId";
      public static final String FACTOR = "factor";
      public static final String REGIONAL_STATE = "state";
+     
+     //Div Line Bu SubBu collection
+     public static final String DLBS_DIV = "d";
+     public static final String DLBS_LN = "l";
+     public static final String DLBS_BU = "bu_nm";
+     public static final String DLBS_SUB = "sub_bu_nm";
 
 }

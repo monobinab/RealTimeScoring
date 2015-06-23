@@ -3,9 +3,9 @@ package analytics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.bolt.ResponsysBolt;
 import analytics.bolt.POSPurchaseBolt;
 import analytics.bolt.UnknownResponsysBolt;
+import analytics.bolt.ResponsysBolt;
 import analytics.spout.ResponsysSpout;
 import analytics.util.AuthPropertiesReader;
 import analytics.util.Constants;
@@ -19,12 +19,12 @@ import backtype.storm.generated.AlreadyAliveException;
 import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.topology.TopologyBuilder;
 
-public class UnknownOccasionsTopology {
+public class POSPurchaseTopology {
 	private static final Logger LOGGER = LoggerFactory
-			.getLogger(UnknownOccasionsTopology.class);
+			.getLogger(POSPurchaseTopology.class);
 
 	public static void main(String[] args) throws Exception {
-		LOGGER.info("starting  unknownOccasions topology");
+		LOGGER.info("starting  POS Purchase topology");
 		if (!SystemUtility.setEnvironment(args)) {
 			System.out
 					.println("Please pass the environment variable argument- 'PROD' or 'QA' or 'LOCAL'");
@@ -32,14 +32,14 @@ public class UnknownOccasionsTopology {
 		} 
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 
-		topologyBuilder.setSpout("unknownOccSpout", new ResponsysSpout(
+		topologyBuilder.setSpout("posPurchaseSpout", new ResponsysSpout(
 				System.getProperty(MongoNameConstants.IS_PROD), AuthPropertiesReader.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
 						.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 1);
 
-		topologyBuilder.setBolt("responsysBolt", new UnknownResponsysBolt(System.getProperty(MongoNameConstants.IS_PROD)), 12).shuffleGrouping("unknownOccSpout");
+		topologyBuilder.setBolt("responsysBolt", new POSPurchaseBolt(System.getProperty(MongoNameConstants.IS_PROD)), 12).shuffleGrouping("posPurchaseSpout");
 
 			Config conf = new Config();
-			conf.put("metrics_topology", "unknownOccasions");
+			conf.put("metrics_topology", "posPurchase");
 			conf.registerMetricsConsumer(MetricsListener.class, System.getProperty(MongoNameConstants.IS_PROD), 3);
 			conf.setDebug(false);
 
@@ -59,7 +59,7 @@ public class UnknownOccasionsTopology {
 				conf.setDebug(false);
 				conf.setMaxTaskParallelism(3);
 				LocalCluster cluster = new LocalCluster();
-				cluster.submitTopology("unknownOccasions_topology", conf,
+				cluster.submitTopology("posPurchase_topology", conf,
 						topologyBuilder.createTopology());
 				try {
 					Thread.sleep(10000000);
