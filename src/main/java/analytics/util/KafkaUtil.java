@@ -3,6 +3,7 @@ package analytics.util;
 import java.util.Properties;
 
 import kafka.javaapi.producer.Producer;
+import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
 
 import org.apache.commons.configuration.ConfigurationException;
@@ -59,18 +60,20 @@ public class KafkaUtil {
 		}
 
 		return kafkaProperties;
+		
 	}
 
 	public static SpoutConfig getSpoutConfig(String environment, String topic)
 			throws ConfigurationException {
 
 		if (spoutConfig == null) {
-			getKafkaProperties(environment);
+			initiateKafkaProperties(environment);
 			BrokerHosts hosts = new ZkHosts(
 					kafkaProperties.getString(ZOOKEEPER));
 			String kafka_id = kafkaProperties.getString(KAFKA_ID);
 			spoutConfig = new SpoutConfig(hosts, topic, "", kafka_id);
 			spoutConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
+
 
 		}
 
@@ -78,7 +81,7 @@ public class KafkaUtil {
 
 	}
 
-	public static Producer getKafkaProducer() throws ConfigurationException {
+	private static Producer getKafkaProducer() throws ConfigurationException {
 
 		if (kafkaProperties != null) {
 			Properties properties = new Properties();
@@ -94,16 +97,32 @@ public class KafkaUtil {
 			throw new ConfigurationException("Kafka properties is not loaded");
 	}
 
-	public static void getKafkaProperties(String environment)
-			 {
+	public static void initiateKafkaProperties(String environment){
+
 		if (kafkaProperties == null) {
 			try {
 				loadKafkaProperties(environment);
 			} catch (ConfigurationException e) {
-				LOGGER.error("Unable to load Kafka Properties");
+				LOGGER.error("Error Loading Kafka properties " + e.getMessage());
 				e.printStackTrace();
 			}
 		}
+
 	}
+	
+	
+	
+	public static void sendKafkaMSGs(String message, String currentTopic) throws ConfigurationException {
+
+		Producer<String, String> producer = getKafkaProducer();
+		KeyedMessage<String, String> data = new KeyedMessage<String, String>(
+				currentTopic, "", message);
+		producer.send(data);
+		producer.close();
+
+	}
+	
+	
+	
 
 }

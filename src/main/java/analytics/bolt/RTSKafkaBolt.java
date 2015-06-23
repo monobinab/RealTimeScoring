@@ -5,9 +5,6 @@ package analytics.bolt;
 
 import java.util.Map;
 
-import kafka.javaapi.producer.Producer;
-import kafka.producer.KeyedMessage;
-
 import org.apache.commons.configuration.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,11 +30,11 @@ public class RTSKafkaBolt extends EnvironmentBolt {
 	public RTSKafkaBolt(String environment, String topic){
 		super(environment);
 		this.currentTopic = topic;
-		KafkaUtil.getKafkaProperties(environment);
+		KafkaUtil.initiateKafkaProperties(environment);
 	}
 
 	/*
-	 * -- Pass the message to be sent over Kafka as the value of "message" field
+	 * -- Pass the message to be sent over to Kafka as the value of "message" field
 	 */
 	@Override
 	public void execute(Tuple input) {
@@ -47,7 +44,7 @@ public class RTSKafkaBolt extends EnvironmentBolt {
 			if (message != null && !"".equals(message)) {
 				try {
 					
-						sendKafkaMSGs(message);
+					KafkaUtil.sendKafkaMSGs(message, currentTopic);
 					
 				} catch (ConfigurationException e) {
 					LOGGER.error(e.getMessage(), e);
@@ -61,20 +58,12 @@ public class RTSKafkaBolt extends EnvironmentBolt {
 			LOGGER.error("Kafka message is missing in the input Tuple");
 			outputCollector.fail(input);
 		}
-		// Else throw an exception
+
 
 		outputCollector.ack(input);
 	}
 
-	private void sendKafkaMSGs(String message) throws ConfigurationException {
 
-		Producer<String, String> producer = KafkaUtil.getKafkaProducer();
-		KeyedMessage<String, String> data = new KeyedMessage<String, String>(
-				currentTopic, "", message);
-		producer.send(data);
-		producer.close();
-
-	}
 
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
