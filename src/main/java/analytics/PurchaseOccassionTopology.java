@@ -3,12 +3,15 @@ package analytics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import storm.kafka.KafkaSpout;
 import analytics.bolt.ParsingBoltOccassion;
 import analytics.bolt.PersistOccasionBolt;
+import analytics.bolt.RTSInterceptorBolt;
 import analytics.bolt.ResponseBolt;
 import analytics.spout.OccassionRedisSpout;
 import analytics.util.AuthPropertiesReader;
 import analytics.util.Constants;
+import analytics.util.KafkaUtil;
 import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
 import analytics.util.SystemUtility;
@@ -43,6 +46,18 @@ public class PurchaseOccassionTopology {
 					"occassionSpout3",
 					new OccassionRedisSpout(2, topic, System
 							.getProperty(MongoNameConstants.IS_PROD)), 1);
+			
+			//Newly added code for adding kafka to the topology
+			String kafkaTopic="stormtopic";
+			topologyBuilder.setSpout(
+					"KafkaSpout",
+					new KafkaSpout(KafkaUtil.getSpoutConfig(
+							
+							System.getProperty(MongoNameConstants.IS_PROD),
+							kafkaTopic)), 1);
+
+			topologyBuilder.setBolt("RTSInterceptorBolt", new RTSInterceptorBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1)
+			.shuffleGrouping("KafkaSpout");			
 
 			/*topologyBuilder.setBolt("parseOccassionBolt", new ParsingBoltOccassion(
 					System.getProperty(MongoNameConstants.IS_PROD)),1)
@@ -53,7 +68,7 @@ public class PurchaseOccassionTopology {
 			topologyBuilder.setBolt("parseOccassionBolt", new ParsingBoltOccassion(System.getProperty(MongoNameConstants.IS_PROD),
 					AuthPropertiesReader.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
 					.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 3)
-			.shuffleGrouping("occassionSpout1").shuffleGrouping("occassionSpout2").shuffleGrouping("occassionSpout3");
+			.shuffleGrouping("occassionSpout1").shuffleGrouping("occassionSpout2").shuffleGrouping("occassionSpout3").shuffleGrouping("RTSInterceptorBolt");
 
 			
 			topologyBuilder.setBolt(

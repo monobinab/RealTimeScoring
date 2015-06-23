@@ -43,7 +43,7 @@ public class RedisPubSubSpout extends BaseRichSpout {
         //JedisPool pool;
         String pattern;
 
-        public ListenerThread(LinkedBlockingQueue<String> queue, JedisPool pool, String pattern) {
+        public ListenerThread(LinkedBlockingQueue<String> queue, String pattern) {
             this.queue = queue;
             //this.pool = pool;
             this.pattern = pattern;
@@ -88,7 +88,7 @@ public class RedisPubSubSpout extends BaseRichSpout {
                 }
             };
 
-            Jedis jedis = new Jedis(redisServers[number], 6379, 172800);
+            Jedis jedis = new Jedis(redisServers[number], 6379, 604800);
 			jedis.connect();
 
             //Jedis jedis = pool.getResource();
@@ -109,7 +109,8 @@ public class RedisPubSubSpout extends BaseRichSpout {
         redisServers = RedisConnection.getServers(environment);
         //pool = new JedisPool(new JedisPoolConfig(), redisServers[number], 6379);
         System.out.println(redisServers[number]);
-        ListenerThread listener = new ListenerThread(queue, pool, pattern);
+        //ListenerThread listener = new ListenerThread(queue, pool, pattern);
+        ListenerThread listener = new ListenerThread(queue, pattern);
         listener.start();
     }
 

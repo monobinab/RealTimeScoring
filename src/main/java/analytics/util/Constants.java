@@ -50,4 +50,8 @@ public class Constants {
 	public static final String VIBES_URL = "vibesWebserviceURL";
 	
 	public static final String MSM_SCORE = "MSM_SCORE";
+	
+	//topology names
+	public static final String UNKNOWN_OCCASION = "unknownOccasions";
+	public static final String POS_PURCHASE = "posPurchase";
 }

@@ -15,6 +15,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import redis.clients.jedis.Jedis;
+import scala.collection.mutable.StringBuilder;
 import analytics.util.JsonUtils;
 import analytics.util.SecurityUtils;
 import analytics.util.XMLParser;
@@ -50,11 +52,20 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
 	private Map<String, List<String>> divLnVariablesMap;
 	private Map<String, List<String>> divCatVariablesMap;
 	private String requestorID = "";
+	private String host;
+	private int port;
 		
-	 public TellurideParsingBoltPOS(String systemProperty){
+	public TellurideParsingBoltPOS(String systemProperty){
 		 super(systemProperty);
 		
-	 }
+	}
+	 
+	public TellurideParsingBoltPOS(String systemProperty, String host, int port) {
+			super(systemProperty);
+			this.host = host;
+			this.port = port;
+	}
+	
 	public void setOutputCollector(OutputCollector outputCollector) {
 		this.outputCollector = outputCollector;
 	}
@@ -95,6 +106,9 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
 	 */
 	@Override
 	public void execute(Tuple input) {
+		
+		Jedis jedis = null;
+		
 		if(LOGGER.isDebugEnabled())
 			LOGGER.debug("The time it enters inside Telluride parsing bolt execute method"+System.currentTimeMillis()+" and the message ID is ..."+input.getMessageId());
 		//countMetric.scope("incoming_tuples").incr();
@@ -194,6 +208,8 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
 					lineItems_toString = lineItems.toString();
 				LOGGER.trace("Line Items are .."+ lineItems_toString);
 			}
+			StringBuilder divLineBuff = new StringBuilder();
+			
 			if (lineItems != null && lineItems.size() != 0) {
 				for (LineItem lineItem : lineItems) {
 
@@ -278,6 +294,11 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
 								/*logger.info("Line is null");*/
 								continue;
 							}
+							//Adding the div line info to the buffer to be used by Responsys Bolts to
+							//send an RTS_Purchase e-mail to the Customer
+
+							divLineBuff.append(div+line+"~");
+							
 							//logger.info("Line is ...." + line);
 							TransactionLineItem transactionLineItem = null; 
 							transactionLineItem = new TransactionLineItem(
@@ -327,6 +348,7 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
 					}
 				}
 			}
+			
 			if (lineItemList != null && !lineItemList.isEmpty()) {
 
 				// 8) FOR EACH LINE ITEM FIND ASSOCIATED VARIABLES BY DIVISION
@@ -376,6 +398,17 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
 				outputCollector.ack(input);
 				return;
 			}
+			
+			//Adding the Div Line information to Redis to send RTS_purchase e-mail
+			if(divLineBuff!=null && divLineBuff.toString().length()>0){
+				//persisting the loyalty id and div lines to redis for sending RTS_Purchase e-mails to customers 
+				
+					jedis = new Jedis(host, port, 1800);
+					jedis.connect();
+					jedis.set("Pos:"+lyl_id_no,divLineBuff.toString());
+					jedis.disconnect();
+			}
+			
 		}
 		else{
 			//countMetric.scope("empty_xml").incr();

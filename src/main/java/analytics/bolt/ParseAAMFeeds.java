@@ -104,6 +104,7 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 	        	listToEmit.add(l_id);
 	        	listToEmit.add(variableValueJSON);
 	        	listToEmit.add(sourceTopic);
+	        	listToEmit.add(loyalty_id);
 	        	this.outputCollector.emit(listToEmit);
 	        	//countMetric.scope("processed_lid").incr();
 	        	redisCountIncr("processed_lid");
@@ -139,7 +140,7 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("l_id","lineItemAsJsonString","source"));
+		declarer.declare(new Fields("l_id","lineItemAsJsonString","source","lyl_id_no"));
 	}
 	
 	

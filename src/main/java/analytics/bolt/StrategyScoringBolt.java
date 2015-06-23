@@ -89,9 +89,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		// 1) PULL OUT HASHED LOYALTY ID FROM THE FIRST RECORD IN lineItemList
 		redisCountIncr("incoming_tuples");
 		String lId = input.getStringByField("l_id");
-		
-		
-		
+
 		String source = input.getStringByField("source");
 		String lyl_id_no = "";
 		try{
@@ -102,9 +100,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		if (input.contains("messageID")) {
 			messageID = input.getStringByField("messageID");
 		}
-		
-		//long timeTaken = System.currentTimeMillis();
-		
+
 		LOGGER.debug("TIME:" + messageID + "-Entering scoring bolt-" + System.currentTimeMillis());
 		// 2) Create map of new changes from the input
 		Map<String, String> newChangesVarValueMap = JsonUtils
@@ -112,10 +108,6 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 
 		// 3) Find all models affected by the changes
 		Set<Integer> modelIdList = scoringSingleton.getModelIdList(newChangesVarValueMap);
-		
-		//filter the models which needs to be scored
-		scoringSingleton.filterScoringModelIdList(modelIdList);
-		
 		if(modelIdList==null||modelIdList.isEmpty()){
 			LOGGER.info("No models affected for " +lyl_id_no);
 			redisCountIncr("no_models_affected");
@@ -184,7 +176,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			newScore = scoringSingleton.calcBoosterScore(boosterMemberVarMap, modelId, newScore);
 			if(newScore > 1.0)
 				newScore = 1.0;
-						
+
 			// 9) Emit the new score
 			Map<String, Date> minMaxMap = scoringSingleton.getMinMaxExpiry(modelId, allChanges);
 			modelIdToExpiryMap.put(modelId, minMaxMap);
@@ -224,13 +216,6 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			}
 		}
 		
-		/*if (System.currentTimeMillis()-timeTaken > 50){
-			LOGGER.info("Time taken for scoring " + lId + " " + (System.currentTimeMillis()-timeTaken) + " " + messageID);
-		}*/
-		//LOGGER.info("newScore for lid " + lId + " "+ modelIdScoreMap + " from " + topologyName );
-		
-		//timeTaken = System.currentTimeMillis();
-		
 		//Persisting to Redis to be retrieved quicker than getting from Mongo.
 		//Perform the below operation only when the Redis is configured
 		//Long timeBefore = System.currentTimeMillis();
@@ -246,24 +231,14 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			//jedisPool.returnResource(jedis);
 			
 		}
-		/*if (System.currentTimeMillis()-timeTaken > 50){
-			LOGGER.info("Time taken to update redis for TI_POS " + lId + " " + (System.currentTimeMillis()-timeTaken) + " " + messageID);
-		}
-		
-		timeTaken = System.currentTimeMillis();*/
+				
 		// 10) Write changedMemberVariableswith expiry
     	scoringSingleton.updateChangedVariables(lId, allChanges);
-    	
-    	LOGGER.debug("TIME:" + messageID + "-Score updates complete-" + System.currentTimeMillis());
-			
+		LOGGER.debug("TIME:" + messageID + "-Score updates complete-" + System.currentTimeMillis());
+	
 		scoringSingleton.updateChangedMemberScore(lId, modelIdList, modelIdToExpiryMap, modelIdScoreMap,source);
 		
-		/*if (System.currentTimeMillis()-timeTaken > 50){
-			LOGGER.info("Time taken for updating " + lId + " " + (System.currentTimeMillis() -timeTaken) + " " + messageID);
-		}*/
 		LOGGER.debug("TIME:" + messageID + "- Scoring complete-" + System.currentTimeMillis());
-		
-		//timeTaken = System.currentTimeMillis();
 		
 		//persisting the loyalty id to redis for UnknownOccasionsTopology to pick up the loyalty id
 		if(respHost != null){
@@ -273,9 +248,12 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			jedis.disconnect();
 		}
 		
-		/*if (System.currentTimeMillis()-timeTaken > 50){
-			LOGGER.info("Time taken to upate redis for unknownOccasions " + (System.currentTimeMillis() - timeTaken) + " " + messageID);
-		}*/
+		//Adding logic to set up a Stream that the KafkaBolt can listen to...
+		List<Object> listToEmit = new ArrayList<Object>();
+		listToEmit.add(lyl_id_no+"~"+topologyName);
+		this.outputCollector.emit("kafka_stream", listToEmit);
+		
+
 		/*List<Object> listToEmit = new ArrayList<Object>();
 		//member_stream is commented as MemberPublish bolt to redis is not in use now
 		listToEmit.add(lId);
@@ -283,17 +261,18 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		listToEmit.add(messageID);
 		this.outputCollector.emit("member_stream", listToEmit);*/
 		redisCountIncr("member_scored_successfully");
-		if(lyl_id_no!=null){
-			List<Object> listToEmit = new ArrayList<Object>();
+		/*if(lyl_id_no!=null){
+			listToEmit = new ArrayList<Object>();
 			listToEmit.add(lyl_id_no);
 			listToEmit.add(messageID);
 			this.outputCollector.emit("response_stream", listToEmit);//response_stream_unknown
-		}
+		}*/
 		
 		this.outputCollector.ack(input);
 		}catch(Exception e){
-			//e.printStackTrace();
-			LOGGER.error("Exception scoring lId " + lId +" " + e );
+			e.printStackTrace();
+			LOGGER.info("Exception scoring lId " +lId );
+
 		}finally{
 			if(jedis!=null)
 				jedis.disconnect();
@@ -305,6 +284,8 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		declarer.declareStream("score_stream",new Fields("l_id", "newScore", "model","source", "messageID", "minExpiry", "maxExpiry"));
 	//	declarer.declareStream("member_stream", new Fields("l_id", "source","messageID"));
 		declarer.declareStream("response_stream", new Fields("lyl_id_no","messageID"));
+		declarer.declareStream("kafka_stream", new Fields("message"));
+		
 	}
 
 }
