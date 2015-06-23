@@ -296,7 +296,8 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
 							}
 							//Adding the div line info to the buffer to be used by Responsys Bolts to
 							//send an RTS_Purchase e-mail to the Customer
-							divLineBuff.append(div+","+line+"~");
+
+							divLineBuff.append(div+line+"~");
 							
 							//logger.info("Line is ...." + line);
 							TransactionLineItem transactionLineItem = null; 
@@ -348,17 +349,6 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
 				}
 			}
 			
-			//Adding the Div Line information to Redis to send RTS_purchase e-mail
-			if(divLineBuff!=null && divLineBuff.toString().length()>0){
-				//persisting the loyalty id and div lines to redis for sending RTS_Purchase e-mails to customers 
-				
-					jedis = new Jedis(host, port, 1800);
-					jedis.connect();
-					jedis.set("Pos:"+lyl_id_no,divLineBuff.toString());
-					jedis.disconnect();
-			}
-			
-			
 			if (lineItemList != null && !lineItemList.isEmpty()) {
 
 				// 8) FOR EACH LINE ITEM FIND ASSOCIATED VARIABLES BY DIVISION
@@ -408,6 +398,17 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
 				outputCollector.ack(input);
 				return;
 			}
+			
+			//Adding the Div Line information to Redis to send RTS_purchase e-mail
+			if(divLineBuff!=null && divLineBuff.toString().length()>0){
+				//persisting the loyalty id and div lines to redis for sending RTS_Purchase e-mails to customers 
+				
+					jedis = new Jedis(host, port, 1800);
+					jedis.connect();
+					jedis.set("Pos:"+lyl_id_no,divLineBuff.toString());
+					jedis.disconnect();
+			}
+			
 		}
 		else{
 			//countMetric.scope("empty_xml").incr();

@@ -1,16 +1,20 @@
 import storm
-import requests
-import json
-import ast
-
+import logging
 
 class SignalSpoutBase(storm.Spout):
-	y = requests.get('http://semantictec.com/message/consume?topic=user.activities.signal&size=100&consumerGroup=analytics&timeout=10')
-	def process(self):
-		for element in json.loads(self.y.content):
-			try:
-				values = ast.literal_eval(element['value'])
-				storm.emit([values['channel'],values['products'],values['signalTime'],values['user']['sywrId'],values['user']['uuid']])
-			except:
-				pass
-		
+	data = []
+
+	def initialize(self, conf, context):
+		y = 'http://semantictec.com/message/consume?topic=user.activities.signal&size=100&consumerGroup=analytics&timeout=10'
+		for element in range(100):
+			self.data.append(y)
+        	
+	def next_tuple(self):
+		for url in self.data:
+			storm.emit([url])
+
+	def ack(self, tup_id):
+		pass  # if a tuple is processed properly, do nothing
+
+	def fail(self, tup_id):
+		pass  # if a tuple fails to process, do nothing

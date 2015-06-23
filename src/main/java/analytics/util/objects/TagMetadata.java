@@ -12,7 +12,22 @@ public class TagMetadata implements Serializable {
 	private String first5CharMdTag;
 	private Double percentile;
 	private String emailOptIn;
+	private String divLine;
 	
+
+	/**
+	 * @return the divLine
+	 */
+	public String getDivLine() {
+		return divLine;
+	}
+
+	/**
+	 * @param divLine the divLine to set
+	 */
+	public void setDivLine(String divLine) {
+		this.divLine = divLine;
+	}
 
 	public Double getPercentile() {
 		return percentile;

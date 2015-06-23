@@ -1,3 +1,4 @@
+
 package analytics.util;
 
 
@@ -16,3 +17,4 @@ public interface TopicConstants {
 	public static final String AAM_BROWSE_KAFKA_TOPIC = "test2";
 	public static final String AAM_INT_SEARCH_KAFKA_TOPIC = "test2";
 }
+

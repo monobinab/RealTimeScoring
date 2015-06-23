@@ -6,6 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,16 +21,15 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.joda.time.LocalDate;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import analytics.exception.RealTimeScoringException;
-import analytics.util.objects.Boost;
 import analytics.util.objects.BoosterModel;
 import analytics.util.objects.Change;
 import analytics.util.objects.Model;
 import analytics.util.objects.Variable;
 
+import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -1383,8 +1383,7 @@ public class ScoringSingletonIntegrationTest {
 			Map<String, Object> memberVariablesMap = scoringSingletonObj.createMemberVariableValueMap(l_id, modelIdsList);
 			Map<String, Change> changedMemberVariablesMap = scoringSingletonObj.createChangedVariablesMap(l_id);
 			Map<String, Change> changedMemVariablesStrategy = scoringSingletonObj.executeStrategy(changedMemberVariablesMap, newChangesVarValueMap, memberVariablesMap);
-			List<Double> newScoreListActual = new LinkedList<Double>();
-
+		
 			//data preparation for booster models
 			Set<Integer> boosterModelIdContents = new HashSet<Integer>();
 			boosterModelIdContents.add(35);
@@ -1435,6 +1434,325 @@ public class ScoringSingletonIntegrationTest {
 			modelsMap.setAccessible(false);
 			variableNameToVidMap.setAccessible(false);
 			regionalFactorsMap.setAccessible(false);
+		}
+			
+		@Test
+		public void executeScoringSingletonBasicWithMonthModelsFilteredTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, RealTimeScoringException, ConfigurationException, ParseException{
+			
+			String l_id = "SearsTesting22";
+			//Fake memberVariables collection
+			DBCollection memVarColl = db.getCollection("memberVariables");
+			memVarColl.insert(new BasicDBObject("l_id", l_id).append("2269", 1).append("2270",0.4));
+
+			//fake changedMemberVariables Collection
+			DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
+			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			Change expected = new Change("2269", 12,
+					simpleDateFormat.parse("2999-09-23"),
+					simpleDateFormat.parse("2014-09-01"));
+			Change expected2 = new Change("2270", 1,
+					simpleDateFormat.parse("2999-09-23"),
+					simpleDateFormat.parse("2014-09-01"));
+			changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
+					"2269",
+					new BasicDBObject("v", expected.getValue()).append("e",
+							expected.getExpirationDateAsString()).append("f",
+							expected.getEffectiveDateAsString())).append(
+									"2270",
+									new BasicDBObject("v", expected2.getValue()).append("e",
+											expected2.getExpirationDateAsString()).append("f",
+											expected2.getEffectiveDateAsString())));
+						
+			Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
+			newChangesVarValueMap.put("S_DSL_APP_INT_ACC", "0.001");
+			newChangesVarValueMap.put("S_DSL_APP_INT_ACC2", "0.001");
+			newChangesVarValueMap.put("S_DSL_APP_INT_ACC3", "0.001");
+			newChangesVarValueMap.put("S_DSL_APP_INT_ACC4", "0.001");
+			List<Integer> modelLists = new ArrayList<Integer>();
+			modelLists.add(48);
+			List<Integer> modelLists2 = new ArrayList<Integer>();
+			modelLists2.add(35);
+			List<Integer> modelLists3 = new ArrayList<Integer>();
+			modelLists3.add(36);
+			List<Integer> modelLists4 = new ArrayList<Integer>();
+			modelLists4.add(39);
+			modelLists4.add(35);
+				
+			Map<String, List<Integer>> variableModelsMapContentMap = new HashMap<String, List<Integer>>();
+			variableModelsMapContentMap.put("S_DSL_APP_INT_ACC", modelLists);
+			variableModelsMapContentMap.put("S_DSL_APP_INT_ACC2", modelLists2);
+			variableModelsMapContentMap.put("S_DSL_APP_INT_ACC3", modelLists3);
+			variableModelsMapContentMap.put("S_DSL_APP_INT_ACC4", modelLists4);
+			Field variableModelsMap = ScoringSingleton.class
+					.getDeclaredField("variableModelsMap");
+			variableModelsMap.setAccessible(true);
+			variableModelsMap.set(scoringSingletonObj, variableModelsMapContentMap);
+		
+			Map<String, Variable> variablesMap = new HashMap<String, Variable>();
+			variablesMap.put("S_DSL_APP_INT_ACC", new Variable("S_DSL_APP_INT_ACC",0.015));
+			Map<String, Variable> variablesMap2 = new HashMap<String, Variable>();
+			variablesMap2.put("S_DSL_APP_INT_ACC2", new Variable("S_DSL_APP_INT_ACC2",0.05));
+			Map<String, Variable> variablesMap3 = new HashMap<String, Variable>();
+			variablesMap3.put("S_DSL_APP_INT_ACC3", new Variable("S_DSL_APP_INT_ACC3",0.05));
+			Map<String, Variable> variablesMap4 = new HashMap<String, Variable>();
+			variablesMap4.put("S_DSL_APP_INT_ACC4", new Variable("S_DSL_APP_INT_ACC4",0.05));
+			Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
+			monthModelMap.put(0, new Model(48, "Model_Name", 0, 5, variablesMap));
+			Map<Integer, Model> monthModelMap2 = new HashMap<Integer, Model>();
+			monthModelMap2.put(Calendar.getInstance().get(Calendar.MONTH) + 1, new Model(35, "Model_Name2", Calendar.getInstance().get(Calendar.MONTH) + 1, 5, variablesMap2));
+			Map<Integer, Model> monthModelMap3 = new HashMap<Integer, Model>();
+			monthModelMap3.put(13, new Model(36, "Model_Name3", 13, 5, variablesMap3));
+			Map<Integer, Model> monthModelMap4 = new HashMap<Integer, Model>();
+			monthModelMap4.put(0, new Model(39, "Model_Name4", 0, 5, variablesMap4));
+			Map<Integer, Map<Integer, Model>> modelsContentMap = new HashMap<Integer, Map<Integer, Model>>();
+			modelsContentMap.put(48, monthModelMap);
+			modelsContentMap.put(35, monthModelMap2);
+			modelsContentMap.put(36, monthModelMap3);
+			modelsContentMap.put(39, monthModelMap4);
+			Field modelsMap = ScoringSingleton.class
+					.getDeclaredField("modelsMap");
+			modelsMap.setAccessible(true);
+			modelsMap.set(scoringSingletonObj,modelsContentMap);
+		
+			Set<Integer> modelIdsList = scoringSingletonObj.getModelIdList(newChangesVarValueMap);
+			scoringSingletonObj.filterScoringModelIdList(modelIdsList);
+		
+			Set<Integer> expectedModelIdList = new HashSet<Integer>() {
+				private static final long serialVersionUID = 1L;
+
+			{
+				  add(48); add(35); add(39);
+				}};
+				
+			Assert.assertEquals(expectedModelIdList, modelIdsList);
+			memVarColl.remove(new BasicDBObject("l_id", l_id));
+			changedMemberVar.remove(new BasicDBObject("l_id", l_id));
+			variableModelsMap.setAccessible(false);
+			modelsMap.setAccessible(false);
+		
+		}
+	
+		
+		@Test
+		public void executeScoringSingletonBasicWithMonthModelsFilteredScoringTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, RealTimeScoringException, ConfigurationException, ParseException{
+			
+			String l_id = "SearsTesting20";
+			//Fake memberVariables collection
+			DBCollection memVarColl = db.getCollection("memberVariables");
+			memVarColl.insert(new BasicDBObject("l_id", l_id).append("2269", 1).append("2270",0.4));
+
+			//fake changedMemberVariables Collection
+			DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
+			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			Change expected = new Change("2269", 12,
+					simpleDateFormat.parse("2999-09-23"),
+					simpleDateFormat.parse("2014-09-01"));
+			Change expected2 = new Change("2270", 1,
+					simpleDateFormat.parse("2999-09-23"),
+					simpleDateFormat.parse("2014-09-01"));
+			changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
+					"2269",
+					new BasicDBObject("v", expected.getValue()).append("e",
+							expected.getExpirationDateAsString()).append("f",
+							expected.getEffectiveDateAsString())).append(
+									"2270",
+									new BasicDBObject("v", expected2.getValue()).append("e",
+											expected2.getExpirationDateAsString()).append("f",
+											expected2.getEffectiveDateAsString())));
+						
+			Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
+			newChangesVarValueMap.put("S_DSL_APP_INT_ACC", "0.001");
+			newChangesVarValueMap.put("S_DSL_APP_INT_ACC2", "0.001");
+			List<Integer> modelLists = new ArrayList<Integer>();
+			modelLists.add(48);
+			List<Integer> modelLists2 = new ArrayList<Integer>();
+			modelLists2.add(35);
+				
+			Map<String, List<Integer>> variableModelsMapContentMap = new HashMap<String, List<Integer>>();
+			variableModelsMapContentMap.put("S_DSL_APP_INT_ACC", modelLists);
+			variableModelsMapContentMap.put("S_DSL_APP_INT_ACC2", modelLists2);
+			Field variableModelsMap = ScoringSingleton.class
+					.getDeclaredField("variableModelsMap");
+			variableModelsMap.setAccessible(true);
+			variableModelsMap.set(scoringSingletonObj, variableModelsMapContentMap);
+		
+			Map<String, Variable> variablesMap = new HashMap<String, Variable>();
+			variablesMap.put("S_DSL_APP_INT_ACC", new Variable("S_DSL_APP_INT_ACC",0.015));
+			Map<String, Variable> variablesMap2 = new HashMap<String, Variable>();
+			variablesMap2.put("S_DSL_APP_INT_ACC2", new Variable("S_DSL_APP_INT_ACC2",0.05));
+			Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
+			monthModelMap.put(0, new Model(48, "Model_Name", 0, 5, variablesMap));
+			Map<Integer, Model> monthModelMap2 = new HashMap<Integer, Model>();
+			monthModelMap2.put(Calendar.getInstance().get(Calendar.MONTH) + 1, new Model(35, "Model_Name2", Calendar.getInstance().get(Calendar.MONTH) + 1, 5, variablesMap2));
+			Map<Integer, Map<Integer, Model>> modelsContentMap = new HashMap<Integer, Map<Integer, Model>>();
+			modelsContentMap.put(48, monthModelMap);
+			modelsContentMap.put(35, monthModelMap2);
+			Field modelsMap = ScoringSingleton.class
+					.getDeclaredField("modelsMap");
+			modelsMap.setAccessible(true);
+			modelsMap.set(scoringSingletonObj,modelsContentMap);
+			
+			Map<String, String> variableNameToVidMapContentsMap = new HashMap<String, String>() ;
+			variableNameToVidMapContentsMap.put("S_DSL_APP_INT_ACC", "2269");
+			variableNameToVidMapContentsMap.put("S_DSL_APP_INT_ACC2", "2270");
+			Field variableNameToVidMap = ScoringSingleton.class
+					.getDeclaredField("variableNameToVidMap");
+			variableNameToVidMap.setAccessible(true);
+			variableNameToVidMap.set(scoringSingletonObj,variableNameToVidMapContentsMap);
+			
+			Map<String, String> variableVidToNameMapContentsMap = new HashMap<String, String>() ;
+			variableVidToNameMapContentsMap.put("2269","S_DSL_APP_INT_ACC");
+			variableVidToNameMapContentsMap.put("2270","S_DSL_APP_INT_ACC2");
+			Field variableVidToNameMap = ScoringSingleton.class
+					.getDeclaredField("variableVidToNameMap");
+			variableVidToNameMap.setAccessible(true);
+			variableVidToNameMap.set(scoringSingletonObj, variableVidToNameMapContentsMap);
+			
+			Map<String, String> variableNameToStrategyMapContentsMap = new HashMap<String, String>();
+			variableNameToStrategyMapContentsMap.put("S_DSL_APP_INT_ACC", "StrategyDaysSinceLast");
+			variableNameToStrategyMapContentsMap.put("S_DSL_APP_INT_ACC2", "StrategySumSales");
+			Field variableNameToStrategyMap = ScoringSingleton.class
+					.getDeclaredField("variableNameToStrategyMap");
+			variableNameToStrategyMap.setAccessible(true);
+			variableNameToStrategyMap.set(scoringSingletonObj, variableNameToStrategyMapContentsMap);
+			
+			Set<Integer> modelIdsList = scoringSingletonObj.getModelIdList(newChangesVarValueMap);
+			scoringSingletonObj.filterScoringModelIdList(modelIdsList);
+			
+			Map<String, Object> memberVariablesMap = scoringSingletonObj.createMemberVariableValueMap(l_id, modelIdsList);
+			Map<String, Change> changedMemberVariablesMap = scoringSingletonObj.createChangedVariablesMap(l_id);
+			Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(changedMemberVariablesMap, newChangesVarValueMap, memberVariablesMap);
+			List<Double> newScoreListActual = new LinkedList<Double>();
+			for(int modelId:modelIdsList){
+				double score = scoringSingletonObj.calcScore(memberVariablesMap, allChangesMap, modelId);
+				newScoreListActual.add(score);
+			}
+			List<Double> newScoreListExpected = new LinkedList<Double>();
+			newScoreListExpected.add(0.99330748147035);
+			newScoreListExpected.add(0.9934061356083235);
+			
+			int compare = new Double(newScoreListExpected.get(0)).compareTo(new Double(newScoreListActual.get(0)));
+			int compare2 = new Double(newScoreListExpected.get(1)).compareTo(new Double(newScoreListActual.get(1)));
+		
+			Assert.assertEquals(compare, 0);
+			Assert.assertEquals(compare2, 0);
+			
+			memVarColl.remove(new BasicDBObject("l_id", l_id));
+			changedMemberVar.remove(new BasicDBObject("l_id", l_id));
+			variableModelsMap.setAccessible(false);
+			modelsMap.setAccessible(false);
+			variableNameToVidMap.setAccessible(false);
+			variableNameToStrategyMap.setAccessible(false);
+		}
+		
+		//In this test, month of modelId 35 is taken as 13 so that this test case will not fail anytime
+		@Test
+		public void executeScoringSingletonBasicWithMonthModelsFilteredScoringTest2() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, RealTimeScoringException, ConfigurationException, ParseException{
+			
+			String l_id = "SearsTesting21";
+			//Fake memberVariables collection
+			DBCollection memVarColl = db.getCollection("memberVariables");
+			memVarColl.insert(new BasicDBObject("l_id", l_id).append("2269", 1).append("2270",0.4));
+
+			//fake changedMemberVariables Collection
+			DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
+			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			Change expected = new Change("2269", 12,
+					simpleDateFormat.parse("2999-09-23"),
+					simpleDateFormat.parse("2014-09-01"));
+			Change expected2 = new Change("2270", 1,
+					simpleDateFormat.parse("2999-09-23"),
+					simpleDateFormat.parse("2014-09-01"));
+			changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
+					"2269",
+					new BasicDBObject("v", expected.getValue()).append("e",
+							expected.getExpirationDateAsString()).append("f",
+							expected.getEffectiveDateAsString())).append(
+									"2270",
+									new BasicDBObject("v", expected2.getValue()).append("e",
+											expected2.getExpirationDateAsString()).append("f",
+											expected2.getEffectiveDateAsString())));
+						
+			Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
+			newChangesVarValueMap.put("S_DSL_APP_INT_ACC", "0.001");
+			newChangesVarValueMap.put("S_DSL_APP_INT_ACC2", "0.001");
+			List<Integer> modelLists = new ArrayList<Integer>();
+			modelLists.add(48);
+			List<Integer> modelLists2 = new ArrayList<Integer>();
+			modelLists2.add(35);
+				
+			Map<String, List<Integer>> variableModelsMapContentMap = new HashMap<String, List<Integer>>();
+			variableModelsMapContentMap.put("S_DSL_APP_INT_ACC", modelLists);
+			variableModelsMapContentMap.put("S_DSL_APP_INT_ACC2", modelLists2);
+			Field variableModelsMap = ScoringSingleton.class
+					.getDeclaredField("variableModelsMap");
+			variableModelsMap.setAccessible(true);
+			variableModelsMap.set(scoringSingletonObj, variableModelsMapContentMap);
+		
+			Map<String, Variable> variablesMap = new HashMap<String, Variable>();
+			variablesMap.put("S_DSL_APP_INT_ACC", new Variable("S_DSL_APP_INT_ACC",0.015));
+			Map<String, Variable> variablesMap2 = new HashMap<String, Variable>();
+			variablesMap2.put("S_DSL_APP_INT_ACC2", new Variable("S_DSL_APP_INT_ACC2",0.05));
+			Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
+			monthModelMap.put(0, new Model(48, "Model_Name", 0, 5, variablesMap));
+			Map<Integer, Model> monthModelMap2 = new HashMap<Integer, Model>();
+			monthModelMap2.put(13, new Model(35, "Model_Name2", 13, 5, variablesMap2));
+			Map<Integer, Map<Integer, Model>> modelsContentMap = new HashMap<Integer, Map<Integer, Model>>();
+			modelsContentMap.put(48, monthModelMap);
+			modelsContentMap.put(35, monthModelMap2);
+			Field modelsMap = ScoringSingleton.class
+					.getDeclaredField("modelsMap");
+			modelsMap.setAccessible(true);
+			modelsMap.set(scoringSingletonObj,modelsContentMap);
+			
+			Map<String, String> variableNameToVidMapContentsMap = new HashMap<String, String>() ;
+			variableNameToVidMapContentsMap.put("S_DSL_APP_INT_ACC", "2269");
+			variableNameToVidMapContentsMap.put("S_DSL_APP_INT_ACC2", "2270");
+			Field variableNameToVidMap = ScoringSingleton.class
+					.getDeclaredField("variableNameToVidMap");
+			variableNameToVidMap.setAccessible(true);
+			variableNameToVidMap.set(scoringSingletonObj,variableNameToVidMapContentsMap);
+			
+			Map<String, String> variableVidToNameMapContentsMap = new HashMap<String, String>() ;
+			variableVidToNameMapContentsMap.put("2269","S_DSL_APP_INT_ACC");
+			variableVidToNameMapContentsMap.put("2270","S_DSL_APP_INT_ACC2");
+			Field variableVidToNameMap = ScoringSingleton.class
+					.getDeclaredField("variableVidToNameMap");
+			variableVidToNameMap.setAccessible(true);
+			variableVidToNameMap.set(scoringSingletonObj, variableVidToNameMapContentsMap);
+			
+			Map<String, String> variableNameToStrategyMapContentsMap = new HashMap<String, String>();
+			variableNameToStrategyMapContentsMap.put("S_DSL_APP_INT_ACC", "StrategyDaysSinceLast");
+			variableNameToStrategyMapContentsMap.put("S_DSL_APP_INT_ACC2", "StrategySumSales");
+			Field variableNameToStrategyMap = ScoringSingleton.class
+					.getDeclaredField("variableNameToStrategyMap");
+			variableNameToStrategyMap.setAccessible(true);
+			variableNameToStrategyMap.set(scoringSingletonObj, variableNameToStrategyMapContentsMap);
+			
+			Set<Integer> modelIdsList = scoringSingletonObj.getModelIdList(newChangesVarValueMap);
+			scoringSingletonObj.filterScoringModelIdList(modelIdsList);
+			
+			Map<String, Object> memberVariablesMap = scoringSingletonObj.createMemberVariableValueMap(l_id, modelIdsList);
+			Map<String, Change> changedMemberVariablesMap = scoringSingletonObj.createChangedVariablesMap(l_id);
+			Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(changedMemberVariablesMap, newChangesVarValueMap, memberVariablesMap);
+			List<Double> newScoreListActual = new LinkedList<Double>();
+			for(int modelId:modelIdsList){
+				double score = scoringSingletonObj.calcScore(memberVariablesMap, allChangesMap, modelId);
+				newScoreListActual.add(score);
+			}
+			List<Double> newScoreListExpected = new LinkedList<Double>();
+			newScoreListExpected.add(0.9934061356083235);
+			
+			int compare = new Double(newScoreListExpected.get(0)).compareTo(new Double(newScoreListActual.get(0)));
+		
+			Assert.assertEquals(0, compare);
+			
+			memVarColl.remove(new BasicDBObject("l_id", l_id));
+			changedMemberVar.remove(new BasicDBObject("l_id", l_id));
+			variableModelsMap.setAccessible(false);
+			modelsMap.setAccessible(false);
+			variableNameToVidMap.setAccessible(false);
+			variableNameToStrategyMap.setAccessible(false);
 		}
 }
 

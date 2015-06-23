@@ -89,6 +89,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		// 1) PULL OUT HASHED LOYALTY ID FROM THE FIRST RECORD IN lineItemList
 		redisCountIncr("incoming_tuples");
 		String lId = input.getStringByField("l_id");
+
 		String source = input.getStringByField("source");
 		String lyl_id_no = "";
 		try{
@@ -99,6 +100,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		if (input.contains("messageID")) {
 			messageID = input.getStringByField("messageID");
 		}
+
 		LOGGER.debug("TIME:" + messageID + "-Entering scoring bolt-" + System.currentTimeMillis());
 		// 2) Create map of new changes from the input
 		Map<String, String> newChangesVarValueMap = JsonUtils
@@ -174,8 +176,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			newScore = scoringSingleton.calcBoosterScore(boosterMemberVarMap, modelId, newScore);
 			if(newScore > 1.0)
 				newScore = 1.0;
-			LOGGER.info("newScore for lid " + lId + " "+ newScore + " from " + topologyName);
-			
+
 			// 9) Emit the new score
 			Map<String, Date> minMaxMap = scoringSingleton.getMinMaxExpiry(modelId, allChanges);
 			modelIdToExpiryMap.put(modelId, minMaxMap);
@@ -252,6 +253,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		listToEmit.add(lyl_id_no+"~"+topologyName);
 		this.outputCollector.emit("kafka_stream", listToEmit);
 		
+
 		/*List<Object> listToEmit = new ArrayList<Object>();
 		//member_stream is commented as MemberPublish bolt to redis is not in use now
 		listToEmit.add(lId);
@@ -270,6 +272,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		}catch(Exception e){
 			e.printStackTrace();
 			LOGGER.info("Exception scoring lId " +lId );
+
 		}finally{
 			if(jedis!=null)
 				jedis.disconnect();

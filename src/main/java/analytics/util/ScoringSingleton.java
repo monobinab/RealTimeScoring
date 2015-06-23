@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -141,12 +142,15 @@ public class ScoringSingleton {
 
 	// TODO: Replace this method. Its for backward compatibility. Bad coding
 	public HashMap<String, Double> execute(String loyaltyId, ArrayList<String> modelIdArrayList, String source) {
+		
 		Set<Integer> modelIdList = new HashSet<Integer>();
 		HashMap<String, Double> modelIdStringScoreMap =  new HashMap<String, Double>();
 		for (String model : modelIdArrayList) {
 			modelIdList.add(Integer.parseInt(model));
 		}
 		
+		//filter the models which needs to be scored
+		this.filterScoringModelIdList(modelIdList);
 		try{
 		// Contains a VID to object mapping, not var name
 		Map<String, Object> memberVariablesMap = this.createMemberVariableValueMap(loyaltyId, modelIdList);
@@ -362,6 +366,17 @@ public class ScoringSingleton {
 			}
 		}
 		return boosts;
+	}
+	
+	public void filterScoringModelIdList(Set<Integer> modelIdList){
+		
+		Iterator<Integer> itr = modelIdList.iterator();
+		while(itr.hasNext()){
+			Integer modelId = itr.next();
+			if (modelsMap.get(modelId) != null && ((!modelsMap.get(modelId).containsKey(0)) && (!modelsMap.get(modelId).containsKey(Calendar.getInstance().get(Calendar.MONTH) + 1)))) {
+				itr.remove();
+			}
+		}
 	}
 
 	private double calculateBoostValue(double boosts, int blackFlag, Change value, Boost boost) {
