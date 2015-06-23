@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.bolt.ResponsysUnknownCallsBolt;
-import analytics.spout.UnknownOccasionSpout;
+import analytics.spout.ResponsysSpout;
 import analytics.util.AuthPropertiesReader;
 import analytics.util.Constants;
 import analytics.util.MetricsListener;
@@ -30,7 +30,7 @@ public class UnknownOccasionsTopology {
 		} 
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 
-		topologyBuilder.setSpout("unknownOccSpout", new UnknownOccasionSpout(
+		topologyBuilder.setSpout("unknownOccSpout", new ResponsysSpout(
 				System.getProperty(MongoNameConstants.IS_PROD), AuthPropertiesReader.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
 						.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 1);
 
