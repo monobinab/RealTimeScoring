@@ -103,7 +103,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			messageID = input.getStringByField("messageID");
 		}
 		
-		long timeTaken = System.currentTimeMillis();
+		//long timeTaken = System.currentTimeMillis();
 		
 		LOGGER.debug("TIME:" + messageID + "-Entering scoring bolt-" + System.currentTimeMillis());
 		// 2) Create map of new changes from the input
@@ -224,12 +224,12 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			}
 		}
 		
-		if (System.currentTimeMillis()-timeTaken > 50){
+		/*if (System.currentTimeMillis()-timeTaken > 50){
 			LOGGER.info("Time taken for scoring " + lId + " " + (System.currentTimeMillis()-timeTaken) + " " + messageID);
-		}
+		}*/
 		//LOGGER.info("newScore for lid " + lId + " "+ modelIdScoreMap + " from " + topologyName );
 		
-		timeTaken = System.currentTimeMillis();
+		//timeTaken = System.currentTimeMillis();
 		
 		//Persisting to Redis to be retrieved quicker than getting from Mongo.
 		//Perform the below operation only when the Redis is configured
@@ -246,11 +246,11 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			//jedisPool.returnResource(jedis);
 			
 		}
-		if (System.currentTimeMillis()-timeTaken > 50){
+		/*if (System.currentTimeMillis()-timeTaken > 50){
 			LOGGER.info("Time taken to update redis for TI_POS " + lId + " " + (System.currentTimeMillis()-timeTaken) + " " + messageID);
 		}
 		
-		timeTaken = System.currentTimeMillis();
+		timeTaken = System.currentTimeMillis();*/
 		// 10) Write changedMemberVariableswith expiry
     	scoringSingleton.updateChangedVariables(lId, allChanges);
     	
@@ -258,12 +258,12 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			
 		scoringSingleton.updateChangedMemberScore(lId, modelIdList, modelIdToExpiryMap, modelIdScoreMap,source);
 		
-		if (System.currentTimeMillis()-timeTaken > 50){
+		/*if (System.currentTimeMillis()-timeTaken > 50){
 			LOGGER.info("Time taken for updating " + lId + " " + (System.currentTimeMillis() -timeTaken) + " " + messageID);
-		}
+		}*/
 		LOGGER.debug("TIME:" + messageID + "- Scoring complete-" + System.currentTimeMillis());
 		
-		timeTaken = System.currentTimeMillis();
+		//timeTaken = System.currentTimeMillis();
 		
 		//persisting the loyalty id to redis for UnknownOccasionsTopology to pick up the loyalty id
 		if(respHost != null){
@@ -273,9 +273,9 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			jedis.disconnect();
 		}
 		
-		if (System.currentTimeMillis()-timeTaken > 50){
+		/*if (System.currentTimeMillis()-timeTaken > 50){
 			LOGGER.info("Time taken to upate redis for unknownOccasions " + (System.currentTimeMillis() - timeTaken) + " " + messageID);
-		}
+		}*/
 		/*List<Object> listToEmit = new ArrayList<Object>();
 		//member_stream is commented as MemberPublish bolt to redis is not in use now
 		listToEmit.add(lId);
