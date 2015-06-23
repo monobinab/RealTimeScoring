@@ -247,6 +247,11 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			jedis.disconnect();
 		}
 		
+		//Adding logic to set up a Stream that the KafkaBolt can listen to...
+		List<Object> listToEmit = new ArrayList<Object>();
+		listToEmit.add(lyl_id_no+"~"+topologyName);
+		this.outputCollector.emit("kafka_stream", listToEmit);
+		
 		/*List<Object> listToEmit = new ArrayList<Object>();
 		//member_stream is commented as MemberPublish bolt to redis is not in use now
 		listToEmit.add(lId);
@@ -254,12 +259,12 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		listToEmit.add(messageID);
 		this.outputCollector.emit("member_stream", listToEmit);*/
 		redisCountIncr("member_scored_successfully");
-		if(lyl_id_no!=null){
-			List<Object> listToEmit = new ArrayList<Object>();
+		/*if(lyl_id_no!=null){
+			listToEmit = new ArrayList<Object>();
 			listToEmit.add(lyl_id_no);
 			listToEmit.add(messageID);
 			this.outputCollector.emit("response_stream", listToEmit);//response_stream_unknown
-		}
+		}*/
 		
 		this.outputCollector.ack(input);
 		}catch(Exception e){
@@ -276,6 +281,8 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		declarer.declareStream("score_stream",new Fields("l_id", "newScore", "model","source", "messageID", "minExpiry", "maxExpiry"));
 	//	declarer.declareStream("member_stream", new Fields("l_id", "source","messageID"));
 		declarer.declareStream("response_stream", new Fields("lyl_id_no","messageID"));
+		declarer.declareStream("kafka_stream", new Fields("message"));
+		
 	}
 
 }
