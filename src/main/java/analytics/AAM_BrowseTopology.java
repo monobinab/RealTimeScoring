@@ -34,8 +34,7 @@ public class AAM_BrowseTopology {
 		} 
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 
-		//String topic = TopicConstants.AAM_BROWSE_PRODUCTS;
-		String topic = TopicConstants.AAM_BROWSE_KAFKA_TOPIC;
+		String topic = TopicConstants.AAM_BROWSE_PRODUCTS;
 	
 		//RedisConnection redisConnection = new RedisConnection();
 		String[] servers = RedisConnection.getServers(System.getProperty(MongoNameConstants.IS_PROD));
