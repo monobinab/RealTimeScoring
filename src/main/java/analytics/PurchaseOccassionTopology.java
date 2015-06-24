@@ -48,7 +48,7 @@ public class PurchaseOccassionTopology {
 							.getProperty(MongoNameConstants.IS_PROD)), 1);
 			
 			//Newly added code for adding kafka to the topology
-			String kafkaTopic="stormtopic";
+			String kafkaTopic="rts_cp_membertags";
 			topologyBuilder.setSpout(
 					"KafkaSpout",
 					new KafkaSpout(KafkaUtil.getSpoutConfig(
