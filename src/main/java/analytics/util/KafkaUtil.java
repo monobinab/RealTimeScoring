@@ -73,8 +73,6 @@ public class KafkaUtil {
 			String kafka_id = kafkaProperties.getString(KAFKA_ID);
 			spoutConfig = new SpoutConfig(hosts, topic, "", kafka_id);
 			spoutConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
-
-
 		}
 
 		return spoutConfig;
@@ -109,7 +107,6 @@ public class KafkaUtil {
 		}
 
 	}
-	
 	
 	
 	public static void sendKafkaMSGs(String message, String currentTopic) throws ConfigurationException {
