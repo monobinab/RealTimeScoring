@@ -79,7 +79,7 @@ public class KafkaUtil {
 
 	}
 
-	private static Producer getKafkaProducer() throws ConfigurationException {
+	private static Producer<String, String> getKafkaProducer() throws ConfigurationException {
 
 		if (kafkaProperties != null) {
 			Properties properties = new Properties();
@@ -99,9 +99,10 @@ public class KafkaUtil {
 
 		if (kafkaProperties == null) {
 			try {
+				
 				loadKafkaProperties(environment);
 			} catch (ConfigurationException e) {
-				LOGGER.error("Error Loading Kafka properties " + e.getMessage());
+				LOGGER.error("Error Loading Kafka properties from env : " +environment + " "+  e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -115,6 +116,7 @@ public class KafkaUtil {
 		KeyedMessage<String, String> data = new KeyedMessage<String, String>(
 				currentTopic, "", message);
 		producer.send(data);
+		System.out.println("Sent message to kafka - "+ currentTopic + " : " + message);
 		producer.close();
 
 	}
