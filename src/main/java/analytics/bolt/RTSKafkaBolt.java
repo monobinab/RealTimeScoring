@@ -32,6 +32,7 @@ public class RTSKafkaBolt extends EnvironmentBolt {
 	public RTSKafkaBolt(String environment, String topic){
 		super(environment);
 		this.currentTopic = topic;
+		KafkaUtil.initiateKafkaProperties(System.getProperty(MongoNameConstants.IS_PROD));
 		//env = environment;		
 	}
 
@@ -72,7 +73,7 @@ public class RTSKafkaBolt extends EnvironmentBolt {
 			OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
 		this.outputCollector = collector;
-		KafkaUtil.initiateKafkaProperties(System.getProperty(MongoNameConstants.IS_PROD));
+		//KafkaUtil.initiateKafkaProperties(System.getProperty(MongoNameConstants.IS_PROD));
 		LOGGER.info("RTSKafkaBolt Preparing to Launch");
 	}
 
