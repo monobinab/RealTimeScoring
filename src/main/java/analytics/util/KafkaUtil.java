@@ -119,7 +119,6 @@ public class KafkaUtil {
 		KeyedMessage<String, String> data = new KeyedMessage<String, String>(
 				currentTopic, "", message);
 		producer.send(data);
-		System.out.println("Sent message to kafka - "+ currentTopic + " : " + message);
 		producer.close();
 
 	}
