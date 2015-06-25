@@ -49,7 +49,6 @@ public class TECTopology {
 		try {
 			builder.setSpout("KafkaSpout", new KafkaSpout(KafkaUtil.getSpoutConfig(System.getProperty(MongoNameConstants.IS_PROD),topic)), 1);
 		} catch (ConfigurationException e) {
-			// TODO Auto-generated catch block
 			LOGGER.error(e.getClass() + ": " + e.getMessage(), e);
 			System.exit(0);			
 		}

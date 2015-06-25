@@ -15,8 +15,7 @@ import org.slf4j.LoggerFactory;
 public class RTSAPICaller {
 	
 	private static RTSAPICaller instance = null;
-	public static final String RTS_API_PRE = "http://rtsapi301p.qa.ch3.s.com:8180/rtsapi/v1/top/categories/";
-	//public static final String SCORING_API_POST = "/16?key=za4n47bd&tags=models"; 
+	public static final String RTS_API_PRE = "http://realtimescoring.intra.searshc.com/rtsapi/v1/top/categories/";
 	private static final Logger LOGGER = LoggerFactory.getLogger(RTSAPICaller.class);
 	
 	public static RTSAPICaller getInstance() {
@@ -42,12 +41,13 @@ public class RTSAPICaller {
 		String jsonRespString = null;
 		try {
 			HttpClient httpclient = new DefaultHttpClient();
+			LOGGER.info("RTS API request :" + baseURL );
 			HttpGet httpget = new HttpGet(baseURL);
 
 			LOGGER.debug("executing request " + httpget.getRequestLine());
 			HttpResponse response = httpclient.execute(httpget);
 			String responseString = response.getStatusLine().toString();
-			LOGGER.debug("RTS API Response : " + responseString);
+			LOGGER.debug("RTS API Response for request : " + baseURL + " is : " + responseString);
 			InputStream instream = response.getEntity().getContent();
 			jsonRespString = read(instream);
 			//LOGGER.info(jsonRespString);	
