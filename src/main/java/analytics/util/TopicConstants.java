@@ -14,7 +14,7 @@ public interface TopicConstants {
 	public static final String SYW = "SYW_Interactions" ;
 	public static final String OCCASSION = "Member_Tags" ;
 	public static final int PORT = 6379 ;
-	public static final String AAM_BROWSE_KAFKA_TOPIC = "test2";
-	public static final String AAM_INT_SEARCH_KAFKA_TOPIC = "test2";
+	public static final String RESCORED_MEMBERIDS_KAFKA_TOPIC = "rts_rescored_memberIds";
+	//public static final String RESCORED_MEMBERIDS_KAFKA_TOPIC = "test2";
 }
 

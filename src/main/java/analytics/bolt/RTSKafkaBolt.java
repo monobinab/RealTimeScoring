@@ -26,11 +26,12 @@ public class RTSKafkaBolt extends EnvironmentBolt {
 	private static final String KAFKA_MSG="message";
 	private OutputCollector outputCollector;
 	private String currentTopic;
+	private String env;
 
 	public RTSKafkaBolt(String environment, String topic){
 		super(environment);
 		this.currentTopic = topic;
-		KafkaUtil.initiateKafkaProperties(environment);
+		env = environment;		
 	}
 
 	/*
@@ -70,6 +71,7 @@ public class RTSKafkaBolt extends EnvironmentBolt {
 			OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
 		this.outputCollector = collector;
+		KafkaUtil.initiateKafkaProperties(env);
 		LOGGER.info("RTSKafkaBolt Preparing to Launch");
 	}
 

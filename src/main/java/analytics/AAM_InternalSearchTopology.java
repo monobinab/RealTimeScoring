@@ -35,7 +35,7 @@ public static void main(String[] args) {
 			System.exit(0);
 		} 
 		
-		String topic = TopicConstants.AAM_INT_SEARCH_KAFKA_TOPIC;
+		String topic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;
 		//RedisConnection redisConnection = new RedisConnection();
 		String[] servers = RedisConnection.getServers(System.getProperty(MongoNameConstants.IS_PROD));
 
