@@ -232,12 +232,15 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			
 		}
 				
+		long timeVar = System.currentTimeMillis();
 		// 10) Write changedMemberVariableswith expiry
     	scoringSingleton.updateChangedVariables(lId, allChanges);
+    	System.out.println(System.currentTimeMillis() - timeVar);
 		LOGGER.debug("TIME:" + messageID + "-Score updates complete-" + System.currentTimeMillis());
 	
+		long timeScores = System.currentTimeMillis();
 		scoringSingleton.updateChangedMemberScore(lId, modelIdList, modelIdToExpiryMap, modelIdScoreMap,source);
-		
+		System.out.println(System.currentTimeMillis() - timeScores);
 		LOGGER.debug("TIME:" + messageID + "- Scoring complete-" + System.currentTimeMillis());
 		
 		//persisting the loyalty id to redis for UnknownOccasionsTopology to pick up the loyalty id
