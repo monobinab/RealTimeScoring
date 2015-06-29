@@ -110,7 +110,7 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
     	
     	for(String searchString : searchStringsCollection) {
 	    	String[] search = splitKeyWords(searchString);
-	    	
+	    	System.out.println("Search Key = " + search);
 	    	//CONSTRUCT URL - queries Solr
 			//String URL1 = "http://solrx308p.stress.ch3.s.com:8180/search/select?qt=search&wt=json&q=";
 	    	String URL1 = "http://solrx-prod.prod.ch4.s.com:80/search/select?qt=search&wt=json&clientID=sywAnalytics&q=";

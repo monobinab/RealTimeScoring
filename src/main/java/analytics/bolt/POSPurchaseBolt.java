@@ -80,35 +80,6 @@ public class POSPurchaseBolt  extends ResponsysBolt{
 		responsysObj.setValue(value);
 	}
 
-	
-		
-
-	private org.json.JSONObject getJsonForResponsys(
-			Map<Integer, String> tagModelsMap, org.json.JSONObject o
-			) throws JSONException {
-		org.json.JSONArray arr = null;
-		if(o.has("scoresInfo"))
-			arr = o.getJSONArray("scoresInfo");
-		else
-			return null;
-		
-		if(((org.json.JSONObject) arr.get(0)).has("mdTag"))
-			return null;
-		
-		for(int i=0; i<arr.length(); i++){
-			if(!((org.json.JSONObject) arr.get(i)).has("mdTag") ){
-				String modelId = ((org.json.JSONObject)arr.get(i)).getString("modelId");
-				Double percentile = Double.valueOf(((org.json.JSONObject)arr.get(i)).getString("percentile"));
-				for(Map.Entry<Integer, String> entry : tagModelsMap.entrySet()){
-					if((String.valueOf(entry.getKey())).equals(modelId) && percentile > 95){
-						return (org.json.JSONObject)arr.get(i);
-					}
-				}
-			}
-		}
-			return null;
-	}
-
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		
