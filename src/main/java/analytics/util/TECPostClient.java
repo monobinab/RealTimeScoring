@@ -39,8 +39,8 @@ public class TECPostClient {
 	}
 	
 	public static void postToTEC(String message, String l_id) {
-		HttpResponse response = null;		 
-		  try {			
+		HttpResponse response = null;
+		try {
 			HttpClient httpclient = new DefaultHttpClient();			
 			HttpPost httppost = new HttpPost(TEC_API);
 			ArrayList<NameValuePair> postParameters;
@@ -51,10 +51,7 @@ public class TECPostClient {
 
 			response = httpclient.execute(httppost);
 			if(response.getStatusLine().getStatusCode() != HttpStatus.SC_OK)
-				LOGGER.error(" Error :: Posting to TEC was not successful. Reason - "+ response.getStatusLine().toString());
-			else
-				LOGGER.info("RTS API response message sent to TEC for loyaltyId - " + l_id);
-			
+				LOGGER.error(" Error :: Posting to TEC was not successful. Reason - "+ response.getStatusLine().toString());			
 	 
 		  } catch (MalformedURLException e) {	 
 			  LOGGER.error("Exception in TECPostClient class - " + e.getMessage());	 

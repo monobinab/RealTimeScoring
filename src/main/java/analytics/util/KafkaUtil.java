@@ -31,14 +31,15 @@ public class KafkaUtil {
 	private static final String KAFKA_ID = "kafka_id";	
 	private static final String KAFKA_METADATA="metadata.broker.list";
 	private static final String SERIALIZER="serializer.class";
-	
+	private static final String TYPE="producer.type";
+	private static final String REQUIRED_ACKS= "request.required.acks";
 	
 	public static PropertiesConfiguration kafkaProperties = null;
 	public static SpoutConfig spoutConfig = null;
 
 	public static PropertiesConfiguration loadKafkaProperties(String environment)
 			throws ConfigurationException {
-
+		
 		if (environment != null) {
 			String propertyurl = null;
 			if (PRODUCTION.equals(environment))
@@ -87,6 +88,8 @@ public class KafkaUtil {
 			properties.put(KAFKA_METADATA, kafkaserver);
 			properties.put(SERIALIZER,
 					kafkaProperties.getProperty(SERIALIZER));
+			properties.put(TYPE,"async");
+			properties.put(REQUIRED_ACKS,"0");
 			ProducerConfig config = new ProducerConfig(properties);
 			Producer<String, String> producer = new Producer<String, String>(
 					config);
@@ -116,7 +119,6 @@ public class KafkaUtil {
 		KeyedMessage<String, String> data = new KeyedMessage<String, String>(
 				currentTopic, "", message);
 		producer.send(data);
-		System.out.println("Sent message to kafka - "+ currentTopic + " : " + message);
 		producer.close();
 
 	}

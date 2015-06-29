@@ -37,8 +37,7 @@ public class TECProcessingBolt extends EnvironmentBolt {
 		super.prepare(stormConf, context, collector);
 		this.outputCollector = collector;
 		rtsApiCaller = RTSAPICaller.getInstance();
-		tecPostClient = TECPostClient.getInstance();
-	
+		tecPostClient = TECPostClient.getInstance();	
 	}
 
 	@Override
@@ -46,17 +45,19 @@ public class TECProcessingBolt extends EnvironmentBolt {
 		
 		redisCountIncr("incoming_tuples");
 		String message  = (String) input.getValueByField("str");
-		String l_id = message.substring(0, 15);		
-		LOGGER.info("input contains message : " + l_id );
+		String l_id = message.substring(0,16);		
+		LOGGER.info("tec input contains message : " + l_id );
 			
 			if (l_id != null && !l_id.isEmpty()) {	
 				try{
 					//call rts api and get response for this l_id 
 					//16 - level, rtsTOtec is the apikey for internal calls to RTS from topologies
-					String scoreInfoSearsJsonString = rtsApiCaller.getRTSAPIResponse(l_id, "16", "rtsTOtec", "sears", Boolean.FALSE, "");
-					String scoreInfoKmartJsonString = rtsApiCaller.getRTSAPIResponse(l_id, "16", "rtsTOtec", "kmart", Boolean.FALSE, "");
-					//send the response for both sears and kmart format to TEC end point.	
-					TECPostClient.postToTEC(scoreInfoSearsJsonString, l_id);					
+					String scoreInfoSearsJsonString = rtsApiCaller.getRTSAPIResponse(l_id, "16", "rtsTeam", "sears", Boolean.FALSE, "");
+					String scoreInfoKmartJsonString = rtsApiCaller.getRTSAPIResponse(l_id, "16", "rtsTeam", "kmart", Boolean.FALSE, "");
+					//send the response for both sears and kmart format to TEC end point.
+					LOGGER.info("sears message sent to TEC for memeber - " + l_id + " is -- " + scoreInfoSearsJsonString);
+					TECPostClient.postToTEC(scoreInfoSearsJsonString, l_id);
+					LOGGER.info("kmart message sent to TEC for memeber - " + l_id + " is -- " + scoreInfoKmartJsonString);
 					TECPostClient.postToTEC(scoreInfoKmartJsonString, l_id);	
 					redisCountIncr("sent_to_tec_process");						
 				} catch (Exception e){
@@ -68,7 +69,7 @@ public class TECProcessingBolt extends EnvironmentBolt {
 				redisCountIncr("null_lid");			
 				outputCollector.fail(input);				
 			}
-		//}
+		
 		
 		if (input.contains("topology_id")) 	{	
 			String topology_id = input.getStringByField("topology_id");
