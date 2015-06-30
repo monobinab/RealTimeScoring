@@ -47,6 +47,9 @@ public class DivLineBuSubDao extends AbstractDao {
 			tagMetadata.setBusinessUnit(tagMetadata.getBusinessUnit()!=null ? tagMetadata.getBusinessUnit()+","+(String)dbObj.get(MongoNameConstants.DLBS_BU) : (String)dbObj.get(MongoNameConstants.DLBS_BU));
 			tagMetadata.setSubBusinessUnit(tagMetadata.getSubBusinessUnit() != null ? tagMetadata.getSubBusinessUnit()+","+(String)dbObj.get(MongoNameConstants.DLBS_SUB) : (String)dbObj.get(MongoNameConstants.DLBS_SUB));
 	
+		}else{
+			tagMetadata.setBusinessUnit(tagMetadata.getBusinessUnit()!=null ? tagMetadata.getBusinessUnit()+",null" : "null");
+			tagMetadata.setSubBusinessUnit(tagMetadata.getSubBusinessUnit() != null ? tagMetadata.getSubBusinessUnit()+",null" : "null");
 		}
 		return tagMetadata;
 	}

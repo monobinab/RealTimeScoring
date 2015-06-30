@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.util.KafkaUtil;
+import analytics.util.MongoNameConstants;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -26,11 +27,12 @@ public class RTSKafkaBolt extends EnvironmentBolt {
 	private static final String KAFKA_MSG="message";
 	private OutputCollector outputCollector;
 	private String currentTopic;
+	//private String env;
 
 	public RTSKafkaBolt(String environment, String topic){
 		super(environment);
 		this.currentTopic = topic;
-		KafkaUtil.initiateKafkaProperties(environment);
+		//env = environment;		
 	}
 
 	/*
@@ -70,6 +72,7 @@ public class RTSKafkaBolt extends EnvironmentBolt {
 			OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
 		this.outputCollector = collector;
+		KafkaUtil.initiateKafkaProperties(System.getProperty(MongoNameConstants.IS_PROD));
 		LOGGER.info("RTSKafkaBolt Preparing to Launch");
 	}
 

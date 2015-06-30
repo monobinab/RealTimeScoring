@@ -82,9 +82,11 @@ public abstract class ResponsysBolt  extends EnvironmentBolt{
 		    //F - Failure occurred, fail the message
 		    //P - Passed, but there is nothing to processing further, so just ack and return
 		    if(successFlag!= null && successFlag.equalsIgnoreCase("F")){
+		    	LOGGER.info("Failing the tuple for Loyalty id : "+lyl_id_no + " from Topology : " + topologyName);
 		    	outputCollector.fail(input);
 		    	return;
 		    }else if(successFlag!= null && successFlag.equalsIgnoreCase("P")){
+		    	LOGGER.info("No further processing needed for Loyalty id : "+lyl_id_no + " from Topology : " + topologyName);
 		    	outputCollector.ack(input);
 		    	return;
 		    }
