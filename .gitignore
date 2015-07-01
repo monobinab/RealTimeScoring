@@ -16,3 +16,5 @@ topology.log
 /log.txt.2
 /log.txt.3
 /log.txt.4
+/.pydevproject
+/.gitignore
