@@ -67,13 +67,15 @@ public class SignalBolt2 extends EnvironmentBolt{
 				if(lyl_id_no != null && pidLst != null && pidLst.size()>0){
 					//String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no);
 					
-					String pidLstStr = StringUtils.join(pidLst, ',');
+					ArrayList<String> lst = new ArrayList<String>(pidLst.subList(1, pidLst.size()));
+					String pidLstStr = StringUtils.join(lst, ',');
 					String str = "[,"+lyl_id_no+","+pidLstStr+",]";
 					
 					outputCollector.emit(tuple(str));
 					
 					str = null;
 					pidLstStr = null;
+					lst = null;
 					
 				}else
 					LOGGER.info("Either L_Id is null or Pid List is null. No sending to Parsing Bolt .. Input Tuple : " +input);
