@@ -54,4 +54,5 @@ public class Constants {
 	//topology names
 	public static final String UNKNOWN_OCCASION = "unknownOccasions";
 	public static final String POS_PURCHASE = "posPurchase";
+	public static final String SIGNAL_TOPOLOGY2 = "2_Signal";
 }
