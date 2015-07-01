@@ -1,4 +1,4 @@
-package analytics;
+/*package analytics;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -25,3 +25,4 @@ public class AllDCTests {
 	//MemberDCDao.java
 	//Two methods in JsonUtils.java
 }
+*/

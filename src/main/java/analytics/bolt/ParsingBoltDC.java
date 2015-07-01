@@ -1,24 +1,16 @@
 package analytics.bolt;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.lang.reflect.Type;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import analytics.util.DCParserHandler;
+import analytics.util.DCParsingHandler;
 import analytics.util.JsonUtils;
 import analytics.util.SecurityUtils;
-import analytics.util.dao.DCDao;
-import analytics.util.dao.MemberDCDao;
+import analytics.util.dao.DcAidVarStrengthDao;
+import analytics.util.objects.ParsedDC;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -27,153 +19,109 @@ import backtype.storm.tuple.Tuple;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.mortbay.util.ajax.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
-import com.google.common.reflect.TypeToken;
 
 public class ParsingBoltDC extends EnvironmentBolt {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ParsingBoltDC.class);
 	private static final long serialVersionUID = 1L;
 	private OutputCollector outputCollector;
-	private DCDao dc;
-	private MemberDCDao memberDCDao;
-	//needs to be removed after development is completed and moved to prod
-	private static final boolean isTestL_ID = false;
-	private static final boolean isDemoXML = false;
-	private static boolean isTest = false;
-	
+	private DcAidVarStrengthDao dcAidVarStrengthDao;
+	private Map<String, Map<String, Double>> dcAidVarStrengthMap;
+
 	 public ParsingBoltDC(String systemProperty){
 		 super(systemProperty);
 	 }
-
-	@Override
-	public void execute(Tuple input) {
-		redisCountIncr("incoming_tuples");
-		// UpdateMemberPrompts
-		String message = (String) input.getValueByField("str");
-		if (message.contains("GetMemberPromptsReply")) {
-			redisCountIncr("prompts_reply");
-			try {
-				parseIncomingMessage(message);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			 //emitFakeData();
-		}
-		outputCollector.ack(input);
-	}
-
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
 		this.outputCollector = collector;
-		memberDCDao = new MemberDCDao();
-		dc = new DCDao();
+		dcAidVarStrengthDao = new DcAidVarStrengthDao();
+		dcAidVarStrengthMap = dcAidVarStrengthDao.getdcAidVarStrenghtMap();
+		System.out.println(dcAidVarStrengthMap.size());
 		LOGGER.info("DC Bolt Preparing to Launch");
 	}
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		declarer.declareStream("score_stream", new Fields("l_id", "lineItemAsJsonString", "source"));
-		declarer.declareStream("persist_stream", new Fields("l_id", "lineItemAsJsonString", "source"));
 	}
-
-	public void parseIncomingMessage(String message) throws ParserConfigurationException, SAXException, IOException, JSONException {
-		JSONObject obj = new JSONObject(message);
-		message = (String) obj.get("xmlRespData");
-		if(isDemoXML){
-			message = "<soapenv:Envelope xmlns:soapenv=\"http://www.w3.org/2003/05/soap-envelope\"><soapenv:Body><PromptGroupName>DC_Appliance</PromptGroupName><MemberNumber>fake</MemberNumber><AnswerID>bb3300163e00123e11e4211b3aa34650</AnswerID><QuestionTextID>bb3300163e00123e11e4211b3aa234e0</QuestionTextID><AnswerID>bb3300163e00123e11e4211b3aa34650</AnswerID><QuestionTextID>bb3300163e00123e11e4211b3aa234e0</QuestionTextID><AnswerID>bb3300163e00123e11e4211b3aa34650</AnswerID><QuestionTextID>bb3300163e00123e11e4211b3aa234e0</QuestionTextID></soapenv:Body></soapenv:Envelope>"; 
-		}
-		SAXParserFactory factory = SAXParserFactory.newInstance();
-		SAXParser saxParser = factory.newSAXParser();
-		DCParserHandler handler = new DCParserHandler();
-		saxParser.parse(new InputSource(new StringReader(message)), handler);
-		List<JSONObject> answers = handler.getAnswerList();
-		String memberId = handler.getMemberId();
-		if(answers != null && answers.size() > 0 && memberId != null){
-			processList(answers, memberId);
-		}
-	}
-	
-	protected Double processList(List<JSONObject> answers, String memberId) throws JSONException {
-		String l_id = SecurityUtils.hashLoyaltyId(memberId);
-		if(isTestL_ID){
-			l_id = "hzuzVKVINbBBen+WGYQT/VJVdwI=";
-		}
-		boolean hasStrength = false;
-		Double strength_sum = 0.0;
-		String category = null;
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		String date = simpleDateFormat.format(new Date());
-		Object varName = null;
-		for (int i = 0; i < answers.size(); i++) {
-			category = (String) answers.get(i).get("promptGroupName");
-			Object strength = dc.getStrength(category, (String) (answers.get(i).get("q_id")), (String) (answers.get(i).get("a_id")));
-			varName = dc.getVarName(category);
-			if (strength != null && varName != null) {
-				strength_sum += JsonUtils.convertToDouble(strength);
-				if(!hasStrength){
-					hasStrength = true;
-				}	
+	 
+	@Override
+	public void execute(Tuple input) {
+		redisCountIncr("incoming_tuples");
+		String message = (String) input.getValueByField("str");
+		
+		//check the incoming string for <UpdateMemberPrompts or :UpdateMemberPrompts as it contains the member's response data
+		if (message.contains("<UpdateMemberPrompts") || message.contains(":UpdateMemberPrompts")) {
+			redisCountIncr("prompts_reply");
+			try {
+				JSONObject obj = new JSONObject(message);
+				
+				//xmlReqData contains the answerChoiceIds which is needed
+				message = (String) obj.get("xmlReqData");
+							
+				//ParsedDC parses the xml and return the list of answerIds along with memberNumber
+				ParsedDC parsedDC = DCParsingHandler.getAnswerJson(message);
+				if(parsedDC != null){
+					processAidsList(parsedDC);
+				}
+				else{
+					outputCollector.ack(input);
+					return;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				LOGGER.error("exception in parsingBoltDC ", e);
 			}
 		}
+		else{
+			outputCollector.ack(input);
+			return;
+		}
+		outputCollector.ack(input);
+	}
+	
+	protected void processAidsList(ParsedDC parsedDC) throws JSONException {
 		
-		if(hasStrength && !isTest){
-			//System.out.println(memberId+" : "+answers);
-			emitToPersistStream(date, category, strength_sum, l_id);
-			emitToScoreStream(date, category, strength_sum, l_id, (String)varName);
+	/*   1. In this processing of parsedDC object, answerIds are iterated 
+		 2. variables for those answerIds are retrieved from dcVariableStrength collection
+		 3. variableValueMap is populated with variables as keys and strength as values for it*/
+		 
+		String l_id = SecurityUtils.hashLoyaltyId(parsedDC.getMemberId());
+		Double strength_sum = 0.0;
+		Map<String, String> variableValueMap = new HashMap<String, String>();
+		List<String> answerChoiceIds = parsedDC.getAnswerChoiceIds();
+		if(answerChoiceIds != null && !answerChoiceIds.isEmpty()){
+		Iterator<String> answerChoiceIdsIterator =  answerChoiceIds.iterator();
+		while(answerChoiceIdsIterator.hasNext()){
+			String aid = answerChoiceIdsIterator.next();
+			Map<String, Double> varStrengthMap = dcAidVarStrengthMap.get(aid);
+			if(varStrengthMap != null){
+				for(String var : varStrengthMap.keySet()){
+					if(!variableValueMap.containsKey(var)){
+						variableValueMap.put(var, Double.toString(varStrengthMap.get(var)));
+					}
+					else{
+						strength_sum = Double.parseDouble(variableValueMap.get(var)) + varStrengthMap.get(var);
+						variableValueMap.put(var,  Double.toString(strength_sum));
+					}
+				}
+			}
+			else{
+				continue;
+			}
 		}
-		return strength_sum;
+			emitToScoreStream(l_id, variableValueMap);
 	}
-	
-	protected void setDCDao(){
-		dc = new DCDao();
-	}
-	
-	public void emitToPersistStream(String date, String category, Double strength_sum, String l_id) throws JSONException{
-		JSONObject json = new JSONObject();
-		json.put("d", date);
-		JSONObject dcObject = new JSONObject();
-		dcObject.put(category, strength_sum);
-		json.put("dc", dcObject);
-		List<Object> listToEmit_p = new ArrayList<Object>();
-		listToEmit_p.add(l_id);
-		listToEmit_p.add(json.toString());
-		listToEmit_p.add("DC");
-		outputCollector.emit("persist_stream", listToEmit_p);
-		LOGGER.info("Emitted message to persist stream");
-	}
-	
-	public void emitToScoreStream(String date, String category, Double strength_sum, String l_id, String varName) throws JSONException{
-		Map<String, String> dateDCMap = memberDCDao.getDateStrengthMap(category, l_id);
-		String today_str = dateDCMap.get(date);	
-		if( today_str == null){
-			//put strength_sum
-			JSONObject obj = new JSONObject();
-			obj.put(category, strength_sum);
-			dateDCMap.put(date, obj.toString());
-		}else{
-			Double today_val = JsonUtils.convertToDouble(JSON.parse(today_str));
-			//put val + strength_sum
-			today_val+=strength_sum;
-			dateDCMap.put(date, today_val.toString());
-		}
-		Map<String, String> map = new HashMap<String, String>();
-		map.put((String)varName, dateDCMap.toString());
+}	
+	public void emitToScoreStream(String l_id, Map<String, String> varValueMap){
 		List<Object> listToEmit_s = new ArrayList<Object>();
 		listToEmit_s.add(l_id);
-		listToEmit_s.add(JsonUtils.createJsonFromStringStringMap(map));
+		listToEmit_s.add(JsonUtils.createJsonFromStringStringMap(varValueMap));
 		listToEmit_s.add("DC");
 		outputCollector.emit("score_stream", listToEmit_s);
 		redisCountIncr("emitted_to_scoring");
-		LOGGER.info("Emitted message to score stream");
-	}
-	
-	protected void setToTestMode(){
-		isTest = true;
+		LOGGER.info("Emitted message to score stream for l_id " + l_id);
 	}
 }

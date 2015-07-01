@@ -1,4 +1,4 @@
-package analytics.bolt;
+/*package analytics.bolt;
 
 import static org.junit.Assert.assertEquals;
 
@@ -47,12 +47,12 @@ public class ParsingBoltDCTest {
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-	/*	System.setProperty(MongoNameConstants.IS_PROD, "test");
+		System.setProperty(MongoNameConstants.IS_PROD, "test");
 		conf = new HashMap<String, String>();
 		conf.put("rtseprod", "test");
 		//Below line ensures an empty DB rather than reusing a DB with values in it
         FakeMongo.setDBConn(new Fongo("test db").getDB("test"));	
-		db = DBConnection.getDBConnection();*/
+		db = DBConnection.getDBConnection();
 		SystemPropertyUtility.setSystemProperty();
 		
         bolt = new ParsingBoltDC(System.getProperty(MongoNameConstants.IS_PROD));
@@ -319,10 +319,11 @@ public class ParsingBoltDCTest {
 	
 	@AfterClass
 	public static void cleanUp(){
-		/*if(db.toString().equalsIgnoreCase("FongoDB.test"))
+		if(db.toString().equalsIgnoreCase("FongoDB.test"))
 		   db.dropDatabase();
 		  else
-		   Assert.fail("Something went wrong. Tests connected to " + db.toString());*/
+		   Assert.fail("Something went wrong. Tests connected to " + db.toString());
 		SystemPropertyUtility.dropDatabase();
 	}
 }
+*/
