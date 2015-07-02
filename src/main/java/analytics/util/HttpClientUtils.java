@@ -55,6 +55,28 @@ public class HttpClientUtils {
 		return result;
 	}
 	
+	public static String httpGetCallJsonString(String baseURL){
+		HttpClient httpclient = new DefaultHttpClient();
+		String jsonRespString = null;
+		
+		try{
+			HttpGet httpget = new HttpGet(baseURL);
+			httpget.setHeader("Accept", "application/json");
+			HttpResponse response = httpclient.execute(httpget);
+			InputStream instream = response.getEntity().getContent();
+			jsonRespString = read(instream);
+
+		}
+		catch (IOException e3) {
+			e3.printStackTrace();
+			return null;
+		} catch (Exception e5) {
+			e5.printStackTrace();
+			return null;
+		}
+		return jsonRespString;
+	}
+	
 	/**
 	 * 
 	 * @param in

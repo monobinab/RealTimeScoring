@@ -1,86 +1,64 @@
 package analytics;
 
-//import analytics.bolt.SignalBolt;
-import analytics.bolt.PrinterBolt;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import analytics.bolt.SignalBolt;
+import analytics.spout.SignalSpout;
+import analytics.util.MetricsListener;
+import analytics.util.MongoNameConstants;
+import analytics.util.SystemUtility;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
-import backtype.storm.spout.ShellSpout;
-import backtype.storm.task.ShellBolt;
-import backtype.storm.topology.IRichBolt;
-import backtype.storm.topology.IRichSpout;
-import backtype.storm.topology.OutputFieldsDeclarer;
+import backtype.storm.generated.AlreadyAliveException;
+import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.topology.TopologyBuilder;
-import backtype.storm.tuple.Fields;
 
-import java.util.Map;
-
-/**
- * This topology demonstrates Storm's stream groupings and multilang capabilities.
- */
 public class SignalTopology {
-  public static class SplitSentence extends ShellBolt implements IRichBolt {
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(SignalTopology.class);
 
-    public SplitSentence() {
-      super("python", "splitsentence.py");
-    }
+	public static void main(String[] args) throws Exception {
+		LOGGER.info("Starting SignalRedisTopology");
+		if (!SystemUtility.setEnvironment(args)) {
+			System.out
+					.println("Please pass the environment variable argument- 'PROD' or 'QA' or 'LOCAL'");
+			System.exit(0);
+		} 
+		TopologyBuilder topologyBuilder = new TopologyBuilder();
 
-    @Override
-    public void declareOutputFields(OutputFieldsDeclarer declarer) {
-      declarer.declare(new Fields("word"));
-    }
+		topologyBuilder.setSpout("signalRedisSpout", new SignalSpout());
+		topologyBuilder.setBolt("signalRedisBolt", new SignalBolt(System.getProperty(MongoNameConstants.IS_PROD), "10.2.8.149", 11211), 3).shuffleGrouping("signalRedisSpout");
 
-    @Override
-    public Map<String, Object> getComponentConfiguration() {
-      return null;
-    }
-  }
-
-  public static class JavaSignalSpout extends ShellSpout implements IRichSpout {
-
-      public JavaSignalSpout(String scriptName)
-      {
-          super("python", scriptName);
-      }
-
-      @Override
-      public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-          outputFieldsDeclarer.declare(new Fields("channel","product","searchTerm","signalTime","source","taxonomy","type","uuid"));
-          //"515 Sandstone Trce","Prattville","autauga-county","AL","36066","1","3\/27\/2013","4","3","2980","0.440","249000"
-      }
-
-      @Override
-      public Map<String, Object> getComponentConfiguration() {
-          return null;
-      }
-  }
-
-  public static void main(String[] args) throws Exception {
-
-	    TopologyBuilder builder = new TopologyBuilder();
-
-	    builder.setSpout("spout", new JavaSignalSpout("signalsp.py"), 1);
-	    builder.setBolt("print", new PrinterBolt(), 1).shuffleGrouping("spout");
-	    //builder.setBolt("mongo", new RealtyTracBolt(), 2).shuffleGrouping("spout").shuffleGrouping("spout2");
-	    //builder.setBolt("signalOut", new JavaSignalBolt("singalBolt.py"), 2).shuffleGrouping("spout");
-
-
-	    Config conf = new Config();
-
-
-
-	    if (args != null && args.length > 0) {
-	      conf.setNumWorkers(3);
-
-	      StormSubmitter.submitTopology(args[0], conf, builder.createTopology());
-	    }
-	    else {
-	        conf.setDebug(true);
-	      conf.setMaxTaskParallelism(3);
-	      LocalCluster cluster = new LocalCluster();
-	      cluster.submitTopology("realty-trac", conf, builder.createTopology());
-	      Thread.sleep(10000000);
-	      cluster.shutdown();
-	    }
-	  }
+		Config conf = new Config();
+		conf.put("metrics_topology", "Signal_Redis");
+		conf.registerMetricsConsumer(MetricsListener.class, System.getProperty(MongoNameConstants.IS_PROD), 3);
+		conf.setMaxSpoutPending(30);
+		if (System.getProperty(MongoNameConstants.IS_PROD)
+				.equalsIgnoreCase("PROD")
+				|| System.getProperty(MongoNameConstants.IS_PROD)
+						.equalsIgnoreCase("QA")) {
+			try {
+				StormSubmitter.submitTopology(args[0], conf,
+						topologyBuilder.createTopology());
+			} catch (AlreadyAliveException e) {
+				LOGGER.error(e.getClass() + ": " + e.getMessage(), e);
+			} catch (InvalidTopologyException e) {
+				LOGGER.error(e.getClass() + ": " + e.getMessage(), e);
+			}
+		} else {
+			conf.setDebug(false);
+			conf.setMaxTaskParallelism(3);
+			LocalCluster cluster = new LocalCluster();
+			cluster.submitTopology("signal_redis_topology", conf,
+					topologyBuilder.createTopology());
+			try {
+				Thread.sleep(10000000);
+			} catch (InterruptedException e) {
+				LOGGER.error(e.getClass() + ": " + e.getMessage(), e);
+			}
+			cluster.shutdown();
+		}
 	}
+}

@@ -124,6 +124,7 @@ public class ParsingBoltDC extends EnvironmentBolt {
 		listToEmit_s.add("DC");
 		outputCollector.emit("score_stream", listToEmit_s);
 		redisCountIncr("emitted_to_scoring");
-		LOGGER.info("Emitted message to score stream for l_id from DC" + l_id);
+		LOGGER.info("Emitted message to score stream for l_id from DC " + l_id);
+		System.out.println("Emitted message to score stream for l_id from DC " + l_id);
 	}
 }
