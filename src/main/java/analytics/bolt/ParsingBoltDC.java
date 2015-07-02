@@ -38,13 +38,13 @@ public class ParsingBoltDC extends EnvironmentBolt {
 		this.outputCollector = collector;
 		dcAidVarStrengthDao = new DcAidVarStrengthDao();
 		dcAidVarStrengthMap = dcAidVarStrengthDao.getdcAidVarStrenghtMap();
-		System.out.println(dcAidVarStrengthMap.size());
+		//System.out.println(dcAidVarStrengthMap.size());
 		LOGGER.info("DC Bolt Preparing to Launch");
 	}
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declareStream("score_stream", new Fields("l_id", "lineItemAsJsonString", "source"));
+		declarer.declareStream("score_stream", new Fields("l_id", "varValueMapAsJsonString", "source"));
 	}
 	 
 	@Override
@@ -125,6 +125,6 @@ public class ParsingBoltDC extends EnvironmentBolt {
 		outputCollector.emit("score_stream", listToEmit_s);
 		redisCountIncr("emitted_to_scoring");
 		LOGGER.info("Emitted message to score stream for l_id from DC " + l_id);
-		System.out.println("Emitted message to score stream for l_id from DC " + l_id);
+		//System.out.println("Emitted message to score stream for l_id from DC " + l_id);
 	}
 }
