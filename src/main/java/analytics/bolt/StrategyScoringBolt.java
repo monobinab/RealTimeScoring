@@ -113,7 +113,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		scoringSingleton.filterScoringModelIdList(modelIdList);
 		
 		if(modelIdList==null||modelIdList.isEmpty()){
-			LOGGER.info("No models affected for " +lyl_id_no);
+			LOGGER.info("No models affected for " + lId);
 			redisCountIncr("no_models_affected");
 			outputCollector.ack(input);
 			return;
@@ -220,6 +220,10 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			}
 		}
 		
+		//logging the rescored member, in case if loggingbolt is not working
+		if(modelIdScoreMap != null && !modelIdScoreMap.isEmpty())
+			LOGGER.info(lId + " has been scored from " + source + " source");
+		
 		//Persisting to Redis to be retrieved quicker than getting from Mongo.
 		//Perform the below operation only when the Redis is configured
 		//Long timeBefore = System.currentTimeMillis();
@@ -236,15 +240,11 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			
 		}
 				
-		long timeVar = System.currentTimeMillis();
 		// 10) Write changedMemberVariableswith expiry
     	scoringSingleton.updateChangedVariables(lId, allChanges);
-    	System.out.println(System.currentTimeMillis() - timeVar);
-		LOGGER.debug("TIME:" + messageID + "-Score updates complete-" + System.currentTimeMillis());
+    	LOGGER.debug("TIME:" + messageID + "-Score updates complete-" + System.currentTimeMillis());
 	
-		long timeScores = System.currentTimeMillis();
-		scoringSingleton.updateChangedMemberScore(lId, modelIdList, modelIdToExpiryMap, modelIdScoreMap,source);
-		System.out.println(System.currentTimeMillis() - timeScores);
+    	scoringSingleton.updateChangedMemberScore(lId, modelIdList, modelIdToExpiryMap, modelIdScoreMap,source);
 		LOGGER.debug("TIME:" + messageID + "- Scoring complete-" + System.currentTimeMillis());
 		
 		//persisting the loyalty id to redis for UnknownOccasionsTopology to pick up the loyalty id
