@@ -23,6 +23,7 @@ public class DCParsingHandler {
 		boolean updateMemberPromptsFlag = false;
 		ParsedDC parsedDC = null;
 		List<String> answerChoiceIds = null;
+		String promptGroupName = null;
 		XMLInputFactory factory = XMLInputFactory.newInstance();
 
 		try {
@@ -52,7 +53,12 @@ public class DCParsingHandler {
 					if(updateMemberPromptsFlag){
 	
 						if ("AnswerChoiceID".equals(reader.getLocalName()) && tagContent != null) {
+							tagContent = tagContent.toLowerCase();
 							answerChoiceIds.add(tagContent);
+							if(promptGroupName != null){
+								LOGGER.info("promptGroup " + promptGroupName + "answerChoiceId " + tagContent);
+								//System.out.println(promptGroupName +" " + tagContent);
+							}
 							break;
 						}
 						if ("POSPrompt".equals(reader.getLocalName())) {
@@ -65,6 +71,10 @@ public class DCParsingHandler {
 						}
 						if ("MemberNumber".equals(reader.getLocalName()) && tagContent != null) {
 							parsedDC.setMemberId(tagContent);
+							break;
+						}
+						if("PromptGroupName".equals(reader.getLocalName()) && tagContent != null && tagContent.equalsIgnoreCase("DC_CE")){
+							promptGroupName = tagContent;
 							break;
 						}
 				 break;

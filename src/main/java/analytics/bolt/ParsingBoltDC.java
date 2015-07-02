@@ -114,7 +114,13 @@ public class ParsingBoltDC extends EnvironmentBolt {
 				continue;
 			}
 		}
-			emitToScoreStream(l_id, variableValueMap);
+			if(variableValueMap != null && !variableValueMap.isEmpty()){
+				emitToScoreStream(l_id, variableValueMap);
+			}
+			else{
+				//System.out.println("varValueMap is null or empty");
+				LOGGER.info("varValueMap is null or empty");
+			}
 	}
 }	
 	public void emitToScoreStream(String l_id, Map<String, String> varValueMap){
@@ -125,6 +131,6 @@ public class ParsingBoltDC extends EnvironmentBolt {
 		outputCollector.emit(listToEmit_s);
 		redisCountIncr("emitted_to_scoring");
 		LOGGER.info("Emitted message to scoring for l_id from DC " + l_id);
-		//System.out.println("Emitted message to score stream for l_id from DC " + l_id);
+	//	System.out.println("Emitted message to score stream for l_id from DC " + l_id);
 	}
 }
