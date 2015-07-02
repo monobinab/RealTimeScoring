@@ -12,7 +12,7 @@ public class StrategyDCStrengthSum implements Strategy {
 
 private int daysToExpiration = 30;
 private double upperCapValue = 10000.0;
-private double lowerCapValue = 10000.0;
+private double lowerCapValue = -10000.0;
 
 @Override
     public Change execute(RealTimeScoringContext context) {

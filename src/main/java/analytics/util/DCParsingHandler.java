@@ -72,7 +72,7 @@ public class DCParsingHandler {
 				}
 			}
 			LOGGER.debug("member " + parsedDC.getMemberId() + " answers " + parsedDC.getAnswerChoiceIds().size());
-			System.out.println(parsedDC.getMemberId() + " " + parsedDC.getAnswerChoiceIds().size());
+			//System.out.println(parsedDC.getMemberId() + " " + parsedDC.getAnswerChoiceIds().size());
 			
 		} catch (Exception e1) {
 			LOGGER.error(e1.getClass() + ": " + e1.getMessage(), e1);

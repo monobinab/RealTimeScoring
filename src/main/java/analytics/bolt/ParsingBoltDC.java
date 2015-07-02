@@ -60,6 +60,8 @@ public class ParsingBoltDC extends EnvironmentBolt {
 				
 				//xmlReqData contains the answerChoiceIds which is needed
 				message = (String) obj.get("xmlReqData");
+				
+				LOGGER.info("xmlReqData: " + message);
 							
 				//ParsedDC parses the xml and return the list of answerIds along with memberNumber
 				ParsedDC parsedDC = DCParsingHandler.getAnswerJson(message);
@@ -122,6 +124,6 @@ public class ParsingBoltDC extends EnvironmentBolt {
 		listToEmit_s.add("DC");
 		outputCollector.emit("score_stream", listToEmit_s);
 		redisCountIncr("emitted_to_scoring");
-		LOGGER.info("Emitted message to score stream for l_id " + l_id);
+		LOGGER.info("Emitted message to score stream for l_id from DC" + l_id);
 	}
 }
