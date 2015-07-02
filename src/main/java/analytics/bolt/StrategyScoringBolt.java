@@ -213,16 +213,13 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			LOGGER.debug("The time spent for creating scores..... "
 					+ System.currentTimeMillis() + " and the message ID is ..."
 					+ messageID);
+			LOGGER.info(lId + " has been scored from for " + modelId  +" " + source + " source");
 			this.outputCollector.emit("score_stream",listToEmit);
 			redisCountIncr("model_scored");
 			} catch (RealTimeScoringException e) {
 				e.printStackTrace();
 			}
 		}
-		
-		//logging the rescored member, in case if loggingbolt is not working
-		if(modelIdScoreMap != null && !modelIdScoreMap.isEmpty())
-			LOGGER.info(lId + " has been scored from " + source + " source");
 		
 		//Persisting to Redis to be retrieved quicker than getting from Mongo.
 		//Perform the below operation only when the Redis is configured

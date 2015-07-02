@@ -44,7 +44,7 @@ public class ParsingBoltDC extends EnvironmentBolt {
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declareStream("score_stream", new Fields("l_id", "varValueMapAsJsonString", "source"));
+		declarer.declare( new Fields("l_id", "varValueMapAsJsonString", "source"));
 	}
 	 
 	@Override
@@ -122,9 +122,9 @@ public class ParsingBoltDC extends EnvironmentBolt {
 		listToEmit_s.add(l_id);
 		listToEmit_s.add(JsonUtils.createJsonFromStringStringMap(varValueMap));
 		listToEmit_s.add("DC");
-		outputCollector.emit("score_stream", listToEmit_s);
+		outputCollector.emit(listToEmit_s);
 		redisCountIncr("emitted_to_scoring");
-		LOGGER.info("Emitted message to score stream for l_id from DC " + l_id);
+		LOGGER.info("Emitted message to scoring for l_id from DC " + l_id);
 		//System.out.println("Emitted message to score stream for l_id from DC " + l_id);
 	}
 }
