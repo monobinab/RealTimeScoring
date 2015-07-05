@@ -35,7 +35,7 @@ public static void main(String[] args) {
 			System.exit(0);
 		} 
 		
-		String topic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;
+		String kafkatopic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;
 		//RedisConnection redisConnection = new RedisConnection();
 		String[] servers = RedisConnection.getServers(System.getProperty(MongoNameConstants.IS_PROD));
 
@@ -48,7 +48,7 @@ public static void main(String[] args) {
 		topologyBuilder.setBolt("strategy_bolt", new StrategyScoringBolt(System.getProperty(MongoNameConstants.IS_PROD)), 10)
 				.shuffleGrouping("ParsingBoltAAM_InternalSearch");
 		
-		topologyBuilder.setBolt("kafka_bolt", new RTSKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD),topic), 10)
+		topologyBuilder.setBolt("kafka_bolt", new RTSKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD),kafkatopic), 10)
 		.shuffleGrouping("strategy_bolt","kafka_stream");
 		
 		if(System.getProperty(MongoNameConstants.IS_PROD).equals("PROD")){

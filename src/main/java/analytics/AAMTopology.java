@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import analytics.bolt.LoggingBolt;
 import analytics.bolt.ParsingBoltWebTraits;
 import analytics.bolt.PersistTraitsBolt;
+import analytics.bolt.RTSKafkaBolt;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.spout.WebHDFSSpout;
 import analytics.util.Constants;
@@ -35,13 +36,18 @@ public class AAMTopology {
 			TopologyBuilder builder = new TopologyBuilder();
 
 	   	String[] servers = RedisConnection.getServers(System.getProperty(MongoNameConstants.IS_PROD));
-	  
+	   	String kafkatopic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;
 	   	//Sree. Spout that wakes up every 5 mins and process the Traits
 	  	builder.setSpout("traitsSpout", new WebHDFSSpout(servers[1], TopicConstants.PORT, Constants.AAM_TRAITS_PATH, "aamTraits"), 1);
 	  	builder.setBolt("parsingBoltWebTraits", new ParsingBoltWebTraits(System.getProperty(MongoNameConstants.IS_PROD), "aamTraits"), 1)
 	  		.shuffleGrouping("traitsSpout");
 	  	builder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System.getProperty(MongoNameConstants.IS_PROD)),1).shuffleGrouping("parsingBoltWebTraits");
 	    builder.setBolt("persistTraits" , new PersistTraitsBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("parsingBoltWebTraits");
+	    
+	    builder.setBolt("RTSKafkaBolt", new RTSKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD),kafkatopic), 1)
+		.shuffleGrouping("strategyScoringBolt","kafka_stream");
+	    
+	       
 	    if(System.getProperty(MongoNameConstants.IS_PROD).equalsIgnoreCase("PROD")){
 	    	builder.setBolt("loggingBolt", new LoggingBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
         }

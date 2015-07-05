@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import analytics.bolt.FlumeRPCBolt;
 import analytics.bolt.LoggingBolt;
 import analytics.bolt.ParsingBoltAAM_Browse;
+import analytics.bolt.RTSKafkaBolt;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.spout.WebHDFSSpout;
 import analytics.util.Constants;
@@ -35,6 +36,7 @@ public class AAM_BrowseTopology {
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 
 		String topic = TopicConstants.AAM_BROWSE_PRODUCTS;
+		String kafkatopic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;
 	
 		//RedisConnection redisConnection = new RedisConnection();
 		String[] servers = RedisConnection.getServers(System.getProperty(MongoNameConstants.IS_PROD));
@@ -47,6 +49,9 @@ public class AAM_BrowseTopology {
 		topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System
 				.getProperty(MongoNameConstants.IS_PROD)), 3)
 				.localOrShuffleGrouping("parsingBoltBrowse");
+		
+		topologyBuilder.setBolt("RTSKafkaBolt", new RTSKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD),kafkatopic), 1)
+			.shuffleGrouping("strategyScoringBolt","kafka_stream");
 		
 		if(System.getProperty(MongoNameConstants.IS_PROD).equals("PROD")){
 			//topologyBuilder.setBolt("flumeLoggingBolt", new FlumeRPCBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
