@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import com.mongodb.DB;
 import com.mongodb.MongoClient;
+import com.mongodb.MongoClientOptions;
 import com.mongodb.ServerAddress;
 import com.mongodb.WriteConcern;
 
@@ -79,8 +80,13 @@ public class DBConnection {
 					sServers.add(new ServerAddress(serverurl, sPort));
 				}
 				
-				mongoClient	= new MongoClient(sServers);
-				mongoClient.setWriteConcern(new WriteConcern(writeconcern));
+                // Code change to set write options differently
+				MongoClientOptions mongoClientOptions= new MongoClientOptions.Builder().writeConcern(new WriteConcern(writeconcern)).build();
+				MongoClient mongoClient = new MongoClient(sServers, mongoClientOptions);
+		
+				
+				//mongoClient	= new MongoClient(sServers);
+				//mongoClient.setWriteConcern(new WriteConcern(writeconcern));
 			}
 			/*
 			else{
