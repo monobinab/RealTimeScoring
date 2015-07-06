@@ -29,7 +29,7 @@ public class SignalTopology {
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 
 		topologyBuilder.setSpout("signalRedisSpout", new SignalSpout());
-		topologyBuilder.setBolt("signalRedisBolt", new SignalBolt(System.getProperty(MongoNameConstants.IS_PROD), "10.2.8.149", 11211), 3).shuffleGrouping("signalRedisSpout");
+		topologyBuilder.setBolt("signalRedisBolt", new SignalBolt(System.getProperty(MongoNameConstants.IS_PROD), "10.2.8.175", 11211), 3).shuffleGrouping("signalRedisSpout");
 
 		Config conf = new Config();
 		conf.put("metrics_topology", "Signal_Redis");

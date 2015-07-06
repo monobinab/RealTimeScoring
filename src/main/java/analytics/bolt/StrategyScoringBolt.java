@@ -120,8 +120,8 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			return;
 		}
 		else{
-			LOGGER.info("models to be scored: " + modelIdList);
-		//	System.out.println("models to be scored: " + modelIdList);
+			LOGGER.info("models to be scored for lid: " + lId + " " + modelIdList);
+			//System.out.println("models to be scored for lid: " + lId + " " + modelIdList);
 		}
 		// 4) Find all variables for models
 
