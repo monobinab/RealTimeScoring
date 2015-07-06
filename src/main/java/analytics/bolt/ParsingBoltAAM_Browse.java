@@ -186,7 +186,11 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 	        String split[]=StringUtils.split(webRec,",");
 	       
 	        if(split !=null && split.length>0) {
-	            return new String [] { split[1], split[2] };
+	        	String [] splits = new String[split.length-2];
+	        	for(int i=0; i<split.length-2; i++){
+	        		splits[i]=split[i+1];
+	        	}
+	            return  splits;
 			}
 			else {
 				return null;
