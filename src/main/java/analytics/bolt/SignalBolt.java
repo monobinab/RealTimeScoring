@@ -62,7 +62,7 @@ public class SignalBolt extends EnvironmentBolt{
 					}
 				}
 			}
-				redisCountIncr("success_signal");
+			//	redisCountIncr("success_signal");
 				outputCollector.ack(input);
 		}
 		catch(Exception e){
