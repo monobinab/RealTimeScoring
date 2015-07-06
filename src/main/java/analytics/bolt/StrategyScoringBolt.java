@@ -219,7 +219,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 					+ System.currentTimeMillis() + " and the message ID is ..."
 					+ messageID);
 		//	System.out.println(lId + " has been scored for " + modelId  +" " + source + " source");
-			LOGGER.info(lId + " has been scored for " + modelId  +" " + source + " source");
+		//	LOGGER.info(lId + " has been scored for " + modelId  +" " + source + " source");
 			this.outputCollector.emit("score_stream",listToEmit);
 			redisCountIncr("model_scored");
 			} catch (RealTimeScoringException e) {
