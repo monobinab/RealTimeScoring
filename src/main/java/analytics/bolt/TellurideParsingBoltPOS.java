@@ -402,11 +402,15 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
 			//Adding the Div Line information to Redis to send RTS_purchase e-mail
 			if(divLineBuff!=null && divLineBuff.toString().length()>0){
 				//persisting the loyalty id and div lines to redis for sending RTS_Purchase e-mails to customers 
-				
+				try{
 					jedis = new Jedis(host, port, 1800);
 					jedis.connect();
 					jedis.set("Pos:"+lyl_id_no,divLineBuff.toString());
 					jedis.disconnect();
+				}catch(Exception e){
+					LOGGER.error("Exception Occurred Writing to Redis for Lid " + lyl_id_no + " with divLines " + divLineBuff);
+				}
+				
 			}
 			
 		}
