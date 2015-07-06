@@ -62,11 +62,13 @@ public class SignalBolt extends EnvironmentBolt{
 					}
 				}
 			}
+				redisCountIncr("success_signal");
+				outputCollector.ack(input);
 		}
 		catch(Exception e){
 			e.printStackTrace();
 			LOGGER.error("Exception in SignalRedisBolt ", e);
+			redisCountIncr("failure_signal");
 		}
-			outputCollector.ack(input);
 	}
 }

@@ -31,14 +31,14 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
-public class SignalBolt2 extends EnvironmentBolt{
+public class SignalBrowseBolt extends EnvironmentBolt{
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = LoggerFactory
-			.getLogger(SignalBolt2.class);
+			.getLogger(SignalBrowseBolt.class);
 	private OutputCollector outputCollector;
 	
-	 public SignalBolt2(String systemProperty){
+	 public SignalBrowseBolt(String systemProperty){
 		 super(systemProperty);
 	 }
 

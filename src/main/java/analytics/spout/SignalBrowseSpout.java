@@ -21,10 +21,10 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 
-public class SignalSpout2 extends BaseRichSpout{
+public class SignalBrowseSpout extends BaseRichSpout{
 	
 	private static final long serialVersionUID = 1L;
-	private static final Logger LOGGER = LoggerFactory.getLogger(SignalSpout2.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(SignalBrowseSpout.class);
 	private String host;
 	private int port;
 
@@ -32,7 +32,7 @@ public class SignalSpout2 extends BaseRichSpout{
     private String topologyName;
     private String searchKey;
 	
-	public SignalSpout2(String systemProperty, String redisServer, Integer redisPort) {
+	public SignalBrowseSpout(String systemProperty, String redisServer, Integer redisPort) {
 			System.setProperty(MongoNameConstants.IS_PROD, systemProperty);
 			this.host = redisServer;
 			this.port = redisPort;
