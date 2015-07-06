@@ -1,3 +1,4 @@
+
 package analytics.bolt;
 
 import java.lang.reflect.Type;
@@ -56,6 +57,8 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 			sourceTopic = "ATC";
 		} else if ("AAM_CDF_Products".equalsIgnoreCase(topic)) {
 			sourceTopic = "BROWSE";
+		} else if ("SIGNAL_Feed".equalsIgnoreCase(topic)) {
+			sourceTopic = "SIGNAL";
 		}
 		divLnVariableDao = new DivLnVariableDao();
 		//divLnBoostDao = new DivLnBoostDao();

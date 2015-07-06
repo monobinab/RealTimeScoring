@@ -36,7 +36,7 @@ public class SignalTopology2{
 		
 		//Spout that wakes up every 3 mins and process the Vibes Text Messages
 		builder.setSpout("2_signalSpout", new SignalSpout2(System.getProperty(MongoNameConstants.IS_PROD),
-				AuthPropertiesReader.getProperty(Constants.TELLURIDE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
+				AuthPropertiesReader.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
 						.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 1);
 		
 		builder.setBolt("2_signalBolt",new SignalBolt2(System.getProperty(MongoNameConstants.IS_PROD)), 3)
