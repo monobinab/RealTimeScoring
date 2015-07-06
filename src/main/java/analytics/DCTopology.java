@@ -45,11 +45,10 @@ public class DCTopology {
 		builder.setBolt("dcParsingBolt", new ParsingBoltDC(System
 				.getProperty(MongoNameConstants.IS_PROD)), 2).localOrShuffleGrouping("kafkaSpout");
 	    builder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System
-				.getProperty(MongoNameConstants.IS_PROD)),1).localOrShuffleGrouping("dcParsingBolt", "score_stream");
-		builder.setBolt("dcPersistBolt", new PersistDCBolt(System
-				.getProperty(MongoNameConstants.IS_PROD)), 1).localOrShuffleGrouping("dcParsingBolt", "persist_stream");
+				.getProperty(MongoNameConstants.IS_PROD)),1).localOrShuffleGrouping("dcParsingBolt");
+		/*builder.setBolt("dcPersistBolt", new PersistDCBolt(System
+				.getProperty(MongoNameConstants.IS_PROD)), 1).localOrShuffleGrouping("dcParsingBolt", "persist_stream");*/
 		if(System.getProperty(MongoNameConstants.IS_PROD).equals("PROD")){
-			//builder.setBolt("flumeLoggingBolt", new FlumeRPCBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
 			builder.setBolt("loggingBolt", new LoggingBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
 		}	
 			

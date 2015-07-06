@@ -1,4 +1,3 @@
-
 package analytics.bolt;
 
 import java.lang.reflect.Type;

@@ -162,5 +162,10 @@ public class MongoNameConstants {
      public static final String DLBS_LN = "l";
      public static final String DLBS_BU = "bu_nm";
      public static final String DLBS_SUB = "sub_bu_nm";
+     
+     //dcAidVariableStrength collection
+     public static final String DC_AID_VAR_AID = "a";
+     public static final String DC_AID_VAR_MODEL = "m";
+     public static final String DC_AID_VAR_SCORE = "s";
 
 }

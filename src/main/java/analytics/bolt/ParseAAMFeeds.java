@@ -33,6 +33,8 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 	protected String sourceTopic;
 //	protected MemberUUIDDao memberDao;
 	protected ModelVariablesDao modelVariablesDao;
+	
+	private static String topicsUsingEncryptLidDirectly = "SIGNAL_Feed";
 			
     public ParseAAMFeeds() {
 	}
@@ -77,17 +79,25 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
         	return;
         }
         
-		// 4) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN SET CURRENT UUID FROM RECORD, SET CURRENT l_id TO NULL AND RETURN
-        //		If l_id is null and the next UUID is the same the current, then the next record will not be processed
-        this.loyalty_id = splitRecArray[0].trim();
-        if(loyalty_id.length()!=16 || !loyalty_id.startsWith("7081")){
-        	LOGGER.info("Could not find Lid: " + this.loyalty_id);
-        	//countMetric.scope("no_lids").incr();
-        	redisCountIncr("no_lids");
-        	outputCollector.ack(input);
-        	return;
+      //condition to check whether loyaltyId or l_ids is passed
+        String l_id = null;
+        if(!topicsUsingEncryptLidDirectly.contains(topic)){
+			// 4) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN SET CURRENT UUID FROM RECORD, SET CURRENT l_id TO NULL AND RETURN
+	        //		If l_id is null and the next UUID is the same the current, then the next record will not be processed
+	        this.loyalty_id = splitRecArray[0].trim();
+	        if(loyalty_id.length()!=16 || !loyalty_id.startsWith("7081")){
+	        	LOGGER.info("Could not find Lid: " + this.loyalty_id);
+	        	//countMetric.scope("no_lids").incr();
+	        	redisCountIncr("no_lids");
+	        	outputCollector.ack(input);
+	        	return;
+	        }
+	        l_id = SecurityUtils.hashLoyaltyId(loyalty_id);
+        
         }
-        String l_id = SecurityUtils.hashLoyaltyId(loyalty_id);
+        else
+        	l_id = splitRecArray[0];
+        
         
         l_idToValueCollectionMap = new HashMap<String, Collection<String>>();
         // set current uuid and l_id from mongoDB query results

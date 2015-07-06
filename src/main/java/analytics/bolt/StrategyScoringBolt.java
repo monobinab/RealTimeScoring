@@ -108,8 +108,12 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 
 		// 3) Find all models affected by the changes
 		Set<Integer> modelIdList = scoringSingleton.getModelIdList(newChangesVarValueMap);
+		
+		//filter the models which needs to be scored
+		scoringSingleton.filterScoringModelIdList(modelIdList);
+		
 		if(modelIdList==null||modelIdList.isEmpty()){
-			LOGGER.info("No models affected for " +lyl_id_no);
+			LOGGER.info("No models affected for " + lId);
 			redisCountIncr("no_models_affected");
 			outputCollector.ack(input);
 			return;
@@ -209,6 +213,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			LOGGER.debug("The time spent for creating scores..... "
 					+ System.currentTimeMillis() + " and the message ID is ..."
 					+ messageID);
+			LOGGER.info(lId + " has been scored from for " + modelId  +" " + source + " source");
 			this.outputCollector.emit("score_stream",listToEmit);
 			redisCountIncr("model_scored");
 			} catch (RealTimeScoringException e) {
@@ -234,10 +239,9 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 				
 		// 10) Write changedMemberVariableswith expiry
     	scoringSingleton.updateChangedVariables(lId, allChanges);
-		LOGGER.debug("TIME:" + messageID + "-Score updates complete-" + System.currentTimeMillis());
+    	LOGGER.debug("TIME:" + messageID + "-Score updates complete-" + System.currentTimeMillis());
 	
-		scoringSingleton.updateChangedMemberScore(lId, modelIdList, modelIdToExpiryMap, modelIdScoreMap,source);
-		
+    	scoringSingleton.updateChangedMemberScore(lId, modelIdList, modelIdToExpiryMap, modelIdScoreMap,source);
 		LOGGER.debug("TIME:" + messageID + "- Scoring complete-" + System.currentTimeMillis());
 		
 		//persisting the loyalty id to redis for UnknownOccasionsTopology to pick up the loyalty id
