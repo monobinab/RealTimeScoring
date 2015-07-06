@@ -81,14 +81,13 @@ public class DBConnection {
 				}
 				
                 // Code change to set write options differently
-				MongoClientOptions mongoClientOptions= new MongoClientOptions.Builder().writeConcern(new WriteConcern(writeconcern)).build();
-				MongoClient mongoClient = new MongoClient(sServers, mongoClientOptions);
-		
-				
-				//mongoClient	= new MongoClient(sServers);
-				//mongoClient.setWriteConcern(new WriteConcern(writeconcern));
+				//MongoClientOptions mongoClientOptions= new MongoClientOptions.Builder().writeConcern(new WriteConcern(writeconcern)).build();
+				//MongoClient mongoClient = new MongoClient(sServers, mongoClientOptions);
+						
+				mongoClient	= new MongoClient(sServers);
+				mongoClient.setWriteConcern(new WriteConcern(writeconcern));
 			}
-			/*
+			/*// The code before write concern
 			else{
 				mongoClient = new MongoClient(sServerName, sPort);
 			}
