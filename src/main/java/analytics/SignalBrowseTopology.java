@@ -5,9 +5,9 @@ import org.slf4j.LoggerFactory;
 
 import analytics.bolt.LoggingBolt;
 import analytics.bolt.ParsingBoltAAM_Browse;
-import analytics.bolt.SignalBolt2;
+import analytics.bolt.SignalBrowseBolt;
 import analytics.bolt.StrategyScoringBolt;
-import analytics.spout.SignalSpout2;
+import analytics.spout.SignalBrowseSpout;
 import analytics.util.AuthPropertiesReader;
 import analytics.util.Constants;
 import analytics.util.MetricsListener;
@@ -19,9 +19,9 @@ import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
 import backtype.storm.topology.TopologyBuilder;
 
-public class SignalTopology2{
+public class SignalBrowseTopology{
 	private static final Logger LOGGER = LoggerFactory
-			.getLogger(SignalTopology2.class);
+			.getLogger(SignalBrowseTopology.class);
 	
 	public static void main(String[] args)  throws Exception{
 		LOGGER.info("starting Signal topology 2");
@@ -35,11 +35,11 @@ public class SignalTopology2{
 		String topic = TopicConstants.SIGNAL_FEED;
 		
 		//Spout that wakes up every 3 mins and process the Vibes Text Messages
-		builder.setSpout("2_signalSpout", new SignalSpout2(System.getProperty(MongoNameConstants.IS_PROD),
+		builder.setSpout("2_signalSpout", new SignalBrowseSpout(System.getProperty(MongoNameConstants.IS_PROD),
 				AuthPropertiesReader.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
 						.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 1);
 		
-		builder.setBolt("2_signalBolt",new SignalBolt2(System.getProperty(MongoNameConstants.IS_PROD)), 3)
+		builder.setBolt("2_signalBolt",new SignalBrowseBolt(System.getProperty(MongoNameConstants.IS_PROD)), 3)
 				.shuffleGrouping("2_signalSpout");
 		
 		builder.setBolt("parsingBoltBrowse", new ParsingBoltAAM_Browse(System.getProperty(MongoNameConstants.IS_PROD), topic), 3).shuffleGrouping("2_signalBolt");

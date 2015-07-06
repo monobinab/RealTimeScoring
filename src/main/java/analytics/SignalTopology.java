@@ -29,10 +29,10 @@ public class SignalTopology {
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 
 		topologyBuilder.setSpout("signalRedisSpout", new SignalSpout());
-		topologyBuilder.setBolt("signalRedisBolt", new SignalBolt(System.getProperty(MongoNameConstants.IS_PROD), "10.2.8.149", 11211), 3).shuffleGrouping("signalRedisSpout");
+		topologyBuilder.setBolt("signalRedisBolt", new SignalBolt(System.getProperty(MongoNameConstants.IS_PROD), "10.2.8.175", 11211), 3).shuffleGrouping("signalRedisSpout");
 
 		Config conf = new Config();
-		conf.put("metrics_topology", "Signal_Redis");
+		conf.put("metrics_topology", "Signal_topology");
 		conf.registerMetricsConsumer(MetricsListener.class, System.getProperty(MongoNameConstants.IS_PROD), 3);
 		conf.setMaxSpoutPending(30);
 		if (System.getProperty(MongoNameConstants.IS_PROD)
@@ -51,7 +51,7 @@ public class SignalTopology {
 			conf.setDebug(false);
 			conf.setMaxTaskParallelism(3);
 			LocalCluster cluster = new LocalCluster();
-			cluster.submitTopology("signal_redis_topology", conf,
+			cluster.submitTopology("signal_topology", conf,
 					topologyBuilder.createTopology());
 			try {
 				Thread.sleep(10000000);

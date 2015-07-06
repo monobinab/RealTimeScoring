@@ -12,6 +12,7 @@ import analytics.bolt.PersistDCBolt;
 import analytics.bolt.ScorePublishBolt;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.bolt.SywScoringBolt;
+import analytics.spout.DCTestSpout;
 import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
 import analytics.util.RedisConnection;
@@ -42,12 +43,16 @@ public class DCTopology {
 		kafkaConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
 		
 		builder.setSpout("kafkaSpout", new KafkaSpout(kafkaConfig), 2);
+		
+		DCTestSpout testSpout = new DCTestSpout();
+		builder.setSpout("testSpout", testSpout, 2);
 		builder.setBolt("dcParsingBolt", new ParsingBoltDC(System
 				.getProperty(MongoNameConstants.IS_PROD)), 2).localOrShuffleGrouping("kafkaSpout");
+		
+		/*builder.setBolt("dcParsingBolt", new ParsingBoltDC(System
+				.getProperty(MongoNameConstants.IS_PROD)), 2).localOrShuffleGrouping("testSpout");*/
 	    builder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System
 				.getProperty(MongoNameConstants.IS_PROD)),1).localOrShuffleGrouping("dcParsingBolt");
-		/*builder.setBolt("dcPersistBolt", new PersistDCBolt(System
-				.getProperty(MongoNameConstants.IS_PROD)), 1).localOrShuffleGrouping("dcParsingBolt", "persist_stream");*/
 		if(System.getProperty(MongoNameConstants.IS_PROD).equals("PROD")){
 			builder.setBolt("loggingBolt", new LoggingBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
 		}	

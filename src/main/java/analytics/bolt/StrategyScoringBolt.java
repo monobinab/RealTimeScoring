@@ -114,9 +114,14 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		
 		if(modelIdList==null||modelIdList.isEmpty()){
 			LOGGER.info("No models affected for " + lId);
+		//	System.out.println("No models affected for " + lId);
 			redisCountIncr("no_models_affected");
 			outputCollector.ack(input);
 			return;
+		}
+		else{
+			LOGGER.info("models to be scored for lid: " + lId + " " + modelIdList);
+			//System.out.println("models to be scored for lid: " + lId + " " + modelIdList);
 		}
 		// 4) Find all variables for models
 
@@ -213,7 +218,8 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			LOGGER.debug("The time spent for creating scores..... "
 					+ System.currentTimeMillis() + " and the message ID is ..."
 					+ messageID);
-			LOGGER.info(lId + " has been scored from for " + modelId  +" " + source + " source");
+		//	System.out.println(lId + " has been scored for " + modelId  +" " + source + " source");
+		//	LOGGER.info(lId + " has been scored for " + modelId  +" " + source + " source");
 			this.outputCollector.emit("score_stream",listToEmit);
 			redisCountIncr("model_scored");
 			} catch (RealTimeScoringException e) {

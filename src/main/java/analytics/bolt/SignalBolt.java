@@ -1,6 +1,5 @@
 package analytics.bolt;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -46,27 +45,30 @@ public class SignalBolt extends EnvironmentBolt{
 				if(input.contains("type") && input.getStringByField("type").equalsIgnoreCase("BrowseProduct")){
 				Jedis jedis = null;
 				redisCountIncr("incoming_tuples");
-				List<String> l_Ids = memberUUIDDao.getLoyaltyIdsFromUUID(input.getStringByField("uuid"));
-				Iterator<String> itr = l_Ids.iterator();
-				
-				while(itr.hasNext()){
+				List<String> l_Ids = memberUUIDDao.getLoyaltyIdsFromUUID((String) input.getValueByField("uuid"));
+				for(String loyaltyId : l_Ids){
 					if(redisHost!=null){
 						jedis = new Jedis(redisHost, redisPort, 1800);
 						jedis.connect();
-						String loyaltyId = "signal:"+itr.next();
-						if(!(jedis.exists(loyaltyId)))
-							jedis.rpush(loyaltyId, System.currentTimeMillis()+"");
-						jedis.rpush(loyaltyId, input.getStringByField("products"));
+						String loyId = "signal:"+loyaltyId;
+						if(!(jedis.exists(loyaltyId))){
+							jedis.rpush(loyId, System.currentTimeMillis()+"");
+							LOGGER.info(loyaltyId + " persisted to redis");
+						}
+						jedis.rpush(loyId, input.getStringByField("products"));
+						LOGGER.info(loyaltyId + " appended to redis with pids " + input.getStringByField("products"));
 						redisCountIncr("lids_to_redis");
 						jedis.disconnect();
 					}
 				}
 			}
+			//	redisCountIncr("success_signal");
+				outputCollector.ack(input);
 		}
 		catch(Exception e){
 			e.printStackTrace();
-			LOGGER.error("Exception in SignalRedddisBolt ", e);
+			LOGGER.error("Exception in SignalRedisBolt ", e);
+			redisCountIncr("failure_signal");
 		}
-			outputCollector.ack(input);
 	}
 }

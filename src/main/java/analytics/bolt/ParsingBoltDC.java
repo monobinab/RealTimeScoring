@@ -62,6 +62,7 @@ public class ParsingBoltDC extends EnvironmentBolt {
 				message = (String) obj.get("xmlReqData");
 				
 				LOGGER.info("xmlReqData: " + message);
+				//System.out.println("xmlreqData: " + message);
 							
 				//ParsedDC parses the xml and return the list of answerIds along with memberNumber
 				ParsedDC parsedDC = DCParsingHandler.getAnswerJson(message);
@@ -114,7 +115,14 @@ public class ParsingBoltDC extends EnvironmentBolt {
 				continue;
 			}
 		}
-			emitToScoreStream(l_id, variableValueMap);
+			if(variableValueMap != null && !variableValueMap.isEmpty()){
+				//System.out.println(variableValueMap + "for " + l_id);
+				emitToScoreStream(l_id, variableValueMap);
+			}
+			else{
+				//System.out.println("varValueMap is null or empty");
+				LOGGER.info("varValueMap is null or empty for " + l_id);
+			}
 	}
 }	
 	public void emitToScoreStream(String l_id, Map<String, String> varValueMap){
