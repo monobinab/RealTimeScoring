@@ -242,12 +242,17 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			//jedisPool.returnResource(jedis);
 			
 		}
-				
+			
+		long timeTaken = System.currentTimeMillis(); 
 		// 10) Write changedMemberVariableswith expiry
     	scoringSingleton.updateChangedVariables(lId, allChanges);
     	LOGGER.debug("TIME:" + messageID + "-Score updates complete-" + System.currentTimeMillis());
-	
+    	LOGGER.info("time taken for variable update: " + (System.currentTimeMillis() - timeTaken )) ;
+    	
+    	timeTaken = System.currentTimeMillis();
+    	// 11) Write changedMemberScores with min max expiry
     	scoringSingleton.updateChangedMemberScore(lId, modelIdList, modelIdToExpiryMap, modelIdScoreMap,source);
+    	LOGGER.info("time taken for score update: " + (System.currentTimeMillis() - timeTaken ));
 		LOGGER.debug("TIME:" + messageID + "- Scoring complete-" + System.currentTimeMillis());
 		
 		//persisting the loyalty id to redis for UnknownOccasionsTopology to pick up the loyalty id
