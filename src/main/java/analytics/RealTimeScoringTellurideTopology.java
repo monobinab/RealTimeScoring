@@ -81,7 +81,7 @@ public class RealTimeScoringTellurideTopology {
 				.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST),new Integer (AuthPropertiesReader
 					.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 12).shuffleGrouping("parsingBolt");
        
-       topologyBuilder.setBolt("kafka_bolt", new RTSKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD),kafkatopic), 12)
+       topologyBuilder.setBolt("kafka_bolt", new RTSKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD),kafkatopic), 2)
 		.shuffleGrouping("strategyScoringBolt","kafka_stream");
 	
         if(System.getProperty(MongoNameConstants.IS_PROD).equalsIgnoreCase("PROD")){
