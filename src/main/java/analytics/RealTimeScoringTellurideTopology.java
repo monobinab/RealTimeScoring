@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.bolt.LoggingBolt;
+import analytics.bolt.RTSKafkaBolt;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.bolt.TellurideParsingBoltPOS;
 import analytics.spout.WebsphereMQSpout;
@@ -14,6 +15,7 @@ import analytics.util.MQConnectionConfig;
 import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
 import analytics.util.SystemUtility;
+import analytics.util.TopicConstants;
 import analytics.util.WebsphereMQCredential;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
@@ -42,6 +44,7 @@ public class RealTimeScoringTellurideTopology {
 			System.exit(0);
 		}
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
+		String kafkatopic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;
 
 		MQConnectionConfig mqConnection = new MQConnectionConfig();
 		WebsphereMQCredential mqCredential = mqConnection
@@ -76,7 +79,10 @@ public class RealTimeScoringTellurideTopology {
 				.getProperty(Constants.TELLURIDE_REDIS_SERVER_PORT)),
 				AuthPropertiesReader
 				.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST),new Integer (AuthPropertiesReader
-						.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 12).shuffleGrouping("parsingBolt");
+					.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 12).shuffleGrouping("parsingBolt");
+       
+       topologyBuilder.setBolt("kafka_bolt", new RTSKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD),kafkatopic), 12)
+		.shuffleGrouping("strategyScoringBolt","kafka_stream");
 	
         if(System.getProperty(MongoNameConstants.IS_PROD).equalsIgnoreCase("PROD")){
         	topologyBuilder.setBolt("loggingBolt", new LoggingBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
