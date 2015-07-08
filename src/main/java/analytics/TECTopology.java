@@ -13,6 +13,7 @@ import storm.kafka.StringScheme;
 import storm.kafka.ZkHosts;
 import analytics.bolt.LoggingBolt;
 import analytics.bolt.TECProcessingBolt;
+import analytics.spout.RTSKafkaSpout;
 import analytics.util.KafkaUtil;
 //import analytics.spout.RTSKafkaSpout;
 import analytics.util.MetricsListener;
@@ -41,22 +42,32 @@ public class TECTopology {
 					.println("Please pass the environment variable argument- 'PROD' or 'QA' or 'LOCAL'");
 			System.exit(0);
 		}
-		String topic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;
+		String kafkaTopic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;
 		String env = System.getProperty(MongoNameConstants.IS_PROD);
 		TopologyBuilder builder = new TopologyBuilder();		
 				
 		//prepare the kafka spout configuration	
+	
 		try {
-			builder.setSpout("KafkaSpout", new KafkaSpout(KafkaUtil.getSpoutConfig(System.getProperty(MongoNameConstants.IS_PROD),topic)), 1);
-		} catch (ConfigurationException e) {
-			LOGGER.error(e.getClass() + ": " + e.getMessage(), e);
-			System.exit(0);			
-		}
+			builder.setSpout(
+					"RTSKafkaSpout",
+					new RTSKafkaSpout(KafkaUtil.getSpoutConfig(
+							
+							System.getProperty(MongoNameConstants.IS_PROD),
+							kafkaTopic)), 1);
+		} catch (ConfigurationException e1) {
+			// TODO Auto-generated catch block
+			LOGGER.error(e1.getClass() + ": " + e1.getMessage(), e1);
+			LOGGER.error("Kafka Not Initialised ");
+			   System.exit(0);
+			}	
 		
-		builder.setBolt("tecProcessingBolt", new TECProcessingBolt(env),2).localOrShuffleGrouping("KafkaSpout");
+		
+		builder.setBolt("tecProcessingBolt", new TECProcessingBolt(env),2).localOrShuffleGrouping("RTSKafkaSpout");
 		
 		Config conf = new Config();
 		conf.put("metrics_topology", "TEC");
+		conf.setMessageTimeoutSecs(7200);	
 		conf.registerMetricsConsumer(MetricsListener.class, env, partition_num);
 		conf.setDebug(false);
 		if (env.equalsIgnoreCase("PROD")|| env.equalsIgnoreCase("QA")) {	
