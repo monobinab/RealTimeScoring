@@ -62,7 +62,7 @@ public class ParsingBoltDC extends EnvironmentBolt {
 				message = (String) obj.get("xmlReqData");
 				
 				LOGGER.info("xmlReqData: " + message);
-				System.out.println("xmlreqData: " + message);
+				//System.out.println("xmlreqData: " + message);
 							
 				//ParsedDC parses the xml and return the list of answerIds along with memberNumber
 				ParsedDC parsedDC = DCParsingHandler.getAnswerJson(message);
@@ -116,11 +116,11 @@ public class ParsingBoltDC extends EnvironmentBolt {
 			}
 		}
 			if(variableValueMap != null && !variableValueMap.isEmpty()){
-				System.out.println(variableValueMap + "for " + l_id);
+				//System.out.println(variableValueMap + "for " + l_id);
 				emitToScoreStream(l_id, variableValueMap);
 			}
 			else{
-				System.out.println("varValueMap is null or empty");
+				//System.out.println("varValueMap is null or empty");
 				LOGGER.info("varValueMap is null or empty for " + l_id);
 			}
 	}
@@ -129,10 +129,10 @@ public class ParsingBoltDC extends EnvironmentBolt {
 		List<Object> listToEmit_s = new ArrayList<Object>();
 		listToEmit_s.add(l_id);
 		listToEmit_s.add(JsonUtils.createJsonFromStringStringMap(varValueMap));
-		outputCollector.emit(listToEmit_s);
 		listToEmit_s.add("DC");
+		outputCollector.emit(listToEmit_s);
 		redisCountIncr("emitted_to_scoring");
 		LOGGER.info("Emitted message to scoring for l_id from DC " + l_id);
-		System.out.println("Emitted message to score stream for l_id from DC " + l_id);
+		//System.out.println("Emitted message to score stream for l_id from DC " + l_id);
 	}
 }
