@@ -27,7 +27,7 @@ public class ParsingBoltDC extends EnvironmentBolt {
 	private static final long serialVersionUID = 1L;
 	private OutputCollector outputCollector;
 	private DcAidVarStrengthDao dcAidVarStrengthDao;
-	private Map<String, Map<String, Double>> dcAidVarStrengthMap;
+	private Map<String, Map<String, Integer>> dcAidVarStrengthMap;
 
 	 public ParsingBoltDC(String systemProperty){
 		 super(systemProperty);
@@ -62,7 +62,7 @@ public class ParsingBoltDC extends EnvironmentBolt {
 				message = (String) obj.get("xmlReqData");
 				
 				LOGGER.info("xmlReqData: " + message);
-				//System.out.println("xmlreqData: " + message);
+				System.out.println("xmlreqData: " + message);
 							
 				//ParsedDC parses the xml and return the list of answerIds along with memberNumber
 				ParsedDC parsedDC = DCParsingHandler.getAnswerJson(message);
@@ -99,7 +99,7 @@ public class ParsingBoltDC extends EnvironmentBolt {
 		Iterator<String> answerChoiceIdsIterator =  answerChoiceIds.iterator();
 		while(answerChoiceIdsIterator.hasNext()){
 			String aid = answerChoiceIdsIterator.next();
-			Map<String, Double> varStrengthMap = dcAidVarStrengthMap.get(aid);
+			Map<String, Integer> varStrengthMap = dcAidVarStrengthMap.get(aid);
 			if(varStrengthMap != null){
 				for(String var : varStrengthMap.keySet()){
 					if(!variableValueMap.containsKey(var)){
@@ -116,11 +116,11 @@ public class ParsingBoltDC extends EnvironmentBolt {
 			}
 		}
 			if(variableValueMap != null && !variableValueMap.isEmpty()){
-				//System.out.println(variableValueMap + "for " + l_id);
+				System.out.println(variableValueMap + "for " + l_id);
 				emitToScoreStream(l_id, variableValueMap);
 			}
 			else{
-				//System.out.println("varValueMap is null or empty");
+				System.out.println("varValueMap is null or empty");
 				LOGGER.info("varValueMap is null or empty for " + l_id);
 			}
 	}
@@ -129,10 +129,10 @@ public class ParsingBoltDC extends EnvironmentBolt {
 		List<Object> listToEmit_s = new ArrayList<Object>();
 		listToEmit_s.add(l_id);
 		listToEmit_s.add(JsonUtils.createJsonFromStringStringMap(varValueMap));
-		listToEmit_s.add("DC");
 		outputCollector.emit(listToEmit_s);
+		listToEmit_s.add("DC");
 		redisCountIncr("emitted_to_scoring");
 		LOGGER.info("Emitted message to scoring for l_id from DC " + l_id);
-		//System.out.println("Emitted message to score stream for l_id from DC " + l_id);
+		System.out.println("Emitted message to score stream for l_id from DC " + l_id);
 	}
 }
