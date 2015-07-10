@@ -46,6 +46,7 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 	private DivLnBoostDao divLnBoostDao;
 	SywApiCalls sywApiCalls;
 	private Map<String, List<String>> divLnBoostVariblesMap;
+	Map<Integer, Map<Integer, Double>> percentileScores;
 	private BoostDao boostDao;
 	private MemberBoostsDao memberBoostsDao;
 	private MemberScoreDao memberScoreDao;
@@ -53,7 +54,7 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 	private ModelPercentileDao modelPercentileDao;
 	private ModelSywBoostDao modelBoostDao;
 	Map<String, List<String>> boostListMap;
-	private Map sywBoostModelMap;
+	private Map<String, Integer> sywBoostModelMap;
 	
 	 public ProcessSYWInteractions(String systemProperty){
 		 super(systemProperty);
@@ -61,10 +62,8 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 
 	 @Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
-	//	System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
-		super.prepare(stormConf, context, collector);
-	 //   HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
-		this.outputCollector = collector;
+		 super.prepare(stormConf, context, collector);
+	     this.outputCollector = collector;
 		sywApiCalls = new SywApiCalls();
 
 		pidDivLnDao = new PidDivLnDao();
@@ -84,37 +83,28 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 		feeds.add("SYW_OWN");
 		feeds.add("SYW_WANT");
 		boostListMap = boostDao.getBoostsMap(feeds);// Feed prefix
+		percentileScores = modelPercentileDao.getModelPercentiles();
 	}
 
 	@Override
 	public void execute(Tuple input) {
-		//countMetric.scope("incoming_tuples").incr();
 		redisCountIncr("incoming_tuples");
 		String feedType = null;
+		
 		// Get l_id", "message", "InteractionType" from parsing bolt
-		/*
-		 * SYWInteraction obj = (SYWInteraction) input
-		 * .getValueByField("message");
-		 */
 		String lId = input.getStringByField("l_id");
-		String interactionType = input.getStringByField("InteractionType");
-		//lId = "a7V7rU68LLBethrQ3W5+xTff7fo=";
 		JsonParser parser = new JsonParser();
 		JsonObject interactionObject = parser.parse(input.getStringByField("message")).getAsJsonObject();
-		//TODO: Add a if exists
+		
 		String lyl_id_no = input.getStringByField("lyl_id_no");
-		/*
-		 * JsonObject interactionObject = (JsonObject) input
-		 * .getValueByField("message");
-		 */
+		
 
 		Gson gson = new Gson();
 		SYWInteraction obj = gson.fromJson(interactionObject, SYWInteraction.class);
 
 
-		/* Ignore interactions that we dont want. */
-		/*
-		 * We currently process Catalogs: Like, Want, Own Others: Like
+		/* Ignore interactions that we dont want. 	
+		   We currently process Catalogs: Like, Want, Own Others: Like
 		 */
 
 		// Find type of catalog to process, and hence the boost variable
@@ -137,19 +127,13 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 						}
 					}
 				}
-//				else{
-//					if(interactionType.equals("Like")){
-//						feedType = "SYW_LIKE";
-//					}
-//				}
 			}
 		}
 
 		if (feedType == null) {
 			LOGGER.info("We process only own, like and want catalogs & SYW Likes");
-			//countMetric.scope("customer_catalog").incr();
 			redisCountIncr("customer_catalog");
-			outputCollector.fail(input);
+			outputCollector.ack(input);  
 			return;
 		}
 		// Variable map stores the vars to send to Strategy Bolt
@@ -254,11 +238,9 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 			listToEmit2.add(feedType);
 			listToEmit2.add(lyl_id_no);
 			this.outputCollector.emit("score_stream", listToEmit2);
-			//countMetric.scope("successful").incr();
 			redisCountIncr("successful");
 
 		} else {
-			//countMetric.scope("empty_var_map").incr();
 			redisCountIncr("empty_var_map");
 		}
 		this.outputCollector.ack(input);
@@ -267,7 +249,6 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 	public Map<String, String> formMapForScoringBolt(String feedType, String lId, Map<String, Map<String, List<String>>> allBoostValuesMap, Map<String, String> variableValueMap) {
 		Map<String, String> memberScores = memberScoreDao.getMemberScores(lId);
 		Map<String, ChangedMemberScore> changedMemberScores = changedMemberScoresDao.getChangedMemberScores(lId);
-		Map<Integer, Map<Integer, Double>> percentileScores = modelPercentileDao.getModelPercentiles();
 		Map<String, String> varValToScore = new HashMap<String, String>();
 		for(String variableName : variableValueMap.keySet()){
 			
@@ -298,10 +279,8 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 						val = 0.0;
 					varValToScore.put(variableName, String.valueOf(val));
 					if("SYW_LIKE".equals(feedType))
-							//countMetric.scope("type_like").incr();
-							redisCountIncr("type_like");
+						redisCountIncr("type_like");
 					if("SYW_WANT".equals(feedType))
-						//countMetric.scope("type_want").incr();
 						redisCountIncr("type_want");
 				} else if ("SYW_OWN".equals(feedType)) {
 					double greater = memberScore;
@@ -310,13 +289,11 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 					if(changedMemberScoreObject != null){
 						changedMemberScore = changedMemberScoreObject.getScore();
 						greater = Math.max(memberScore, changedMemberScore);
-						//System.out.println(greater);
 					}
 					if(greater >= percentileScore){
 						val = percentileScore - greater;//This will be negative
 					}
 					varValToScore.put(variableName, String.valueOf(val));
-					//countMetric.scope("type_own").incr();
 					redisCountIncr("type_own");
 				}
 			}
