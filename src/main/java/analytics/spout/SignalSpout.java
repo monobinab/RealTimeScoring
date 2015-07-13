@@ -20,13 +20,11 @@ import backtype.storm.tuple.Fields;
 
 public class SignalSpout extends BaseRichSpout{
 	private static final Logger LOGGER = LoggerFactory.getLogger(SignalSpout.class);
-	String signalUrl = null;
-    private SpoutOutputCollector collector;
+	private SpoutOutputCollector collector;
 
 	@Override
 	public void open(Map conf, TopologyContext context,
 			SpoutOutputCollector collector) {
-		signalUrl = Constants.SIGNAL_URL;
 		this.collector = collector;
 	}
 
@@ -34,7 +32,7 @@ public class SignalSpout extends BaseRichSpout{
 	public void nextTuple() {
 		try {
 			
-			JSONArray feedJsonArray = new JSONArray( HttpClientUtils.httpGetCallJsonString(signalUrl));
+			JSONArray feedJsonArray = new JSONArray( HttpClientUtils.httpGetCallJsonString(Constants.SIGNAL_URL));
 			
 			for(int i=0; i<feedJsonArray.length();i++){
 				List<Object> listToEmit = new ArrayList<Object>();
@@ -51,11 +49,14 @@ public class SignalSpout extends BaseRichSpout{
 				listToEmit.add(userJsonObj.get("uuid"));
 				listToEmit.add(valueJsonObj.get("type"));
 				collector.emit(listToEmit);
+				//nullifying the objects once emitted successfully 
+				listToEmit = null;
+				valueJsonObj = null;
+				feedJsonArray = null;
 			}
 			
 		} catch (JSONException e) {
-			LOGGER.error("Exception in SignalSpout " , e.getClass() + " " + e.getMessage());
-			e.printStackTrace();
+			LOGGER.error("Exception in SignalSpout " , e.getClass() + ": " + e.getMessage());
 		}
 	}
 
