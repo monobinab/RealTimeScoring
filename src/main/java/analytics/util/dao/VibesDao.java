@@ -61,6 +61,9 @@ public class VibesDao extends AbstractDao {
 		
 		vibesCollection.insert(vibesObj);
 	
+		LOGGER.info("PERSIST: " + ft.format(dNow) + ", Topology: Vibes, lid: " + l_id 
+				+", successFlag: "+successFlag);
+	
 	}
 
 }

@@ -44,8 +44,9 @@ public class OccasionResponsesDao extends AbstractDao {
 		
 		occasionResonsesCollection.insert(occObj);
 		
-		LOGGER.info("PERSIST: " + ft.format(dNow) + " : Topology: "+topologyName+" : lid: " + l_id + ", "
-				+ "eid: "+eid + ", custEvent: "+custEvent +", successFlag: "+successFlag+", tag: "+tag+", purchaseOccasion: "+purOcca);
+		LOGGER.info("PERSIST: " + ft.format(dNow) + ", Topology: "+topologyName+", lid: " + l_id + ", "
+				+ "eid: "+eid + ", custEvent: "+custEvent +", successFlag: "+successFlag+", tag: "+tag+", purchaseOccasion: "+purOcca
+				+ ", businessUnit: "+businessUnit+", SubBusinessUnit: " + subBusUnit);
 	
 	}
 	

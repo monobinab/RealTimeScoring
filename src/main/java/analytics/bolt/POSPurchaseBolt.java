@@ -35,7 +35,7 @@ public class POSPurchaseBolt  extends ResponsysBolt{
 
 	
 	@Override
-	public String process (String lyl_id_no, ResponsysPayload responsysObj, String l_id, String eid, String value,String topologyName ){
+	public String process (String lyl_id_no, ResponsysPayload responsysObj, String l_id, MemberInfo memberInfo, String value,String topologyName ){
 
 		TagMetadata tagMetadata = null;
 		String custEventNm = null;   
@@ -55,7 +55,7 @@ public class POSPurchaseBolt  extends ResponsysBolt{
 				responsysUtil.getTagMetadata(tagMetadata,divLineArr[i]);
 			}
 			
-			setResponsysObj(lyl_id_no, responsysObj, l_id, eid, o, tagMetadata, value, custEventNm, topologyName);
+			setResponsysObj(lyl_id_no, responsysObj, l_id, memberInfo, o, tagMetadata, value, custEventNm, topologyName);
 	    }catch(Exception e){
 	    	LOGGER.error(" Error Occured processing Unknown Responsys for member : " + lyl_id_no);
 	    }
@@ -66,7 +66,7 @@ public class POSPurchaseBolt  extends ResponsysBolt{
 	
 
 	private void setResponsysObj(String lyl_id_no,
-			ResponsysPayload responsysObj, String l_id, String eid,
+			ResponsysPayload responsysObj, String l_id, MemberInfo memberInfo,
 			org.json.JSONObject o, TagMetadata tagMetadata, 
 			String value, String custEventNm, String topologyName) {
 		//set the responsys object
@@ -74,11 +74,13 @@ public class POSPurchaseBolt  extends ResponsysBolt{
 		responsysObj.setL_id(l_id);
 		responsysObj.setJsonObj(o);
 		responsysObj.setTagMetadata(tagMetadata);
-		responsysObj.setEid(eid);
+		responsysObj.setMemberInfo(memberInfo);
 		responsysObj.setCustomEventName(custEventNm);
 		responsysObj.setTopologyName(topologyName);
 		responsysObj.setValue(value);
 	}
+	
+	public void addRtsMemberTag(String l_id, String rtsTag){}
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {

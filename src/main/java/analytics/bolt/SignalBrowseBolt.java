@@ -2,29 +2,14 @@ package analytics.bolt;
 
 import static backtype.storm.utils.Utils.tuple;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.util.AuthPropertiesReader;
-import analytics.util.Constants;
-import analytics.util.HttpClientUtils;
-import analytics.util.SecurityUtils;
-import analytics.util.dao.VibesDao;
 import analytics.util.objects.RtsCommonObj;
-import analytics.util.objects.Vibes;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -51,7 +36,7 @@ public class SignalBrowseBolt extends EnvironmentBolt{
 	
 	@Override
 	public void execute(Tuple input) {
-		LOGGER.info("~~~~~~~~~~Incoming tuple in Vibesbolt: " + input);
+		LOGGER.info("~~~~~~~~~~Incoming tuple in SignalBrowseBolt: " + input);
 		
 		redisCountIncr("incoming_tuples");
 		RtsCommonObj rtsCommonObj = (RtsCommonObj) input.getValueByField("rtsCommonObj");
