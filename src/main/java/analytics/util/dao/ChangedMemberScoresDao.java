@@ -62,7 +62,7 @@ public class ChangedMemberScoresDao extends AbstractDao{
 		BasicDBObject query = new BasicDBObject();
 		query.put(MongoNameConstants.L_ID, l_id);
 		DBObject dbObj = changedMemberScoresCollection.findOne(query);
-
+		double score = 0.0;
 		if (dbObj != null && dbObj.keySet() != null) {
 			for (String key : dbObj.keySet()) {
 				// skip expired changes
@@ -70,11 +70,20 @@ public class ChangedMemberScoresDao extends AbstractDao{
 					continue;
 				}
 				else{
+					try{
 					DBObject scoreObj = (DBObject) dbObj.get(key);
 					if(scoreObj!=null && scoreObj.get(MongoNameConstants.CMS_MIN_EXPIRY_DATE)!=null && 
 							scoreObj.get(MongoNameConstants.CMS_MAX_EXPIRY_DATE)!=null){
-						ChangedMemberScore score = new ChangedMemberScore((Double)scoreObj.get("s"), (String)scoreObj.get("minEx"), (String)scoreObj.get("maxEx"), (String)scoreObj.get("f"), (String)scoreObj.get("c"));
-						memberScores.put(key, score);
+						if(scoreObj.get("s") instanceof Double)
+							score = (Double)scoreObj.get("s");
+						else if(scoreObj.get("s") instanceof Integer)
+							score = ((Integer)scoreObj.get("s")).doubleValue();
+						ChangedMemberScore changedMemberScore = new ChangedMemberScore(score, (String)scoreObj.get("minEx"), (String)scoreObj.get("maxEx"), (String)scoreObj.get("f"), (String)scoreObj.get("c"));
+						memberScores.put(key, changedMemberScore);
+					}
+				}
+					catch(Exception e){
+						LOGGER.error("Exception in changedMemberScoresDao ", e);
 					}
 				}
 			}

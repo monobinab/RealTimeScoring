@@ -52,8 +52,7 @@ public class ParsingBoltSYW extends EnvironmentBolt {
 
 	@Override
 	public void execute(Tuple input) {
-		//Read the JSON message from the spout
-		//countMetric.scope("incoming_tuples").incr();
+		
 		redisCountIncr("incoming_tuples");
 		JsonParser parser = new JsonParser();
 		JsonArray interactionArray = parser.parse(input.getStringByField("message")).getAsJsonArray();
@@ -63,8 +62,7 @@ public class ParsingBoltSYW extends EnvironmentBolt {
 			JsonObject interactionObject = interaction.getAsJsonObject();		
 			String l_id = sywApiCalls.getLoyaltyId(interactionObject.get("UserId").getAsString());
 			String lyl_id_no = l_id;
-			//TODO : Instead of passing through storm, we can also write loyalty id to REDIS for Responsys bolt
-			
+					
 			/*Ignore if we can not get member information
 			 * Possible causes are
 			1. user is not subscribed to our app
@@ -72,11 +70,8 @@ public class ParsingBoltSYW extends EnvironmentBolt {
 			*/
 
 			if (l_id == null) {
-				//countMetric.scope("null_lid").incr();
 				redisCountIncr("null_lid");
-				//LOGGER.warn("Unable to get member information" + input);
-				outputCollector.fail(input);
-				//could not process record
+				outputCollector.ack(input);
 				return;
 			} else {		
 				// RTS only wants encrypted loyalty ids
@@ -88,12 +83,10 @@ public class ParsingBoltSYW extends EnvironmentBolt {
 			if (listOfInteractionsForRTS.contains(interactionTypeString)) {
 				// Create a SYW Interaction object
 					outputCollector.emit(tuple(l_id, interactionObject.toString(),interactionTypeString, lyl_id_no));
-					//countMetric.scope("sent_to_process").incr();
 					redisCountIncr("sent_to_process");
 			} else {
 				//We should look into either processing this request type or not subscribing to it
 				LOGGER.info("Ignore interaction type" + interactionType.getAsString());
-				//countMetric.scope("unwanted_interaction_type").incr();
 				redisCountIncr("unwanted_interaction_type");
 			}
 		}

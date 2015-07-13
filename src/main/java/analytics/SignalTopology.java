@@ -3,8 +3,10 @@ package analytics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.bolt.SignalBolt;
+import analytics.bolt.ParsingSignalBolt;
 import analytics.spout.SignalSpout;
+import analytics.util.AuthPropertiesReader;
+import analytics.util.Constants;
 import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
 import analytics.util.SystemUtility;
@@ -20,7 +22,7 @@ public class SignalTopology {
 			.getLogger(SignalTopology.class);
 
 	public static void main(String[] args) throws Exception {
-		LOGGER.info("Starting SignalRedisTopology");
+		LOGGER.info("Starting SignalTopology");
 		if (!SystemUtility.setEnvironment(args)) {
 			System.out
 					.println("Please pass the environment variable argument- 'PROD' or 'QA' or 'LOCAL'");
@@ -28,8 +30,9 @@ public class SignalTopology {
 		} 
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 
-		topologyBuilder.setSpout("signalRedisSpout", new SignalSpout());
-		topologyBuilder.setBolt("signalRedisBolt", new SignalBolt(System.getProperty(MongoNameConstants.IS_PROD), "10.2.8.175", 11211), 3).shuffleGrouping("signalRedisSpout");
+		topologyBuilder.setSpout("signalSpout", new SignalSpout(), 1);
+		topologyBuilder.setBolt("parsingSignalBolt", new ParsingSignalBolt(System.getProperty(MongoNameConstants.IS_PROD), AuthPropertiesReader.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
+				.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 3).shuffleGrouping("signalSpout");
 
 		Config conf = new Config();
 		conf.put("metrics_topology", "Signal_topology");

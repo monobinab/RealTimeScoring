@@ -1,10 +1,8 @@
 
 package analytics.util.dao;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,6 +16,7 @@ import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
+import com.mongodb.WriteConcernException;
 
 public class MemberBoostsDao extends AbstractDao {
 
@@ -137,7 +136,12 @@ public class MemberBoostsDao extends AbstractDao {
 		
 		objectToUpsert.append(MongoNameConstants.BOOSTS_ARRAY, boostDateValues);
 		BasicDBObject searchQuery = new BasicDBObject(MongoNameConstants.L_ID, l_id);
-		memberBoostsCollection.update(searchQuery, new BasicDBObject("$set", objectToUpsert), true, false);
+		try{
+			memberBoostsCollection.update(searchQuery, new BasicDBObject("$set", objectToUpsert), true, false);
+		}
+		catch(WriteConcernException e){
+			LOGGER.error("WriteConcernException occured ", e.getClass(), e.getMessage());
+		}
 	}
 }
 

@@ -1,8 +1,6 @@
 package analytics.spout;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -14,7 +12,6 @@ import redis.clients.jedis.Jedis;
 import analytics.util.Constants;
 import analytics.util.MongoNameConstants;
 import analytics.util.objects.RtsCommonObj;
-import analytics.util.objects.Vibes;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -47,8 +44,8 @@ public class SignalBrowseSpout extends BaseRichSpout{
 			SpoutOutputCollector collector) {
 		this.collector = collector;
 		topologyName = (String) conf.get("metrics_topology");
-		if(topologyName.equalsIgnoreCase(Constants.SIGNAL_TOPOLOGY2))
-			this.searchKey = "signal";
+		if(topologyName.equalsIgnoreCase(Constants.SIGNAL_BROWSE_TOPOLOGY))
+			this.searchKey = "signalBrowseFeed";
 	}
 
 	@Override
@@ -103,7 +100,7 @@ public class SignalBrowseSpout extends BaseRichSpout{
 			Thread.sleep(180000);
 		}
 		catch(Exception e){
-			LOGGER.error("Error in SignalSpout2 ");
+			LOGGER.error("Error in SignalBrowseSpout ");
 		}finally{
 			if(jedis !=null)
 				jedis.disconnect();

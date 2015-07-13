@@ -95,7 +95,7 @@ public class PersistBoostsBolt extends EnvironmentBolt {
         LOGGER.trace("Sent to DAO " + memberBoostValuesMap + " lid: " + l_id);
 
 
-        new MemberBoostsDao().writeMemberBoostValues(l_id, memberBoostValuesMap);
+        memberBoostsDao.writeMemberBoostValues(l_id, memberBoostValuesMap);
 		//countMetric.scope("persisted_boost").incr();
         redisCountIncr("persisted_boost");
 	}

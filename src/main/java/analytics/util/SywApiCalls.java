@@ -2,25 +2,16 @@ package analytics.util;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.TimeZone;
 
-import org.apache.cassandra.thrift.Cassandra.system_add_column_family_args;
 import org.apache.commons.codec.binary.Hex;
-import org.json.simple.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import clojure.main;
 
 import com.github.kevinsawicki.http.HttpRequest;
 import com.google.common.primitives.Bytes;
@@ -28,7 +19,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.ibm.disthub2.impl.matching.selector.ParseException;
 
 public class SywApiCalls {
 	/*
@@ -167,8 +157,14 @@ public class SywApiCalls {
 	 */
 	private JsonElement makeGetRequestToSywAPI(String requestURL){
 		Gson gson = new Gson();
-		JsonElement element = gson.fromJson (HttpRequest.get(requestURL + "&token=" + token + "&hash=" + hash).body(), JsonElement.class); 
-		if(element.isJsonArray()==false){
+		JsonElement element = null;
+		try{
+			element = gson.fromJson (HttpRequest.get(requestURL + "&token=" + token + "&hash=" + hash).body(), JsonElement.class);
+		}
+		catch(Exception e){
+			LOGGER.error("Exeption in connecting to shopyourway url ", e);
+		}
+		if(element == null || element.isJsonArray()==false){
 			LOGGER.info("Token expired. Re-fetching");
 			//Until auth/state call is fixed, we can only retry to find if token and hash are valid
 			//If it fails after 1 retry, we return null
@@ -179,11 +175,18 @@ public class SywApiCalls {
 				LOGGER.warn(e.getMessage(), e);
 			} catch (UnsupportedEncodingException e) {
 				LOGGER.warn(e.getMessage(), e);
+			} catch(Exception e){
+				LOGGER.error("Exception occured in getting loyaltyId from sywId ", e.getClass(), e.getMessage());
 			}
-			//Use the new value of token and hash 
-			element = gson.fromJson (HttpRequest.get(requestURL + "&token=" + token + "&hash=" + hash).body(), JsonElement.class); 
+			try{
+				//Use the new value of token and hash 
+				element = gson.fromJson (HttpRequest.get(requestURL + "&token=" + token + "&hash=" + hash).body(), JsonElement.class); 
+			}
+			catch(Exception e){
+				LOGGER.error("Exeption in connecting to shopyourway url ", e);
+			}
 		}
-		if(element.isJsonArray()==false)//if it is not well formed even after a retry
+		if(element == null || element.isJsonArray()==false)//if it is not well formed even after a retry
 			return null;
 		return element;
 	}
@@ -237,6 +240,8 @@ public class SywApiCalls {
 	 * @return
 	 * @throws Exception
 	 */
+	
+	//TODO: try catch block for this api call
 	public String getLoyaltyId(String userid) {
 		String requestURL = BASEURI +
 	            "/users/get?ids=" + userid ;

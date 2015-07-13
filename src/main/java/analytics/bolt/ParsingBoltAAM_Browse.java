@@ -14,7 +14,6 @@ import com.google.gson.Gson;
 
 import analytics.util.MongoNameConstants;
 import analytics.util.PidMatchUtils;
-import analytics.util.dao.BoostDao;
 import analytics.util.dao.DivLnVariableDao;
 import analytics.util.dao.MemberBoostsDao;
 import analytics.util.dao.VariableDao;
@@ -57,8 +56,8 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 			sourceTopic = "ATC";
 		} else if ("AAM_CDF_Products".equalsIgnoreCase(topic)) {
 			sourceTopic = "BROWSE";
-		} else if ("SIGNAL_Feed".equalsIgnoreCase(topic)) {
-			sourceTopic = "SIGNAL";
+		} else if ("SIGNAL_BrowseFeed".equalsIgnoreCase(topic)) {
+			sourceTopic = "SB";
 		}
 		divLnVariableDao = new DivLnVariableDao();
 		//divLnBoostDao = new DivLnBoostDao();

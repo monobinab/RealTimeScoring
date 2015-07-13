@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import analytics.bolt.LoggingBolt;
 import analytics.bolt.ParsingBoltAAM_Browse;
-import analytics.bolt.SignalBrowseBolt;
+import analytics.bolt.ParsingSignalBrowseBolt;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.spout.SignalBrowseSpout;
 import analytics.util.AuthPropertiesReader;
@@ -24,7 +24,7 @@ public class SignalBrowseTopology{
 			.getLogger(SignalBrowseTopology.class);
 	
 	public static void main(String[] args)  throws Exception{
-		LOGGER.info("starting Signal topology 2");
+		LOGGER.info("starting Signal Browse topology ");
 		if (!SystemUtility.setEnvironment(args)) {
 			System.out
 					.println("Please pass the environment variable argument- 'PROD' or 'QA' or 'LOCAL'");
@@ -32,17 +32,16 @@ public class SignalBrowseTopology{
 		} else {
 		
 		TopologyBuilder builder = new TopologyBuilder();
-		String topic = TopicConstants.SIGNAL_FEED;
+		String topic = TopicConstants.SIGNAL_BROWSE_FEED;
 		
-		//Spout that wakes up every 3 mins and process the Vibes Text Messages
-		builder.setSpout("2_signalSpout", new SignalBrowseSpout(System.getProperty(MongoNameConstants.IS_PROD),
+		builder.setSpout("signalBrowseSpout", new SignalBrowseSpout(System.getProperty(MongoNameConstants.IS_PROD),
 				AuthPropertiesReader.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
 						.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 1);
 		
-		builder.setBolt("2_signalBolt",new SignalBrowseBolt(System.getProperty(MongoNameConstants.IS_PROD)), 3)
-				.shuffleGrouping("2_signalSpout");
+		builder.setBolt("parsingSignalBrowseBolt",new ParsingSignalBrowseBolt(System.getProperty(MongoNameConstants.IS_PROD)), 3)
+				.shuffleGrouping("signalBrowseSpout");
 		
-		builder.setBolt("parsingBoltBrowse", new ParsingBoltAAM_Browse(System.getProperty(MongoNameConstants.IS_PROD), topic), 3).shuffleGrouping("2_signalBolt");
+		builder.setBolt("parsingBoltBrowse", new ParsingBoltAAM_Browse(System.getProperty(MongoNameConstants.IS_PROD), topic), 3).shuffleGrouping("parsingSignalBrowseBolt");
 
 		
 		builder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System
@@ -50,12 +49,11 @@ public class SignalBrowseTopology{
 				.localOrShuffleGrouping("parsingBoltBrowse");
 		
 		if(System.getProperty(MongoNameConstants.IS_PROD).equals("PROD")){
-			//topologyBuilder.setBolt("flumeLoggingBolt", new FlumeRPCBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
 			builder.setBolt("loggingBolt", new LoggingBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
 		}
 
 		Config conf = new Config();
-			conf.put("metrics_topology", "2_Signal");
+			conf.put("metrics_topology", "SignalBrowse");
 			//stormconf is set with system's property as MetricsListener needs it
 			conf.registerMetricsConsumer(MetricsListener.class,System.getProperty(MongoNameConstants.IS_PROD), 3);
 			if (System.getProperty(MongoNameConstants.IS_PROD)
@@ -69,7 +67,7 @@ public class SignalBrowseTopology{
 				conf.setDebug(false);
 				conf.setMaxTaskParallelism(3);
 				LocalCluster cluster = new LocalCluster();
-				cluster.submitTopology("2_signal_topology", conf,
+				cluster.submitTopology("signal_browse_topology", conf,
 						builder.createTopology());
 				Thread.sleep(10000000);
 				cluster.shutdown();

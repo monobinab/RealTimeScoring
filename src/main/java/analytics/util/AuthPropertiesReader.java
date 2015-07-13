@@ -1,12 +1,7 @@
 package analytics.util;
 
-import java.util.Properties;
-
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
-
-
-
 
 public class AuthPropertiesReader extends PropertiesFileReader {
 

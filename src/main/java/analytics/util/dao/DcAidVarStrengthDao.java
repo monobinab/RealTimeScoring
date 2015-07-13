@@ -18,14 +18,14 @@ public class DcAidVarStrengthDao extends AbstractDao{
 		dcAidVarStrength = db.getCollection("dcAidVariableStrength"); // MongoNameConstants.PID_DIV_LN_COLLECTION
 	}
 	
-	public Map<String, Map<String, Double>> getdcAidVarStrenghtMap(){
+	public Map<String, Map<String, Integer>> getdcAidVarStrenghtMap(){
 		DBCursor modelsCursor = dcAidVarStrength.find();
-		Map<String, Map<String, Double>> dcAidVarStrengthMap = new HashMap<String, Map<String, Double>>();
+		Map<String, Map<String, Integer>> dcAidVarStrengthMap = new HashMap<String, Map<String, Integer>>();
 		for(DBObject dbObj : modelsCursor){
-			Map<String, Double> varStrengthMap = new HashMap<String, Double>();
+			Map<String, Integer> varStrengthMap = new HashMap<String, Integer>();
 			String aid = (String) dbObj.get(MongoNameConstants.DC_AID_VAR_AID);
 			String var = (String) dbObj.get(MongoNameConstants.DC_AID_VAR_MODEL);
-			Double strength = (Double) dbObj.get(MongoNameConstants.DC_AID_VAR_SCORE);
+			Integer strength = (Integer) dbObj.get(MongoNameConstants.DC_AID_VAR_SCORE);
 			varStrengthMap.put(var, strength);
 			if(!dcAidVarStrengthMap.containsKey(aid)){
 				dcAidVarStrengthMap.put(aid, varStrengthMap);

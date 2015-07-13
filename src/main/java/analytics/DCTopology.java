@@ -44,8 +44,8 @@ public class DCTopology {
 		
 		builder.setSpout("kafkaSpout", new KafkaSpout(kafkaConfig), 2);
 		
-		DCTestSpout testSpout = new DCTestSpout();
-		builder.setSpout("testSpout", testSpout, 2);
+		/*DCTestSpout testSpout = new DCTestSpout();
+		builder.setSpout("testSpout", testSpout, 2);*/
 		builder.setBolt("dcParsingBolt", new ParsingBoltDC(System
 				.getProperty(MongoNameConstants.IS_PROD)), 2).localOrShuffleGrouping("kafkaSpout");
 		

@@ -27,7 +27,7 @@ public class ParsingBoltDC extends EnvironmentBolt {
 	private static final long serialVersionUID = 1L;
 	private OutputCollector outputCollector;
 	private DcAidVarStrengthDao dcAidVarStrengthDao;
-	private Map<String, Map<String, Double>> dcAidVarStrengthMap;
+	private Map<String, Map<String, Integer>> dcAidVarStrengthMap;
 
 	 public ParsingBoltDC(String systemProperty){
 		 super(systemProperty);
@@ -99,7 +99,7 @@ public class ParsingBoltDC extends EnvironmentBolt {
 		Iterator<String> answerChoiceIdsIterator =  answerChoiceIds.iterator();
 		while(answerChoiceIdsIterator.hasNext()){
 			String aid = answerChoiceIdsIterator.next();
-			Map<String, Double> varStrengthMap = dcAidVarStrengthMap.get(aid);
+			Map<String, Integer> varStrengthMap = dcAidVarStrengthMap.get(aid);
 			if(varStrengthMap != null){
 				for(String var : varStrengthMap.keySet()){
 					if(!variableValueMap.containsKey(var)){

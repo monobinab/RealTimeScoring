@@ -16,14 +16,14 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
-public class SignalBrowseBolt extends EnvironmentBolt{
+public class ParsingSignalBrowseBolt extends EnvironmentBolt{
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = LoggerFactory
-			.getLogger(SignalBrowseBolt.class);
+			.getLogger(ParsingSignalBrowseBolt.class);
 	private OutputCollector outputCollector;
 	
-	 public SignalBrowseBolt(String systemProperty){
+	 public ParsingSignalBrowseBolt(String systemProperty){
 		 super(systemProperty);
 	 }
 
@@ -65,13 +65,13 @@ public class SignalBrowseBolt extends EnvironmentBolt{
 				}else
 					LOGGER.info("Either L_Id is null or Pid List is null. No sending to Parsing Bolt .. Input Tuple : " +input);
 			
-			redisCountIncr("success_signal2");
+			redisCountIncr("success_signal_browse");
 			outputCollector.ack(input);
 		} catch (Exception e) {
-			LOGGER.error("Exception Occured at Signal Bolt 2 for Lid" + lyl_id_no );
+			LOGGER.error("Exception Occured at SignalBrowseBolt for Lid" + lyl_id_no );
 			e.printStackTrace();
 			
-			redisCountIncr("failure_signal2");
+			redisCountIncr("failure_signal_browse");
 		}
 	}
 

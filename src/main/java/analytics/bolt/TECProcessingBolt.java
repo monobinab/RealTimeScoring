@@ -52,8 +52,8 @@ public class TECProcessingBolt extends EnvironmentBolt {
 				try{
 					//call rts api and get response for this l_id 
 					//16 - level, rtsTOtec is the apikey for internal calls to RTS from topologies
-					String scoreInfoSearsJsonString = rtsApiCaller.getRTSAPIResponse(l_id, "16", "rtsTeam", "sears", Boolean.FALSE, "");
-					String scoreInfoKmartJsonString = rtsApiCaller.getRTSAPIResponse(l_id, "16", "rtsTeam", "kmart", Boolean.FALSE, "");
+					String scoreInfoSearsJsonString = rtsApiCaller.getRTSAPIResponse(l_id, "16", "rtsTOtec", "sears", Boolean.FALSE, "");
+					String scoreInfoKmartJsonString = rtsApiCaller.getRTSAPIResponse(l_id, "16", "rtsTOtec", "kmart", Boolean.FALSE, "");
 					//send the response for both sears and kmart format to TEC end point.
 					LOGGER.info("sears message sent to TEC for memeber - " + l_id + " is -- " + scoreInfoSearsJsonString);
 					TECPostClient.postToTEC(scoreInfoSearsJsonString, l_id);
