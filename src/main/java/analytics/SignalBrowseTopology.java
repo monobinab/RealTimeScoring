@@ -32,7 +32,7 @@ public class SignalBrowseTopology{
 		} else {
 		
 		TopologyBuilder builder = new TopologyBuilder();
-		String topic = TopicConstants.SIGNAL_FEED;
+		String topic = TopicConstants.SIGNAL_BROWSE_FEED;
 		
 		builder.setSpout("signalBrowseSpout", new SignalBrowseSpout(System.getProperty(MongoNameConstants.IS_PROD),
 				AuthPropertiesReader.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader

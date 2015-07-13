@@ -44,8 +44,8 @@ public class SignalBrowseSpout extends BaseRichSpout{
 			SpoutOutputCollector collector) {
 		this.collector = collector;
 		topologyName = (String) conf.get("metrics_topology");
-		if(topologyName.equalsIgnoreCase(Constants.SIGNAL_TOPOLOGY2))
-			this.searchKey = "signal";
+		if(topologyName.equalsIgnoreCase(Constants.SIGNAL_BROWSE_TOPOLOGY))
+			this.searchKey = "signalBrowse";
 	}
 
 	@Override
@@ -87,7 +87,7 @@ public class SignalBrowseSpout extends BaseRichSpout{
 				        listToEmit.add(commonObj);
 						this.collector.emit(listToEmit);
 						listToEmit = null;
-						//jedis.del(s);
+						jedis.del(s);
 			        }
 
 					s = null;

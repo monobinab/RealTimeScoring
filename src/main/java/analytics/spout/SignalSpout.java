@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +53,7 @@ public class SignalSpout extends BaseRichSpout{
 				valueJsonObj = null;
 			}
 			feedJsonArray = null;
-			Thread.sleep(18000); // has to sleep for 3mins as SignalBrowse topology sleeps for 3 mins
+			Thread.sleep(180000); // has to sleep for 3mins as SignalBrowse topology sleeps for 3 mins
 		} catch (Exception e) {
 			LOGGER.error("Exception in SignalSpout " , e.getClass() + ": " + e.getMessage());
 		}
