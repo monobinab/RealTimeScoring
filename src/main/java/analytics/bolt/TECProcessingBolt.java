@@ -9,6 +9,7 @@ import analytics.util.RTSAPICaller;
 import analytics.util.SecurityUtils;
 import analytics.util.ResponsysUtil;
 import analytics.util.TECPostClient;
+import analytics.util.dao.ClientApiKeysDAO;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.IRichBolt;
@@ -18,6 +19,8 @@ import backtype.storm.tuple.Tuple;
 public class TECProcessingBolt extends EnvironmentBolt {
 	
 	private static final long serialVersionUID = 1L;
+	private static final String api_Key_Param="RTS_TEC";
+	private String api_key;
 	private static final Logger LOGGER = LoggerFactory.getLogger(TECProcessingBolt.class);
 	private OutputCollector outputCollector;
 	private RTSAPICaller rtsApiCaller;
@@ -37,7 +40,9 @@ public class TECProcessingBolt extends EnvironmentBolt {
 		super.prepare(stormConf, context, collector);
 		this.outputCollector = collector;
 		rtsApiCaller = RTSAPICaller.getInstance();
-		tecPostClient = TECPostClient.getInstance();	
+		tecPostClient = TECPostClient.getInstance();
+		api_key=new ClientApiKeysDAO().findkey(api_Key_Param);
+		
 	}
 
 	@Override
@@ -52,8 +57,8 @@ public class TECProcessingBolt extends EnvironmentBolt {
 				try{
 					//call rts api and get response for this l_id 
 					//16 - level, rtsTOtec is the apikey for internal calls to RTS from topologies
-					String scoreInfoSearsJsonString = rtsApiCaller.getRTSAPIResponse(l_id, "16", "rtsTOtec", "sears", Boolean.FALSE, "");
-					String scoreInfoKmartJsonString = rtsApiCaller.getRTSAPIResponse(l_id, "16", "rtsTOtec", "kmart", Boolean.FALSE, "");
+					String scoreInfoSearsJsonString = rtsApiCaller.getRTSAPIResponse(l_id, "16", api_key, "sears", Boolean.FALSE, "");
+					String scoreInfoKmartJsonString = rtsApiCaller.getRTSAPIResponse(l_id, "16", api_key, "kmart", Boolean.FALSE, "");
 					//send the response for both sears and kmart format to TEC end point.
 					LOGGER.info("sears message sent to TEC for memeber - " + l_id + " is -- " + scoreInfoSearsJsonString);
 					TECPostClient.postToTEC(scoreInfoSearsJsonString, l_id);
