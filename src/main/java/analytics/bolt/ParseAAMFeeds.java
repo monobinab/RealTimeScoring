@@ -34,7 +34,7 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 //	protected MemberUUIDDao memberDao;
 	protected ModelVariablesDao modelVariablesDao;
 	
-	private static String topicsUsingEncryptLidDirectly = "SIGNAL_Feed";
+	private static String topicsUsingEncryptLidDirectly = "SIGNAL_BrowseFeed";
 			
     public ParseAAMFeeds() {
 	}
