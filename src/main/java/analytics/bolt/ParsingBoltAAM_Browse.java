@@ -57,7 +57,7 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 		} else if ("AAM_CDF_Products".equalsIgnoreCase(topic)) {
 			sourceTopic = "BROWSE";
 		} else if ("SIGNAL_BrowseFeed".equalsIgnoreCase(topic)) {
-			sourceTopic = "SIG_BROWSE";
+			sourceTopic = "SB";
 		}
 		divLnVariableDao = new DivLnVariableDao();
 		//divLnBoostDao = new DivLnBoostDao();
