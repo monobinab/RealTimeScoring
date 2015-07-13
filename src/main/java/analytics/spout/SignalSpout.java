@@ -52,9 +52,8 @@ public class SignalSpout extends BaseRichSpout{
 				//nullifying the objects once emitted successfully 
 				listToEmit = null;
 				valueJsonObj = null;
-				feedJsonArray = null;
 			}
-			
+			feedJsonArray = null;
 		} catch (JSONException e) {
 			LOGGER.error("Exception in SignalSpout " , e.getClass() + ": " + e.getMessage());
 		}
