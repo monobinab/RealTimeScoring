@@ -7,6 +7,7 @@ import analytics.bolt.LoggingBolt;
 import analytics.bolt.ParsingBoltSYW;
 import analytics.bolt.PersistBoostsBolt;
 import analytics.bolt.ProcessSYWInteractions;
+import analytics.bolt.RTSKafkaBolt;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.spout.SYWRedisSpout;
 import analytics.util.MetricsListener;
@@ -35,7 +36,7 @@ public class SYWEventsTopology {
 		} 
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 		String topic = TopicConstants.SYW;
- 
+		String kafkatopic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;
 		topologyBuilder.setSpout("sywEventsSpout1", new SYWRedisSpout(
 				0, topic, System
 				.getProperty(MongoNameConstants.IS_PROD)), 1);
@@ -55,6 +56,8 @@ public class SYWEventsTopology {
 		topologyBuilder.setBolt("processSYWEvents",
 				new ProcessSYWInteractions(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping(
 				"parseEventsBolt");
+		topologyBuilder.setBolt("RTSKafkaBolt", new RTSKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD),kafkatopic), 1)
+		.shuffleGrouping("strategyScoringBolt","kafka_stream");
 		topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System
 				.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("processSYWEvents", "score_stream");
 		topologyBuilder.setBolt("persistBolt", new PersistBoostsBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("processSYWEvents", "persist_stream");
