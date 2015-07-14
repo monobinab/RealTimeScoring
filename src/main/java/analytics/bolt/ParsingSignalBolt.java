@@ -52,10 +52,10 @@ public class ParsingSignalBolt extends EnvironmentBolt {
 						String loyId = "signalBrowseFeed:" + loyaltyId;
 						if (!(jedis.exists(loyaltyId))) {
 							jedis.rpush(loyId, Long.toString(System.currentTimeMillis()));
-							LOGGER.info(loyaltyId + " persisted to redis");
+						//	LOGGER.info(loyaltyId + " persisted to redis");
 						}
 						jedis.rpush(loyId, input.getStringByField("products"));
-						LOGGER.info("signalTime " + input.getStringByField("signalTime") + " " + loyaltyId + " appended to redis with pids "	+ input.getStringByField("products") + "offset " + input.getStringByField("offset") );
+						LOGGER.info("signalTime " + input.getStringByField("signalTime") + " " + loyaltyId + " appended to redis with pid "	+ input.getStringByField("products") + "offset " + input.getStringByField("offset") + "source " + input.getStringByField("source"));
 						redisCountIncr("lids_to_redis");
 						jedis.disconnect();
 					}
