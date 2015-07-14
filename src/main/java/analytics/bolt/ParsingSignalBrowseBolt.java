@@ -36,7 +36,8 @@ public class ParsingSignalBrowseBolt extends EnvironmentBolt{
 	
 	@Override
 	public void execute(Tuple input) {
-			
+		LOGGER.info("~~~~~~~~~~Incoming tuple in SignalBrowseBolt: " + input);
+		
 		redisCountIncr("incoming_tuples");
 		RtsCommonObj rtsCommonObj = (RtsCommonObj) input.getValueByField("rtsCommonObj");
 		String lyl_id_no = null;

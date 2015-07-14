@@ -5,22 +5,16 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.util.Constants;
-import analytics.util.MongoNameConstants;
 import analytics.util.ResponsysUtil;
 import analytics.util.SecurityUtils;
 import analytics.util.dao.MemberInfoDao;
 import analytics.util.dao.TagMetadataDao;
 import analytics.util.objects.MemberInfo;
 import analytics.util.objects.ResponsysPayload;
-import analytics.util.objects.TagMetadata;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Tuple;
-
-import org.apache.commons.lang3.StringUtils;
-import org.json.JSONException;
 
 public abstract class ResponsysBolt  extends EnvironmentBolt{
 
@@ -75,7 +69,7 @@ public abstract class ResponsysBolt  extends EnvironmentBolt{
 		    }
 			
 
-		    String successFlag = process(lyl_id_no,responsysObj,l_id,eid,value, topologyName);
+		    String successFlag = process(lyl_id_no,responsysObj,l_id,memberInfo,value, topologyName);
 		    
 		    //Success Flags would be either null or F or P indicating as follows
 		    //null - no action needed, continue further processing
@@ -92,6 +86,9 @@ public abstract class ResponsysBolt  extends EnvironmentBolt{
 		    }
 
 			responsysUtil.getResponsysServiceResult(responsysObj);
+			
+			addRtsMemberTag(l_id, responsysObj.getTagMetadata().getMdTags());
+			
 		    redisCountIncr("data_to_responsys");
 		
 			outputCollector.ack(input);
@@ -102,7 +99,9 @@ public abstract class ResponsysBolt  extends EnvironmentBolt{
 
 	
 	
-	protected abstract String process(String lyl_id_no, ResponsysPayload responsysObj, String l_id, String eid, String value, String topologyName ) ;
+	protected abstract String process(String lyl_id_no, ResponsysPayload responsysObj, String l_id, MemberInfo memberInfo, String value, String topologyName ) ;
+	
+	protected abstract void addRtsMemberTag(String l_id, String rtsTag);
 	
 
 	@Override

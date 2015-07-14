@@ -1,13 +1,16 @@
 package analytics.bolt;
 
+import analytics.util.dao.MemberMDTags2Dao;
 import analytics.util.dao.MemberMDTagsDao;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import scala.actors.threadpool.Arrays;
 
 import java.util.ArrayList;
@@ -18,6 +21,7 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(PersistOccasionBolt.class);
 	private MemberMDTagsDao memberMDTagsDao;
+	private MemberMDTags2Dao memberMDTags2Dao;
 	private OutputCollector outputCollector;
 	 public PersistOccasionBolt(String systemProperty){
 		 super(systemProperty);
@@ -29,6 +33,7 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 		super.prepare(stormConf, context, collector);
 		this.outputCollector = collector;
 		memberMDTagsDao = new MemberMDTagsDao();
+		memberMDTags2Dao = new MemberMDTags2Dao();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -51,6 +56,10 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 				String[] tagsArray = tag.split(",");
 				tags = Arrays.asList(tagsArray);
 				memberMDTagsDao.addMemberMDTags(l_id, tags);
+				
+				//Write to the new collection as well...
+				memberMDTags2Dao.addMemberMDTags(l_id, tags);
+				
 				LOGGER.info("PERSIST OCCATION UPDATE: " + l_id + "~"+tags);
 				countMetric.scope("persisted_occasionTags").incr();
 			}

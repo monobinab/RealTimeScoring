@@ -10,9 +10,22 @@ public class ResponsysPayload{
 	private String customEventName;
 	private String topologyName;
 	private String value;
+	private MemberInfo memberInfo;
 	
 	
 	
+	/**
+	 * @return the memberInfo
+	 */
+	public MemberInfo getMemberInfo() {
+		return memberInfo;
+	}
+	/**
+	 * @param memberInfo the memberInfo to set
+	 */
+	public void setMemberInfo(MemberInfo memberInfo) {
+		this.memberInfo = memberInfo;
+	}
 	/**
 	 * @return the value
 	 */

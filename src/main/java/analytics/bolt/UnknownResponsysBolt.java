@@ -1,5 +1,6 @@
 package analytics.bolt;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -34,7 +35,7 @@ public class UnknownResponsysBolt  extends ResponsysBolt{
 	}
 
 	
-	public String process (String lyl_id_no, ResponsysPayload responsysObj, String l_id, String eid, String value, String topologyName ){
+	public String process (String lyl_id_no, ResponsysPayload responsysObj, String l_id, MemberInfo memberInfo, String value, String topologyName ){
 		
 		org.json.JSONObject o = null;
 		org.json.JSONObject objToSend = null;
@@ -65,7 +66,7 @@ public class UnknownResponsysBolt  extends ResponsysBolt{
 			tagMetadata = responsysUtil.getTagMetadata(objToSend);
 			custEventNm = "RTS_Unknown";
 		
-			setResponsysObj(lyl_id_no, responsysObj, l_id, eid, o, tagMetadata, value, custEventNm, topologyName);
+			setResponsysObj(lyl_id_no, responsysObj, l_id, memberInfo, o, tagMetadata, value, custEventNm, topologyName);
 	    }catch(Exception e){
 	    	LOGGER.error(" Error Occured processing RTS purchase for member : " + lyl_id_no);
 	    	e.printStackTrace();
@@ -77,7 +78,7 @@ public class UnknownResponsysBolt  extends ResponsysBolt{
 	
 
 	private void setResponsysObj(String lyl_id_no,
-			ResponsysPayload responsysObj, String l_id, String eid,
+			ResponsysPayload responsysObj, String l_id, MemberInfo memberInfo,
 			org.json.JSONObject o, TagMetadata tagMetadata, 
 			String value, String custEventNm, String topologyName) {
 		//set the responsys object
@@ -85,14 +86,19 @@ public class UnknownResponsysBolt  extends ResponsysBolt{
 		responsysObj.setL_id(l_id);
 		responsysObj.setJsonObj(o);
 		responsysObj.setTagMetadata(tagMetadata);
-		responsysObj.setEid(eid);
+		responsysObj.setMemberInfo(memberInfo);
 		responsysObj.setCustomEventName(custEventNm);
 		responsysObj.setTopologyName(topologyName);
 		responsysObj.setValue(value);
 	}
 
 	
-		
+	public void addRtsMemberTag(String l_id, String rtsTag){
+		ArrayList<String> rtsTagLst = new ArrayList<String>();
+		rtsTagLst.add(rtsTag);
+		responsysUtil.getMemberMDTags2Dao().addRtsMemberTags(l_id, rtsTagLst);
+	}
+	
 
 	private org.json.JSONObject getJsonForResponsys(
 			Map<Integer, String> tagModelsMap, org.json.JSONObject o

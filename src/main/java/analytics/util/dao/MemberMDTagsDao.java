@@ -11,14 +11,13 @@ import analytics.util.MongoNameConstants;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
 public class MemberMDTagsDao extends AbstractDao {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(MemberMDTagsDao.class);
 	DBCollection memberMDTagsCollection;
-
+	
 	public MemberMDTagsDao() {
 		super("server2");
 		memberMDTagsCollection = db.getCollection("memberMdTags");
@@ -86,4 +85,5 @@ public class MemberMDTagsDao extends AbstractDao {
 		List<String> sample = dao.getMemberMDTags("hzuzVKVINbBBen+WGYQT/VJVdwI=");
 		System.out.println(sample);
 	}*/
+	
 }
