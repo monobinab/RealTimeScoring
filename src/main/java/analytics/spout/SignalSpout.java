@@ -47,8 +47,7 @@ public class SignalSpout extends BaseRichSpout{
 				listToEmit.add(valueJsonObj.get("taxonomy"));
 				listToEmit.add(userJsonObj.get("uuid"));
 				listToEmit.add(valueJsonObj.get("type"));
-				listToEmit.add(valueJsonObj.get("offset"));
-				listToEmit.add(valueJsonObj.get("signalTime"));
+				listToEmit.add(jsonObj.get("offset"));
 				collector.emit(listToEmit);
 				//nullifying the objects once emitted successfully 
 				listToEmit = null;
@@ -63,7 +62,7 @@ public class SignalSpout extends BaseRichSpout{
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("channel", "products", "searchTerm", "signalTime", "source", "taxonomy", "uuid", "type", "offset", "signalTime"));
+		declarer.declare(new Fields("channel", "products", "searchTerm", "signalTime", "source", "taxonomy", "uuid", "type", "offset"));
 	}
 
 }
