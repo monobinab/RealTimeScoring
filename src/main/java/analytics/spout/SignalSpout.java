@@ -53,7 +53,7 @@ public class SignalSpout extends BaseRichSpout{
 				valueJsonObj = null;
 			}
 			feedJsonArray = null;
-			Thread.sleep(180000); // has to sleep for 3mins as SignalBrowse topology sleeps for 3 mins
+			Thread.sleep(30000); // has to sleep for 3mins as SignalBrowse topology sleeps for 3 mins
 		} catch (Exception e) {
 			LOGGER.error("Exception in SignalSpout " , e.getClass() + ": " + e.getMessage());
 		}
