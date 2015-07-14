@@ -47,13 +47,15 @@ public class SignalSpout extends BaseRichSpout{
 				listToEmit.add(valueJsonObj.get("taxonomy"));
 				listToEmit.add(userJsonObj.get("uuid"));
 				listToEmit.add(valueJsonObj.get("type"));
+				listToEmit.add(valueJsonObj.get("offset"));
+				listToEmit.add(valueJsonObj.get("signalTime"));
 				collector.emit(listToEmit);
 				//nullifying the objects once emitted successfully 
 				listToEmit = null;
 				valueJsonObj = null;
 			}
 			feedJsonArray = null;
-			Thread.sleep(30000); // has to sleep for 30secs
+			Thread.sleep(60000); // has to sleep for 30secs
 		} catch (Exception e) {
 			LOGGER.error("Exception in SignalSpout " , e.getClass() + ": " + e.getMessage());
 		}
@@ -61,7 +63,7 @@ public class SignalSpout extends BaseRichSpout{
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("channel", "products", "searchTerm", "signalTime", "source", "taxonomy", "uuid", "type"));
+		declarer.declare(new Fields("channel", "products", "searchTerm", "signalTime", "source", "taxonomy", "uuid", "type", "offset", "signalTime"));
 	}
 
 }
