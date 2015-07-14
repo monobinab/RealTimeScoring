@@ -44,7 +44,7 @@ public class ParsingBoltDC extends EnvironmentBolt {
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare( new Fields("l_id", "varValueMapAsJsonString", "source"));
+		declarer.declare( new Fields("l_id", "varValueMapAsJsonString", "source", "lyl_id_no"));
 	}
 	 
 	@Override
@@ -90,8 +90,8 @@ public class ParsingBoltDC extends EnvironmentBolt {
 	/*   1. In this processing of parsedDC object, answerIds are iterated 
 		 2. variables for those answerIds are retrieved from dcVariableStrength collection
 		 3. variableValueMap is populated with variables as keys and strength as values for it*/
-		 
-		String l_id = SecurityUtils.hashLoyaltyId(parsedDC.getMemberId());
+		String loyalty_id = parsedDC.getMemberId();
+		String l_id = SecurityUtils.hashLoyaltyId(loyalty_id);
 		Double strength_sum = 0.0;
 		Map<String, String> variableValueMap = new HashMap<String, String>();
 		List<String> answerChoiceIds = parsedDC.getAnswerChoiceIds();
@@ -117,7 +117,7 @@ public class ParsingBoltDC extends EnvironmentBolt {
 		}
 			if(variableValueMap != null && !variableValueMap.isEmpty()){
 				//System.out.println(variableValueMap + "for " + l_id);
-				emitToScoreStream(l_id, variableValueMap);
+				emitToScoreStream(l_id, variableValueMap, loyalty_id);
 			}
 			else{
 				//System.out.println("varValueMap is null or empty");
@@ -125,11 +125,12 @@ public class ParsingBoltDC extends EnvironmentBolt {
 			}
 	}
 }	
-	public void emitToScoreStream(String l_id, Map<String, String> varValueMap){
+	public void emitToScoreStream(String l_id, Map<String, String> varValueMap, String loyalty_id){
 		List<Object> listToEmit_s = new ArrayList<Object>();
 		listToEmit_s.add(l_id);
 		listToEmit_s.add(JsonUtils.createJsonFromStringStringMap(varValueMap));
 		listToEmit_s.add("DC");
+		listToEmit_s.add(loyalty_id);
 		outputCollector.emit(listToEmit_s);
 		redisCountIncr("emitted_to_scoring");
 		LOGGER.info("Emitted message to scoring for l_id from DC " + l_id);

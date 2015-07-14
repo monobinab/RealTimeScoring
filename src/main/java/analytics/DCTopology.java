@@ -4,19 +4,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import storm.kafka.*;
-import analytics.bolt.FlumeRPCBolt;
 import analytics.bolt.LoggingBolt;
 import analytics.bolt.ParsingBoltDC;
-import analytics.bolt.MemberPublishBolt;
-import analytics.bolt.PersistDCBolt;
-import analytics.bolt.ScorePublishBolt;
+import analytics.bolt.RTSKafkaBolt;
 import analytics.bolt.StrategyScoringBolt;
-import analytics.bolt.SywScoringBolt;
-import analytics.spout.DCTestSpout;
 import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
-import analytics.util.RedisConnection;
 import analytics.util.SystemUtility;
+import analytics.util.TopicConstants;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
@@ -29,7 +24,7 @@ public class DCTopology {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ParsingBoltDC.class);
 	private static final int partition_num = 3;
 	public static void main(String[] args) {
-	
+		String kafkatopic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;
 		String topologyId = "";
 		if (!SystemUtility.setEnvironment(args)) {
 			System.out
@@ -53,12 +48,12 @@ public class DCTopology {
 				.getProperty(MongoNameConstants.IS_PROD)), 2).localOrShuffleGrouping("testSpout");*/
 	    builder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System
 				.getProperty(MongoNameConstants.IS_PROD)),1).localOrShuffleGrouping("dcParsingBolt");
+	    
+	    builder.setBolt("RTSKafkaBolt", new RTSKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD),kafkatopic), 1)
+		.shuffleGrouping("strategyScoringBolt","kafka_stream");
 		if(System.getProperty(MongoNameConstants.IS_PROD).equals("PROD")){
 			builder.setBolt("loggingBolt", new LoggingBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
 		}	
-			
-		//builder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], redis_port,"score"), partition_num).localOrShuffleGrouping("strategyScoringBolt", "score_stream");
-		//builder.setBolt("memberPublishBolt", new MemberPublishBolt(RedisConnection.getServers()[0], redis_port,"member"), partition_num).localOrShuffleGrouping("strategyScoringBolt", "member_stream");
 		Config conf = new Config();
 		conf.put("metrics_topology", "DC");
 		conf.registerMetricsConsumer(MetricsListener.class, System.getProperty(MongoNameConstants.IS_PROD), partition_num);
