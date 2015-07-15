@@ -20,7 +20,7 @@ import backtype.storm.tuple.Fields;
 public class SignalSpout extends BaseRichSpout{
 	private static final Logger LOGGER = LoggerFactory.getLogger(SignalSpout.class);
 	private SpoutOutputCollector collector;
-
+	
 	@Override
 	public void open(Map conf, TopologyContext context,
 			SpoutOutputCollector collector) {
@@ -32,10 +32,10 @@ public class SignalSpout extends BaseRichSpout{
 		try {
 			
 			JSONArray feedJsonArray = new JSONArray( HttpClientUtils.httpGetCallJsonString(Constants.SIGNAL_URL));
-			
 			for(int i=0; i<feedJsonArray.length();i++){
 				List<Object> listToEmit = new ArrayList<Object>();
 				JSONObject jsonObj = (JSONObject) feedJsonArray.get(i);
+				LOGGER.info(jsonObj.toString());
 				String valueString = (String) jsonObj.get("value");
 				JSONObject valueJsonObj = new JSONObject(valueString);
 				JSONObject userJsonObj = (JSONObject) valueJsonObj.get("user");
@@ -54,7 +54,7 @@ public class SignalSpout extends BaseRichSpout{
 				valueJsonObj = null;
 			}
 			feedJsonArray = null;
-			Thread.sleep(60000); // has to sleep for 30secs
+			//Thread.sleep(30000); // has to sleep for 30secs
 		} catch (Exception e) {
 			LOGGER.error("Exception in SignalSpout " , e.getClass() + ": " + e.getMessage());
 		}
