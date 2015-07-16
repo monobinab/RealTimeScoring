@@ -47,10 +47,10 @@ public class ParsingSignalBolt extends EnvironmentBolt {
 				List<String> l_Ids = memberUUIDDao.getLoyaltyIdsFromUUID((String) input.getValueByField("uuid"));
 				for (String loyaltyId : l_Ids) {
 					if (redisHost != null) {
-						jedis = new Jedis(redisHost, redisPort, 1800);
+						jedis = new Jedis(redisHost, redisPort, 3600);
 						jedis.connect();
 						String loyId = "signalBrowseFeed:" + loyaltyId;
-						if (!(jedis.exists(loyaltyId))) {
+						if (!(jedis.exists(loyId))) {
 							jedis.rpush(loyId, Long.toString(System.currentTimeMillis()));
 						//	LOGGER.info(loyaltyId + " persisted to redis");
 						}
