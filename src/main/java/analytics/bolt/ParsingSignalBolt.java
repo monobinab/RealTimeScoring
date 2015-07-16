@@ -50,7 +50,7 @@ public class ParsingSignalBolt extends EnvironmentBolt {
 						jedis = new Jedis(redisHost, redisPort, 3600);
 						jedis.connect();
 						String loyId = "signalBrowseFeed:" + loyaltyId;
-						if (!(jedis.exists(loyId))) {
+						if (!(jedis.exists(loyaltyId))) {
 							jedis.rpush(loyId, Long.toString(System.currentTimeMillis()));
 						//	LOGGER.info(loyaltyId + " persisted to redis");
 						}
