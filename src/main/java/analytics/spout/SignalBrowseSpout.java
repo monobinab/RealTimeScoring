@@ -100,7 +100,7 @@ public class SignalBrowseSpout extends BaseRichSpout{
 			Thread.sleep(180000);
 		}
 		catch(Exception e){
-			LOGGER.error("Error in SignalBrowseSpout ");
+			LOGGER.error("Error in SignalBrowseSpout ", e);
 		}finally{
 			if(jedis !=null)
 				jedis.disconnect();
