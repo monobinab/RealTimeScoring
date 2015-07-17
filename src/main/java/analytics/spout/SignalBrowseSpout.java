@@ -100,7 +100,7 @@ public class SignalBrowseSpout extends BaseRichSpout{
 			Thread.sleep(180000);
 		}
 		catch(Exception e){
-			LOGGER.error("Error in SignalBrowseSpout ");
+			LOGGER.error("Error in SignalBrowseSpout ", e);
 		}finally{
 			if(jedis !=null)
 				jedis.disconnect();
@@ -110,10 +110,15 @@ public class SignalBrowseSpout extends BaseRichSpout{
 	private boolean shouldProceedWithProcessing(RtsCommonObj commonObj){
 		
 		ArrayList<String> lst = commonObj.getPidList();
-		Long timeInsertedIntoRedis = new Long (lst.get(0));
-		if(System.currentTimeMillis()-timeInsertedIntoRedis >= 5000)
-			return true;
-	
+		try{
+			Long timeInsertedIntoRedis = new Long (lst.get(0));
+			if(System.currentTimeMillis()-timeInsertedIntoRedis >= 5000)
+				return true;
+		}
+		catch(Exception e){
+			LOGGER.error("Exception ", e.getClass() +": " + e.getMessage());
+			return false;
+		}
 		return false;
 	}
 	

@@ -76,4 +76,5 @@ public class ParsingSignalBolt extends EnvironmentBolt {
 			redisCountIncr("failure_signal");
 		}
 	}
+
 }

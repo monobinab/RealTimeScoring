@@ -20,7 +20,6 @@ import backtype.storm.tuple.Fields;
 public class SignalSpout extends BaseRichSpout{
 	private static final Logger LOGGER = LoggerFactory.getLogger(SignalSpout.class);
 	private SpoutOutputCollector collector;
-
 	@Override
 	public void open(Map conf, TopologyContext context,
 			SpoutOutputCollector collector) {
@@ -32,10 +31,11 @@ public class SignalSpout extends BaseRichSpout{
 		try {
 			
 			JSONArray feedJsonArray = new JSONArray( HttpClientUtils.httpGetCallJsonString(Constants.SIGNAL_URL));
-			
+			//System.out.println("incoming json " + feedJsonArray);
 			for(int i=0; i<feedJsonArray.length();i++){
 				List<Object> listToEmit = new ArrayList<Object>();
 				JSONObject jsonObj = (JSONObject) feedJsonArray.get(i);
+				LOGGER.info(jsonObj.toString());
 				String valueString = (String) jsonObj.get("value");
 				JSONObject valueJsonObj = new JSONObject(valueString);
 				JSONObject userJsonObj = (JSONObject) valueJsonObj.get("user");
@@ -47,13 +47,14 @@ public class SignalSpout extends BaseRichSpout{
 				listToEmit.add(valueJsonObj.get("taxonomy"));
 				listToEmit.add(userJsonObj.get("uuid"));
 				listToEmit.add(valueJsonObj.get("type"));
+				listToEmit.add(jsonObj.get("offset"));
 				collector.emit(listToEmit);
 				//nullifying the objects once emitted successfully 
 				listToEmit = null;
 				valueJsonObj = null;
 			}
 			feedJsonArray = null;
-			Thread.sleep(30000); // has to sleep for 30secs
+			//Thread.sleep(30000); // has to sleep for 30secs
 		} catch (Exception e) {
 			LOGGER.error("Exception in SignalSpout " , e.getClass() + ": " + e.getMessage());
 		}
@@ -61,7 +62,7 @@ public class SignalSpout extends BaseRichSpout{
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("channel", "products", "searchTerm", "signalTime", "source", "taxonomy", "uuid", "type"));
+		declarer.declare(new Fields("channel", "products", "searchTerm", "signalTime", "source", "taxonomy", "uuid", "type", "offset"));
 	}
 
 }
