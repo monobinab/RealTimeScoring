@@ -64,4 +64,15 @@ public class MemberInfo {
 			this.eid = eid;
 		}
 		
+		public String getWinningOptIn(){
+			if(getSrs_opt_in()!=null && getSrs_opt_in().equalsIgnoreCase("Y"))
+				return "searsOptIn";
+			else if(getSyw_opt_in()!=null && getSrs_opt_in().equalsIgnoreCase("Y"))
+				return "sywOptIn";
+			else if(getKmt_opt_in()!=null && getKmt_opt_in().equalsIgnoreCase("Y"))
+				return "kmartOptIn";
+			else
+				return "searsOptIn";
+		}
+		
 }

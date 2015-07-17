@@ -439,7 +439,7 @@ public class ResponsysUtil {
 		String xmlWithoutBOM = removeUTF8BOM(customXml);
 	
 		//System.out.println("customXml = " + customXml);
-		StringBuffer strBuff = sendToResponsys(xmlWithoutBOM);
+		StringBuffer strBuff = sendToResponsys(xmlWithoutBOM,memberInfo);
 		//StringBuffer strBuff = new StringBuffer();
 		
 		//Persist info to Mongo after successfully transmission of message to Oracle.
@@ -889,7 +889,7 @@ public class ResponsysUtil {
 	 * @param xmlWithoutBOM
 	 * @return the result of sending the XML to Responsys
 	 */
-	public StringBuffer sendToResponsys(String xmlWithoutBOM){
+	public StringBuffer sendToResponsys(String xmlWithoutBOM, MemberInfo memberInfo){
 		HttpURLConnection connection = null;
 		BufferedReader in = null;
 		OutputStreamWriter out = null;
@@ -898,8 +898,8 @@ public class ResponsysUtil {
 		try {
 			connection = HttpClientUtils.getConnectionWithBasicAuthentication(AuthPropertiesReader
 					.getProperty(Constants.RESP_URL),"application/xml", "POST",AuthPropertiesReader
-					.getProperty(Constants.RESP_URL_USER_NAME), AuthPropertiesReader
-					.getProperty(Constants.RESP_URL_PASSWORD));
+					.getProperty(memberInfo.getWinningOptIn()+"Usrname"), AuthPropertiesReader
+					.getProperty(memberInfo.getWinningOptIn()+"Password"));
 
 			out = new OutputStreamWriter(connection.getOutputStream());
 			System.out.println(xmlWithoutBOM);
