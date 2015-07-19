@@ -58,7 +58,7 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 				memberMDTagsDao.addMemberMDTags(l_id, tags);
 				
 				//Write to the new collection as well...
-				memberMDTags2Dao.addMemberMDTags(l_id, tags);
+				//memberMDTags2Dao.addMemberMDTags(l_id, tags);
 				
 				LOGGER.info("PERSIST OCCATION UPDATE: " + l_id + "~"+tags);
 				countMetric.scope("persisted_occasionTags").incr();
