@@ -23,7 +23,7 @@ public class DBConnection {
 	private static int sPort = 0;
 	//Write concern
 	private static int writeconcern = 0;
-	private static List<ServerAddress> sServers = new ArrayList<ServerAddress>();
+
 	
 	private static String sDatabaseName = "";
 	private static String sUserName = "";
@@ -72,6 +72,7 @@ public class DBConnection {
 			}
 			else{
 				//Following is the logic to implement write concern.
+				List<ServerAddress> sServers = new ArrayList<ServerAddress>();
 				writeconcern = Integer.parseInt( properties.getString("user.writeconcern"));
 				String serverlist = properties.getString("servers.list"); 
 				String[] servers = serverlist.split(";");
