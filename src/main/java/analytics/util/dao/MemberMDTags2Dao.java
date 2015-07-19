@@ -138,7 +138,7 @@ public class MemberMDTags2Dao extends AbstractDao {
 		DBObject tagstoUpdate = new BasicDBObject();
 		tagstoUpdate.put("l_id", l_id);
 		tagstoUpdate.put("tags", newMdTagsList);
-		if(rtsTagsList.size()>0)
+		if(rtsTagsList!=null && rtsTagsList.size()>0)
 			tagstoUpdate.put("rtsTags", rtsTagsList);
 		LOGGER.info("tags are getting updated in " +  memberMDTagsCollection.getDB().getName());
 		memberMDTagsCollection.update(new BasicDBObject(
@@ -204,7 +204,7 @@ public void addRtsMemberTags(String l_id, List<String> tags) {
 		DBObject tagstoUpdate = new BasicDBObject();
 		tagstoUpdate.put("l_id", l_id);
 		tagstoUpdate.put("rtsTags", newRtsTagsList);
-		if(mdTagsList.size()>0)
+		if(mdTagsList!=null && mdTagsList.size()>0)
 			tagstoUpdate.put("tags", mdTagsList);
 		LOGGER.info("tags are getting updated in " +  memberMDTagsCollection.getDB().getName());
 		memberMDTagsCollection.update(new BasicDBObject(
