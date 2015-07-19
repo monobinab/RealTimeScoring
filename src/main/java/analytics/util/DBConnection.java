@@ -71,10 +71,10 @@ public class DBConnection {
 				mongoClient = new MongoClient(sServerName2, sPort);
 			}
 			else{
+				String serverlist = properties.getString("servers.list"); 
 				//Following is the logic to implement write concern.
 				List<ServerAddress> sServers = new ArrayList<ServerAddress>();
 				writeconcern = Integer.parseInt( properties.getString("user.writeconcern"));
-				String serverlist = properties.getString("servers.list"); 
 				String[] servers = serverlist.split(";");
 				for (String serverurl : servers) {
 					sServers.add(new ServerAddress(serverurl, sPort));
