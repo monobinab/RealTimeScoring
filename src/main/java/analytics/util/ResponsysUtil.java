@@ -443,8 +443,9 @@ public class ResponsysUtil {
 		//StringBuffer strBuff = new StringBuffer();
 		
 		//Persist info to Mongo after successfully transmission of message to Oracle.
-		occasionResponsesDao.addOccasionResponse(l_id, memberInfo.getEid(), customEventName, !topologyName.equalsIgnoreCase("unknownOccasions")?tagMetadata.getPurchaseOccasion():"Unknown", tagMetadata.getBusinessUnit(), tagMetadata.getSubBusinessUnit(), 
-				strBuff.toString().contains("<success>true</success>") ? "Y" : "N", tagMetadata.getMdTags(), topologyName);
+		occasionResponsesDao.addOccasionResponse(l_id, memberInfo.getEid(), customEventName, 
+				!topologyName.equalsIgnoreCase("unknownOccasions")?tagMetadata.getPurchaseOccasion():"Unknown", 
+						tagMetadata, strBuff.toString().contains("<success>true</success>") ? "Y" : "N", topologyName);
 	
 		LOGGER.info("PERSIST: Winning Tag for Lid: " + lyl_l_id +" : "+tagMetadata.getMdTags());
 		

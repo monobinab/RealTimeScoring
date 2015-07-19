@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.util.MongoNameConstants;
+import analytics.util.objects.TagMetadata;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
@@ -23,8 +24,8 @@ public class OccasionResponsesDao extends AbstractDao {
 	}
 
 
-	public void addOccasionResponse(String l_id, String eid, String custEvent, String purOcca, String businessUnit, 
-			String subBusUnit, String successFlag, String tag, String topologyName) {
+	public void addOccasionResponse(String l_id, String eid, String custEvent, String purOcca, TagMetadata tagMetadata, 
+			String successFlag, String topologyName) {
 		
 		DBObject occObj = new BasicDBObject();
 		occObj.put(MongoNameConstants.L_ID, l_id);
@@ -35,18 +36,19 @@ public class OccasionResponsesDao extends AbstractDao {
 		occObj.put("eid", eid);
 		occObj.put("custEvent", custEvent);
 		occObj.put("topology", topologyName);
-		//if(!topologyName.equalsIgnoreCase("Telluride"))
 		occObj.put("purchaseOccasion", purOcca);
 		//occObj.put("businessUnit", businessUnit);
 		//occObj.put("subBusinessUnit", subBusUnit);
 		occObj.put("successFlag", successFlag);
-		occObj.put("tag", tag);
+		occObj.put("tag", tagMetadata.getMdTags());
+		if(tagMetadata.getDivLine()!=null)
+			occObj.put("divLine", tagMetadata.getDivLine());
 		
 		occasionResonsesCollection.insert(occObj);
 		
 		LOGGER.info("PERSIST: " + ft.format(dNow) + ", Topology: "+topologyName+", lid: " + l_id + ", "
-				+ "eid: "+eid + ", custEvent: "+custEvent +", successFlag: "+successFlag+", tag: "+tag+", purchaseOccasion: "+purOcca
-				+ ", businessUnit: "+businessUnit+", SubBusinessUnit: " + subBusUnit);
+				+ "eid: "+eid + ", custEvent: "+custEvent +", successFlag: "+successFlag+", tag: "+tagMetadata.getMdTags()+", purchaseOccasion: "+purOcca
+				+ ", businessUnit: "+tagMetadata.getBusinessUnit()+", SubBusinessUnit: " + tagMetadata.getSubBusinessUnit());
 	
 	}
 	
