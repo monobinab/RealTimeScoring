@@ -40,6 +40,7 @@ public class RTSInterceptorBolt extends EnvironmentBolt {
 		listToEmit.add(input.getValue(0));
 		//A message ID is added as in REDIS Spout
 		listToEmit.add(new Double(Math.random()).toString());
+		LOGGER.info("Emitting Record in RTSInterceptorBolt "+input.getValue(0) );
 		this.outputCollector.emit(listToEmit);
 		outputCollector.ack(input);
 	}
