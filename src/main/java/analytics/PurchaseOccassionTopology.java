@@ -102,7 +102,7 @@ public class PurchaseOccassionTopology {
 			Config conf = new Config();
 			conf.put("metrics_topology", "PurchaseOccasion");
 			//Added the timeout so that topology will not read the message again
-			conf.setMessageTimeoutSecs(7200);	
+			conf.setMessageTimeoutSecs(86400);	
 			//stormconf is set with system's property as MetricsListener needs it
 			conf.put("topology_environment", System.getProperty(MongoNameConstants.IS_PROD));
 			conf.registerMetricsConsumer(MetricsListener.class,  System.getProperty(MongoNameConstants.IS_PROD), 3);
