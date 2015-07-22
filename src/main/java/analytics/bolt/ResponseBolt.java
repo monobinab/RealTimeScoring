@@ -56,6 +56,7 @@ public class ResponseBolt extends EnvironmentBolt{
 	@SuppressWarnings("unchecked")
 	@Override
 	public void execute(Tuple input) {
+		redisCountIncr("ResponseBolt_begin_count");
 		String lyl_id_no = null; 
 		Jedis jedis = null;
 		countMetric.scope("entering_responsys_bolt").incr();
@@ -127,6 +128,7 @@ public class ResponseBolt extends EnvironmentBolt{
 				countMetric.scope("no_lid").incr();
 			}
 			LOGGER.debug("TIME:" + messageID + "-Completed Response bolt-" + System.currentTimeMillis());
+			redisCountIncr("ResponseBolt_end_count");
 			outputCollector.ack(input);
 			
 		} catch (Exception e) {

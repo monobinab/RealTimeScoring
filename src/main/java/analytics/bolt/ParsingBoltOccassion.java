@@ -90,6 +90,8 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 	@Override
 	public void execute(Tuple input) {
 		// System.out.println("IN PARSING BOLT: " + input);
+		redisCountIncr("ParsingBoltOccassion_begin_count");	
+		
 		Jedis jedis = null;
 		try {
 			
@@ -254,6 +256,11 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 				listToEmit.add(messageID);
 				this.outputCollector.emit(listToEmit);
 				countMetric.scope("no_variables_affected").incr();
+				
+				
+				redisCountIncr("ParsingBoltOccassion_end_count");	
+				
+				
 			//}
 		} catch (Exception e) {
 			LOGGER.error("exception in parsing: " + e);
