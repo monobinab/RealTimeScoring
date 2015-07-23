@@ -23,6 +23,12 @@ public class RTSKafkaSpout extends KafkaSpout {
 		 
 		 		 LOGGER.error("The message failed messageID:"+msgId.toString());
 	 }
+	 
+	 @Override
+		public void nextTuple() {
+		 super.nextTuple();
+		 LOGGER.info("RTSKafkaSpout Emitting message ");
+	 }
 	
 
 }

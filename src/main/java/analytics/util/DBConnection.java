@@ -20,6 +20,7 @@ public class DBConnection {
 	private static MongoClient mongoClient;
 	private static String sServerName = "";
 	private static String sServerName2 = "";
+	private static String sServerName2_2 = "";
 	private static int sPort = 0;
 	//Write concern
 	private static int writeconcern = 0;
@@ -28,6 +29,12 @@ public class DBConnection {
 	private static String sDatabaseName = "";
 	private static String sUserName = "";
 	private static String sPassword = "";
+	
+	//Connection variables for connecting to Mongo2 incase of MemberVariables
+	private static String sDatabaseName2_2 = "";
+	private static String sUserName2_2 = "";
+	
+	
 	public static DB getDBConnection() throws ConfigurationException{
 		return getDBConnection("default");
 	}
@@ -65,6 +72,19 @@ public class DBConnection {
 			sDatabaseName = properties.getString("database.name");
 			sUserName = properties.getString("user.name");
 			sPassword = properties.getString("user.password");
+			
+			//Code to connect to Mongo2 incase of MemberVariables
+			sServerName2_2 = properties.getString("server2_2.name");
+			sDatabaseName2_2 = properties.getString("database2_2.name");
+			sUserName2_2 = properties.getString("user.name2_2");
+			if("server2_2".equalsIgnoreCase(server) && sServerName2_2!=null&&!sServerName2_2.isEmpty()){
+				mongoClient = new MongoClient(sServerName2_2, sPort);
+				conn = mongoClient.getDB(sDatabaseName2_2);
+				//	System.out.println("Connection is established...."+ mongoClient.getAllAddress() + " " + conn.getName());
+				LOGGER.info("Connection is established ...."+ mongoClient.getAllAddress() + " " + conn.getName());
+				conn.authenticate(sUserName2_2, sPassword.toCharArray());
+				return conn;
+			}
 		
 			if("server2".equals(server)&&sServerName2!=null&&!sServerName2.isEmpty())
 			{
@@ -106,8 +126,5 @@ public class DBConnection {
 			conn.authenticate(sUserName, sPassword.toCharArray());
 			return conn;
 	}
-	
-	
-	
 	
 }

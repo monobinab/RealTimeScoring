@@ -21,7 +21,7 @@ import com.mongodb.WriteConcernException;
 public class MemberBoostsDao extends AbstractDao {
 
 	private static final Logger LOGGER = LoggerFactory
-			.getLogger(MemberVariablesDao.class);
+			.getLogger(MemberBoostsDao.class);
 
 	DBCollection memberBoostsCollection;
 

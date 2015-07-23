@@ -49,15 +49,8 @@ public class PurchaseOccassionTopology {
 			
 			//Newly added code for adding kafka to the topology
 			String kafkaTopic="rts_cp_membertags";
-			/*
-			topologyBuilder.setSpout(
-					"KafkaSpout",
-					new KafkaSpout(KafkaUtil.getSpoutConfig(
-							
-							System.getProperty(MongoNameConstants.IS_PROD),
-							kafkaTopic)), 1);
-			*/
-			topologyBuilder.setSpout(
+
+			/*topologyBuilder.setSpout(
 					"RTSKafkaSpout",
 					new RTSKafkaSpout(KafkaUtil.getSpoutConfig(
 							
@@ -66,18 +59,12 @@ public class PurchaseOccassionTopology {
 			
 			
 			topologyBuilder.setBolt("RTSInterceptorBolt", new RTSInterceptorBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1)
-			.shuffleGrouping("RTSKafkaSpout");			
-
-			/*topologyBuilder.setBolt("parseOccassionBolt", new ParsingBoltOccassion(
-					System.getProperty(MongoNameConstants.IS_PROD)),1)
-					.shuffleGrouping("occassionSpout1")
-					.shuffleGrouping("occassionSpout2")
-					.shuffleGrouping("occassionSpout3");*/
+			.shuffleGrouping("RTSKafkaSpout");	*/		
 			
 			topologyBuilder.setBolt("parseOccassionBolt", new ParsingBoltOccassion(System.getProperty(MongoNameConstants.IS_PROD),
 					AuthPropertiesReader.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
 					.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 3)
-			.shuffleGrouping("occassionSpout1").shuffleGrouping("occassionSpout2").shuffleGrouping("occassionSpout3").shuffleGrouping("RTSInterceptorBolt");
+			.shuffleGrouping("occassionSpout1").shuffleGrouping("occassionSpout2").shuffleGrouping("occassionSpout3");//.shuffleGrouping("RTSInterceptorBolt");
 
 			
 			topologyBuilder.setBolt(

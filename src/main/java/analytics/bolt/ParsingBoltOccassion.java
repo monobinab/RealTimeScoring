@@ -99,6 +99,8 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 			}
 			LOGGER.debug("TIME:" + messageID + "-Entering ParsingboltOccasion-"
 					+ System.currentTimeMillis());
+			
+			LOGGER.info("Message Being Received " + messageID);
 
 			// LOGGER.info("~~~~~~~~~~~Incoming tuple in ParsingboltOccasion: "
 			// + input);
