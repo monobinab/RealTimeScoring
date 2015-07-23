@@ -48,6 +48,7 @@ public class ParsingSignalBrowseBolt extends EnvironmentBolt{
 				pidLst = rtsCommonObj.getPidList();
 				if(pidLst.get(0).length() != 13){
 					pidLst.add(0, "");
+					redisCountIncr("lids_proce_noTS");
 				}
 				LOGGER.info("PROCESSING L_Id: " + lyl_id_no +" with PIDs " + pidLst);
 				
