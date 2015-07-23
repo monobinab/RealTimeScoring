@@ -207,16 +207,16 @@ public class ResponsysUtil {
 		String jsonRespString = null;
 		try {
 			HttpClient httpclient = new DefaultHttpClient();
-			HttpGet httpget = new HttpGet(baseURL);
-
-			LOGGER.debug("executing request " + httpget.getRequestLine());
+			
 			long time = System.currentTimeMillis();
+			HttpGet httpget = new HttpGet(baseURL);
+			LOGGER.debug("executing request " + httpget.getRequestLine());
 			HttpResponse response = httpclient.execute(httpget);
-			LOGGER.info("Time take for API call  = " + (System.currentTimeMillis() - time));
 			String responseString = response.getStatusLine().toString();
 			LOGGER.debug("RTS API Response : " + responseString);
 			InputStream instream = response.getEntity().getContent();
 			jsonRespString = read(instream);
+			LOGGER.info("Time taken for API call  = " + (System.currentTimeMillis() - time));
 			//LOGGER.info(jsonRespString);	
 
 		} catch (IOException e3) {
