@@ -53,20 +53,6 @@ public class SignalBrowseSpout extends BaseRichSpout{
 		Jedis jedis = null;
 		try{
 			
-			/*Date date = new Date();
-			
-			String startTime = (new SimpleDateFormat("yyyy-MM-dd").format(date))+" 10:00:00";
-			Date startTimeToday = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(startTime);
-			
-			String endTime = (new SimpleDateFormat("yyyy-MM-dd").format(date))+" 17:00:00";
-			Date endTimeToday = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(endTime);
-
-			//Perform Vibes Text Processing between 10:00AM and 4:00PM CST
-			if(date.after(startTimeToday) && date.before(endTimeToday)){*/
-			
-				//List<DBObject> vibesLst = vibesDao.getVibes(Constants.NO);
-				//Iterator<DBObject> iter = vibesLst.iterator();
-				
 				jedis = new Jedis(host,port,900);
 				Set<String> names=jedis.keys(searchKey+":*");
 				RtsCommonObj commonObj = null;
@@ -116,8 +102,9 @@ public class SignalBrowseSpout extends BaseRichSpout{
 				return true;
 		}
 		catch(Exception e){
-			LOGGER.error("Exception ", e.getClass() +": " + e.getMessage());
-			return false;
+			LOGGER.error("Exception occured in shouldProceedWithProcessing SignalBrowseSpout ", e);
+			LOGGER.info("Processing lid " + commonObj.getLyl_id_no() + " after Exception caught");
+			return true;
 		}
 		return false;
 	}
