@@ -210,7 +210,9 @@ public class ResponsysUtil {
 			HttpGet httpget = new HttpGet(baseURL);
 
 			LOGGER.debug("executing request " + httpget.getRequestLine());
+			long time = System.currentTimeMillis();
 			HttpResponse response = httpclient.execute(httpget);
+			LOGGER.info("Time take for API call  = " + (System.currentTimeMillis() - time));
 			String responseString = response.getStatusLine().toString();
 			LOGGER.debug("RTS API Response : " + responseString);
 			InputStream instream = response.getEntity().getContent();
