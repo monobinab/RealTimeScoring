@@ -427,8 +427,10 @@ public class ResponsysUtil {
 			TagMetadata tagMetadata, String lyl_l_id, String topologyName, String l_id) throws Exception{
 		
 		//Generate the Custome Xml to be sent to Oracle
-
+		Long time = System.currentTimeMillis();
 		String customXml = createCustomXml("", memberInfo, customEventName, tagMetadata, lyl_l_id, topologyName);
+		
+		LOGGER.info("Time Taken to create custom xml = " + (System.currentTimeMillis() - time));
 	
 		//BOM = Byte-Order-Mark
 		//Remove the BOM to make the XML valid
@@ -450,6 +452,7 @@ public class ResponsysUtil {
 		System.out.println("Response String ====>" + strBuff.toString());
 		strBuff = null;
 		
+		LOGGER.info("Time taken in Process Message = " + (System.currentTimeMillis() - time));
 		//return strBuff;
 	}
 	
@@ -909,11 +912,11 @@ public class ResponsysUtil {
 			while ((c = in.read()) != -1) {
 				strBuff.append((char) c); 
 			}
-			System.out.println("time take for Resposys = " + (System.currentTimeMillis() - time));
+			System.out.println("time take to call Oracle = " + (System.currentTimeMillis() - time));
 		//	System.out.println("Response String ====>" + strBuff.toString());
 		}catch (IOException e) {
 			e.printStackTrace();
-			LOGGER.error("Exception occured in sendResponse ", e);
+			LOGGER.error("PERSIST: Exception occured in sendResponse ", e);
 		}
 		finally {
 			try {

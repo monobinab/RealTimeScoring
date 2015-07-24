@@ -40,7 +40,7 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 	@Override
 	public void execute(Tuple input) {
 	//	System.out.println("IN PERSIST BOLT: " + input);
-		redisCountIncr("PersistOccasionBolt_begin_count");
+		redisCountIncr("PersistOccasionBolt_input_count");
 		String messageID = "";
 		if (input.contains("messageID")) {
 			messageID = input.getStringByField("messageID");
@@ -100,7 +100,7 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 			LOGGER.debug("TIME:" + messageID + "-Exiting PersistOccasionbolt-" + System.currentTimeMillis());
 			outputCollector.ack(input);
 			countMetric.scope("persisted_successfully").incr();
-			redisCountIncr("PersistOccasionBolt_end_count");
+			redisCountIncr("PersistOccasionBolt_output_count");
 			
 		} catch (Exception e) {
 			LOGGER.error("Json Exception ", e);

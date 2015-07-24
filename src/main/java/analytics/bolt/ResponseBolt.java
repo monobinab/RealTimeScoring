@@ -56,7 +56,8 @@ public class ResponseBolt extends EnvironmentBolt{
 	@SuppressWarnings("unchecked")
 	@Override
 	public void execute(Tuple input) {
-		redisCountIncr("ResponseBolt_begin_count");
+		Long startTime = System.currentTimeMillis();
+		redisCountIncr("ResponseBolt_input_count");
 		String lyl_id_no = null; 
 		Jedis jedis = null;
 		countMetric.scope("entering_responsys_bolt").incr();
@@ -102,8 +103,12 @@ public class ResponseBolt extends EnvironmentBolt{
 					
 					LOGGER.debug("TIME:" + messageID + "-Making responsys call-" + System.currentTimeMillis());
 					//if( readyToProcessTags.size()>0){
+					
+						
 						TagMetadata tagMetadata = responsysUtil.getResponseServiceResult(scoreInfoJsonString,lyl_id_no,l_id, messageID, countMetric);
 
+						LOGGER.info(" Time Taken for ResponsysCall & Processing = " + (System.currentTimeMillis() - startTime));
+						
 						LOGGER.debug("TIME:" + messageID + "-Completed responsys call-" + System.currentTimeMillis());
 						StringBuilder custVibesEvent = new StringBuilder();
 
@@ -128,8 +133,9 @@ public class ResponseBolt extends EnvironmentBolt{
 			else{
 				countMetric.scope("no_lid").incr();
 			}
+			LOGGER.info(" Time Taken Complete = " + (System.currentTimeMillis() - startTime));
 			LOGGER.debug("TIME:" + messageID + "-Completed Response bolt-" + System.currentTimeMillis());
-			redisCountIncr("ResponseBolt_end_count");
+			redisCountIncr("ResponseBolt_output_count");
 			outputCollector.ack(input);
 			
 		} catch (Exception e) {
