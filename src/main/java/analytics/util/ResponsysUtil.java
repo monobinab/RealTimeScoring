@@ -219,7 +219,7 @@ public class ResponsysUtil {
 			return null;
 		} catch (Exception e5) {
 			e5.printStackTrace();
-			LOGGER.error("Error occured while calling the web service " + e5);
+			LOGGER.error("Error occured while calling the web service " , e5.getMessage() + "---" +baseURL);
 			return null;
 		}
 		return jsonRespString;
@@ -901,6 +901,9 @@ public class ResponsysUtil {
 					.getProperty(memberInfo.getWinningOptIn()+"Usrname"), AuthPropertiesReader
 					.getProperty(memberInfo.getWinningOptIn()+"Password"));
 
+			connection.setConnectTimeout(3000);
+			connection.setReadTimeout(3000);
+			   
 			out = new OutputStreamWriter(connection.getOutputStream());
 			System.out.println(xmlWithoutBOM);
 			out.write(xmlWithoutBOM);
@@ -914,9 +917,11 @@ public class ResponsysUtil {
 			}
 			System.out.println("time take to call Oracle = " + (System.currentTimeMillis() - time));
 		//	System.out.println("Response String ====>" + strBuff.toString());
-		}catch (IOException e) {
+		}catch (java.net.SocketTimeoutException e1) {
+		     LOGGER.error("PERSIST: Connection timed out in Oracle ", e1.getMessage() + "---" + memberInfo.getEid());
+	    }catch (IOException e) {
 			e.printStackTrace();
-			LOGGER.error("PERSIST: Exception occured in sendResponse ", e);
+			LOGGER.error("PERSIST: IOException occured in sendResponse ", e.getMessage() + "---" + memberInfo.getEid());
 		}
 		finally {
 			try {

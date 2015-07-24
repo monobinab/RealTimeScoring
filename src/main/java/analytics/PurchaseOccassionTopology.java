@@ -62,17 +62,17 @@ public class PurchaseOccassionTopology {
 			topologyBuilder.setBolt("RTSInterceptorBolt", new RTSInterceptorBolt(System.getProperty(MongoNameConstants.IS_PROD)), 6)
 			.shuffleGrouping("RTSKafkaSpout");			
 			
-			topologyBuilder.setBolt("parseOccassionBolt", new ParsingBoltOccassion(System.getProperty(MongoNameConstants.IS_PROD),
+			topologyBuilder.setBolt("parse_persist_OccassionBolt", new ParsingBoltOccassion(System.getProperty(MongoNameConstants.IS_PROD),
 					AuthPropertiesReader.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
 					.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 6).shuffleGrouping("RTSInterceptorBolt")
 			.shuffleGrouping("occassionSpout1").shuffleGrouping("occassionSpout2").shuffleGrouping("occassionSpout3");
 
 			
-			topologyBuilder.setBolt(
+			/*topologyBuilder.setBolt(
 					"persistOccasionBolt",
 					new PersistOccasionBolt(System
 							.getProperty(MongoNameConstants.IS_PROD)), 6)
-					.shuffleGrouping("parseOccassionBolt");
+					.shuffleGrouping("parseOccassionBolt");*/
 			/*topologyBuilder.setBolt(
 					"strategy_bolt",
 					new StrategyScoringBolt(System
@@ -84,8 +84,7 @@ public class PurchaseOccassionTopology {
 				.getProperty(MongoNameConstants.IS_PROD), AuthPropertiesReader
 				.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
 				.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 48)
-		//.shuffleGrouping("strategy_bolt", "response_stream")
-		.shuffleGrouping("persistOccasionBolt", "response_stream_from_persist");
+				.localOrShuffleGrouping("parse_persist_OccassionBolt");
 		
 			Config conf = new Config();
 			conf.put("metrics_topology", "PurchaseOccasion");

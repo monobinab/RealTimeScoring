@@ -62,9 +62,7 @@ public static void intialize() throws Exception{
 			
 		parsingBoltOccassion = new ParsingBoltOccassion(System.getProperty("rtseprod"));
 		parsingBoltOccassion.setMemberTagsDao();
-		parsingBoltOccassion.setTagMetadataDao();
-		parsingBoltOccassion.setTagVariableDao();
-		parsingBoltOccassion.setModelPercDao();
+
 		
 }
 
@@ -127,32 +125,6 @@ public void getTagVariablesListEmptyTest(){
 	Assert.assertEquals(0, tagsVarListActual.size());
 	}
 
-//test to check the resetting of variableValueMap to zero before persisting tags to memberMDTags collection
-@Test
-public void resetVariableValueMap(){
-	Map<String, String> varValueMap = new HashMap<String, String>();
-	parsingBoltOccassion.resetVariableValuesMap(varValueMap, "OccassionTopologyTestingl_id");
-	Assert.assertEquals(3, varValueMap.size());
-	Assert.assertEquals("0", varValueMap.get("BOOST_PO_HA_COOK_TEST"));
-}
-
-//test to check the empty variableBalueMap for non existent member in memberMDTags collection
-@Test
-public void resetVariableValueMapForNonExistentMemberId(){
-	
-	Map<String, String> varValueMap = new HashMap<String, String>();
-	parsingBoltOccassion.resetVariableValuesMap(varValueMap, "testingId");
-	Assert.assertEquals(0, varValueMap.size());
-}
-
-//test to check the variableValueMap for non existent variable in tagVariables collection
-@Test
-public void resetVariableValueMapFornonexistentVar(){
-	Map<String, String> varValueMap = new HashMap<String, String>();
-	parsingBoltOccassion.resetVariableValuesMap(varValueMap, "OccassionTopologyTestingl_id");
-	Assert.assertEquals(3, varValueMap.size());
-}
-
 //test to check the StringBuilder which will be added to object, that is to be emitted to persistbolt
 @Test
 public void persistToMemberTagsTest(){
@@ -165,57 +137,6 @@ public void persistToMemberTagsTest(){
 	Assert.assertEquals(9, stringBuilder.length());
 	}
 
-//test to check the metaData from tagMetadata collection
-@Test
-public void getTagMetaDataTest(){
-	JsonParser parser = new JsonParser();
-	JsonElement tag = parser.parse("HACKS2010");
-	TagMetadata tagMetaData = parsingBoltOccassion.getTagMetaData(tag);
-	Assert.assertEquals("Duress", tagMetaData.getPurchaseOccasion());
-	Assert.assertEquals("HA", tagMetaData.getBusinessUnit());
-	}
-//test to check for null if mdTag does not exist in tagMetadata collection
-@Test
-public void getTagMetaDataNullTest(){
-	JsonParser parser = new JsonParser();
-	JsonElement tag = parser.parse("HAKKS2010");
-	TagMetadata tagMetaData = parsingBoltOccassion.getTagMetaData(tag);
-	Assert.assertNull(tagMetaData);
-	}
-
-//test to the variable value for mdTag from tagVariable collection
-@Test
-public void getVariableValueTest(){
-	
-	String tagVarValue = parsingBoltOccassion.getTagVarValue("35");
-	Assert.assertEquals("0.11", tagVarValue);
-}
-
-@Test
-public void getVariableValueNullTest(){
-	String tagVarValue = parsingBoltOccassion.getTagVarValue(null);
-	Assert.assertNull(tagVarValue);
-}
-
-//test to check the variable for specific mdTag from tagVariables collection
-@Test
-public void getVariableTest(){
-	JsonParser parser = new JsonParser();
-	JsonElement tag = parser.parse("HACKS2010");
-	Map<String, String> tagVarActual = parsingBoltOccassion.getTagVariable(tag);
-	Map<String, String> tagVarExpected = new HashMap<String, String>();
-	tagVarExpected.put("BOOST_PO_HA_COOK_TEST", "35");
-	Assert.assertEquals(tagVarExpected, tagVarActual);
-}
-
-//test to check the variable for non existent mdTag from tagVariables collection
-@Test
-public void getVariablenullTest(){
-	JsonParser parser = new JsonParser();
-	JsonElement tag = parser.parse("HAKKS2010");
-	Map<String, String> tagVar = parsingBoltOccassion.getTagVariable(tag);
-	Assert.assertNull(tagVar);
-}
 
 //test to check the tags ["HASCKS2010", "HALAS2010"] format of the input from spout
 @Test

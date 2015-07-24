@@ -1,9 +1,7 @@
 package analytics.bolt;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,13 +113,15 @@ public class ResponseBolt extends EnvironmentBolt{
 						if(tagMetadata!=null && tagMetadata.getPurchaseOccasion()!=null && 
 								tagMetadata.getEmailOptIn()!=null && tagMetadata.getEmailOptIn().equals("N") && 
 								isVibesActiveWithEvent(tagMetadata.getPurchaseOccasion(),tagMetadata.getFirst5CharMdTag(),custVibesEvent)){
-								jedis = new Jedis(host, port, 1800);
-								jedis.connect();
-								jedis.set("Vibes:"+lyl_id_no, custVibesEvent.toString());
-								jedis.disconnect();
-								//jedisPool.returnResource(jedis);
-								countMetric.scope("adding_to_vibes_call").incr();
-								custVibesEvent = null;
+							Long time = System.currentTimeMillis();
+							jedis = new Jedis(host, port, 1800);
+							jedis.connect();
+							jedis.set("Vibes:"+lyl_id_no, custVibesEvent.toString());
+							jedis.disconnect();
+							//jedisPool.returnResource(jedis);
+							countMetric.scope("adding_to_vibes_call").incr();
+							custVibesEvent = null;
+							LOGGER.info("Time taken to process Vibes : " + (System.currentTimeMillis()- time));
 						}
 						countMetric.scope("responsys_call_completed").incr();
 				}
