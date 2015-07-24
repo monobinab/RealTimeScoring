@@ -90,6 +90,8 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 	@Override
 	public void execute(Tuple input) {
 		// System.out.println("IN PARSING BOLT: " + input);
+		redisCountIncr("ParsingBoltOccassion_begin_count");	
+		
 		Jedis jedis = null;
 		try {
 			
@@ -160,11 +162,11 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 			
 			LOGGER.info("PERSIST: Input Tags for Lid " + lyl_id_no + " : "+ diffTagsString);
 			
-			jedis = new Jedis(host, port, 1800);
+			/*jedis = new Jedis(host, port, 1800);
 			jedis.connect();
 			jedis.set("Responses:" + l_id, diffTagsString);
 			jedis.expire("Responses:" + l_id, 172800);
-			jedis.disconnect();
+			jedis.disconnect();*/
 
 			// reset the variableValueMap to 0 before persisting new incoming
 			// tags
@@ -256,6 +258,11 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 				listToEmit.add(messageID);
 				this.outputCollector.emit(listToEmit);
 				countMetric.scope("no_variables_affected").incr();
+				
+				
+				redisCountIncr("ParsingBoltOccassion_end_count");	
+				
+				
 			//}
 		} catch (Exception e) {
 			LOGGER.error("exception in parsing: " + e);

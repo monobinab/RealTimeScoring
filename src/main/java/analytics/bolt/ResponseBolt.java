@@ -56,6 +56,7 @@ public class ResponseBolt extends EnvironmentBolt{
 	@SuppressWarnings("unchecked")
 	@Override
 	public void execute(Tuple input) {
+		redisCountIncr("ResponseBolt_begin_count");
 		String lyl_id_no = null; 
 		Jedis jedis = null;
 		countMetric.scope("entering_responsys_bolt").incr();
@@ -79,7 +80,7 @@ public class ResponseBolt extends EnvironmentBolt{
 				//for which the response has to be sent is taken from the 1st ranks occasion tags from the API call
 				
 				//Get the Difference Tags from Redis for an lid
-				jedis = new Jedis(host, port, 1800);
+				/*jedis = new Jedis(host, port, 1800);
 				jedis.connect();
 				String diffTags = null;
 				if(jedis.exists("Responses:"+l_id)){
@@ -88,10 +89,11 @@ public class ResponseBolt extends EnvironmentBolt{
 				}
 				else{
 					LOGGER.info("PERSIST: No Tags found for lyl_id_no " + lyl_id_no);
-				}
+				}*/
+				String diffTags = input.getStringByField("tags");
 				LOGGER.info("PERSIST: Input Tags for lyl_id_no " + lyl_id_no+ " : "+diffTags);
 				
-				jedis.disconnect();
+				//jedis.disconnect();
 
 				if(diffTags!=null && !"".equals(diffTags)){
 					countMetric.scope("making_responsys_call").incr();
@@ -127,6 +129,7 @@ public class ResponseBolt extends EnvironmentBolt{
 				countMetric.scope("no_lid").incr();
 			}
 			LOGGER.debug("TIME:" + messageID + "-Completed Response bolt-" + System.currentTimeMillis());
+			redisCountIncr("ResponseBolt_end_count");
 			outputCollector.ack(input);
 			
 		} catch (Exception e) {

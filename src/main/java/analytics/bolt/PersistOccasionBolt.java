@@ -40,6 +40,7 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 	@Override
 	public void execute(Tuple input) {
 	//	System.out.println("IN PERSIST BOLT: " + input);
+		redisCountIncr("PersistOccasionBolt_begin_count");
 		String messageID = "";
 		if (input.contains("messageID")) {
 			messageID = input.getStringByField("messageID");
@@ -80,16 +81,18 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 			    	countMetric.scope("tags_with_rescoring").incr();
 			}else{*/
 				
-				if (input.contains("lyl_id_no")) {
+				if (input.contains("lyl_id_no") && tag != null && !tag.isEmpty()) {
 					String lyl_id_no = input.getStringByField("lyl_id_no");
 					List<Object> listToEmit = new ArrayList<Object>();
 					listToEmit = new ArrayList<Object>();
 					listToEmit.add(lyl_id_no);
+					listToEmit.add(tag);
 					listToEmit.add(messageID);
 					this.outputCollector.emit("response_stream_from_persist", listToEmit);
 					countMetric.scope("tags_without_rescoring").incr();
 				}
 				else{
+					LOGGER.info("PERSIST: No Tags found for lyl_id_no " + input.getStringByField("lyl_id_no"));
 					countMetric.scope("no_lyl_id_no").incr();
 				}
 				
@@ -97,6 +100,7 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 			LOGGER.debug("TIME:" + messageID + "-Exiting PersistOccasionbolt-" + System.currentTimeMillis());
 			outputCollector.ack(input);
 			countMetric.scope("persisted_successfully").incr();
+			redisCountIncr("PersistOccasionBolt_end_count");
 			
 		} catch (Exception e) {
 			LOGGER.error("Json Exception ", e);
@@ -107,7 +111,8 @@ public class PersistOccasionBolt extends EnvironmentBolt{
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 			//declarer.declare(new Fields("l_id", "lineItemAsJsonString","source","lyl_id_no", "messageID"));
-			declarer.declareStream("response_stream_from_persist", new Fields("lyl_id_no","messageID"));
+			//declarer.declareStream("response_stream_from_persist", new Fields("lyl_id_no","messageID"));
+			declarer.declareStream("response_stream_from_persist", new Fields("lyl_id_no","tags","messageID"));
 		}
 
 }

@@ -82,14 +82,14 @@ public class PurchaseOccassionTopology {
 		topologyBuilder.setBolt("responses_bolt", new ResponseBolt(System
 				.getProperty(MongoNameConstants.IS_PROD), AuthPropertiesReader
 				.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
-				.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 24)
+				.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 48)
 		//.shuffleGrouping("strategy_bolt", "response_stream")
 		.shuffleGrouping("persistOccasionBolt", "response_stream_from_persist");
 		
 			Config conf = new Config();
 			conf.put("metrics_topology", "PurchaseOccasion");
 			//Added the timeout so that topology will not read the message again
-			conf.setMessageTimeoutSecs(7200);	
+			conf.setMessageTimeoutSecs(86400);	
 			//stormconf is set with system's property as MetricsListener needs it
 			conf.put("topology_environment", System.getProperty(MongoNameConstants.IS_PROD));
 			conf.registerMetricsConsumer(MetricsListener.class,  System.getProperty(MongoNameConstants.IS_PROD), 3);
