@@ -901,9 +901,9 @@ public class ResponsysUtil {
 					.getProperty(memberInfo.getWinningOptIn()+"Usrname"), AuthPropertiesReader
 					.getProperty(memberInfo.getWinningOptIn()+"Password"));
 
-			connection.setConnectTimeout(10000);
-			connection.setReadTimeout(10000);
-			   
+			connection.setConnectTimeout(12000);
+			connection.setReadTimeout(12000);
+						   
 			out = new OutputStreamWriter(connection.getOutputStream());
 			System.out.println(xmlWithoutBOM);
 			out.write(xmlWithoutBOM);
