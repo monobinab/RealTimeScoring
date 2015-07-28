@@ -897,7 +897,7 @@ public class ResponsysUtil {
 		long time = System.currentTimeMillis();
 		try {
 			connection = HttpClientUtils.getConnectionWithBasicAuthentication(AuthPropertiesReader
-					.getProperty(Constants.RESP_URL),"application/xml", "POST",AuthPropertiesReader
+					.getProperty(memberInfo.getWinningOptIn()+"WebserviceURL"),"application/xml", "POST",AuthPropertiesReader
 					.getProperty(memberInfo.getWinningOptIn()+"Usrname"), AuthPropertiesReader
 					.getProperty(memberInfo.getWinningOptIn()+"Password"));
 
@@ -918,10 +918,10 @@ public class ResponsysUtil {
 			System.out.println("time take to call Oracle = " + (System.currentTimeMillis() - time));
 		//	System.out.println("Response String ====>" + strBuff.toString());
 		}catch (java.net.SocketTimeoutException e1) {
-		     LOGGER.error("PERSIST: Connection timed out in Oracle ", e1.getMessage() + "---" + memberInfo.getEid());
+		     LOGGER.error("PERSIST: Connection timed out in Oracle --- "+ memberInfo.getEid(), e1.getMessage() + "---" + memberInfo.getEid());
 	    }catch (IOException e) {
 			e.printStackTrace();
-			LOGGER.error("PERSIST: IOException occured in sendResponse ", e.getMessage() + "---" + memberInfo.getEid());
+			LOGGER.error("PERSIST: IOException occured in sendResponse "+ memberInfo.getEid(), e.getMessage() + "---" + memberInfo.getEid());
 		}
 		finally {
 			try {

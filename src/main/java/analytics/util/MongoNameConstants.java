@@ -141,9 +141,9 @@ public class MongoNameConstants {
      public static final String E_ID = "eid";
      public static final String EMAIL_OPT_IN = "eml_opt_in";
      public static final String STATE = "st_cd";
-     public static final String SEARS_OPT_IN = "srs_opt_in";
-     public static final String KMART_OPT_IN = "kmt_opt_in";
-     public static final String SYW_OPT_IN = "syw_opt_in";
+     public static final String SEARS_OPT_IN = "srse";
+     public static final String KMART_OPT_IN = "kmte";
+     public static final String SYW_OPT_IN = "sywe";
      
      
      //Occasion Custome Event Collection
