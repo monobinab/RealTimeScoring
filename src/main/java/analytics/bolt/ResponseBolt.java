@@ -110,7 +110,7 @@ public class ResponseBolt extends EnvironmentBolt{
 						LOGGER.debug("TIME:" + messageID + "-Completed responsys call-" + System.currentTimeMillis());
 						StringBuilder custVibesEvent = new StringBuilder();
 
-						if(tagMetadata!=null && tagMetadata.getPurchaseOccasion()!=null && 
+						/*if(tagMetadata!=null && tagMetadata.getPurchaseOccasion()!=null && 
 								tagMetadata.getEmailOptIn()!=null && tagMetadata.getEmailOptIn().equals("N") && 
 								isVibesActiveWithEvent(tagMetadata.getPurchaseOccasion(),tagMetadata.getFirst5CharMdTag(),custVibesEvent)){
 							Long time = System.currentTimeMillis();
@@ -122,7 +122,7 @@ public class ResponseBolt extends EnvironmentBolt{
 							countMetric.scope("adding_to_vibes_call").incr();
 							custVibesEvent = null;
 							LOGGER.info("Time taken to process Vibes : " + (System.currentTimeMillis()- time));
-						}
+						}*/
 						countMetric.scope("responsys_call_completed").incr();
 				}
 				else{
