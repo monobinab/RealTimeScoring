@@ -24,7 +24,7 @@ public class DBConnection {
 	private static int sPort = 0;
 	//Write concern
 	private static int writeconcern = 0;
-
+	private static int writeconcern2 = 0;
 	
 	private static String sDatabaseName = "";
 	private static String sUserName = "";
@@ -88,7 +88,18 @@ public class DBConnection {
 		
 			if("server2".equals(server)&&sServerName2!=null&&!sServerName2.isEmpty())
 			{
-				mongoClient = new MongoClient(sServerName2, sPort);
+				
+				String serverlist2 = properties.getString("server2.list"); 
+				List<ServerAddress> sServers2 = new ArrayList<ServerAddress>();
+				writeconcern2 = Integer.parseInt( properties.getString("server2.user.writeconcern"));
+				String[] servers2 = serverlist2.split(";");
+				for (String serverurl2 : servers2) {
+					sServers2.add(new ServerAddress(serverurl2, sPort));
+				}
+				mongoClient	= new MongoClient(sServers2);
+				mongoClient.setWriteConcern(new WriteConcern(writeconcern2,100));
+				
+				//mongoClient = new MongoClient(sServerName2, sPort);
 			}
 			else{
 				String serverlist = properties.getString("servers.list"); 
