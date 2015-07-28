@@ -46,13 +46,9 @@ public class ParsingSignalBrowseBolt extends EnvironmentBolt{
 		try {
 				lyl_id_no = rtsCommonObj.getLyl_id_no();
 				pidLst = rtsCommonObj.getPidList();
-				if(pidLst.get(0).length() != 13){
-					pidLst.add(0, "");
-					redisCountIncr("lids_proce_noTS");
-				}
+			
 				LOGGER.info("PROCESSING L_Id: " + lyl_id_no +" with PIDs " + pidLst);
-				
-				
+						
 				if(lyl_id_no != null && pidLst != null && pidLst.size()>0){
 					//String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no);
 					

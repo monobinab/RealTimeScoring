@@ -182,9 +182,10 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 				newScore = 1.0;
 		
 			//get the boostedScore
-			newScore = scoringSingleton.calcBoosterScore(boosterMemberVarMap, modelId, newScore);
+			//MSM's boosting is not in production..so disabling this for now
+			/*newScore = scoringSingleton.calcBoosterScore(boosterMemberVarMap, modelId, newScore);
 			if(newScore > 1.0)
-				newScore = 1.0;
+				newScore = 1.0;*/
 
 			// 9) Emit the new score
 			Map<String, Date> minMaxMap = scoringSingleton.getMinMaxExpiry(modelId, allChanges);
