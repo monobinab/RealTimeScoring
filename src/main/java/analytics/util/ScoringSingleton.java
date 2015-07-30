@@ -201,23 +201,23 @@ public class ScoringSingleton {
 		
 		for (Integer modId : modelIdList) {
 			try{
-			int month;
-			if (modelsMap.get(modId).containsKey(0)) {
-				month = 0;
-			} else {
-				month = Calendar.getInstance().get(Calendar.MONTH) + 1;
-			}
-			if (modelsMap.get(modId).get(month) != null && modelsMap.get(modId).get(month).getVariables() != null) {
-				for (String var : modelsMap.get(modId).get(month).getVariables().keySet()) {
-					if (variableNameToVidMap.get(var) == null) {
-						LOGGER.error("VID is null for variable " + var);
-					} else {
-						variableFilter.add(variableNameToVidMap.get(var));
-					}
+				int month;
+				if (modelsMap.get(modId).containsKey(0)) {
+					month = 0;
+				} else {
+					month = Calendar.getInstance().get(Calendar.MONTH) + 1;
 				}
-			} else {
-				LOGGER.error("Unable to find the model for " + modId);
-			}
+				if (modelsMap.get(modId).get(month) != null && modelsMap.get(modId).get(month).getVariables() != null) {
+					for (String var : modelsMap.get(modId).get(month).getVariables().keySet()) {
+						if (variableNameToVidMap.get(var) == null) {
+							LOGGER.error("VID is null for variable " + var);
+						} else {
+							variableFilter.add(variableNameToVidMap.get(var));
+						}
+					}
+				} else {
+					LOGGER.error("Unable to find the model for " + modId);
+				}
 			}
 			catch(Exception e){
 				LOGGER.error("Exception in createMemberVariableValueMap method ", e);
@@ -293,6 +293,7 @@ public class ScoringSingleton {
 
 				RealTimeScoringContext context = new RealTimeScoringContext();
 				context.setValue(newChangesVarValueMap.get(variableName));
+				// set default previous value to 0 in case the variable does not exist in memberVariables or changedMemberVariables
 				context.setPreviousValue(0);
 
 				if ("NONE".equals(variableNameToStrategyMap.get(variableName))) {

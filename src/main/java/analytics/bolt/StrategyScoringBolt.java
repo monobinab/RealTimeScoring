@@ -109,7 +109,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		// 3) Find all models affected by the changes
 		Set<Integer> modelIdList = scoringSingleton.getModelIdList(newChangesVarValueMap);
 		
-		//filter the models which needs to be scored
+		//filter the models which do not have valid month (either month = 0 or month = current month)
 		scoringSingleton.filterScoringModelIdList(modelIdList);
 		
 		if(modelIdList==null||modelIdList.isEmpty()){
