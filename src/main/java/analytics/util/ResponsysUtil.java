@@ -452,7 +452,7 @@ public class ResponsysUtil {
 			String hashedXML = createCustomXml("", memberInfo, customEventName, tagMetadata, l_id, topologyName);
 			String hashxmlWithoutBOM = removeUTF8BOM(hashedXML);
 			xmlResponsysDAO.addXMLResponsys(l_id,hashxmlWithoutBOM, "N", topologyName);
-			
+			nullifyObjects(hashxmlWithoutBOM, hashedXML);
 		}
 		
 		//timeout code ends
