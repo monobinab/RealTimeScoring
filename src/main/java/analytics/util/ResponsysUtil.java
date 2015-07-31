@@ -451,7 +451,7 @@ public class ResponsysUtil {
 		{
 			String hashedXML = createCustomXml("", memberInfo, customEventName, tagMetadata, l_id, topologyName);
 			String hashxmlWithoutBOM = removeUTF8BOM(hashedXML);
-			xmlResponsysDAO.addXMLResponsys(l_id,hashxmlWithoutBOM, "N", topologyName);
+			xmlResponsysDAO.addXMLResponsys(l_id,hashxmlWithoutBOM,memberInfo.getWinningOptIn(),"N", topologyName);
 			nullifyObjects(hashxmlWithoutBOM, hashedXML);
 		}
 		

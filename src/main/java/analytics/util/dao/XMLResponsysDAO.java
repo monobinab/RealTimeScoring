@@ -27,13 +27,14 @@ public class XMLResponsysDAO extends AbstractDao {
 	}
 	
 	
-	public void addXMLResponsys(String l_id,  String xmlWithoutBOM,  
+	public void addXMLResponsys(String l_id,  String xmlWithoutBOM,  String winOptIn,
 			String successFlag, String topologyName) {
 		try {
 			Date dNow = new Date( );
 			DBObject respObj = new BasicDBObject();
 			respObj.put(MongoNameConstants.L_ID, l_id);		
 			respObj.put("xmlrequest", xmlWithoutBOM);
+			respObj.put("winOptIn", winOptIn);
 			respObj.put("successFlag", successFlag);
 			respObj.put("retry_dt", "");
 			respObj.put("topology", topologyName);
