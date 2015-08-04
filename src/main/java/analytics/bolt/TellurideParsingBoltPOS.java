@@ -416,6 +416,7 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
 		}
 		else{
 			//countMetric.scope("empty_xml").incr();
+			LOGGER.info("empty xml " + transactionXmlAsString);
 			redisCountIncr("empty_xml");
 			outputCollector.ack(input);
 			return;
