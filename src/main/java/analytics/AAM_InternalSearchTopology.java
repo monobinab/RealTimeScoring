@@ -2,8 +2,6 @@ package analytics;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import analytics.bolt.FlumeRPCBolt;
 import analytics.bolt.LoggingBolt;
 import analytics.bolt.ParsingBoltAAM_InternalSearch;
 import analytics.bolt.RTSKafkaBolt;
@@ -36,7 +34,6 @@ public static void main(String[] args) {
 		} 
 		
 		String kafkatopic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;
-		//RedisConnection redisConnection = new RedisConnection();
 		String[] servers = RedisConnection.getServers(System.getProperty(MongoNameConstants.IS_PROD));
 
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
@@ -52,7 +49,6 @@ public static void main(String[] args) {
 		.shuffleGrouping("strategy_bolt","kafka_stream");
 		
 		if(System.getProperty(MongoNameConstants.IS_PROD).equals("PROD")){
-			//topologyBuilder.setBolt("flumeLoggingBolt", new FlumeRPCBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategy_bolt", "score_stream");
 			topologyBuilder.setBolt("loggingBolt", new LoggingBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategy_bolt", "score_stream");
 		}
 		

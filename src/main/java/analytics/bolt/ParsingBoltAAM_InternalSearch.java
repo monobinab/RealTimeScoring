@@ -108,9 +108,9 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
     	if(searchStringsCollection==null || searchStringsCollection.isEmpty()|| (searchStringsCollection.toArray())[0].toString().trim().equalsIgnoreCase(""))
     		return null;
     	
+    	LOGGER.info(current_l_id + " has " + searchStringsCollection.size() + " searchTerms");
     	for(String searchString : searchStringsCollection) {
 	    	String[] search = splitKeyWords(searchString);
-	    	System.out.println("Search Key = " + search);
 	    	//CONSTRUCT URL - queries Solr
 			//String URL1 = "http://solrx308p.stress.ch3.s.com:8180/search/select?qt=search&wt=json&q=";
 	    	String URL1 = "http://solrx-prod.prod.ch4.s.com:80/search/select?qt=search&wt=json&clientID=sywAnalytics&q=";
@@ -226,17 +226,12 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
     }
 	@Override
 	protected String[] splitRec(String webRec) {
-		//TODO: See if other fields in the record are relevant. It was anyway not being used, so made this change
-	        //System.out.println("WEB RECORD: " + webRec);
-		webRec = webRec.replaceAll("[']",""); ;
-	        String split[]=StringUtils.split(webRec,",");
-	       
-	        if(split !=null && split.length>0) {
-	            return new String [] { split[1], split[2] };
-			}
+		String split[]=StringUtils.split(webRec,",");
+	    if(split !=null && split.length>0) {
+	        	return split;
+	    }
 			else {
 				return null;
 			}
 		}
-    
 }
