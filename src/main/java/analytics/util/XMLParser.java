@@ -8,7 +8,6 @@ import analytics.util.objects.ProcessTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -26,9 +25,7 @@ public class XMLParser {
 			.getLogger(XMLParser.class);
 
 	public static ProcessTransaction parseXMLProcessTransaction(String fileName) {
-		List<String> testMembers= new ArrayList<String>();
-		testMembers.add("7081197526669586");
-		testMembers.add("7081187606915702"); 
+
 		ProcessTransaction processTransaction = null;
 		XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
         xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, Boolean.FALSE);
@@ -55,10 +52,10 @@ public class XMLParser {
                 switch (event) {
 									
 				case XMLStreamConstants.START_ELEMENT:
-                    String elementName = xmlStreamReader.getLocalName().replace("tns:","");
+                    String elementName = extractElementName(xmlStreamReader);
 
 
-                    QName qname = xmlStreamReader.getName();
+             //       QName qname = xmlStreamReader.getName();
 					if (elementName.contains("MemberNumber")) {
 						bMemberNumber = true;
 					} else if ("RequestorID".equals(
@@ -88,7 +85,7 @@ public class XMLParser {
 					if (bMemberNumber) {
 						String memberNumber = xmlStreamReader
 								.getText();
-						if(memberNumber.startsWith("7081") && !testMembers.contains(memberNumber) && memberNumber.length()==16)
+						if(memberNumber.startsWith("7081") && memberNumber.length()==16)
 							{
 								processTransaction.setMemberNumber(xmlStreamReader
 								.getText());
@@ -113,9 +110,14 @@ public class XMLParser {
 						bItemType = false;
 					} else if (bEarnFlag){
 						if("E".equals(xmlStreamReader.getText()))
+                        {
+                                processTransaction.setEarnFlag(xmlStreamReader.getText());
 								bEarnFlag = false;
-						else 
+                        }
+                        else
+                        {
 							return null;
+                        }
 					}
 
 					else if (bDollarValuePostDisc) {
@@ -126,7 +128,7 @@ public class XMLParser {
 
 					break;
 				case XMLStreamConstants.END_ELEMENT:
-                    elementName = xmlStreamReader.getLocalName().replace("tns:","");
+                    elementName = extractElementName(xmlStreamReader);
 
                     if ("LineItem".equals(elementName)) {
                     	if(!("000000000".equals(lineItem.getItemNumber())) && "1".equals(lineItem.getItemType()) )
@@ -147,5 +149,17 @@ public class XMLParser {
 		return processTransaction;
 
 	}
+
+    private static String extractElementName(XMLStreamReader xmlStreamReader) {
+        String elementName = xmlStreamReader.getLocalName();
+        String[] parts = elementName.split(":");
+
+        elementName = parts.length>1?parts[1]:elementName;
+       // System.out.println(elementName);
+
+        return elementName;
+    }
+
+
 
 }
