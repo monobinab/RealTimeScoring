@@ -33,15 +33,18 @@ public class DBConnection {
 	//Connection variables for connecting to Mongo2 incase of MemberVariables
 	private static String sDatabaseName2_2 = "";
 	private static String sUserName2_2 = "";
+	static DB conn1 = null;
+	static DB conn2 = null;
+	static DB conn2_2 = null;
 	
-	
+		
 	public static DB getDBConnection() throws ConfigurationException{
 		return getDBConnection("default");
 	}
 
 	public static DB getDBConnection(String server) throws ConfigurationException {
 		LOGGER.info("~~~~~~~~~~~~~~~DBCONNECTION CLASS~~~~~~~: " + System.getProperty(MongoNameConstants.IS_PROD));
-		DB conn = null;
+
 		PropertiesConfiguration properties = null;
 		String isProd = System.getProperty(MongoNameConstants.IS_PROD);
 		//If test, return only a test fake mongo connection
@@ -52,16 +55,19 @@ public class DBConnection {
 		if(isProd!=null && "PROD".equals(isProd)){
 			properties=  new PropertiesConfiguration("resources/connection_config_prod.properties");
 			LOGGER.info("~~~~~~~Using production properties in DBConnection~~~~~~~~~");
+			return isDbAlreadyActive(server);
 		}
 		
 		else if(isProd!=null && "QA".equals(isProd)){
 			properties=  new PropertiesConfiguration("resources/connection_config.properties");
-			LOGGER.info("Using test properties");	
+			LOGGER.info("Using test properties");
+			return isDbAlreadyActive(server);
 		}
 		
 		else if(isProd!=null && "LOCAL".equals(isProd)){
 			properties=  new PropertiesConfiguration("resources/connection_config_local.properties");
-			LOGGER.info("Using test properties");	
+			LOGGER.info("Using test properties");
+			return isDbAlreadyActive(server);
 		}
 
 		try {
@@ -77,13 +83,14 @@ public class DBConnection {
 			sServerName2_2 = properties.getString("server2_2.name");
 			sDatabaseName2_2 = properties.getString("database2_2.name");
 			sUserName2_2 = properties.getString("user.name2_2");
+			
 			if("server2_2".equalsIgnoreCase(server) && sServerName2_2!=null&&!sServerName2_2.isEmpty()){
 				mongoClient = new MongoClient(sServerName2_2, sPort);
-				conn = mongoClient.getDB(sDatabaseName2_2);
+				conn2_2 = mongoClient.getDB(sDatabaseName2_2);
 				//	System.out.println("Connection is established...."+ mongoClient.getAllAddress() + " " + conn.getName());
-				LOGGER.info("Connection is established ...."+ mongoClient.getAllAddress() + " " + conn.getName());
-				conn.authenticate(sUserName2_2, sPassword.toCharArray());
-				return conn;
+				LOGGER.info("Connection is established ...."+ mongoClient.getAllAddress() + " " + conn2_2.getName());
+				conn2_2.authenticate(sUserName2_2, sPassword.toCharArray());
+				return conn2_2;
 			}
 		
 			if("server2".equals(server)&&sServerName2!=null&&!sServerName2.isEmpty())
@@ -109,22 +116,28 @@ public class DBConnection {
 				//After waiting for 100 milliseconds, each write will throw an exception 
 				mongoClient.setWriteConcern(new WriteConcern(writeconcern,100));
 				
+				conn1 = mongoClient.getDB(sDatabaseName);
+			//	System.out.println("Connection is established...."+ mongoClient.getAllAddress() + " " + conn.getName());
+				LOGGER.info("Connection is established...."+ mongoClient.getAllAddress() + " " + conn1.getName());
+				conn1.authenticate(sUserName, sPassword.toCharArray());
+				return conn1;
+				
 				
 			}
-			/*// The code before write concern
-			else{
-				mongoClient = new MongoClient(sServerName, sPort);
-			}
-				*/
 		} catch (UnknownHostException e) {
 			LOGGER.error("Mongo host unknown",e);
 		}
 	
-			conn = mongoClient.getDB(sDatabaseName);
-		//	System.out.println("Connection is established...."+ mongoClient.getAllAddress() + " " + conn.getName());
-			LOGGER.info("Connection is established...."+ mongoClient.getAllAddress() + " " + conn.getName());
-			conn.authenticate(sUserName, sPassword.toCharArray());
-			return conn;
 	}
 	
+	private static DB isDbAlreadyActive(String server){
+		if("server2_2".equalsIgnoreCase(server) && conn2_2!=null)
+			return conn2_2;
+		else if ("server2".equalsIgnoreCase(server) && conn2!=null)
+			return conn2;
+		else if (conn1!=null)
+			return conn1;
+		
+		return null;
+	}
 }

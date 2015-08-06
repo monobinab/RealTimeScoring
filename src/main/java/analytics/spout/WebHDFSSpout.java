@@ -87,6 +87,7 @@ public class WebHDFSSpout extends BaseRichSpout{
 				//Get the remaining TO BE PROCESSED prefixes
 				sortedSubSet = (TreeSet<Long>) sortedSet.tailSet(latestPrefix, false);
 			}
+			//sortedSubSet.add(20150729L);
 			
 			Iterator iter = sortedSubSet.iterator();
 			//Process Individual files from the timestamped(prefixed) directory.
