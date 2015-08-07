@@ -171,10 +171,7 @@ public class ScoringSingleton {
 			score = score * regionalFactor;
 			if (score > 1)
 				score = 1.0;
-			//get the boostedScore
-			score = this.calcBoosterScore(boosterMemberVarMap, modelId, score);
-			if(score > 1.0)
-				score = 1.0;
+			
 			modelIdScoreMap.put(modelId, score);
 			modelIdToExpiryMap.put(modelId, getMinMaxExpiry(modelId, allChanges));
 			}
@@ -523,60 +520,7 @@ public class ScoringSingleton {
 		return boosterMemberVariablesDao.getBoosterMemberVariablesFiltered(loyaltyId, variableFilter);
 	}
 
-	public double calcBoosterScore(Map<String, Object> mbrBoosterVarMap, int modelId, double newScore){
-
-		BoosterModel boosterModel = null;
-		if(boosterModelIds.contains(modelId) && boosterModelVariablesMap.containsKey(modelId) && boosterModelVariablesMap.get(modelId) != null){
-			boosterModel = boosterModelVariablesMap.get(modelId);
-		}
-		else{
-			return newScore;
-		}
-
-		if(mbrBoosterVarMap == null || mbrBoosterVarMap.isEmpty())
-			return newScore;
-
-		double boosterScore = boosterModel.getConstant();
-		Map<String, Double> variablesMap = boosterModel.getBoosterVariablesMap();
-
-		Set<String> commonVar = new HashSet<String>(mbrBoosterVarMap.keySet());
-		Map<String, String> varVIDToVarNameMap = new HashMap<String, String>();
-
-		for (Entry<String, Double> entry : variablesMap.entrySet()) {
-			String bVid = null;
-			Object variableValue = null;
-		    String varName = entry.getKey();
-		    Double coefficient = entry.getValue();
-		    if( boosterVariableNameToVidMap.get(varName) != null){
-		    	bVid = boosterVariableNameToVidMap.get(varName);
-		    }
-		    else if(!varName.equalsIgnoreCase(Constants.MSM_SCORE) && boosterVariableNameToVidMap.get(varName) == null){
-		    	LOGGER.error("variable not found in boosterVariables collection but present in modelBoosterVarCollection " + varName);
-		    	continue;
-		    }
-		     if(mbrBoosterVarMap.containsKey(bVid)){
-		    	variableValue = mbrBoosterVarMap.get(bVid);
-		    }
-		    else
-		    	continue;
-		    if (variableValue instanceof Integer) {
-		    	boosterScore =  boosterScore + ((Integer) variableValue * coefficient) ;
-		   	} else if (variableValue instanceof Double) {
-		   		boosterScore = boosterScore + ((Double) variableValue * coefficient) ;
-			} 
-		    varVIDToVarNameMap.put(bVid, varName);
-		}
-			//check whether mbrBoosterVarMap contains atleast one variable for this boostermodel modelId - to be scored
-			//if mbrBoosterVarMap does not contain any var of interest, return the newScore
-			commonVar.retainAll(varVIDToVarNameMap.keySet());
-			if(commonVar.size() == 0)
-				return newScore;
-
-			boosterScore = 1/(1+Math.exp(-(boosterScore + variablesMap.get(Constants.MSM_SCORE)*(Math.log((newScore +0.00000001)/(1-newScore+0.00000001))))));
-			return boosterScore;
-	}
-
-	
+		
 	public Map<String, Date> getMinMaxExpiry(Integer modelId, Map<String, Change> allChanges) {
 	Date minDate = null;
 	Date maxDate = null;
@@ -585,9 +529,9 @@ public class ScoringSingleton {
 	for (Map.Entry<String, Change> entry : allChanges.entrySet()) {
 		String key = entry.getKey();
 		Change value = entry.getValue();
-		if (!variableModelsMap.containsKey(key)) {
+		/*if (!variableModelsMap.containsKey(key)) {
 			LOGGER.error("Could not find variable in map " + key);
-		}
+		}*/
 		// variable models map
 		if (variableModelsMap.containsKey(key) && variableModelsMap.get(key).contains(modelId)) {
 			Date exprDate = value.getExpirationDate();
@@ -604,10 +548,25 @@ public class ScoringSingleton {
 			}
 		}
 	}
-	minMaxMap.put("minExpiry", minDate);
-	minMaxMap.put("maxExpiry", maxDate);
-	return minMaxMap;
-}
+		// IF THE MODEL IS MONTH SPECIFIC AND THE MIN/MAX DATE IS AFTER THE
+		// END OF THE MONTH SET TO THE LAST DAY OF THIS MONTH
+		if (modelCheck(modelId) && checkMonthModel(modelId)) {
+			Calendar calendar = Calendar.getInstance();
+			calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DATE));
+			Date lastDayOfMonth = calendar.getTime();
+	
+			if (minDate != null && minDate.after(lastDayOfMonth)) {
+				minDate = lastDayOfMonth;
+				maxDate = lastDayOfMonth;
+			} else if (maxDate != null && maxDate.after(lastDayOfMonth)) {
+				maxDate = lastDayOfMonth;
+			}
+		}
+		
+		minMaxMap.put("minExpiry", minDate);
+		minMaxMap.put("maxExpiry", maxDate);
+		return minMaxMap;
+	}
 
 	/**
 	 * 
@@ -626,9 +585,9 @@ public class ScoringSingleton {
 			Map<String, Date> minMaxMap = modelIdToExpiry.get(modelId);
 			Date minDate = minMaxMap.get("minExpiry");
 			Date maxDate = minMaxMap.get("maxExpiry");
-			// IF THE MODEL IS MONTH SPECIFIC AND THE MIN/MAX DATE IS AFTER THE
-			// END OF THE MONTH SET TO THE LAST DAY OF THIS MONTH
-			if (modelsMap.containsKey(modelId) && modelsMap.get(modelId).containsKey(Calendar.getInstance().get(Calendar.MONTH) + 1)) {
+			
+			//moved to getMinMaxExpiry() method
+			/*if (modelsMap.containsKey(modelId) && modelsMap.get(modelId).containsKey(Calendar.getInstance().get(Calendar.MONTH) + 1)) {
 				Calendar calendar = Calendar.getInstance();
 				calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DATE));
 				Date lastDayOfMonth = calendar.getTime();
@@ -639,11 +598,12 @@ public class ScoringSingleton {
 				} else if (maxDate != null && maxDate.after(lastDayOfMonth)) {
 					maxDate = lastDayOfMonth;
 				}
-			}
+			}*/
+			
+			
 			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 			String today = simpleDateFormat.format(new Date());
-			// APPEND CHANGED SCORE AND MIN/MAX EXPIRATION DATES TO DOCUMENT FOR
-			// UPDATE
+			// APPEND CHANGED SCORE AND MIN/MAX EXPIRATION DATES TO DOCUMENT FOR UPDATE
 			if (modelIdScoreMap != null && !modelIdScoreMap.isEmpty()) {
 				updatedScores.put(modelId, new ChangedMemberScore(modelIdScoreMap.get(modelId), minDate != null ? simpleDateFormat.format(minDate) : today,
 						maxDate != null ? simpleDateFormat.format(maxDate) : today, simpleDateFormat.format(new Date()), source));
