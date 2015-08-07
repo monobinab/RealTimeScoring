@@ -577,38 +577,38 @@ public class ScoringSingleton {
 	}
 
 	
-		public Map<String, Date> getMinMaxExpiry(Integer modelId, Map<String, Change> allChanges) {
-		Date minDate = null;
-		Date maxDate = null;
-		Map<String, Date> minMaxMap = new HashMap<String, Date>();
+	public Map<String, Date> getMinMaxExpiry(Integer modelId, Map<String, Change> allChanges) {
+	Date minDate = null;
+	Date maxDate = null;
+	Map<String, Date> minMaxMap = new HashMap<String, Date>();
 
-		for (Map.Entry<String, Change> entry : allChanges.entrySet()) {
-			String key = entry.getKey();
-			Change value = entry.getValue();
-			if (!variableModelsMap.containsKey(key)) {
-				LOGGER.error("Could not find variable in map " + key);
-			}
-			// variable models map
-			if (variableModelsMap.containsKey(key) && variableModelsMap.get(key).contains(modelId)) {
-				Date exprDate = value.getExpirationDate();
-				if (minDate == null) {
+	for (Map.Entry<String, Change> entry : allChanges.entrySet()) {
+		String key = entry.getKey();
+		Change value = entry.getValue();
+		if (!variableModelsMap.containsKey(key)) {
+			LOGGER.error("Could not find variable in map " + key);
+		}
+		// variable models map
+		if (variableModelsMap.containsKey(key) && variableModelsMap.get(key).contains(modelId)) {
+			Date exprDate = value.getExpirationDate();
+			if (minDate == null) {
+				minDate = exprDate;
+				maxDate = exprDate;
+			} else {
+				if (exprDate.before(minDate)) {
 					minDate = exprDate;
+				}
+				if (exprDate.after(maxDate)) {
 					maxDate = exprDate;
-				} else {
-					if (exprDate.before(minDate)) {
-						minDate = exprDate;
-					}
-					if (exprDate.after(maxDate)) {
-						maxDate = exprDate;
-					}
 				}
 			}
 		}
-		minMaxMap.put("minExpiry", minDate);
-		minMaxMap.put("maxExpiry", maxDate);
-		return minMaxMap;
 	}
-	
+	minMaxMap.put("minExpiry", minDate);
+	minMaxMap.put("maxExpiry", maxDate);
+	return minMaxMap;
+}
+
 	/**
 	 * 
 	 * @param l_id
@@ -693,14 +693,16 @@ public class ScoringSingleton {
 		int month;
 		if (checkNonMonthModel(modelId) ) {
 			month = 0;
-		} else {
+			//??????modelsMap.get(modelId) != null, not needed, can be checked in modelVariablesDao
+			if (modelCheck(modelId) && modelsMap.get(modelId) != null && modelsMap.get(modelId).get(month) != null) {
+				model = modelsMap.get(modelId).get(month);
+			} 
+		} else if(checkMonthModel(modelId)){
 			month = getCurrentMonth();
+			if (modelCheck(modelId) && modelsMap.get(modelId) != null && modelsMap.get(modelId).get(month) != null) {
+				model = modelsMap.get(modelId).get(month);
+			} 
 		}
-		
-		//??????modelsMap.get(modelId) != null, not needed, can be checked in modelVariablesDao
-		if (modelCheck(modelId) && modelsMap.get(modelId) != null && modelsMap.get(modelId).get(month) != null) {
-			model = modelsMap.get(modelId).get(month);
-		} 
 		
 		return model;
 	}
@@ -710,14 +712,21 @@ public class ScoringSingleton {
 		Map<String, Variable> variables = null;
 		if (checkNonMonthModel(modelId)) {
 			month = 0;
+			//???????can be checked in modelVariablesDao and only modelsMap.containsKey(modelId) is sufficient
+			//????modelsMap.get(modelId).get(month) != null && modelsMap.get(modelId).get(month).getVariables() != null not needed
+			if (modelsMap.get(modelId).get(month) != null && modelsMap.get(modelId).get(month).getVariables() != null) {
+				variables = modelsMap.get(modelId).get(month).getVariables();
+			}
 		} else {
 			month = getCurrentMonth();
+			if (modelsMap.get(modelId).get(month) != null && modelsMap.get(modelId).get(month).getVariables() != null) {
+				variables = modelsMap.get(modelId).get(month).getVariables();
+			}
 		}
-		//???????can be checked in modelVariablesDao and only modelsMap.containsKey(modelId) is sufficient
-		//????modelsMap.get(modelId).get(month) != null && modelsMap.get(modelId).get(month).getVariables() != null not needed
-		if (modelsMap.containsKey(modelId) && modelsMap.get(modelId).get(month) != null && modelsMap.get(modelId).get(month).getVariables() != null) {
+		
+		/*if (modelsMap.get(modelId).get(month) != null && modelsMap.get(modelId).get(month).getVariables() != null) {
 			variables = modelsMap.get(modelId).get(month).getVariables();
-		}
+		}*/
 		
 		return variables;
 	}
