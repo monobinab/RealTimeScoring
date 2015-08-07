@@ -43,7 +43,7 @@ public class ChangedMemberVariablesDao extends AbstractDao{
 				new BasicDBObject("$set", newDocument), true, false);
 		
 	}
-    public Map<String,Change> getMemberVariables(String l_id){
+    public Map<String,Change> getChangedMemberVariables(String l_id){
     	SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
     	DBObject changedMbrVariables = changedMemberVariablesCollection.findOne(
 				new BasicDBObject("l_id", l_id));

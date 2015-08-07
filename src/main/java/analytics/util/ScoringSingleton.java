@@ -199,27 +199,22 @@ public class ScoringSingleton {
 	public Map<String, Object> createMemberVariableValueMap(String loyaltyId, Set<Integer> modelIdList)  {
 		List<String> variableFilter = new ArrayList<String>();
 		
-		for (Integer modId : modelIdList) {
+		for (Integer modelId : modelIdList) {
 			try{
-				int month;
-				if (modelsMap.get(modId).containsKey(0)) {
-					month = 0;
-				} else {
-					month = Calendar.getInstance().get(Calendar.MONTH) + 1;
+				Map<String, Variable> variables = getModelVariables(modelId);
+				if(variables == null){
+					LOGGER.error("variables is null for the modelId " + modelId);
+					continue;
 				}
-				if (modelsMap.get(modId).get(month) != null && modelsMap.get(modId).get(month).getVariables() != null) {
-					for (String var : modelsMap.get(modId).get(month).getVariables().keySet()) {
+				for (String var : variables.keySet()) {
 						if (variableNameToVidMap.get(var) == null) {
 							LOGGER.error("VID is null for variable " + var);
 						} else {
 							variableFilter.add(variableNameToVidMap.get(var));
 						}
 					}
-				} else {
-					LOGGER.error("Unable to find the model for " + modId);
 				}
-			}
-			catch(Exception e){
+			 catch(Exception e){
 				LOGGER.error("Exception in createMemberVariableValueMap method ", e);
 			}
 		}
@@ -233,9 +228,10 @@ public class ScoringSingleton {
 		for (String changedVariable : newChangesVarValueMap.keySet()) {
 			List<Integer> models = variableModelsMap.get(changedVariable);
 			if (models == null)
-				continue;// next var
+				continue;
 			for (Integer modelId : models) {
-				modelIdList.add(modelId);
+				if (modelCheck(modelId) && (checkNonMonthModel(modelId) || checkMonthModel(modelId))) 
+					modelIdList.add(modelId);
 			}
 		}
 		return modelIdList;
@@ -243,7 +239,7 @@ public class ScoringSingleton {
 
 	public Map<String, Change> createChangedVariablesMap(String lId) {
 		// This map is VID->Change
-		Map<String, Change> changedMbrVariables = changedVariablesDao.getMemberVariables(lId);
+		Map<String, Change> changedMbrVariables = changedVariablesDao.getChangedMemberVariables(lId);
 
 		// Create a map from VName->Change
 		Map<String, Change> changedMemberVariablesMap = new HashMap<String, Change>();
@@ -326,23 +322,22 @@ public class ScoringSingleton {
 
 	public double getBoostScore(Map<String, Change> allChanges, Integer modelId) {
 		double boosts = 0.0;
-		Map<String, Variable> varMap = new HashMap<String, Variable>();
+	//	Map<String, Variable> varMap = new HashMap<String, Variable>();
 
-		if (modelId == null) {
+	
+		if (modelId == null) { //?????
 			LOGGER.warn("getBoostScore() modelId is null");
 			return 0;
-		} else if (modelsMap.get(modelId) == null || modelsMap.get(modelId).isEmpty()) {
+		} else if (modelsMap.get(modelId) == null || modelsMap.get(modelId).isEmpty()) {//?????????
 			LOGGER.warn("getBoostScore() modelsMap is null or empty");
 			return 0;
 		} else if (allChanges == null || allChanges.isEmpty()) {
 			LOGGER.warn("getBoostScore() allChanges is null or empty");
 			return 0;
 		}
-		if (modelsMap.get(modelId).containsKey(0)) {
-			varMap = modelsMap.get(modelId).get(0).getVariables();
-		} else if (modelsMap.get(modelId).containsKey(Calendar.getInstance().get(Calendar.MONTH) + 1)) {
-			varMap = modelsMap.get(modelId).get(Calendar.getInstance().get(Calendar.MONTH) + 1).getVariables();
-		}
+		
+		Map<String, Variable> varMap = getModelVariables(modelId);
+	
 		if (varMap == null || varMap.isEmpty()) {
 			LOGGER.warn("getBoostScore() variables map is null or empty, modelId: " + modelId);
 			return 0;
@@ -652,6 +647,47 @@ public class ScoringSingleton {
 			changedVariablesDao.upsertUpdateChangedVariables(lId, allChanges, variableNameToVidMap);
 		}
 
+	}
+	
+	public Boolean modelCheck(Integer modelId){
+		if(modelsMap.containsKey(modelId))
+			return Boolean.TRUE;
+		else
+			return Boolean.FALSE;
+	}
+	
+	public Boolean checkNonMonthModel(Integer modelId){
+		if(modelsMap.get(modelId).containsKey(0))
+			return Boolean.TRUE;
+		else
+			return Boolean.FALSE;
+	}
+	
+	public Boolean checkMonthModel(Integer modelId){
+		if(modelsMap.get(modelId).containsKey(Integer.toString(getCurrentMonth())))
+			return Boolean.TRUE;
+		else
+			return Boolean.FALSE;
+	}
+	
+	public Integer getCurrentMonth(){
+		return Calendar.getInstance().get(Calendar.MONTH) + 1;
+	}
+	
+	public Map<String, Variable> getModelVariables(Integer modelId){
+		int month;
+		Map<String, Variable> variables = null;
+		if (checkNonMonthModel(modelId)) {
+			month = 0;
+		} else {
+			month = getCurrentMonth();
+		}
+		
+		if (modelsMap.get(modelId).get(month) != null && modelsMap.get(modelId).get(month).getVariables() != null) {
+			variables = modelsMap.get(modelId).get(month).getVariables();
+		}
+		
+		return variables;
 	}
 
 	public String getModelName(int modelId) {
