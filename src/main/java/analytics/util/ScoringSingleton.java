@@ -419,7 +419,7 @@ public class ScoringSingleton {
 		if (allChanges == null) {
 			throw new RealTimeScoringException("changed member vairbles is null");
 		}
-		Model model = null;
+		/*Model model = null;
 
 		if (modelsMap.get(modelId) != null && modelsMap.get(modelId).containsKey(0)) {
 			model = modelsMap.get(modelId).get(0);
@@ -427,7 +427,9 @@ public class ScoringSingleton {
 			model = modelsMap.get(modelId).get(Calendar.getInstance().get(Calendar.MONTH) + 1);
 		} else {
 			return 0;
-		}
+		}*/
+		
+		Map<String, Variable> variables = getModelVariables(modelId);
 
 		double val = (Double) model.getConstant();
 
