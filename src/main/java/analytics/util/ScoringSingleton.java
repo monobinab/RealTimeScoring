@@ -214,7 +214,7 @@ public class ScoringSingleton {
 						}
 					}
 				}
-			 catch(Exception e){
+			catch(Exception e){
 				LOGGER.error("Exception in createMemberVariableValueMap method ", e);
 			}
 		}
@@ -324,14 +324,15 @@ public class ScoringSingleton {
 		double boosts = 0.0;
 	//	Map<String, Variable> varMap = new HashMap<String, Variable>();
 
-	
-		if (modelId == null) { //?????
+    	
+		//if (modelId == null) {
+		if(modelId == null || !modelCheck(modelId)){
 			LOGGER.warn("getBoostScore() modelId is null");
 			return 0;
-		} else if (modelsMap.get(modelId) == null || modelsMap.get(modelId).isEmpty()) {//?????????
+		} /*else if (modelsMap.get(modelId) == null || modelsMap.get(modelId).isEmpty()) {
 			LOGGER.warn("getBoostScore() modelsMap is null or empty");
-			return 0;
-		} else if (allChanges == null || allChanges.isEmpty()) {
+			return 0; // this is handled in getModelVariables()
+		}*/ else if (allChanges == null || allChanges.isEmpty()) {
 			LOGGER.warn("getBoostScore() allChanges is null or empty");
 			return 0;
 		}
@@ -339,7 +340,7 @@ public class ScoringSingleton {
 		Map<String, Variable> varMap = getModelVariables(modelId);
 	
 		if (varMap == null || varMap.isEmpty()) {
-			LOGGER.warn("getBoostScore() variables map is null or empty, modelId: " + modelId);
+			LOGGER.warn("getBoostScore() variables map is null or empty, modelId: " + modelId); 
 			return 0;
 		}
 
@@ -395,7 +396,7 @@ public class ScoringSingleton {
 																																					// 1
 	}
 
-	public double calcScore(Map<String, Object> mbrVarMap, Map<String, Change> allChanges, int modelId) throws RealTimeScoringException {
+	public double calcScore(Map<String, Object> mbrVarMap, Map<String, Change> allChanges, Integer modelId) throws RealTimeScoringException {
 		// recalculate score for model
 		double baseScore = calcBaseScore(mbrVarMap, allChanges, modelId);
 		double newScore;
@@ -410,7 +411,7 @@ public class ScoringSingleton {
 		return newScore;
 	}
 
-	public double calcBaseScore(Map<String, Object> mbrVarMap, Map<String, Change> allChanges, int modelId) throws RealTimeScoringException {
+	public double calcBaseScore(Map<String, Object> mbrVarMap, Map<String, Change> allChanges, Integer modelId) throws RealTimeScoringException {
 
 		if (mbrVarMap == null) {
 			throw new RealTimeScoringException("member variables is null");
@@ -419,6 +420,15 @@ public class ScoringSingleton {
 		if (allChanges == null) {
 			throw new RealTimeScoringException("changed member vairbles is null");
 		}
+		
+		if(modelId == null){
+			throw new RealTimeScoringException("changed member vairbles is null");
+		}
+		
+		//All the above three checks have to be handled in the calling method
+		//Or if either of these is null, return null -- calcScore throws RTSExcep....
+		
+		
 		/*Model model = null;
 
 		if (modelsMap.get(modelId) != null && modelsMap.get(modelId).containsKey(0)) {
@@ -428,9 +438,11 @@ public class ScoringSingleton {
 		} else {
 			return 0;
 		}*/
+	
+		Model model = getModel(modelId);
+		if(model == null)
+			throw new RealTimeScoringException("model is null");
 		
-		Map<String, Variable> variables = getModelVariables(modelId);
-
 		double val = (Double) model.getConstant();
 
 		for (String v : model.getVariables().keySet()) {
@@ -659,14 +671,14 @@ public class ScoringSingleton {
 	}
 	
 	public Boolean checkNonMonthModel(Integer modelId){
-		if(modelsMap.get(modelId).containsKey(0))
+		if(modelCheck(modelId) && modelsMap.get(modelId).containsKey(0))
 			return Boolean.TRUE;
 		else
 			return Boolean.FALSE;
 	}
 	
 	public Boolean checkMonthModel(Integer modelId){
-		if(modelsMap.get(modelId).containsKey(Integer.toString(getCurrentMonth())))
+		if(modelCheck(modelId) && modelsMap.get(modelId).containsKey(Integer.toString(getCurrentMonth())))
 			return Boolean.TRUE;
 		else
 			return Boolean.FALSE;
@@ -674,6 +686,23 @@ public class ScoringSingleton {
 	
 	public Integer getCurrentMonth(){
 		return Calendar.getInstance().get(Calendar.MONTH) + 1;
+	}
+	
+	public Model getModel(Integer modelId){
+		Model model = null;
+		int month;
+		if (checkNonMonthModel(modelId) ) {
+			month = 0;
+		} else {
+			month = getCurrentMonth();
+		}
+		
+		//??????modelsMap.get(modelId) != null, not needed, can be checked in modelVariablesDao
+		if (modelCheck(modelId) && modelsMap.get(modelId) != null && modelsMap.get(modelId).get(month) != null) {
+			model = modelsMap.get(modelId).get(month);
+		} 
+		
+		return model;
 	}
 	
 	public Map<String, Variable> getModelVariables(Integer modelId){
@@ -684,8 +713,9 @@ public class ScoringSingleton {
 		} else {
 			month = getCurrentMonth();
 		}
-		
-		if (modelsMap.get(modelId).get(month) != null && modelsMap.get(modelId).get(month).getVariables() != null) {
+		//???????can be checked in modelVariablesDao and only modelsMap.containsKey(modelId) is sufficient
+		//????modelsMap.get(modelId).get(month) != null && modelsMap.get(modelId).get(month).getVariables() != null not needed
+		if (modelsMap.containsKey(modelId) && modelsMap.get(modelId).get(month) != null && modelsMap.get(modelId).get(month).getVariables() != null) {
 			variables = modelsMap.get(modelId).get(month).getVariables();
 		}
 		
