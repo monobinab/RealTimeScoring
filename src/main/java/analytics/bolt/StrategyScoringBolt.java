@@ -110,7 +110,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		Set<Integer> modelIdList = scoringSingleton.getModelIdList(newChangesVarValueMap);
 		
 		//filter the models which do not have valid month (either month = 0 or month = current month)
-		scoringSingleton.filterScoringModelIdList(modelIdList);
+		//scoringSingleton.filterScoringModelIdList(modelIdList);
 		
 		if(modelIdList==null||modelIdList.isEmpty()){
 			LOGGER.info("No models affected for " + lId);
@@ -158,7 +158,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		String state = scoringSingleton.getState(lId);
 		
 		//boosterMemberVariables map from boosterMemberVariables collection
-		Map<String, Object> boosterMemberVarMap = scoringSingleton.createBoosterMemberVariables(lId, modelIdList);
+		//Map<String, Object> boosterMemberVarMap = scoringSingleton.createBoosterMemberVariables(lId, modelIdList);
 		
 		for (Integer modelId : modelIdList) {// Score and emit for all modelIds
 												// before mongo inserts

@@ -1,0 +1,729 @@
+package analytics.util;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import analytics.exception.RealTimeScoringException;
+import analytics.util.dao.BoosterMemberVariablesDao;
+import analytics.util.dao.BoosterModelVariablesDao;
+import analytics.util.dao.BoosterVariableDao;
+import analytics.util.dao.ChangedMemberScoresDao;
+import analytics.util.dao.ChangedMemberVariablesDao;
+import analytics.util.dao.MemberInfoDao;
+import analytics.util.dao.MemberVariablesDao;
+import analytics.util.dao.MemberBoostsDao;
+import analytics.util.dao.ModelSywBoostDao;
+import analytics.util.dao.ModelVariablesDao;
+import analytics.util.dao.RegionalFactorDao;
+import analytics.util.dao.VariableDao;
+import analytics.util.objects.Boost;
+import analytics.util.objects.BoosterModel;
+import analytics.util.objects.BoosterVariable;
+import analytics.util.objects.Change;
+import analytics.util.objects.ChangedMemberScore;
+import analytics.util.objects.MemberInfo;
+import analytics.util.objects.Model;
+import analytics.util.objects.RealTimeScoringContext;
+import analytics.util.objects.StrategyMapper;
+import analytics.util.objects.Variable;
+import analytics.util.strategies.Strategy;
+
+public class ScoringSingleton2 {
+	private static final Logger LOGGER = LoggerFactory.getLogger(ScoringSingleton.class);
+	private Map<String, List<Integer>> variableModelsMap;
+	private Map<Integer, Map<Integer, Model>> modelsMap;
+	private Map<String, String> variableVidToNameMap;
+	private Map<String, String> variableNameToVidMap;
+	private Map<String, String> variableNameToStrategyMap;
+	private Map<String, Double> regionalFactorsMap;
+	private List<String> modelVariables;
+	//private Map<String, String> sourcesMap;
+	private MemberVariablesDao memberVariablesDao;
+	//private SourcesDao sourcesDao;
+	private ChangedMemberScoresDao changedMemberScoresDao;
+	private ChangedMemberVariablesDao changedVariablesDao;
+	private VariableDao variableDao;
+	private ModelVariablesDao modelVariablesDao;
+	private RegionalFactorDao regionalFactorDao;
+	private MemberInfoDao memberInfoDao;
+	
+	private static ScoringSingleton2 instance = null;
+	Set<String> modelIdsWithRegionalFactors;
+
+	ModelSywBoostDao modelSywBoostDao;
+	MemberBoostsDao memberBoostsDao;
+	
+	//for Booster models
+	private Set<Integer> boosterModelIds;
+	private BoosterModelVariablesDao boosterModelVariablesDao;
+	private BoosterVariableDao boosterVariablesDao;
+	private Map<Integer, BoosterModel> boosterModelVariablesMap;
+	private Map<String, String> boosterVariableNameToVidMap;
+	private BoosterMemberVariablesDao boosterMemberVariablesDao;
+
+
+	public static ScoringSingleton2 getInstance() {
+		if (instance == null) {
+			synchronized (ScoringSingleton2.class) {
+				if (instance == null)
+					instance = new ScoringSingleton2();
+			}
+		}
+		return instance;
+	}
+
+	private ScoringSingleton2() {
+		// Get DB connection
+		LOGGER.debug("Populate variable vid map");
+		variableDao = new VariableDao();
+		modelVariablesDao = new ModelVariablesDao();
+		changedVariablesDao = new ChangedMemberVariablesDao();
+		memberVariablesDao = new MemberVariablesDao();
+		changedMemberScoresDao = new ChangedMemberScoresDao();
+		//sourcesDao = new SourcesDao();
+		// populate the variableVidToNameMap
+		//sourcesMap = sourcesDao.getSources();
+		variableNameToStrategyMap = new HashMap<String, String>();
+		variableVidToNameMap = new HashMap<String, String>();
+		variableNameToVidMap = new HashMap<String, String>();
+		List<Variable> variables = variableDao.getVariables();
+		for (Variable variable : variables) {
+			if (variable.getName() != null && variable.getVid() != null) {
+				variableVidToNameMap.put(variable.getVid(), variable.getName());
+				variableNameToVidMap.put(variable.getName(), variable.getVid());
+				variableNameToStrategyMap.put(variable.getName(), variable.getStrategy());
+			}
+		}
+
+		LOGGER.debug("Populate variable models map");
+		// populate the variableModelsMap
+		variableModelsMap = new HashMap<String, List<Integer>>();
+		// populate the variableModelsMap and modelsMap
+		modelsMap = new HashMap<Integer, Map<Integer, Model>>();
+		// Populate both maps
+		// TODO: Refactor this so that it is a simple DAO method. Variable
+		// models map can be populated later
+		modelVariablesDao.populateModelVariables(modelsMap, variableModelsMap);
+
+		modelSywBoostDao = new ModelSywBoostDao();
+		memberBoostsDao = new MemberBoostsDao();
+		
+		regionalFactorDao = new RegionalFactorDao();
+		regionalFactorsMap = regionalFactorDao.populateRegionalFactors();
+		
+		memberInfoDao = new MemberInfoDao();
+		
+		boosterModelVariablesDao = new BoosterModelVariablesDao();
+		boosterVariablesDao = new BoosterVariableDao();
+		boosterMemberVariablesDao = new BoosterMemberVariablesDao();
+		boosterModelVariablesMap = new HashMap<Integer, BoosterModel>();
+		boosterModelIds = new HashSet<Integer>();
+		boosterModelVariablesDao.populateBoosterModelVariables(boosterModelIds, boosterModelVariablesMap);
+		List<BoosterVariable> boosterVariablesList = boosterVariablesDao.getBoosterVariables();
+		boosterVariableNameToVidMap = new HashMap<String, String>();
+		for (BoosterVariable boosterVariable : boosterVariablesList) {
+			if (boosterVariable.getName() != null && boosterVariable.getBvid() != null) {
+				boosterVariableNameToVidMap.put(boosterVariable.getName(), boosterVariable.getBvid());
+			}
+		}
+	}
+
+	// TODO: Replace this method. Its for backward compatibility. Bad coding
+	public HashMap<String, Double> execute(String loyaltyId, ArrayList<String> modelIdArrayList, String source) {
+		
+		Set<Integer> modelIdList = new HashSet<Integer>();
+		HashMap<String, Double> modelIdStringScoreMap =  new HashMap<String, Double>();
+		for (String model : modelIdArrayList) {
+			modelIdList.add(Integer.parseInt(model));
+		}
+		
+		//filter the models which needs to be scored
+		this.filterScoringModelIdList(modelIdList);
+		try{
+		// Contains a VID to object mapping, not var name
+		Map<String, Object> memberVariablesMap = this.createMemberVariableValueMap(loyaltyId, modelIdList);
+		if (memberVariablesMap == null) {
+			LOGGER.warn("Unable to find member variables");
+			return null;
+		}
+		Map<String, Change> allChanges = this.createChangedVariablesMap(loyaltyId);
+		//boosterMemberVariables map from boosterMemberVariables collection
+		Map<String, Object> boosterMemberVarMap = this.createBoosterMemberVariables(loyaltyId, modelIdList);
+		Map<Integer, Double> modelIdScoreMap = new HashMap<Integer, Double>();
+		String state = this.getState(loyaltyId);
+		Map<Integer,Map<String,Date>> modelIdToExpiryMap = new HashMap<Integer, Map<String,Date>>();
+		for (Integer modelId : modelIdList) {
+			try{
+			double score = this.calcScore(memberVariablesMap, allChanges, modelId);
+			double regionalFactor = this.calcRegionalFactor(modelId, state);
+			score = score * regionalFactor;
+			if (score > 1)
+				score = 1.0;
+			//get the boostedScore
+			score = this.calcBoosterScore(boosterMemberVarMap, modelId, score);
+			if(score > 1.0)
+				score = 1.0;
+			modelIdScoreMap.put(modelId, score);
+			modelIdToExpiryMap.put(modelId, getMinMaxExpiry(modelId, allChanges));
+			}
+			catch(RealTimeScoringException e){
+				LOGGER.error("Exception in rescoring " + modelId +" " + loyaltyId);
+			}
+		}
+		updateChangedMemberScore(loyaltyId, modelIdList, modelIdToExpiryMap, modelIdScoreMap, source);
+		// TODO: This is a very bad way of defining, but a very temp fix before
+		// fixing other topologies
+		for (Map.Entry<Integer, Double> entry : modelIdScoreMap.entrySet()) {
+			
+			modelIdStringScoreMap.put(entry.getKey().toString(), entry.getValue());
+		}
+		}
+		catch(Exception e){
+			LOGGER.error("Exception occured in rescoring " + loyaltyId + " ", e);
+		}
+		return modelIdStringScoreMap;
+	}
+
+	public Map<String, Object> createMemberVariableValueMap(String loyaltyId, Set<Integer> modelIdList)  {
+		List<String> variableFilter = new ArrayList<String>();
+		
+		for (Integer modId : modelIdList) {
+			try{
+			int month;
+			if (modelsMap.get(modId).containsKey(0)) {
+				month = 0;
+			} else {
+				month = Calendar.getInstance().get(Calendar.MONTH) + 1;
+			}
+			if (modelsMap.get(modId).get(month) != null && modelsMap.get(modId).get(month).getVariables() != null) {
+				for (String var : modelsMap.get(modId).get(month).getVariables().keySet()) {
+					if (variableNameToVidMap.get(var) == null) {
+						LOGGER.error("VID is null for variable " + var);
+					} else {
+						variableFilter.add(variableNameToVidMap.get(var));
+					}
+				}
+			} else {
+				LOGGER.error("Unable to find the model for " + modId);
+			}
+			}
+			catch(Exception e){
+				LOGGER.error("Exception in createMemberVariableValueMap method ", e);
+			}
+		}
+		return memberVariablesDao.getMemberVariablesFiltered(loyaltyId, variableFilter);
+	}
+
+	public Set<Integer> getModelIdList(Map<String, String> newChangesVarValueMap) {
+		Set<Integer> modelIdList = new HashSet<Integer>();
+		if (newChangesVarValueMap == null)
+			return modelIdList;
+		for (String changedVariable : newChangesVarValueMap.keySet()) {
+			List<Integer> models = variableModelsMap.get(changedVariable);
+			if (models == null)
+				continue;// next var
+			for (Integer modelId : models) {
+				modelIdList.add(modelId);
+			}
+		}
+		return modelIdList;
+	}
+
+	public Map<String, Change> createChangedVariablesMap(String lId) {
+		// This map is VID->Change
+		Map<String, Change> changedMbrVariables = changedVariablesDao.getChangedMemberVariables(lId);
+
+		// Create a map from VName->Change
+		Map<String, Change> changedMemberVariablesMap = new HashMap<String, Change>();
+		if (changedMbrVariables != null && changedMbrVariables.keySet() != null) {
+			for (Map.Entry<String, Change> entry : changedMbrVariables.entrySet()) {
+				String key = entry.getKey();
+				Change value = entry.getValue();
+				// key is VID
+				// skip expired changes
+				if (value.getExpirationDate().after(new Date())) {
+					changedMemberVariablesMap.put(variableVidToNameMap.get(key), value);
+				} else {
+					LOGGER.debug("Got an expired value for " + value);
+				}
+			}
+		}
+		return changedMemberVariablesMap;
+	}
+	
+	
+	public String getState(String lId){
+		MemberInfo memberIfo = memberInfoDao.getMemberInfo(lId);
+		String state = null;
+		if(memberIfo != null && memberIfo.getState() != null)
+			state = memberIfo.getState();
+		return state;
+	}
+
+	/**
+	 * 
+	 * @param allChanges
+	 *            Varname -> Change
+	 * @param newChangesVarValueMap
+	 *            VarName -> Value
+	 * @param memberVariablesMap
+	 *            L_id -> Variables
+	 * @return
+	 */
+	public Map<String, Change> executeStrategy(Map<String, Change> allChanges, Map<String, String> newChangesVarValueMap, Map<String, Object> memberVariablesMap) {
+		for (String variableName : newChangesVarValueMap.keySet()) {
+			if (variableModelsMap.containsKey(variableName)) {
+				variableName = variableName.toUpperCase();
+				if (variableNameToStrategyMap.get(variableName) == null) {
+					LOGGER.info(" ~~~ DID NOT FIND VARIABLE: ");
+					continue;
+				}
+
+				RealTimeScoringContext context = new RealTimeScoringContext();
+				context.setValue(newChangesVarValueMap.get(variableName));
+				context.setPreviousValue(0);
+
+				if ("NONE".equals(variableNameToStrategyMap.get(variableName))) {
+					continue;
+				}
+
+				Strategy strategy = StrategyMapper.getInstance().getStrategy(variableNameToStrategyMap.get(variableName));
+				if (strategy == null) {
+					LOGGER.error("Unable to obtain strategy for " + variableName);
+					continue;
+				}
+				// If this member had a changed variable
+				// allChanges at this point only contain changedMemberVariables
+				if (allChanges != null && allChanges.containsKey(variableName)) {
+					context.setPreviousValue(allChanges.get(variableName).getValue());
+				}
+				// else get it from memberVariablesMap
+				else {
+					if (memberVariablesMap.get(variableNameToVidMap.get(variableName)) != null) {
+						context.setPreviousValue(memberVariablesMap.get(variableNameToVidMap.get(variableName)));
+					}
+				}
+				LOGGER.debug(" ~~~ STRATEGY BOLT CHANGES - context: " + context);
+				Change executedValue = strategy.execute(context);
+				allChanges.put(variableName, executedValue);
+			}
+		}
+		return allChanges;
+	}
+
+	public double getNewRTSBoostedScore(Map<String, Object> memberVariablesMap, Map<String, Change> allChanges, Integer modelId, String state) throws RealTimeScoringException {
+		
+		double newScore = 0.0;
+		double regionalFactor = 1.0;
+		if(isBlackOutModel(allChanges, modelId))
+			return newScore;
+		
+		newScore = calcScore(memberVariablesMap, allChanges,modelId);
+
+		LOGGER.debug("new score before boost var: " + newScore);
+
+		newScore = newScore + getBoostScore(allChanges, modelId );
+	
+		//get the score weighed with regionalFactor only if the member has state
+		if(StringUtils.isNotEmpty(state)){
+			regionalFactor = calcRegionalFactor(modelId, state);
+		}
+		newScore = newScore * regionalFactor;
+		if(newScore > 1.0)
+			newScore = 1.0;
+
+		return newScore;
+	}
+	
+	private boolean isBlackOutModel(Map<String, Change> allChanges,	Integer modelId) {
+		int blackFlag = 0;
+		for (Map.Entry<String, Change> entry : allChanges.entrySet()) {
+			String ch = entry.getKey();
+			Change value = entry.getValue();
+			modelVariables = modelVariablesDao.getModelVariableList(modelId); //get from cache instead
+			if (ch.startsWith(MongoNameConstants.BLACKOUT_VAR_PREFIX) && modelVariables.contains(ch)) {
+				blackFlag = Integer.valueOf(value.getValue().toString());
+				if(blackFlag==1)
+				{
+					return true;
+				}				
+			}
+		}
+			return false;
+	}
+
+	public double getBoostScore(Map<String, Change> allChanges, Integer modelId) {
+		double boosts = 0.0;
+
+		Map<String, Variable> varMap = new HashMap<String, Variable>();
+
+		if (modelId == null) {
+			LOGGER.warn("getBoostScore() modelId is null");
+			return 0;
+		} else if (modelsMap.get(modelId) == null || modelsMap.get(modelId).isEmpty()) {
+			LOGGER.warn("getBoostScore() modelsMap is null or empty");
+			return 0;
+		} else if (allChanges == null || allChanges.isEmpty()) {
+			LOGGER.warn("getBoostScore() allChanges is null or empty");
+			return 0;
+		}
+		if (modelsMap.get(modelId).containsKey(0)) {
+			varMap = modelsMap.get(modelId).get(0).getVariables();
+		} else if (modelsMap.get(modelId).containsKey(Calendar.getInstance().get(Calendar.MONTH) + 1)) {
+			varMap = modelsMap.get(modelId).get(Calendar.getInstance().get(Calendar.MONTH) + 1).getVariables();
+		}
+		if (varMap == null || varMap.isEmpty()) {
+			LOGGER.warn("getBoostScore() variables map is null or empty, modelId: " + modelId);
+			return 0;
+		}
+
+		// create boost to send to calculateBoostValue method
+		Boost blackout = new Boost(MongoNameConstants.BLACKOUT_VAR_PREFIX, 0, 0);
+		int blackFlag = 0;
+		
+		for (Map.Entry<String, Change> entry : allChanges.entrySet()) {
+			String ch = entry.getKey();
+			Change value = entry.getValue();
+			if (ch.substring(0, MongoNameConstants.BOOST_VAR_PREFIX.length()).toUpperCase().equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
+				Boost boost;
+				if (varMap.get(ch) instanceof Boost) {
+					boost = (Boost) varMap.get(ch);
+					boosts = calculateBoostValue(boosts, blackFlag, value, boost);
+				}
+			}
+		}
+
+		
+		
+		
+		for (Map.Entry<String, Change> entry : allChanges.entrySet()) {
+			String ch = entry.getKey();
+			Change value = entry.getValue();
+			if (ch.startsWith(MongoNameConstants.BLACKOUT_VAR_PREFIX)) {
+				blackFlag = Integer.valueOf(value.getValue().toString());
+				boosts = calculateBoostValue(boosts, blackFlag, value, blackout);
+			}
+			if (ch.substring(0, MongoNameConstants.BOOST_VAR_PREFIX.length()).toUpperCase().equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
+				Boost boost;
+				if (varMap.get(ch) instanceof Boost) {
+					boost = (Boost) varMap.get(ch);
+					boosts = calculateBoostValue(boosts, blackFlag, value, boost);
+				}
+			}
+		
+		}
+		
+		return boosts;
+	}
+	
+	public void filterScoringModelIdList(Set<Integer> modelIdList){
+		
+		Iterator<Integer> itr = modelIdList.iterator();
+		while(itr.hasNext()){
+			Integer modelId = itr.next();
+			if (modelsMap.get(modelId) != null && ((!modelsMap.get(modelId).containsKey(0)) && (!modelsMap.get(modelId).containsKey(Calendar.getInstance().get(Calendar.MONTH) + 1)))) {
+				itr.remove();
+			}
+		}
+	}
+
+	private double calculateBoostValue(double boosts, int blackFlag, Change value, Boost boost) {
+		return (boosts + boost.getIntercept() + Double.valueOf(value.getValue().toString()) * boost.getCoefficient()) * Math.abs(blackFlag - 1); // if
+																																					// flag
+																																					// is
+																																					// on
+																																					// it
+																																					// will
+																																					// be
+																																					// 0
+																																					// -
+																																					// if
+																																					// flag
+																																					// is
+																																					// off
+																																					// it
+																																					// will
+																																					// be
+																																					// 1
+	}
+
+	public double calcScore(Map<String, Object> mbrVarMap, Map<String, Change> allChanges, int modelId) throws RealTimeScoringException {
+		// recalculate score for model
+		double baseScore = calcBaseScore(mbrVarMap, allChanges, modelId);
+		double newScore;
+
+		if (baseScore <= -100) {
+			newScore = 0;
+		} else if (baseScore >= 35) {
+			newScore = 1;
+		} else {
+			newScore = Math.exp(baseScore) / (1 + Math.exp(baseScore));
+		}
+		return newScore;
+	}
+
+	public double calcBaseScore(Map<String, Object> mbrVarMap, Map<String, Change> allChanges, int modelId) throws RealTimeScoringException {
+
+		if (mbrVarMap == null) {
+			throw new RealTimeScoringException("member variables is null");
+		}
+
+		if (allChanges == null) {
+			throw new RealTimeScoringException("changed member vairbles is null");
+		}
+		Model model = null;
+
+		if (modelsMap.get(modelId) != null && modelsMap.get(modelId).containsKey(0)) {
+			model = modelsMap.get(modelId).get(0);
+		} else if (modelsMap.get(modelId) != null && modelsMap.get(modelId).containsKey(Calendar.getInstance().get(Calendar.MONTH) + 1)) {
+			model = modelsMap.get(modelId).get(Calendar.getInstance().get(Calendar.MONTH) + 1);
+		} else {
+			return 0;
+		}
+
+		double val = (Double) model.getConstant();
+
+		for (String v : model.getVariables().keySet()) {
+			Variable variable = model.getVariables().get(v);
+
+			// need variableNameToVidMap here before mbrVarMap is checked for
+			// its variables
+			// String vid = variableNameToVidMap.get(variable.getName());
+
+			// if variable does not have a name then skip it
+			if (variable.getName() == null) {
+				continue;
+			}
+			// if the variable is a boost variable then skip it
+			if (variable.getName().substring(0, MongoNameConstants.BOOST_VAR_PREFIX.length()).toUpperCase().equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
+				continue;
+			}
+
+			String vid;
+			// if the variable VID cannot be found then skip it
+			if (variableNameToVidMap.get(variable.getName()) != null) {
+				vid = variableNameToVidMap.get(variable.getName());
+			} else {
+				continue;
+			}
+
+			Object variableValue;
+			// if the variable has been changed then use the changed value
+			// if the variable has not been changed and has a value from
+			// memberVariables then use that value
+			// otherwise skip it
+			if (allChanges.containsKey(variable.getName())) {
+				variableValue = allChanges.get(variable.getName().toUpperCase()).getValue();
+			} else if (mbrVarMap.containsKey(vid)) {
+				variableValue = mbrVarMap.get(vid);
+			} else {
+				continue;
+			}
+
+			if (variableValue instanceof Integer) {
+				val = val + ((Integer) variableValue * variable.getCoefficient());
+			} else if (variableValue instanceof Double) {
+				val = val + ((Double) variableValue * variable.getCoefficient());
+			} else {
+				continue;
+			}
+		}
+		return val;
+	}
+	
+	public double calcRegionalFactor(Integer modelId, String state){
+
+		if(StringUtils.isNotEmpty(state)){
+			String key = modelId+ "-" + state;
+			if(regionalFactorsMap != null  && !regionalFactorsMap.isEmpty() && regionalFactorsMap.containsKey(key)){
+					return  regionalFactorsMap.get(key);
+				}
+			}
+			return 1.0;
+	}
+	
+	public Map<String, Object> createBoosterMemberVariables(String loyaltyId, Set<Integer> modelIdList) throws RealTimeScoringException{
+		//retain only the boostermodels which needs to be scored
+		boosterModelIds.retainAll(modelIdList);
+		List<String> variableFilter = new ArrayList<String>();
+		for(Integer modelId : boosterModelIds){
+			if(boosterModelVariablesMap.containsKey(modelId) && boosterModelVariablesMap.get(modelId).getBoosterVariablesMap() != null){
+				for(String var : boosterModelVariablesMap.get(modelId).getBoosterVariablesMap().keySet() ){
+					if(boosterVariableNameToVidMap.get(var) == null)
+						continue;
+					else
+						variableFilter.add(boosterVariableNameToVidMap.get(var));
+				}
+			}
+			else
+				LOGGER.error("Unable to find variables for booster model " + modelId);
+		}
+		return boosterMemberVariablesDao.getBoosterMemberVariablesFiltered(loyaltyId, variableFilter);
+	}
+
+	public double calcBoosterScore(Map<String, Object> mbrBoosterVarMap, int modelId, double newScore){
+
+		BoosterModel boosterModel = null;
+		if(boosterModelIds.contains(modelId) && boosterModelVariablesMap.containsKey(modelId) && boosterModelVariablesMap.get(modelId) != null){
+			boosterModel = boosterModelVariablesMap.get(modelId);
+		}
+		else{
+			return newScore;
+		}
+
+		if(mbrBoosterVarMap == null || mbrBoosterVarMap.isEmpty())
+			return newScore;
+
+		double boosterScore = boosterModel.getConstant();
+		Map<String, Double> variablesMap = boosterModel.getBoosterVariablesMap();
+
+		Set<String> commonVar = new HashSet<String>(mbrBoosterVarMap.keySet());
+		Map<String, String> varVIDToVarNameMap = new HashMap<String, String>();
+
+		for (Entry<String, Double> entry : variablesMap.entrySet()) {
+			String bVid = null;
+			Object variableValue = null;
+		    String varName = entry.getKey();
+		    Double coefficient = entry.getValue();
+		    if( boosterVariableNameToVidMap.get(varName) != null){
+		    	bVid = boosterVariableNameToVidMap.get(varName);
+		    }
+		    else if(!varName.equalsIgnoreCase(Constants.MSM_SCORE) && boosterVariableNameToVidMap.get(varName) == null){
+		    	LOGGER.error("variable not found in boosterVariables collection but present in modelBoosterVarCollection " + varName);
+		    	continue;
+		    }
+		     if(mbrBoosterVarMap.containsKey(bVid)){
+		    	variableValue = mbrBoosterVarMap.get(bVid);
+		    }
+		    else
+		    	continue;
+		    if (variableValue instanceof Integer) {
+		    	boosterScore =  boosterScore + ((Integer) variableValue * coefficient) ;
+		   	} else if (variableValue instanceof Double) {
+		   		boosterScore = boosterScore + ((Double) variableValue * coefficient) ;
+			} 
+		    varVIDToVarNameMap.put(bVid, varName);
+		}
+			//check whether mbrBoosterVarMap contains atleast one variable for this boostermodel modelId - to be scored
+			//if mbrBoosterVarMap does not contain any var of interest, return the newScore
+			commonVar.retainAll(varVIDToVarNameMap.keySet());
+			if(commonVar.size() == 0)
+				return newScore;
+
+			boosterScore = 1/(1+Math.exp(-(boosterScore + variablesMap.get(Constants.MSM_SCORE)*(Math.log((newScore +0.00000001)/(1-newScore+0.00000001))))));
+			return boosterScore;
+	}
+
+	
+		public Map<String, Date> getMinMaxExpiry(Integer modelId, Map<String, Change> allChanges) {
+		Date minDate = null;
+		Date maxDate = null;
+		Map<String, Date> minMaxMap = new HashMap<String, Date>();
+
+		for (Map.Entry<String, Change> entry : allChanges.entrySet()) {
+			String key = entry.getKey();
+			Change value = entry.getValue();
+			if (!variableModelsMap.containsKey(key)) {
+				LOGGER.error("Could not find variable in map " + key);
+			}
+			// variable models map
+			if (variableModelsMap.containsKey(key) && variableModelsMap.get(key).contains(modelId)) {
+				Date exprDate = value.getExpirationDate();
+				if (minDate == null) {
+					minDate = exprDate;
+					maxDate = exprDate;
+				} else {
+					if (exprDate.before(minDate)) {
+						minDate = exprDate;
+					}
+					if (exprDate.after(maxDate)) {
+						maxDate = exprDate;
+					}
+				}
+			}
+		}
+		minMaxMap.put("minExpiry", minDate);
+		minMaxMap.put("maxExpiry", maxDate);
+		return minMaxMap;
+	}
+	
+	/**
+	 * 
+	 * @param l_id
+	 * @param modelIdList
+	 * @param modelIdToExpiryMap
+	 * @param modelIdScoreMap
+	 * @param source
+	 */
+	public void updateChangedMemberScore(String l_id, Set<Integer> modelIdList, Map<Integer, Map<String,Date>> modelIdToExpiry, Map<Integer, Double> modelIdScoreMap, String source) {
+		Map<Integer, ChangedMemberScore> updatedScores = new HashMap<Integer, ChangedMemberScore>();
+
+		for (Integer modelId : modelIdList) {
+			// FIND THE MIN AND MAX EXPIRATION DATE OF ALL VARIABLE CHANGES FOR
+			// CHANGED MODEL SCORE TO WRITE TO SCORE CHANGES COLLECTION
+			Map<String, Date> minMaxMap = modelIdToExpiry.get(modelId);
+			Date minDate = minMaxMap.get("minExpiry");
+			Date maxDate = minMaxMap.get("maxExpiry");
+			// IF THE MODEL IS MONTH SPECIFIC AND THE MIN/MAX DATE IS AFTER THE
+			// END OF THE MONTH SET TO THE LAST DAY OF THIS MONTH
+			if (modelsMap.containsKey(modelId) && modelsMap.get(modelId).containsKey(Calendar.getInstance().get(Calendar.MONTH) + 1)) {
+				Calendar calendar = Calendar.getInstance();
+				calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DATE));
+				Date lastDayOfMonth = calendar.getTime();
+
+				if (minDate != null && minDate.after(lastDayOfMonth)) {
+					minDate = lastDayOfMonth;
+					maxDate = lastDayOfMonth;
+				} else if (maxDate != null && maxDate.after(lastDayOfMonth)) {
+					maxDate = lastDayOfMonth;
+				}
+			}
+			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			String today = simpleDateFormat.format(new Date());
+			// APPEND CHANGED SCORE AND MIN/MAX EXPIRATION DATES TO DOCUMENT FOR
+			// UPDATE
+			if (modelIdScoreMap != null && !modelIdScoreMap.isEmpty()) {
+				updatedScores.put(modelId, new ChangedMemberScore(modelIdScoreMap.get(modelId), minDate != null ? simpleDateFormat.format(minDate) : today,
+						maxDate != null ? simpleDateFormat.format(maxDate) : today, simpleDateFormat.format(new Date()), source));
+			}
+		}
+		if (updatedScores != null && !updatedScores.isEmpty()) {
+			changedMemberScoresDao.upsertUpdateChangedScores(l_id, updatedScores);
+		}
+	}
+
+	public void updateChangedVariables(String lId, Map<String, Change> allChanges) {
+		// 11) Write changedMemberVariables with expiry
+		if (allChanges != null && !allChanges.isEmpty()) {
+			// upsert document
+			changedVariablesDao.upsertUpdateChangedVariables(lId, allChanges, variableNameToVidMap);
+		}
+
+	}
+
+	public String getModelName(int modelId) {
+		int month;
+		if (modelsMap.get(modelId) == null)
+			return "";
+		if (modelsMap.get(modelId).containsKey(0)) {
+			month = 0;
+		} else {
+			month = Calendar.getInstance().get(Calendar.MONTH) + 1;
+		}
+
+		return modelsMap.get(modelId).get(month).getModelName();
+	}
+}
