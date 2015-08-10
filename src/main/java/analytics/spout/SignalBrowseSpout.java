@@ -104,6 +104,9 @@ public class SignalBrowseSpout extends BaseRichSpout{
 		catch(Exception e){
 			LOGGER.error("Exception occured in shouldProceedWithProcessing SignalBrowseSpout for lid " + commonObj.getLyl_id_no(), e);
 			LOGGER.info("Processing lid " + commonObj.getLyl_id_no() + " after Exception caught");
+			ArrayList<String> modLists = commonObj.getPidList();
+			modLists.add(0, "");
+			commonObj.setPidList(modLists);
 			return true;
 		}
 		return false;

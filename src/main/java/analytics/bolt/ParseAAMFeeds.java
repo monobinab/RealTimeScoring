@@ -27,11 +27,8 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 
     protected List<String> modelVariablesList;
     protected Map<String,Collection<String>> l_idToValueCollectionMap; // USED TO MAP BETWEEN l_id AND THE TRAITS OR PID OR SearchKeyword ASSOCIATED WITH THAT ID 
-    protected String loyalty_id;
-    
     protected String topic;
 	protected String sourceTopic;
-//	protected MemberUUIDDao memberDao;
 	protected ModelVariablesDao modelVariablesDao;
 	
 	private static String topicsUsingEncryptLidDirectly = "SIGNAL_BrowseFeed";
@@ -81,12 +78,14 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
         
       //condition to check whether loyaltyId or l_ids is passed
         String l_id = null;
+        String loyalty_id = null;
         if(!topicsUsingEncryptLidDirectly.contains(topic)){
 			// 4) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN SET CURRENT UUID FROM RECORD, SET CURRENT l_id TO NULL AND RETURN
 	        //		If l_id is null and the next UUID is the same the current, then the next record will not be processed
-	        this.loyalty_id = splitRecArray[0].trim();
+	        
+        	loyalty_id = splitRecArray[0].trim();
 	        if(loyalty_id.length()!=16 || !loyalty_id.startsWith("7081")){
-	        	LOGGER.info("Could not find Lid: " + this.loyalty_id);
+	        	LOGGER.info("Could not find Lid: " + loyalty_id);
 	        	//countMetric.scope("no_lids").incr();
 	        	redisCountIncr("no_lids");
 	        	outputCollector.ack(input);

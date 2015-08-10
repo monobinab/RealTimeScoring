@@ -13,7 +13,22 @@ public class TagMetadata implements Serializable {
 	private Double percentile;
 	private String emailOptIn;
 	private String divLine;
+	private String textOptIn;
 	
+
+	/**
+	 * @return the textOptIn
+	 */
+	public String getTextOptIn() {
+		return textOptIn;
+	}
+
+	/**
+	 * @param textOptIn the textOptIn to set
+	 */
+	public void setTextOptIn(String textOptIn) {
+		this.textOptIn = textOptIn;
+	}
 
 	/**
 	 * @return the divLine

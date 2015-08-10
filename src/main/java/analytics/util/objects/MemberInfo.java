@@ -8,7 +8,20 @@ public class MemberInfo {
 		private String srs_opt_in;
 		private String kmt_opt_in;
 		private String syw_opt_in;
+		private String text_opt_in;
 		
+		/**
+		 * @return the text_opt_in
+		 */
+		public String getText_opt_in() {
+			return text_opt_in;
+		}
+		/**
+		 * @param text_opt_in the text_opt_in to set
+		 */
+		public void setText_opt_in(String text_opt_in) {
+			this.text_opt_in = text_opt_in;
+		}
 		/**
 		 * @return the srs_opt_in
 		 */

@@ -27,7 +27,7 @@ public class RTSKafkaSpout extends KafkaSpout {
 	 @Override
 		public void nextTuple() {
 		 super.nextTuple();
-		 LOGGER.info("RTSKafkaSpout Emitting message ");
+		 //LOGGER.info("RTSKafkaSpout Emitting message ");
 	 }
 	
 

@@ -24,7 +24,7 @@ public class DBConnection {
 	private static int sPort = 0;
 	//Write concern
 	private static int writeconcern = 0;
-
+	private static int writeconcern2 = 0;
 	
 	private static String sDatabaseName = "";
 	private static String sUserName = "";
@@ -53,21 +53,25 @@ public class DBConnection {
 		}
 	
 		if(isProd!=null && "PROD".equals(isProd)){
+			/*if(isDbAlreadyActive(server)!=null) 
+				return isDbAlreadyActive(server);*/
 			properties=  new PropertiesConfiguration("resources/connection_config_prod.properties");
 			LOGGER.info("~~~~~~~Using production properties in DBConnection~~~~~~~~~");
-			return isDbAlreadyActive(server);
+			
 		}
 		
 		else if(isProd!=null && "QA".equals(isProd)){
+			/*if(isDbAlreadyActive(server)!=null) 
+				return isDbAlreadyActive(server);*/
 			properties=  new PropertiesConfiguration("resources/connection_config.properties");
 			LOGGER.info("Using test properties");
-			return isDbAlreadyActive(server);
 		}
 		
 		else if(isProd!=null && "LOCAL".equals(isProd)){
+			/*if(isDbAlreadyActive(server)!=null) 
+				return isDbAlreadyActive(server);*/
 			properties=  new PropertiesConfiguration("resources/connection_config_local.properties");
 			LOGGER.info("Using test properties");
-			return isDbAlreadyActive(server);
 		}
 
 		try {
@@ -95,7 +99,22 @@ public class DBConnection {
 		
 			if("server2".equals(server)&&sServerName2!=null&&!sServerName2.isEmpty())
 			{
-				mongoClient = new MongoClient(sServerName2, sPort);
+				
+				String serverlist2 = properties.getString("server2.list"); 
+				List<ServerAddress> sServers2 = new ArrayList<ServerAddress>();
+				writeconcern2 = Integer.parseInt( properties.getString("server2.user.writeconcern"));
+				String[] servers2 = serverlist2.split(";");
+				for (String serverurl2 : servers2) {
+					sServers2.add(new ServerAddress(serverurl2, sPort));
+				}
+				mongoClient	= new MongoClient(sServers2);
+				mongoClient.setWriteConcern(new WriteConcern(writeconcern2,100));
+				
+				conn2 = mongoClient.getDB(sDatabaseName);
+				LOGGER.info("Connection is established...."+ mongoClient.getAllAddress() + " " + conn2.getName());
+				conn2.authenticate(sUserName, sPassword.toCharArray());
+				return conn2;
+				//mongoClient = new MongoClient(sServerName2, sPort);
 			}
 			else{
 				String serverlist = properties.getString("servers.list"); 
@@ -117,17 +136,14 @@ public class DBConnection {
 				mongoClient.setWriteConcern(new WriteConcern(writeconcern,100));
 				
 				conn1 = mongoClient.getDB(sDatabaseName);
-			//	System.out.println("Connection is established...."+ mongoClient.getAllAddress() + " " + conn.getName());
 				LOGGER.info("Connection is established...."+ mongoClient.getAllAddress() + " " + conn1.getName());
 				conn1.authenticate(sUserName, sPassword.toCharArray());
 				return conn1;
-				
-				
 			}
 		} catch (UnknownHostException e) {
 			LOGGER.error("Mongo host unknown",e);
 		}
-	
+		return null;
 	}
 	
 	private static DB isDbAlreadyActive(String server){

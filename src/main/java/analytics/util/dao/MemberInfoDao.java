@@ -34,6 +34,7 @@ public class MemberInfoDao extends AbstractDao {
 		info.setSrs_opt_in(obj.get(MongoNameConstants.SEARS_OPT_IN)==null?null:obj.get(MongoNameConstants.SEARS_OPT_IN).toString());
 		info.setKmt_opt_in(obj.get(MongoNameConstants.KMART_OPT_IN)==null?null:obj.get(MongoNameConstants.KMART_OPT_IN).toString());
 		info.setSyw_opt_in(obj.get(MongoNameConstants.SYW_OPT_IN)==null?null:obj.get(MongoNameConstants.SYW_OPT_IN).toString());
+		info.setText_opt_in(obj.get(MongoNameConstants.TEXT_OPT_IN)==null?null:obj.get(MongoNameConstants.TEXT_OPT_IN).toString());
 		return info;
 	}
 

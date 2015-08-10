@@ -144,6 +144,7 @@ public class MongoNameConstants {
      public static final String SEARS_OPT_IN = "srse";
      public static final String KMART_OPT_IN = "kmte";
      public static final String SYW_OPT_IN = "sywe";
+     public static final String TEXT_OPT_IN = "mblo";
      
      
      //Occasion Custome Event Collection

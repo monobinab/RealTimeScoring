@@ -109,7 +109,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		// 3) Find all models affected by the changes
 		Set<Integer> modelIdList = scoringSingleton.getModelIdList(newChangesVarValueMap);
 		
-		//filter the models which needs to be scored
+		//filter the models which do not have valid month (either month = 0 or month = current month)
 		scoringSingleton.filterScoringModelIdList(modelIdList);
 		
 		if(modelIdList==null||modelIdList.isEmpty()){
@@ -182,9 +182,10 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 				newScore = 1.0;
 		
 			//get the boostedScore
-			newScore = scoringSingleton.calcBoosterScore(boosterMemberVarMap, modelId, newScore);
+			//MSM's boosting is not in production..so disabling this for now
+			/*newScore = scoringSingleton.calcBoosterScore(boosterMemberVarMap, modelId, newScore);
 			if(newScore > 1.0)
-				newScore = 1.0;
+				newScore = 1.0;*/
 
 			// 9) Emit the new score
 			Map<String, Date> minMaxMap = scoringSingleton.getMinMaxExpiry(modelId, allChanges);

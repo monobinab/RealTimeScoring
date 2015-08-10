@@ -110,8 +110,9 @@ public class ResponseBolt extends EnvironmentBolt{
 						LOGGER.debug("TIME:" + messageID + "-Completed responsys call-" + System.currentTimeMillis());
 						StringBuilder custVibesEvent = new StringBuilder();
 
-						/*if(tagMetadata!=null && tagMetadata.getPurchaseOccasion()!=null && 
-								tagMetadata.getEmailOptIn()!=null && tagMetadata.getEmailOptIn().equals("N") && 
+						if(tagMetadata!=null && tagMetadata.getPurchaseOccasion()!=null && 
+								//tagMetadata.getEmailOptIn()!=null && tagMetadata.getEmailOptIn().equals("N") && 
+								tagMetadata.getTextOptIn()!=null && tagMetadata.getTextOptIn().equals("Y") && 
 								isVibesActiveWithEvent(tagMetadata.getPurchaseOccasion(),tagMetadata.getFirst5CharMdTag(),custVibesEvent)){
 							Long time = System.currentTimeMillis();
 							jedis = new Jedis(host, port, 1800);
@@ -122,7 +123,7 @@ public class ResponseBolt extends EnvironmentBolt{
 							countMetric.scope("adding_to_vibes_call").incr();
 							custVibesEvent = null;
 							LOGGER.info("Time taken to process Vibes : " + (System.currentTimeMillis()- time));
-						}*/
+						}
 						countMetric.scope("responsys_call_completed").incr();
 				}
 				else{

@@ -53,6 +53,7 @@ import analytics.util.dao.OccationCustomeEventDao;
 import analytics.util.dao.TagMetadataDao;
 import analytics.util.dao.TagResponsysActiveDao;
 import analytics.util.dao.TagVariableDao;
+import analytics.util.dao.XMLResponsysDAO;
 import analytics.util.objects.MemberInfo;
 import analytics.util.objects.ResponsysPayload;
 import analytics.util.objects.TagMetadata;
@@ -82,6 +83,8 @@ public class ResponsysUtil {
 	private MemberMDTags2Dao memberMDTags2Dao;
 	private MemberMDTagsDao memberMDTagsDao;
 	
+	private XMLResponsysDAO xmlResponsysDAO;
+	
 	//ArrayList<TagMetadata> metaDataList = new ArrayList<TagMetadata>();
 	//ArrayList<String> readyTags = new ArrayList<String>();
 
@@ -106,6 +109,8 @@ public class ResponsysUtil {
 		divLineBuSubDao = new DivLineBuSubDao();
 		memberMDTagsDao = new MemberMDTagsDao();
 		memberMDTags2Dao = new MemberMDTags2Dao();
+		
+		xmlResponsysDAO=new XMLResponsysDAO();
  
 	}
 	
@@ -301,7 +306,8 @@ public class ResponsysUtil {
 				processMessage(memberInfo, custEventName, 
 						winningTag, lyl_l_id, "PO", l_id);
 				
-				winningTag.setEmailOptIn( memberInfo != null?memberInfo.getEmailOptIn():null);
+				//winningTag.setEmailOptIn( memberInfo != null?memberInfo.getEmailOptIn():null);
+				winningTag.setTextOptIn(memberInfo != null?memberInfo.getText_opt_in():null);
 
 				obj = null;
 			}
@@ -440,6 +446,17 @@ public class ResponsysUtil {
 		StringBuffer strBuff = sendToResponsys(xmlWithoutBOM,memberInfo);
 		//StringBuffer strBuff = new StringBuffer();
 		
+		//Code to handle timeouts
+		
+		if(strBuff.length()==0)
+		{
+			String hashedXML = createCustomXml("", memberInfo, customEventName, tagMetadata, l_id, topologyName);
+			String hashxmlWithoutBOM = removeUTF8BOM(hashedXML);
+			xmlResponsysDAO.addXMLResponsys(l_id,hashxmlWithoutBOM,memberInfo.getWinningOptIn(),"N", topologyName);
+			nullifyObjects(hashxmlWithoutBOM, hashedXML);
+		}
+		
+		//timeout code ends
 		//Persist info to Mongo after successfully transmission of message to Oracle.
 		occasionResponsesDao.addOccasionResponse(l_id, memberInfo.getEid(), customEventName, 
 				!topologyName.equalsIgnoreCase("unknownOccasions")?tagMetadata.getPurchaseOccasion():"Unknown", 
@@ -901,9 +918,9 @@ public class ResponsysUtil {
 					.getProperty(memberInfo.getWinningOptIn()+"Usrname"), AuthPropertiesReader
 					.getProperty(memberInfo.getWinningOptIn()+"Password"));
 
-			connection.setConnectTimeout(3000);
-			connection.setReadTimeout(3000);
-			   
+			connection.setConnectTimeout(12000);
+			connection.setReadTimeout(12000);
+			
 			out = new OutputStreamWriter(connection.getOutputStream());
 			System.out.println(xmlWithoutBOM);
 			out.write(xmlWithoutBOM);
@@ -919,12 +936,14 @@ public class ResponsysUtil {
 		//	System.out.println("Response String ====>" + strBuff.toString());
 		}catch (java.net.SocketTimeoutException e1) {
 		     LOGGER.error("PERSIST: Connection timed out in Oracle --- "+ memberInfo.getEid(), e1.getMessage() + "---" + memberInfo.getEid());
+			 strBuff.setLength(0);
 	    }catch (IOException e) {
 			e.printStackTrace();
 			LOGGER.error("PERSIST: IOException occured in sendResponse "+ memberInfo.getEid(), e.getMessage() + "---" + memberInfo.getEid());
 		}
 		finally {
 			try {
+								
 				if(out!=null) 
 					out.close(); 
 				if (in != null) 
