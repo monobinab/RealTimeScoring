@@ -1,4 +1,4 @@
-package analytics.util;
+/*package analytics.util;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -273,7 +273,7 @@ public class ScoringSingleton2 {
 		return state;
 	}
 
-	/**
+	*//**
 	 * 
 	 * @param allChanges
 	 *            Varname -> Change
@@ -282,7 +282,7 @@ public class ScoringSingleton2 {
 	 * @param memberVariablesMap
 	 *            L_id -> Variables
 	 * @return
-	 */
+	 *//*
 	public Map<String, Change> executeStrategy(Map<String, Change> allChanges, Map<String, String> newChangesVarValueMap, Map<String, Object> memberVariablesMap) {
 		for (String variableName : newChangesVarValueMap.keySet()) {
 			if (variableModelsMap.containsKey(variableName)) {
@@ -660,14 +660,14 @@ public class ScoringSingleton2 {
 		return minMaxMap;
 	}
 	
-	/**
+	*//**
 	 * 
 	 * @param l_id
 	 * @param modelIdList
 	 * @param modelIdToExpiryMap
 	 * @param modelIdScoreMap
 	 * @param source
-	 */
+	 *//*
 	public void updateChangedMemberScore(String l_id, Set<Integer> modelIdList, Map<Integer, Map<String,Date>> modelIdToExpiry, Map<Integer, Double> modelIdScoreMap, String source) {
 		Map<Integer, ChangedMemberScore> updatedScores = new HashMap<Integer, ChangedMemberScore>();
 
@@ -726,4 +726,4 @@ public class ScoringSingleton2 {
 
 		return modelsMap.get(modelId).get(month).getModelName();
 	}
-}
+}*/

@@ -182,9 +182,82 @@ public class ScoringSingleton {
 		}
 		return modelIdStringScoreMap;
 	}
+	
+	
+	//needs loyaltyId, modelIdList, source from api
+	   //needs loyaltyId, newChangesVarValueMap) from bolt
+	   //can be coded to return modelIdScoreMap for a member for both api and topology
+	// in that case, updating scores and variables will be continued in SS itself
+	// for logging bolt, modelIdScoreMap can be iterated 
+	public Map<String, Object> getModeIdScoreMap(String lId, Map<String, String> newChangesVarValueMap){
+		
+		Map<String, Object> objToBeReturned = new HashMap<String, Object>();
+		
+		Set<Integer> modelIdList = this.getModelIdList(newChangesVarValueMap);
+		
+		if(modelIdList==null||modelIdList.isEmpty()){
+			LOGGER.info("No models affected for " + lId);
+			//need to think for redis metrics
+			return null;
+		}
+		else{
+			LOGGER.info("models to be scored for lid: " + lId + " " + modelIdList);
+		}
+		
+		Map<String, Object> memberVariablesMap = this.createMemberVariableValueMap(lId, modelIdList);
+		
+		if(memberVariablesMap==null){
+			LOGGER.info("Unable to find member variables for " + lId);
+			//need to think for redis metrics
+			return null;
+		}
+		Map<String, Change> changedMemberVariables = this.createChangedVariablesMap(lId);
+	
+		Map<String, Change> allChanges = this.executeStrategy(changedMemberVariables, newChangesVarValueMap, memberVariablesMap);
+		
+		String state = this.getState(lId);
+		
+		Map<Integer,Map<String,Date>> modelIdToExpiryMap = new HashMap<Integer, Map<String,Date>>();
+		Map<Integer, Double> modelIdScoreMap = new HashMap<Integer, Double>();
+		
+		for (Integer modelId : modelIdList) {
+		
+				double newScore;
+				double regionalFactor = 1.0;
+				try {
+				newScore = this.calcScore(memberVariablesMap, allChanges, modelId);
+				
+				LOGGER.debug("new score before boost var: " + newScore);
+				
+				newScore = newScore + this.getBoostScore(allChanges, modelId );
+				
+				//get the score weighed with regionalFactor only if the member has state
+				if(StringUtils.isNotEmpty(state)){
+					regionalFactor = this.calcRegionalFactor(modelId, state);
+				}
+				newScore = newScore * regionalFactor;
+				if(newScore > 1.0)
+					newScore = 1.0;
+			
+				modelIdScoreMap.put(modelId, newScore);
+				Map<String, Date> minMaxMap = this.getMinMaxExpiry(modelId, allChanges);
+				modelIdToExpiryMap.put(modelId, minMaxMap);
+			}
+					catch(Exception e){
+						
+					}
+		}
+		
+		objToBeReturned.put("scoreMap", modelIdScoreMap);
+		objToBeReturned.put("expMap", modelIdToExpiryMap);
+		objToBeReturned.put("allChanges", allChanges);
+		
+		return null;
+		
+	}
 
 	public Map<String, Object> createMemberVariableValueMap(String loyaltyId, Set<Integer> modelIdList)  {
-		List<String> variableFilter = new ArrayList<String>();
+		Set<String> variableFilter = new HashSet<String>();
 		
 		for (Integer modelId : modelIdList) {
 			try{
@@ -308,7 +381,7 @@ public class ScoringSingleton {
 		return allChanges;
 	}
 	
-	private boolean isBlackOutModel(Map<String, Change> allChanges,	Integer modelId) {
+	public boolean isBlackOutModel(Map<String, Change> allChanges,	Integer modelId) {
 		int blackFlag = 0;
 		Map<String, Variable> variableMap = getModelVariables(modelId);
 		for (Map.Entry<String, Change> entry : allChanges.entrySet()) {
@@ -385,7 +458,7 @@ public class ScoringSingleton {
 	public double calcBaseScore(Map<String, Object> mbrVarMap, Map<String, Change> allChanges, Integer modelId) throws RealTimeScoringException {
 
 		if (allChanges == null) {
-			throw new RealTimeScoringException("changed member vairbles is null");
+			throw new RealTimeScoringException("changed member variables is null");
 		}
 		
 		Model model = getModel(modelId);

@@ -1,4 +1,4 @@
-package analytics.util;
+/*package analytics.util;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -1170,7 +1170,7 @@ public class ScoringSingletonIntegrationTest {
 			variableNameToVidMap.setAccessible(false);
 			}
 
-		/*//this test case needs to be written
+		//this test case needs to be written
 		@Test
 		@Ignore
 		public void executeScoringSingletonWithPositiveCaseWithBoostVarTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, RealTimeScoringException, ConfigurationException, ParseException{
@@ -1281,7 +1281,7 @@ public class ScoringSingletonIntegrationTest {
 			newScoreListExpected.add(2.008307149075715);
 			Assert.assertEquals(newScoreListExpected, newScoreListActual);
 
-		}*/
+		}
 		
 		
 
@@ -1757,3 +1757,4 @@ public class ScoringSingletonIntegrationTest {
 }
 
 
+*/
