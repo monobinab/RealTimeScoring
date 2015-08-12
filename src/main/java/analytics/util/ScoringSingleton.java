@@ -132,127 +132,110 @@ public class ScoringSingleton {
 	}
 
 	// TODO: Replace this method. Its for backward compatibility. Bad coding
+	@SuppressWarnings("unchecked")
 	public HashMap<String, Double> execute(String loyaltyId, ArrayList<String> modelIdArrayList, String source) {
 		
 		Set<Integer> modelIdList = new HashSet<Integer>();
 		HashMap<String, Double> modelIdStringScoreMap =  new HashMap<String, Double>();
-		for (String model : modelIdArrayList) {
-			modelIdList.add(Integer.parseInt(model));
-		}
-		
-		//filter the models which needs to be scored
-		//this.filterScoringModelIdList(modelIdList);
 		try{
-		// Contains a VID to object mapping, not var name
-		Map<String, Object> memberVariablesMap = this.createMemberVariableValueMap(loyaltyId, modelIdList);
-		if (memberVariablesMap == null) {
-			LOGGER.warn("Unable to find member variables");
-			return null;
-		}
-		Map<String, Change> allChanges = this.createChangedVariablesMap(loyaltyId);
-	
-		Map<Integer, Double> modelIdScoreMap = new HashMap<Integer, Double>();
-		String state = this.getState(loyaltyId);
-		Map<Integer,Map<String,Date>> modelIdToExpiryMap = new HashMap<Integer, Map<String,Date>>();
-		for (Integer modelId : modelIdList) {
-			try{
-			double score = this.calcScore(memberVariablesMap, allChanges, modelId);
-			double regionalFactor = this.calcRegionalFactor(modelId, state);
-			score = score * regionalFactor;
-			if (score > 1)
-				score = 1.0;
-			
-			modelIdScoreMap.put(modelId, score);
-			modelIdToExpiryMap.put(modelId, getMinMaxExpiry(modelId, allChanges));
+			for (String modelId : modelIdArrayList) {
+				modelIdList.add(Integer.parseInt(modelId));
 			}
-			catch(RealTimeScoringException e){
-				LOGGER.error("Exception in rescoring " + modelId +" " + loyaltyId);
-			}
-		}
-		updateChangedMemberScore(loyaltyId, modelIdList, modelIdToExpiryMap, modelIdScoreMap, source);
-		// TODO: This is a very bad way of defining, but a very temp fix before
-		// fixing other topologies
-		for (Map.Entry<Integer, Double> entry : modelIdScoreMap.entrySet()) {
 			
-			modelIdStringScoreMap.put(entry.getKey().toString(), entry.getValue());
-		}
+			Map<String, Object> object = getModeIdScoreExpDatesMap(loyaltyId, null, modelIdList, false );
+			if(object != null){
+				Map<Integer, Double> modelIdScoreMap = (Map<Integer, Double>) object.get("scoreMap");
+				Map<Integer,Map<String,Date>> modelIdToExpiryMap = (Map<Integer, Map<String, Date>>) object.get("expMap");
+				updateChangedMemberScore(loyaltyId, modelIdList, modelIdToExpiryMap, modelIdScoreMap, source);
+				for (Map.Entry<Integer, Double> entry : modelIdScoreMap.entrySet()) {
+					modelIdStringScoreMap.put(entry.getKey().toString(), entry.getValue());
+				}
+			}
 		}
 		catch(Exception e){
-			LOGGER.error("Exception occured in rescoring " + loyaltyId + " ", e);
+			
 		}
-		return modelIdStringScoreMap;
+			return modelIdStringScoreMap;
 	}
-	
-	
-	//needs loyaltyId, modelIdList, source from api
-	   //needs loyaltyId, newChangesVarValueMap) from bolt
-	   //can be coded to return modelIdScoreMap for a member for both api and topology
-	// in that case, updating scores and variables will be continued in SS itself
-	// for logging bolt, modelIdScoreMap can be iterated 
-	public Map<String, Object> getModeIdScoreMap(String lId, Map<String, String> newChangesVarValueMap){
+
+	public Map<String, Object> getModeIdScoreExpDatesMap(String lId, Map<String, String> newChangesVarValueMap, Set<Integer> modelIdsList, Boolean topologyFlag){
 		
 		Map<String, Object> objToBeReturned = new HashMap<String, Object>();
-		
-		Set<Integer> modelIdList = this.getModelIdList(newChangesVarValueMap);
-		
-		if(modelIdList==null||modelIdList.isEmpty()){
-			LOGGER.info("No models affected for " + lId);
-			//need to think for redis metrics
-			return null;
-		}
-		else{
-			LOGGER.info("models to be scored for lid: " + lId + " " + modelIdList);
-		}
-		
-		Map<String, Object> memberVariablesMap = this.createMemberVariableValueMap(lId, modelIdList);
-		
-		if(memberVariablesMap==null){
-			LOGGER.info("Unable to find member variables for " + lId);
-			//need to think for redis metrics
-			return null;
-		}
-		Map<String, Change> changedMemberVariables = this.createChangedVariablesMap(lId);
-	
-		Map<String, Change> allChanges = this.executeStrategy(changedMemberVariables, newChangesVarValueMap, memberVariablesMap);
-		
-		String state = this.getState(lId);
-		
 		Map<Integer,Map<String,Date>> modelIdToExpiryMap = new HashMap<Integer, Map<String,Date>>();
 		Map<Integer, Double> modelIdScoreMap = new HashMap<Integer, Double>();
-		
-		for (Integer modelId : modelIdList) {
-		
-				double newScore;
-				double regionalFactor = 1.0;
-				try {
-				newScore = this.calcScore(memberVariablesMap, allChanges, modelId);
-				
-				LOGGER.debug("new score before boost var: " + newScore);
-				
-				newScore = newScore + this.getBoostScore(allChanges, modelId );
-				
-				//get the score weighed with regionalFactor only if the member has state
-				if(StringUtils.isNotEmpty(state)){
-					regionalFactor = this.calcRegionalFactor(modelId, state);
-				}
-				newScore = newScore * regionalFactor;
-				if(newScore > 1.0)
-					newScore = 1.0;
-			
-				modelIdScoreMap.put(modelId, newScore);
-				Map<String, Date> minMaxMap = this.getMinMaxExpiry(modelId, allChanges);
-				modelIdToExpiryMap.put(modelId, minMaxMap);
+		try{
+			//get the list of modelIds Find all models affected by the new incoming changes for topology
+			if(topologyFlag ==  true){
+				 modelIdsList = this.getModelIdList(newChangesVarValueMap);
 			}
-					catch(Exception e){
+			if(modelIdsList==null||modelIdsList.isEmpty()){
+				LOGGER.info("No models affected for " + lId);
+				//need to think for redis metrics
+				return null;
+			}
+			else{
+				LOGGER.info("models to be scored for lid: " + lId + " " + modelIdsList);
+			}
+			
+			//Create a map of variable values for member, fetched from from memberVariables collection
+			Map<String, Object> memberVariablesMap = this.createMemberVariableValueMap(lId, modelIdsList);
+			
+			if(memberVariablesMap==null){
+				LOGGER.info("Unable to find member variables for " + lId);
+				//need to think for redis metrics
+				return null;
+			}
+			
+			//create a map of unexpired variables and value fetched from changedMembervariables collection
+			Map<String, Change> changedMemberVariables = this.createChangedVariablesMap(lId);
+		
+			//For each variable in new changes, execute strategy and store in allChanges
+			Map<String, Change> allChanges = null;
+			if(topologyFlag ==  true){
+				allChanges = this.executeStrategy(changedMemberVariables, newChangesVarValueMap, memberVariablesMap);
+			}
+			
+			//get the state for the memberId to get the regionalFactor for scoring
+			String state = this.getState(lId);
+			
+			for (Integer modelId : modelIdsList) {
+			
+					double newScore;
+					double regionalFactor = 1.0;
+					try {
+						//recalculate score for each model
+						newScore = this.calcScore(memberVariablesMap, allChanges, modelId);
 						
-					}
+						LOGGER.debug("new score before boost var: " + newScore);
+						
+						newScore = newScore + this.getBoostScore(allChanges, modelId );
+						
+						//get the score weighed with regionalFactor only if the member has state
+						if(StringUtils.isNotEmpty(state)){
+							regionalFactor = this.calcRegionalFactor(modelId, state);
+						}
+						newScore = newScore * regionalFactor;
+						if(newScore > 1.0)
+							newScore = 1.0;
+					
+						modelIdScoreMap.put(modelId, newScore);
+						Map<String, Date> minMaxMap = this.getMinMaxExpiry(modelId, allChanges);
+						modelIdToExpiryMap.put(modelId, minMaxMap);
+				 }
+				  catch(Exception e){
+					
+				  }
+			}
+				objToBeReturned.put("scoreMap", modelIdScoreMap);
+				objToBeReturned.put("expMap", modelIdToExpiryMap);
+				objToBeReturned.put("allChanges", allChanges);
+				objToBeReturned.put("modelIdList", modelIdsList);
+			}
+		catch(Exception e){
+			
 		}
 		
-		objToBeReturned.put("scoreMap", modelIdScoreMap);
-		objToBeReturned.put("expMap", modelIdToExpiryMap);
-		objToBeReturned.put("allChanges", allChanges);
-		
-		return null;
+		return objToBeReturned;
 		
 	}
 
@@ -552,7 +535,7 @@ public class ScoringSingleton {
 		// IF THE MODEL IS MONTH SPECIFIC AND THE MIN/MAX DATE IS AFTER THE
 		// END OF THE MONTH SET TO THE LAST DAY OF THIS MONTH
 		int month = getMonth(modelId);
-		if (modelExists(modelId) && month != 0 ) {
+		if (modelExists(modelId) && month != 0 && month != -1) {
 			Calendar calendar = Calendar.getInstance();
 			calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DATE));
 			Date lastDayOfMonth = calendar.getTime();

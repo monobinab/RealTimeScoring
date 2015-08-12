@@ -63,6 +63,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	  	scoringSingleton = ScoringSingleton.getInstance();
 	  }
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void execute(Tuple input) {
 			
@@ -102,131 +103,27 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		}
 
 		LOGGER.debug("TIME:" + messageID + "-Entering scoring bolt-" + System.currentTimeMillis());
-		// 2) Create map of new changes from the input
+		
+		//Create map of new changes from the input
 		Map<String, String> newChangesVarValueMap = JsonUtils
 				.restoreVariableListFromJson(input.getString(1));
 
-		// 3) Find all models affected by the changes
-		Set<Integer> modelIdList = scoringSingleton.getModelIdList(newChangesVarValueMap);
+		Map<String, Object> object = scoringSingleton.getModeIdScoreExpDatesMap(lId, newChangesVarValueMap, null, true);
 		
-		//filter the models which do not have valid month (either month = 0 or month = current month)
-		//scoringSingleton.filterScoringModelIdList(modelIdList);
-		
-		if(modelIdList==null||modelIdList.isEmpty()){
-			LOGGER.info("No models affected for " + lId);
-		//	System.out.println("No models affected for " + lId);
-			redisCountIncr("no_models_affected");
+		if(object == null){
 			outputCollector.ack(input);
 			return;
 		}
-		else{
-			LOGGER.info("models to be scored for lid: " + lId + " " + modelIdList);
-			//System.out.println("models to be scored for lid: " + lId + " " + modelIdList);
-		}
-		// 4) Find all variables for models
+	
+		Map<Integer, Double> modelIdScoreMap = (Map<Integer, Double>) object.get("scoreMap");
+		
+		Map<Integer,Map<String,Date>> modelIdToExpiryMap = (Map<Integer, Map<String, Date>>) object.get("expMap");
+		
+		Map<String, Change> allChanges = (Map<String, Change>) object.get("allChanges");
+		
+		Set<Integer> modelIdsList = (Set<Integer>) object.get("modelIdList");
 
-		// 5) Create a map of variable values, fetched from from memberVariables
-		Map<String, Object> memberVariablesMap = scoringSingleton.createMemberVariableValueMap(lId, modelIdList);
-		
-		if(memberVariablesMap==null){
-			LOGGER.info("Unable to find member variables for " + lId);
-			redisCountIncr("no_member_variables");
-			outputCollector.ack(input);
-			return;
-		}
-		
-		// 7) Fetch changedMemberVariables for rescoring and create a map- fetch
-		// all for the member since upsert needs it too
-		
-		// 6.1) CREATE MAP FROM CHANGED VARIABLES TO VALUE AND EXPIRATION DATE
-		// (CHANGE CLASS) and store in allChanges
-		Map<String, Change> changedMemberVariables = scoringSingleton.createChangedVariablesMap(lId);
-		
-		
-		// 6) For each variable in new changes, execute strategy and store in
-		// allChanges
-		// allChanges will contain newChanges and the changedMemberVariables
-		Map<String, Change> allChanges = scoringSingleton.executeStrategy(changedMemberVariables, newChangesVarValueMap, memberVariablesMap);
-		
-		// 8) Rescore - arbitrate between all changes and memberVariables
-		// Score each model in a loop
-		Map<Integer, Double> modelIdScoreMap = new HashMap<Integer, Double>();
 		Map<String, String> modelIdScoreStringMap = new HashMap<String, String>();
-		Map<Integer,Map<String,Date>> modelIdToExpiryMap = new HashMap<Integer, Map<String,Date>>();
-		
-		//get the state for the memberId to get the regionalFactor for scoring
-		String state = scoringSingleton.getState(lId);
-		
-		//boosterMemberVariables map from boosterMemberVariables collection
-		//Map<String, Object> boosterMemberVarMap = scoringSingleton.createBoosterMemberVariables(lId, modelIdList);
-		
-		for (Integer modelId : modelIdList) {// Score and emit for all modelIds
-												// before mongo inserts
-			// recalculate score for model
-			double newScore;
-			double regionalFactor = 1.0;
-			try {
-				newScore = scoringSingleton.calcScore(memberVariablesMap, allChanges,
-						modelId);
-
-			LOGGER.debug("new score before boost var: " + newScore);
-
-			newScore = newScore + scoringSingleton.getBoostScore(allChanges, modelId );
-			
-			//get the score weighed with regionalFactor only if the member has state
-			if(StringUtils.isNotEmpty(state)){
-				regionalFactor = scoringSingleton.calcRegionalFactor(modelId, state);
-			}
-			newScore = newScore * regionalFactor;
-			if(newScore > 1.0)
-				newScore = 1.0;
-		
-			//get the boostedScore
-			//MSM's boosting is not in production..so disabling this for now
-			/*newScore = scoringSingleton.calcBoosterScore(boosterMemberVarMap, modelId, newScore);
-			if(newScore > 1.0)
-				newScore = 1.0;*/
-
-			// 9) Emit the new score
-			Map<String, Date> minMaxMap = scoringSingleton.getMinMaxExpiry(modelId, allChanges);
-			modelIdToExpiryMap.put(modelId, minMaxMap);
-			Date minExpiryDate = minMaxMap.get("minExpiry");
-			Date maxExpiryDate = minMaxMap.get("maxExpiry");
-			SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
-			String minExpiry = null;
-			String maxExpiry = null;
-			if(minExpiryDate != null){
-				minExpiry = format.format(minExpiryDate);
-			}
-			if(maxExpiryDate != null){
-				maxExpiry = format.format(maxExpiryDate);
-			}
-			// TODO: change oldScore to a timestamp of the change to persist to changedMemberScore
-			List<Object> listToEmit = new ArrayList<Object>();
-			listToEmit.add(lId);
-			listToEmit.add(newScore);
-			listToEmit.add(modelId.toString());
-			listToEmit.add(source);
-			listToEmit.add(messageID);
-			listToEmit.add(minExpiry);
-			listToEmit.add(maxExpiry);
-			modelIdScoreMap.put(modelId, newScore);
-			
-			//String Map to set to redis...
-			modelIdScoreStringMap.put(""+modelId, ""+BigDecimal.valueOf(newScore).toPlainString());
-			LOGGER.debug(" ### SCORING BOLT EMITTING: " + listToEmit);
-			if(LOGGER.isDebugEnabled())
-			LOGGER.debug("The time spent for creating scores..... "
-					+ System.currentTimeMillis() + " and the message ID is ..."
-					+ messageID);
-		//	System.out.println(lId + " has been scored for " + modelId  +" " + source + " source");
-		//	LOGGER.info(lId + " has been scored for " + modelId  +" " + source + " source");
-			this.outputCollector.emit("score_stream",listToEmit);
-			redisCountIncr("model_scored");
-			} catch (RealTimeScoringException e) {
-				e.printStackTrace();
-			}
-		}
 		
 		//Persisting to Redis to be retrieved quicker than getting from Mongo.
 		//Perform the below operation only when the Redis is configured
@@ -236,23 +133,19 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			jedis = new Jedis(host, port, 1800);
 			jedis.connect();
 			jedis.hmset("RTS:Telluride:"+lId, modelIdScoreStringMap);
-			//jedis.hset("RTS:Telluride:"+lId, ""+modelId, ""+BigDecimal.valueOf(newScore).toPlainString());
-			
 			jedis.expire("RTS:Telluride:"+lId, 600);
 			jedis.disconnect();
-			//jedisPool.returnResource(jedis);
-			
 		}
 			
 		long timeTaken = System.currentTimeMillis(); 
-		// 10) Write changedMemberVariableswith expiry
+		//Write changedMemberVariableswith expiry
     	scoringSingleton.updateChangedVariables(lId, allChanges);
     	LOGGER.debug("TIME:" + messageID + "-Score updates complete-" + System.currentTimeMillis());
     	LOGGER.info("time taken for variable update: " + (System.currentTimeMillis() - timeTaken )) ;
     	
     	timeTaken = System.currentTimeMillis();
-    	// 11) Write changedMemberScores with min max expiry
-    	scoringSingleton.updateChangedMemberScore(lId, modelIdList, modelIdToExpiryMap, modelIdScoreMap,source);
+    	//Write changedMemberScores with min max expiry
+    	scoringSingleton.updateChangedMemberScore(lId, modelIdsList, modelIdToExpiryMap, modelIdScoreMap,source);
     	LOGGER.info("time taken for score update: " + (System.currentTimeMillis() - timeTaken ));
 		LOGGER.debug("TIME:" + messageID + "- Scoring complete-" + System.currentTimeMillis());
 		
@@ -268,26 +161,12 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		List<Object> listToEmit = new ArrayList<Object>();
 		listToEmit.add(lyl_id_no+"~"+topologyName);
 		this.outputCollector.emit("kafka_stream", listToEmit);
-		
-
-		/*List<Object> listToEmit = new ArrayList<Object>();
-		//member_stream is commented as MemberPublish bolt to redis is not in use now
-		listToEmit.add(lId);
-		listToEmit.add(source);
-		listToEmit.add(messageID);
-		this.outputCollector.emit("member_stream", listToEmit);*/
+	
 		redisCountIncr("member_scored_successfully");
-		/*if(lyl_id_no!=null){
-			listToEmit = new ArrayList<Object>();
-			listToEmit.add(lyl_id_no);
-			listToEmit.add(messageID);
-			this.outputCollector.emit("response_stream", listToEmit);//response_stream_unknown
-		}*/
-		
 		this.outputCollector.ack(input);
 		}catch(Exception e){
 			e.printStackTrace();
-			LOGGER.info("Exception scoring lId " +lId );
+			LOGGER.info("Exception scoring lId " +lId +" ", e );
 
 		}finally{
 			if(jedis!=null)
@@ -298,7 +177,6 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		declarer.declareStream("score_stream",new Fields("l_id", "newScore", "model","source", "messageID", "minExpiry", "maxExpiry"));
-	//	declarer.declareStream("member_stream", new Fields("l_id", "source","messageID"));
 		declarer.declareStream("response_stream", new Fields("lyl_id_no","messageID"));
 		declarer.declareStream("kafka_stream", new Fields("message"));
 		
