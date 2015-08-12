@@ -116,15 +116,15 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		}
 	
 		Map<Integer, Double> modelIdScoreMap = (Map<Integer, Double>) object.get("scoreMap");
-		
 		Map<Integer,Map<String,Date>> modelIdToExpiryMap = (Map<Integer, Map<String, Date>>) object.get("expMap");
-		
 		Map<String, Change> allChanges = (Map<String, Change>) object.get("allChanges");
-		
 		Set<Integer> modelIdsList = (Set<Integer>) object.get("modelIdList");
 
 		Map<String, String> modelIdScoreStringMap = new HashMap<String, String>();
 		
+		for (Map.Entry<Integer, Double> entry : modelIdScoreMap.entrySet()) {
+			modelIdScoreStringMap.put(""+entry.getKey(), ""+BigDecimal.valueOf(entry.getValue()).toPlainString());
+		}
 		//Persisting to Redis to be retrieved quicker than getting from Mongo.
 		//Perform the below operation only when the Redis is configured
 		//Long timeBefore = System.currentTimeMillis();
@@ -161,6 +161,8 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		List<Object> listToEmit = new ArrayList<Object>();
 		listToEmit.add(lyl_id_no+"~"+topologyName);
 		this.outputCollector.emit("kafka_stream", listToEmit);
+		
+		
 	
 		redisCountIncr("member_scored_successfully");
 		this.outputCollector.ack(input);

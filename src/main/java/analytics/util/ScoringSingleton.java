@@ -179,13 +179,7 @@ public class ScoringSingleton {
 			
 			//Create a map of variable values for member, fetched from from memberVariables collection
 			Map<String, Object> memberVariablesMap = this.createMemberVariableValueMap(lId, modelIdsList);
-			
-			if(memberVariablesMap==null){
-				LOGGER.info("Unable to find member variables for " + lId);
-				//need to think for redis metrics
-				return null;
-			}
-			
+				
 			//create a map of unexpired variables and value fetched from changedMembervariables collection
 			Map<String, Change> changedMemberVariables = this.createChangedVariablesMap(lId);
 		
@@ -194,6 +188,8 @@ public class ScoringSingleton {
 			if(topologyFlag ==  true){
 				allChanges = this.executeStrategy(changedMemberVariables, newChangesVarValueMap, memberVariablesMap);
 			}
+		
+			//NOTE: memberVarMap and allChanges null is not checked
 			
 			//get the state for the memberId to get the regionalFactor for scoring
 			String state = this.getState(lId);
