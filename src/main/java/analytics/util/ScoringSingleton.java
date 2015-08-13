@@ -224,8 +224,7 @@ public class ScoringSingleton {
 					 changedMemberScore.setModelId(modelId.toString());
 					 changedMemberScore.setMinDate(simpleDateFormat.format(minMaxMap.get("minDate")));
 					 changedMemberScore.setMaxDate(simpleDateFormat.format(minMaxMap.get("maxDate")));
-								
-					
+				
 				 }
 				  catch(Exception e){
 					
