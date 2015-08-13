@@ -176,7 +176,6 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
     	Type boostValueType = new TypeToken<Map<String, List<String>>>() {
 			private static final long serialVersionUID = 1L;
 		}.getType();
-		
 		return gson.toJson(dateValuesMap, boostValueType);
 	}
 

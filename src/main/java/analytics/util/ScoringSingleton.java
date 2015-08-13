@@ -163,9 +163,11 @@ public class ScoringSingleton {
 		Map<String, Object> objToBeReturned = new HashMap<String, Object>();
 		Map<Integer,Map<String,Date>> modelIdToExpiryMap = new HashMap<Integer, Map<String,Date>>();
 		Map<Integer, Double> modelIdScoreMap = new HashMap<Integer, Double>();
+		
+		ChangedMemberScore changedMemberScore = null;
 		try{
-			//get the list of modelIds Find all models affected by the new incoming changes for topology
-			if(topologyFlag ==  true){
+			//Find all models affected by the new incoming changes if newChangeVaraValueMap is null
+			if(newChangesVarValueMap ==  null || newChangesVarValueMap.isEmpty()){
 				 modelIdsList = this.getModelIdList(newChangesVarValueMap);
 			}
 			if(modelIdsList==null||modelIdsList.isEmpty()){
@@ -185,14 +187,17 @@ public class ScoringSingleton {
 		
 			//For each variable in new changes, execute strategy and store in allChanges
 			Map<String, Change> allChanges = null;
-			if(topologyFlag ==  true){
+			if(newChangesVarValueMap ==  null || newChangesVarValueMap.isEmpty()){
 				allChanges = this.executeStrategy(changedMemberVariables, newChangesVarValueMap, memberVariablesMap);
 			}
 		
-			//NOTE: memberVarMap  null is not checked
-			
+			//memberVarMap  null is not checked
+			if(memberVariablesMap == null){
+				return null;
+			}
 			//get the state for the memberId to get the regionalFactor for scoring
 			String state = this.getState(lId);
+			changedMemberScore = new ChangedMemberScore();
 			
 			for (Integer modelId : modelIdsList) {
 			
@@ -213,10 +218,14 @@ public class ScoringSingleton {
 						newScore = newScore * regionalFactor;
 						if(newScore > 1.0)
 							newScore = 1.0;
+						
+					 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+					 Map<String, Date> minMaxMap = this.getMinMaxExpiry(modelId, allChanges);
+					 changedMemberScore.setModelId(modelId.toString());
+					 changedMemberScore.setMinDate(simpleDateFormat.format(minMaxMap.get("minDate")));
+					 changedMemberScore.setMaxDate(simpleDateFormat.format(minMaxMap.get("maxDate")));
+								
 					
-						modelIdScoreMap.put(modelId, newScore);
-						Map<String, Date> minMaxMap = this.getMinMaxExpiry(modelId, allChanges);
-						modelIdToExpiryMap.put(modelId, minMaxMap);
 				 }
 				  catch(Exception e){
 					
