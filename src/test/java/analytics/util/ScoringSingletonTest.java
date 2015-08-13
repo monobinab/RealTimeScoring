@@ -128,7 +128,7 @@ public class ScoringSingletonTest {
 
 	//if none of the variables in newChangesVarValueMap is found in variableModelsMap, modelLists which needs to be scored will be empty
 	@Test
-	public void getModelIdListNullNewChangesVarValueMapTest2() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+	public void getModelIdListInvalidNewChangesVarValueMapTest2() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
 		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
 		newChangesVarValueMap.put("key", "value");
 		List<Integer> modelLists = new ArrayList<Integer>();

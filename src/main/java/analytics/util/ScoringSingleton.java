@@ -189,7 +189,7 @@ public class ScoringSingleton {
 				allChanges = this.executeStrategy(changedMemberVariables, newChangesVarValueMap, memberVariablesMap);
 			}
 		
-			//NOTE: memberVarMap and allChanges null is not checked
+			//NOTE: memberVarMap  null is not checked
 			
 			//get the state for the memberId to get the regionalFactor for scoring
 			String state = this.getState(lId);
@@ -225,7 +225,7 @@ public class ScoringSingleton {
 				objToBeReturned.put("scoreMap", modelIdScoreMap);
 				objToBeReturned.put("expMap", modelIdToExpiryMap);
 				objToBeReturned.put("allChanges", allChanges);
-				objToBeReturned.put("modelIdList", modelIdsList);
+			//	objToBeReturned.put("modelIdList", modelIdsList);
 			}
 		catch(Exception e){
 			
