@@ -2,8 +2,11 @@ package analytics.bolt;
 
 import analytics.exception.RealTimeScoringException;
 import analytics.util.JsonUtils;
+import analytics.util.MongoNameConstants;
 import analytics.util.ScoringSingleton;
+import analytics.util.dao.ModelVariablesDao;
 import analytics.util.objects.Change;
+import analytics.util.objects.Model;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -39,7 +42,9 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	
 	private String respHost;
 	private int respPort;
-	
+	private ModelVariablesDao modelVariablesDao; 
+	private Map<String, List<Integer>> variableModelsMap;
+	private Map<Integer, Map<Integer, Model>> modelsMap;
 	public StrategyScoringBolt(String systemProperty, String host, int port, String respHost, int respPort) {
 		super(systemProperty);
 		this.host = host;
@@ -61,6 +66,14 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	  	this.outputCollector = collector;
 	  	topologyName = (String) stormConf.get("metrics_topology");
 	  	scoringSingleton = ScoringSingleton.getInstance();
+	  	modelVariablesDao = new ModelVariablesDao();
+		// populate the variableModelsMap
+		variableModelsMap = new HashMap<String, List<Integer>>();
+		// populate the variableModelsMap and modelsMap
+		modelsMap = new HashMap<Integer, Map<Integer, Model>>();
+		// Populate both maps
+		modelVariablesDao.populateModelVariables(modelsMap, variableModelsMap);
+	  
 	  }
 	
 	@Override
@@ -109,7 +122,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		// 3) Find all models affected by the changes
 		Set<Integer> modelIdList = scoringSingleton.getModelIdList(newChangesVarValueMap);
 		
-		//filter the models which do not have valid month (either month = 0 or month = current month)
+		//filter the models which needs to be scored
 		scoringSingleton.filterScoringModelIdList(modelIdList);
 		
 		if(modelIdList==null||modelIdList.isEmpty()){
@@ -162,70 +175,50 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		
 		for (Integer modelId : modelIdList) {// Score and emit for all modelIds
 												// before mongo inserts
-			// recalculate score for model
-			double newScore;
-			double regionalFactor = 1.0;
+			// recalculate score for model			
+			double newScore = 0.0;			
 			try {
-				newScore = scoringSingleton.calcScore(memberVariablesMap, allChanges,
-						modelId);
-
-			LOGGER.debug("new score before boost var: " + newScore);
-
-			newScore = newScore + scoringSingleton.getBoostScore(allChanges, modelId );
-			
-			//get the score weighed with regionalFactor only if the member has state
-			if(StringUtils.isNotEmpty(state)){
-				regionalFactor = scoringSingleton.calcRegionalFactor(modelId, state);
-			}
-			newScore = newScore * regionalFactor;
-			if(newScore > 1.0)
-				newScore = 1.0;
-		
-			//get the boostedScore
-			//MSM's boosting is not in production..so disabling this for now
-			/*newScore = scoringSingleton.calcBoosterScore(boosterMemberVarMap, modelId, newScore);
-			if(newScore > 1.0)
-				newScore = 1.0;*/
-
-			// 9) Emit the new score
-			Map<String, Date> minMaxMap = scoringSingleton.getMinMaxExpiry(modelId, allChanges);
-			modelIdToExpiryMap.put(modelId, minMaxMap);
-			Date minExpiryDate = minMaxMap.get("minExpiry");
-			Date maxExpiryDate = minMaxMap.get("maxExpiry");
-			SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
-			String minExpiry = null;
-			String maxExpiry = null;
-			if(minExpiryDate != null){
-				minExpiry = format.format(minExpiryDate);
-			}
-			if(maxExpiryDate != null){
-				maxExpiry = format.format(maxExpiryDate);
-			}
-			// TODO: change oldScore to a timestamp of the change to persist to changedMemberScore
-			List<Object> listToEmit = new ArrayList<Object>();
-			listToEmit.add(lId);
-			listToEmit.add(newScore);
-			listToEmit.add(modelId.toString());
-			listToEmit.add(source);
-			listToEmit.add(messageID);
-			listToEmit.add(minExpiry);
-			listToEmit.add(maxExpiry);
-			modelIdScoreMap.put(modelId, newScore);
-			
-			//String Map to set to redis...
-			modelIdScoreStringMap.put(""+modelId, ""+BigDecimal.valueOf(newScore).toPlainString());
-			LOGGER.debug(" ### SCORING BOLT EMITTING: " + listToEmit);
-			if(LOGGER.isDebugEnabled())
-			LOGGER.debug("The time spent for creating scores..... "
-					+ System.currentTimeMillis() + " and the message ID is ..."
-					+ messageID);
-		//	System.out.println(lId + " has been scored for " + modelId  +" " + source + " source");
-		//	LOGGER.info(lId + " has been scored for " + modelId  +" " + source + " source");
-			this.outputCollector.emit("score_stream",listToEmit);
-			redisCountIncr("model_scored");
-			} catch (RealTimeScoringException e) {
-				e.printStackTrace();
-			}
+					newScore = scoringSingleton.getNewRTSBoostedScore(memberVariablesMap, allChanges, modelId, state);
+				
+					// 9) Emit the new score
+					Map<String, Date> minMaxMap = scoringSingleton.getMinMaxExpiry(modelId, allChanges);
+					modelIdToExpiryMap.put(modelId, minMaxMap);
+					Date minExpiryDate = minMaxMap.get("minExpiry");
+					Date maxExpiryDate = minMaxMap.get("maxExpiry");
+					SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
+					String minExpiry = null;
+					String maxExpiry = null;
+					if(minExpiryDate != null){
+						minExpiry = format.format(minExpiryDate);
+					}
+					if(maxExpiryDate != null){
+						maxExpiry = format.format(maxExpiryDate);
+					}
+					// TODO: change oldScore to a timestamp of the change to persist to changedMemberScore
+					List<Object> listToEmit = new ArrayList<Object>();
+					listToEmit.add(lId);
+					listToEmit.add(newScore);
+					listToEmit.add(modelId.toString());
+					listToEmit.add(source);
+					listToEmit.add(messageID);
+					listToEmit.add(minExpiry);
+					listToEmit.add(maxExpiry);
+					modelIdScoreMap.put(modelId, newScore);
+					
+					//String Map to set to redis...
+					modelIdScoreStringMap.put(""+modelId, ""+BigDecimal.valueOf(newScore).toPlainString());
+					LOGGER.debug(" ### SCORING BOLT EMITTING: " + listToEmit);
+					if(LOGGER.isDebugEnabled())
+					LOGGER.debug("The time spent for creating scores..... "
+							+ System.currentTimeMillis() + " and the message ID is ..."
+							+ messageID);
+					//System.out.println(lId + " has been scored for " + modelId  +" " + source + " source");
+					//LOGGER.info(lId + " has been scored for " + modelId  +" " + source + " source");
+					this.outputCollector.emit("score_stream",listToEmit);
+					redisCountIncr("model_scored");
+				} catch (RealTimeScoringException e) {
+					e.printStackTrace();
+				}
 		}
 		
 		//Persisting to Redis to be retrieved quicker than getting from Mongo.
@@ -240,8 +233,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			
 			jedis.expire("RTS:Telluride:"+lId, 600);
 			jedis.disconnect();
-			//jedisPool.returnResource(jedis);
-			
+			//jedisPool.returnResource(jedis);			
 		}
 			
 		long timeTaken = System.currentTimeMillis(); 

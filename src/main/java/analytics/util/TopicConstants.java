@@ -17,5 +17,6 @@ public interface TopicConstants {
 	public static final int PORT = 6379 ;
 	public static final String RESCORED_MEMBERIDS_KAFKA_TOPIC = "rts_rescored_memberIds";
 	//public static final String RESCORED_MEMBERIDS_KAFKA_TOPIC = "test2";
+	public static final String EMAIL_FEEDBACK_RESPONSES_KAFKA_TOPIC = "rts_emailFeedback_responses";
 }
 

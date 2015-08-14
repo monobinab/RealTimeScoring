@@ -173,4 +173,9 @@ public class MongoNameConstants {
      public static final String DC_AID_VAR_MODEL = "m";
      public static final String DC_AID_VAR_SCORE = "s";
 
+     //emailBlackoutVariables collection
+     public static final String EMAIL_BU = "bu";
+     public static final String EMAIL_VAR = "v";
+     public static final String STORE_FORMAT = "f";
+     public static final String EMAIL_MODEL_ID = "m";
 }

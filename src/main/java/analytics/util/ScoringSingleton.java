@@ -49,6 +49,7 @@ public class ScoringSingleton {
 	private Map<String, String> variableNameToVidMap;
 	private Map<String, String> variableNameToStrategyMap;
 	private Map<String, Double> regionalFactorsMap;
+	private List<String> modelVariables;
 	//private Map<String, String> sourcesMap;
 	private MemberVariablesDao memberVariablesDao;
 	//private SourcesDao sourcesDao;
@@ -324,6 +325,48 @@ public class ScoringSingleton {
 		return allChanges;
 	}
 
+	public double getNewRTSBoostedScore(Map<String, Object> memberVariablesMap, Map<String, Change> allChanges, Integer modelId, String state) throws RealTimeScoringException {
+		
+		double newScore = 0.0;
+		double regionalFactor = 1.0;
+		if(isBlackOutModel(allChanges, modelId))
+			return newScore;
+		
+		newScore = calcScore(memberVariablesMap, allChanges,modelId);
+
+		LOGGER.debug("new score before boost var: " + newScore);
+
+		newScore = newScore + getBoostScore(allChanges, modelId );
+	
+		//get the score weighed with regionalFactor only if the member has state
+		if(StringUtils.isNotEmpty(state)){
+			regionalFactor = calcRegionalFactor(modelId, state);
+		}
+		newScore = newScore * regionalFactor;
+		if(newScore > 1.0)
+			newScore = 1.0;
+
+		return newScore;
+	}
+	
+	private boolean isBlackOutModel(Map<String, Change> allChanges,	Integer modelId) {
+		int blackFlag = 0;
+		for (Map.Entry<String, Change> entry : allChanges.entrySet()) {
+			String ch = entry.getKey();
+			Change value = entry.getValue();
+			modelVariables = modelVariablesDao.getModelVariableList(modelId); //get from cache instead
+			if (ch.startsWith(MongoNameConstants.BLACKOUT_VAR_PREFIX) && modelVariables.contains(ch)) {
+				blackFlag = Integer.valueOf(value.getValue().toString());
+				if(blackFlag==1)
+				{
+					return true;
+				}				
+			}
+		}
+		
+		return false;
+	}
+
 	public double getBoostScore(Map<String, Change> allChanges, Integer modelId) {
 		double boosts = 0.0;
 		Map<String, Variable> varMap = new HashMap<String, Variable>();
@@ -354,10 +397,6 @@ public class ScoringSingleton {
 		for (Map.Entry<String, Change> entry : allChanges.entrySet()) {
 			String ch = entry.getKey();
 			Change value = entry.getValue();
-			if (ch.startsWith(MongoNameConstants.BLACKOUT_VAR_PREFIX)) {
-				blackFlag = Integer.valueOf(value.getValue().toString());
-				boosts = calculateBoostValue(boosts, blackFlag, value, blackout);
-			}
 			if (ch.substring(0, MongoNameConstants.BOOST_VAR_PREFIX.length()).toUpperCase().equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
 				Boost boost;
 				if (varMap.get(ch) instanceof Boost) {
@@ -625,11 +664,8 @@ public class ScoringSingleton {
 				Date lastDayOfMonth = calendar.getTime();
 
 				if (minDate != null && minDate.after(lastDayOfMonth)) {
-					minDate = lastDayOfMonth;
-					maxDate = lastDayOfMonth;
-				} else if (maxDate != null && maxDate.after(lastDayOfMonth)) {
-					maxDate = lastDayOfMonth;
-				}
+					minDate = lastDayOfMonth;					
+				} 
 			}
 			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 			String today = simpleDateFormat.format(new Date());
