@@ -67,6 +67,7 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 		// 1) SPLIT INPUT STRING
 		
         String interactionRec = input.getString(0);
+
         String splitRecArray[] = splitRec(interactionRec);
         
         if(splitRecArray == null || splitRecArray.length==0) {

@@ -177,16 +177,12 @@ public class WebHDFSSpout extends BaseRichSpout{
 		    replacedString = "['"+returnStr+"]";
 		   }
 		   else if(topologyIdentifier.equalsIgnoreCase("aamInternalSearch")){
-		    returnStr = returnStr.replace("null", "");
-		    String[] splitStr = returnStr.split(",");
-		    returnStr = splitStr[2]+"', '"+splitStr[0]+"', '"+splitStr[1]+"', '"+splitStr[5];
-		    replacedString = "['"+returnStr+"']";
-		    splitStr = null;
+		  	    replacedString = str;
 		   }
-		   else
-		    replacedString = returnStr;// "['"+returnStr+"']";
+		   else{
+			   replacedString = returnStr;
+		   }
 		   LOGGER.info("Formatted String = " +replacedString);
-		   //System.out.println("Formatted String = " +replacedString);
 		   returnStr = null;
 		  }
 		  

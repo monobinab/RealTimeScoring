@@ -224,12 +224,25 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
     	
     	return variableValueMap;
     }
-	@Override
+/*	@Override
 	protected String[] splitRec(String webRec) {
 		String split[]=StringUtils.split(webRec,",");
 	    if(split !=null && split.length>0) {
 	        	return split;
 	    }
+			else {
+				return null;
+			}
+		}*/
+	
+	@Override
+	protected String[] splitRec(String webRec) {
+		//webRec = webRec.replaceAll("[']","");
+	        String split[]=StringUtils.split(webRec,",");
+	        
+	        if(split !=null && split.length>0) {
+	        	return split;
+			}
 			else {
 				return null;
 			}
