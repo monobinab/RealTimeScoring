@@ -184,9 +184,9 @@ public class WebHDFSSpout extends BaseRichSpout{
 		    splitStr = null;
 		   }
 		   else
-		    replacedString = "['"+returnStr+"']";
-		   //LOGGER.info("Formatted String = " +replacedString);
-		   System.out.println("Formatted String = " +replacedString);
+		    replacedString = returnStr;// "['"+returnStr+"']";
+		   LOGGER.info("Formatted String = " +replacedString);
+		   //System.out.println("Formatted String = " +replacedString);
 		   returnStr = null;
 		  }
 		  
