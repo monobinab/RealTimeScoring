@@ -170,63 +170,63 @@ public class ScoringSingleton {
 		
 			if(modelIdsList != null && !modelIdsList.isEmpty()){ 
 			
-			//Create a map of variable values for member, fetched from memberVariables collection
-			Map<String, Object> memberVariablesMap = this.createMemberVariableValueMap(lId, modelIdsList);
-			if(memberVariablesMap != null){
-			
-			//create a map of unexpired variables and value fetched from changedMembervariables collection
-			Map<String, Change> changedMemberVariables = this.createChangedVariablesMap(lId);
-		
-			//For each variable in new changes, execute strategy and store in allChanges
-			Map<String, Change> allChanges = null;
-			if(newChangesVarValueMap ==  null || newChangesVarValueMap.isEmpty()){
-				allChanges = this.executeStrategy(changedMemberVariables, newChangesVarValueMap, memberVariablesMap);
-			}
-		
-			//get the state for the memberId to get the regionalFactor for scoring
-			String state = this.getState(lId);
-			
-			memberRTSChanges = new MemberRTSChanges();
-			List<ChangedMemberScore> changedMemberScoreList = new ArrayList<ChangedMemberScore>();
-			
-			for (Integer modelId : modelIdsList) {
-			
-					double newScore;
-					double regionalFactor = 1.0;
-					try {
-						//recalculate score for each model
-						newScore = this.calcScore(memberVariablesMap, allChanges, modelId);
-						
-						LOGGER.debug("new score before boost var: " + newScore);
-						
-						newScore = newScore + this.getBoostScore(allChanges, modelId );
-						
-						//get the score weighed with regionalFactor only if the member has state
-						if(StringUtils.isNotEmpty(state)){
-							regionalFactor = this.calcRegionalFactor(modelId, state);
-						}
-						newScore = newScore * regionalFactor;
-						if(newScore > 1.0)
-							newScore = 1.0;
-						
-					 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-					 Map<String, Date> minMaxMap = this.getMinMaxExpiry(modelId, allChanges);
-					 ChangedMemberScore changedMemberScore = new ChangedMemberScore();
-					 changedMemberScore.setModelId(modelId.toString());
-					 changedMemberScore.setMinDate(simpleDateFormat.format(minMaxMap.get("minDate")));
-					 changedMemberScore.setMaxDate(simpleDateFormat.format(minMaxMap.get("maxDate")));
-					 changedMemberScore.setEffDate(simpleDateFormat.format(minMaxMap.get("effDate")));
-					 changedMemberScoreList.add(changedMemberScore);
-					 memberRTSChanges.setlId(lId);
-					 memberRTSChanges.setChangedMemberScoreList(changedMemberScoreList);
-					 memberRTSChanges.setAllChangesMap(allChanges);
+				//Create a map of variable values for member, fetched from memberVariables collection
+				Map<String, Object> memberVariablesMap = this.createMemberVariableValueMap(lId, modelIdsList);
+				if(memberVariablesMap != null){
 				
-				 }
-				  catch(Exception e){
-					
-				  }
+				//create a map of unexpired variables and value fetched from changedMembervariables collection
+				Map<String, Change> changedMemberVariables = this.createChangedVariablesMap(lId);
+			
+				//For each variable in new changes, execute strategy and store in allChanges
+				Map<String, Change> allChanges = null;
+				if(newChangesVarValueMap ==  null || newChangesVarValueMap.isEmpty()){
+					allChanges = this.executeStrategy(changedMemberVariables, newChangesVarValueMap, memberVariablesMap);
 				}
-			 }
+			
+				//get the state for the memberId to get the regionalFactor for scoring
+				String state = this.getState(lId);
+				
+				memberRTSChanges = new MemberRTSChanges();
+				List<ChangedMemberScore> changedMemberScoreList = new ArrayList<ChangedMemberScore>();
+				
+				for (Integer modelId : modelIdsList) {
+				
+						double newScore;
+						double regionalFactor = 1.0;
+						try {
+							//recalculate score for each model
+							newScore = this.calcScore(memberVariablesMap, allChanges, modelId);
+							
+							LOGGER.debug("new score before boost var: " + newScore);
+							
+							newScore = newScore + this.getBoostScore(allChanges, modelId );
+							
+							//get the score weighed with regionalFactor only if the member has state
+							if(StringUtils.isNotEmpty(state)){
+								regionalFactor = this.calcRegionalFactor(modelId, state);
+							}
+							newScore = newScore * regionalFactor;
+							if(newScore > 1.0)
+								newScore = 1.0;
+							
+						 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+						 Map<String, Date> minMaxMap = this.getMinMaxExpiry(modelId, allChanges);
+						 ChangedMemberScore changedMemberScore = new ChangedMemberScore();
+						 changedMemberScore.setModelId(modelId.toString());
+						 changedMemberScore.setMinDate(simpleDateFormat.format(minMaxMap.get("minDate")));
+						 changedMemberScore.setMaxDate(simpleDateFormat.format(minMaxMap.get("maxDate")));
+						 changedMemberScore.setEffDate(simpleDateFormat.format(minMaxMap.get("effDate")));
+						 changedMemberScoreList.add(changedMemberScore);
+						 memberRTSChanges.setlId(lId);
+						 memberRTSChanges.setChangedMemberScoreList(changedMemberScoreList);
+						 memberRTSChanges.setAllChangesMap(allChanges);
+					
+					 }
+					  catch(Exception e){
+						
+					  }
+					}
+				 }
 		}	
 			}
 		catch(Exception e){
