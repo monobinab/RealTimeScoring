@@ -70,7 +70,8 @@ public class LoggingBolt extends EnvironmentBolt {
 		Double newScore = input.getDoubleByField("newScore");
 		String minExpiry = input.getStringByField("minExpiry");
 		String maxExpiry = input.getStringByField("maxExpiry");
-		Integer percentile = getPercentileForScore(newScore,Integer.parseInt(modelId));
+		Integer newPercentile = getPercentileForScore(newScore,Integer.parseInt(modelId));
+		Integer oldPercentile = getPercentileForScore(new Integer (oldScore),Integer.parseInt(modelId));
 
 		String messageID = "";
 		if (input.contains("messageID")) {
@@ -78,7 +79,8 @@ public class LoggingBolt extends EnvironmentBolt {
 		}
 		LOGGER.info("TIME:" + messageID + "-Entering logging bolt-" + System.currentTimeMillis());
 		LOGGER.info("PERSIST: " + new Date() + ": Topology: Changes Scores : lid: " + l_id + ", modelId: "+modelId + ", oldScore: "+oldScore +
-				", newScore: "+newScore+", minExpiry: "+minExpiry+", maxExpiry: "+maxExpiry+", source: " + source+", percentile: " + percentile);
+				", newScore: "+newScore+", minExpiry: "+minExpiry+", maxExpiry: "+maxExpiry+", source: " + source+", oldPercentile: " + oldPercentile
+				+", newPercentile: " + newPercentile);
 		//System.out.println("PERSIST: " + new Date() + ": Topology: Changes Scores : lid: " + l_id + ", modelId: "+modelId + ", oldScore: "+oldScore +", newScore: "+newScore+", minExpiry: "+minExpiry+", maxExpiry: "+maxExpiry+", source: " + source);
 
 		//countMetric.scope("score_logged").incr();
