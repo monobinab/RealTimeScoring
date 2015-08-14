@@ -1,12 +1,13 @@
 package analytics.util.objects;
 
 import java.util.List;
+import java.util.Map;
 
-public class Member {
+public class MemberRTSChanges {
 	
 	String lId; 
 	List<ChangedMemberScore> changedMemberScoreList;
-	List<Change> changedMemberVariablesList;
+	Map<String, Change> allChangesMap;
 	public String getlId() {
 		return lId;
 	}
@@ -20,13 +21,13 @@ public class Member {
 			List<ChangedMemberScore> changedMemberScoreList) {
 		this.changedMemberScoreList = changedMemberScoreList;
 	}
-	public List<Change> getChangedMemberVariablesList() {
-		return changedMemberVariablesList;
+	public Map<String, Change> getAllChangesMap() {
+		return allChangesMap;
 	}
-	public void setChangedMemberVariablesList(
-			List<Change> changedMemberVariablesList) {
-		this.changedMemberVariablesList = changedMemberVariablesList;
+	public void setAllChangesMap(Map<String, Change> allChangesMap) {
+		this.allChangesMap = allChangesMap;
 	}
+
 	
 
 }

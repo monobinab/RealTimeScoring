@@ -32,6 +32,7 @@ import analytics.util.objects.BoosterVariable;
 import analytics.util.objects.Change;
 import analytics.util.objects.ChangedMemberScore;
 import analytics.util.objects.MemberInfo;
+import analytics.util.objects.MemberRTSChanges;
 import analytics.util.objects.Model;
 import analytics.util.objects.RealTimeScoringContext;
 import analytics.util.objects.StrategyMapper;
@@ -132,7 +133,7 @@ public class ScoringSingleton {
 	}
 
 	// TODO: Replace this method. Its for backward compatibility. Bad coding
-	@SuppressWarnings("unchecked")
+	/*@SuppressWarnings("unchecked")
 	public HashMap<String, Double> execute(String loyaltyId, ArrayList<String> modelIdArrayList, String source) {
 		
 		Set<Integer> modelIdList = new HashSet<Integer>();
@@ -142,8 +143,8 @@ public class ScoringSingleton {
 				modelIdList.add(Integer.parseInt(modelId));
 			}
 			
-			Map<String, Object> object = getModeIdScoreExpDatesMap(loyaltyId, null, modelIdList, false );
-			if(object != null){
+			MemberRTSChanges memberRTSChanges = calcRTSChanges(loyaltyId, null, modelIdList );
+			if(memberRTSChanges != null){
 				Map<Integer, Double> modelIdScoreMap = (Map<Integer, Double>) object.get("scoreMap");
 				Map<Integer,Map<String,Date>> modelIdToExpiryMap = (Map<Integer, Map<String, Date>>) object.get("expMap");
 				updateChangedMemberScore(loyaltyId, modelIdList, modelIdToExpiryMap, modelIdScoreMap, source);
@@ -157,31 +158,22 @@ public class ScoringSingleton {
 		}
 			return modelIdStringScoreMap;
 	}
-
-	public Map<String, Object> getModeIdScoreExpDatesMap(String lId, Map<String, String> newChangesVarValueMap, Set<Integer> modelIdsList, Boolean topologyFlag){
+*/
+	public MemberRTSChanges calcRTSChanges(String lId, Map<String, String> newChangesVarValueMap, List<Integer> modelIdsList, Boolean topologyFlag){
 		
-		Map<String, Object> objToBeReturned = new HashMap<String, Object>();
-		Map<Integer,Map<String,Date>> modelIdToExpiryMap = new HashMap<Integer, Map<String,Date>>();
-		Map<Integer, Double> modelIdScoreMap = new HashMap<Integer, Double>();
-		
-		ChangedMemberScore changedMemberScore = null;
+		MemberRTSChanges memberRTSChanges = null;
 		try{
-			//Find all models affected by the new incoming changes if newChangeVaraValueMap is null
+			//Find all models affected by the new incoming changes if newChangesVarValueMap is null
 			if(newChangesVarValueMap ==  null || newChangesVarValueMap.isEmpty()){
 				 modelIdsList = this.getModelIdList(newChangesVarValueMap);
 			}
-			if(modelIdsList==null||modelIdsList.isEmpty()){
-				LOGGER.info("No models affected for " + lId);
-				//need to think for redis metrics
-				return null;
-			}
-			else{
-				LOGGER.info("models to be scored for lid: " + lId + " " + modelIdsList);
-			}
+		
+			if(modelIdsList != null && !modelIdsList.isEmpty()){ 
 			
-			//Create a map of variable values for member, fetched from from memberVariables collection
+			//Create a map of variable values for member, fetched from memberVariables collection
 			Map<String, Object> memberVariablesMap = this.createMemberVariableValueMap(lId, modelIdsList);
-				
+			if(memberVariablesMap != null){
+			
 			//create a map of unexpired variables and value fetched from changedMembervariables collection
 			Map<String, Change> changedMemberVariables = this.createChangedVariablesMap(lId);
 		
@@ -191,13 +183,11 @@ public class ScoringSingleton {
 				allChanges = this.executeStrategy(changedMemberVariables, newChangesVarValueMap, memberVariablesMap);
 			}
 		
-			//memberVarMap  null is not checked
-			if(memberVariablesMap == null){
-				return null;
-			}
 			//get the state for the memberId to get the regionalFactor for scoring
 			String state = this.getState(lId);
-			changedMemberScore = new ChangedMemberScore();
+			
+			memberRTSChanges = new MemberRTSChanges();
+			List<ChangedMemberScore> changedMemberScoreList = new ArrayList<ChangedMemberScore>();
 			
 			for (Integer modelId : modelIdsList) {
 			
@@ -221,29 +211,33 @@ public class ScoringSingleton {
 						
 					 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 					 Map<String, Date> minMaxMap = this.getMinMaxExpiry(modelId, allChanges);
+					 ChangedMemberScore changedMemberScore = new ChangedMemberScore();
 					 changedMemberScore.setModelId(modelId.toString());
 					 changedMemberScore.setMinDate(simpleDateFormat.format(minMaxMap.get("minDate")));
 					 changedMemberScore.setMaxDate(simpleDateFormat.format(minMaxMap.get("maxDate")));
+					 changedMemberScore.setEffDate(simpleDateFormat.format(minMaxMap.get("effDate")));
+					 changedMemberScoreList.add(changedMemberScore);
+					 memberRTSChanges.setlId(lId);
+					 memberRTSChanges.setChangedMemberScoreList(changedMemberScoreList);
+					 memberRTSChanges.setAllChangesMap(allChanges);
 				
 				 }
 				  catch(Exception e){
 					
 				  }
-			}
-				objToBeReturned.put("scoreMap", modelIdScoreMap);
-				objToBeReturned.put("expMap", modelIdToExpiryMap);
-				objToBeReturned.put("allChanges", allChanges);
-			//	objToBeReturned.put("modelIdList", modelIdsList);
+				}
+			 }
+		}	
 			}
 		catch(Exception e){
 			
 		}
 		
-		return objToBeReturned;
+		return memberRTSChanges;
 		
 	}
 
-	public Map<String, Object> createMemberVariableValueMap(String loyaltyId, Set<Integer> modelIdList)  {
+	public Map<String, Object> createMemberVariableValueMap(String loyaltyId, List<Integer> modelIdList)  {
 		Set<String> variableFilter = new HashSet<String>();
 		
 		for (Integer modelId : modelIdList) {
@@ -268,8 +262,8 @@ public class ScoringSingleton {
 		return memberVariablesDao.getMemberVariablesFiltered(loyaltyId, variableFilter);
 	}
 
-	public Set<Integer> getModelIdList(Map<String, String> newChangesVarValueMap) {
-		Set<Integer> modelIdList = new HashSet<Integer>();
+	public List<Integer> getModelIdList(Map<String, String> newChangesVarValueMap) {
+		List<Integer> modelIdList = new ArrayList<Integer>();
 		if (newChangesVarValueMap == null)
 			return modelIdList;
 		for (String changedVariable : newChangesVarValueMap.keySet()) {
