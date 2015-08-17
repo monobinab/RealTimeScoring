@@ -435,7 +435,7 @@ public class ScoringSingleton {
 		}
 		return newScore;
 	}
-
+	
 	public double calcBaseScore(Map<String, Object> mbrVarMap, Map<String, Change> allChanges, Integer modelId) throws RealTimeScoringException {
 
 		if (allChanges == null) {
