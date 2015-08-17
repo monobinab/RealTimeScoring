@@ -4,6 +4,8 @@ import analytics.exception.RealTimeScoringException;
 import analytics.util.JsonUtils;
 import analytics.util.ScoringSingleton;
 import analytics.util.objects.Change;
+import analytics.util.objects.ChangedMemberScore;
+import analytics.util.objects.MemberRTSChanges;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -68,23 +70,8 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	public void execute(Tuple input) {
 			
 		if(LOGGER.isDebugEnabled()){
-		LOGGER.debug("The time it enters inside Strategy Bolt execute method "
-				+ System.currentTimeMillis());
+			LOGGER.debug("The time it enters inside Strategy Bolt execute method "	+ System.currentTimeMillis());
 		}
-		// 1) PULL OUT HASHED LOYALTY ID FROM THE FIRST RECORD IN lineItemList
-		// 2) Create map of new changes from the input
-		// 3) Find all models affected by the changes
-		// 4) Find all variables for models
-		// 5) Create a map of variable values, fetched from from memberVariables
-		// 6) For each variable in new changes, execute strategy
-		// 7) Fetch changedMemberVariables for rescoring and create a map- fetch
-		// all for the member since upsert needs it too
-		// 8) Rescore - arbitrate between new changes, changedMemberVariables
-		// and memberVariables
-		// 9) Emit the score
-		// 10) Write changedMemberScores with expiry
-		// 11) Write changedMemberVariables with expiry
-		
 		Jedis jedis = null;
 
 		// 1) PULL OUT HASHED LOYALTY ID FROM THE FIRST RECORD IN lineItemList
@@ -108,23 +95,19 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		Map<String, String> newChangesVarValueMap = JsonUtils
 				.restoreVariableListFromJson(input.getString(1));
 
-		Map<String, Object> object = scoringSingleton.getModeIdScoreExpDatesMap(lId, newChangesVarValueMap, null, true);
+		MemberRTSChanges memberRTSChanges = scoringSingleton.calcRTSChanges(lId, newChangesVarValueMap, null, true);
 		
-		if(object == null){
+		if(memberRTSChanges == null){
 			outputCollector.ack(input);
 			return;
 		}
 	
-		Map<Integer, Double> modelIdScoreMap = (Map<Integer, Double>) object.get("scoreMap");
-		Map<Integer,Map<String,Date>> modelIdToExpiryMap = (Map<Integer, Map<String, Date>>) object.get("expMap");
-		Map<String, Change> allChanges = (Map<String, Change>) object.get("allChanges");
-		Set<Integer> modelIdsList = (Set<Integer>) object.get("modelIdList");
-
 		Map<String, String> modelIdScoreStringMap = new HashMap<String, String>();
-		
-		for (Map.Entry<Integer, Double> entry : modelIdScoreMap.entrySet()) {
-			modelIdScoreStringMap.put(""+entry.getKey(), ""+BigDecimal.valueOf(entry.getValue()).toPlainString());
+		List<ChangedMemberScore> changedMemberScoresList = memberRTSChanges.getChangedMemberScoreList();
+		for(ChangedMemberScore changedMemberScore : changedMemberScoresList){
+			modelIdScoreStringMap.put(""+changedMemberScore.getModelId(), ""+BigDecimal.valueOf(changedMemberScore.getScore()).toPlainString());
 		}
+	
 		//Persisting to Redis to be retrieved quicker than getting from Mongo.
 		//Perform the below operation only when the Redis is configured
 		//Long timeBefore = System.currentTimeMillis();
@@ -139,13 +122,13 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			
 		long timeTaken = System.currentTimeMillis(); 
 		//Write changedMemberVariableswith expiry
-    	scoringSingleton.updateChangedVariables(lId, allChanges);
+    	scoringSingleton.updateChangedVariables(lId, memberRTSChanges.getAllChangesMap());
     	LOGGER.debug("TIME:" + messageID + "-Score updates complete-" + System.currentTimeMillis());
     	LOGGER.info("time taken for variable update: " + (System.currentTimeMillis() - timeTaken )) ;
-    	
     	timeTaken = System.currentTimeMillis();
     	//Write changedMemberScores with min max expiry
-    	scoringSingleton.updateChangedMemberScore(lId, modelIdsList, modelIdToExpiryMap, modelIdScoreMap,source);
+    	
+    	scoringSingleton.updateChangedMemberScore(lId, changedMemberScoresList, source);
     	LOGGER.info("time taken for score update: " + (System.currentTimeMillis() - timeTaken ));
 		LOGGER.debug("TIME:" + messageID + "- Scoring complete-" + System.currentTimeMillis());
 		
@@ -161,9 +144,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		List<Object> listToEmit = new ArrayList<Object>();
 		listToEmit.add(lyl_id_no+"~"+topologyName);
 		this.outputCollector.emit("kafka_stream", listToEmit);
-		
-		
-	
+
 		redisCountIncr("member_scored_successfully");
 		this.outputCollector.ack(input);
 		}catch(Exception e){

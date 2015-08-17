@@ -159,7 +159,8 @@ public class ScoringSingleton {
 			return modelIdStringScoreMap;
 	}
 */
-	public MemberRTSChanges calcRTSChanges(String lId, Map<String, String> newChangesVarValueMap, List<Integer> modelIdsList, Boolean topologyFlag){
+	public MemberRTSChanges calcRTSChanges(String lId, Map<String, String> newChangesVarValueMap, Set<Integer> modelIdsList, Boolean topologyFlag){
+		
 		
 		MemberRTSChanges memberRTSChanges = null;
 		try{
@@ -175,7 +176,7 @@ public class ScoringSingleton {
 				if(memberVariablesMap != null){
 				
 				//create a map of unexpired variables and value fetched from changedMembervariables collection
-				Map<String, Change> changedMemberVariables = this.createChangedVariablesMap(lId);
+				Map<String, Change> changedMemberVariables = this.createChangedMemberVariablesMap(lId);
 			
 				//For each variable in new changes, execute strategy and store in allChanges
 				Map<String, Change> allChanges = null;
@@ -208,14 +209,13 @@ public class ScoringSingleton {
 							newScore = newScore * regionalFactor;
 							if(newScore > 1.0)
 								newScore = 1.0;
-							
-						 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+					
 						 Map<String, Date> minMaxMap = this.getMinMaxExpiry(modelId, allChanges);
 						 ChangedMemberScore changedMemberScore = new ChangedMemberScore();
 						 changedMemberScore.setModelId(modelId.toString());
-						 changedMemberScore.setMinDate(simpleDateFormat.format(minMaxMap.get("minDate")));
-						 changedMemberScore.setMaxDate(simpleDateFormat.format(minMaxMap.get("maxDate")));
-						 changedMemberScore.setEffDate(simpleDateFormat.format(minMaxMap.get("effDate")));
+						 changedMemberScore.setMinDate(getDateFormat(minMaxMap.get("minDate")));
+						 changedMemberScore.setMaxDate(getDateFormat(minMaxMap.get("maxDate")));
+						 changedMemberScore.setEffDate(getDateFormat(minMaxMap.get("effDate")));
 						 changedMemberScoreList.add(changedMemberScore);
 						 memberRTSChanges.setlId(lId);
 						 memberRTSChanges.setChangedMemberScoreList(changedMemberScoreList);
@@ -237,7 +237,7 @@ public class ScoringSingleton {
 		
 	}
 
-	public Map<String, Object> createMemberVariableValueMap(String loyaltyId, List<Integer> modelIdList)  {
+	public Map<String, Object> createMemberVariableValueMap(String loyaltyId, Set<Integer> modelIdList)  {
 		Set<String> variableFilter = new HashSet<String>();
 		
 		for (Integer modelId : modelIdList) {
@@ -262,8 +262,8 @@ public class ScoringSingleton {
 		return memberVariablesDao.getMemberVariablesFiltered(loyaltyId, variableFilter);
 	}
 
-	public List<Integer> getModelIdList(Map<String, String> newChangesVarValueMap) {
-		List<Integer> modelIdList = new ArrayList<Integer>();
+	public Set<Integer> getModelIdList(Map<String, String> newChangesVarValueMap) {
+		Set<Integer> modelIdList = new HashSet<Integer>();
 		if (newChangesVarValueMap == null)
 			return modelIdList;
 		for (String changedVariable : newChangesVarValueMap.keySet()) {
@@ -278,7 +278,7 @@ public class ScoringSingleton {
 		return modelIdList;
 	}
 
-	public Map<String, Change> createChangedVariablesMap(String lId) {
+	public Map<String, Change> createChangedMemberVariablesMap(String lId) {
 		// This map is VID->Change
 		Map<String, Change> changedMbrVariables = changedVariablesDao.getChangedMemberVariables(lId);
 
@@ -511,9 +511,10 @@ public class ScoringSingleton {
 	for (Map.Entry<String, Change> entry : allChanges.entrySet()) {
 		String key = entry.getKey();
 		Change value = entry.getValue();
-		/*if (!variableModelsMap.containsKey(key)) {
+		if (!variableModelsMap.containsKey(key)) {
 			LOGGER.error("Could not find variable in map " + key);
-		}*/
+			continue;
+		}
 		// variable models map
 		if (variableModelsMap.containsKey(key) && variableModelsMap.get(key).contains(modelId)) {
 			Date exprDate = value.getExpirationDate();
@@ -540,10 +541,7 @@ public class ScoringSingleton {
 	
 			if (minDate != null && minDate.after(lastDayOfMonth)) {
 				minDate = lastDayOfMonth;
-				maxDate = lastDayOfMonth;
-			} else if (maxDate != null && maxDate.after(lastDayOfMonth)) {
-				maxDate = lastDayOfMonth;
-			}
+			} 
 		}
 		
 		minMaxMap.put("minExpiry", minDate);
@@ -581,14 +579,17 @@ public class ScoringSingleton {
 			changedMemberScoresDao.upsertUpdateChangedScores(l_id, updatedScores);
 		}
 	}
+	
+	public void updateChangedMemberScore(String l_id, List<ChangedMemberScore> changedMemberScoresList, String source) {
+		//new ChangedMemberScore(modelIdScoreMap.get(modelId), minDate != null ? simpleDateFormat.format(minDate) : today
+		changedMemberScoresDao.upsertUpdateChangedScores(l_id, changedMemberScoresList);
+	}
 
 	public void updateChangedVariables(String lId, Map<String, Change> allChanges) {
-		// 11) Write changedMemberVariables with expiry
 		if (allChanges != null && !allChanges.isEmpty()) {
 			// upsert document
 			changedVariablesDao.upsertUpdateChangedVariables(lId, allChanges, variableNameToVidMap);
 		}
-
 	}
 	
 	public Boolean modelExists(Integer modelId){
@@ -630,6 +631,11 @@ public class ScoringSingleton {
 			variables = modelsMap.get(modelId).get(month).getVariables();
 		}
      		return variables;
+	}
+	
+	public String getDateFormat(Date date){
+		SimpleDateFormat simpleDateFormatter = new SimpleDateFormat("yyyy:HH:mm");
+		return simpleDateFormatter.format(date);
 	}
 
 	public String getModelName(int modelId) {
