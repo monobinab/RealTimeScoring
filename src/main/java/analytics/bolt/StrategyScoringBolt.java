@@ -95,13 +95,12 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		Map<String, String> newChangesVarValueMap = JsonUtils
 				.restoreVariableListFromJson(input.getString(1));
 
-		MemberRTSChanges memberRTSChanges = scoringSingleton.calcRTSChanges(lId, newChangesVarValueMap, null, true);
+		MemberRTSChanges memberRTSChanges = scoringSingleton.calcRTSChanges(lId, newChangesVarValueMap, null, source);
 		
 		if(memberRTSChanges == null){
 			outputCollector.ack(input);
 			return;
 		}
-	
 		Map<String, String> modelIdScoreStringMap = new HashMap<String, String>();
 		List<ChangedMemberScore> changedMemberScoresList = memberRTSChanges.getChangedMemberScoreList();
 		for(ChangedMemberScore changedMemberScore : changedMemberScoresList){

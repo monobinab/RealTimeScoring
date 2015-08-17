@@ -5,9 +5,17 @@ import java.util.Map;
 
 public class MemberRTSChanges {
 	
-	String lId; 
-	List<ChangedMemberScore> changedMemberScoreList;
-	Map<String, Change> allChangesMap;
+	private String lId; 
+	private List<ChangedMemberScore> changedMemberScoreList;
+	private Map<String, Change> allChangesMap;
+	private String source;
+	
+	public String getSource() {
+		return source;
+	}
+	public void setSource(String source) {
+		this.source = source;
+	}
 	public String getlId() {
 		return lId;
 	}

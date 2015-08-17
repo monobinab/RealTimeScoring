@@ -159,13 +159,13 @@ public class ScoringSingleton {
 			return modelIdStringScoreMap;
 	}
 */
-	public MemberRTSChanges calcRTSChanges(String lId, Map<String, String> newChangesVarValueMap, Set<Integer> modelIdsList, Boolean topologyFlag){
+	public MemberRTSChanges calcRTSChanges(String lId, Map<String, String> newChangesVarValueMap, Set<Integer> modelIdsList, String source){
 		
 		
 		MemberRTSChanges memberRTSChanges = null;
 		try{
 			//Find all models affected by the new incoming changes if newChangesVarValueMap is null
-			if(newChangesVarValueMap ==  null || newChangesVarValueMap.isEmpty()){
+			if(  newChangesVarValueMap !=  null && !newChangesVarValueMap.isEmpty() ){
 				 modelIdsList = this.getModelIdList(newChangesVarValueMap);
 			}
 		
@@ -173,68 +173,72 @@ public class ScoringSingleton {
 			
 				//Create a map of variable values for member, fetched from memberVariables collection
 				Map<String, Object> memberVariablesMap = this.createMemberVariableValueMap(lId, modelIdsList);
+			
 				if(memberVariablesMap != null){
-				
-				//create a map of unexpired variables and value fetched from changedMembervariables collection
-				Map<String, Change> changedMemberVariables = this.createChangedMemberVariablesMap(lId);
-			
-				//For each variable in new changes, execute strategy and store in allChanges
-				Map<String, Change> allChanges = null;
-				if(newChangesVarValueMap ==  null || newChangesVarValueMap.isEmpty()){
-					allChanges = this.executeStrategy(changedMemberVariables, newChangesVarValueMap, memberVariablesMap);
-				}
-			
-				//get the state for the memberId to get the regionalFactor for scoring
-				String state = this.getState(lId);
-				
-				memberRTSChanges = new MemberRTSChanges();
-				List<ChangedMemberScore> changedMemberScoreList = new ArrayList<ChangedMemberScore>();
-				
-				for (Integer modelId : modelIdsList) {
-				
-						double newScore;
-						double regionalFactor = 1.0;
-						try {
-							//recalculate score for each model
-							newScore = this.calcScore(memberVariablesMap, allChanges, modelId);
-							
-							LOGGER.debug("new score before boost var: " + newScore);
-							
-							newScore = newScore + this.getBoostScore(allChanges, modelId );
-							
-							//get the score weighed with regionalFactor only if the member has state
-							if(StringUtils.isNotEmpty(state)){
-								regionalFactor = this.calcRegionalFactor(modelId, state);
-							}
-							newScore = newScore * regionalFactor;
-							if(newScore > 1.0)
-								newScore = 1.0;
 					
-						 Map<String, Date> minMaxMap = this.getMinMaxExpiry(modelId, allChanges);
-						 ChangedMemberScore changedMemberScore = new ChangedMemberScore();
-						 changedMemberScore.setModelId(modelId.toString());
-						 changedMemberScore.setMinDate(getDateFormat(minMaxMap.get("minDate")));
-						 changedMemberScore.setMaxDate(getDateFormat(minMaxMap.get("maxDate")));
-						 changedMemberScore.setEffDate(getDateFormat(minMaxMap.get("effDate")));
-						 changedMemberScoreList.add(changedMemberScore);
-						 memberRTSChanges.setlId(lId);
-						 memberRTSChanges.setChangedMemberScoreList(changedMemberScoreList);
-						 memberRTSChanges.setAllChangesMap(allChanges);
-					
-					 }
-					  catch(Exception e){
-						
-					  }
+					//create a map of unexpired variables and value fetched from changedMembervariables collection
+					Map<String, Change> changedMemberVariables = this.createChangedMemberVariablesMap(lId);
+				
+					//For each variable in new changes, execute strategy and store in allChanges
+					Map<String, Change> allChanges = null;
+					if( newChangesVarValueMap !=  null && !newChangesVarValueMap.isEmpty()){
+						allChanges = this.executeStrategy(changedMemberVariables, newChangesVarValueMap, memberVariablesMap);
 					}
-				 }
-		}	
+				
+					//get the state for the memberId to get the regionalFactor for scoring
+					String state = this.getState(lId);
+					
+					memberRTSChanges = new MemberRTSChanges();
+					List<ChangedMemberScore> changedMemberScoreList = new ArrayList<ChangedMemberScore>();
+					
+					for (Integer modelId : modelIdsList) {
+					
+							double rtsScore;
+							double regionalFactor = 1.0;
+							try {
+								//recalculate score for each model
+								rtsScore = this.calcScore(memberVariablesMap, allChanges, modelId);
+								
+								LOGGER.debug("new score before boost var: " + rtsScore);
+								
+								rtsScore = rtsScore + this.getBoostScore(allChanges, modelId );
+								
+								//get the score weighed with regionalFactor 
+								if(StringUtils.isNotEmpty(state)){
+									regionalFactor = this.calcRegionalFactor(modelId, state);
+								}
+								rtsScore = rtsScore * regionalFactor;
+								if(rtsScore > 1.0)
+									rtsScore = 1.0;
+						
+							 Map<String, Date> minMaxMap = this.getMinMaxExpiry(modelId, allChanges);
+							 ChangedMemberScore changedMemberScore = new ChangedMemberScore();
+							 changedMemberScore.setModelId(modelId.toString());
+							 changedMemberScore.setMinDate(getDateFormat(minMaxMap.get("minExpiry")));
+							 changedMemberScore.setMaxDate(getDateFormat(minMaxMap.get("maxExpiry")));
+							 changedMemberScore.setEffDate(getDateFormat(new Date()));
+							 changedMemberScore.setScore(rtsScore);
+							 changedMemberScore.setSource(source);
+							 changedMemberScoreList.add(changedMemberScore);
+							 memberRTSChanges.setlId(lId);
+							 memberRTSChanges.setChangedMemberScoreList(changedMemberScoreList);
+							 memberRTSChanges.setAllChangesMap(allChanges);
+						
+						 }
+						   catch(Exception e){
+								//System.out.println("Exception scoring modelId " + modelId +" for lId " + lId + " " + e);
+								System.out.println(e.getMessage());
+								LOGGER.error("Exception scoring modelId " + modelId +" for lId " + lId + " " + e);
+						   }
+						}
+				 	}
+			 	}	
 			}
 		catch(Exception e){
-			
+			System.out.println(e.getMessage());
+			LOGGER.error("Exception scoring lId " + lId + " " + e);
 		}
-		
-		return memberRTSChanges;
-		
+			return memberRTSChanges;
 	}
 
 	public Map<String, Object> createMemberVariableValueMap(String loyaltyId, Set<Integer> modelIdList)  {
@@ -631,7 +635,7 @@ public class ScoringSingleton {
 	}
 	
 	public String getDateFormat(Date date){
-		SimpleDateFormat simpleDateFormatter = new SimpleDateFormat("yyyy:HH:mm");
+		SimpleDateFormat simpleDateFormatter = new SimpleDateFormat("yyyy-MM-dd");
 		return simpleDateFormatter.format(date);
 	}
 
