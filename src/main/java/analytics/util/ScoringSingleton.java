@@ -451,22 +451,17 @@ public class ScoringSingleton {
 		for (String v : model.getVariables().keySet()) {
 			Variable variable = model.getVariables().get(v);
 
-			// if variable does not have a name then skip it
-			if (variable.getName() == null) {
-				continue;
+			// if variable does not have a name or VID, skip scoring that model by throwing exception
+			if (variable.getName() == null || variableNameToVidMap.get(variable.getName()) == null) {
+				LOGGER.error("variable name or VID is null for variable " + variable.getName());
+				throw new RealTimeScoringException("variable name or VID is null for variable " );
 			}
 			// if the variable is a boost variable then skip it
 			if (variable.getName().substring(0, MongoNameConstants.BOOST_VAR_PREFIX.length()).toUpperCase().equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
 				continue;
 			}
 
-			String vid;
-			// if the variable VID cannot be found then skip it
-			if (variableNameToVidMap.get(variable.getName()) != null) {
-				vid = variableNameToVidMap.get(variable.getName());
-			} else {
-				continue;
-			}
+			String vid = variableNameToVidMap.get(variable.getName());
 
 			Object variableValue;
 			// if the variable has been changed then use the changed value
@@ -480,13 +475,15 @@ public class ScoringSingleton {
 			} else {
 				continue;
 			}
-
+			
+			//if val is not an integer or double, assume that variable value is zero in the model scoring
+			//this is discussed on 8/17/2015 and have been concluded to go with zero value for variable
 			if (variableValue instanceof Integer) {
 				val = val + ((Integer) variableValue * variable.getCoefficient());
 			} else if (variableValue instanceof Double) {
 				val = val + ((Double) variableValue * variable.getCoefficient());
 			} else {
-				continue;
+				continue;  
 			}
 		}
 		return val;

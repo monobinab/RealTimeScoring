@@ -579,7 +579,7 @@ public class ScoringSingletonTest {
 			throws ParseException, SecurityException, NoSuchFieldException,
 			IllegalArgumentException, IllegalAccessException {
 
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd");
+		//SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd");
 		HashMap<String, Change> allChanges = new HashMap<String, Change>();
 		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
 		variablesMap.put("BOOST_S_DSL_APP_INT_ACC", new Variable("BOOST_S_DSL_APP_INT_ACC",
@@ -1047,7 +1047,7 @@ public class ScoringSingletonTest {
 
 	// tests the baseScore for non-month model
 	@Test
-	public void calcBaseScorePositiveCaseWithMonth0Test() throws SecurityException,
+	public void calcBaseScorePositiveCaseWithNonMonthModelTest() throws SecurityException,
 			NoSuchFieldException, ParseException, IllegalArgumentException,
 			IllegalAccessException, RealTimeScoringException {
 
@@ -1195,8 +1195,8 @@ public class ScoringSingletonTest {
 		varNameToVidMap.setAccessible(false);
 	}
 	
-	// tests the baseScore for non-month model
-	@Test
+	// tests the baseScore for null variable name or null VID
+	@Test(expected = RealTimeScoringException.class)
 	public void calcBaseScoreForNullVarName() throws SecurityException,
 			NoSuchFieldException, ParseException, IllegalArgumentException,
 			IllegalAccessException, RealTimeScoringException {
@@ -1218,7 +1218,7 @@ public class ScoringSingletonTest {
 				0.002));
 		variablesMap.put("S_HOME_6M_IND_ALL", new Variable("S_HOME_6M_IND_ALL",
 				0.0915));
-		variablesMap.put(null, new Variable(null, 0.0915));
+		variablesMap.put(null, new Variable(null, 0.0915)); //variable name is passed as nu
 		Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
 		monthModelMap.put(0, new Model(35, "Model_Name", 0, 5, variablesMap));
 		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
@@ -1237,10 +1237,7 @@ public class ScoringSingletonTest {
 		varNameToVidMap.setAccessible(true);
 		varNameToVidMap.set(scoringSingletonObj,
 				variableNameToVidMapContents);
-		double baseScore = scoringSingletonObj.calcBaseScore(memVariables,
-				allChanges, 35);
-		int comapreVal = new Double(5.0203).compareTo(new Double(baseScore));
-		Assert.assertEquals(comapreVal, 0);
+		scoringSingletonObj.calcBaseScore(memVariables,	allChanges, 35);
 		modelsMap.setAccessible(false);
 		varNameToVidMap.setAccessible(false);
 	}
@@ -1276,7 +1273,7 @@ public class ScoringSingletonTest {
 
 		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
 		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC", "2269");
-		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC2", "2270");
+		variableNameToVidMapContents.put("BOOST_S_DSL_APP_INT_ACC", "2270");
 		variableNameToVidMapContents.put("S_HOME_6M_IND_ALL", "2271");
 
 		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
@@ -1296,8 +1293,8 @@ public class ScoringSingletonTest {
 	}
 	
 	//to test for a variable (S_DSL_APP_INT_ACC2) with no VID (i.e. variables collection does not contain it but is there in modelVaraibles collection)
-	//specific variable will not be used in scoring
-	@Test
+	//expected to throw RealTimeScoringException
+	@Test(expected=RealTimeScoringException.class)
 	public void calcBaseScoreWithNoVIDVar() throws SecurityException,
 			NoSuchFieldException, ParseException, IllegalArgumentException,
 			IllegalAccessException, RealTimeScoringException {
@@ -1337,10 +1334,8 @@ public class ScoringSingletonTest {
 		varNameToVidMap.setAccessible(true);
 		varNameToVidMap.set(scoringSingletonObj,
 				variableNameToVidMapContents);
-		double baseScore = scoringSingletonObj.calcBaseScore(memVariables,
+		scoringSingletonObj.calcBaseScore(memVariables,
 				allChanges, 35);
-		int comapreVal = new Double(5.0203).compareTo(new Double(baseScore));
-		Assert.assertEquals(comapreVal, 0);
 		modelsMap.setAccessible(false);
 		varNameToVidMap.setAccessible(false);
 	}
