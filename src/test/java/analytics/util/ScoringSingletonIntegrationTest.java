@@ -82,7 +82,7 @@ public class ScoringSingletonIntegrationTest {
 		String l_id = "SearsTesting";
 		//Fake memberVariables collection
 		DBCollection memVarColl = db.getCollection("memberVariables");
-		memVarColl.insert(new BasicDBObject("l_id", l_id).append("2269", 1).append("2270",0.4));
+		memVarColl.insert(new BasicDBObject("l_id", l_id).append("4", 1).append("10",0.4));
 
 		//fake changedMemberVariables Collection
 		DBCollection changedMemberVar = db.getCollection("changedMemberVariables");

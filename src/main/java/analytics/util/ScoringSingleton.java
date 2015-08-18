@@ -277,7 +277,7 @@ public class ScoringSingleton {
 		if (newChangesVarValueMap == null)
 			return modelIdList;
 		for (String changedVariable : newChangesVarValueMap.keySet()) {
-			List<Integer> models = variableModelsMap.get(changedVariable);
+			List<Integer> models = variableModelsMap.get(changedVariable.toUpperCase());
 			if (models == null)
 				continue;
 			for (Integer modelId : models) {
@@ -331,7 +331,7 @@ public class ScoringSingleton {
 	 */
 	public Map<String, Change> executeStrategy(Map<String, Change> allChanges, Map<String, String> newChangesVarValueMap, Map<String, Object> memberVariablesMap) {
 		for (String variableName : newChangesVarValueMap.keySet()) {
-			if (variableModelsMap.containsKey(variableName)) {
+			if (variableModelsMap.containsKey(variableName.toUpperCase())) {
 				variableName = variableName.toUpperCase();
 				if (variableNameToStrategyMap.get(variableName) == null) {
 					LOGGER.info(" ~~~ DID NOT FIND VARIABLE: ");
