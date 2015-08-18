@@ -132,9 +132,8 @@ public class ScoringSingleton {
 		}
 	}
 
-	// TODO: Replace this method. Its for backward compatibility. Bad coding
-	/*@SuppressWarnings("unchecked")
-	public HashMap<String, Double> execute(String loyaltyId, ArrayList<String> modelIdArrayList, String source) {
+	@SuppressWarnings("unchecked")
+	public HashMap<String, Double> execute(String l_id, ArrayList<String> modelIdArrayList, String source) {
 		
 		Set<Integer> modelIdList = new HashSet<Integer>();
 		HashMap<String, Double> modelIdStringScoreMap =  new HashMap<String, Double>();
@@ -143,25 +142,26 @@ public class ScoringSingleton {
 				modelIdList.add(Integer.parseInt(modelId));
 			}
 			
-			MemberRTSChanges memberRTSChanges = calcRTSChanges(loyaltyId, null, modelIdList );
+			MemberRTSChanges memberRTSChanges = calcRTSChanges(l_id, null, modelIdList, source );
 			if(memberRTSChanges != null){
-				Map<Integer, Double> modelIdScoreMap = (Map<Integer, Double>) object.get("scoreMap");
-				Map<Integer,Map<String,Date>> modelIdToExpiryMap = (Map<Integer, Map<String, Date>>) object.get("expMap");
-				updateChangedMemberScore(loyaltyId, modelIdList, modelIdToExpiryMap, modelIdScoreMap, source);
-				for (Map.Entry<Integer, Double> entry : modelIdScoreMap.entrySet()) {
-					modelIdStringScoreMap.put(entry.getKey().toString(), entry.getValue());
+				List<ChangedMemberScore> changedMemberScoresList = memberRTSChanges.getChangedMemberScoreList();
+				if(changedMemberScoresList != null && !changedMemberScoresList.isEmpty()){
+					updateChangedMemberScore(l_id, changedMemberScoresList, source);
+					for(ChangedMemberScore changedMemScore : changedMemberScoresList){
+						modelIdStringScoreMap.put(changedMemScore.getModelId(), changedMemScore.getScore());
+					}
 				}
 			}
 		}
 		catch(Exception e){
-			
+			LOGGER.error("Exception occured in rescoring " + l_id + " ", e);
 		}
 			return modelIdStringScoreMap;
 	}
-*/
+
+	
 	public MemberRTSChanges calcRTSChanges(String lId, Map<String, String> newChangesVarValueMap, Set<Integer> modelIdsList, String source){
-		
-		
+			
 		MemberRTSChanges memberRTSChanges = null;
 		try{
 			//Find all models affected by the new incoming changes if newChangesVarValueMap is null
@@ -176,13 +176,17 @@ public class ScoringSingleton {
 			
 				if(memberVariablesMap != null){
 					
-					//create a map of unexpired variables and value fetched from changedMembervariables collection
+					//create a map of non-expired variables and value fetched from changedMembervariables collection
 					Map<String, Change> changedMemberVariables = this.createChangedMemberVariablesMap(lId);
 				
 					//For each variable in new changes, execute strategy and store in allChanges
 					Map<String, Change> allChanges = null;
 					if( newChangesVarValueMap !=  null && !newChangesVarValueMap.isEmpty()){
 						allChanges = this.executeStrategy(changedMemberVariables, newChangesVarValueMap, memberVariablesMap);
+					}//if calling from api, newChangesVarValueMap will be null and 
+					  //thereby allChanges should be set with changedMemberVariables for scoring
+					else{
+						allChanges = changedMemberVariables;
 					}
 				
 					//get the state for the memberId to get the regionalFactor for scoring
@@ -220,22 +224,20 @@ public class ScoringSingleton {
 							 changedMemberScore.setScore(rtsScore);
 							 changedMemberScore.setSource(source);
 							 changedMemberScoreList.add(changedMemberScore);
-							 memberRTSChanges.setlId(lId);
-							 memberRTSChanges.setChangedMemberScoreList(changedMemberScoreList);
-							 memberRTSChanges.setAllChangesMap(allChanges);
-						
 						 }
 						   catch(Exception e){
-								//System.out.println("Exception scoring modelId " + modelId +" for lId " + lId + " " + e);
-								System.out.println(e.getMessage());
+								e.printStackTrace();
 								LOGGER.error("Exception scoring modelId " + modelId +" for lId " + lId + " " + e);
 						   }
 						}
+							 memberRTSChanges.setlId(lId);
+							 memberRTSChanges.setChangedMemberScoreList(changedMemberScoreList);
+							 memberRTSChanges.setAllChangesMap(allChanges);
 				 	}
 			 	}	
 			}
 		catch(Exception e){
-			System.out.println(e.getMessage());
+			e.printStackTrace();
 			LOGGER.error("Exception scoring lId " + lId + " " + e);
 		}
 			return memberRTSChanges;
@@ -442,7 +444,7 @@ public class ScoringSingleton {
 	
 	public double calcBaseScore(Map<String, Object> mbrVarMap, Map<String, Change> allChanges, Integer modelId) throws RealTimeScoringException {
 
-		if (allChanges == null) {
+		if (allChanges == null || allChanges.isEmpty()) {
 			throw new RealTimeScoringException("changed member variables is null");
 		}
 		
@@ -481,7 +483,7 @@ public class ScoringSingleton {
 			}
 			
 			//if val is not an integer or double, assume that variable value is zero in the model scoring
-			//this is discussed on 8/17/2015 and have been concluded to go with zero value for variable
+			//this is discussed and have been concluded to go with zero value for variable
 			if (variableValue instanceof Integer) {
 				val = val + ((Integer) variableValue * variable.getCoefficient());
 			} else if (variableValue instanceof Double) {
@@ -544,9 +546,8 @@ public class ScoringSingleton {
 				minDate = lastDayOfMonth;
 			} 
 		}
-		
-		minMaxMap.put("minExpiry", minDate);
-		minMaxMap.put("maxExpiry", maxDate);
+			minMaxMap.put("minExpiry", minDate);
+			minMaxMap.put("maxExpiry", maxDate);
 		return minMaxMap;
 	}
 
