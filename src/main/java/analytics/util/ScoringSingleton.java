@@ -197,24 +197,28 @@ public class ScoringSingleton {
 					
 					for (Integer modelId : modelIdsList) {
 					
-							double rtsScore;
+							double rtsScore = 0.0;
 							double regionalFactor = 1.0;
 							try {
-								//recalculate score for each model
-								rtsScore = this.calcScore(memberVariablesMap, allChanges, modelId);
 								
-								LOGGER.debug("new score before boost var: " + rtsScore);
+								if(!isBlackOutModel(allChanges, modelId)){
 								
-								rtsScore = rtsScore + this.getBoostScore(allChanges, modelId );
-								
-								//get the score weighed with regionalFactor 
-								if(StringUtils.isNotEmpty(state)){
-									regionalFactor = this.calcRegionalFactor(modelId, state);
+									//recalculate score for each model
+									rtsScore = this.calcScore(memberVariablesMap, allChanges, modelId);
+									
+									LOGGER.debug("new score before boost var: " + rtsScore);
+									
+									rtsScore = rtsScore + this.getBoostScore(allChanges, modelId );
+									
+									//get the score weighed with regionalFactor 
+									if(StringUtils.isNotEmpty(state)){
+										regionalFactor = this.calcRegionalFactor(modelId, state);
+									}
+									rtsScore = rtsScore * regionalFactor;
+									if(rtsScore > 1.0)
+										rtsScore = 1.0;
 								}
-								rtsScore = rtsScore * regionalFactor;
-								if(rtsScore > 1.0)
-									rtsScore = 1.0;
-						
+								
 							 Map<String, Date> minMaxMap = this.getMinMaxExpiry(modelId, allChanges);
 							 ChangedMemberScore changedMemberScore = new ChangedMemberScore();
 							 changedMemberScore.setModelId(modelId.toString());
@@ -422,12 +426,9 @@ public class ScoringSingleton {
 		return (boosts + boost.getIntercept() + Double.valueOf(value.getValue().toString()) * boost.getCoefficient()) * Math.abs(blackFlag - 1); 
 																																					
 	}
-
+	
 	public double calcScore(Map<String, Object> mbrVarMap, Map<String, Change> allChanges, Integer modelId) throws RealTimeScoringException {
 				
-		if(isBlackOutModel(allChanges, modelId))
-			return 0.0;
-		
 		// recalculate score for model
 		double baseScore = calcBaseScore(mbrVarMap, allChanges, modelId);
 		double newScore;
