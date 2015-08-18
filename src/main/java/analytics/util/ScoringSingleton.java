@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -164,6 +165,8 @@ public class ScoringSingleton {
 			
 		MemberRTSChanges memberRTSChanges = null;
 		try{
+			
+						
 			//Find all models affected by the new incoming changes if newChangesVarValueMap is null
 			if(  newChangesVarValueMap !=  null && !newChangesVarValueMap.isEmpty() ){
 				 modelIdsList = this.getModelIdList(newChangesVarValueMap);
@@ -277,7 +280,7 @@ public class ScoringSingleton {
 		if (newChangesVarValueMap == null)
 			return modelIdList;
 		for (String changedVariable : newChangesVarValueMap.keySet()) {
-			List<Integer> models = variableModelsMap.get(changedVariable.toUpperCase());
+			List<Integer> models = variableModelsMap.get(changedVariable);
 			if (models == null)
 				continue;
 			for (Integer modelId : models) {
@@ -331,8 +334,8 @@ public class ScoringSingleton {
 	 */
 	public Map<String, Change> executeStrategy(Map<String, Change> allChanges, Map<String, String> newChangesVarValueMap, Map<String, Object> memberVariablesMap) {
 		for (String variableName : newChangesVarValueMap.keySet()) {
-			if (variableModelsMap.containsKey(variableName.toUpperCase())) {
-				variableName = variableName.toUpperCase();
+			variableName = variableName.toUpperCase();
+			if (variableModelsMap.containsKey(variableName)) {
 				if (variableNameToStrategyMap.get(variableName) == null) {
 					LOGGER.info(" ~~~ DID NOT FIND VARIABLE: ");
 					continue;

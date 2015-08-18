@@ -93,7 +93,8 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			LOGGER.debug("TIME:" + messageID + "-Entering scoring bolt-" + System.currentTimeMillis());
 			
 			//Create map of new changes from the input
-			Map<String, String> newChangesVarValueMap = JsonUtils.restoreVariableListFromJson(input.getString(1));
+			String jsonString = input.getString(1).toUpperCase();
+			Map<String, String> newChangesVarValueMap = JsonUtils.restoreVariableListFromJson(jsonString);
 	
 			MemberRTSChanges memberRTSChanges = scoringSingleton.calcRTSChanges(lId, newChangesVarValueMap, null, source);
 			
