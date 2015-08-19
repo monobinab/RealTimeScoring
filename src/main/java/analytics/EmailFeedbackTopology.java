@@ -51,7 +51,7 @@ public class EmailFeedbackTopology {
 			builder.setBolt("loggingBolt", new LoggingBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
 		}
 		Config conf = new Config();
-		conf.put("metrics_topology", "EmailFeeback");
+		conf.put("metrics_topology", "EF");
 		conf.setMessageTimeoutSecs(7200);	
 		conf.registerMetricsConsumer(MetricsListener.class, System.getProperty(MongoNameConstants.IS_PROD), partition_num);
 		conf.setDebug(false);
