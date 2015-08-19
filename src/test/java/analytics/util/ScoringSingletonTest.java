@@ -22,6 +22,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.joda.time.LocalDate;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import analytics.exception.RealTimeScoringException;
@@ -56,17 +57,19 @@ public class ScoringSingletonTest {
 		constructor.setAccessible(true);
 		scoringSingletonObj = constructor.newInstance();
 		
-		/*DBCollection varColl = db.getCollection("Variables");
-		varColl.insert(new BasicDBObject("name", "v1").append("VID", 1).append("strategy","StrategyCountTransactions"));
-		varColl.insert(new BasicDBObject("name", "v2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
-		varColl.insert(new BasicDBObject("name", "v3").append("VID", 3).append("strategy","StrategyCountTraits"));
-		varColl.insert(new BasicDBObject("name", "v4").append("VID", 4).append("strategy","StrategyDaysSinceLast"));
-		varColl.insert(new BasicDBObject("name", "v5").append("VID", 5).append("strategy","StrategyTurnOnFlag"));
-		varColl.insert(new BasicDBObject("name", "v6").append("VID", 6).append("strategy","StrategyTurnOffFlag"));
-		varColl.insert(new BasicDBObject("name", "v7").append("VID", 7).append("strategy","StrategyBoostProductTotalCount"));
-		varColl.insert(new BasicDBObject("name", "v8").append("VID", 8).append("strategy","StrategyDCFlag"));
-		varColl.insert(new BasicDBObject("name", "v9").append("VID", 9).append("strategy","StrategyPurchaseOccasions"));
-		varColl.insert(new BasicDBObject("name", "v10").append("VID", 10).append("strategy","StrategySumSales"));*/
+		//fake variables collection
+		DBCollection varColl = db.getCollection("Variables");
+		varColl.insert(new BasicDBObject("name", "variable1").append("VID", 1).append("strategy","StrategyCountTransactions"));
+		varColl.insert(new BasicDBObject("name", "variable2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
+		varColl.insert(new BasicDBObject("name", "variable3").append("VID", 3).append("strategy","StrategyCountTraits"));
+		varColl.insert(new BasicDBObject("name", "variable4").append("VID", 4).append("strategy","StrategyDaysSinceLast"));
+		varColl.insert(new BasicDBObject("name", "variable5").append("VID", 5).append("strategy","StrategyTurnOnFlag"));
+		varColl.insert(new BasicDBObject("name", "variable6").append("VID", 6).append("strategy","StrategyTurnOffFlag"));
+		varColl.insert(new BasicDBObject("name", "variable7").append("VID", 7).append("strategy","StrategyBoostProductTotalCount"));
+		varColl.insert(new BasicDBObject("name", "Boost_Syw_variable7").append("VID", 71).append("strategy","StrategySywTotalCounts"));
+		varColl.insert(new BasicDBObject("name", "variable8").append("VID", 8).append("strategy","StrategyDCFlag"));
+		varColl.insert(new BasicDBObject("name", "variable9").append("VID", 9).append("strategy","StrategyPurchaseOccasions"));
+		varColl.insert(new BasicDBObject("name", "variable10").append("VID", 10).append("strategy","StrategySumSales"));
 		
 		}
 
@@ -1576,31 +1579,20 @@ public class ScoringSingletonTest {
 	public void strategyCountTransactionsTest() throws SecurityException,
 	NoSuchFieldException, IllegalArgumentException,
 	IllegalAccessException, ParseException, ConfigurationException {
-		DBCollection varColl = db.getCollection("Variables");
-		varColl.insert(new BasicDBObject("name", "v1").append("VID", 1).append("strategy","StrategyCountTransactions"));
-		varColl.insert(new BasicDBObject("name", "v2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
-		varColl.insert(new BasicDBObject("name", "v3").append("VID", 3).append("strategy","StrategyCountTraits"));
-		varColl.insert(new BasicDBObject("name", "v4").append("VID", 4).append("strategy","StrategyDaysSinceLast"));
-		varColl.insert(new BasicDBObject("name", "v5").append("VID", 5).append("strategy","StrategyTurnOnFlag"));
-		varColl.insert(new BasicDBObject("name", "v6").append("VID", 6).append("strategy","StrategyTurnOffFlag"));
-		varColl.insert(new BasicDBObject("name", "v7").append("VID", 7).append("strategy","StrategyBoostProductTotalCount"));
-		varColl.insert(new BasicDBObject("name", "v8").append("VID", 8).append("strategy","StrategyDCFlag"));
-		varColl.insert(new BasicDBObject("name", "v9").append("VID", 9).append("strategy","StrategyPurchaseOccasions"));
-		varColl.insert(new BasicDBObject("name", "v10").append("VID", 10).append("strategy","StrategySumSales"));
 		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
-		newChangesVarValueMap.put("S_DSL_APP_INT_ACC_FTWR_TRS", "0.001");
+		newChangesVarValueMap.put("VARIABLE1", "0.001");
 		
 		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
 		List<Integer> modelLists = new ArrayList<Integer>();
 		modelLists.add(48);
-		variableModelsMapContents.put("S_DSL_APP_INT_ACC_FTWR_TRS", modelLists);
+		variableModelsMapContents.put("VARIABLE1", modelLists);
 		Field varaibleModelsMap = ScoringSingleton.class
 				.getDeclaredField("variableModelsMap");
 		varaibleModelsMap.setAccessible(true);
 		varaibleModelsMap.set(scoringSingletonObj,variableModelsMapContents);
 		
 		Map<String, String> variableNameToStrategyMapContents = new HashMap<String, String>();
-		variableNameToStrategyMapContents.put("S_DSL_APP_INT_ACC_FTWR_TRS",
+		variableNameToStrategyMapContents.put("VARIABLE1",
 				"StrategyCountTransactions");
 		Field variableNameToStrategyMap = ScoringSingleton.class
 				.getDeclaredField("variableNameToStrategyMap");
@@ -1608,7 +1600,7 @@ public class ScoringSingletonTest {
 		variableNameToStrategyMap.set(scoringSingletonObj,variableNameToStrategyMapContents);
 		
 		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
-		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC_FTWR_TRS", "2273");
+		variableNameToVidMapContents.put("VARIABLE1", "1");
 		Field variableNameToVidMap = ScoringSingleton.class
 				.getDeclaredField("variableNameToVidMap");
 		variableNameToVidMap.setAccessible(true);
@@ -1618,16 +1610,16 @@ public class ScoringSingletonTest {
 		memVariables.put("2269", 1);
 		
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		Change change = new Change("2273", 3,
+		Change change = new Change("1", 3,
 				simpleDateFormat.parse("2999-10-21"),
 				simpleDateFormat.parse("2014-10-01"));
 		Map<String, Change> allChanges = new HashMap<String, Change>();
-		allChanges.put("S_DSL_APP_INT_ACC_FTWR_TRS", change);
+		allChanges.put("VARIABLE1", change);
 		
 		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(
 				allChanges, newChangesVarValueMap, memVariables );
-		Assert.assertEquals(4, allChangesMap.get("S_DSL_APP_INT_ACC_FTWR_TRS").getValue());
-		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()),allChangesMap.get("S_DSL_APP_INT_ACC_FTWR_TRS").getExpirationDateAsString());
+		Assert.assertEquals(4, allChangesMap.get("VARIABLE1").getValue());
+		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()),allChangesMap.get("VARIABLE1").getExpirationDateAsString());
 		variableNameToStrategyMap.setAccessible(false);
 		variableNameToVidMap.setAccessible(false);
 		varaibleModelsMap.setAccessible(false);
@@ -1638,32 +1630,21 @@ public class ScoringSingletonTest {
 	public void strategyDaysSinceLastTest() throws SecurityException,
 	NoSuchFieldException, IllegalArgumentException,
 	IllegalAccessException, ParseException, ConfigurationException {
-	
-		DBCollection varColl = db.getCollection("Variables");
-		varColl.insert(new BasicDBObject("name", "v1").append("VID", 1).append("strategy","StrategyCountTransactions"));
-		varColl.insert(new BasicDBObject("name", "v2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
-		varColl.insert(new BasicDBObject("name", "v3").append("VID", 3).append("strategy","StrategyCountTraits"));
-		varColl.insert(new BasicDBObject("name", "v4").append("VID", 4).append("strategy","StrategyDaysSinceLast"));
-		varColl.insert(new BasicDBObject("name", "v5").append("VID", 5).append("strategy","StrategyTurnOnFlag"));
-		varColl.insert(new BasicDBObject("name", "v6").append("VID", 6).append("strategy","StrategyTurnOffFlag"));
-		varColl.insert(new BasicDBObject("name", "v7").append("VID", 7).append("strategy","StrategyBoostProductTotalCount"));
-		varColl.insert(new BasicDBObject("name", "v8").append("VID", 8).append("strategy","StrategyDCFlag"));
-		varColl.insert(new BasicDBObject("name", "v9").append("VID", 9).append("strategy","StrategyPurchaseOccasions"));
-		varColl.insert(new BasicDBObject("name", "v10").append("VID", 10).append("strategy","StrategySumSales"));
+			
 		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
-		newChangesVarValueMap.put("S_DSL_APP_INT_ACC_FTWR_TRS2", "0.001");
+		newChangesVarValueMap.put("VARIABLE4", "0.001");
 		
 		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
 		List<Integer> modelLists = new ArrayList<Integer>();
 		modelLists.add(35);
-		variableModelsMapContents.put("S_DSL_APP_INT_ACC_FTWR_TRS2", modelLists);
+		variableModelsMapContents.put("VARIABLE4", modelLists);
 		Field varaibleModelsMap = ScoringSingleton.class
 				.getDeclaredField("variableModelsMap");
 		varaibleModelsMap.setAccessible(true);
 		varaibleModelsMap.set(scoringSingletonObj,variableModelsMapContents);
 		
 		Map<String, String> variableNameToStrategyMapContents = new HashMap<String, String>();
-		variableNameToStrategyMapContents.put("S_DSL_APP_INT_ACC_FTWR_TRS2",
+		variableNameToStrategyMapContents.put("VARIABLE4",
 				"StrategyDaysSinceLast");
 		Field variableNameToStrategyMap = ScoringSingleton.class
 				.getDeclaredField("variableNameToStrategyMap");
@@ -1671,26 +1652,26 @@ public class ScoringSingletonTest {
 		variableNameToStrategyMap.set(scoringSingletonObj,variableNameToStrategyMapContents);
 		
 		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
-		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC_FTWR_TRS2", "2284");
+		variableNameToVidMapContents.put("VARIABLE4", "2284");
 		Field variableNameToVidMap = ScoringSingleton.class
 				.getDeclaredField("variableNameToVidMap");
 		variableNameToVidMap.setAccessible(true);
 		variableNameToVidMap.set(scoringSingletonObj,variableNameToVidMapContents);
 		
 		Map<String, Object> memVariables = new HashMap<String, Object>();
-		memVariables.put("2284", 1);
+		memVariables.put("4", 1);
 		
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		Change change = new Change("2284", 3,
+		Change change = new Change("4", 3,
 				simpleDateFormat.parse("2999-10-21"),
 				simpleDateFormat.parse("2014-10-01"));
 		Map<String, Change> allChanges = new HashMap<String, Change>();
-		allChanges.put("S_DSL_APP_INT_ACC_FTWR_TRS2", change);
+		allChanges.put("variable4", change);
 		
 		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(
 				allChanges, newChangesVarValueMap, memVariables );
-		Assert.assertEquals(1, allChangesMap.get("S_DSL_APP_INT_ACC_FTWR_TRS2").getValue());
-		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()),allChangesMap.get("S_DSL_APP_INT_ACC_FTWR_TRS2").getExpirationDateAsString());
+		Assert.assertEquals(1, allChangesMap.get("VARIABLE4").getValue());
+		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()),allChangesMap.get("VARIABLE4").getExpirationDateAsString());
 		variableNameToStrategyMap.setAccessible(false);
 		variableNameToVidMap.setAccessible(false);
 		varaibleModelsMap.setAccessible(false);
@@ -1701,32 +1682,21 @@ public class ScoringSingletonTest {
 	public void strategyTurnOnFlagTest() throws SecurityException,
 	NoSuchFieldException, IllegalArgumentException,
 	IllegalAccessException, ParseException, ConfigurationException {
-		DBCollection varColl = db.getCollection("Variables");
-		varColl.insert(new BasicDBObject("name", "v1").append("VID", 1).append("strategy","StrategyCountTransactions"));
-		varColl.insert(new BasicDBObject("name", "v2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
-		varColl.insert(new BasicDBObject("name", "v3").append("VID", 3).append("strategy","StrategyCountTraits"));
-		varColl.insert(new BasicDBObject("name", "v4").append("VID", 4).append("strategy","StrategyDaysSinceLast"));
-		varColl.insert(new BasicDBObject("name", "v5").append("VID", 5).append("strategy","StrategyTurnOnFlag"));
-		varColl.insert(new BasicDBObject("name", "v6").append("VID", 6).append("strategy","StrategyTurnOffFlag"));
-		varColl.insert(new BasicDBObject("name", "v7").append("VID", 7).append("strategy","StrategyBoostProductTotalCount"));
-		varColl.insert(new BasicDBObject("name", "v8").append("VID", 8).append("strategy","StrategyDCFlag"));
-		varColl.insert(new BasicDBObject("name", "v9").append("VID", 9).append("strategy","StrategyPurchaseOccasions"));
-		varColl.insert(new BasicDBObject("name", "v10").append("VID", 10).append("strategy","StrategySumSales"));
-		
+	
 		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
-		newChangesVarValueMap.put("S_DSL_APP_INT_ACC_FTWR_TRS2", "0.001");
+		newChangesVarValueMap.put("VARIABLE5", "0.001");
 		
 		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
 		List<Integer> modelLists = new ArrayList<Integer>();
 		modelLists.add(35);
-		variableModelsMapContents.put("S_DSL_APP_INT_ACC_FTWR_TRS2", modelLists);
+		variableModelsMapContents.put("VARIABLE5", modelLists);
 		Field varaibleModelsMap = ScoringSingleton.class
 				.getDeclaredField("variableModelsMap");
 		varaibleModelsMap.setAccessible(true);
 		varaibleModelsMap.set(scoringSingletonObj,variableModelsMapContents);
 		
 		Map<String, String> variableNameToStrategyMapContents = new HashMap<String, String>();
-		variableNameToStrategyMapContents.put("S_DSL_APP_INT_ACC_FTWR_TRS2",
+		variableNameToStrategyMapContents.put("VARIABLE5",
 				"StrategyTurnOnFlag");
 		Field variableNameToStrategyMap = ScoringSingleton.class
 				.getDeclaredField("variableNameToStrategyMap");
@@ -1734,26 +1704,26 @@ public class ScoringSingletonTest {
 		variableNameToStrategyMap.set(scoringSingletonObj,variableNameToStrategyMapContents);
 		
 		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
-		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC_FTWR_TRS2", "2283");
+		variableNameToVidMapContents.put("VARIABLE5", "5");
 		Field variableNameToVidMap = ScoringSingleton.class
 				.getDeclaredField("variableNameToVidMap");
 		variableNameToVidMap.setAccessible(true);
 		variableNameToVidMap.set(scoringSingletonObj,variableNameToVidMapContents);
 		
 		Map<String, Object> memVariables = new HashMap<String, Object>();
-		memVariables.put("2283", 1);
+		memVariables.put("5", 1);
 		
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		Change change = new Change("2283", 3,
+		Change change = new Change("5", 3,
 				simpleDateFormat.parse("2999-10-21"),
 				simpleDateFormat.parse("2014-10-01"));
 		Map<String, Change> allChanges = new HashMap<String, Change>();
-		allChanges.put("S_DSL_APP_INT_ACC_FTWR_TRS2", change);
+		allChanges.put("VARIABLE5", change);
 		
 		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(
 				allChanges, newChangesVarValueMap, memVariables );
-		Assert.assertEquals(1, allChangesMap.get("S_DSL_APP_INT_ACC_FTWR_TRS2").getValue());
-		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()),allChangesMap.get("S_DSL_APP_INT_ACC_FTWR_TRS2").getExpirationDateAsString());
+		Assert.assertEquals(1, allChangesMap.get("VARIABLE5").getValue());
+		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()),allChangesMap.get("VARIABLE5").getExpirationDateAsString());
 		variableNameToStrategyMap.setAccessible(false);
 		variableNameToVidMap.setAccessible(false);
 		varaibleModelsMap.setAccessible(false);
@@ -1765,31 +1735,20 @@ public class ScoringSingletonTest {
 	NoSuchFieldException, IllegalArgumentException,
 	IllegalAccessException, ParseException, ConfigurationException {
 		
-		DBCollection varColl = db.getCollection("Variables");
-		varColl.insert(new BasicDBObject("name", "v1").append("VID", 1).append("strategy","StrategyCountTransactions"));
-		varColl.insert(new BasicDBObject("name", "v2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
-		varColl.insert(new BasicDBObject("name", "v3").append("VID", 3).append("strategy","StrategyCountTraits"));
-		varColl.insert(new BasicDBObject("name", "v4").append("VID", 4).append("strategy","StrategyDaysSinceLast"));
-		varColl.insert(new BasicDBObject("name", "v5").append("VID", 5).append("strategy","StrategyTurnOnFlag"));
-		varColl.insert(new BasicDBObject("name", "v6").append("VID", 6).append("strategy","StrategyTurnOffFlag"));
-		varColl.insert(new BasicDBObject("name", "v7").append("VID", 7).append("strategy","StrategyBoostProductTotalCount"));
-		varColl.insert(new BasicDBObject("name", "v8").append("VID", 8).append("strategy","StrategyDCFlag"));
-		varColl.insert(new BasicDBObject("name", "v9").append("VID", 9).append("strategy","StrategyPurchaseOccasions"));
-		varColl.insert(new BasicDBObject("name", "v10").append("VID", 10).append("strategy","StrategySumSales"));
 		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
-		newChangesVarValueMap.put("S_DSL_APP_INT_ACC_FTWR_TRS2", "0.001");
+		newChangesVarValueMap.put("VARIABLE6", "0.001");
 		
 		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
 		List<Integer> modelLists = new ArrayList<Integer>();
 		modelLists.add(35);
-		variableModelsMapContents.put("S_DSL_APP_INT_ACC_FTWR_TRS2", modelLists);
+		variableModelsMapContents.put("VARIABLE6", modelLists);
 		Field varaibleModelsMap = ScoringSingleton.class
 				.getDeclaredField("variableModelsMap");
 		varaibleModelsMap.setAccessible(true);
 		varaibleModelsMap.set(scoringSingletonObj,variableModelsMapContents);
 		
 		Map<String, String> variableNameToStrategyMapContents = new HashMap<String, String>();
-		variableNameToStrategyMapContents.put("S_DSL_APP_INT_ACC_FTWR_TRS2",
+		variableNameToStrategyMapContents.put("VARIABLE6",
 				"StrategyTurnOffFlag");
 		Field variableNameToStrategyMap = ScoringSingleton.class
 				.getDeclaredField("variableNameToStrategyMap");
@@ -1797,49 +1756,39 @@ public class ScoringSingletonTest {
 		variableNameToStrategyMap.set(scoringSingletonObj,variableNameToStrategyMapContents);
 		
 		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
-		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC_FTWR_TRS2", "2283");
+		variableNameToVidMapContents.put("VARIABLE6", "6");
 		Field variableNameToVidMap = ScoringSingleton.class
 				.getDeclaredField("variableNameToVidMap");
 		variableNameToVidMap.setAccessible(true);
 		variableNameToVidMap.set(scoringSingletonObj,variableNameToVidMapContents);
 		
 		Map<String, Object> memVariables = new HashMap<String, Object>();
-		memVariables.put("2283", 1);
+		memVariables.put("6", 1);
 		
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		Change change = new Change("2283", 3,
+		Change change = new Change("6", 3,
 				simpleDateFormat.parse("2999-10-21"),
 				simpleDateFormat.parse("2014-10-01"));
 		Map<String, Change> allChanges = new HashMap<String, Change>();
-		allChanges.put("S_DSL_APP_INT_ACC_FTWR_TRS2", change);
+		allChanges.put("VARIABLE6", change);
 		
 		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(
 				allChanges, newChangesVarValueMap, memVariables );
-		Assert.assertEquals(0, allChangesMap.get("S_DSL_APP_INT_ACC_FTWR_TRS2").getValue());
-		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()),allChangesMap.get("S_DSL_APP_INT_ACC_FTWR_TRS2").getExpirationDateAsString());
+		Assert.assertEquals(0, allChangesMap.get("VARIABLE6").getValue());
+		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()),allChangesMap.get("VARIABLE6").getExpirationDateAsString());
 		variableNameToStrategyMap.setAccessible(false);
 		variableNameToVidMap.setAccessible(false);
 		varaibleModelsMap.setAccessible(false);
 			
 	}
 
-
+	//ignored as there is no scoring for purchase occasions  
+	@Ignore
 	@Test
 	public void strategyPurchaseOccasionsTest() throws SecurityException,
 	NoSuchFieldException, IllegalArgumentException,
 	IllegalAccessException, ParseException, ConfigurationException {
 		
-		DBCollection varColl = db.getCollection("Variables");
-		varColl.insert(new BasicDBObject("name", "v1").append("VID", 1).append("strategy","StrategyCountTransactions"));
-		varColl.insert(new BasicDBObject("name", "v2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
-		varColl.insert(new BasicDBObject("name", "v3").append("VID", 3).append("strategy","StrategyCountTraits"));
-		varColl.insert(new BasicDBObject("name", "v4").append("VID", 4).append("strategy","StrategyDaysSinceLast"));
-		varColl.insert(new BasicDBObject("name", "v5").append("VID", 5).append("strategy","StrategyTurnOnFlag"));
-		varColl.insert(new BasicDBObject("name", "v6").append("VID", 6).append("strategy","StrategyTurnOffFlag"));
-		varColl.insert(new BasicDBObject("name", "v7").append("VID", 7).append("strategy","StrategyBoostProductTotalCount"));
-		varColl.insert(new BasicDBObject("name", "v8").append("VID", 8).append("strategy","StrategyDCFlag"));
-		varColl.insert(new BasicDBObject("name", "v9").append("VID", 9).append("strategy","StrategyPurchaseOccasions"));
-		varColl.insert(new BasicDBObject("name", "v10").append("VID", 10).append("strategy","StrategySumSales"));
 		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
 		newChangesVarValueMap.put("S_DSL_APP_INT_ACC_FTWR_TRS2", "0.001");
 		
