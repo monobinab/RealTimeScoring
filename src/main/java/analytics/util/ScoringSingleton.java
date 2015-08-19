@@ -177,6 +177,7 @@ public class ScoringSingleton {
 				//Create a map of variable values for member, fetched from memberVariables collection
 				Map<String, Object> memberVariablesMap = this.createMemberVariableValueMap(lId, modelIdsList);
 			
+				//checking only for null map as with empty memberVaraiblesMap also, scoring should happen with changes for that member
 				if(memberVariablesMap != null){
 					
 					//create a map of non-expired variables and value fetched from changedMembervariables collection

@@ -93,8 +93,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			LOGGER.debug("TIME:" + messageID + "-Entering scoring bolt-" + System.currentTimeMillis());
 			
 			//Create map of new changes from the input
-			String jsonString = input.getString(1).toUpperCase();
-			Map<String, String> newChangesVarValueMap = JsonUtils.restoreVariableListFromJson(jsonString);
+			Map<String, String> newChangesVarValueMap = JsonUtils.restoreVariableListFromJson(input.getString(1));
 	
 			MemberRTSChanges memberRTSChanges = scoringSingleton.calcRTSChanges(lId, newChangesVarValueMap, null, source);
 			
@@ -105,6 +104,8 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			
 			Map<String, String> modelIdScoreStringMap = new HashMap<String, String>();
 			List<ChangedMemberScore> changedMemberScoresList = memberRTSChanges.getChangedMemberScoreList();
+			
+			//for TI_POS, score-value map set in redis for the specific member
 			for(ChangedMemberScore changedMemberScore : changedMemberScoresList){
 				modelIdScoreStringMap.put(""+changedMemberScore.getModelId(), ""+BigDecimal.valueOf(changedMemberScore.getScore()).toPlainString());
 			}
@@ -112,7 +113,6 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			//Persisting to Redis to be retrieved quicker than getting from Mongo.
 			//Perform the below operation only when the Redis is configured
 			//Long timeBefore = System.currentTimeMillis();
-			//if(jedisPool!=null){
 			if(host!=null){
 				jedis = new Jedis(host, port, 1800);
 				jedis.connect();
@@ -120,19 +120,13 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 				jedis.expire("RTS:Telluride:"+lId, 600);
 				jedis.disconnect();
 			}
-				
-			long timeTaken = System.currentTimeMillis(); 
+		
 			//Write changedMemberVariableswith expiry
 	    	scoringSingleton.updateChangedVariables(lId, memberRTSChanges.getAllChangesMap());
-	    	LOGGER.debug("TIME:" + messageID + "-Score updates complete-" + System.currentTimeMillis());
-	    	LOGGER.info("time taken for variable update: " + (System.currentTimeMillis() - timeTaken )) ;
-	    	timeTaken = System.currentTimeMillis();
+	    
 	    	//Write changedMemberScores with min max expiry
-	    	
-	    	scoringSingleton.updateChangedMemberScore(lId, changedMemberScoresList, source);
-	    	LOGGER.info("time taken for score update: " + (System.currentTimeMillis() - timeTaken ));
-			LOGGER.debug("TIME:" + messageID + "- Scoring complete-" + System.currentTimeMillis());
-			
+	      	scoringSingleton.updateChangedMemberScore(lId, changedMemberScoresList, source);
+	   			
 			//persisting the loyalty id to redis for UnknownOccasionsTopology to pick up the loyalty id
 			if(respHost != null){
 				jedis = new Jedis(respHost, respPort, 1800);

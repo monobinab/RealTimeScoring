@@ -71,11 +71,11 @@ public class ScoringSingletonTest {
 		varColl.insert(new BasicDBObject("name", "variable9").append("VID", 9).append("strategy","StrategyPurchaseOccasions"));
 		varColl.insert(new BasicDBObject("name", "variable10").append("VID", 10).append("strategy","StrategySumSales"));
 		
-		}
+	}
 
 
 	//this test ensures that there will be no modelIds to get scored, when there are no new variables from the incoming feed
-	//newChangesVarValueMap is null
+	//newChangesVarValueMap is null, ideally it should not happen as null variableValueMap will not be emitted for scoring at all
 	@Test
 	public void getModelIdListNullNewChangesVarValueMapTest1() {
 		Map<String, String> newChangesVarValueMap = null;
@@ -102,7 +102,60 @@ public class ScoringSingletonTest {
 		assertTrue("expecting empty modelIdList as none of the variables in newChangesVarValueMap is not in variableModelsMap", modelList.isEmpty());
 		variableModelsMap.setAccessible(false);
 	}
+	
 
+	// if variableModelsMap does not contain any one of the variables from newChangesVarValueMap --
+		// i.e. here variableModelsMap does not contain key S_DSL_APP_INT_ACC_FTWR_TRS2
+		// The method is skipping that variable perfectly while populating modelIdLists which needs to be re-scored
+		@Test
+		public void getModelIdListForVariableNotPresentInVariableModelsMapTest()
+				throws ConfigurationException, SecurityException,
+				NoSuchFieldException, IllegalArgumentException,
+				IllegalAccessException {
+			Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
+			newChangesVarValueMap.put("S_DSL_APP_INT_ACC_FTWR_TRS", "0.001");
+			newChangesVarValueMap.put("S_DSL_APP_INT_ACC_FTWR_TRS2", "0.001");
+			
+			List<Integer> modelLists = new ArrayList<Integer>();
+			modelLists.add(48);
+			List<Integer> modelLists2 = new ArrayList<Integer>();
+			modelLists2.add(35);
+			Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
+			variableModelsMapContents.put("S_DSL_APP_INT_ACC_FTWR_TRS", modelLists);
+			variableModelsMapContents.put("S_DSL_APP_INT_ACC_FTWR", modelLists2);
+
+			Field variableModelsMap = ScoringSingleton.class.getDeclaredField("variableModelsMap");
+			variableModelsMap.setAccessible(true);
+			variableModelsMap.set(scoringSingletonObj, variableModelsMapContents);
+			
+			Map<String, Variable> variablesMap = new HashMap<String, Variable>();
+			variablesMap.put("S_DSL_APP_INT_ACC_FTWR_TRS", new Variable("S_DSL_APP_INT_ACC_FTWR_TRS",0.002));
+			Map<String, Variable> variablesMap2 = new HashMap<String, Variable>();
+			variablesMap2.put("S_DSL_APP_INT_ACC_FTWR", new Variable("S_DSL_APP_INT_ACC_FTWR", 0.0915));
+			Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
+			monthModelMap.put(Calendar.getInstance().get(Calendar.MONTH) + 1, new Model(35, "Model_Name", Calendar.getInstance().get(Calendar.MONTH) + 1, 5, variablesMap2));
+			monthModelMap.put(Calendar.getInstance().get(Calendar.MONTH), new Model(35, "Model_Name", Calendar.getInstance().get(Calendar.MONTH), 5, variablesMap2));
+			Map<Integer, Model> monthModelMap2 = new HashMap<Integer, Model>();
+			monthModelMap2.put(0, new Model(48, "Model_Name2", 0, 7, variablesMap));
+			Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
+			modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
+			modelsMapContent.put(35, monthModelMap);
+			modelsMapContent.put(48, monthModelMap2);
+			Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
+			modelsMap.setAccessible(true);
+			modelsMap.set(scoringSingletonObj, modelsMapContent);
+			
+			
+			// Actual modelIds from ScoringSingleton
+			Set<Integer> actualModelLists = scoringSingletonObj
+					.getModelIdList(newChangesVarValueMap);
+			// Expected modelIds
+			Set<Integer> expectedModelLists = new HashSet<Integer>();
+			expectedModelLists.add(48);
+			Assert.assertEquals(expectedModelLists, actualModelLists);
+			variableModelsMap.setAccessible(false);
+		}
+		
 	// This test is for a positive case, and return modelIdLists for newChangesVarValueMap
 	// 30 is currentMonth model and 48 is non month model
 	@Test
@@ -155,64 +208,44 @@ public class ScoringSingletonTest {
 		modelsMap.setAccessible(false);
 		
 	}
-	
-	
-	//ADD A TEST FOR MONTH MODEL BUT NOT CURRENT MONTH
-
-	// if variableModelsMap does not contain any one of the variables from newChangesVarValueMap --
-	// i.e. here variableModelsMap does not contain key S_DSL_APP_INT_ACC_FTWR_TRS2
-	// The method is skipping that variable perfectly while populating modelIdLists which needs to be re-scored
+	// This test is for a positive case, and return modelIdLists for newChangesVarValueMap
+		// 30 is currentMonth model and 48 is non month model
 	@Test
-	public void getModelIdListForVariableNotPresentInVariableModelsMapTest()
-			throws ConfigurationException, SecurityException,
-			NoSuchFieldException, IllegalArgumentException,
+	public void getModelIdListForInvalidMonthModelTest() throws ConfigurationException,
+			SecurityException, NoSuchFieldException, IllegalArgumentException,
 			IllegalAccessException {
-		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
-		newChangesVarValueMap.put("S_DSL_APP_INT_ACC_FTWR_TRS", "0.001");
-		newChangesVarValueMap.put("S_DSL_APP_INT_ACC_FTWR_TRS2", "0.001");
-		
+
 		List<Integer> modelLists = new ArrayList<Integer>();
 		modelLists.add(48);
-		List<Integer> modelLists2 = new ArrayList<Integer>();
-		modelLists2.add(35);
+		
 		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
 		variableModelsMapContents.put("S_DSL_APP_INT_ACC_FTWR_TRS", modelLists);
-		variableModelsMapContents.put("S_DSL_APP_INT_ACC_FTWR", modelLists2);
-
 		Field variableModelsMap = ScoringSingleton.class.getDeclaredField("variableModelsMap");
 		variableModelsMap.setAccessible(true);
 		variableModelsMap.set(scoringSingletonObj, variableModelsMapContents);
 		
 		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
 		variablesMap.put("S_DSL_APP_INT_ACC_FTWR_TRS", new Variable("S_DSL_APP_INT_ACC_FTWR_TRS",0.002));
-		Map<String, Variable> variablesMap2 = new HashMap<String, Variable>();
-		variablesMap2.put("S_DSL_APP_INT_ACC_FTWR", new Variable("S_DSL_APP_INT_ACC_FTWR", 0.0915));
-		Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
-		monthModelMap.put(Calendar.getInstance().get(Calendar.MONTH) + 1, new Model(35, "Model_Name", Calendar.getInstance().get(Calendar.MONTH) + 1, 5, variablesMap2));
-		monthModelMap.put(Calendar.getInstance().get(Calendar.MONTH), new Model(35, "Model_Name", Calendar.getInstance().get(Calendar.MONTH), 5, variablesMap2));
 		Map<Integer, Model> monthModelMap2 = new HashMap<Integer, Model>();
-		monthModelMap2.put(0, new Model(48, "Model_Name2", 0, 7, variablesMap));
+		monthModelMap2.put(Calendar.getInstance().get(Calendar.MONTH), new Model(48, "Model_Name2", Calendar.getInstance().get(Calendar.MONTH), 7, variablesMap));
 		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
-		modelsMapContent.put(35, monthModelMap);
 		modelsMapContent.put(48, monthModelMap2);
 		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
 		modelsMap.setAccessible(true);
 		modelsMap.set(scoringSingletonObj, modelsMapContent);
 		
-		
-		// Actual modelIds from ScoringSingleton
-		Set<Integer> actualModelLists = scoringSingletonObj
-				.getModelIdList(newChangesVarValueMap);
-		// Expected modelIds
-		Set<Integer> expectedModelLists = new HashSet<Integer>();
-		expectedModelLists.add(48);
-		Assert.assertEquals(expectedModelLists, actualModelLists);
-		variableModelsMap.setAccessible(false);
-	}
-	
-	
+		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
+		newChangesVarValueMap.put("S_DSL_APP_INT_ACC_FTWR_TRS", "0.001");
 
+		// Actual modelIds from ScoringSingleton
+		Set<Integer> actualModelList = scoringSingletonObj
+				.getModelIdList(newChangesVarValueMap);
+		
+		Assert.assertTrue( actualModelList.isEmpty());
+		variableModelsMap.setAccessible(false);
+		modelsMap.setAccessible(false);
+	}
 
 	// This test is to check whether createMemberVariableValueMap() returns null if loyaltyid is null
 	@Test
