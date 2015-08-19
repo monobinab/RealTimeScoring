@@ -6,7 +6,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -107,7 +106,6 @@ public class ScoringSingleton {
 		// populate the variableModelsMap and modelsMap
 		modelsMap = new HashMap<Integer, Map<Integer, Model>>();
 		// Populate both maps
-		// TODO: Refactor this so that it is a simple DAO method. Variable
 		// models map can be populated later
 		modelVariablesDao.populateModelVariables(modelsMap, variableModelsMap);
 
@@ -133,7 +131,6 @@ public class ScoringSingleton {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public HashMap<String, Double> execute(String l_id, ArrayList<String> modelIdArrayList, String source) {
 		
 		Set<Integer> modelIdList = new HashSet<Integer>();
@@ -165,7 +162,6 @@ public class ScoringSingleton {
 			
 		MemberRTSChanges memberRTSChanges = null;
 		try{
-			
 						
 			//Find all models affected by the new incoming changes if newChangesVarValueMap is null
 			if(  newChangesVarValueMap !=  null && !newChangesVarValueMap.isEmpty() ){
@@ -177,7 +173,7 @@ public class ScoringSingleton {
 				//Create a map of variable values for member, fetched from memberVariables collection
 				Map<String, Object> memberVariablesMap = this.createMemberVariableValueMap(lId, modelIdsList);
 			
-				//checking only for null map as with empty memberVaraiblesMap also, scoring should happen with changes for that member
+				//checking only for null map as, with empty memberVaraiblesMap also, scoring should happen with new changes for that member
 				if(memberVariablesMap != null){
 					
 					//create a map of non-expired variables and value fetched from changedMembervariables collection
@@ -187,7 +183,7 @@ public class ScoringSingleton {
 					Map<String, Change> allChanges = null;
 					if( newChangesVarValueMap !=  null && !newChangesVarValueMap.isEmpty()){
 						allChanges = this.executeStrategy(changedMemberVariables, newChangesVarValueMap, memberVariablesMap);
-					}//if calling from api, newChangesVarValueMap will be null and 
+					}//if this method is called from outside of the topology, newChangesVarValueMap will be null and 
 					  //thereby allChanges should be set with changedMemberVariables for scoring
 					else{
 						allChanges = changedMemberVariables;
@@ -204,7 +200,6 @@ public class ScoringSingleton {
 							double rtsScore = 0.0;
 							double regionalFactor = 1.0;
 							try {
-								
 								if(!isBlackOutModel(allChanges, modelId)){
 								
 									//recalculate score for each model
@@ -222,16 +217,15 @@ public class ScoringSingleton {
 									if(rtsScore > 1.0)
 										rtsScore = 1.0;
 								}
-								
-							 Map<String, Date> minMaxMap = this.getMinMaxExpiry(modelId, allChanges);
-							 ChangedMemberScore changedMemberScore = new ChangedMemberScore();
-							 changedMemberScore.setModelId(modelId.toString());
-							 changedMemberScore.setMinDate(getDateFormat(minMaxMap.get("minExpiry")));
-							 changedMemberScore.setMaxDate(getDateFormat(minMaxMap.get("maxExpiry")));
-							 changedMemberScore.setEffDate(getDateFormat(new Date()));
-							 changedMemberScore.setScore(rtsScore);
-							 changedMemberScore.setSource(source);
-							 changedMemberScoreList.add(changedMemberScore);
+									 Map<String, Date> minMaxMap = this.getMinMaxExpiry(modelId, allChanges);
+									 ChangedMemberScore changedMemberScore = new ChangedMemberScore();
+									 changedMemberScore.setModelId(modelId.toString());
+									 changedMemberScore.setMinDate(getDateFormat(minMaxMap.get("minExpiry")));
+									 changedMemberScore.setMaxDate(getDateFormat(minMaxMap.get("maxExpiry")));
+									 changedMemberScore.setEffDate(getDateFormat(new Date()));
+									 changedMemberScore.setScore(rtsScore);
+									 changedMemberScore.setSource(source);
+									 changedMemberScoreList.add(changedMemberScore);
 						 }
 						   catch(Exception e){
 								e.printStackTrace();
