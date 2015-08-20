@@ -1,8 +1,20 @@
 package analytics.bolt;
 
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import redis.clients.jedis.Jedis;
 import analytics.exception.RealTimeScoringException;
 import analytics.util.JsonUtils;
-import analytics.util.MongoNameConstants;
 import analytics.util.ScoringSingleton;
 import analytics.util.dao.ModelVariablesDao;
 import analytics.util.objects.Change;
@@ -12,16 +24,6 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import redis.clients.jedis.Jedis;
-
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 /**
  * 
@@ -66,14 +68,6 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	  	this.outputCollector = collector;
 	  	topologyName = (String) stormConf.get("metrics_topology");
 	  	scoringSingleton = ScoringSingleton.getInstance();
-	  	/*modelVariablesDao = new ModelVariablesDao();
-		// populate the variableModelsMap
-		variableModelsMap = new HashMap<String, List<Integer>>();
-		// populate the variableModelsMap and modelsMap
-		modelsMap = new HashMap<Integer, Map<Integer, Model>>();
-		// Populate both maps
-		modelVariablesDao.populateModelVariables(modelsMap, variableModelsMap);*/
-	  
 	  }
 	
 	@Override
