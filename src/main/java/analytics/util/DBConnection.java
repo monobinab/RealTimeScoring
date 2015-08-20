@@ -53,23 +53,23 @@ public class DBConnection {
 		}
 	
 		if(isProd!=null && "PROD".equals(isProd)){
-			/*if(isDbAlreadyActive(server)!=null) 
-				return isDbAlreadyActive(server);*/
+			if(getAlreadyActiveDBConnection(server)!=null) 
+				return getAlreadyActiveDBConnection(server);
 			properties=  new PropertiesConfiguration("resources/connection_config_prod.properties");
 			LOGGER.info("~~~~~~~Using production properties in DBConnection~~~~~~~~~");
 			
 		}
 		
 		else if(isProd!=null && "QA".equals(isProd)){
-			/*if(isDbAlreadyActive(server)!=null) 
-				return isDbAlreadyActive(server);*/
+			if(getAlreadyActiveDBConnection(server)!=null) 
+				return getAlreadyActiveDBConnection(server);
 			properties=  new PropertiesConfiguration("resources/connection_config.properties");
 			LOGGER.info("Using test properties");
 		}
 		
 		else if(isProd!=null && "LOCAL".equals(isProd)){
-			/*if(isDbAlreadyActive(server)!=null) 
-				return isDbAlreadyActive(server);*/
+			if(getAlreadyActiveDBConnection(server)!=null) 
+				return getAlreadyActiveDBConnection(server);
 			properties=  new PropertiesConfiguration("resources/connection_config_local.properties");
 			LOGGER.info("Using test properties");
 		}
@@ -93,6 +93,7 @@ public class DBConnection {
 				conn2_2 = mongoClient.getDB(sDatabaseName2_2);
 				//	System.out.println("Connection is established...."+ mongoClient.getAllAddress() + " " + conn.getName());
 				LOGGER.info("Connection is established ...."+ mongoClient.getAllAddress() + " " + conn2_2.getName());
+				LOGGER.info(sUserName2_2+"-----"+sPassword.toCharArray()+"---server2_2");
 				conn2_2.authenticate(sUserName2_2, sPassword.toCharArray());
 				return conn2_2;
 			}
@@ -109,6 +110,8 @@ public class DBConnection {
 				}
 				mongoClient	= new MongoClient(sServers2);
 				mongoClient.setWriteConcern(new WriteConcern(writeconcern2,100));
+				
+				LOGGER.info(sUserName+"-----"+sPassword.toCharArray()+"---server2");
 				
 				conn2 = mongoClient.getDB(sDatabaseName);
 				LOGGER.info("Connection is established...."+ mongoClient.getAllAddress() + " " + conn2.getName());
@@ -134,7 +137,7 @@ public class DBConnection {
 				//Setting the write concern timeout to 100 milli seconds
 				//After waiting for 100 milliseconds, each write will throw an exception 
 				mongoClient.setWriteConcern(new WriteConcern(writeconcern,100));
-				
+				LOGGER.info(sUserName+"-----"+sPassword.toCharArray()+"---server1");
 				conn1 = mongoClient.getDB(sDatabaseName);
 				LOGGER.info("Connection is established...."+ mongoClient.getAllAddress() + " " + conn1.getName());
 				conn1.authenticate(sUserName, sPassword.toCharArray());
@@ -146,7 +149,7 @@ public class DBConnection {
 		return null;
 	}
 	
-	private static DB isDbAlreadyActive(String server){
+	private static DB getAlreadyActiveDBConnection(String server){
 		if("server2_2".equalsIgnoreCase(server) && conn2_2!=null)
 			return conn2_2;
 		else if ("server2".equalsIgnoreCase(server) && conn2!=null)

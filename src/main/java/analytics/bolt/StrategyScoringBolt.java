@@ -66,13 +66,13 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	  	this.outputCollector = collector;
 	  	topologyName = (String) stormConf.get("metrics_topology");
 	  	scoringSingleton = ScoringSingleton.getInstance();
-	  	modelVariablesDao = new ModelVariablesDao();
+	  	/*modelVariablesDao = new ModelVariablesDao();
 		// populate the variableModelsMap
 		variableModelsMap = new HashMap<String, List<Integer>>();
 		// populate the variableModelsMap and modelsMap
 		modelsMap = new HashMap<Integer, Map<Integer, Model>>();
 		// Populate both maps
-		modelVariablesDao.populateModelVariables(modelsMap, variableModelsMap);
+		modelVariablesDao.populateModelVariables(modelsMap, variableModelsMap);*/
 	  
 	  }
 	
