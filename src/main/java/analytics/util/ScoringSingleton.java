@@ -228,7 +228,7 @@ public class ScoringSingleton {
 									 changedMemberScoreList.add(changedMemberScore);
 						 }
 						   catch(Exception e){
-								e.printStackTrace();
+								//e.printStackTrace();
 								LOGGER.error("Exception scoring modelId " + modelId +" for lId " + lId + " " + e);
 						   }
 						}
@@ -246,7 +246,7 @@ public class ScoringSingleton {
 	}
 
 	public Map<String, Object> createMemberVariableValueMap(String loyaltyId, Set<Integer> modelIdList)  {
-		Set<String> variableFilter = new HashSet<String>();
+		Set<String> filteredVariables = new HashSet<String>();
 		
 		for (Integer modelId : modelIdList) {
 			try{
@@ -259,7 +259,7 @@ public class ScoringSingleton {
 						if (variableNameToVidMap.get(var) == null) {
 							LOGGER.error("VID is null for variable " + var);
 						} else {
-							variableFilter.add(variableNameToVidMap.get(var));
+							filteredVariables.add(variableNameToVidMap.get(var));
 						}
 					}
 				}
@@ -267,7 +267,7 @@ public class ScoringSingleton {
 				LOGGER.error("Exception in createMemberVariableValueMap method ", e);
 			}
 		}
-		return memberVariablesDao.getMemberVariablesFiltered(loyaltyId, variableFilter);
+		return memberVariablesDao.getMemberVariablesFiltered(loyaltyId, filteredVariables);
 	}
 
 	public Set<Integer> getModelIdList(Map<String, String> newChangesVarValueMap) {
