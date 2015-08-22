@@ -558,31 +558,8 @@ public class ScoringSingleton {
 	 * @param modelIdScoreMap
 	 * @param source
 	 */
-	public void updateChangedMemberScore(String l_id, Set<Integer> modelIdList, Map<Integer, Map<String,Date>> modelIdToExpiry, Map<Integer, Double> modelIdScoreMap, String source) {
-		Map<Integer, ChangedMemberScore> updatedScores = new HashMap<Integer, ChangedMemberScore>();
-
-		for (Integer modelId : modelIdList) {
-			// FIND THE MIN AND MAX EXPIRATION DATE OF ALL VARIABLE CHANGES FOR
-			// CHANGED MODEL SCORE TO WRITE TO SCORE CHANGES COLLECTION
-			Map<String, Date> minMaxMap = modelIdToExpiry.get(modelId);
-			Date minDate = minMaxMap.get("minExpiry");
-			Date maxDate = minMaxMap.get("maxExpiry");
-			
-			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-			String today = simpleDateFormat.format(new Date());
-			// APPEND CHANGED SCORE AND MIN/MAX EXPIRATION DATES TO DOCUMENT FOR UPDATE
-			if (modelIdScoreMap != null && !modelIdScoreMap.isEmpty()) {
-				updatedScores.put(modelId, new ChangedMemberScore(modelIdScoreMap.get(modelId), minDate != null ? simpleDateFormat.format(minDate) : today,
-						maxDate != null ? simpleDateFormat.format(maxDate) : today, simpleDateFormat.format(new Date()), source));
-			}
-		}
-		if (updatedScores != null && !updatedScores.isEmpty()) {
-			changedMemberScoresDao.upsertUpdateChangedScores(l_id, updatedScores);
-		}
-	}
-	
+		
 	public void updateChangedMemberScore(String l_id, List<ChangedMemberScore> changedMemberScoresList, String source) {
-		//new ChangedMemberScore(modelIdScoreMap.get(modelId), minDate != null ? simpleDateFormat.format(minDate) : today
 		changedMemberScoresDao.upsertUpdateChangedScores(l_id, changedMemberScoresList);
 	}
 
