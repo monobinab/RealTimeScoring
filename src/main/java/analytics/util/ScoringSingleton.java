@@ -15,8 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.exception.RealTimeScoringException;
-import analytics.util.dao.BoosterModelVariablesDao;
-import analytics.util.dao.BoosterVariableDao;
 import analytics.util.dao.ChangedMemberScoresDao;
 import analytics.util.dao.ChangedMemberVariablesDao;
 import analytics.util.dao.MemberInfoDao;
@@ -27,8 +25,6 @@ import analytics.util.dao.ModelVariablesDao;
 import analytics.util.dao.RegionalFactorDao;
 import analytics.util.dao.VariableDao;
 import analytics.util.objects.Boost;
-import analytics.util.objects.BoosterModel;
-import analytics.util.objects.BoosterVariable;
 import analytics.util.objects.Change;
 import analytics.util.objects.ChangedMemberScore;
 import analytics.util.objects.MemberInfo;
@@ -60,13 +56,6 @@ public class ScoringSingleton {
 
 	ModelSywBoostDao modelSywBoostDao;
 	MemberBoostsDao memberBoostsDao;
-	
-	//for Booster models
-	private Set<Integer> boosterModelIds;
-	private BoosterModelVariablesDao boosterModelVariablesDao;
-	private BoosterVariableDao boosterVariablesDao;
-	private Map<Integer, BoosterModel> boosterModelVariablesMap;
-	private Map<String, String> boosterVariableNameToVidMap;
 	
 	public static ScoringSingleton getInstance() {
 		if (instance == null) {
@@ -117,18 +106,6 @@ public class ScoringSingleton {
 		
 		memberInfoDao = new MemberInfoDao();
 		
-		boosterModelVariablesDao = new BoosterModelVariablesDao();
-		boosterVariablesDao = new BoosterVariableDao();
-		boosterModelVariablesMap = new HashMap<Integer, BoosterModel>();
-		boosterModelIds = new HashSet<Integer>();
-		boosterModelVariablesDao.populateBoosterModelVariables(boosterModelIds, boosterModelVariablesMap);
-		List<BoosterVariable> boosterVariablesList = boosterVariablesDao.getBoosterVariables();
-		boosterVariableNameToVidMap = new HashMap<String, String>();
-		for (BoosterVariable boosterVariable : boosterVariablesList) {
-			if (boosterVariable.getName() != null && boosterVariable.getBvid() != null) {
-				boosterVariableNameToVidMap.put(boosterVariable.getName(), boosterVariable.getBvid());
-			}
-		}
 	}
 
 	public HashMap<String, Double> execute(String l_id, ArrayList<String> modelIdArrayList, String source) {
@@ -239,7 +216,7 @@ public class ScoringSingleton {
 			 	}	
 			}
 		catch(Exception e){
-			e.printStackTrace();
+			//e.printStackTrace();
 			LOGGER.error("Exception scoring lId " + lId + " " + e);
 		}
 			return memberRTSChanges;

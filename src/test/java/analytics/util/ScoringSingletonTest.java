@@ -596,6 +596,25 @@ public class ScoringSingletonTest {
 		varIdToNameMap.setAccessible(false);
 	}
 	
+	/*if the member does not have any record in changedMemVar collection, changedMemVarMap will be empty*/
+	@Test
+	public void testCreateChangedMemberWithNullChangedMemVarTest() throws ConfigurationException,
+			NoSuchFieldException, SecurityException, IllegalArgumentException,
+			IllegalAccessException, ParseException {
+		String l_id = "6RpGnW1XhFFBoJV+T9cT9ok2";
+		Map<String, String> varIdToNameMapContents = new HashMap<String, String>();
+		varIdToNameMapContents.put("2270", "MY_VAR_NAME");
+		Field varIdToNameMap = ScoringSingleton.class
+				.getDeclaredField("variableVidToNameMap");
+		varIdToNameMap.setAccessible(true);
+		varIdToNameMap.set(scoringSingletonObj, varIdToNameMapContents);
+
+		Map<String, Change> changedVars = scoringSingletonObj
+				.createChangedMemberVariablesMap(l_id);
+		Assert.assertEquals("Expecting an empty map as no record in chamgedMemVar collection for this member", new HashMap(), changedVars);
+		varIdToNameMap.setAccessible(false);
+	}
+	
 	//testing the boosting method with null allChanges
 	@Test
 	public void getBoostScoreNullllChangesTest() throws ParseException,
@@ -2181,6 +2200,38 @@ public class ScoringSingletonTest {
 	public void calcRegionalWithNoStateForMemberTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
 		Double factor = scoringSingletonObj.calcRegionalFactor(35, null);
 		Assert.assertEquals(1.0, factor);
+	}
+	
+	//a positive case
+	@Test
+	public void getStateTest(){
+		String l_id = "TestingLid";
+		//Fake memberInfo collection
+		DBCollection memInfoColl = db.getCollection("memberInfo");
+		memInfoColl.insert(new BasicDBObject("l_id", l_id).append("srs", "0001470")
+				.append("srs_zip", "46142").append("kmt", "3251").append("kmt_zip", "46241")
+				.append( "eid", "258003809").append("eml_opt_in", "Y").append("st_cd", "TN"));
+		String state = scoringSingletonObj.getState(l_id);
+		Assert.assertEquals("TN", state );
+	}
+	
+	@Test
+	public void getStateWithNoStateForMemberTest(){
+		String l_id = "TestingLid2";
+		//Fake memberInfo collection
+		DBCollection memInfoColl = db.getCollection("memberInfo");
+		memInfoColl.insert(new BasicDBObject("l_id", l_id).append("srs", "0001470")
+				.append("srs_zip", "46142").append("kmt", "3251").append("kmt_zip", "46241")
+				.append( "eid", "258003809").append("eml_opt_in", "Y"));
+		String state = scoringSingletonObj.getState(l_id);
+		Assert.assertEquals("Expecting null as state as there is no state field for this memebr", null, state );
+	}
+	
+	@Test
+	public void getStateWithNullMemberInfoTest(){
+		String l_id = "TestingLid3";
+		String state = scoringSingletonObj.getState(l_id);
+		Assert.assertEquals("Expecting null as state as there is no record for this member in memberInfo coll", null, state );
 	}
 
 	@AfterClass
