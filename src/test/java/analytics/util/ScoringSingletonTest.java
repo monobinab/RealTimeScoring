@@ -1662,9 +1662,9 @@ public class ScoringSingletonTest {
 		allChanges.put("S_HOME_6M_IND_ALL2", change2);
 		
 		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
-		variablesMap.put("S_HOME_6M_IND_ALL", new Variable("S_DSL_APP_INT_ACC",
+		variablesMap.put("S_HOME_6M_IND_ALL", new Variable("S_HOME_6M_IND_ALL",
 				0.002));
-		variablesMap.put("S_HOME_6M_IND_ALL2", new Variable("S_DSL_APP_INT_ACC2",
+		variablesMap.put("S_HOME_6M_IND_ALL2", new Variable("S_HOME_6M_IND_ALL2",
 				0.002));
 		Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
 		monthModelMap.put(0, new Model(35, "Model_Name", 0, 5, variablesMap));
@@ -1894,8 +1894,8 @@ public class ScoringSingletonTest {
 		calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DATE));
 		Date lastDayOfMonth = calendar.getTime();
 		
-		//minExpiry is changed to string as lastdayOfMonth get changed by seconds before assertion and does not match with lastDayOfMonth
-		//returned by the method
+		/*minExpiry is changed to string, as lastDayOfMonth gets changed by seconds before assertion and does not match with lastDayOfMonth
+		returned by the method*/
 		Assert.assertEquals(simpleDateFormat.format(lastDayOfMonth), simpleDateFormat.format(minMaxMap.get("minExpiry")));
 		Assert.assertEquals(simpleDateFormat.parse("2999-10-21"), minMaxMap.get("maxExpiry"));
 	}

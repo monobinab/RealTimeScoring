@@ -497,7 +497,8 @@ public class ScoringSingleton {
 			continue;
 		}
 		// variable models map
-		if (variableModelsMap.containsKey(key) && variableModelsMap.get(key).contains(modelId)) {
+		//if (variableModelsMap.containsKey(key) && variableModelsMap.get(key).contains(modelId)) {
+		if (variableModelsMap.get(key).contains(modelId)) {
 			Date exprDate = value.getExpirationDate();
 			if (minDate == null) {
 				minDate = exprDate;
