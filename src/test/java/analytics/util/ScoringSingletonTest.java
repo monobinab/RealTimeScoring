@@ -611,7 +611,7 @@ public class ScoringSingletonTest {
 
 		Map<String, Change> changedVars = scoringSingletonObj
 				.createChangedMemberVariablesMap(l_id);
-		Assert.assertEquals("Expecting an empty map as no record in chamgedMemVar collection for this member", new HashMap<String, Change>(), changedVars);
+		Assert.assertEquals("Expecting an empty map as no record in changedMemVar collection for this member", new HashMap<String, Change>(), changedVars);
 		varIdToNameMap.setAccessible(false);
 	}
 	
@@ -651,8 +651,9 @@ public class ScoringSingletonTest {
 		modelsMap.setAccessible(false);
 	}
 
+	/*if the model does not have variables for this specific month*/
 	@Test
-	public void getBoostScoreForNullModelVarMapTest()
+	public void getBoostScoreWithNullVarMapForModelOfInterestTest()
 			throws ParseException, SecurityException, NoSuchFieldException,
 			IllegalArgumentException, IllegalAccessException {
 
@@ -669,6 +670,39 @@ public class ScoringSingletonTest {
 				Calendar.getInstance().get(Calendar.MONTH) + 1,
 				new Model(27, "Model_Name", Calendar.getInstance().get(
 						Calendar.MONTH) + 1, 5, null));
+
+		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
+		modelsMapContent.put(27, monthModelMap);
+
+		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
+		modelsMap.setAccessible(true);
+		modelsMap.set(scoringSingletonObj, modelsMapContent);
+		double boost = scoringSingletonObj.getBoostScore(allChanges, 27);
+		int comapreVal = new Double(0.0).compareTo(new Double(boost));
+		Assert.assertEquals("Expecting a boost of 0 as there are no vars for this model", comapreVal, 0);
+		modelsMap.setAccessible(false);
+	}
+	
+	/*if the model does not have variables for this specific month*/
+	@Test
+	public void getBoostScoreWithEmptyVarMapForModelOfInterestTest()
+			throws ParseException, SecurityException, NoSuchFieldException,
+			IllegalArgumentException, IllegalAccessException {
+
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd");
+		Change change = new Change("2270", 12,
+				simpleDateFormat.parse("2999-10-21"),
+				simpleDateFormat.parse("2014-10-01"));
+
+		HashMap<String, Change> allChanges = new HashMap<String, Change>();
+		allChanges.put("BOOST_S_DSL_APP_INT_ACC", change);
+
+		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
+		Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
+		monthModelMap.put(
+				Calendar.getInstance().get(Calendar.MONTH) + 1,
+				new Model(27, "Model_Name", Calendar.getInstance().get(
+						Calendar.MONTH) + 1, 5, variablesMap));
 
 		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContent.put(27, monthModelMap);
@@ -756,7 +790,7 @@ public class ScoringSingletonTest {
 		modelsMap.setAccessible(false);
 	}
 	
-	/*to test for boost variable which is NOT an BOOST instance, i.e. deos not have an interceot and id just a Variable*/
+	/*to test for boost variable which is NOT an BOOST instance, i.e. does not have an intercept and is just a Variable*/
 	@Test
 	public void getBoostScoreForNonBoostInstanceTest()
 			throws ParseException, SecurityException, NoSuchFieldException,
