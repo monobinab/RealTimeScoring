@@ -25,6 +25,7 @@ import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
 
 public class ScoringSingletonIntegrationTest {
 	
@@ -57,7 +58,7 @@ public class ScoringSingletonIntegrationTest {
 		varColl.insert(new BasicDBObject("name", "variable9").append("VID", 9).append("strategy","StrategyPurchaseOccasions"));
 		varColl.insert(new BasicDBObject("name", "variable10").append("VID", 10).append("strategy","StrategySumSales"));
 		varColl.insert(new BasicDBObject("name", "Blackout_variable").append("VID", 11).append("strategy","StrategyBlackout"));
-	//	varColl.insert(new BasicDBObject("name", "invalidVariable").append("VID", 12).append("strategy","StrategyDaysSinceLast"));
+		varColl.insert(new BasicDBObject("name", "variable12").append("VID", 12).append("strategy","NONE"));
 		
 		//fake modelVariables collection
 		DBCollection modeVarColl = db.getCollection("modelVariables");
@@ -117,9 +118,7 @@ public class ScoringSingletonIntegrationTest {
 				.append("srs_zip", "46142").append("kmt", "3251").append("kmt_zip", "46241")
 				.append( "eid", "258003809").append("eml_opt_in", "Y").append("st_cd", "TN"));
 					
-		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
-		newChangesVarValueMap.put("VARIABLE4", "0.01");
-		newChangesVarValueMap.put("VARIABLE10", "0.1");
+		Map<String, String> newChangesVarValueMap = newChangesVarValueMap();
 	
 		MemberRTSChanges memberRTSChanges = scoringSingletonObj.calcRTSChanges(l_id, newChangesVarValueMap, null, "TEST");
 		
@@ -165,6 +164,13 @@ public class ScoringSingletonIntegrationTest {
 		Assert.assertEquals(expectedChangedMemberScore.getMinDate(), actualChangedMemberScore.getMinDate());
 		Assert.assertEquals(expectedChangedMemberScore.getMaxDate(), actualChangedMemberScore.getMaxDate());
 	}
+
+	private Map<String, String> newChangesVarValueMap() {
+		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
+		newChangesVarValueMap.put("VARIABLE4", "0.01");
+		newChangesVarValueMap.put("VARIABLE10", "0.1");
+		return newChangesVarValueMap;
+	}
 	
 	
 	@Test
@@ -194,9 +200,7 @@ public class ScoringSingletonIntegrationTest {
 										expected2.getExpirationDateAsString()).append("f",
 										expected2.getEffectiveDateAsString())));
 						
-		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
-		newChangesVarValueMap.put("VARIABLE4", "0.01");
-		newChangesVarValueMap.put("VARIABLE10", "0.1");
+		Map<String, String> newChangesVarValueMap = newChangesVarValueMap();
 	
 		MemberRTSChanges memberRTSChanges = scoringSingletonObj.calcRTSChanges(l_id, newChangesVarValueMap, null, "TEST");
 		
@@ -279,10 +283,7 @@ public class ScoringSingletonIntegrationTest {
 				.append("srs_zip", "46142").append("kmt", "3251").append("kmt_zip", "46241")
 				.append( "eid", "258003809").append("eml_opt_in", "Y").append("st_cd", "TN"));
 					
-		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
-		newChangesVarValueMap.put("VARIABLE4", "0.01");
-		newChangesVarValueMap.put("VARIABLE10", "0.1");
-		newChangesVarValueMap.put("BOOST_SYW_VARIABLE7", "0.1");
+		Map<String, String> newChangesVarValueMap = getNewChangesBoostVarValueMap();
 				
 		MemberRTSChanges memberRTSChanges = scoringSingletonObj.calcRTSChanges(l_id, newChangesVarValueMap, null, "TEST");
 		
@@ -340,6 +341,12 @@ public class ScoringSingletonIntegrationTest {
 		Assert.assertEquals(expectedChangedMemberScore.getMinDate(), actualChangedMemberScore.getMinDate());
 		Assert.assertEquals(expectedChangedMemberScore.getMaxDate(), actualChangedMemberScore.getMaxDate());
 	}
+
+	private Map<String, String> getNewChangesBoostVarValueMap() {
+		Map<String, String> newChangesVarValueMap = newChangesVarValueMap();
+		newChangesVarValueMap.put("BOOST_SYW_VARIABLE7", "0.1");
+		return newChangesVarValueMap;
+	}
 	
 	@Test
 	public void calcRTSChangesTestWithScoreBoostedGT1() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
@@ -368,10 +375,7 @@ public class ScoringSingletonIntegrationTest {
 										expected2.getExpirationDateAsString()).append("f",
 										expected2.getEffectiveDateAsString())));
 					
-		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
-		newChangesVarValueMap.put("VARIABLE4", "0.01");
-		newChangesVarValueMap.put("VARIABLE10", "0.1");
-		newChangesVarValueMap.put("BOOST_SYW_VARIABLE7", "0.1");
+		Map<String, String> newChangesVarValueMap = getNewChangesBoostVarValueMap();
 				
 		MemberRTSChanges memberRTSChanges = scoringSingletonObj.calcRTSChanges(l_id, newChangesVarValueMap, null, "TEST");
 		
@@ -467,9 +471,7 @@ public class ScoringSingletonIntegrationTest {
 				.append("srs_zip", "46142").append("kmt", "3251").append("kmt_zip", "46241")
 				.append( "eid", "258003809").append("eml_opt_in", "Y").append("st_cd", "TN"));
 					
-		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
-		newChangesVarValueMap.put("VARIABLE4", "0.01");
-		newChangesVarValueMap.put("VARIABLE10", "0.1");
+		Map<String, String> newChangesVarValueMap = newChangesVarValueMap();
 					
 		MemberRTSChanges memberRTSChanges = scoringSingletonObj.calcRTSChanges(l_id, newChangesVarValueMap, null, "TEST");
 		
@@ -547,9 +549,7 @@ public class ScoringSingletonIntegrationTest {
 				.append("srs_zip", "46142").append("kmt", "3251").append("kmt_zip", "46241")
 				.append( "eid", "258003809").append("eml_opt_in", "Y").append("st_cd", "TN"));
 					
-		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
-		newChangesVarValueMap.put("VARIABLE4", "0.01");
-		newChangesVarValueMap.put("VARIABLE10", "0.1");
+		Map<String, String> newChangesVarValueMap = newChangesVarValueMap();
 				
 		MemberRTSChanges memberRTSChanges = scoringSingletonObj.calcRTSChanges(l_id, newChangesVarValueMap, null, "TEST");
 		
@@ -603,7 +603,7 @@ public class ScoringSingletonIntegrationTest {
 		Date expDate = new LocalDate(new Date()).plusDays(30).toDateMidnight().toDate();
 		String expirationDate = simpleDateFormat.format(expDate);
 		
-		Assert.assertEquals("Expecting score of 0 as this model is blaked out", 0.0, changedMemberScore.getScore());
+		Assert.assertEquals("Expecting score of 0 as this model is blacked out", 0.0, changedMemberScore.getScore());
 		Assert.assertEquals(expirationDate, changedMemberScore.getMinDate());
 		Assert.assertEquals(expirationDate, changedMemberScore.getMaxDate());
 	}
@@ -679,9 +679,7 @@ public class ScoringSingletonIntegrationTest {
 				.append("srs_zip", "46142").append("kmt", "3251").append("kmt_zip", "46241")
 				.append( "eid", "258003809").append("eml_opt_in", "Y").append("st_cd", "TN"));
 					
-		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
-		newChangesVarValueMap.put("VARIABLE4", "0.01");
-		newChangesVarValueMap.put("VARIABLE10", "0.1");
+		Map<String, String> newChangesVarValueMap = newChangesVarValueMap();
 	
 		MemberRTSChanges memberRTSChanges = scoringSingletonObj.calcRTSChanges(l_id, newChangesVarValueMap, null, "TEST");
 		
@@ -727,6 +725,58 @@ public class ScoringSingletonIntegrationTest {
 		Assert.assertEquals(expectedChangedMemberScore.getMinDate(), actualChangedMemberScore.getMinDate());
 		Assert.assertEquals(expectedChangedMemberScore.getMaxDate(), actualChangedMemberScore.getMaxDate());
 	}
+	
+	/*
+	 * api's call to scoring
+	 */
+	@SuppressWarnings("unchecked")
+	@Test
+	public void executeTest() throws ParseException{
+		
+		String l_id = "apiLid";
+		//Fake memberVariables collection
+		DBCollection memVarColl = db.getCollection("memberVariables");
+		memVarColl.insert(new BasicDBObject("l_id", l_id).append("4", 1).append("10",0.4));
+
+		//fake changedMemberVariables Collection
+		DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Change expected = new Change("4", 12,
+				simpleDateFormat.parse("2999-09-23"),
+				simpleDateFormat.parse("2014-09-01"));
+		Change expected2 = new Change("10", 1.0,
+				simpleDateFormat.parse("2999-09-23"),
+				simpleDateFormat.parse("2014-09-01"));
+		changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
+				"4",
+				new BasicDBObject("v", expected.getValue()).append("e",
+						expected.getExpirationDateAsString()).append("f",
+						expected.getEffectiveDateAsString())).append(
+								"10",
+								new BasicDBObject("v", expected2.getValue()).append("e",
+										expected2.getExpirationDateAsString()).append("f",
+										expected2.getEffectiveDateAsString())));
+		
+		//fake changedMemberScore collection
+		//empty changedMemberScore collection before update
+		DBCollection changedMemberScore = db.getCollection("changedMemberScores");
+	
+		ArrayList<String> modelLists = new ArrayList<String>();
+		modelLists.add("35");
+		HashMap<String, Double> actuaModelIdStringScoreMap = scoringSingletonObj.execute(l_id, modelLists,  "TEST");
+		
+		//this method updates the changedMemberScore collection
+		DBObject dbObj = changedMemberScore.findOne(new BasicDBObject("l_id", l_id));
+		HashMap<String, ChangedMemberScore> changedMemScoresUpdated = (HashMap<String, ChangedMemberScore>) dbObj
+				.get("35");
+		Assert.assertEquals(0.9946749823142578, changedMemScoresUpdated.get("s"));
+		Assert.assertEquals("2999-09-23", changedMemScoresUpdated.get("minEx"));
+		Assert.assertEquals("2999-09-23", changedMemScoresUpdated.get("maxEx"));
+		Assert.assertEquals(0.9946749823142578, actuaModelIdStringScoreMap.get("35"));
+		changedMemberScore.remove(new BasicDBObject("l_id", l_id));
+		
+	}
+	
 	
 	@AfterClass
 	public static void cleanUp(){
