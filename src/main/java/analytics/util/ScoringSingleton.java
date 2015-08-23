@@ -563,7 +563,7 @@ public class ScoringSingleton {
 	public Model getModel(Integer modelId){
 		Model model = null;
 		int month = getMonth(modelId);
-		if (month != -1 && modelExists(modelId) && modelsMap.get(modelId) != null && modelsMap.get(modelId).get(month) != null) {
+		if (month != -1 && modelsMap.get(modelId) != null && modelsMap.get(modelId).get(month) != null) {
 			model = modelsMap.get(modelId).get(month);
 		} 
 		return model;
