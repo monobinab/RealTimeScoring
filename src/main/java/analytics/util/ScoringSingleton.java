@@ -269,7 +269,8 @@ public class ScoringSingleton {
 
 		// Create a map from VName->Change
 		Map<String, Change> changedMemberVariablesMap = new HashMap<String, Change>();
-		if (changedMbrVariables != null && changedMbrVariables.keySet() != null) {
+	//	if (changedMbrVariables != null && changedMbrVariables.keySet() != null) {
+		if (changedMbrVariables != null ) {
 			for (Map.Entry<String, Change> entry : changedMbrVariables.entrySet()) {
 				String key = entry.getKey();
 				Change value = entry.getValue();
@@ -366,7 +367,8 @@ public class ScoringSingleton {
 	public double getBoostScore(Map<String, Change> allChanges, Integer modelId) {
 		double boosts = 0.0;
 	
-		if(modelId == null || !modelExists(modelId)){
+		//if(modelId == null || !modelExists(modelId)){
+		if(!modelExists(modelId)){
 			LOGGER.warn("getBoostScore() modelId is null");
 			return 0;
 		}  else if (allChanges == null || allChanges.isEmpty()) {
@@ -593,7 +595,7 @@ public class ScoringSingleton {
 		return simpleDateFormatter.format(date);
 	}
 
-	public String getModelName(int modelId) {
+	/*public String getModelName(int modelId) {
 		int month;
 		if (modelsMap.get(modelId) == null)
 			return "";
@@ -604,5 +606,5 @@ public class ScoringSingleton {
 		}
 
 		return modelsMap.get(modelId).get(month).getModelName();
-	}
+	}*/
 }
