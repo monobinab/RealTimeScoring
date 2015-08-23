@@ -75,6 +75,7 @@ public class ScoringSingletonTest {
 		varColl.insert(new BasicDBObject("name", "variable9").append("VID", 9).append("strategy","StrategyPurchaseOccasions"));
 		varColl.insert(new BasicDBObject("name", "variable10").append("VID", 10).append("strategy","StrategySumSales"));
 		varColl.insert(new BasicDBObject("name", "Blackout_variable").append("VID", 11).append("strategy","StrategyBlackout"));
+		varColl.insert(new BasicDBObject("name", "variable12").append("VID", 12).append("strategy","NONE"));
 		
 	}
 
@@ -1946,7 +1947,55 @@ public class ScoringSingletonTest {
 	 * @throws ConfigurationException
 	 */
 	
-	
+	@Test
+	public void strategySumSalesTest() throws SecurityException,
+	NoSuchFieldException, IllegalArgumentException,
+	IllegalAccessException, ParseException, ConfigurationException {
+		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
+		newChangesVarValueMap.put("VARIABLE10", "0.001");
+		
+		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
+		List<Integer> modelLists = new ArrayList<Integer>();
+		modelLists.add(48);
+		variableModelsMapContents.put("VARIABLE10", modelLists);
+		Field varaibleModelsMap = ScoringSingleton.class
+				.getDeclaredField("variableModelsMap");
+		varaibleModelsMap.setAccessible(true);
+		varaibleModelsMap.set(scoringSingletonObj,variableModelsMapContents);
+		
+		Map<String, String> variableNameToStrategyMapContents = new HashMap<String, String>();
+		variableNameToStrategyMapContents.put("VARIABLE10",
+				"StrategySumSales");
+		Field variableNameToStrategyMap = ScoringSingleton.class
+				.getDeclaredField("variableNameToStrategyMap");
+		variableNameToStrategyMap.setAccessible(true);
+		variableNameToStrategyMap.set(scoringSingletonObj,variableNameToStrategyMapContents);
+		
+		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
+		variableNameToVidMapContents.put("VARIABLE10", "10");
+		Field variableNameToVidMap = ScoringSingleton.class
+				.getDeclaredField("variableNameToVidMap");
+		variableNameToVidMap.setAccessible(true);
+		variableNameToVidMap.set(scoringSingletonObj,variableNameToVidMapContents);
+		
+		Map<String, Object> memVariables = new HashMap<String, Object>();
+		memVariables.put("10", 1);
+		
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Change change = new Change("10", 3,
+				simpleDateFormat.parse("2999-10-21"),
+				simpleDateFormat.parse("2014-10-01"));
+		Map<String, Change> allChanges = new HashMap<String, Change>();
+		allChanges.put("VARIABLE10", change);
+		
+		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(
+				allChanges, newChangesVarValueMap, memVariables );
+		Assert.assertEquals(0.001, allChangesMap.get("VARIABLE10").getValue());
+		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()),allChangesMap.get("VARIABLE10").getExpirationDateAsString());
+		variableNameToStrategyMap.setAccessible(false);
+		variableNameToVidMap.setAccessible(false);
+		varaibleModelsMap.setAccessible(false);
+	}
 	
 	@Test
 	public void strategyCountTransactionsTest() throws SecurityException,
@@ -2209,13 +2258,14 @@ public class ScoringSingletonTest {
 			
 	}
 	
-	
+	/*to test if all newChangesVar from incoming feed are not in varaibleModelsMap, allChanges map will be only unexpired member variables from changedMemVar collection
+	 * ideally this will happen at this point, would have been taken care in modelIdsList itself*/
 	@Test
 	public void strategyIfAllNewChangesVarNotInVarModelsMapTest() throws SecurityException,
 	NoSuchFieldException, IllegalArgumentException,
 	IllegalAccessException, ParseException, ConfigurationException {
 		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
-		newChangesVarValueMap.put("VARIABLE11", "0.001");
+		newChangesVarValueMap.put("VARIABLE12", "0.001");
 		
 		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
 		List<Integer> modelLists = new ArrayList<Integer>();
@@ -2242,7 +2292,7 @@ public class ScoringSingletonTest {
 		variableNameToVidMap.set(scoringSingletonObj,variableNameToVidMapContents);
 		
 		Map<String, Object> memVariables = new HashMap<String, Object>();
-		memVariables.put("2269", 1);
+		memVariables.put("1", 1);
 		
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Change change = new Change("1", 3,
@@ -2259,7 +2309,111 @@ public class ScoringSingletonTest {
 		variableNameToVidMap.setAccessible(false);
 		varaibleModelsMap.setAccessible(false);
 	}
+	
+	@Test
+	public void strategyForVariableWithNONEStrategyTest() throws SecurityException,
+	NoSuchFieldException, IllegalArgumentException,
+	IllegalAccessException, ParseException, ConfigurationException {
+		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
+		newChangesVarValueMap.put("VARIABLE12", "0.001");
+		
+		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
+		List<Integer> modelLists = new ArrayList<Integer>();
+		modelLists.add(48);
+		variableModelsMapContents.put("VARIABLE12", modelLists);
+		Field varaibleModelsMap = ScoringSingleton.class
+				.getDeclaredField("variableModelsMap");
+		varaibleModelsMap.setAccessible(true);
+		varaibleModelsMap.set(scoringSingletonObj,variableModelsMapContents);
+		
+		Map<String, String> variableNameToStrategyMapContents = new HashMap<String, String>();
+		variableNameToStrategyMapContents.put("VARIABLE12",
+				"NONE");
+		Field variableNameToStrategyMap = ScoringSingleton.class
+				.getDeclaredField("variableNameToStrategyMap");
+		variableNameToStrategyMap.setAccessible(true);
+		variableNameToStrategyMap.set(scoringSingletonObj,variableNameToStrategyMapContents);
+		
+		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
+		variableNameToVidMapContents.put("VARIABLE12", "12");
+		Field variableNameToVidMap = ScoringSingleton.class
+				.getDeclaredField("variableNameToVidMap");
+		variableNameToVidMap.setAccessible(true);
+		variableNameToVidMap.set(scoringSingletonObj,variableNameToVidMapContents);
+		
+		Map<String, Object> memVariables = new HashMap<String, Object>();
+		memVariables.put("12", 1);
+		
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Change change = new Change("12", 3,
+				simpleDateFormat.parse("2999-10-21"),
+				simpleDateFormat.parse("2014-10-01"));
+		Map<String, Change> allChanges = new HashMap<String, Change>();
+		allChanges.put("VARIABLE12", change);
+		
+		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(
+				allChanges, newChangesVarValueMap, memVariables );
+		Assert.assertEquals(3, allChangesMap.get("VARIABLE12").getValue());
+		Assert.assertEquals("2999-10-21", allChangesMap.get("VARIABLE12").getExpirationDateAsString());
+		variableNameToStrategyMap.setAccessible(false);
+		variableNameToVidMap.setAccessible(false);
+		varaibleModelsMap.setAccessible(false);
+	}
 
+	/*If we pass unknown strategy to StrategyMapper class' getStrategy method, Strategy returned will be null
+	 * Ideally, this will not happen at all as strategies in strategyMap (which is used in getStrategy method) and strategy in varNameToStrategy map 
+	 * are populated from variables collection. Even the condition if (strategy == null) in executeStrategy is an over protective check 
+	 * this test case is written just as an external class 
+	 */
+	@Test
+	public void strategyForNullStrategyTest() throws SecurityException,
+	NoSuchFieldException, IllegalArgumentException,
+	IllegalAccessException, ParseException, ConfigurationException {
+		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
+		newChangesVarValueMap.put("VARIABLE12", "0.001");
+		
+		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
+		List<Integer> modelLists = new ArrayList<Integer>();
+		modelLists.add(48);
+		variableModelsMapContents.put("VARIABLE12", modelLists);
+		Field varaibleModelsMap = ScoringSingleton.class
+				.getDeclaredField("variableModelsMap");
+		varaibleModelsMap.setAccessible(true);
+		varaibleModelsMap.set(scoringSingletonObj,variableModelsMapContents);
+		
+		Map<String, String> variableNameToStrategyMapContents = new HashMap<String, String>();
+		variableNameToStrategyMapContents.put("VARIABLE12",
+				"TESTING");
+		Field variableNameToStrategyMap = ScoringSingleton.class
+				.getDeclaredField("variableNameToStrategyMap");
+		variableNameToStrategyMap.setAccessible(true);
+		variableNameToStrategyMap.set(scoringSingletonObj,variableNameToStrategyMapContents);
+		
+		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
+		variableNameToVidMapContents.put("VARIABLE12", "12");
+		Field variableNameToVidMap = ScoringSingleton.class
+				.getDeclaredField("variableNameToVidMap");
+		variableNameToVidMap.setAccessible(true);
+		variableNameToVidMap.set(scoringSingletonObj,variableNameToVidMapContents);
+		
+		Map<String, Object> memVariables = new HashMap<String, Object>();
+		memVariables.put("12", 1);
+		
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Change change = new Change("12", 3,
+				simpleDateFormat.parse("2999-10-21"),
+				simpleDateFormat.parse("2014-10-01"));
+		Map<String, Change> allChanges = new HashMap<String, Change>();
+		allChanges.put("VARIABLE12", change);
+		
+		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(
+				allChanges, newChangesVarValueMap, memVariables );
+		Assert.assertEquals(3, allChangesMap.get("VARIABLE12").getValue());
+		Assert.assertEquals("2999-10-21", allChangesMap.get("VARIABLE12").getExpirationDateAsString());
+		variableNameToStrategyMap.setAccessible(false);
+		variableNameToVidMap.setAccessible(false);
+		varaibleModelsMap.setAccessible(false);
+	}
 	
 	//This is a positive test case to update changedMemberScore collection
 	@SuppressWarnings("unchecked")
