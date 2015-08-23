@@ -515,7 +515,7 @@ public class ScoringSingleton {
 		// IF THE MODEL IS MONTH SPECIFIC AND THE MIN/MAX DATE IS AFTER THE
 		// END OF THE MONTH SET TO THE LAST DAY OF THIS MONTH
 		int month = getMonth(modelId);
-		if (modelExists(modelId) && month != 0 && month != -1) {
+		if (month != 0 && month != -1) {
 			Calendar calendar = Calendar.getInstance();
 			calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DATE));
 			Date lastDayOfMonth = calendar.getTime();
@@ -542,7 +542,7 @@ public class ScoringSingleton {
 		changedMemberScoresDao.upsertUpdateChangedScores(l_id, changedMemberScoresList);
 	}
 
-	public void updateChangedVariables(String lId, Map<String, Change> allChanges) {
+	public void updateChangedMemberVariables(String lId, Map<String, Change> allChanges) {
 		if (allChanges != null && !allChanges.isEmpty()) {
 			// upsert document
 			changedVariablesDao.upsertUpdateChangedVariables(lId, allChanges, variableNameToVidMap);

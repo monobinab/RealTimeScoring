@@ -651,20 +651,25 @@ public class ScoringSingletonTest {
 		modelsMap.setAccessible(false);
 	}
 
-	/*to test for null modelvarMap, expecting a boost score of 0.0*/
 	@Test
-	public void getBoostScoreForNullModelVarMap()
+	public void getBoostScoreForNullModelVarMapTest()
 			throws ParseException, SecurityException, NoSuchFieldException,
 			IllegalArgumentException, IllegalAccessException {
 
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd");
+		Change change = new Change("2270", 12,
+				simpleDateFormat.parse("2999-10-21"),
+				simpleDateFormat.parse("2014-10-01"));
+
 		HashMap<String, Change> allChanges = new HashMap<String, Change>();
-		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
-		
-		Map<Integer, Model> monthModelMap= new HashMap<Integer, Model>();
+		allChanges.put("BOOST_S_DSL_APP_INT_ACC", change);
+
+		Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
 		monthModelMap.put(
 				Calendar.getInstance().get(Calendar.MONTH) + 1,
-				new Model(27, "Model_Name4", Calendar.getInstance().get(
-						Calendar.MONTH) + 1, 5, variablesMap));
+				new Model(27, "Model_Name", Calendar.getInstance().get(
+						Calendar.MONTH) + 1, 5, null));
+
 		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContent.put(27, monthModelMap);
 
@@ -673,10 +678,10 @@ public class ScoringSingletonTest {
 		modelsMap.set(scoringSingletonObj, modelsMapContent);
 		double boost = scoringSingletonObj.getBoostScore(allChanges, 27);
 		int comapreVal = new Double(0.0).compareTo(new Double(boost));
-		Assert.assertEquals("Expecting boost value of 0 as there are no vars for this modelId in modeVar collection", comapreVal, 0);
+		Assert.assertEquals("Expecting a boost of 0 as there are no vars for this model", comapreVal, 0);
 		modelsMap.setAccessible(false);
 	}
-
+	
 	// This tests the boosts returned for current month model
 	@Test
 	public void getBoostScoreBoostVarPresentInModelsMapWithCurrentMonthTest()
@@ -1740,6 +1745,77 @@ public class ScoringSingletonTest {
 		Assert.assertEquals(simpleDateFormat.parse("2999-10-21"), minMaxMap.get("maxExpiry"));
 	}
 	
+	@Test
+	public void getMinMaxExpAllVarsNotInVarModelsMapTest() throws ParseException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd");
+		Change change = new Change("2271", 0.2,	simpleDateFormat.parse("2777-10-21"), simpleDateFormat.parse("2014-10-01"));
+	
+		Map<String, Change> allChanges = new HashMap<String, Change>();
+		allChanges.put("S_HOME_6M_IND_ALL", change);
+		
+		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
+		variablesMap.put("S_HOME_6M_IND_ALL2", new Variable("S_DSL_APP_INT_ACC2",
+				0.002));
+				
+		Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
+		monthModelMap.put(Calendar.getInstance().get(Calendar.MONTH)+1, new Model(35, "Model_Name", Calendar.getInstance().get(Calendar.MONTH) + 1, 5, variablesMap));
+		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
+		modelsMapContent.put(35, monthModelMap);
+		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
+		modelsMap.setAccessible(true);
+		modelsMap.set(scoringSingletonObj, modelsMapContent);
+		
+		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
+		List<Integer> modelLists = new ArrayList<Integer>();
+		modelLists.add(35);
+		variableModelsMapContents.put("S_HOME_6M_IND_ALL2", modelLists);
+		Field varaibleModelsMap = ScoringSingleton.class
+				.getDeclaredField("variableModelsMap");
+		varaibleModelsMap.setAccessible(true);
+		varaibleModelsMap.set(scoringSingletonObj,variableModelsMapContents);
+		
+		Map<String, Date> minMaxMap = scoringSingletonObj.getMinMaxExpiry(35, allChanges);
+		
+		Assert.assertEquals(null, minMaxMap.get("minExpiry"));
+		Assert.assertEquals(null, minMaxMap.get("maxExpiry"));
+	}
+	
+	@Test
+	public void getMinMaxExpForNonExistentModelInVarModelsMapTest() throws ParseException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd");
+		Change change = new Change("2271", 0.2,	simpleDateFormat.parse("2777-10-21"), simpleDateFormat.parse("2014-10-01"));
+		
+		Map<String, Change> allChanges = new HashMap<String, Change>();
+		allChanges.put("S_HOME_6M_IND_ALL", change);
+		
+		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
+		variablesMap.put("S_HOME_6M_IND_ALL", new Variable("S_DSL_APP_INT_ACC2",
+				0.002));
+				
+		Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
+		monthModelMap.put(0, new Model(35, "Model_Name", 0, 5, variablesMap));
+		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
+		modelsMapContent.put(35, monthModelMap);
+		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
+		modelsMap.setAccessible(true);
+		modelsMap.set(scoringSingletonObj, modelsMapContent);
+		
+		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
+		List<Integer> modelLists = new ArrayList<Integer>();
+		modelLists.add(35);
+		variableModelsMapContents.put("S_HOME_6M_IND_ALL", modelLists);
+		Field varaibleModelsMap = ScoringSingleton.class
+				.getDeclaredField("variableModelsMap");
+		varaibleModelsMap.setAccessible(true);
+		varaibleModelsMap.set(scoringSingletonObj,variableModelsMapContents);
+		
+		Map<String, Date> minMaxMap = scoringSingletonObj.getMinMaxExpiry(27, allChanges);
+		
+		Assert.assertEquals(null, minMaxMap.get("minExpiry"));
+		Assert.assertEquals(null, minMaxMap.get("maxExpiry"));
+	}
+	
+	
 	//to test whether minExpiry is set with lastDayOfMonth if it is a valid month model
 	@Test
 	public void getMinMaxExpForLastDayOfMonthTest() throws ParseException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
@@ -2208,7 +2284,7 @@ public class ScoringSingletonTest {
 	 Ideally it will not happen, was just checking as an external class*/
 	@SuppressWarnings("unchecked")
 	@Test
-	public void updateChangedVariablesForNullChangedMemberVariablesTest()
+	public void updateChangedVariablesForNullAllChangesTest()
 			throws ConfigurationException, SecurityException,
 			NoSuchFieldException, IllegalArgumentException,
 			IllegalAccessException, ParseException {
@@ -2226,7 +2302,39 @@ public class ScoringSingletonTest {
 						expected.getExpirationDateAsString()).append("f",
 						expected.getEffectiveDateAsString())));
 
-		scoringSingletonObj.updateChangedVariables(l_id, null);
+		scoringSingletonObj.updateChangedMemberVariables(l_id, null);
+		DBObject dbObj = changedMemberVar.findOne(new BasicDBObject("l_id",
+				l_id));
+		HashMap<String, Object> map = (HashMap<String, Object>) dbObj
+				.get("222");
+		Double score = (Double) map.get("v");
+		Assert.assertEquals(expected.getExpirationDateAsString(), map.get("e"));
+		Assert.assertEquals(expected.getValue(), score);
+		
+		changedMemberVar.remove(new BasicDBObject("l_id", l_id));
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void updateChangedVariablesForEmptyAllChangesTest()
+			throws ConfigurationException, SecurityException,
+			NoSuchFieldException, IllegalArgumentException,
+			IllegalAccessException, ParseException {
+				
+		String l_id = "SearsUpdate4";
+		DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Change expected = new Change("222", 12.0,
+				simpleDateFormat.parse("2999-09-23"),
+				simpleDateFormat.parse("2014-09-01"));
+	
+		changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
+				"222",
+				new BasicDBObject("v", expected.getValue()).append("e",
+						expected.getExpirationDateAsString()).append("f",
+						expected.getEffectiveDateAsString())));
+
+		scoringSingletonObj.updateChangedMemberVariables(l_id, new HashMap<String, Change>());
 		DBObject dbObj = changedMemberVar.findOne(new BasicDBObject("l_id",
 				l_id));
 		HashMap<String, Object> map = (HashMap<String, Object>) dbObj
@@ -2283,7 +2391,7 @@ public class ScoringSingletonTest {
 		System.out.println("changedMemberVar before update" + dbObject2);
 
 		
-		scoringSingletonObj.updateChangedVariables(l_id,
+		scoringSingletonObj.updateChangedMemberVariables(l_id,
 				allchanges);
 
 		DBObject dbObject = changedMemberVar.findOne(new BasicDBObject("l_id",
@@ -2374,6 +2482,18 @@ public class ScoringSingletonTest {
 	public void calcRegionalWithNoStateForMemberTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
 		Double factor = scoringSingletonObj.calcRegionalFactor(35, null);
 		Assert.assertEquals(1.0, factor);
+	}
+	
+	@Test
+	public void calcRegionalWithRegionalFactorMapTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
+		
+		Field regionalFactorsMap = ScoringSingleton.class
+				.getDeclaredField("regionalFactorsMap");
+		regionalFactorsMap.setAccessible(true);
+		regionalFactorsMap.set(scoringSingletonObj, null);
+		Double factor = scoringSingletonObj.calcRegionalFactor( 35, "TN");
+		Assert.assertEquals(1.0, factor);
+		regionalFactorsMap.setAccessible(false);
 	}
 	
 	//a positive case
