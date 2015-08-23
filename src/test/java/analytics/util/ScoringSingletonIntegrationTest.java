@@ -166,11 +166,89 @@ public class ScoringSingletonIntegrationTest {
 		Assert.assertEquals(expectedChangedMemberScore.getMaxDate(), actualChangedMemberScore.getMaxDate());
 	}
 	
+	
+	@Test
+	public void calcRTSChangesTestWithNoState() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
+		String l_id = "SearsTesting2";
+		
+		//Fake memberVariables collection
+		DBCollection memVarColl = db.getCollection("memberVariables");
+		memVarColl.insert(new BasicDBObject("l_id", l_id).append("4", 1).append("10",0.4));
+
+		//fake changedMemberVariables Collection
+		DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Change expected = new Change("4", 12,
+				simpleDateFormat.parse("2999-09-23"),
+				simpleDateFormat.parse("2014-09-01"));
+		Change expected2 = new Change("10", 1.0,
+				simpleDateFormat.parse("2999-09-23"),
+				simpleDateFormat.parse("2014-09-01"));
+		changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
+				"4",
+				new BasicDBObject("v", expected.getValue()).append("e",
+						expected.getExpirationDateAsString()).append("f",
+						expected.getEffectiveDateAsString())).append(
+								"10",
+								new BasicDBObject("v", expected2.getValue()).append("e",
+										expected2.getExpirationDateAsString()).append("f",
+										expected2.getEffectiveDateAsString())));
+						
+		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
+		newChangesVarValueMap.put("VARIABLE4", "0.01");
+		newChangesVarValueMap.put("VARIABLE10", "0.1");
+	
+		MemberRTSChanges memberRTSChanges = scoringSingletonObj.calcRTSChanges(l_id, newChangesVarValueMap, null, "TEST");
+		
+		ChangedMemberScore expectedChangedMemberScore = new ChangedMemberScore();
+		//both variables VARIABLE4 and VARIABLE10 has strategies with expiration date set to 2 days
+		Date date = new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate();
+		expectedChangedMemberScore.setModelId("35");
+		expectedChangedMemberScore.setScore(0.9937568022504835);
+		expectedChangedMemberScore.setMinDate(simpleDateFormat.format(date));
+		expectedChangedMemberScore.setMaxDate(simpleDateFormat.format(date));
+		expectedChangedMemberScore.setEffDate(simpleDateFormat.format(new Date()));
+		
+		Map<String, Change> expectedAllChanges = new HashMap<String, Change>();
+		Change change = new Change(1, date);
+		Change change2 = new Change(1.1, date);
+		expectedAllChanges.put("VARIABLE4", change);
+		expectedAllChanges.put("VARIABLE10", change2);
+		Object expectedVar4Value = expectedAllChanges.get("VARIABLE4").getValue();
+		Object expectedVar10Value = expectedAllChanges.get("VARIABLE10").getValue();
+		Date expectedVar4Date = expectedAllChanges.get("VARIABLE4").getExpirationDate();
+		Date expectedVar10Date = expectedAllChanges.get("VARIABLE10").getExpirationDate();
+		
+		List<ChangedMemberScore> changedMemberScoresList = memberRTSChanges.getChangedMemberScoreList();
+		ChangedMemberScore actualChangedMemberScore = changedMemberScoresList.get(0);
+		
+		Map<String, Change> actualAllChanges =  memberRTSChanges.getAllChangesMap();
+		Object actualVar4Value = actualAllChanges.get("VARIABLE4").getValue();
+		Object actualVar10Value = actualAllChanges.get("VARIABLE10").getValue();
+		Date actualVar4Date = actualAllChanges.get("VARIABLE4").getExpirationDate();
+		Date actualVar10Date = actualAllChanges.get("VARIABLE10").getExpirationDate();
+	
+		int compareVal = new Integer((Integer) actualVar4Value).compareTo(new Integer((Integer) expectedVar4Value));
+		int compareVal2 = new Double((Double) actualVar10Value).compareTo(new Double((Double) expectedVar10Value));
+		
+		int compareVal3 = new Double(expectedChangedMemberScore.getScore()).compareTo(new Double(actualChangedMemberScore.getScore()));
+	
+		Assert.assertEquals(compareVal, 0);
+		Assert.assertEquals(compareVal2, 0);
+		Assert.assertEquals(actualVar4Date, expectedVar4Date);
+		Assert.assertEquals(expectedVar10Date, actualVar10Date);
+		
+		Assert.assertEquals(compareVal3, 0);
+		Assert.assertEquals(expectedChangedMemberScore.getMinDate(), actualChangedMemberScore.getMinDate());
+		Assert.assertEquals(expectedChangedMemberScore.getMaxDate(), actualChangedMemberScore.getMaxDate());
+	}
+	
+	
 	//a positive case for modelId 35 (for topology call)
 	//the incoming feed corresponds to a BOOST variable which boosts the score
 	@Test
-	public void calcRTSChangesTest2() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
-		String l_id = "SearsTesting2";
+	public void calcRTSChangesTestWithBoostScore() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
+		String l_id = "SearsTesting3";
 		
 		//Fake memberVariables collection
 		DBCollection memVarColl = db.getCollection("memberVariables");
@@ -263,12 +341,102 @@ public class ScoringSingletonIntegrationTest {
 		Assert.assertEquals(expectedChangedMemberScore.getMaxDate(), actualChangedMemberScore.getMaxDate());
 	}
 	
+	@Test
+	public void calcRTSChangesTestWithScoreBoostedGT1() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
+		String l_id = "SearsTesting3_2";
+		
+		//Fake memberVariables collection
+		DBCollection memVarColl = db.getCollection("memberVariables");
+		memVarColl.insert(new BasicDBObject("l_id", l_id).append("4", 1).append("10",0.4));
+
+		//fake changedMemberVariables Collection
+		DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Change expected = new Change("4", 12,
+				simpleDateFormat.parse("2999-09-23"),
+				simpleDateFormat.parse("2014-09-01"));
+		Change expected2 = new Change("10", 1.0,
+				simpleDateFormat.parse("2999-09-23"),
+				simpleDateFormat.parse("2014-09-01"));
+		changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
+				"4",
+				new BasicDBObject("v", expected.getValue()).append("e",
+						expected.getExpirationDateAsString()).append("f",
+						expected.getEffectiveDateAsString())).append(
+								"10",
+								new BasicDBObject("v", expected2.getValue()).append("e",
+										expected2.getExpirationDateAsString()).append("f",
+										expected2.getEffectiveDateAsString())));
+					
+		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
+		newChangesVarValueMap.put("VARIABLE4", "0.01");
+		newChangesVarValueMap.put("VARIABLE10", "0.1");
+		newChangesVarValueMap.put("BOOST_SYW_VARIABLE7", "0.1");
+				
+		MemberRTSChanges memberRTSChanges = scoringSingletonObj.calcRTSChanges(l_id, newChangesVarValueMap, null, "TEST");
+		
+		ChangedMemberScore expectedChangedMemberScore = new ChangedMemberScore();
+		//both variables VARIABLE4 and VARIABLE10 has strategies with expiration date set to 2 days
+		Date minDate = new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate();
+		Date maxDate = new LocalDate(new Date()).plusDays(7).toDateMidnight().toDate();
+		expectedChangedMemberScore.setModelId("35");
+		expectedChangedMemberScore.setScore(1.0);
+		expectedChangedMemberScore.setMinDate(simpleDateFormat.format(minDate));
+		expectedChangedMemberScore.setMaxDate(simpleDateFormat.format(maxDate));
+		expectedChangedMemberScore.setEffDate(simpleDateFormat.format(new Date()));
+		
+		Map<String, Change> expectedAllChanges = new HashMap<String, Change>();
+		//VARIABLE4 and VARIABLE10 are set with minDate as exp dates as their strategy is to expire these variables in two days
+		Change change = new Change(1, minDate);
+		Change change2 = new Change(1.1, minDate);
+		//BOOST_SYW_VARIABLE7 is set with maxDate as exp dates as their strategy is to expire these variables in 7 days 
+		Change change3 = new Change(0.1, maxDate);
+		expectedAllChanges.put("VARIABLE4", change);
+		expectedAllChanges.put("VARIABLE10", change2);
+		expectedAllChanges.put("BOOST_SYW_VARIABLE7", change3);
+		Object expectedVar4Value = expectedAllChanges.get("VARIABLE4").getValue();
+		Object expectedVar10Value = expectedAllChanges.get("VARIABLE10").getValue();
+		Object expectedBoostSywVar7Value = expectedAllChanges.get("BOOST_SYW_VARIABLE7").getValue();
+		Date expectedVar4Date = expectedAllChanges.get("VARIABLE4").getExpirationDate();
+		Date expectedVar10Date = expectedAllChanges.get("VARIABLE10").getExpirationDate();
+		Date expectedBoostSywVar7Date = expectedAllChanges.get("BOOST_SYW_VARIABLE7").getExpirationDate();
+		
+		List<ChangedMemberScore> changedMemberScoresList = memberRTSChanges.getChangedMemberScoreList();
+		ChangedMemberScore actualChangedMemberScore = changedMemberScoresList.get(0);
+		
+		Map<String, Change> actualAllChanges =  memberRTSChanges.getAllChangesMap();
+		Object actualVar4Value = actualAllChanges.get("VARIABLE4").getValue();
+		Object actualVar10Value = actualAllChanges.get("VARIABLE10").getValue();
+		Object actualBoostSywVar7Value = actualAllChanges.get("BOOST_SYW_VARIABLE7").getValue();
+		Date actualVar4Date = actualAllChanges.get("VARIABLE4").getExpirationDate();
+		Date actualVar10Date = actualAllChanges.get("VARIABLE10").getExpirationDate();
+		Date actualBoostSywVar7Date = actualAllChanges.get("BOOST_SYW_VARIABLE7").getExpirationDate();
+	
+		int compareVarVal = new Integer((Integer) actualVar4Value).compareTo(new Integer((Integer) expectedVar4Value));
+		int compareVarVal2 = new Double((Double) actualVar10Value).compareTo(new Double((Double) expectedVar10Value));
+		int compareVarVal3 = new Double(Double.valueOf( actualBoostSywVar7Value.toString())).compareTo(new Double(Double.valueOf( expectedBoostSywVar7Value.toString())));
+		
+		int compareScoreVal3 = new Double(expectedChangedMemberScore.getScore()).compareTo(new Double(actualChangedMemberScore.getScore()));
+	
+		Assert.assertEquals(compareVarVal, 0);
+		Assert.assertEquals(compareVarVal2, 0);
+		Assert.assertEquals(compareVarVal3, 0);
+		Assert.assertEquals(actualVar4Date, expectedVar4Date);
+		Assert.assertEquals(expectedVar10Date, actualVar10Date);
+		Assert.assertEquals(expectedBoostSywVar7Date, actualBoostSywVar7Date);
+		
+		Assert.assertEquals(compareScoreVal3, 0);
+		Assert.assertEquals(expectedChangedMemberScore.getMinDate(), actualChangedMemberScore.getMinDate());
+		Assert.assertEquals(expectedChangedMemberScore.getMaxDate(), actualChangedMemberScore.getMaxDate());
+	}
+	
+	
 	//if the member does not have variables of interest, i.e. memberVariablesMap is empty
 	//in this case, the member does not have variables 4 and 10 which are associated with model 35
 	//but these variables, because of previous rts scoring are unexpired in changedMemScore and hence used for the current scoring
 	@Test
-	public void calcRTSChangesTest3() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
-		String l_id = "SearsTesting3";
+	public void calcRTSChangesTestEmptyMemVar() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
+		String l_id = "SearsTesting4";
 		
 		//Fake memberVariables collection
 		DBCollection memVarColl = db.getCollection("memberVariables");
@@ -351,8 +519,8 @@ public class ScoringSingletonIntegrationTest {
 	// if a member does not have record in memberVariables collection, then the member should not be scored
 	// i.e. memberVariablesMap is null
 	@Test
-	public void calcRTSChangesTest4() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
-		String l_id = "SearsTesting4";
+	public void calcRTSChangesTestNullMemVar() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
+		String l_id = "SearsTesting5";
 	
 		//fake changedMemberVariables Collection
 		DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
@@ -393,8 +561,8 @@ public class ScoringSingletonIntegrationTest {
 	//even before getting into the logic of scoring, it should be blacked out with a score of 0.0 
 	//with expiration dates set based on StrategyBlackout (30 days for now)
 	@Test
-	public void calcRTSChangesTest5() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
-		String l_id = "SearsTesting5";
+	public void calcRTSChangesTestBlackoutVar() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
+		String l_id = "SearsTesting6";
 	
 		//Fake memberVariables collection
 		DBCollection memVarColl = db.getCollection("memberVariables");
@@ -444,8 +612,8 @@ public class ScoringSingletonIntegrationTest {
 	//but not in variables collection at all or does not have proper record for it in the collection
 	//then, the model which gets affected by the variable will NOT be scored
 	@Test
-	public void calcRTSChangesTest6() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
-		String l_id = "SearsTesting6";
+	public void calcRTSChangesTestInvalidVar() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
+		String l_id = "SearsTesting7";
 		
 		//Fake memberVariables collection
 		DBCollection memVarColl = db.getCollection("memberVariables");
@@ -479,8 +647,8 @@ public class ScoringSingletonIntegrationTest {
 	//test case for a variable "variable4" expired in changedMemberVariable
 	//will be picked up from MemberVariable collection
 	@Test
-	public void calcRTSChangesTest7() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
-		String l_id = "SearsTesting7";
+	public void calcRTSChangesTestWithOneVarExp() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
+		String l_id = "SearsTesting8";
 		
 		//Fake memberVariables collection
 		DBCollection memVarColl = db.getCollection("memberVariables");
