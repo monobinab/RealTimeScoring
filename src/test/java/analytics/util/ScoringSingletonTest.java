@@ -467,7 +467,7 @@ public class ScoringSingletonTest {
 		variableNameToVidMap.setAccessible(false);
 	}
 
-	/*if variable collection does not have a varaible so that there is no VID in record, it will be skipped in the creation of memberVariableValueMap*/ 
+	/*if variable collection does not have a variable so that there is no VID in record, it will be skipped in the creation of memberVariableValueMap*/ 
 	@Test
 	public void createMemberVariableValueMapForNullVIDTest()
 			throws ConfigurationException, SecurityException,
@@ -1849,7 +1849,8 @@ public class ScoringSingletonTest {
 		Assert.assertEquals(null, minMaxMap.get("maxExpiry"));
 	}
 	
-	
+	/*if variables of interest are there in variableModelsMap but of none of them are associated with model of interest, then minDate, maxDate will be null
+	Ideally, this should not happen when the flow reaches this point of code, testing as if an external class calling this method*/
 	@Test
 	public void getMinMaxExpForNullMinDateSetTest() throws ParseException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd");
@@ -1944,6 +1945,9 @@ public class ScoringSingletonTest {
 	 * @throws ParseException
 	 * @throws ConfigurationException
 	 */
+	
+	
+	
 	@Test
 	public void strategyCountTransactionsTest() throws SecurityException,
 	NoSuchFieldException, IllegalArgumentException,
@@ -2204,6 +2208,58 @@ public class ScoringSingletonTest {
 		varaibleModelsMap.setAccessible(false);
 			
 	}
+	
+	
+	@Test
+	public void strategyIfAllNewChangesVarNotInVarModelsMapTest() throws SecurityException,
+	NoSuchFieldException, IllegalArgumentException,
+	IllegalAccessException, ParseException, ConfigurationException {
+		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
+		newChangesVarValueMap.put("VARIABLE11", "0.001");
+		
+		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
+		List<Integer> modelLists = new ArrayList<Integer>();
+		modelLists.add(48);
+		variableModelsMapContents.put("VARIABLE1", modelLists);
+		Field varaibleModelsMap = ScoringSingleton.class
+				.getDeclaredField("variableModelsMap");
+		varaibleModelsMap.setAccessible(true);
+		varaibleModelsMap.set(scoringSingletonObj,variableModelsMapContents);
+		
+		Map<String, String> variableNameToStrategyMapContents = new HashMap<String, String>();
+		variableNameToStrategyMapContents.put("VARIABLE1",
+				"StrategyCountTransactions");
+		Field variableNameToStrategyMap = ScoringSingleton.class
+				.getDeclaredField("variableNameToStrategyMap");
+		variableNameToStrategyMap.setAccessible(true);
+		variableNameToStrategyMap.set(scoringSingletonObj,variableNameToStrategyMapContents);
+		
+		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
+		variableNameToVidMapContents.put("VARIABLE1", "1");
+		Field variableNameToVidMap = ScoringSingleton.class
+				.getDeclaredField("variableNameToVidMap");
+		variableNameToVidMap.setAccessible(true);
+		variableNameToVidMap.set(scoringSingletonObj,variableNameToVidMapContents);
+		
+		Map<String, Object> memVariables = new HashMap<String, Object>();
+		memVariables.put("2269", 1);
+		
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Change change = new Change("1", 3,
+				simpleDateFormat.parse("2999-10-21"),
+				simpleDateFormat.parse("2014-10-01"));
+		Map<String, Change> allChanges = new HashMap<String, Change>();
+		allChanges.put("VARIABLE1", change);
+		
+		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(
+				allChanges, newChangesVarValueMap, memVariables );
+		Assert.assertEquals(3, allChangesMap.get("VARIABLE1").getValue());
+		Assert.assertEquals("2999-10-21", allChangesMap.get("VARIABLE1").getExpirationDateAsString());
+		variableNameToStrategyMap.setAccessible(false);
+		variableNameToVidMap.setAccessible(false);
+		varaibleModelsMap.setAccessible(false);
+	}
+
 	
 	//This is a positive test case to update changedMemberScore collection
 	@SuppressWarnings("unchecked")
