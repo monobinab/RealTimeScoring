@@ -493,7 +493,7 @@ public class ScoringSingleton {
 		String key = entry.getKey();
 		Change value = entry.getValue();
 		if (!variableModelsMap.containsKey(key)) {
-			LOGGER.error("Could not find variable in map " + key);
+			LOGGER.error("Could not find variable in variableModelsMap " + key);
 			continue;
 		}
 		// variable models map
