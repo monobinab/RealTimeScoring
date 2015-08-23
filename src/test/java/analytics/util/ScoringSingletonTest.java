@@ -1815,7 +1815,7 @@ public class ScoringSingletonTest {
 		Assert.assertEquals(null, minMaxMap.get("maxExpiry"));
 	}
 	
-	@Test
+	/*@Test
 	public void getMinMaxExpForNonExistentModelInVarModelsMapTest() throws ParseException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd");
 		Change change = new Change("2271", 0.2,	simpleDateFormat.parse("2777-10-21"), simpleDateFormat.parse("2014-10-01"));
@@ -1848,12 +1848,12 @@ public class ScoringSingletonTest {
 		
 		Assert.assertEquals(null, minMaxMap.get("minExpiry"));
 		Assert.assertEquals(null, minMaxMap.get("maxExpiry"));
-	}
+	}*/
 	
 	/*if variables of interest are there in variableModelsMap but of none of them are associated with model of interest, then minDate, maxDate will be null
 	Ideally, this should not happen when the flow reaches this point of code, testing as if an external class calling this method*/
 	@Test
-	public void getMinMaxExpForNullMinDateSetTest() throws ParseException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
+	public void getMinMaxExpForNonExistentModelInVarModelsMapTest() throws ParseException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd");
 		Change change = new Change("2271", 0.2,	simpleDateFormat.parse("2777-10-21"), simpleDateFormat.parse("2014-10-01"));
 		
@@ -1885,6 +1885,47 @@ public class ScoringSingletonTest {
 		
 		Assert.assertEquals(null, minMaxMap.get("minExpiry"));
 		Assert.assertEquals(null, minMaxMap.get("maxExpiry"));
+	}
+	/*
+	 * to test a month model whose variables' expiration dates are with the lastDateOfMonth
+	 * so, not needed to explicitly set the dates with the lastDayOfMonth
+	 */
+	@Test
+	public void getMinMaxExpForMonthModelWithValidMinDateTest() throws ParseException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd");
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DATE));
+		Date lastDayOfMonth = calendar.getTime();
+		Change change = new Change("2271", 0.2,	lastDayOfMonth, simpleDateFormat.parse("2014-10-01"));
+		
+		Map<String, Change> allChanges = new HashMap<String, Change>();
+		allChanges.put("S_HOME_6M_IND_ALL", change);
+		
+		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
+		variablesMap.put("S_HOME_6M_IND_ALL", new Variable("S_DSL_APP_INT_ACC2",
+				0.002));
+				
+		Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
+		monthModelMap.put(Calendar.getInstance().get(Calendar.MONTH)+1, new Model(35, "Model_Name", Calendar.getInstance().get(Calendar.MONTH)+1, 5, variablesMap));
+		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
+		modelsMapContent.put(35, monthModelMap);
+		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
+		modelsMap.setAccessible(true);
+		modelsMap.set(scoringSingletonObj, modelsMapContent);
+		
+		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
+		List<Integer> modelLists = new ArrayList<Integer>();
+		modelLists.add(35);
+		variableModelsMapContents.put("S_HOME_6M_IND_ALL", modelLists);
+		Field varaibleModelsMap = ScoringSingleton.class
+				.getDeclaredField("variableModelsMap");
+		varaibleModelsMap.setAccessible(true);
+		varaibleModelsMap.set(scoringSingletonObj,variableModelsMapContents);
+		
+		Map<String, Date> minMaxMap = scoringSingletonObj.getMinMaxExpiry(35, allChanges);
+		
+		Assert.assertEquals(simpleDateFormat.format(lastDayOfMonth), simpleDateFormat.format(minMaxMap.get("minExpiry")));
+		Assert.assertEquals(simpleDateFormat.format(lastDayOfMonth), simpleDateFormat.format(minMaxMap.get("maxExpiry")));
 	}
 	
 	//to test whether minExpiry is set with lastDayOfMonth if it is a valid month model
