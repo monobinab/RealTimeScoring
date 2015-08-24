@@ -588,6 +588,13 @@ public class ScoringSingletonIntegrationTest {
 		Assert.assertEquals(expectedChangedMemberScore.getMaxDate(), actualChangedMemberScore.getMaxDate());
 	}
 	
+	@Test
+	public void calcRTSChangesWithEmptyNewChangesMapTest() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
+		String l_id = "SearsIntegrationTesting9";
+		MemberRTSChanges memberRTSChanges = scoringSingletonObj.calcRTSChanges(l_id, new HashMap<String, String>(), null, "TEST");
+		Assert.assertEquals(null, memberRTSChanges);;
+	}
+	
 	/*
 	 * api's call to scoring
 	 */
@@ -623,19 +630,17 @@ public class ScoringSingletonIntegrationTest {
 	public void executeWithEmptyModelListsTest() throws ParseException{
 		
 		String l_id = "apiLid2";
-		getMemberVarCollection(l_id);
-		getChangedMemberVarColl(l_id);
-
-		//fake changedMemberScore collection
-		//empty changedMemberScore collection before update
-		DBCollection changedMemberScore = db.getCollection("changedMemberScores");
-	
 		ArrayList<String> modelLists = new ArrayList<String>();
 		HashMap<String, Double> actuaModelIdStringScoreMap = scoringSingletonObj.execute(l_id, modelLists,  "TEST");
 		Assert.assertTrue("Expecting an emptymodelIdStringScoreMap as modelList passed is empty", actuaModelIdStringScoreMap.isEmpty());
+	}
+	
+	@Test
+	public void executeWithNullModelListsTest() throws ParseException{
 		
-		changedMemberScore.remove(new BasicDBObject("l_id", l_id));
-		
+		String l_id = "apiLid3";
+		HashMap<String, Double> actuaModelIdStringScoreMap = scoringSingletonObj.execute(l_id, null,  "TEST");
+		Assert.assertTrue("Expecting an emptymodelIdStringScoreMap as modelList passed is empty", actuaModelIdStringScoreMap.isEmpty());
 	}
 	
 	@AfterClass
