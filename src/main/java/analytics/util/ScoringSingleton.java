@@ -157,8 +157,10 @@ public class ScoringSingleton {
 					Map<String, Change> changedMemberVariables = this.createChangedMemberVariablesMap(lId);
 				
 					//For each variable in new changes, execute strategy and store in allChanges
+					//empty check for newChangesVarValueMap is NOT NEEDED here as empty map will come only from topology
+					//and if it is empty, modelList will be empty and the control won't be here
 					Map<String, Change> allChanges = null;
-					if( newChangesVarValueMap !=  null && !newChangesVarValueMap.isEmpty()){
+					if( newChangesVarValueMap !=  null ){
 						allChanges = this.executeStrategy(changedMemberVariables, newChangesVarValueMap, memberVariablesMap);
 					}//if this method is called from outside of the topology, newChangesVarValueMap will be null and 
 					  //thereby allChanges should be set with changedMemberVariables for scoring
