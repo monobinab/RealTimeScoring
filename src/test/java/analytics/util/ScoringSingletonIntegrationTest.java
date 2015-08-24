@@ -101,8 +101,7 @@ public class ScoringSingletonIntegrationTest {
 								new BasicDBObject("v", expected2.getValue()).append("e",
 										expected2.getExpirationDateAsString()).append("f",
 										expected2.getEffectiveDateAsString())));
-		}
-
+	}
 	private void getMemberInfoColl(String l_id) {
 		//Fake memberInfo collection
 		DBCollection memInfoColl = db.getCollection("memberInfo");
@@ -187,6 +186,9 @@ public class ScoringSingletonIntegrationTest {
 		Assert.assertEquals(expectedChangedMemberScore.getMaxDate(), actualChangedMemberScore.getMaxDate());
 	}
 
+	/*
+	 * 	same test as calcRTSChangesTest except that the member has no state in memberInfo coll or does not have record in the collection
+	 */
 	@Test
 	public void calcRTSChangesTestWithNoState() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
 		String l_id = "SearsIntegrationTesting2";
@@ -241,8 +243,12 @@ public class ScoringSingletonIntegrationTest {
 		Assert.assertEquals(expectedChangedMemberScore.getMaxDate(), actualChangedMemberScore.getMaxDate());
 	}
 	
-	//a positive case for modelId 35 (for topology call)
-	//the incoming feed corresponds to a BOOST variable which boosts the score
+	/*
+	 * a positive case for modelId 35 (for topology call)
+		the incoming feed corresponds to a BOOST variable which boosts the score
+		same data as calcRTSChanges with an additional Boost_syw_variable7 as the incoming var
+		so, the score got boosted from 0.09937568022504835 (by calcRTSChanges test) to 0.10037568022504835
+	 */
 	@Test
 	public void calcRTSChangesTestWithBoostScore() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
 		String l_id = "SearsIntegrationTesting3";
@@ -310,6 +316,9 @@ public class ScoringSingletonIntegrationTest {
 		Assert.assertEquals(expectedChangedMemberScore.getMaxDate(), actualChangedMemberScore.getMaxDate());
 	}
 	
+	/*
+	 * if the score gets boosted to be greater than 1, it is set to 1.0 again 
+	 */
 	@Test
 	public void calcRTSChangesTestWithScoreBoostedGT1() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
 		String l_id = "SearsIntegrationTesting3_2";
@@ -376,10 +385,11 @@ public class ScoringSingletonIntegrationTest {
 		Assert.assertEquals(expectedChangedMemberScore.getMaxDate(), actualChangedMemberScore.getMaxDate());
 	}
 	
-	
-	//if the member does not have variables of interest, i.e. memberVariablesMap is empty
-	//in this case, the member does not have variables 4 and 10 which are associated with model 35
-	//but these variables, because of previous rts scoring are unexpired in changedMemScore and hence used for the current scoring
+	/*
+	 *if the member does not have variables of interest, i.e. memberVariablesMap is empty
+	 *in this case, the member does not have variables 4 and 10 which are associated with model 35
+	 *but these variables, because of previous rts scoring are non-expired in changedMemVariables and hence used for the current scoring 
+	 */
 	@Test
 	public void calcRTSChangesTestEmptyMemVar() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
 		String l_id = "SearsIntegrationTesting4";
@@ -437,8 +447,10 @@ public class ScoringSingletonIntegrationTest {
 		Assert.assertEquals(expectedChangedMemberScore.getMaxDate(), actualChangedMemberScore.getMaxDate());
 	}
 	
-	// if a member does not have record in memberVariables collection, then the member should not be scored
-	// i.e. memberVariablesMap is null
+	/*
+	 *  if a member does not have record in memberVariables collection i.e. memberVariablesMap is null,
+	 *  then the member should not be scored
+	 */
 	@Test
 	public void calcRTSChangesTestNullMemVar() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
 		String l_id = "SearsIntegrationTesting5";
@@ -451,10 +463,10 @@ public class ScoringSingletonIntegrationTest {
 		Assert.assertEquals("Expecting null memberRTSChanges, as memberVariablesMap is null", null, memberRTSChanges);
 	}
 	
-	//to test a black out model
-	//BLACKOUT_VARIABLE is associated with modelId 46 and is the new incoming variable for this member
-	//even before getting into the logic of scoring, it should be blacked out with a score of 0.0 
-	//with expiration dates set based on StrategyBlackout (30 days for now)
+	/*to test a black out model
+	 *BLACKOUT_VARIABLE is associated with modelId 46 and is the new incoming variable for this member
+	 *even before getting into the logic of scoring, it should be blacked out with a score of 0.0 
+	 *with expiration dates set based on StrategyBlackout (30 days for now)*/
 	@Test
 	public void calcRTSChangesTestBlackoutVar() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
 		String l_id = "SearsIntegrationTesting6";
@@ -478,9 +490,12 @@ public class ScoringSingletonIntegrationTest {
 		Assert.assertEquals(expirationDate, changedMemberScore.getMaxDate());
 	}
 	
-	//to test if a variable (INVALIDVARIABLE)which is associated with a model 48(i.e. there in our modelVariables collection )
-	//but not in variables collection at all or does not have proper record for it in the collection
-	//then, the model which gets affected by the variable will NOT be scored
+	/*
+	 * to test if a variable (INVALIDVARIABLE)which is associated with a model 48 is there in our modelVariables collection )
+	 * but not in variables collection at all or 
+	 * does not have proper record for it in the variables collection, so there will be no proper name or VID for it
+	 * then, the model (model 48 int his case) which gets affected by the variable will NOT be scored
+	 */
 	@Test
 	public void calcRTSChangesTestInvalidVar() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
 		String l_id = "SearsIntegrationTesting7";
@@ -512,8 +527,10 @@ public class ScoringSingletonIntegrationTest {
 		Assert.assertEquals("Expecting an empty scorelist as the incoming invalidvariable for the model can not be used in scoring", new ArrayList<ChangedMemberScore>(), actualChangedMemberScoreList);
 	}
 	
-	//test case for a variable "variable4" expired in changedMemberVariable
-	//will be picked up from MemberVariable collection
+	/*
+	 * if a variable "variable4" is expired in changedMemberVariable, 
+	 * its value should be picked up from MemberVariable collection, if exists
+	 */
 	@Test
 	public void calcRTSChangesTestWithOneVarExp() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
 		String l_id = "SearsIntegrationTesting8";
@@ -596,7 +613,7 @@ public class ScoringSingletonIntegrationTest {
 	}
 	
 	/*
-	 * api's call to scoring
+	 * api's call to scoring, a positive case
 	 */
 	@SuppressWarnings("unchecked")
 	@Test
