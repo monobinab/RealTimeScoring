@@ -59,7 +59,7 @@ public class ScoringSingletonIntegrationTest {
 		varColl.insert(new BasicDBObject("name", "variable10").append("VID", 10).append("strategy","StrategySumSales"));
 		varColl.insert(new BasicDBObject("name", "Blackout_variable").append("VID", 11).append("strategy","StrategyBlackout"));
 		varColl.insert(new BasicDBObject("name", "variable12").append("VID", 12).append("strategy","NONE"));
-		
+			
 		//fake modelVariables collection
 		DBCollection modeVarColl = db.getCollection("modelVariables");
 		BasicDBList dbList = new BasicDBList();
@@ -641,6 +641,21 @@ public class ScoringSingletonIntegrationTest {
 		String l_id = "apiLid3";
 		HashMap<String, Double> actuaModelIdStringScoreMap = scoringSingletonObj.execute(l_id, null,  "TEST");
 		Assert.assertTrue("Expecting an emptymodelIdStringScoreMap as modelList passed is empty", actuaModelIdStringScoreMap.isEmpty());
+	}
+	
+	/**
+	 *if allChanges is null, calcScore will throw exception, which gets caught in calcRTSChanges method
+	 *so, changedMemberScoreList will be empty
+	 ***/
+	@Test
+	public void executeWithNullAllChangesTest() throws ParseException{
+		
+		String l_id = "apiLid4";
+		getMemberVarCollection(l_id);
+		ArrayList<String> modelLists = new ArrayList<String>();
+		modelLists.add("35");
+		HashMap<String, Double> actuaModelIdStringScoreMap = scoringSingletonObj.execute(l_id, modelLists, "TEST");
+		Assert.assertEquals("Expecting an empty map as List of ChangedMemScore is empty returned by calcRTSChanges", new HashMap<String, Double>(), actuaModelIdStringScoreMap);
 	}
 	
 	@AfterClass

@@ -400,13 +400,13 @@ public class ScoringSingletonTest {
 		variableNameToVidMap.setAccessible(true);
 		variableNameToVidMap.set(scoringSingletonObj,
 				variableNameToVidMapContents);
-		Map<String, Object> expectedMemberVariables = scoringSingletonObj
+		Map<String, Object> actualMemberVariables = scoringSingletonObj
 				.createMemberVariableValueMap(lId, modelIdsList);
-		Set<String> actualMemVarValue = new HashSet<String>();
-		actualMemVarValue.add("2270");
-		actualMemVarValue.add("2269");
+		Set<String> expectedMemVarValue = new HashSet<String>();
+		expectedMemVarValue.add("2270");
+		expectedMemVarValue.add("2269");
 
-		Assert.assertEquals("Expecting 2269 and 2270 only as 2271 not in memberVar collection", actualMemVarValue, expectedMemberVariables.keySet());
+		Assert.assertEquals("Expecting 2269 and 2270 only as 2271 not in memberVar collection", expectedMemVarValue, actualMemberVariables.keySet());
 		
 		memberVariables.remove(new BasicDBObject("l_id", lId));
 		modelsMap.setAccessible(false);
@@ -416,7 +416,7 @@ public class ScoringSingletonTest {
 	/*model 48 is month model but not correspond to current month, so the associated variables will not be fetched from memberVariables collection
 	Ideally, this will not happen as those models will be filtered in getModelIdList() method itself*/
 	@Test
-	public void createMemberVariableValueMapPositiveCaseTest3()
+	public void createMemberVariableValueMapInvalidMonthModelTest()
 			throws ConfigurationException, SecurityException,
 			NoSuchFieldException, IllegalArgumentException,
 			IllegalAccessException, RealTimeScoringException {
@@ -517,6 +517,53 @@ public class ScoringSingletonTest {
 		variableNameToVidMap.setAccessible(false);
 	}
 
+	
+	@Test
+	public void createMemberVariableValueMapAllFilteredVarNotInMemVarCollTest()
+			throws ConfigurationException, SecurityException,
+			NoSuchFieldException, IllegalArgumentException,
+			IllegalAccessException {
+		
+		String lId = "SearsTesting44";
+		DBCollection memberVariables = db.getCollection("memberVariables");
+		memberVariables.insert(new BasicDBObject("l_id", lId)
+				.append("1000", 1).append("1001", 0.10455));
+
+		//variablesMap, modelsMap are populated from modelVaraibles collection
+		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
+		variablesMap.put("S_DSL_APP_INT_ACC", new Variable("S_DSL_APP_INT_ACC",
+				0.002));
+		variablesMap
+				.put("S_HOME_6M_IND_ALL", new Variable("S_HOME_6M_IND_ALL", 0.0015));
+
+		Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
+		monthModelMap.put(0, new Model(35, "Model_Name", 0, 5, variablesMap));
+		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
+		modelsMapContent.put(35, monthModelMap);
+		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
+		modelsMap.setAccessible(true);
+		modelsMap.set(scoringSingletonObj, modelsMapContent);
+
+		//variableNameToVidMap is populated from variables collection
+		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
+		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC", "2269");
+		Field variableNameToVidMap = ScoringSingleton.class
+				.getDeclaredField("variableNameToVidMap");
+		variableNameToVidMap.setAccessible(true);
+		variableNameToVidMap.set(scoringSingletonObj,
+				variableNameToVidMapContents);
+		
+		Set<Integer> modelIdsList = new HashSet<Integer>();
+		modelIdsList.add(35);
+		Map<String, Object> actualMemberVariablesMap = scoringSingletonObj
+				.createMemberVariableValueMap(lId, modelIdsList);
+		Set<String> expectedMemVarValueMap = new HashSet<String>();
+		
+		Assert.assertEquals("Expecting empty memberVarValueMap as this member does not have any of the filtered variables", expectedMemVarValueMap, actualMemberVariablesMap.keySet());
+		memberVariables.remove(new BasicDBObject("l_id", lId));
+		modelsMap.setAccessible(false);
+		variableNameToVidMap.setAccessible(false);
+	}
 
 	/* This test is to check whether changedMemberVariablesMap is getting populated
 	 (positive case)*/
@@ -1154,10 +1201,10 @@ public class ScoringSingletonTest {
 		modelsMap.setAccessible(false);
 	}
 	
-	/* If memberVariables is null, was expected to throw RealTimeScoringException, now changed with the fact that scoring can be done with allChanges values
-	 allChanges mentioned here is unexpired member variables*/
+	/* If memberVariables is empty, was expected to throw RealTimeScoringException, now changed with the fact that scoring can be done with allChanges values
+	 allChanges mentioned here is unexpired member variables..Note: null memberVarMap is not checked as null memberVarMap was checked even before scoring part */
 	@Test
-	public void calcScoreForNullMemberVariablesTest() throws ParseException,
+	public void calcScoreForEmptyMemberVariablesTest() throws ParseException,
 			SecurityException, NoSuchFieldException, IllegalArgumentException,
 			IllegalAccessException, ConfigurationException,
 			RealTimeScoringException {
@@ -1188,7 +1235,7 @@ public class ScoringSingletonTest {
 		varNameToVidMap.setAccessible(true);
 		varNameToVidMap.set(scoringSingletonObj,
 				variableNameToVidMapContents);
-		double newScore = scoringSingletonObj.calcScore(null, allChanges, 35);
+		double newScore = scoringSingletonObj.calcScore(new HashMap<String, Object>(), allChanges, 35);
 		int comapreVal = new Double(0.9934277167211376).compareTo(new Double(newScore));
 		Assert.assertEquals(comapreVal, 0);
 		modelsMap.setAccessible(false);

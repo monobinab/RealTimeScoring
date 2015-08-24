@@ -120,7 +120,8 @@ public class ScoringSingleton {
 			MemberRTSChanges memberRTSChanges = calcRTSChanges(l_id, null, modelIdList, source );
 			if(memberRTSChanges != null){
 				List<ChangedMemberScore> changedMemberScoresList = memberRTSChanges.getChangedMemberScoreList();
-				if(changedMemberScoresList != null && !changedMemberScoresList.isEmpty()){
+				//changedMemberScoresList null check is not needed, as calcRTSChanges method will NOT return null map
+				if(!changedMemberScoresList.isEmpty()){
 					updateChangedMemberScore(l_id, changedMemberScoresList, source);
 					for(ChangedMemberScore changedMemScore : changedMemberScoresList){
 						modelIdStringScoreMap.put(changedMemScore.getModelId(), changedMemScore.getScore());

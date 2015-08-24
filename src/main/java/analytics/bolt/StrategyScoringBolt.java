@@ -144,7 +144,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			this.outputCollector.ack(input);
 		}catch(Exception e){
 			e.printStackTrace();
-			LOGGER.info("Exception scoring lId " +lId +" ", e );
+			LOGGER.info("Exception scoring lId " +lId +" "+ e );
 
 		}finally{
 			if(jedis!=null)
