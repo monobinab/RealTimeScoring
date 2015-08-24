@@ -329,9 +329,13 @@ public class ScoringSingleton {
 					LOGGER.error("Unable to obtain strategy for " + variableName);
 					continue;
 				}
-				// If this member had a changed variable
-				// allChanges at this point only contain changedMemberVariables
-				if (allChanges != null && allChanges.containsKey(variableName)) {
+				/*
+				 * If this member had a changed variable
+				   allChanges at this point only contain changedMemberVariables
+				   changedMemberVariables can never be null, so no need for null check 
+				   ChangedMemberVarDao will return empty map NOT null map
+				 */
+				if (!allChanges.isEmpty() && allChanges.containsKey(variableName)) {
 					context.setPreviousValue(allChanges.get(variableName).getValue());
 				}
 				// else get it from memberVariablesMap

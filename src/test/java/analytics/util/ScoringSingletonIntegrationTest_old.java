@@ -1,4 +1,4 @@
-package analytics.util;
+/*package analytics.util;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
@@ -27,7 +27,7 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 
-public class ScoringSingletonIntegrationTest {
+public class ScoringSingletonIntegrationTest_old {
 	
 	private static ScoringSingleton scoringSingletonObj;
 	private static DB db;
@@ -77,12 +77,22 @@ public class ScoringSingletonIntegrationTest {
 		//fake regionalFactors collection
 		DBCollection regionalAdjFactorsColl = db.getCollection("regionalAdjustmentFactors");
 		regionalAdjFactorsColl.insert(new BasicDBObject("state", "TN").append("modelName", "Model_Name").append("modelId", "35").append("factor", "0.1"));
+		
 		scoringSingletonObj = constructor.newInstance();
+		
 	}
 	
+	//a positive case for modelId 35 (for topology call)
+	// the member has non-expired variables VARIABLE4 AND VARIABLE10, which are associated with modelId 35 
+	//so, their values and exp dates are set by their corresponding strategy, and used in scoring
+	@Test
+	public void calcRTSChangesTest() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
+		String l_id = "SearsTesting";
+		
+		//Fake memberVariables collection
+		DBCollection memVarColl = db.getCollection("memberVariables");
+		memVarColl.insert(new BasicDBObject("l_id", l_id).append("4", 1).append("10",0.4));
 
-	private void getChangedMemberVarColl(String l_id)
-			throws ParseException {
 		//fake changedMemberVariables Collection
 		DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -101,45 +111,13 @@ public class ScoringSingletonIntegrationTest {
 								new BasicDBObject("v", expected2.getValue()).append("e",
 										expected2.getExpirationDateAsString()).append("f",
 										expected2.getEffectiveDateAsString())));
-		}
-
-	private void getMemberInfoColl(String l_id) {
+		
 		//Fake memberInfo collection
 		DBCollection memInfoColl = db.getCollection("memberInfo");
 		memInfoColl.insert(new BasicDBObject("l_id", l_id).append("srs", "0001470")
 				.append("srs_zip", "46142").append("kmt", "3251").append("kmt_zip", "46241")
 				.append( "eid", "258003809").append("eml_opt_in", "Y").append("st_cd", "TN"));
-	}
-	private void getMemberVarCollection(String l_id) {
-		//Fake memberVariables collection
-		DBCollection memVarColl = db.getCollection("memberVariables");
-		memVarColl.insert(new BasicDBObject("l_id", l_id).append("4", 1).append("10",0.4));
-	}
-	private Map<String, String> newChangesVarValueMap() {
-		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
-		newChangesVarValueMap.put("VARIABLE4", "0.01");
-		newChangesVarValueMap.put("VARIABLE10", "0.1");
-		return newChangesVarValueMap;
-	}
-
-	private Map<String, String> getNewChangesBoostVarValueMap() {
-		Map<String, String> newChangesVarValueMap = newChangesVarValueMap();
-		newChangesVarValueMap.put("BOOST_SYW_VARIABLE7", "0.1");
-		return newChangesVarValueMap;
-	}
-	
-	//a positive case for modelId 35 (for topology call)
-	// the member has non-expired variables VARIABLE4 AND VARIABLE10, which are associated with modelId 35 
-	//so, their values and exp dates are set by their corresponding strategy, and used in scoring
-	@Test
-	public void calcRTSChangesTest() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
-		
-		String l_id = "SearsIntegrationTesting";
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		
-		getMemberVarCollection(l_id);
-		getChangedMemberVarColl(l_id);
-		getMemberInfoColl(l_id);
+					
 		Map<String, String> newChangesVarValueMap = newChangesVarValueMap();
 	
 		MemberRTSChanges memberRTSChanges = scoringSingletonObj.calcRTSChanges(l_id, newChangesVarValueMap, null, "TEST");
@@ -187,13 +165,41 @@ public class ScoringSingletonIntegrationTest {
 		Assert.assertEquals(expectedChangedMemberScore.getMaxDate(), actualChangedMemberScore.getMaxDate());
 	}
 
+	private Map<String, String> newChangesVarValueMap() {
+		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
+		newChangesVarValueMap.put("VARIABLE4", "0.01");
+		newChangesVarValueMap.put("VARIABLE10", "0.1");
+		return newChangesVarValueMap;
+	}
+	
+	
 	@Test
 	public void calcRTSChangesTestWithNoState() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
-		String l_id = "SearsIntegrationTesting2";
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		String l_id = "SearsTesting2";
 		
-		getMemberVarCollection(l_id);
-		getChangedMemberVarColl(l_id);
+		//Fake memberVariables collection
+		DBCollection memVarColl = db.getCollection("memberVariables");
+		memVarColl.insert(new BasicDBObject("l_id", l_id).append("4", 1).append("10",0.4));
+
+		//fake changedMemberVariables Collection
+		DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Change expected = new Change("4", 12,
+				simpleDateFormat.parse("2999-09-23"),
+				simpleDateFormat.parse("2014-09-01"));
+		Change expected2 = new Change("10", 1.0,
+				simpleDateFormat.parse("2999-09-23"),
+				simpleDateFormat.parse("2014-09-01"));
+		changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
+				"4",
+				new BasicDBObject("v", expected.getValue()).append("e",
+						expected.getExpirationDateAsString()).append("f",
+						expected.getEffectiveDateAsString())).append(
+								"10",
+								new BasicDBObject("v", expected2.getValue()).append("e",
+										expected2.getExpirationDateAsString()).append("f",
+										expected2.getEffectiveDateAsString())));
+						
 		Map<String, String> newChangesVarValueMap = newChangesVarValueMap();
 	
 		MemberRTSChanges memberRTSChanges = scoringSingletonObj.calcRTSChanges(l_id, newChangesVarValueMap, null, "TEST");
@@ -241,16 +247,42 @@ public class ScoringSingletonIntegrationTest {
 		Assert.assertEquals(expectedChangedMemberScore.getMaxDate(), actualChangedMemberScore.getMaxDate());
 	}
 	
+	
 	//a positive case for modelId 35 (for topology call)
 	//the incoming feed corresponds to a BOOST variable which boosts the score
 	@Test
 	public void calcRTSChangesTestWithBoostScore() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
-		String l_id = "SearsIntegrationTesting3";
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		String l_id = "SearsTesting3";
 		
-		getMemberVarCollection(l_id);
-		getChangedMemberVarColl(l_id);
-		getMemberInfoColl(l_id);
+		//Fake memberVariables collection
+		DBCollection memVarColl = db.getCollection("memberVariables");
+		memVarColl.insert(new BasicDBObject("l_id", l_id).append("4", 1).append("10",0.4));
+
+		//fake changedMemberVariables Collection
+		DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Change expected = new Change("4", 12,
+				simpleDateFormat.parse("2999-09-23"),
+				simpleDateFormat.parse("2014-09-01"));
+		Change expected2 = new Change("10", 1.0,
+				simpleDateFormat.parse("2999-09-23"),
+				simpleDateFormat.parse("2014-09-01"));
+		changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
+				"4",
+				new BasicDBObject("v", expected.getValue()).append("e",
+						expected.getExpirationDateAsString()).append("f",
+						expected.getEffectiveDateAsString())).append(
+								"10",
+								new BasicDBObject("v", expected2.getValue()).append("e",
+										expected2.getExpirationDateAsString()).append("f",
+										expected2.getEffectiveDateAsString())));
+		
+		//Fake memberInfo collection
+		DBCollection memInfoColl = db.getCollection("memberInfo");
+		memInfoColl.insert(new BasicDBObject("l_id", l_id).append("srs", "0001470")
+				.append("srs_zip", "46142").append("kmt", "3251").append("kmt_zip", "46241")
+				.append( "eid", "258003809").append("eml_opt_in", "Y").append("st_cd", "TN"));
+					
 		Map<String, String> newChangesVarValueMap = getNewChangesBoostVarValueMap();
 				
 		MemberRTSChanges memberRTSChanges = scoringSingletonObj.calcRTSChanges(l_id, newChangesVarValueMap, null, "TEST");
@@ -309,14 +341,40 @@ public class ScoringSingletonIntegrationTest {
 		Assert.assertEquals(expectedChangedMemberScore.getMinDate(), actualChangedMemberScore.getMinDate());
 		Assert.assertEquals(expectedChangedMemberScore.getMaxDate(), actualChangedMemberScore.getMaxDate());
 	}
+
+	private Map<String, String> getNewChangesBoostVarValueMap() {
+		Map<String, String> newChangesVarValueMap = newChangesVarValueMap();
+		newChangesVarValueMap.put("BOOST_SYW_VARIABLE7", "0.1");
+		return newChangesVarValueMap;
+	}
 	
 	@Test
 	public void calcRTSChangesTestWithScoreBoostedGT1() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
-		String l_id = "SearsIntegrationTesting3_2";
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		String l_id = "SearsTesting3_2";
 		
-		getMemberVarCollection(l_id);
-		getChangedMemberVarColl(l_id);
+		//Fake memberVariables collection
+		DBCollection memVarColl = db.getCollection("memberVariables");
+		memVarColl.insert(new BasicDBObject("l_id", l_id).append("4", 1).append("10",0.4));
+
+		//fake changedMemberVariables Collection
+		DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Change expected = new Change("4", 12,
+				simpleDateFormat.parse("2999-09-23"),
+				simpleDateFormat.parse("2014-09-01"));
+		Change expected2 = new Change("10", 1.0,
+				simpleDateFormat.parse("2999-09-23"),
+				simpleDateFormat.parse("2014-09-01"));
+		changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
+				"4",
+				new BasicDBObject("v", expected.getValue()).append("e",
+						expected.getExpirationDateAsString()).append("f",
+						expected.getEffectiveDateAsString())).append(
+								"10",
+								new BasicDBObject("v", expected2.getValue()).append("e",
+										expected2.getExpirationDateAsString()).append("f",
+										expected2.getEffectiveDateAsString())));
+					
 		Map<String, String> newChangesVarValueMap = getNewChangesBoostVarValueMap();
 				
 		MemberRTSChanges memberRTSChanges = scoringSingletonObj.calcRTSChanges(l_id, newChangesVarValueMap, null, "TEST");
@@ -382,14 +440,37 @@ public class ScoringSingletonIntegrationTest {
 	//but these variables, because of previous rts scoring are unexpired in changedMemScore and hence used for the current scoring
 	@Test
 	public void calcRTSChangesTestEmptyMemVar() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
-		String l_id = "SearsIntegrationTesting4";
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		String l_id = "SearsTesting4";
 		
 		//Fake memberVariables collection
 		DBCollection memVarColl = db.getCollection("memberVariables");
 		memVarColl.insert(new BasicDBObject("l_id", l_id).append("14", 1).append("20",0.4));
-		getChangedMemberVarColl(l_id);
-		getMemberInfoColl(l_id);
+
+		//fake changedMemberVariables Collection
+		DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Change expected = new Change("4", 12,
+				simpleDateFormat.parse("2999-09-23"),
+				simpleDateFormat.parse("2014-09-01"));
+		Change expected2 = new Change("10", 1.0,
+				simpleDateFormat.parse("2999-09-23"),
+				simpleDateFormat.parse("2014-09-01"));
+		changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
+				"4",
+				new BasicDBObject("v", expected.getValue()).append("e",
+						expected.getExpirationDateAsString()).append("f",
+						expected.getEffectiveDateAsString())).append(
+								"10",
+								new BasicDBObject("v", expected2.getValue()).append("e",
+										expected2.getExpirationDateAsString()).append("f",
+										expected2.getEffectiveDateAsString())));
+		
+		//Fake memberInfo collection
+		DBCollection memInfoColl = db.getCollection("memberInfo");
+		memInfoColl.insert(new BasicDBObject("l_id", l_id).append("srs", "0001470")
+				.append("srs_zip", "46142").append("kmt", "3251").append("kmt_zip", "46241")
+				.append( "eid", "258003809").append("eml_opt_in", "Y").append("st_cd", "TN"));
+					
 		Map<String, String> newChangesVarValueMap = newChangesVarValueMap();
 					
 		MemberRTSChanges memberRTSChanges = scoringSingletonObj.calcRTSChanges(l_id, newChangesVarValueMap, null, "TEST");
@@ -441,9 +522,33 @@ public class ScoringSingletonIntegrationTest {
 	// i.e. memberVariablesMap is null
 	@Test
 	public void calcRTSChangesTestNullMemVar() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
-		String l_id = "SearsIntegrationTesting5";
+		String l_id = "SearsTesting5";
 	
-		getMemberInfoColl(l_id);
+		//fake changedMemberVariables Collection
+		DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Change expected = new Change("4", 12,
+				simpleDateFormat.parse("2999-09-23"),
+				simpleDateFormat.parse("2014-09-01"));
+		Change expected2 = new Change("10", 1.0,
+				simpleDateFormat.parse("2999-09-23"),
+				simpleDateFormat.parse("2014-09-01"));
+		changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
+				"4",
+				new BasicDBObject("v", expected.getValue()).append("e",
+						expected.getExpirationDateAsString()).append("f",
+						expected.getEffectiveDateAsString())).append(
+								"10",
+								new BasicDBObject("v", expected2.getValue()).append("e",
+										expected2.getExpirationDateAsString()).append("f",
+										expected2.getEffectiveDateAsString())));
+		
+		//Fake memberInfo collection
+		DBCollection memInfoColl = db.getCollection("memberInfo");
+		memInfoColl.insert(new BasicDBObject("l_id", l_id).append("srs", "0001470")
+				.append("srs_zip", "46142").append("kmt", "3251").append("kmt_zip", "46241")
+				.append( "eid", "258003809").append("eml_opt_in", "Y").append("st_cd", "TN"));
+					
 		Map<String, String> newChangesVarValueMap = newChangesVarValueMap();
 				
 		MemberRTSChanges memberRTSChanges = scoringSingletonObj.calcRTSChanges(l_id, newChangesVarValueMap, null, "TEST");
@@ -457,12 +562,37 @@ public class ScoringSingletonIntegrationTest {
 	//with expiration dates set based on StrategyBlackout (30 days for now)
 	@Test
 	public void calcRTSChangesTestBlackoutVar() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
-		String l_id = "SearsIntegrationTesting6";
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		String l_id = "SearsTesting6";
+	
+		//Fake memberVariables collection
+		DBCollection memVarColl = db.getCollection("memberVariables");
+		memVarColl.insert(new BasicDBObject("l_id", l_id).append("4", 1).append("10",0.4));
 		
-		getMemberVarCollection(l_id);
-		getChangedMemberVarColl(l_id);
-		getMemberInfoColl(l_id);
+		//fake changedMemberVariables Collection
+		DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Change expected = new Change("4", 12,
+				simpleDateFormat.parse("2999-09-23"),
+				simpleDateFormat.parse("2014-09-01"));
+		Change expected2 = new Change("10", 1.0,
+				simpleDateFormat.parse("2999-09-23"),
+				simpleDateFormat.parse("2014-09-01"));
+		changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
+				"4",
+				new BasicDBObject("v", expected.getValue()).append("e",
+						expected.getExpirationDateAsString()).append("f",
+						expected.getEffectiveDateAsString())).append(
+								"10",
+								new BasicDBObject("v", expected2.getValue()).append("e",
+										expected2.getExpirationDateAsString()).append("f",
+										expected2.getEffectiveDateAsString())));
+		
+		//Fake memberInfo collection
+		DBCollection memInfoColl = db.getCollection("memberInfo");
+		memInfoColl.insert(new BasicDBObject("l_id", l_id).append("srs", "0001470")
+				.append("srs_zip", "46142").append("kmt", "3251").append("kmt_zip", "46241")
+				.append( "eid", "258003809").append("eml_opt_in", "Y").append("st_cd", "TN"));
+					
 		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
 		newChangesVarValueMap.put("BLACKOUT_VARIABLE", "0.01");
 				
@@ -483,9 +613,11 @@ public class ScoringSingletonIntegrationTest {
 	//then, the model which gets affected by the variable will NOT be scored
 	@Test
 	public void calcRTSChangesTestInvalidVar() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
-		String l_id = "SearsIntegrationTesting7";
+		String l_id = "SearsTesting7";
 		
-		getMemberVarCollection(l_id);
+		//Fake memberVariables collection
+		DBCollection memVarColl = db.getCollection("memberVariables");
+		memVarColl.insert(new BasicDBObject("l_id", l_id).append("4", 1).append("10",0.4));
 
 		//fake changedMemberVariables Collection
 		DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
@@ -516,9 +648,11 @@ public class ScoringSingletonIntegrationTest {
 	//will be picked up from MemberVariable collection
 	@Test
 	public void calcRTSChangesTestWithOneVarExp() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
-		String l_id = "SearsIntegrationTesting8";
+		String l_id = "SearsTesting8";
 		
-		getMemberVarCollection(l_id);
+		//Fake memberVariables collection
+		DBCollection memVarColl = db.getCollection("memberVariables");
+		memVarColl.insert(new BasicDBObject("l_id", l_id).append("4", 1).append("10",0.4));
 
 		//fake changedMemberVariables Collection
 		DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
@@ -539,7 +673,11 @@ public class ScoringSingletonIntegrationTest {
 										expected2.getExpirationDateAsString()).append("f",
 										expected2.getEffectiveDateAsString())));
 		
-		getMemberInfoColl(l_id);
+		//Fake memberInfo collection
+		DBCollection memInfoColl = db.getCollection("memberInfo");
+		memInfoColl.insert(new BasicDBObject("l_id", l_id).append("srs", "0001470")
+				.append("srs_zip", "46142").append("kmt", "3251").append("kmt_zip", "46241")
+				.append( "eid", "258003809").append("eml_opt_in", "Y").append("st_cd", "TN"));
 					
 		Map<String, String> newChangesVarValueMap = newChangesVarValueMap();
 	
@@ -588,17 +726,37 @@ public class ScoringSingletonIntegrationTest {
 		Assert.assertEquals(expectedChangedMemberScore.getMaxDate(), actualChangedMemberScore.getMaxDate());
 	}
 	
-	/*
+	
 	 * api's call to scoring
-	 */
+	 
 	@SuppressWarnings("unchecked")
 	@Test
 	public void executeTest() throws ParseException{
 		
 		String l_id = "apiLid";
-		getMemberVarCollection(l_id);
-		getChangedMemberVarColl(l_id);
+		//Fake memberVariables collection
+		DBCollection memVarColl = db.getCollection("memberVariables");
+		memVarColl.insert(new BasicDBObject("l_id", l_id).append("4", 1).append("10",0.4));
 
+		//fake changedMemberVariables Collection
+		DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Change expected = new Change("4", 12,
+				simpleDateFormat.parse("2999-09-23"),
+				simpleDateFormat.parse("2014-09-01"));
+		Change expected2 = new Change("10", 1.0,
+				simpleDateFormat.parse("2999-09-23"),
+				simpleDateFormat.parse("2014-09-01"));
+		changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
+				"4",
+				new BasicDBObject("v", expected.getValue()).append("e",
+						expected.getExpirationDateAsString()).append("f",
+						expected.getEffectiveDateAsString())).append(
+								"10",
+								new BasicDBObject("v", expected2.getValue()).append("e",
+										expected2.getExpirationDateAsString()).append("f",
+										expected2.getEffectiveDateAsString())));
+		
 		//fake changedMemberScore collection
 		//empty changedMemberScore collection before update
 		DBCollection changedMemberScore = db.getCollection("changedMemberScores");
@@ -619,31 +777,14 @@ public class ScoringSingletonIntegrationTest {
 		
 	}
 	
-	@Test
-	public void executeWithEmptyModelListsTest() throws ParseException{
-		
-		String l_id = "apiLid2";
-		getMemberVarCollection(l_id);
-		getChangedMemberVarColl(l_id);
-
-		//fake changedMemberScore collection
-		//empty changedMemberScore collection before update
-		DBCollection changedMemberScore = db.getCollection("changedMemberScores");
-	
-		ArrayList<String> modelLists = new ArrayList<String>();
-		HashMap<String, Double> actuaModelIdStringScoreMap = scoringSingletonObj.execute(l_id, modelLists,  "TEST");
-		Assert.assertTrue("Expecting an emptymodelIdStringScoreMap as modelList passed is empty", actuaModelIdStringScoreMap.isEmpty());
-		
-		changedMemberScore.remove(new BasicDBObject("l_id", l_id));
-		
-	}
 	
 	@AfterClass
 	public static void cleanUp(){
 		if(db.toString().equalsIgnoreCase("FongoDB.test"))
 			   db.dropDatabase();
-		else
+			  else
 			   Assert.fail("Something went wrong. Tests connected to " + db.toString());
 		SystemPropertyUtility.dropDatabase();
 	}
 }
+*/

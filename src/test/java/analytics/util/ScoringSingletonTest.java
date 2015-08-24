@@ -26,6 +26,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import analytics.exception.RealTimeScoringException;
+import analytics.util.dao.ChangedMemberVariablesDao;
 import analytics.util.objects.Boost;
 import analytics.util.objects.Change;
 import analytics.util.objects.ChangedMemberScore;
@@ -107,9 +108,8 @@ public class ScoringSingletonTest {
 		assertTrue("expecting empty modelIdList as none of the variables in newChangesVarValueMap is not in variableModelsMap", modelList.isEmpty());
 		variableModelsMap.setAccessible(false);
 	}
-	
 
-	 /*if variableModelsMap does not contain any one of the variables from newChangesVarValueMap --
+	/*if variableModelsMap does not contain any one of the variables from newChangesVarValueMap --
 	 i.e. here variableModelsMap does not contain key S_DSL_APP_INT_ACC_FTWR_TRS2
 	 The method is skipping that variable perfectly while populating modelIdLists which needs to be scored*/
 	@Test
@@ -2024,6 +2024,102 @@ public class ScoringSingletonTest {
 		
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Change change = new Change("10", 3,
+				simpleDateFormat.parse("2999-10-21"),
+				simpleDateFormat.parse("2014-10-01"));
+		Map<String, Change> allChanges = new HashMap<String, Change>();
+		allChanges.put("VARIABLE10", change);
+		
+		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(
+				allChanges, newChangesVarValueMap, memVariables );
+		Assert.assertEquals(0.001, allChangesMap.get("VARIABLE10").getValue());
+		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()),allChangesMap.get("VARIABLE10").getExpirationDateAsString());
+		variableNameToStrategyMap.setAccessible(false);
+		variableNameToVidMap.setAccessible(false);
+		varaibleModelsMap.setAccessible(false);
+	}
+	
+	/*if changedMemberVars is null or empty, previous value for allChanges will be set with value from memberVarMap*/
+	@Test
+	public void strategySumSalesEmptyChangedMemVarMapTest() throws SecurityException,
+	NoSuchFieldException, IllegalArgumentException,
+	IllegalAccessException, ParseException, ConfigurationException {
+		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
+		newChangesVarValueMap.put("VARIABLE10", "0.001");
+		
+		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
+		List<Integer> modelLists = new ArrayList<Integer>();
+		modelLists.add(48);
+		variableModelsMapContents.put("VARIABLE10", modelLists);
+		Field varaibleModelsMap = ScoringSingleton.class
+				.getDeclaredField("variableModelsMap");
+		varaibleModelsMap.setAccessible(true);
+		varaibleModelsMap.set(scoringSingletonObj,variableModelsMapContents);
+		
+		Map<String, String> variableNameToStrategyMapContents = new HashMap<String, String>();
+		variableNameToStrategyMapContents.put("VARIABLE10",
+				"StrategySumSales");
+		Field variableNameToStrategyMap = ScoringSingleton.class
+				.getDeclaredField("variableNameToStrategyMap");
+		variableNameToStrategyMap.setAccessible(true);
+		variableNameToStrategyMap.set(scoringSingletonObj,variableNameToStrategyMapContents);
+		
+		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
+		variableNameToVidMapContents.put("VARIABLE10", "10");
+		Field variableNameToVidMap = ScoringSingleton.class
+				.getDeclaredField("variableNameToVidMap");
+		variableNameToVidMap.setAccessible(true);
+		variableNameToVidMap.set(scoringSingletonObj,variableNameToVidMapContents);
+		
+		Map<String, Object> memVariables = new HashMap<String, Object>();
+		memVariables.put("10", 1);
+		
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+	
+		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(
+				new HashMap<String, Change>(), newChangesVarValueMap, memVariables );
+		Assert.assertEquals(0.001, allChangesMap.get("VARIABLE10").getValue());
+		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()),allChangesMap.get("VARIABLE10").getExpirationDateAsString());
+		variableNameToStrategyMap.setAccessible(false);
+		variableNameToVidMap.setAccessible(false);
+		varaibleModelsMap.setAccessible(false);
+	}
+	
+	@Test
+	public void strategySumSalesVarOFInterestNotInChangedMemVarMap() throws SecurityException,
+	NoSuchFieldException, IllegalArgumentException,
+	IllegalAccessException, ParseException, ConfigurationException {
+		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
+		newChangesVarValueMap.put("VARIABLE10", "0.001");
+		
+		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
+		List<Integer> modelLists = new ArrayList<Integer>();
+		modelLists.add(48);
+		variableModelsMapContents.put("VARIABLE10", modelLists);
+		Field varaibleModelsMap = ScoringSingleton.class
+				.getDeclaredField("variableModelsMap");
+		varaibleModelsMap.setAccessible(true);
+		varaibleModelsMap.set(scoringSingletonObj,variableModelsMapContents);
+		
+		Map<String, String> variableNameToStrategyMapContents = new HashMap<String, String>();
+		variableNameToStrategyMapContents.put("VARIABLE10",
+				"StrategySumSales");
+		Field variableNameToStrategyMap = ScoringSingleton.class
+				.getDeclaredField("variableNameToStrategyMap");
+		variableNameToStrategyMap.setAccessible(true);
+		variableNameToStrategyMap.set(scoringSingletonObj,variableNameToStrategyMapContents);
+		
+		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
+		variableNameToVidMapContents.put("VARIABLE10", "10");
+		Field variableNameToVidMap = ScoringSingleton.class
+				.getDeclaredField("variableNameToVidMap");
+		variableNameToVidMap.setAccessible(true);
+		variableNameToVidMap.set(scoringSingletonObj,variableNameToVidMapContents);
+		
+		Map<String, Object> memVariables = new HashMap<String, Object>();
+		memVariables.put("10", 1);
+		
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Change change = new Change("1", 3,
 				simpleDateFormat.parse("2999-10-21"),
 				simpleDateFormat.parse("2014-10-01"));
 		Map<String, Change> allChanges = new HashMap<String, Change>();

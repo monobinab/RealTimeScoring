@@ -18,7 +18,7 @@ public class Testing {
 		
 		HashMap<String, Double> mbrChanges = sc.execute("BfdA+wNN9wbHYbJwCDAgLR+pf0s=", modelIdList, "RESCORED");*/
 		
-		double score =  Math.exp(5.07) / (1 + Math.exp(5.07));
+		double score =  Math.exp(5.23) / (1 + Math.exp(5.23));
 		System.out.println(score);
 
 	}
