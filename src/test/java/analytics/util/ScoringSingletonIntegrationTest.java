@@ -60,6 +60,8 @@ public class ScoringSingletonIntegrationTest {
 		varColl.insert(new BasicDBObject("name", "Blackout_variable").append("VID", 11).append("strategy","StrategyBlackout"));
 		varColl.insert(new BasicDBObject("name", "variable12").append("VID", 12).append("strategy","NONE"));
 		varColl.insert(new BasicDBObject("name", "variable40").append("VID", 40).append("strategy","NONE"));
+		varColl.insert(new BasicDBObject("name", "variable13").append("VID", 13).append("strategy","StrategyCountTraitDates"));
+		varColl.insert(new BasicDBObject("name", "variable14").append("VID", 14).append("strategy","StrategyDCStrengthSum"));
 			
 		//fake modelVariables collection
 		DBCollection modeVarColl = db.getCollection("modelVariables");
