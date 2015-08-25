@@ -78,6 +78,7 @@ public class ScoringSingletonTest {
 		varColl.insert(new BasicDBObject("name", "variable12").append("VID", 12).append("strategy","NONE"));
 		varColl.insert(new BasicDBObject("name", "variable40").append("VID", 40).append("strategy","NONE"));
 		varColl.insert(new BasicDBObject("name", "variable13").append("VID", 13).append("strategy","StrategyCountTraitDates"));
+		varColl.insert(new BasicDBObject("name", "variable14").append("VID", 14).append("strategy","StrategyDCStrengthSum"));
 		
 	}
 
@@ -2035,6 +2036,53 @@ public class ScoringSingletonTest {
 	 * @throws ParseException
 	 * @throws ConfigurationException
 	 */
+	
+	@Test
+	public void strategyDCStrengthSumTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, ParseException{
+		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
+		newChangesVarValueMap.put("VARIABLE14", "2000");
+		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
+		List<Integer> modelLists = new ArrayList<Integer>();
+		modelLists.add(55);
+		variableModelsMapContents.put("VARIABLE14", modelLists);
+		Field varaibleModelsMap = ScoringSingleton.class
+				.getDeclaredField("variableModelsMap");
+		varaibleModelsMap.setAccessible(true);
+		varaibleModelsMap.set(scoringSingletonObj,variableModelsMapContents);
+		
+		Map<String, String> variableNameToStrategyMapContents = new HashMap<String, String>();
+		variableNameToStrategyMapContents.put("VARIABLE14",
+				"StrategyDCStrengthSum");
+		Field variableNameToStrategyMap = ScoringSingleton.class
+				.getDeclaredField("variableNameToStrategyMap");
+		variableNameToStrategyMap.setAccessible(true);
+		variableNameToStrategyMap.set(scoringSingletonObj,variableNameToStrategyMapContents);
+		
+		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
+		variableNameToVidMapContents.put("VARIABLE14", "14");
+		Field variableNameToVidMap = ScoringSingleton.class
+				.getDeclaredField("variableNameToVidMap");
+		variableNameToVidMap.setAccessible(true);
+		variableNameToVidMap.set(scoringSingletonObj,variableNameToVidMapContents);
+		
+		Map<String, Object> memVariables = new HashMap<String, Object>();
+		memVariables.put("13", 1);
+		
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Change change = new Change("14", 3.0,
+				simpleDateFormat.parse("2999-10-21"),
+				simpleDateFormat.parse("2014-10-01"));
+		Map<String, Change> allChanges = new HashMap<String, Change>();
+		allChanges.put("VARIABLE14", change);
+		
+		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(
+				allChanges, newChangesVarValueMap, memVariables );
+		Assert.assertEquals(2003.0, allChangesMap.get("VARIABLE14").getValue());
+		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(30).toDateMidnight().toDate()),allChangesMap.get("VARIABLE14").getExpirationDateAsString());
+		variableNameToStrategyMap.setAccessible(false);
+		variableNameToVidMap.setAccessible(false);
+		varaibleModelsMap.setAccessible(false);
+	}
 	
 	@Test
 	public void strategyCountTraitsDatesTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, ParseException{
