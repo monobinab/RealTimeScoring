@@ -77,6 +77,7 @@ public class ScoringSingletonTest {
 		varColl.insert(new BasicDBObject("name", "variable10").append("VID", 10).append("strategy","StrategySumSales"));
 		varColl.insert(new BasicDBObject("name", "Blackout_variable").append("VID", 11).append("strategy","StrategyBlackout"));
 		varColl.insert(new BasicDBObject("name", "variable12").append("VID", 12).append("strategy","NONE"));
+		varColl.insert(new BasicDBObject("name", "variable40").append("VID", 40).append("strategy","NONE"));
 		
 	}
 
@@ -2990,6 +2991,22 @@ public class ScoringSingletonTest {
 		String state = scoringSingletonObj.getState(l_id);
 		Assert.assertEquals("Expecting null as state as there is no record for this member in memberInfo coll", null, state );
 	}
+	
+	@Test
+	public void getDateFormatTest(){
+		Date date = new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate();
+		String dateReturned = scoringSingletonObj.getDateFormat(date);
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		String expDate = simpleDateFormat.format(date);
+		Assert.assertEquals(expDate, dateReturned);
+	}
+	
+	@Test
+	public void getDateFormatWithNullDateTest(){
+		String dateReturned = scoringSingletonObj.getDateFormat(null);
+		Assert.assertEquals(null, dateReturned);
+	}
+
 
 	@AfterClass
 	public static void cleanUp(){

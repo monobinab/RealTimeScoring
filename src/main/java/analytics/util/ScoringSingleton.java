@@ -313,7 +313,7 @@ public class ScoringSingleton {
 			variableName = variableName.toUpperCase();
 			if (variableModelsMap.containsKey(variableName)) {
 				if (variableNameToStrategyMap.get(variableName) == null) {
-					LOGGER.info(" ~~~ DID NOT FIND VARIABLE: ");
+					LOGGER.info(" ~~~ DID NOT FIND VARIABLE IN VARIABLES COLLECTION: " + variableName);
 					continue;
 				}
 
@@ -600,7 +600,10 @@ public class ScoringSingleton {
 	
 	public String getDateFormat(Date date){
 		SimpleDateFormat simpleDateFormatter = new SimpleDateFormat("yyyy-MM-dd");
-		return simpleDateFormatter.format(date);
+		String dateReturned = null;
+		if(date != null)
+			dateReturned = simpleDateFormatter.format(date);
+		return dateReturned;
 	}
 
 	/*public String getModelName(int modelId) {

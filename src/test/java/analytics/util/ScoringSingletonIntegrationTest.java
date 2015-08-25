@@ -59,6 +59,7 @@ public class ScoringSingletonIntegrationTest {
 		varColl.insert(new BasicDBObject("name", "variable10").append("VID", 10).append("strategy","StrategySumSales"));
 		varColl.insert(new BasicDBObject("name", "Blackout_variable").append("VID", 11).append("strategy","StrategyBlackout"));
 		varColl.insert(new BasicDBObject("name", "variable12").append("VID", 12).append("strategy","NONE"));
+		varColl.insert(new BasicDBObject("name", "variable40").append("VID", 40).append("strategy","NONE"));
 			
 		//fake modelVariables collection
 		DBCollection modeVarColl = db.getCollection("modelVariables");
@@ -673,6 +674,50 @@ public class ScoringSingletonIntegrationTest {
 		modelLists.add("35");
 		HashMap<String, Double> actuaModelIdStringScoreMap = scoringSingletonObj.execute(l_id, modelLists, "TEST");
 		Assert.assertEquals("Expecting an empty map as List of ChangedMemScore is empty returned by calcRTSChanges", new HashMap<String, Double>(), actuaModelIdStringScoreMap);
+	}
+	
+	/*
+	 * If allChanges (allChanges = changedMemVarMap as it is from api) does not contain any variable associated with modelId to be scored
+	 * min max Expiry will be set with null
+	 * so, changedMemberScore should be updated with current date for their expiration
+	 */
+	@SuppressWarnings("unchecked")
+	@Test
+	public void executeWithAllChangesNotHavingVarsOfInterestForModelToBeScoredTest() throws ParseException{
+		
+		String l_id = "apiLid5";
+		getMemberVarCollection(l_id);
+		//fake changedMemberVariables Collection
+		DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Change expected = new Change("4", 12,
+				simpleDateFormat.parse("2999-09-23"),
+				simpleDateFormat.parse("2014-09-01"));
+		
+		changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
+				"40",
+				new BasicDBObject("v", expected.getValue()).append("e",
+						expected.getExpirationDateAsString()).append("f",
+						expected.getEffectiveDateAsString())));
+			
+		//fake changedMemberScore collection
+		//empty changedMemberScore collection before update
+		DBCollection changedMemberScore = db.getCollection("changedMemberScores");
+	
+		ArrayList<String> modelLists = new ArrayList<String>();
+		modelLists.add("35");
+		HashMap<String, Double> actuaModelIdStringScoreMap = scoringSingletonObj.execute(l_id, modelLists,  "TEST");
+		
+		//this method updates the changedMemberScore collection
+		DBObject dbObj = changedMemberScore.findOne(new BasicDBObject("l_id", l_id));
+		HashMap<String, ChangedMemberScore> changedMemScoresUpdated = (HashMap<String, ChangedMemberScore>) dbObj
+				.get("35");
+		Assert.assertEquals(0.9935358588660986, changedMemScoresUpdated.get("s"));
+		Assert.assertEquals(simpleDateFormat.format(new Date()), changedMemScoresUpdated.get("minEx"));
+		Assert.assertEquals(simpleDateFormat.format(new Date()), changedMemScoresUpdated.get("maxEx"));
+		Assert.assertEquals(0.9935358588660986, actuaModelIdStringScoreMap.get("35"));
+		changedMemberScore.remove(new BasicDBObject("l_id", l_id));
+		
 	}
 	
 	@AfterClass
