@@ -94,6 +94,7 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
     		return null;
     	
     	LOGGER.info(current_l_id + " has " + pidsCollection.size() + " pids");
+    	System.out.println(current_l_id + " has " + pidsCollection.size() + " pids");
 		for (String pid : l_idToValueCollectionMap.get(current_l_id)) {
 			// query MongoDB for division and line associated with the pid
 			DivLn divLnObj = pidMatchUtil.getDivInformation(pid);

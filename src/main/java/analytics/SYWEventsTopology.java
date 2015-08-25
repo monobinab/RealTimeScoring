@@ -37,7 +37,7 @@ public class SYWEventsTopology {
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 		String topic = TopicConstants.SYW;
 		String kafkatopic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;
-		topologyBuilder.setSpout("sywEventsSpout1", new SYWRedisSpout(
+		/*topologyBuilder.setSpout("sywEventsSpout1", new SYWRedisSpout(
 				0, topic, System
 				.getProperty(MongoNameConstants.IS_PROD)), 1);
 		topologyBuilder.setSpout("sywEventsSpout2", new SYWRedisSpout(
@@ -45,22 +45,38 @@ public class SYWEventsTopology {
 				.getProperty(MongoNameConstants.IS_PROD)), 1);
 		topologyBuilder.setSpout("sywEventsSpout3", new SYWRedisSpout(
 				2, topic, System
-				.getProperty(MongoNameConstants.IS_PROD)), 1);
+				.getProperty(MongoNameConstants.IS_PROD)), 1)*/;
+				
+		topologyBuilder.setSpout("sywEventsSpout1", new SYWRedisSpout(
+				0, topic, "PROD"), 1);
+		topologyBuilder.setSpout("sywEventsSpout2", new SYWRedisSpout(
+				1, topic, "PROD"), 1);
+		topologyBuilder.setSpout("sywEventsSpout3", new SYWRedisSpout(
+				2, topic, "PROD"), 1);
 		
 		// Parse the JSON
-		topologyBuilder.setBolt("parseEventsBolt", new ParsingBoltSYW(System
+		/*topologyBuilder.setBolt("parseEventsBolt", new ParsingBoltSYW(System
 				.getProperty(MongoNameConstants.IS_PROD)), 1)
+				.shuffleGrouping("sywEventsSpout1").shuffleGrouping("sywEventsSpout2").shuffleGrouping("sywEventsSpout3");*/
+		topologyBuilder.setBolt("parseEventsBolt", new ParsingBoltSYW("PROD"), 1)
 				.shuffleGrouping("sywEventsSpout1").shuffleGrouping("sywEventsSpout2").shuffleGrouping("sywEventsSpout3");
 
 		// Get the div line and boost variable
-		topologyBuilder.setBolt("processSYWEvents",
+		/*topologyBuilder.setBolt("processSYWEvents",
 				new ProcessSYWInteractions(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping(
+				"parseEventsBolt");*/
+		topologyBuilder.setBolt("processSYWEvents",
+				new ProcessSYWInteractions("PROD"), 1).shuffleGrouping(
 				"parseEventsBolt");
+		
 		topologyBuilder.setBolt("RTSKafkaBolt", new RTSKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD),kafkatopic), 1)
 		.shuffleGrouping("strategyScoringBolt","kafka_stream");
-		topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System
-				.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("processSYWEvents", "score_stream");
-		topologyBuilder.setBolt("persistBolt", new PersistBoostsBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("processSYWEvents", "persist_stream");
+		/*topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System
+				.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("processSYWEvents", "score_stream");*/
+		topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt("PROD"), 1).shuffleGrouping("processSYWEvents", "score_stream");
+		
+		/*topologyBuilder.setBolt("persistBolt", new PersistBoostsBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("processSYWEvents", "persist_stream");*/
+		topologyBuilder.setBolt("persistBolt", new PersistBoostsBolt("PROD"), 1).shuffleGrouping("processSYWEvents", "persist_stream");
 		
 		if(System.getProperty(MongoNameConstants.IS_PROD).equals("PROD")){
 			topologyBuilder.setBolt("loggingBolt", new LoggingBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
