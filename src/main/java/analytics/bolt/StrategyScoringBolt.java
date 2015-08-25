@@ -126,6 +126,19 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	    
 	    	//Write changedMemberScores with min max expiry
 	      	scoringSingleton.updateChangedMemberScore(lId, changedMemberScoresList, source);
+	      	
+	      	//emitting to logging bolt
+	      	for(ChangedMemberScore changedMemberScore : changedMemberScoresList){
+	      		List<Object> listToEmit = new ArrayList<Object>();
+				listToEmit.add(lId);
+				listToEmit.add(changedMemberScore.getScore());
+				listToEmit.add(changedMemberScore.getModelId().toString());
+				listToEmit.add(source);
+				listToEmit.add(messageID);
+				listToEmit.add(changedMemberScore.getMinDate());
+				listToEmit.add(changedMemberScore.getMaxDate());
+				this.outputCollector.emit("score_stream",listToEmit);
+			}
 	   			
 			//persisting the loyalty id to redis for UnknownOccasionsTopology to pick up the loyalty id
 			if(respHost != null){
@@ -155,7 +168,6 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		declarer.declareStream("score_stream",new Fields("l_id", "newScore", "model","source", "messageID", "minExpiry", "maxExpiry"));
-		declarer.declareStream("response_stream", new Fields("lyl_id_no","messageID"));
 		declarer.declareStream("kafka_stream", new Fields("message"));
 		
 	}
