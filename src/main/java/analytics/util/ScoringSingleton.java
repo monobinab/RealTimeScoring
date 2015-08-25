@@ -130,6 +130,7 @@ public class ScoringSingleton {
 			}
 		}
 		catch(Exception e){
+			e.printStackTrace();
 			LOGGER.error("Exception occured in rescoring " + l_id + " ", e);
 		}
 			return modelIdStringScoreMap;
@@ -207,9 +208,9 @@ public class ScoringSingleton {
 									 changedMemberScore.setSource(source);
 									 changedMemberScoreList.add(changedMemberScore);
 						 }
-						   catch(Exception e){
-								//e.printStackTrace();
-								LOGGER.error("Exception scoring modelId " + modelId +" for lId " + lId + " " + e);
+						   catch(RealTimeScoringException e){
+								LOGGER.error("Exception scoring modelId " + modelId +" for lId " + lId + " " , e);
+								//System.out.println("Exception scoring modelId " + modelId +" for lId " + lId + " " + e.getErrorMessage());
 						   }
 						}
 							 memberRTSChanges.setlId(lId);
@@ -219,8 +220,8 @@ public class ScoringSingleton {
 			 	}	
 			}
 		catch(Exception e){
-			//e.printStackTrace();
 			LOGGER.error("Exception scoring lId " + lId + " " + e);
+			e.printStackTrace();
 		}
 			return memberRTSChanges;
 	}
@@ -600,10 +601,10 @@ public class ScoringSingleton {
 	
 	public String getDateFormat(Date date){
 		SimpleDateFormat simpleDateFormatter = new SimpleDateFormat("yyyy-MM-dd");
-		String dateReturned = null;
 		if(date != null)
-			dateReturned = simpleDateFormatter.format(date);
-		return dateReturned;
+			return simpleDateFormatter.format(date);
+		else
+			return null;
 	}
 
 	/*public String getModelName(int modelId) {
