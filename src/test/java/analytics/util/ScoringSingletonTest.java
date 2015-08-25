@@ -26,7 +26,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import analytics.exception.RealTimeScoringException;
-import analytics.util.dao.ChangedMemberVariablesDao;
 import analytics.util.objects.Boost;
 import analytics.util.objects.Change;
 import analytics.util.objects.ChangedMemberScore;
@@ -78,6 +77,7 @@ public class ScoringSingletonTest {
 		varColl.insert(new BasicDBObject("name", "Blackout_variable").append("VID", 11).append("strategy","StrategyBlackout"));
 		varColl.insert(new BasicDBObject("name", "variable12").append("VID", 12).append("strategy","NONE"));
 		varColl.insert(new BasicDBObject("name", "variable40").append("VID", 40).append("strategy","NONE"));
+		varColl.insert(new BasicDBObject("name", "variable13").append("VID", 13).append("strategy","StrategyCountTraitDates"));
 		
 	}
 
@@ -2035,6 +2035,53 @@ public class ScoringSingletonTest {
 	 * @throws ParseException
 	 * @throws ConfigurationException
 	 */
+	
+	@Test
+	public void strategyCountTraitsDatesTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, ParseException{
+		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
+		newChangesVarValueMap.put("VARIABLE13", "{2015-08-24:[206634]}");
+		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
+		List<Integer> modelLists = new ArrayList<Integer>();
+		modelLists.add(55);
+		variableModelsMapContents.put("VARIABLE13", modelLists);
+		Field varaibleModelsMap = ScoringSingleton.class
+				.getDeclaredField("variableModelsMap");
+		varaibleModelsMap.setAccessible(true);
+		varaibleModelsMap.set(scoringSingletonObj,variableModelsMapContents);
+		
+		Map<String, String> variableNameToStrategyMapContents = new HashMap<String, String>();
+		variableNameToStrategyMapContents.put("VARIABLE13",
+				"StrategyCountTraitDates");
+		Field variableNameToStrategyMap = ScoringSingleton.class
+				.getDeclaredField("variableNameToStrategyMap");
+		variableNameToStrategyMap.setAccessible(true);
+		variableNameToStrategyMap.set(scoringSingletonObj,variableNameToStrategyMapContents);
+		
+		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
+		variableNameToVidMapContents.put("VARIABLE13", "13");
+		Field variableNameToVidMap = ScoringSingleton.class
+				.getDeclaredField("variableNameToVidMap");
+		variableNameToVidMap.setAccessible(true);
+		variableNameToVidMap.set(scoringSingletonObj,variableNameToVidMapContents);
+		
+		Map<String, Object> memVariables = new HashMap<String, Object>();
+		memVariables.put("13", 1);
+		
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Change change = new Change("13", 3,
+				simpleDateFormat.parse("2999-10-21"),
+				simpleDateFormat.parse("2014-10-01"));
+		Map<String, Change> allChanges = new HashMap<String, Change>();
+		allChanges.put("VARIABLE13", change);
+		
+		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(
+				allChanges, newChangesVarValueMap, memVariables );
+		Assert.assertEquals(1, allChangesMap.get("VARIABLE13").getValue());
+		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(1).toDateMidnight().toDate()),allChangesMap.get("VARIABLE13").getExpirationDateAsString());
+		variableNameToStrategyMap.setAccessible(false);
+		variableNameToVidMap.setAccessible(false);
+		varaibleModelsMap.setAccessible(false);
+	}
 	
 	@Test
 	public void strategySumSalesTest() throws SecurityException,
