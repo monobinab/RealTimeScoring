@@ -75,6 +75,10 @@ public class KafkaUtil {
 			spoutConfig = new SpoutConfig(hosts, topic, "", kafka_id);
 			spoutConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
 		}
+		
+		// Temporary test change to see if multiple consumers work
+		spoutConfig.forceFromStart = true; // this might be what you're missing
+		spoutConfig.startOffsetTime = kafka.api.OffsetRequest.LatestTime(); // i.e. -1
 
 		return spoutConfig;
 
