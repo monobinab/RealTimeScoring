@@ -10,31 +10,9 @@ import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-import scala.Array;
 import analytics.util.MongoNameConstants;
-import analytics.util.objects.MemberInfo;
-import analytics.util.objects.TagVariable;
-import clojure.main;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;

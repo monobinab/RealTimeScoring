@@ -6,6 +6,7 @@ import java.util.Map;
 import junit.framework.Assert;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.lang.StringUtils;
 
 import com.github.fakemongo.Fongo;
 import com.mongodb.DB;
@@ -28,6 +29,7 @@ public class SystemPropertyUtility {
 	}
 	public static void setSystemProperty() {
 		System.setProperty("rtseprod", "test");
+		System.setProperty(MongoNameConstants.REQ_SOURCE, StringUtils.EMPTY);
 		stormConf = new HashMap<String, String>();
 		stormConf.put("nimbus.host", "test");
 		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));	

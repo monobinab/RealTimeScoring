@@ -3,6 +3,7 @@ package analytics.bolt;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,8 +53,6 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 		pidMatchUtil = new PidMatchUtils();
 	
 		divLnVariableDao = new DivLnVariableDao();
-		//divLnBoostDao = new DivLnBoostDao();
-		//boostDao = new BoostDao();
 		variableDao = new VariableDao();
 		memberBoostsDao = new MemberBoostsDao();
 		
@@ -68,9 +67,6 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 				boostMap.put(v.getName(),v);
 				boostList.add(v.getName());
 			}
-//			if(boostList.contains(v.getName())) {
-//				boostMap.put(v.getName(),v);
-//			}
 		}
 	}
 
@@ -79,6 +75,13 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 		Map<String, String> variableValueMap = new HashMap<String, String>();
 		Map<String, List<String>> boostValuesMap = new HashMap<String, List<String>>();
 		
+		Collection<String> pidsCollection = l_idToValueCollectionMap.get(current_l_id);
+    	
+    	if(pidsCollection==null || pidsCollection.isEmpty()|| (pidsCollection.toArray())[0].toString().trim().equalsIgnoreCase(""))
+    		return null;
+    	
+    	LOGGER.info(current_l_id + " has " + pidsCollection.size() + " pids");
+    	//System.out.println(current_l_id + " has " + pidsCollection.size() + " pids");
 		for (String pid : l_idToValueCollectionMap.get(current_l_id)) {
 			// query MongoDB for division and line associated with the pid
 			DivLn divLnObj = pidMatchUtil.getDivInformation(pid);
@@ -168,7 +171,6 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
     	Type boostValueType = new TypeToken<Map<String, List<String>>>() {
 			private static final long serialVersionUID = 1L;
 		}.getType();
-		
 		return gson.toJson(dateValuesMap, boostValueType);
 	}
 

@@ -60,9 +60,7 @@ public class LoggingBolt extends EnvironmentBolt {
 	 */
 	@Override
 	public void execute(Tuple input) {
-		//countMetric.scope("incoming_tuples").incr();
 		redisCountIncr("incoming_tuples");
-		//System.out.println(" %%% scorepublishbolt :" + input);
 		String l_id = input.getStringByField("l_id");
 		String modelId = input.getStringByField("model");
 		String oldScore = memberScoreDao.getMemberScores(l_id).get(modelId);
@@ -70,8 +68,10 @@ public class LoggingBolt extends EnvironmentBolt {
 		Double newScore = input.getDoubleByField("newScore");
 		String minExpiry = input.getStringByField("minExpiry");
 		String maxExpiry = input.getStringByField("maxExpiry");
-		/*Integer newPercentile = getPercentileForScore(newScore,Integer.parseInt(modelId));
-		Integer oldPercentile = getPercentileForScore(new Integer (oldScore),Integer.parseInt(modelId));*/
+
+		Integer newPercentile = getPercentileForScore(newScore,Integer.parseInt(modelId));
+		Integer oldPercentile = getPercentileForScore(new Double (oldScore),Integer.parseInt(modelId));
+
 
 		String messageID = "";
 		if (input.contains("messageID")) {
@@ -79,10 +79,8 @@ public class LoggingBolt extends EnvironmentBolt {
 		}
 		LOGGER.info("TIME:" + messageID + "-Entering logging bolt-" + System.currentTimeMillis());
 		LOGGER.info("PERSIST: " + new Date() + ": Topology: Changes Scores : lid: " + l_id + ", modelId: "+modelId + ", oldScore: "+oldScore +
-				", newScore: "+newScore+", minExpiry: "+minExpiry+", maxExpiry: "+maxExpiry+", source: " + source);
-		//System.out.println("PERSIST: " + new Date() + ": Topology: Changes Scores : lid: " + l_id + ", modelId: "+modelId + ", oldScore: "+oldScore +", newScore: "+newScore+", minExpiry: "+minExpiry+", maxExpiry: "+maxExpiry+", source: " + source);
-
-		//countMetric.scope("score_logged").incr();
+				", newScore: "+newScore+", minExpiry: "+minExpiry+", maxExpiry: "+maxExpiry+", source: " + source+", "
+						+ "oldPercentile: " + oldPercentile+", newPercentile: " + newPercentile);
 		redisCountIncr("score_logged");
 		outputCollector.ack(input);	}
 

@@ -42,26 +42,7 @@ public class ModelVariablesDao extends AbstractDao{
     	return modelVariablesList;
     }
     
-    public List<String> getModelVariableList(int modelId){
-    	List<String> modelVariablesList = new ArrayList<String>();
-    	if (modelVariablesCollection != null) {
-			BasicDBObject query = new BasicDBObject();
-			query.put("modelId", modelId);
-			DBObject obj = modelVariablesCollection.findOne(query);
-			if (obj != null){
-				BasicDBList variablesDBList = (BasicDBList) obj.get(MongoNameConstants.MODELV_VARIABLE);
-				for(Object var:variablesDBList) {
-					if(!modelVariablesList.contains(var.toString())) {
-						modelVariablesList.add(((BasicDBObject) var).get(MongoNameConstants.MODELV_NAME).toString());
-					}
-				}
-				//return (List<String>) obj.get("variable"); //see if this works?
-				return modelVariablesList;
-			}
-		}
-		return null;
-    }
-    
+
     public void populateModelVariables(Map<Integer, Map<Integer, Model>> modelsMap,
     		Map<String, List<Integer>> variableModelsMap){
 		DBCursor models = modelVariablesCollection.find();
@@ -86,6 +67,26 @@ public class ModelVariablesDao extends AbstractDao{
 		}
     }
     
+    public List<String> getModelVariableList(int modelId){
+    	List<String> modelVariablesList = new ArrayList<String>();
+    	if (modelVariablesCollection != null) {
+			BasicDBObject query = new BasicDBObject();
+			query.put("modelId", modelId);
+			DBObject obj = modelVariablesCollection.findOne(query);
+			if (obj != null){
+				BasicDBList variablesDBList = (BasicDBList) obj.get(MongoNameConstants.MODELV_VARIABLE);
+				for(Object var:variablesDBList) {
+					if(!modelVariablesList.contains(var.toString())) {
+						modelVariablesList.add(((BasicDBObject) var).get(MongoNameConstants.MODELV_NAME).toString());
+					}
+				}
+				//return (List<String>) obj.get("variable"); //see if this works?
+				return modelVariablesList;
+			}
+		}
+		return null;
+    }
+       
 	private Map<String, Variable> populateVariableModelsMap(DBObject model,
 			int modelId, Map<String, List<Integer>> variableModelsMap) {
 		BasicDBList modelVariables = (BasicDBList) model.get(MongoNameConstants.VARIABLE);

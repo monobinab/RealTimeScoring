@@ -14,6 +14,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mongodb.DB;
+
 import analytics.exception.RealTimeScoringException;
 import analytics.util.dao.ChangedMemberScoresDao;
 import analytics.util.dao.ChangedMemberVariablesDao;
@@ -22,6 +24,7 @@ import analytics.util.dao.MemberVariablesDao;
 import analytics.util.dao.MemberBoostsDao;
 import analytics.util.dao.ModelSywBoostDao;
 import analytics.util.dao.ModelVariablesDao;
+import analytics.util.dao.MongoDBConnectionWrapper;
 import analytics.util.dao.RegionalFactorDao;
 import analytics.util.dao.VariableDao;
 import analytics.util.objects.Boost;
@@ -57,6 +60,9 @@ public class ScoringSingleton {
 	ModelSywBoostDao modelSywBoostDao;
 	MemberBoostsDao memberBoostsDao;
 	
+
+	private boolean isExecuted = Boolean.FALSE;
+	
 	public static ScoringSingleton getInstance() {
 		if (instance == null) {
 			synchronized (ScoringSingleton.class) {
@@ -68,44 +74,61 @@ public class ScoringSingleton {
 	}
 
 	private ScoringSingleton() {
-		// Get DB connection
-		LOGGER.debug("Populate variable vid map");
-		variableDao = new VariableDao();
-		modelVariablesDao = new ModelVariablesDao();
-		changedVariablesDao = new ChangedMemberVariablesDao();
-		memberVariablesDao = new MemberVariablesDao();
-		changedMemberScoresDao = new ChangedMemberScoresDao();
-	
-		// populate the variableVidToNameMap
-		variableNameToStrategyMap = new HashMap<String, String>();
-		variableVidToNameMap = new HashMap<String, String>();
-		variableNameToVidMap = new HashMap<String, String>();
-		List<Variable> variables = variableDao.getVariables();
-		for (Variable variable : variables) {
-			if (variable.getName() != null && variable.getVid() != null) {
-				variableVidToNameMap.put(variable.getVid(), variable.getName());
-				variableNameToVidMap.put(variable.getName(), variable.getVid());
-				variableNameToStrategyMap.put(variable.getName(), variable.getStrategy());
-			}
+
+		String reqSource = System.getProperty(MongoNameConstants.REQ_SOURCE);
+		if(StringUtils.isEmpty(reqSource)){
+			this.initDAO(null, null);
 		}
+	}
 
-		LOGGER.debug("Populate variable models map");
-		// populate the variableModelsMap
-		variableModelsMap = new HashMap<String, List<Integer>>();
-		// populate the variableModelsMap and modelsMap
-		modelsMap = new HashMap<Integer, Map<Integer, Model>>();
-		// Populate both maps
-		// models map can be populated later
-		modelVariablesDao.populateModelVariables(modelsMap, variableModelsMap);
 
-		modelSywBoostDao = new ModelSywBoostDao();
-		memberBoostsDao = new MemberBoostsDao();
+	public void initDAO(DB db1, DB db2){
+		if(!isExecuted){
+			isExecuted = Boolean.TRUE;
+			if(db1 != null && db2 != null){
+				MongoDBConnectionWrapper mongoDBConnectionWrapper = MongoDBConnectionWrapper.getInstance();
+				if(mongoDBConnectionWrapper != null){
+					mongoDBConnectionWrapper.populateDBConnection(db1, db2);
+				}
+			}
+			// Get DB connection
+			LOGGER.debug("Populate variable vid map");
+			variableDao = new VariableDao();
+			modelVariablesDao = new ModelVariablesDao();
+			changedVariablesDao = new ChangedMemberVariablesDao();
+			memberVariablesDao = new MemberVariablesDao();
+			changedMemberScoresDao = new ChangedMemberScoresDao();
 		
-		regionalFactorDao = new RegionalFactorDao();
-		regionalFactorsMap = regionalFactorDao.populateRegionalFactors();
-		
-		memberInfoDao = new MemberInfoDao();
-		
+			// populate the variableVidToNameMap
+			variableNameToStrategyMap = new HashMap<String, String>();
+			variableVidToNameMap = new HashMap<String, String>();
+			variableNameToVidMap = new HashMap<String, String>();
+			List<Variable> variables = variableDao.getVariables();
+			for (Variable variable : variables) {
+				if (variable.getName() != null && variable.getVid() != null) {
+					variableVidToNameMap.put(variable.getVid(), variable.getName());
+					variableNameToVidMap.put(variable.getName(), variable.getVid());
+					variableNameToStrategyMap.put(variable.getName(), variable.getStrategy());
+				}
+			}
+
+			LOGGER.debug("Populate variable models map");
+			// populate the variableModelsMap
+			variableModelsMap = new HashMap<String, List<Integer>>();
+			// populate the variableModelsMap and modelsMap
+			modelsMap = new HashMap<Integer, Map<Integer, Model>>();
+			// Populate both maps
+			// models map can be populated later
+			modelVariablesDao.populateModelVariables(modelsMap, variableModelsMap);
+
+			modelSywBoostDao = new ModelSywBoostDao();
+			memberBoostsDao = new MemberBoostsDao();
+			
+			regionalFactorDao = new RegionalFactorDao();
+			regionalFactorsMap = regionalFactorDao.populateRegionalFactors();
+			
+			memberInfoDao = new MemberInfoDao();
+		}
 	}
 
 	public HashMap<String, Double> execute(String l_id, ArrayList<String> modelIdArrayList, String source) {
@@ -130,8 +153,8 @@ public class ScoringSingleton {
 			}
 		}
 		catch(Exception e){
-			e.printStackTrace();
-			LOGGER.error("Exception occured in rescoring " + l_id + " ", e);
+			//e.printStackTrace();
+			LOGGER.error("Exception occured in rescoring " + l_id + " ", e.getMessage());
 		}
 			return modelIdStringScoreMap;
 	}
@@ -209,8 +232,8 @@ public class ScoringSingleton {
 									 changedMemberScoreList.add(changedMemberScore);
 						 }
 						   catch(RealTimeScoringException e){
-								LOGGER.error("Exception scoring modelId " + modelId +" for lId " + lId + " " , e);
-								//System.out.println("Exception scoring modelId " + modelId +" for lId " + lId + " " + e.getErrorMessage());
+
+								LOGGER.error("Exception scoring modelId " + modelId +" for lId " + lId + " " , e.getErrorMessage());
 						   }
 						}
 							 memberRTSChanges.setlId(lId);
@@ -220,8 +243,8 @@ public class ScoringSingleton {
 			 	}	
 			}
 		catch(Exception e){
-			LOGGER.error("Exception scoring lId " + lId + " " + e);
-			e.printStackTrace();
+			LOGGER.error("Exception scoring lId " + lId + " " + e.getMessage());
+//			e.printStackTrace();
 		}
 			return memberRTSChanges;
 	}
@@ -359,7 +382,7 @@ public class ScoringSingleton {
 	public boolean isBlackOutModel(Map<String, Change> allChanges,	Integer modelId) {
 		int blackFlag = 0;
 		Map<String, Variable> variableMap = getModelVariables(modelId);
-		if(variableMap != null && !variableMap.isEmpty()){
+		if(variableMap != null ){
 			for (Map.Entry<String, Change> entry : allChanges.entrySet()) {
 				String ch = entry.getKey();
 				Change value = entry.getValue();
@@ -445,8 +468,8 @@ public class ScoringSingleton {
 		
 		double val = (Double) model.getConstant();
 
-		for (String v : model.getVariables().keySet()) {
-			Variable variable = model.getVariables().get(v);
+		for (String v : variableMap.keySet()) {
+			Variable variable = variableMap.get(v);
 
 			// if variable does not have a name or VID, skip scoring that model by throwing exception
 			if (variable.getName() == null || variableNameToVidMap.get(variable.getName()) == null) {

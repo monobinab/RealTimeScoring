@@ -1,11 +1,6 @@
 package analytics.util;
 
-import java.io.InputStream;
-import java.util.Properties;
-
-import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 
 

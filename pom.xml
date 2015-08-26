@@ -385,24 +385,24 @@
 		    bind the maven-assembly-plugin to the package phase
 		    this will create a jar file without the storm dependencies
 		    suitable for deployment to a cluster.
-		     -->
- <!--  <plugin>
-  <groupId>com.atlassian.maven.plugins</groupId> 
-  <artifactId>maven-clover2-plugin</artifactId> 
-  <version>2.6.3</version> 
- <configuration>
-  <licenseLocation>clover.license</licenseLocation> 
-  </configuration>
-<executions>
-<execution>
-  <phase>verify</phase> 
- <goals>
-  <goal>instrument</goal> 
-  <goal>check</goal> 
-  </goals>
-  </execution>
-  </executions>
-  </plugin> -->
+		    		     
+	<plugin>
+		  <groupId>com.atlassian.maven.plugins</groupId> 
+		  <artifactId>maven-clover2-plugin</artifactId> 
+		  <version>2.6.3</version> 
+			 <configuration>
+			  <licenseLocation>clover.license</licenseLocation> 
+			 </configuration>
+		<executions>
+			<execution>
+			  <phase>verify</phase> 
+				 <goals>
+				  	<goal>instrument</goal> 
+				  	<goal>check</goal> 
+				 </goals>
+			  </execution>
+		  </executions>
+  	</plugin> -->
 		     
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
