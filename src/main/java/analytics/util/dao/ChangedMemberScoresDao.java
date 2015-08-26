@@ -3,6 +3,7 @@ package analytics.util.dao;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -47,6 +48,32 @@ public class ChangedMemberScoresDao extends AbstractDao{
 							.append(MongoNameConstants.CMS_EFFECTIVE_DATE, scoreObj.getEffDate())
 							.append(MongoNameConstants.CMS_SOURCE, scoreObj.getSource()));
 		}}
+		if(!updateRec.isEmpty())
+		{
+			updateRec.append("t",timeStamp);
+			changedMemberScoresCollection.update(new BasicDBObject(MongoNameConstants.L_ID,
+				lId), new BasicDBObject("$set", updateRec), true,
+				false);
+		}
+		
+	}
+	
+	public void upsertUpdateChangedScores(String lId, List< ChangedMemberScore> changedMemberScoresList) {
+		SimpleDateFormat timestampForMongo = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
+		String timeStamp = timestampForMongo.format(new Date());
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		String today = dateFormat.format(new Date());
+		BasicDBObject updateRec = new BasicDBObject();
+	
+		for(ChangedMemberScore changedMemberScore : changedMemberScoresList){
+			updateRec.append(changedMemberScore.getModelId(), new BasicDBObject()
+							.append(MongoNameConstants.CMS_SCORE, changedMemberScore.getScore())
+							.append(MongoNameConstants.CMS_MIN_EXPIRY_DATE, changedMemberScore.getMinDate() != null?changedMemberScore.getMinDate() : today )
+							.append(MongoNameConstants.CMS_MAX_EXPIRY_DATE, changedMemberScore.getMaxDate() != null?changedMemberScore.getMaxDate() : today)
+							.append(MongoNameConstants.CMS_EFFECTIVE_DATE, changedMemberScore.getEffDate())
+							.append(MongoNameConstants.CMS_SOURCE, changedMemberScore.getSource()));
+		}
+		
 		if(!updateRec.isEmpty())
 		{
 			updateRec.append("t",timeStamp);

@@ -1,6 +1,6 @@
 /**
  * 
- */
+ *//*
 package analytics.bolt;
 
 import analytics.util.Constants;
@@ -28,9 +28,9 @@ public class ScorePublishBolt extends BaseRichBolt {
 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ScorePublishBolt.class);
-	/**
+	*//**
 	 *
-	 */
+	 *//*
 	private static final long serialVersionUID = 1L;
 	private OutputCollector outputCollector;
 	final String host;
@@ -46,12 +46,12 @@ public class ScorePublishBolt extends BaseRichBolt {
 		this.pattern = pattern;
 	}
 
-	/*
+	
 	 * (non-Javadoc)
 	 * 
 	 * @see backtype.storm.task.IBolt#prepare(java.util.Map,
 	 * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
-	 */
+	 
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
@@ -70,11 +70,11 @@ public class ScorePublishBolt extends BaseRichBolt {
 	     context.registerMetric("custom_metrics", countMetric, Constants.METRICS_INTERVAL);
 	    }
 
-	/*
+	
 	 * (non-Javadoc)
 	 * 
 	 * @see backtype.storm.task.IBolt#execute(backtype.storm.tuple.Tuple)
-	 */
+	 
 	@Override
 	public void execute(Tuple input) {
 		countMetric.scope("incoming_tuples").incr();
@@ -120,15 +120,16 @@ public class ScorePublishBolt extends BaseRichBolt {
 		LOGGER.info("TIME:" + messageID + "-Score publish complete-" + System.currentTimeMillis());
 		}
 
-	/*
+	
 	 * (non-Javadoc)
 	 * 
 	 * @see
 	 * backtype.storm.topology.IComponent#declareOutputFields(backtype.storm.
 	 * topology.OutputFieldsDeclarer)
-	 */
+	 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 	}
 
 }
+*/

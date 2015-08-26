@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,7 @@ public class MemberVariablesDao extends AbstractDao {
 		memberVariablesCollection = db.getCollection("memberVariables");
     }
    
-    public Map<String,Object> getMemberVariablesFiltered(String l_id, List<String> variableFilter){
+    public Map<String,Object> getMemberVariablesFiltered(String l_id, Set<String> variableFilter){
     	BasicDBObject variableFilterDBO = new BasicDBObject(MongoNameConstants.ID, 0);
     	for(String var:variableFilter){
     		variableFilterDBO.append(var, 1);
