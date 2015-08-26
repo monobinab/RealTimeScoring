@@ -62,7 +62,6 @@ public class ParsingBoltSYWMockTest {
 	}
 
 	@Test
-	@Ignore
 	public void catalogInteractionsAreProcessed(){
 		String lId = "b1Ydvqii2CTcolqxu8oyHdzq1NQ=";
 		String interactionType = "AddToCatalog";

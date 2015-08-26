@@ -69,7 +69,6 @@ public class ProcessSywBoltMockTest {
 	}
 	
 	@Test
-	@Ignore
 	public void standardCatalogsAreProcessed() throws ConfigurationException{
 		/*
 		 *     15009844,    15009912,    16881520 - like, want and own catalog ids
