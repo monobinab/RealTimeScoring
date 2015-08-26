@@ -379,7 +379,7 @@ public class ScoringSingleton {
 	public boolean isBlackOutModel(Map<String, Change> allChanges,	Integer modelId) {
 		int blackFlag = 0;
 		Map<String, Variable> variableMap = getModelVariables(modelId);
-		if(variableMap != null || !variableMap.isEmpty()){
+		if(variableMap != null ){
 			for (Map.Entry<String, Change> entry : allChanges.entrySet()) {
 				String ch = entry.getKey();
 				Change value = entry.getValue();
