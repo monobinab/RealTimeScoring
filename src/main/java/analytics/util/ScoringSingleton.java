@@ -150,8 +150,8 @@ public class ScoringSingleton {
 			}
 		}
 		catch(Exception e){
-			e.printStackTrace();
-			LOGGER.error("Exception occured in rescoring " + l_id + " ", e);
+			//e.printStackTrace();
+			LOGGER.error("Exception occured in rescoring " + l_id + " ", e.getMessage());
 		}
 			return modelIdStringScoreMap;
 	}
@@ -229,7 +229,7 @@ public class ScoringSingleton {
 									 changedMemberScoreList.add(changedMemberScore);
 						 }
 						   catch(RealTimeScoringException e){
-								LOGGER.error("Exception scoring modelId " + modelId +" for lId " + lId + " " , e);
+								LOGGER.error("Exception scoring modelId " + modelId +" for lId " + lId + " " , e.getErrorMessage());
 								//System.out.println("Exception scoring modelId " + modelId +" for lId " + lId + " " + e.getErrorMessage());
 						   }
 						}
@@ -240,7 +240,7 @@ public class ScoringSingleton {
 			 	}	
 			}
 		catch(Exception e){
-			LOGGER.error("Exception scoring lId " + lId + " " + e);
+			LOGGER.error("Exception scoring lId " + lId + " " + e.getMessage());
 			e.printStackTrace();
 		}
 			return memberRTSChanges;

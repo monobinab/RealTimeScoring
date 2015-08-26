@@ -44,8 +44,8 @@ public class StrategyDCFlag implements Strategy {
 					totalUnexpiredStrength += JsonUtils.convertToDouble(value);
 				}
 			} catch (ParseException e) {
-				LOGGER.warn("Unable to parse date",e);
-				e.printStackTrace();
+				LOGGER.warn("Unable to parse date",e.getMessage());
+				//e.printStackTrace();
 			}
 
 		}
