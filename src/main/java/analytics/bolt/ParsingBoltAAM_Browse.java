@@ -172,7 +172,7 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 		return gson.toJson(dateValuesMap, boostValueType);
 	}
 
-	@Override
+	/*@Override
 	protected String[] splitRec(String webRec) {
 		//TODO: See if other fields in the record are relevant. It was anyway not being used, so made this change
     	webRec = webRec.replaceAll("[']",""); 
@@ -184,6 +184,20 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 	        		splits[i]=split[i+1];
 	        	}
 	            return  splits;
+			}
+			else {
+				return null;
+			}
+		}*/
+	
+	@Override
+	protected String[] splitRec(String webRec) {
+		//TODO: See if other fields in the record are relevant. It was anyway not being used, so made this change
+    	webRec = webRec.replaceAll("[']",""); 
+	        String split[]=StringUtils.split(webRec,",");
+	       
+	        if(split !=null && split.length>0) {
+	        	return  split;
 			}
 			else {
 				return null;

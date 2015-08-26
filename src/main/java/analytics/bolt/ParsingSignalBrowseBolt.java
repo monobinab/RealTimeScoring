@@ -56,7 +56,8 @@ public class ParsingSignalBrowseBolt extends EnvironmentBolt{
 				if(lId != null && pidLst != null && pidLst.size()>0){
 					ArrayList<String> lst = new ArrayList<String>(pidLst.subList(1, pidLst.size()));
 					String pidLstStr = StringUtils.join(lst, ',');
-					String str = "[,"+loyaltyId+","+pidLstStr+",]";
+				//	String str = "[,"+loyaltyId+","+pidLstStr+",]";
+					String str = loyaltyId+","+pidLstStr;
 					outputCollector.emit(tuple(str));
 					str = null;
 					pidLstStr = null;
