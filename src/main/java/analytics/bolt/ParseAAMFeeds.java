@@ -27,19 +27,17 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 
     protected List<String> modelVariablesList;
     protected Map<String,Collection<String>> l_idToValueCollectionMap; // USED TO MAP BETWEEN l_id AND THE TRAITS OR PID OR SearchKeyword ASSOCIATED WITH THAT ID 
-    protected String topic;
-	protected String sourceTopic;
+    protected String loyalty_id;
+    
+    protected String source;
+    protected String sourceTopic;
 	protected ModelVariablesDao modelVariablesDao;
-	
-	private static String topicsUsingEncryptLidDirectly = "SIGNAL_BrowseFeed";
 			
     public ParseAAMFeeds() {
 	}
-
-	// Overloaded Paramterized constructor to get the topic to which the spout is listening to
-	public ParseAAMFeeds( String systemProperty, String topic) {
+	public ParseAAMFeeds( String systemProperty, String source) {
 		super(systemProperty);
-		this.topic = topic;
+		this.source = source;
 		}
 	
     public void setOutputCollector(OutputCollector outputCollector) {
@@ -50,8 +48,7 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         this.outputCollector = collector;
         super.prepare(stormConf, context, collector);
-	//    memberDao = new MemberUUIDDao();
-        modelVariablesDao =  new ModelVariablesDao(); 
+	    modelVariablesDao =  new ModelVariablesDao(); 
         modelVariablesList = new ArrayList<String>();
      
 		//POPULATE MODEL VARIABLES LIST
@@ -63,85 +60,51 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 		
 		LOGGER.debug("PARSING DOCUMENT -- WEB TRAIT RECORD ");
 		redisCountIncr("incoming_tuples");
-		//countMetric.scope("incoming_tuples").incr();
-		// 1) SPLIT INPUT STRING
 		
         String interactionRec = input.getString(0);
-
         String splitRecArray[] = splitRec(interactionRec);
         
         if(splitRecArray == null || splitRecArray.length==0) {
-    		//countMetric.scope("invalid_record").incr();
     		redisCountIncr("invalid_record");
     		outputCollector.ack(input);
         	return;
         }
-        
-      //condition to check whether loyaltyId or l_ids is passed
+      
         String l_id = null;
-        String loyalty_id = null;
-        if(!topicsUsingEncryptLidDirectly.contains(topic)){
-			// 4) IDENTIFY MEMBER BY UUID - IF NOT FOUND THEN SET CURRENT UUID FROM RECORD, SET CURRENT l_id TO NULL AND RETURN
-	        //		If l_id is null and the next UUID is the same the current, then the next record will not be processed
-	        
-        	loyalty_id = splitRecArray[0].trim();
-	        if(loyalty_id.length()!=16 || !loyalty_id.startsWith("7081")){
-	        	LOGGER.info("Could not find Lid: " + loyalty_id);
-	        	//countMetric.scope("no_lids").incr();
-	        	redisCountIncr("no_lids");
-	        	outputCollector.ack(input);
-	        	return;
-	        }
-	        l_id = SecurityUtils.hashLoyaltyId(loyalty_id);
         
+        this.loyalty_id = splitRecArray[0].trim();
+        if(loyalty_id.length()!=16 || !loyalty_id.startsWith("7081")){
+        	LOGGER.info("Could not find Lid: " + this.loyalty_id);
+        	redisCountIncr("no_lids");
+        	outputCollector.ack(input);
+        	return;
         }
-        else
-        	l_id = splitRecArray[0];
+	    l_id = SecurityUtils.hashLoyaltyId(loyalty_id);
         
-        
-        l_idToValueCollectionMap = new HashMap<String, Collection<String>>();
-        // set current uuid and l_id from mongoDB query results
-        //for(String l_id:l_ids) {
-        	l_idToValueCollectionMap.put(l_id, new ArrayList<String>());
-    		for(int i=1;i<splitRecArray.length;i++){
-    			l_idToValueCollectionMap.get(l_id).add(splitRecArray[i].trim());
-    		}
-    		LOGGER.debug("processing found traits...");
-        	Map<String,String> variableValueMap = processList(l_id); //LIST OF VARIABLES FOUND DURING TRAITS PROCESSING
-        	if(variableValueMap !=null && !variableValueMap.isEmpty()) {
- 	        	Object variableValueJSON = JsonUtils.createJsonFromStringStringMap(variableValueMap);
-	        	List<Object> listToEmit = new ArrayList<Object>();
-	        	listToEmit.add(l_id);
-	        	listToEmit.add(variableValueJSON);
-	        	listToEmit.add(sourceTopic);
-	        	listToEmit.add(loyalty_id);
-	        	this.outputCollector.emit(listToEmit);
-	        	//countMetric.scope("processed_lid").incr();
-	        	redisCountIncr("processed_lid");
-	        	LOGGER.debug(" *** PARSING BOLT EMITTING: " + listToEmit);
-        	}
-        	else {
-        		LOGGER.debug(" *** NO VARIABLES FOUND - NOTHING TO EMIT");
-        		redisCountIncr("no_variables_affected");
-        		//countMetric.scope("no_variables_affected").incr();
-        	}
-        	//countMetric.scope("total_processing").incr();
-        	redisCountIncr("total_processing");
-        	
-        //}
-        
-        //TODO: If we need this, we should ask Dustin to send it to Traits feed as well
-        /*SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
-        Date interactionDateTime = new Date();
-        try {
-			interactionDateTime = dateTimeFormat.parse(splitRecArray[0]);
-		} catch (ParseException e) {
-			logger.debug("Can not parse date",e);
-		}*/
-        
-		//countMetric.scope("unique_uuids_processed").incr();
-        	redisCountIncr("unique_uuids_processed");
-		outputCollector.ack(input);
+         l_idToValueCollectionMap = new HashMap<String, Collection<String>>();
+         l_idToValueCollectionMap.put(l_id, new ArrayList<String>());
+		for(int i=1;i<splitRecArray.length;i++){
+			l_idToValueCollectionMap.get(l_id).add(splitRecArray[i].trim());
+		}
+		LOGGER.debug("processing found traits...");
+    	Map<String,String> variableValueMap = processList(l_id); //LIST OF VARIABLES FOUND DURING TRAITS PROCESSING
+    	if(variableValueMap !=null && !variableValueMap.isEmpty()) {
+        	Object variableValueJSON = JsonUtils.createJsonFromStringStringMap(variableValueMap);
+        	List<Object> listToEmit = new ArrayList<Object>();
+        	listToEmit.add(l_id);
+        	listToEmit.add(variableValueJSON);
+        	listToEmit.add(source);
+        	listToEmit.add(loyalty_id);
+        	this.outputCollector.emit(listToEmit);
+        	redisCountIncr("processed_lid");
+        	LOGGER.debug(" *** PARSING BOLT EMITTING: " + listToEmit);
+    	}
+    	else {
+    		LOGGER.debug(" *** NO VARIABLES FOUND - NOTHING TO EMIT");
+    		redisCountIncr("no_variables_affected");
+    	}
+    	redisCountIncr("total_processing");
+    	outputCollector.ack(input);
     	return;
         
 	}
@@ -152,10 +115,6 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		declarer.declare(new Fields("l_id","lineItemAsJsonString","source","lyl_id_no"));
 	}
-	
-	
     abstract protected String[] splitRec(String webRec);
-    
+}    
 
-
-}
