@@ -47,7 +47,7 @@ public class RTSKafkaBolt extends EnvironmentBolt {
 				try {
 					
 					KafkaUtil.sendKafkaMSGs(message, currentTopic);
-					System.out.println("MSG SENT");
+				//	System.out.println("MSG SENT");
 				} catch (ConfigurationException e) {
 					LOGGER.error(e.getMessage(), e);
 					outputCollector.fail(input);
