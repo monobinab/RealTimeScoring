@@ -379,14 +379,16 @@ public class ScoringSingleton {
 	public boolean isBlackOutModel(Map<String, Change> allChanges,	Integer modelId) {
 		int blackFlag = 0;
 		Map<String, Variable> variableMap = getModelVariables(modelId);
-		for (Map.Entry<String, Change> entry : allChanges.entrySet()) {
-			String ch = entry.getKey();
-			Change value = entry.getValue();
-		if (ch.startsWith(MongoNameConstants.BLACKOUT_VAR_PREFIX) && variableMap.containsKey(ch)) 
-			blackFlag = Integer.valueOf(value.getValue().toString());
-			if(blackFlag==1)
-			{
-				return true;
+		if(variableMap != null || !variableMap.isEmpty()){
+			for (Map.Entry<String, Change> entry : allChanges.entrySet()) {
+				String ch = entry.getKey();
+				Change value = entry.getValue();
+			if (ch.startsWith(MongoNameConstants.BLACKOUT_VAR_PREFIX) && variableMap.containsKey(ch)) 
+				blackFlag = Integer.valueOf(value.getValue().toString());
+				if(blackFlag==1)
+				{
+					return true;
+				}
 			}
 		}
 	  	return false;
@@ -456,12 +458,16 @@ public class ScoringSingleton {
 		
 		Model model = getModel(modelId);
 		if(model == null)
-			throw new RealTimeScoringException("model is null");
+			throw new RealTimeScoringException("model is null for modelId " + modelId);
+		
+		Map<String, Variable> variableMap = model.getVariables();
+		if(variableMap == null || variableMap.isEmpty())
+			throw new RealTimeScoringException("variableMap is null for " + modelId);
 		
 		double val = (Double) model.getConstant();
 
-		for (String v : model.getVariables().keySet()) {
-			Variable variable = model.getVariables().get(v);
+		for (String v : variableMap.keySet()) {
+			Variable variable = variableMap.get(v);
 
 			// if variable does not have a name or VID, skip scoring that model by throwing exception
 			if (variable.getName() == null || variableNameToVidMap.get(variable.getName()) == null) {
