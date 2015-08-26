@@ -62,6 +62,6 @@ public class Constants {
 	public static final String SIGNAL_BROWSE_TOPOLOGY = "SignalBrowse";
 	
 	//SignalTopology constants
-	public static final String SIGNAL_URL = "http://semantictec.com/message/consume?topic=user.activities.signal&size=10000&consumerGroup=RTS&timeout=60";
+	public static final String SIGNAL_URL = "http://semantictec.com/message/consume?topic=user.activities.signal&size=10000&consumerGroup=RTS2&timeout=60";
 
 }
