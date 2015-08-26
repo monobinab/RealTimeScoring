@@ -359,14 +359,16 @@ public class ScoringSingleton {
 	public boolean isBlackOutModel(Map<String, Change> allChanges,	Integer modelId) {
 		int blackFlag = 0;
 		Map<String, Variable> variableMap = getModelVariables(modelId);
-		for (Map.Entry<String, Change> entry : allChanges.entrySet()) {
-			String ch = entry.getKey();
-			Change value = entry.getValue();
-		if (ch.startsWith(MongoNameConstants.BLACKOUT_VAR_PREFIX) && variableMap.containsKey(ch)) 
-			blackFlag = Integer.valueOf(value.getValue().toString());
-			if(blackFlag==1)
-			{
-				return true;
+		if(variableMap != null && !variableMap.isEmpty()){
+			for (Map.Entry<String, Change> entry : allChanges.entrySet()) {
+				String ch = entry.getKey();
+				Change value = entry.getValue();
+			if (ch.startsWith(MongoNameConstants.BLACKOUT_VAR_PREFIX) && variableMap.containsKey(ch)) 
+				blackFlag = Integer.valueOf(value.getValue().toString());
+				if(blackFlag==1)
+				{
+					return true;
+				}
 			}
 		}
 	  	return false;
@@ -436,7 +438,10 @@ public class ScoringSingleton {
 		
 		Model model = getModel(modelId);
 		if(model == null)
-			throw new RealTimeScoringException("model is null");
+			throw new RealTimeScoringException("Model is null for " +  modelId);
+		Map<String, Variable> variableMap = model.getVariables();
+		if(variableMap == null || variableMap.isEmpty())
+			throw new RealTimeScoringException("variableMap is null for modelId " + modelId);
 		
 		double val = (Double) model.getConstant();
 
