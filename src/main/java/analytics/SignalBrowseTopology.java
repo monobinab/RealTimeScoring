@@ -49,7 +49,7 @@ public class SignalBrowseTopology{
 		if(System.getProperty(MongoNameConstants.IS_PROD).equals("PROD")){
 			builder.setBolt("loggingBolt", new LoggingBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
 		}
-		builder.setBolt("RTSKafkaBolt", new RTSKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD),kafkatopic), 1)
+		builder.setBolt("RTSKafkaBolt", new RTSKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD),"stormtopic"), 1)
 		.shuffleGrouping("strategyScoringBolt","kafka_stream");
 
 		Config conf = new Config();
