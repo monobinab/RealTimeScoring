@@ -224,8 +224,14 @@
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
-			<version>4.2.3</version>
+			<version>4.5</version>
 			<scope>compile</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.google.protobuf</groupId>
+			<artifactId>protobuf-java</artifactId>
+			<version>3.0.0-alpha-3.1</version>
 		</dependency>
 
         <dependency>
@@ -363,7 +369,7 @@
 		<dependency>
 		    <groupId>org.apache.hadoop</groupId>
 		    <artifactId>hadoop-client</artifactId>
-		    <version>2.2.0</version>
+		    <version>2.6.0</version>
 		    <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -371,8 +377,19 @@
                 </exclusion>
             </exclusions>
 		</dependency>
-    </dependencies>
 
+   		<dependency>
+			<groupId>org.apache.hadoop</groupId>
+			<artifactId>hadoop-auth</artifactId>
+			<version>2.6.0</version>
+			<exclusions>
+			<exclusion>
+				<groupId>jdk.tools</groupId>
+				<artifactId>jdk.tools</artifactId>
+			</exclusion>
+			</exclusions>
+		</dependency>
+    </dependencies>
 	<build>
 		<resources>
 			<resource>
