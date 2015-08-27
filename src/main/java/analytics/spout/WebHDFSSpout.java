@@ -79,8 +79,8 @@ public class WebHDFSSpout extends BaseRichSpout {
 
 			System.setProperty("java.security.krb5.conf", Constants.KERBEROSE_CONF_PATH);
 			System.setProperty("keytabPath", Constants.KERBEROSE_KEYTAB_PATH);
-		  	System.setProperty("java.security.krb5.realm", "HADOOP.SEARSHC.COM");
-			System.setProperty("java.security.krb5.kdc", "10.0.29.9");
+		  	//System.setProperty("java.security.krb5.realm", "HADOOP.SEARSHC.COM");
+			//System.setProperty("java.security.krb5.kdc", "10.0.29.9");
 			Configuration conf = new Configuration();
 			conf.set("hadoop.security.authentication", "kerberos");
 			conf.set("fs.defaultFS", Constants.WEBHDFS_URL);
