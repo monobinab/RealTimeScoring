@@ -140,6 +140,7 @@ public class WebHDFSSpout extends BaseRichSpout {
 			// Sleep for 5 mins before starting the next process
 			Thread.sleep(60000);
 		} catch (Exception e) {
+			e.printStackTrace();
 			LOGGER.error("Error in communication with webhdfs [" + hdfsPath
 					+ "]");
 		}
