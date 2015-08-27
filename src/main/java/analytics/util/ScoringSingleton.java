@@ -220,6 +220,9 @@ public class ScoringSingleton {
 									rtsScore = rtsScore * regionalFactor;
 									if(rtsScore > 1.0)
 										rtsScore = 1.0;
+									
+									if(rtsScore < 0.0)
+										rtsScore = 1.0;
 								}
 									 Map<String, Date> minMaxMap = this.getMinMaxExpiry(modelId, allChanges);
 									 ChangedMemberScore changedMemberScore = new ChangedMemberScore();
@@ -232,8 +235,7 @@ public class ScoringSingleton {
 									 changedMemberScoreList.add(changedMemberScore);
 						 }
 						   catch(RealTimeScoringException e){
-
-								LOGGER.error("Exception scoring modelId " + modelId +" for lId " + lId + " " , e.getErrorMessage());
+							   LOGGER.error("Exception scoring modelId " + modelId +" for lId " + lId + " " , e.getErrorMessage());
 						   }
 						}
 							 memberRTSChanges.setlId(lId);
