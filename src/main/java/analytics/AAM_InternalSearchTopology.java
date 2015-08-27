@@ -35,12 +35,12 @@ public static void main(String[] args) {
 		
 		String kafkatopic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;
 		String[] servers = RedisConnection.getServers(System.getProperty(MongoNameConstants.IS_PROD));
-
+		String source = TopicConstants.AAM_CDF_INTERNALSEARCH;
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 		
 		//Sree. Spout that wakes up every 5 mins and process the Traits
 		topologyBuilder.setSpout("internalSearchSpout", new WebHDFSSpout(servers[1], TopicConstants.PORT, Constants.AAM_INTERNAL_SEARCH_PATH, "aamInternalSearch"), 1);
-		topologyBuilder.setBolt("ParsingBoltAAM_InternalSearch",new ParsingBoltAAM_InternalSearch(System.getProperty(MongoNameConstants.IS_PROD), "aamInternalSearch"),10).shuffleGrouping("internalSearchSpout");
+		topologyBuilder.setBolt("ParsingBoltAAM_InternalSearch",new ParsingBoltAAM_InternalSearch(System.getProperty(MongoNameConstants.IS_PROD), source),10).shuffleGrouping("internalSearchSpout");
 
 		topologyBuilder.setBolt("strategy_bolt", new StrategyScoringBolt(System.getProperty(MongoNameConstants.IS_PROD)), 10)
 				.shuffleGrouping("ParsingBoltAAM_InternalSearch");

@@ -222,7 +222,7 @@ public class ScoringSingleton {
 										rtsScore = 1.0;
 									
 									if(rtsScore < 0.0)
-										rtsScore = 1.0;
+										rtsScore = 0.0;
 								}
 									 Map<String, Date> minMaxMap = this.getMinMaxExpiry(modelId, allChanges);
 									 ChangedMemberScore changedMemberScore = new ChangedMemberScore();
