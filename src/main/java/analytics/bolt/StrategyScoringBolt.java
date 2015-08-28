@@ -150,6 +150,9 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			List<Object> listToEmit = new ArrayList<Object>();
 			listToEmit.add(lyl_id_no+"~"+topologyName);
 			this.outputCollector.emit("kafka_stream", listToEmit);
+			
+			List<Object> objectToCps = new ArrayList<Object>();
+			objectToCps.add(lyl_id_no);
 	
 			redisCountIncr("member_scored_successfully");
 			this.outputCollector.ack(input);
