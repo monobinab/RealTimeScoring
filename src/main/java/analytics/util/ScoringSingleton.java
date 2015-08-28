@@ -246,7 +246,7 @@ public class ScoringSingleton {
 			}
 		catch(Exception e){
 			LOGGER.error("Exception scoring lId " + lId + " " + e.getMessage());
-//			e.printStackTrace();
+			e.printStackTrace();
 		}
 			return memberRTSChanges;
 	}
