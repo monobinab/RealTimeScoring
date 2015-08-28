@@ -18,8 +18,15 @@ public class ProcessTransaction {
 	private String transactionTime;
 	private String associateID;
 	private String earnFlag;
+	private String pickUpStoreNumber;
 	private List<LineItem> lineItemList; 
 	
+	public String getPickUpStoreNumber() {
+		return pickUpStoreNumber;
+	}
+	public void setPickUpStoreNumber(String pickUpStoreNumber) {
+		this.pickUpStoreNumber = pickUpStoreNumber;
+	}
 	public String getMessageVersion() {
 		return messageVersion;
 	}

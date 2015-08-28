@@ -15,27 +15,23 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-
 import com.ibm.jms.JMSBytesMessage;
 import com.ibm.jms.JMSMessage;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import redis.clients.jedis.Jedis;
 
 import javax.jms.BytesMessage;
 import javax.jms.JMSException;
 import javax.jms.Message;
-
 import java.io.ByteArrayOutputStream;
 import java.util.*;
 
-public class TellurideParsingBoltPOS extends EnvironmentBolt {
+public class TellurideParsingBoltPOS_Old extends EnvironmentBolt {
 
     private static final Logger LOGGER = LoggerFactory
-            .getLogger(TellurideParsingBoltPOS.class);
+            .getLogger(TellurideParsingBoltPOS_Old.class);
     /**
      * Created by Devarshi Das 8/27/2014
      */
@@ -50,12 +46,12 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
     private String host;
     private int port;
 
-    public TellurideParsingBoltPOS(String systemProperty) {
+    public TellurideParsingBoltPOS_Old(String systemProperty) {
         super(systemProperty);
 
     }
 
-    public TellurideParsingBoltPOS(String systemProperty, String host, int port) {
+    public TellurideParsingBoltPOS_Old(String systemProperty, String host, int port) {
         super(systemProperty);
         this.host = host;
         this.port = port;
@@ -102,10 +98,8 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
     @Override
     public void execute(Tuple input) {
 
-          if (LOGGER.isDebugEnabled()){
+          if (LOGGER.isDebugEnabled())
             LOGGER.debug("The time it enters inside Telluride parsing bolt execute method" + System.currentTimeMillis() + " and the message ID is ..." + input.getMessageId());
-          }
-        LOGGER.info("PERSIST: incoming tuples in parsingbolt TELLURIDE");
         redisCountIncr("incoming_tuples");
         String lyl_id_no = "";
         ProcessTransaction processTransaction = null;
@@ -114,11 +108,26 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
             messageID = input.getStringByField("messageID");
         }
         LOGGER.info("TIME:" + messageID + "-Entering parsing bolt-" + System.currentTimeMillis());
-        String transactionXmlAsString = (String) input.getValueByField("npos");
-    	
+        String transactionXmlAsString = "";
+        // KPOS and KCOM
+        JMSMessage documentNPOS = (JMSMessage) input.getValueByField("npos");
+
+        try {
+            if (documentNPOS instanceof JMSBytesMessage)
+                transactionXmlAsString = convertStreamToString(documentNPOS);
+        } catch (JMSException e) {
+            LOGGER.error("Unable to read message from MQ", e);
+        } catch (Exception e) {
+            LOGGER.error("Unable to read message from MQ", e);
+        }
+        if (StringUtils.isEmpty(transactionXmlAsString)) {
+            redisCountIncr("empty_message");
+            outputCollector.ack(input);
+            return;
+        }
+
         processTransaction = parseXMLAndExtractProcessTransaction(processTransaction, transactionXmlAsString);
-        //System.out.println("Earn flag " + processTransaction.getEarnFlag());
-        LOGGER.info("PERSIST: EarnFlag for member " + processTransaction.getMemberNumber() +": " + processTransaction.getEarnFlag());
+
 
         // 1) TEST IF TRANSACTION TYPE CODE IS = 1 (RETURN IF FALSE)
         // 2) TEST IF TRANSACTION IS A MEMBER TRANSACTION (IF NOT RETURN)
@@ -128,19 +137,11 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
         // AND PUT INTO LINE ITEM CLASS CONTAINER WITH HASHED LOYALTY ID + ALL
         // TRANSACTION LEVEL DATA
         // 5) EMIT LINE ITEMS
-         
-        if (processTransaction != null && processTransaction.getEarnFlag().equalsIgnoreCase("E")) {
+
+        if (processTransaction != null) {
         	
-        	/*String memberNumber = (processTransaction.getMemberNumber() != null) ? processTransaction.getMemberNumber() : "NONE";
-        	String pickUpStoreNumber = (processTransaction.getOrderStoreNumber() != null) ? processTransaction.getOrderStoreNumber() : "NONE";
-        	String tenderStoreNumber = (processTransaction.getTenderStoreNumber() != null) ? processTransaction.getTenderStoreNumber() : "NONE";
-        	String orderStoreNumber = (processTransaction.getOrderStoreNumber() != null) ? processTransaction.getOrderStoreNumber() : "NONE";
-            String registerNumber = (processTransaction.getRegisterNumber() != null) ? processTransaction.getRegisterNumber() : "NONE";
-            String transactionNumber = (processTransaction.getTransactionNumber() != null) ? processTransaction.getTransactionNumber() : "NONE";
-            String transactionTime = (processTransaction.getTransactionTime() != null) ? processTransaction.getTransactionTime() : "NONE";
-         //   System.out.println("PERSIST: " + memberNumber +", " + pickUpStoreNumber + ", " + tenderStoreNumber +", " + orderStoreNumber + ", " + registerNumber +", " + transactionNumber +", " + transactionTime);
-            LOGGER.info("PERSIST: " + memberNumber +", " + pickUpStoreNumber + ", " + tenderStoreNumber +", " + orderStoreNumber + ", " + registerNumber +", " + transactionNumber +", " + transactionTime +", " + "valid transaction");*/
-        	
+        	LOGGER.info("valid xml " + transactionXmlAsString);
+
             lyl_id_no = processTransaction.getMemberNumber();
 
             if (lyl_id_no == null || StringUtils.isEmpty(lyl_id_no)) {
@@ -158,7 +159,7 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
             listLineItemsAndEmit(input, lyl_id_no, processTransaction, messageID, l_id);
 
         } else {
-          //  LOGGER.info("empty xml " + transactionXmlAsString);
+            LOGGER.info("empty xml " + transactionXmlAsString);
             redisCountIncr("empty_xml");
             outputCollector.ack(input);
             return;
