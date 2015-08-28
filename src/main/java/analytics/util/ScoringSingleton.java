@@ -335,50 +335,56 @@ public class ScoringSingleton {
 	 * @return
 	 */
 	public Map<String, Change> executeStrategy(Map<String, Change> allChanges, Map<String, String> newChangesVarValueMap, Map<String, Object> memberVariablesMap) {
-		for (String variableName : newChangesVarValueMap.keySet()) {
-			variableName = variableName.toUpperCase();
-			if (variableModelsMap.containsKey(variableName)) {
-				if (variableNameToStrategyMap.get(variableName) == null) {
-					LOGGER.info(" ~~~ DID NOT FIND VARIABLE IN VARIABLES COLLECTION: " + variableName);
-					continue;
-				}
-
-				RealTimeScoringContext context = new RealTimeScoringContext();
-				context.setValue(newChangesVarValueMap.get(variableName));
-				// set default previous value to 0 in case the variable does not exist in memberVariables or changedMemberVariables
-				// memberVariables with 0 are removed by batch job
-				context.setPreviousValue(0);
-
-				if ("NONE".equals(variableNameToStrategyMap.get(variableName))) {
-					continue;
-				}
-
-				Strategy strategy = StrategyMapper.getInstance().getStrategy(variableNameToStrategyMap.get(variableName));
-				if (strategy == null) {
-					LOGGER.error("Unable to obtain strategy for " + variableName);
-					continue;
-				}
-				/*
-				 * If this member had a changed variable
-				   allChanges at this point only contain changedMemberVariables
-				   changedMemberVariables can never be null, so no need for null check 
-				   ChangedMemberVarDao will return empty map NOT null map
-				 */
-				if (!allChanges.isEmpty() && allChanges.containsKey(variableName)) {
-					context.setPreviousValue(allChanges.get(variableName).getValue());
-				}
-				// else get it from memberVariablesMap
-				else {
-					if (memberVariablesMap.get(variableNameToVidMap.get(variableName)) != null) {
-						context.setPreviousValue(memberVariablesMap.get(variableNameToVidMap.get(variableName)));
+		try{
+			for (String variableName : newChangesVarValueMap.keySet()) {
+				variableName = variableName.toUpperCase();
+				if (variableModelsMap.containsKey(variableName)) {
+					if (variableNameToStrategyMap.get(variableName) == null) {
+						LOGGER.info(" ~~~ DID NOT FIND VARIABLE IN VARIABLES COLLECTION: " + variableName);
+						continue;
 					}
+	
+					RealTimeScoringContext context = new RealTimeScoringContext();
+					context.setValue(newChangesVarValueMap.get(variableName));
+					// set default previous value to 0 in case the variable does not exist in memberVariables or changedMemberVariables
+					// memberVariables with 0 are removed by batch job
+					context.setPreviousValue(0);
+	
+					if ("NONE".equals(variableNameToStrategyMap.get(variableName))) {
+						continue;
+					}
+	
+					Strategy strategy = StrategyMapper.getInstance().getStrategy(variableNameToStrategyMap.get(variableName));
+					if (strategy == null) {
+						LOGGER.error("Unable to obtain strategy for " + variableName);
+						continue;
+					}
+					/*
+					 * If this member had a changed variable
+					   allChanges at this point only contain changedMemberVariables
+					   changedMemberVariables can never be null, so no need for null check 
+					   ChangedMemberVarDao will return empty map NOT null map
+					 */
+					if (!allChanges.isEmpty() && allChanges.containsKey(variableName)) {
+						context.setPreviousValue(allChanges.get(variableName).getValue());
+					}
+					// else get it from memberVariablesMap
+					else {
+						if (memberVariablesMap.get(variableNameToVidMap.get(variableName)) != null) {
+							context.setPreviousValue(memberVariablesMap.get(variableNameToVidMap.get(variableName)));
+						}
+					}
+					LOGGER.debug(" ~~~ STRATEGY BOLT CHANGES - context: " + context);
+					Change executedValue = strategy.execute(context);
+					allChanges.put(variableName, executedValue);
 				}
-				LOGGER.debug(" ~~~ STRATEGY BOLT CHANGES - context: " + context);
-				Change executedValue = strategy.execute(context);
-				allChanges.put(variableName, executedValue);
 			}
 		}
-		return allChanges;
+		catch(Exception e){
+			LOGGER.error("Exception in executeStrategy " + e.getStackTrace());
+			e.printStackTrace();
+		}
+			return allChanges;
 	}
 	
 	public boolean isBlackOutModel(Map<String, Change> allChanges,	Integer modelId) {
