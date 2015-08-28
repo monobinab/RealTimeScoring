@@ -23,21 +23,33 @@ public class Constants {
 	public static final String OCC_SUB = "s";
 	public static final String OCC_PO = "po";
 	
-	public static final String AAM_TRAITS_PATH="/smith/adobe/rts/out/traits";
+	//public static final String AAM_TRAITS_PATH="/smith/adobe/rts/out/traits";
 	//public static final String AAM_BROWSER_PATH="/smith/adobe/rts/out/products";
-	public static final String AAM_INTERNAL_SEARCH_PATH="/smith/adobe/rts/out/is_grouped_search";
-	public static final String AAM_BROWSER_PATH = "/smith/adobe/rts/out/products_grouping";
+	//public static final String AAM_INTERNAL_SEARCH_PATH="/smith/adobe/rts/out/is_grouped_search";
+	//public static final String AAM_BROWSER_PATH = "/smith/adobe/rts/out/products_grouping";
+	
+	public static final String AAM_TRAITS_PATH="/warehouse/aam/prod/rts/out/traits";
+	//public static final String AAM_BROWSER_PATH="/smith/adobe/rts/out/products";
+	public static final String AAM_INTERNAL_SEARCH_PATH="/warehouse/aam/prod/rts/out/is_grouped_search";
+	public static final String AAM_BROWSER_PATH = "/warehouse/aam/prod/rts/out/products_grouping";
+	public static final String KERBEROSE_KEYTAB_PATH = "/appl/storm/keytabs/prod_aamadmin.keytab";
+	public static final String KERBEROSE_CONF_PATH = "/home/auto/spannal/krb5.conf";
 	//public static final String AAM_INTERNAL_SEARCH_PATH="/smith/adobe/rts/out/is";
 	//public static final String AAM_INTERNAL_SEARCH_PATH="/user/kmuthuk/test";
 	//public static final String AAM_INTERNAL_SEARCH_PATH="/user/spannal/internalSearch/is";
 	//public static final String AAM_BROWSER_PATH="/user/kmuthuk/browse_grouped";
+	//public static final String LIST_STATUS_WEBHDFS_URL="http://151.149.131.21:14000/webhdfs/v1<HDFS_LOCATION>?user.name=spannal&op=LISTSTATUS";
+	//public static final String CONTENT_SUMMARY_WEBHDFS_URL = "http://151.149.131.21:14000/webhdfs/v1<HDFS_LOCATION>/<PATH>?user.name=spannal&op=GETCONTENTSUMMARY";
+	//public static final String FILE_READ_WEBHDFS_URL = "http://151.149.131.21:14000/webhdfs/v1<HDFS_LOCATION>/<PATH>?user.name=spannal&op=OPEN";
+	//public static final String FILE_STATUS_WEBHDFS_URL = "http://151.149.131.21:14000/webhdfs/v1<HDFS_LOCATION>/<PATH>?user.name=spannal&op=GETFILESTATUS";
+	
 	public static final String LIST_STATUS_WEBHDFS_URL="http://151.149.131.21:14000/webhdfs/v1<HDFS_LOCATION>?user.name=spannal&op=LISTSTATUS";
-	public static final String CONTENT_SUMMARY_WEBHDFS_URL = "http://151.149.131.21:14000/webhdfs/v1<HDFS_LOCATION>/<PATH>?user.name=spannal&op=GETCONTENTSUMMARY";
 	public static final String FILE_READ_WEBHDFS_URL = "http://151.149.131.21:14000/webhdfs/v1<HDFS_LOCATION>/<PATH>?user.name=spannal&op=OPEN";
-	public static final String FILE_STATUS_WEBHDFS_URL = "http://151.149.131.21:14000/webhdfs/v1<HDFS_LOCATION>/<PATH>?user.name=spannal&op=GETFILESTATUS";
-	public static final String WEBHDFS_URL = "http://151.149.131.21:14000";
-	public static final String WEBHDFS_USERNAME = "webhdfs_grp_username";
-	public static final String WEBHDFS_PASSWORD = "webhdfs_grp_password";
+	
+	public static final String WEBHDFS_URL = "webhdfs://10.0.29.9:14000";
+	public static final String WEBHDFS_PRINCIPAL = "aamadmin@HADOOP.SEARSHC.COM";
+	public static final String WEBHDFS_USERNAME = "aamadmin@HADOOP.SEARSHC.COM";
+	public static final String WEBHDFS_PASSWORD = "";
 	
 	
 	public static final String RESPONSE_REDIS_SERVER_HOST="respRedisServerHost";
@@ -62,6 +74,6 @@ public class Constants {
 	public static final String SIGNAL_BROWSE_TOPOLOGY = "SignalBrowse";
 	
 	//SignalTopology constants
-	public static final String SIGNAL_URL = "http://semantictec.com/message/consume?topic=user.activities.signal&size=10000&consumerGroup=RTS2&timeout=60";
+	public static final String SIGNAL_URL = "http://semantictec.com/message/consume?topic=user.activities.signal&size=10000&consumerGroup=RTS&timeout=60";
 
 }
