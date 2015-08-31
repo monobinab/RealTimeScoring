@@ -125,7 +125,7 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
         // 5) EMIT LINE ITEMS
         
         //this needs to be removed, as we got NPE 
-        if(processTransaction.getEarnFlag() == null){
+        if(processTransaction != null && processTransaction.getEarnFlag() == null){
         	LOGGER.info("LOGGING TO CHECK THE XML WITHOUT EARNFLAG " + transactionXmlAsString);
         }
          
