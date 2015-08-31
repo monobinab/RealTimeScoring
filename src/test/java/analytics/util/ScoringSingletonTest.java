@@ -2084,6 +2084,7 @@ public class ScoringSingletonTest {
 		varaibleModelsMap.setAccessible(false);
 	}
 	
+	@Ignore
 	@Test
 	public void strategyCountTraitsDatesTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, ParseException{
 		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
