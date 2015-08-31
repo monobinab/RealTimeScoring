@@ -70,7 +70,7 @@ public class LoggingBolt extends EnvironmentBolt {
 		String maxExpiry = input.getStringByField("maxExpiry");
 
 		Integer newPercentile = getPercentileForScore(newScore,Integer.parseInt(modelId));
-		Integer oldPercentile = getPercentileForScore(new Double (oldScore),Integer.parseInt(modelId));
+		Integer oldPercentile = (oldScore == null ? null : getPercentileForScore(new Double (oldScore),Integer.parseInt(modelId)));
 
 
 		String messageID = "";
