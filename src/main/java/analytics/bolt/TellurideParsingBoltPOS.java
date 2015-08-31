@@ -123,8 +123,13 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
         // AND PUT INTO LINE ITEM CLASS CONTAINER WITH HASHED LOYALTY ID + ALL
         // TRANSACTION LEVEL DATA
         // 5) EMIT LINE ITEMS
+        
+        //this needs to be removed, as we got NPE 
+        if(processTransaction.getEarnFlag() == null){
+        	LOGGER.info("LOGGING TO CHECK THE XML WITHOUT EARNFLAG " + transactionXmlAsString);
+        }
          
-        if (processTransaction != null && processTransaction.getEarnFlag().equalsIgnoreCase("E")) {
+        if (processTransaction != null && processTransaction.getEarnFlag() != null && processTransaction.getEarnFlag().equalsIgnoreCase("E")) {
         	
         	logTransaction(processTransaction);
         	
