@@ -39,6 +39,12 @@ public class XMLParser {
 		boolean bRequestorID = false;
 		boolean bItemType=false;
 		boolean bEarnFlag=false;
+		boolean btransactionFlag = false;
+		boolean bOrderStoreFlag = false;
+		boolean bpickUpStoreFlag = false;
+		boolean btenderStoreFlag = false;
+		boolean bRegisterFlag = false;
+		boolean btransactionTimeFlag = false;
 		try {
 			XMLStreamReader xmlStreamReader = xmlInputFactory
 					.createXMLStreamReader(new StringReader(fileName));
@@ -63,6 +69,24 @@ public class XMLParser {
 						bRequestorID = true;
 					} else if("EarnFlag".equals(elementName)){
 						bEarnFlag = true;
+					}
+					else if("TransactionNumber".equals(elementName)){
+						btransactionFlag = true;
+					}
+					else if("OrderStoreNumber".equals(elementName)){
+						bOrderStoreFlag = true;
+					}
+					else if("PickUpStoreNumber".equals(elementName)){
+						bpickUpStoreFlag = true;
+					}
+					else if("TenderStoreNumber".equals(elementName)){
+						btenderStoreFlag = true;
+					}
+					else if("RegisterNumber".equals(elementName)){
+						bRegisterFlag = true;
+					}
+					else if("TransactionTime".equals(elementName)){
+						btransactionTimeFlag = true;
 					}
 					if ("LineItem".equals(elementName)) {
 						lineItem = new LineItem();
@@ -97,7 +121,36 @@ public class XMLParser {
 						LOGGER.debug("Requestor Id is..."
 								+ processTransaction.getRequestorID());
 						bRequestorID = false;
-					} else if (bLineItem) {
+					}else if(btransactionFlag) {
+						processTransaction.setTransactionNumber(xmlStreamReader
+								.getText());
+						btransactionFlag = false;
+					}else if(btransactionTimeFlag) {
+						processTransaction.setTransactionTime(xmlStreamReader
+								.getText());
+						btransactionTimeFlag = false;
+					}
+					else if(bOrderStoreFlag) {
+						processTransaction.setOrderStoreNumber(xmlStreamReader
+								.getText());
+						bOrderStoreFlag = false;
+					}
+					else if(btenderStoreFlag) {
+						processTransaction.setTenderStoreNumber(xmlStreamReader
+								.getText());
+						btenderStoreFlag = false;
+					}
+					else if(bpickUpStoreFlag) {
+						processTransaction.setPickUpStoreNumber(xmlStreamReader
+								.getText());
+						bpickUpStoreFlag = false;
+					}
+					else if(bRegisterFlag) {
+						processTransaction.setRegisterNumber(xmlStreamReader
+								.getText());
+						bRegisterFlag = false;
+					}
+					else if (bLineItem) {
 						bLineItem = false;
 					} else if (bDivision) {
 						lineItem.setDivision(xmlStreamReader.getText());
@@ -109,17 +162,9 @@ public class XMLParser {
 						lineItem.setItemType(xmlStreamReader.getText());
 						bItemType = false;
 					} else if (bEarnFlag){
-						if("E".equals(xmlStreamReader.getText()))
-                        {
-                                processTransaction.setEarnFlag(xmlStreamReader.getText());
-								bEarnFlag = false;
-                        }
-                        else
-                        {
-							return null;
-                        }
-					}
-
+						processTransaction.setEarnFlag(xmlStreamReader.getText());
+						bEarnFlag = false;
+                    }
 					else if (bDollarValuePostDisc) {
 						lineItem.setDollarValuePostDisc(xmlStreamReader
 								.getText());

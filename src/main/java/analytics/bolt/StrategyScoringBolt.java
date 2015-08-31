@@ -9,7 +9,6 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -150,12 +149,15 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			List<Object> listToEmit = new ArrayList<Object>();
 			listToEmit.add(lyl_id_no+"~"+topologyName);
 			this.outputCollector.emit("kafka_stream", listToEmit);
+			
+			List<Object> objectToCps = new ArrayList<Object>();
+			objectToCps.add(lyl_id_no);
 	
 			redisCountIncr("member_scored_successfully");
 			this.outputCollector.ack(input);
 		}catch(Exception e){
 			e.printStackTrace();
-			LOGGER.info("Exception scoring lId " +lId +" "+ e );
+			LOGGER.info("Exception scoring lId " +lId +" "+ e.getCause());
 
 		}finally{
 			if(jedis!=null)

@@ -1,13 +1,18 @@
 package analytics.spout;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Map;
 
+import javax.jms.BytesMessage;
 import javax.jms.JMSException;
+import javax.jms.Message;
 import javax.jms.Session;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import analytics.util.XMLParser;
+import analytics.util.objects.ProcessTransaction;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -15,6 +20,7 @@ import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
 
+import com.ibm.jms.JMSBytesMessage;
 import com.ibm.jms.JMSMessage;
 import com.ibm.mq.jms.JMSC;
 import com.ibm.mq.jms.MQQueue;
@@ -89,17 +95,50 @@ public class WebsphereMQSpout extends BaseRichSpout {
 		LOGGER.debug("Fetching a message from MQ");
 		try {
 			JMSMessage receivedMessage = (JMSMessage) receiver.receive();
+			LOGGER.info("PERSIST: incoming tuples in spout TELLURIDE");
 			String messageID = receivedMessage.getJMSMessageID();
 			LOGGER.info("TIME:" + messageID + "-Entering spout-" + System.currentTimeMillis());
-			long timeStamp = receivedMessage.getJMSTimestamp();
-			if(LOGGER.isDebugEnabled())
-				LOGGER.debug("The time it enters with next message with it " +
-					"id" +messageID+ " and its time stamp" +timeStamp + "Start Time in millisecond "+System.currentTimeMillis());
-			collector.emit(new Values(receivedMessage,messageID), receivedMessage);
-			LOGGER.info("TIME:" + messageID + "-Emitted from spout-" + System.currentTimeMillis());
+			String transactionXmlString = getTransactionString(receivedMessage);
+			collector.emit(new Values(transactionXmlString,messageID), transactionXmlString);
+			LOGGER.info("inc xml: " + transactionXmlString);
+
+			logValidTransaction(transactionXmlString);
 		} catch (JMSException e) {
 			LOGGER.error("Exception occurred while receiving message from queue ", e);
 		}
+	}
+	
+	private String getTransactionString(JMSMessage receivedMessage){
+		String transactionXmlAsString = "";
+		  try {
+		        if (receivedMessage instanceof JMSBytesMessage)
+		            transactionXmlAsString = convertStreamToString(receivedMessage);
+		    } catch (JMSException e) {
+		        LOGGER.error("Unable to read message from MQ", e);
+		    } catch (Exception e) {
+		        LOGGER.error("Unable to read message from MQ", e);
+		    }
+		  return transactionXmlAsString;
+	}
+
+	private void logValidTransaction(String xmlString) {
+		
+		ProcessTransaction processTransaction = null;
+ 	    processTransaction = parseXMLAndExtractProcessTransaction(processTransaction, xmlString);
+
+		 //   if (processTransaction != null && processTransaction.getEarnFlag().equalsIgnoreCase("E")) {
+		    	String memberNumber = (processTransaction.getMemberNumber() != null) ? processTransaction.getMemberNumber() : "NONE";
+		    	String pickUpStoreNumber = (processTransaction.getOrderStoreNumber() != null) ? processTransaction.getOrderStoreNumber() : "NONE";
+		    	String tenderStoreNumber = (processTransaction.getTenderStoreNumber() != null) ? processTransaction.getTenderStoreNumber() : "NONE";
+		    	String orderStoreNumber = (processTransaction.getOrderStoreNumber() != null) ? processTransaction.getOrderStoreNumber() : "NONE";
+		        String registerNumber = (processTransaction.getRegisterNumber() != null) ? processTransaction.getRegisterNumber() : "NONE";
+		        String transactionNumber = (processTransaction.getTransactionNumber() != null) ? processTransaction.getTransactionNumber() : "NONE";
+		        String transactionTime = (processTransaction.getTransactionTime() != null) ? processTransaction.getTransactionTime() : "NONE";
+		        String requestorId = (processTransaction.getRequestorID() != null) ? processTransaction.getRequestorID() : "NONE";
+		        String earnFlag = (processTransaction.getEarnFlag() != null) ? processTransaction.getEarnFlag() : "NONE";
+		       // System.out.println("PERSIST: " + memberNumber +", " + pickUpStoreNumber + ", " + tenderStoreNumber +", " + orderStoreNumber + ", " + registerNumber +", " + transactionNumber +", " + transactionTime);
+		        LOGGER.info("PERSIST: " + memberNumber +", " + pickUpStoreNumber + ", " + tenderStoreNumber +", " + orderStoreNumber + ", " + registerNumber +", " + transactionNumber +", " + transactionTime +", " + requestorId +", " + earnFlag + ", allTransactions");
+		 //   }
 	}
 
 	@Override
@@ -124,6 +163,34 @@ public class WebsphereMQSpout extends BaseRichSpout {
 		declarer.declare(new Fields("npos","messageID"));
 	}
 
+	
+	 private final static String convertStreamToString( Message jmsMsg)
+	            throws Exception {
+	        String stringMessage = "";
+	        BytesMessage bMsg = (BytesMessage) jmsMsg;
+	        byte[] buffer = new byte[40620];
+	        int byteRead;
+	        ByteArrayOutputStream bout = new java.io.ByteArrayOutputStream();
+	        while ((byteRead = bMsg.readBytes(buffer)) != -1) {
+	            bout.write(buffer, 0, byteRead);
+	        }
+	        bout.flush();
+	        stringMessage = new String(bout.toByteArray());
+
+	        bout.close();
+	        //logger.info(stringMessage.toString());
+	        return stringMessage;
+	    }
+	 
+	  private ProcessTransaction parseXMLAndExtractProcessTransaction(ProcessTransaction processTransaction, String transactionXmlAsString) {
+	        LOGGER.debug("Parsing MQ message XML");
+	        if (transactionXmlAsString.contains("<ProcessTransaction") || transactionXmlAsString.contains(":ProcessTransaction")) {
+
+	            processTransaction = XMLParser
+	                    .parseXMLProcessTransaction(transactionXmlAsString);
+	        }
+	        return processTransaction;
+	  }
 	/**
 	 * Close connections
 	 * 
