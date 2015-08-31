@@ -18,7 +18,6 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Values;
 
 import com.ibm.jms.JMSBytesMessage;
 import com.ibm.jms.JMSMessage;
@@ -31,7 +30,7 @@ import com.ibm.mq.jms.MQQueueSession;
 public class WebsphereMQSpout extends BaseRichSpout {
 
 	
-	private SpoutOutputCollector collector;
+//	private SpoutOutputCollector collector;
 	private MQQueueReceiver receiver;
 	private MQQueueSession queueSession;
 	private MQQueueConnection queueConnection;
@@ -72,7 +71,7 @@ public class WebsphereMQSpout extends BaseRichSpout {
 	public void open(@SuppressWarnings("rawtypes") final Map conf, final TopologyContext context, final SpoutOutputCollector collector) {
 		LOGGER.info("Spout connecting to MQ queue");
 		try {
-			this.collector = collector;
+		//	this.collector = collector;
 			MQQueueConnectionFactory cf = new MQQueueConnectionFactory();
 			cf.setHostName(hostNanme);
 			cf.setPort(port);
@@ -95,14 +94,14 @@ public class WebsphereMQSpout extends BaseRichSpout {
 		LOGGER.debug("Fetching a message from MQ");
 		try {
 			JMSMessage receivedMessage = (JMSMessage) receiver.receive();
-			LOGGER.info("PERSIST: incoming tuples in spout TELLURIDE");
+			LOGGER.info("PERSIST: incoming tuples in spout from MQ TELLURIDE");
 			String messageID = receivedMessage.getJMSMessageID();
 			LOGGER.info("TIME:" + messageID + "-Entering spout-" + System.currentTimeMillis());
 			String transactionXmlString = getTransactionString(receivedMessage);
-			collector.emit(new Values(transactionXmlString,messageID), transactionXmlString);
-			LOGGER.info("inc xml: " + transactionXmlString);
+			//collector.emit(new Values(transactionXmlString,messageID), transactionXmlString);
+			LOGGER.info("incoming xml in spout from MQ: " + transactionXmlString);
 
-			logValidTransaction(transactionXmlString);
+			logAllTransaction(transactionXmlString);
 		} catch (JMSException e) {
 			LOGGER.error("Exception occurred while receiving message from queue ", e);
 		}
@@ -121,24 +120,21 @@ public class WebsphereMQSpout extends BaseRichSpout {
 		  return transactionXmlAsString;
 	}
 
-	private void logValidTransaction(String xmlString) {
+	private void logAllTransaction(String xmlString) {
 		
 		ProcessTransaction processTransaction = null;
  	    processTransaction = parseXMLAndExtractProcessTransaction(processTransaction, xmlString);
 
-		 //   if (processTransaction != null && processTransaction.getEarnFlag().equalsIgnoreCase("E")) {
-		    	String memberNumber = (processTransaction.getMemberNumber() != null) ? processTransaction.getMemberNumber() : "NONE";
-		    	String pickUpStoreNumber = (processTransaction.getOrderStoreNumber() != null) ? processTransaction.getOrderStoreNumber() : "NONE";
-		    	String tenderStoreNumber = (processTransaction.getTenderStoreNumber() != null) ? processTransaction.getTenderStoreNumber() : "NONE";
-		    	String orderStoreNumber = (processTransaction.getOrderStoreNumber() != null) ? processTransaction.getOrderStoreNumber() : "NONE";
-		        String registerNumber = (processTransaction.getRegisterNumber() != null) ? processTransaction.getRegisterNumber() : "NONE";
-		        String transactionNumber = (processTransaction.getTransactionNumber() != null) ? processTransaction.getTransactionNumber() : "NONE";
-		        String transactionTime = (processTransaction.getTransactionTime() != null) ? processTransaction.getTransactionTime() : "NONE";
-		        String requestorId = (processTransaction.getRequestorID() != null) ? processTransaction.getRequestorID() : "NONE";
-		        String earnFlag = (processTransaction.getEarnFlag() != null) ? processTransaction.getEarnFlag() : "NONE";
-		       // System.out.println("PERSIST: " + memberNumber +", " + pickUpStoreNumber + ", " + tenderStoreNumber +", " + orderStoreNumber + ", " + registerNumber +", " + transactionNumber +", " + transactionTime);
-		        LOGGER.info("PERSIST: " + memberNumber +", " + pickUpStoreNumber + ", " + tenderStoreNumber +", " + orderStoreNumber + ", " + registerNumber +", " + transactionNumber +", " + transactionTime +", " + requestorId +", " + earnFlag + ", allTransactions");
-		 //   }
+    	String memberNumber = (processTransaction.getMemberNumber() != null) ? processTransaction.getMemberNumber() : "NONE";
+    	String pickUpStoreNumber = (processTransaction.getOrderStoreNumber() != null) ? processTransaction.getOrderStoreNumber() : "NONE";
+    	String tenderStoreNumber = (processTransaction.getTenderStoreNumber() != null) ? processTransaction.getTenderStoreNumber() : "NONE";
+    	String orderStoreNumber = (processTransaction.getOrderStoreNumber() != null) ? processTransaction.getOrderStoreNumber() : "NONE";
+        String registerNumber = (processTransaction.getRegisterNumber() != null) ? processTransaction.getRegisterNumber() : "NONE";
+        String transactionNumber = (processTransaction.getTransactionNumber() != null) ? processTransaction.getTransactionNumber() : "NONE";
+        String transactionTime = (processTransaction.getTransactionTime() != null) ? processTransaction.getTransactionTime() : "NONE";
+        String requestorId = (processTransaction.getRequestorID() != null) ? processTransaction.getRequestorID() : "NONE";
+        String earnFlag = (processTransaction.getEarnFlag() != null) ? processTransaction.getEarnFlag() : "NONE";
+        LOGGER.info("PERSIST: " + memberNumber +", " + pickUpStoreNumber + ", " + tenderStoreNumber +", " + orderStoreNumber + ", " + registerNumber +", " + transactionNumber +", " + transactionTime +", " + requestorId +", " + earnFlag + ", allTransactions in MQspout from MQQueue");
 	}
 
 	@Override
@@ -178,7 +174,6 @@ public class WebsphereMQSpout extends BaseRichSpout {
 	        stringMessage = new String(bout.toByteArray());
 
 	        bout.close();
-	        //logger.info(stringMessage.toString());
 	        return stringMessage;
 	    }
 	 

@@ -16,9 +16,6 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
-import com.ibm.jms.JMSBytesMessage;
-import com.ibm.jms.JMSMessage;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 
 import javax.jms.BytesMessage;
-import javax.jms.JMSException;
 import javax.jms.Message;
 
 import java.io.ByteArrayOutputStream;
@@ -114,12 +110,11 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
             messageID = input.getStringByField("messageID");
         }
         LOGGER.info("TIME:" + messageID + "-Entering parsing bolt-" + System.currentTimeMillis());
-        String transactionXmlAsString = (String) input.getValueByField("npos");
+        
+        String transactionXmlAsString = extractTransactionXml(input);
     	
         processTransaction = parseXMLAndExtractProcessTransaction(processTransaction, transactionXmlAsString);
-        //System.out.println("Earn flag " + processTransaction.getEarnFlag());
-        LOGGER.info("PERSIST: EarnFlag for member " + processTransaction.getMemberNumber() +": " + processTransaction.getEarnFlag());
-
+        
         // 1) TEST IF TRANSACTION TYPE CODE IS = 1 (RETURN IF FALSE)
         // 2) TEST IF TRANSACTION IS A MEMBER TRANSACTION (IF NOT RETURN)
         // 3) HASH LOYALTY ID
@@ -128,18 +123,15 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
         // AND PUT INTO LINE ITEM CLASS CONTAINER WITH HASHED LOYALTY ID + ALL
         // TRANSACTION LEVEL DATA
         // 5) EMIT LINE ITEMS
+        
+        //this needs to be removed, as we got NPE 
+        if(processTransaction != null && processTransaction.getEarnFlag() == null){
+        	LOGGER.info("LOGGING TO CHECK THE XML WITHOUT EARNFLAG " + transactionXmlAsString);
+        }
          
-        if (processTransaction != null && processTransaction.getEarnFlag().equalsIgnoreCase("E")) {
+        if (processTransaction != null && processTransaction.getEarnFlag() != null && processTransaction.getEarnFlag().equalsIgnoreCase("E")) {
         	
-        	/*String memberNumber = (processTransaction.getMemberNumber() != null) ? processTransaction.getMemberNumber() : "NONE";
-        	String pickUpStoreNumber = (processTransaction.getOrderStoreNumber() != null) ? processTransaction.getOrderStoreNumber() : "NONE";
-        	String tenderStoreNumber = (processTransaction.getTenderStoreNumber() != null) ? processTransaction.getTenderStoreNumber() : "NONE";
-        	String orderStoreNumber = (processTransaction.getOrderStoreNumber() != null) ? processTransaction.getOrderStoreNumber() : "NONE";
-            String registerNumber = (processTransaction.getRegisterNumber() != null) ? processTransaction.getRegisterNumber() : "NONE";
-            String transactionNumber = (processTransaction.getTransactionNumber() != null) ? processTransaction.getTransactionNumber() : "NONE";
-            String transactionTime = (processTransaction.getTransactionTime() != null) ? processTransaction.getTransactionTime() : "NONE";
-         //   System.out.println("PERSIST: " + memberNumber +", " + pickUpStoreNumber + ", " + tenderStoreNumber +", " + orderStoreNumber + ", " + registerNumber +", " + transactionNumber +", " + transactionTime);
-            LOGGER.info("PERSIST: " + memberNumber +", " + pickUpStoreNumber + ", " + tenderStoreNumber +", " + orderStoreNumber + ", " + registerNumber +", " + transactionNumber +", " + transactionTime +", " + "valid transaction");*/
+        	logTransaction(processTransaction);
         	
             lyl_id_no = processTransaction.getMemberNumber();
 
@@ -158,17 +150,40 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
             listLineItemsAndEmit(input, lyl_id_no, processTransaction, messageID, l_id);
 
         } else {
-          //  LOGGER.info("empty xml " + transactionXmlAsString);
             redisCountIncr("empty_xml");
             outputCollector.ack(input);
             return;
         }
     }
 
+	protected String extractTransactionXml(Tuple input) {
+		String transactionXmlAsString = (String) input.getValueByField("npos");
+		return transactionXmlAsString;
+	}
+
+	private void logTransaction(ProcessTransaction processTransaction) {
+		String memberNumber = (processTransaction.getMemberNumber() != null) ? processTransaction.getMemberNumber() : "NONE";
+		String pickUpStoreNumber = (processTransaction.getOrderStoreNumber() != null) ? processTransaction.getOrderStoreNumber() : "NONE";
+		String tenderStoreNumber = (processTransaction.getTenderStoreNumber() != null) ? processTransaction.getTenderStoreNumber() : "NONE";
+		String orderStoreNumber = (processTransaction.getOrderStoreNumber() != null) ? processTransaction.getOrderStoreNumber() : "NONE";
+		String registerNumber = (processTransaction.getRegisterNumber() != null) ? processTransaction.getRegisterNumber() : "NONE";
+		String transactionNumber = (processTransaction.getTransactionNumber() != null) ? processTransaction.getTransactionNumber() : "NONE";
+		String transactionTime = (processTransaction.getTransactionTime() != null) ? processTransaction.getTransactionTime() : "NONE";
+     	logPersist(memberNumber, pickUpStoreNumber, tenderStoreNumber,
+				orderStoreNumber, registerNumber, transactionNumber,
+				transactionTime, "MQ");
+	}
+
+	public void logPersist(String memberNumber, String pickUpStoreNumber,
+			String tenderStoreNumber, String orderStoreNumber,
+			String registerNumber, String transactionNumber,
+			String transactionTime, String queueType) {
+		LOGGER.info("PERSIST: " + memberNumber +", " + pickUpStoreNumber + ", " + tenderStoreNumber +", " + orderStoreNumber + ", " + registerNumber +", " + transactionNumber +", " + transactionTime +", " + queueType);
+	}
+
     private void listLineItemsAndEmit(Tuple input, String lyl_id_no, ProcessTransaction processTransaction, String messageID, String l_id) {
         Collection<TransactionLineItem> lineItemList = new ArrayList<TransactionLineItem>();
-        //logger.info("nposTransaction XML is" + transactionXmlAsString.toString());
-
+       
         List<LineItem> lineItems = processTransaction.getLineItemList();
         if (LOGGER.isTraceEnabled()) {
             String lineItems_toString = null;
