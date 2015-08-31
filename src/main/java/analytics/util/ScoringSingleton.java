@@ -234,8 +234,9 @@ public class ScoringSingleton {
 									 changedMemberScore.setSource(source);
 									 changedMemberScoreList.add(changedMemberScore);
 						 }
-						   catch(RealTimeScoringException e){
-							   LOGGER.error("Exception scoring modelId " + modelId +" for lId " + lId + " " , e.getErrorMessage());
+						   catch(Exception e){
+							   LOGGER.error("Exception scoring modelId " + modelId +" for lId " + lId + " " , e.getCause());
+							   e.printStackTrace();
 						   }
 						}
 							 memberRTSChanges.setlId(lId);
