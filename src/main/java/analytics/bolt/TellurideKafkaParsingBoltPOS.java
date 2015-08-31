@@ -26,7 +26,7 @@ public class TellurideKafkaParsingBoltPOS extends TellurideParsingBoltPOS {
  	@Override
 	protected String extractTransactionXml(Tuple input) {
 		 String message = (String) input.getValueByField("str");
-		 System.out.println(message);
+		// System.out.println(message);
       	
          //check the incoming string for <ProcessTransaction or :ProcessTransaction as it contains the member's transaction data
  			if (message.contains("<ProcessTransaction") || message.contains(":ProcessTransaction")) {
@@ -34,7 +34,7 @@ public class TellurideKafkaParsingBoltPOS extends TellurideParsingBoltPOS {
 				try {
 					obj = new JSONObject(message);
 					message = (String) obj.get("xmlReqData");
-					System.out.println(message);
+				//	System.out.println(message);
 				} catch (JSONException e) {
 					LOGGER.error("Exception in json parsing ", e);
 					e.printStackTrace();
