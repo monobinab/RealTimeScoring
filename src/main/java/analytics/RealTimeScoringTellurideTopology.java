@@ -4,10 +4,15 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import storm.kafka.BrokerHosts;
+import storm.kafka.KafkaSpout;
+import storm.kafka.SpoutConfig;
+import storm.kafka.StringScheme;
+import storm.kafka.ZkHosts;
 import analytics.bolt.LoggingBolt;
 import analytics.bolt.RTSKafkaBolt;
 import analytics.bolt.StrategyScoringBolt;
-import analytics.bolt.TellurideParsingBoltPOS;
+import analytics.bolt.TellurideKafkaParsingBoltPOS;
 import analytics.spout.WebsphereMQSpout;
 import analytics.util.AuthPropertiesReader;
 import analytics.util.Constants;
@@ -22,6 +27,7 @@ import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
 import backtype.storm.generated.AlreadyAliveException;
 import backtype.storm.generated.InvalidTopologyException;
+import backtype.storm.spout.SchemeAsMultiScheme;
 import backtype.storm.topology.TopologyBuilder;
 
 
@@ -43,6 +49,7 @@ public class RealTimeScoringTellurideTopology {
 					.println("Please pass the environment variable argument- 'PROD' or 'QA' or 'LOCAL'");
 			System.exit(0);
 		}
+		String topologyId = "";
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 		String kafkatopic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;
 
@@ -69,17 +76,29 @@ public class RealTimeScoringTellurideTopology {
 										.getQueueTwoManager(), mqCredential
 										.getQueueChannel(), mqCredential
 										.getQueueName()), 3);
+		
+		
+		BrokerHosts hosts = new ZkHosts("trprtelpacmapp1.vm.itg.corp.us.shldcorp.com:2181");
+		// use topology Id as part of the consumer ID to make it unique
+		SpoutConfig kafkaConfig = new SpoutConfig(hosts, "telprod_reqresp_log_output", "", "RTSConsumer_Telluride"+topologyId);
+		kafkaConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
+		
+		topologyBuilder.setSpout("kafkaSpout", new KafkaSpout(kafkaConfig), 1);
+		topologyBuilder.setBolt("kafkaParsingBolt", new TellurideKafkaParsingBoltPOS(System.getProperty(MongoNameConstants.IS_PROD),AuthPropertiesReader
+				.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST),new Integer (AuthPropertiesReader
+						.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 12).shuffleGrouping("kafkaSpout");
+		
 
 		// create definition of main spout for queue 1
-		topologyBuilder.setBolt("parsingBolt", new TellurideParsingBoltPOS(System.getProperty(MongoNameConstants.IS_PROD),AuthPropertiesReader
+		/*topologyBuilder.setBolt("parsingBolt", new TellurideParsingBoltPOS(System.getProperty(MongoNameConstants.IS_PROD),AuthPropertiesReader
 				.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST),new Integer (AuthPropertiesReader
-						.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 12).shuffleGrouping("telluride1").shuffleGrouping("telluride2");
+						.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 12).shuffleGrouping("telluride1").shuffleGrouping("telluride2");*/
        topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System.getProperty(MongoNameConstants.IS_PROD), AuthPropertiesReader
 				.getProperty(Constants.TELLURIDE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
 				.getProperty(Constants.TELLURIDE_REDIS_SERVER_PORT)),
 				AuthPropertiesReader
 				.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST),new Integer (AuthPropertiesReader
-					.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 12).shuffleGrouping("parsingBolt");
+					.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 12).shuffleGrouping("kafkaParsingBolt");
        
 		
 		/*topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System.getProperty(MongoNameConstants.IS_PROD), "10.2.8.175", 11211,

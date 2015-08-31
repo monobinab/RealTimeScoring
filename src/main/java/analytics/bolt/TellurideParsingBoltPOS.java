@@ -114,12 +114,10 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
             messageID = input.getStringByField("messageID");
         }
         LOGGER.info("TIME:" + messageID + "-Entering parsing bolt-" + System.currentTimeMillis());
-        String transactionXmlAsString = (String) input.getValueByField("npos");
+        String transactionXmlAsString = extractTransactionXml(input);
     	
         processTransaction = parseXMLAndExtractProcessTransaction(processTransaction, transactionXmlAsString);
-        //System.out.println("Earn flag " + processTransaction.getEarnFlag());
-        LOGGER.info("PERSIST: EarnFlag for member " + processTransaction.getMemberNumber() +": " + processTransaction.getEarnFlag());
-
+        
         // 1) TEST IF TRANSACTION TYPE CODE IS = 1 (RETURN IF FALSE)
         // 2) TEST IF TRANSACTION IS A MEMBER TRANSACTION (IF NOT RETURN)
         // 3) HASH LOYALTY ID
@@ -131,15 +129,7 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
          
         if (processTransaction != null && processTransaction.getEarnFlag().equalsIgnoreCase("E")) {
         	
-        	/*String memberNumber = (processTransaction.getMemberNumber() != null) ? processTransaction.getMemberNumber() : "NONE";
-        	String pickUpStoreNumber = (processTransaction.getOrderStoreNumber() != null) ? processTransaction.getOrderStoreNumber() : "NONE";
-        	String tenderStoreNumber = (processTransaction.getTenderStoreNumber() != null) ? processTransaction.getTenderStoreNumber() : "NONE";
-        	String orderStoreNumber = (processTransaction.getOrderStoreNumber() != null) ? processTransaction.getOrderStoreNumber() : "NONE";
-            String registerNumber = (processTransaction.getRegisterNumber() != null) ? processTransaction.getRegisterNumber() : "NONE";
-            String transactionNumber = (processTransaction.getTransactionNumber() != null) ? processTransaction.getTransactionNumber() : "NONE";
-            String transactionTime = (processTransaction.getTransactionTime() != null) ? processTransaction.getTransactionTime() : "NONE";
-         //   System.out.println("PERSIST: " + memberNumber +", " + pickUpStoreNumber + ", " + tenderStoreNumber +", " + orderStoreNumber + ", " + registerNumber +", " + transactionNumber +", " + transactionTime);
-            LOGGER.info("PERSIST: " + memberNumber +", " + pickUpStoreNumber + ", " + tenderStoreNumber +", " + orderStoreNumber + ", " + registerNumber +", " + transactionNumber +", " + transactionTime +", " + "valid transaction");*/
+        	logTransaction(processTransaction);
         	
             lyl_id_no = processTransaction.getMemberNumber();
 
@@ -165,10 +155,34 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
         }
     }
 
+	protected String extractTransactionXml(Tuple input) {
+		String transactionXmlAsString = (String) input.getValueByField("npos");
+		return transactionXmlAsString;
+	}
+
+	private void logTransaction(ProcessTransaction processTransaction) {
+		String memberNumber = (processTransaction.getMemberNumber() != null) ? processTransaction.getMemberNumber() : "NONE";
+		String pickUpStoreNumber = (processTransaction.getOrderStoreNumber() != null) ? processTransaction.getOrderStoreNumber() : "NONE";
+		String tenderStoreNumber = (processTransaction.getTenderStoreNumber() != null) ? processTransaction.getTenderStoreNumber() : "NONE";
+		String orderStoreNumber = (processTransaction.getOrderStoreNumber() != null) ? processTransaction.getOrderStoreNumber() : "NONE";
+		String registerNumber = (processTransaction.getRegisterNumber() != null) ? processTransaction.getRegisterNumber() : "NONE";
+		String transactionNumber = (processTransaction.getTransactionNumber() != null) ? processTransaction.getTransactionNumber() : "NONE";
+		String transactionTime = (processTransaction.getTransactionTime() != null) ? processTransaction.getTransactionTime() : "NONE";
+     	logPersist(memberNumber, pickUpStoreNumber, tenderStoreNumber,
+				orderStoreNumber, registerNumber, transactionNumber,
+				transactionTime, "MQ");
+	}
+
+	public void logPersist(String memberNumber, String pickUpStoreNumber,
+			String tenderStoreNumber, String orderStoreNumber,
+			String registerNumber, String transactionNumber,
+			String transactionTime, String queueType) {
+		LOGGER.info("PERSIST: " + memberNumber +", " + pickUpStoreNumber + ", " + tenderStoreNumber +", " + orderStoreNumber + ", " + registerNumber +", " + transactionNumber +", " + transactionTime +", " + queueType);
+	}
+
     private void listLineItemsAndEmit(Tuple input, String lyl_id_no, ProcessTransaction processTransaction, String messageID, String l_id) {
         Collection<TransactionLineItem> lineItemList = new ArrayList<TransactionLineItem>();
-        //logger.info("nposTransaction XML is" + transactionXmlAsString.toString());
-
+       
         List<LineItem> lineItems = processTransaction.getLineItemList();
         if (LOGGER.isTraceEnabled()) {
             String lineItems_toString = null;
