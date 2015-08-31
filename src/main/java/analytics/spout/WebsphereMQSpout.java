@@ -101,7 +101,7 @@ public class WebsphereMQSpout extends BaseRichSpout {
 			//collector.emit(new Values(transactionXmlString,messageID), transactionXmlString);
 			LOGGER.info("incoming xml in spout from MQ: " + transactionXmlString);
 
-			logValidTransaction(transactionXmlString);
+			logAllTransaction(transactionXmlString);
 		} catch (JMSException e) {
 			LOGGER.error("Exception occurred while receiving message from queue ", e);
 		}
@@ -120,7 +120,7 @@ public class WebsphereMQSpout extends BaseRichSpout {
 		  return transactionXmlAsString;
 	}
 
-	private void logValidTransaction(String xmlString) {
+	private void logAllTransaction(String xmlString) {
 		
 		ProcessTransaction processTransaction = null;
  	    processTransaction = parseXMLAndExtractProcessTransaction(processTransaction, xmlString);

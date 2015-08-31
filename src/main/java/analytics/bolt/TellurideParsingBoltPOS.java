@@ -16,9 +16,6 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
-import com.ibm.jms.JMSBytesMessage;
-import com.ibm.jms.JMSMessage;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 
 import javax.jms.BytesMessage;
-import javax.jms.JMSException;
 import javax.jms.Message;
 
 import java.io.ByteArrayOutputStream;
@@ -114,6 +110,7 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
             messageID = input.getStringByField("messageID");
         }
         LOGGER.info("TIME:" + messageID + "-Entering parsing bolt-" + System.currentTimeMillis());
+        
         String transactionXmlAsString = extractTransactionXml(input);
     	
         processTransaction = parseXMLAndExtractProcessTransaction(processTransaction, transactionXmlAsString);
@@ -148,7 +145,6 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
             listLineItemsAndEmit(input, lyl_id_no, processTransaction, messageID, l_id);
 
         } else {
-          //  LOGGER.info("empty xml " + transactionXmlAsString);
             redisCountIncr("empty_xml");
             outputCollector.ack(input);
             return;
