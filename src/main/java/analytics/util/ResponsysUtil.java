@@ -462,7 +462,7 @@ public class ResponsysUtil {
 				!topologyName.equalsIgnoreCase("unknownOccasions")?tagMetadata.getPurchaseOccasion():"Unknown", 
 						tagMetadata, strBuff.toString().contains("<success>true</success>") ? "Y" : "N", topologyName);
 	
-		LOGGER.info("PERSIST: Winning Tag for Lid: " + lyl_l_id +" : "+tagMetadata.getMdTags());
+		LOGGER.info("PERSIST: Winning Tag for Lid: " + lyl_l_id +" : "+tagMetadata.getMdTag());
 		
 		nullifyObjects(xmlWithoutBOM, customXml);
 		
@@ -629,8 +629,8 @@ public class ResponsysUtil {
 			optionalData2.appendChild(name2);
 			Element value2 = doc.createElement("value");
 			optionalData2.appendChild(value2);
-			if(tagMetaData!=null && tagMetaData.getMdTags()!=null && !tagMetaData.getMdTags().equals(""))
-				value2.appendChild(doc.createTextNode(tagMetaData.getMdTags()));
+			if(tagMetaData!=null && tagMetaData.getMdTag()!=null && !tagMetaData.getMdTag().equals(""))
+				value2.appendChild(doc.createTextNode(tagMetaData.getMdTag()));
 		}
 		
 		if(topologyName.equalsIgnoreCase(Constants.POS_PURCHASE)){
@@ -761,7 +761,7 @@ public class ResponsysUtil {
 					((org.json.JSONObject) obj.getJSONArray("scoresInfo").get(0)).get("businessUnit").toString() : null);
 			tagMetaData.setSubBusinessUnit(((org.json.JSONObject) obj.getJSONArray("scoresInfo").get(0)).get("subBusinessUnit")!= null ? 
 					((org.json.JSONObject) obj.getJSONArray("scoresInfo").get(0)).get("subBusinessUnit").toString() : null);
-			tagMetaData.setMdTags(((org.json.JSONObject) obj.getJSONArray("scoresInfo").get(0)).get("mdTag")!= null ? 
+			tagMetaData.setMdTag(((org.json.JSONObject) obj.getJSONArray("scoresInfo").get(0)).get("mdTag")!= null ? 
 					((org.json.JSONObject) obj.getJSONArray("scoresInfo").get(0)).get("mdTag").toString() : null);
 			tagMetaData.setFirst5CharMdTag(((org.json.JSONObject) obj.getJSONArray("scoresInfo").get(0)).get("mdTag")!= null ? 
 					((org.json.JSONObject) obj.getJSONArray("scoresInfo").get(0)).get("mdTag").toString().substring(0,5) : null);
@@ -851,7 +851,7 @@ public class ResponsysUtil {
 							((org.json.JSONObject) arr.get(i)).get("businessUnit").toString() : null);
 					tagMetaData.setSubBusinessUnit(((org.json.JSONObject) arr.get(i)).get("subBusinessUnit")!= null ? 
 							((org.json.JSONObject) arr.get(i)).get("subBusinessUnit").toString() : null);
-					tagMetaData.setMdTags(((org.json.JSONObject) arr.get(i)).get("mdTag")!= null ? 
+					tagMetaData.setMdTag(((org.json.JSONObject) arr.get(i)).get("mdTag")!= null ? 
 							((org.json.JSONObject) arr.get(i)).get("mdTag").toString() : null);
 					tagMetaData.setFirst5CharMdTag(((org.json.JSONObject) arr.get(i)).get("mdTag")!= null ? 
 							((org.json.JSONObject) arr.get(i)).get("mdTag").toString().substring(0,5) : null);
@@ -1000,7 +1000,7 @@ public class ResponsysUtil {
 		TagMetadata tagMetadata = null;
 		String tag = tagModelsMap.get(Integer.parseInt((String) objToSend.get("modelId")));
 		tagMetadata = tagMetadataDao.getBuSubBu(tag);
-		tagMetadata.setMdTags(tag+"8000000000000");
+		tagMetadata.setMdTag(tag+"8000000000000");
 		return tagMetadata;
 	}
 	

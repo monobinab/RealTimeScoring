@@ -1,11 +1,10 @@
 package analytics.util.objects;
 
 import java.io.Serializable;
-import java.util.Map;
 
 public class TagMetadata implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private String mdTags;
+	private String mdTag;
 	private String businessUnit;
 	private String subBusinessUnit;
 	private String purchaseOccasion;
@@ -14,8 +13,50 @@ public class TagMetadata implements Serializable {
 	private String emailOptIn;
 	private String divLine;
 	private String textOptIn;
-	
+	private int priority;
+	private int sendDuration;
+	private int daysToCheckInHistory;
 
+	
+	public TagMetadata() {}
+	
+	/**
+	 * @param mdTag
+	 * @param businessUnit
+	 * @param subBusinessUnit
+	 * @param purchaseOccasion
+	 * @param first5CharMdTag
+	 * @param percentile
+	 * @param emailOptIn
+	 * @param divLine
+	 * @param priority
+	 * @param sendDuration
+	 * @param daysToCheckInHistory
+	 */
+	public TagMetadata(String mdTag, String businessUnit,
+			String subBusinessUnit, String purchaseOccasion,
+			String first5CharMdTag, Double percentile, String emailOptIn,
+			String divLine, int priority, int sendDuration, int daysToCheckInHistory) {
+		this.mdTag = mdTag;
+		this.businessUnit = businessUnit;
+		this.subBusinessUnit = subBusinessUnit;
+		this.purchaseOccasion = purchaseOccasion;
+		this.first5CharMdTag = first5CharMdTag;
+		this.percentile = percentile;
+		this.emailOptIn = emailOptIn;
+		this.divLine = divLine;
+		this.priority = priority;
+		this.sendDuration = sendDuration;
+		this.daysToCheckInHistory = daysToCheckInHistory;
+	}
+
+	public TagMetadata(String mdTag, String bu, String subBu, String occName) {
+		this.mdTag = mdTag;
+		this.businessUnit = bu;
+		this.subBusinessUnit = subBu;
+		this.purchaseOccasion = occName;
+	}
+	
 	/**
 	 * @return the textOptIn
 	 */
@@ -60,12 +101,12 @@ public class TagMetadata implements Serializable {
 		this.first5CharMdTag = first5CharMdTag;
 	}
 
-	public String getMdTags() {
-		return mdTags;
+	public String getMdTag() {
+		return mdTag;
 	}
 
-	public void setMdTags(String mdTags) {
-		this.mdTags = mdTags;
+	public void setMdTag(String mdTag) {
+		this.mdTag = mdTag;
 	}
 
 	public String getBusinessUnit() {
@@ -100,4 +141,29 @@ public class TagMetadata implements Serializable {
 	public String getEmailOptIn(){
 		return emailOptIn;
 	}
+	
+	public int getPriority() {
+		return priority;
+	}
+
+	public void setPriority(int priority) {
+		this.priority = priority;
+	}
+
+	public int getSendDuration() {
+		return sendDuration;
+	}
+
+	public void setSendDuration(int sendDuration) {
+		this.sendDuration = sendDuration;
+	}
+
+	public int getDaysToCheckInHistory() {
+		return daysToCheckInHistory;
+	}
+
+	public void setDaysToCheckInHistory(int daysToCheckInHistory) {
+		this.daysToCheckInHistory = daysToCheckInHistory;
+	}
+
 }

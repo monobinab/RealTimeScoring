@@ -87,7 +87,7 @@ public abstract class ResponsysBolt  extends EnvironmentBolt{
 
 			responsysUtil.getResponsysServiceResult(responsysObj);
 			
-			addRtsMemberTag(l_id, responsysObj.getTagMetadata().getMdTags());
+			addRtsMemberTag(l_id, responsysObj.getTagMetadata().getMdTag());
 			
 		    redisCountIncr("data_to_responsys");
 		

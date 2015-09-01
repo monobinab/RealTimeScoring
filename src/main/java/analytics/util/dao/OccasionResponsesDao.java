@@ -40,14 +40,14 @@ public class OccasionResponsesDao extends AbstractDao {
 		//occObj.put("businessUnit", businessUnit);
 		//occObj.put("subBusinessUnit", subBusUnit);
 		occObj.put("successFlag", successFlag);
-		occObj.put("tag", tagMetadata.getMdTags());
+		occObj.put("tag", tagMetadata.getMdTag());
 		if(tagMetadata.getDivLine()!=null)
 			occObj.put("divLine", tagMetadata.getDivLine());
 		
 		occasionResonsesCollection.insert(occObj);
 		
 		LOGGER.info("PERSIST: " + ft.format(dNow) + ", Topology: "+topologyName+", lid: " + l_id + ", "
-				+ "eid: "+eid + ", custEvent: "+custEvent +", successFlag: "+successFlag+", tag: "+tagMetadata.getMdTags()+", purchaseOccasion: "+purOcca
+				+ "eid: "+eid + ", custEvent: "+custEvent +", successFlag: "+successFlag+", tag: "+tagMetadata.getMdTag()+", purchaseOccasion: "+purOcca
 				+ ", businessUnit: "+tagMetadata.getBusinessUnit()+", SubBusinessUnit: " + tagMetadata.getSubBusinessUnit());
 	
 	}
