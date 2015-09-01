@@ -2084,11 +2084,11 @@ public class ScoringSingletonTest {
 		varaibleModelsMap.setAccessible(false);
 	}
 	
-	@Ignore
+	
 	@Test
 	public void strategyCountTraitsDatesTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, ParseException{
 		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
-		newChangesVarValueMap.put("VARIABLE13", "{2015-08-24:[206634]}");
+		newChangesVarValueMap.put("VARIABLE13", "{2999-08-24:[206634]}");
 		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
 		List<Integer> modelLists = new ArrayList<Integer>();
 		modelLists.add(55);

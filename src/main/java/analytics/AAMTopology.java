@@ -34,12 +34,14 @@ public class AAMTopology {
 			System.exit(0);
 		}
 			TopologyBuilder builder = new TopologyBuilder();
+		
+			String source = TopicConstants.AAM_CDF_TRAITS;
 
 	   	String[] servers = RedisConnection.getServers(System.getProperty(MongoNameConstants.IS_PROD));
 	   	String kafkatopic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;
 	   	//Sree. Spout that wakes up every 5 mins and process the Traits
 	  	builder.setSpout("traitsSpout", new WebHDFSSpout(servers[1], TopicConstants.PORT, Constants.AAM_TRAITS_PATH, "aamTraits"), 1);
-	  	builder.setBolt("parsingBoltWebTraits", new ParsingBoltWebTraits(System.getProperty(MongoNameConstants.IS_PROD), "aamTraits"), 1)
+	  	builder.setBolt("parsingBoltWebTraits", new ParsingBoltWebTraits(System.getProperty(MongoNameConstants.IS_PROD), source), 1)
 	  		.shuffleGrouping("traitsSpout");
 	  	builder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System.getProperty(MongoNameConstants.IS_PROD)),1).shuffleGrouping("parsingBoltWebTraits");
 	    builder.setBolt("persistTraits" , new PersistTraitsBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("parsingBoltWebTraits");
