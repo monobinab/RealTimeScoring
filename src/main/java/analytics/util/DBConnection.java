@@ -17,7 +17,7 @@ import com.mongodb.WriteConcern;
 public class DBConnection {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DBConnection.class);
-	private static MongoClient mongoClient;
+	//private static MongoClient mongoClient;
 	private static String sServerName = "";
 	private static String sServerName2 = "";
 	private static String sServerName2_2 = "";
@@ -77,18 +77,26 @@ public class DBConnection {
 			sServerName2_2 = properties.getString("server2_2.name");
 			sDatabaseName2_2 = properties.getString("database2_2.name");
 			sUserName2_2 = properties.getString("user.name2_2");
+			
+			//Connection to Mongo Server 2
 			if("server2_2".equalsIgnoreCase(server) && sServerName2_2!=null&&!sServerName2_2.isEmpty()){
-				mongoClient = new MongoClient(sServerName2_2, sPort);
+				MongoClient mongoClient;
+				String[] servers2_2 = sServerName2_2.split(";");
+				List<ServerAddress> sServers2_2 = new ArrayList<ServerAddress>();
+				for (String serverurl2_2 : servers2_2) {
+					sServers2_2.add(new ServerAddress(serverurl2_2, sPort));
+				}
+				mongoClient = MongoConnectionHelper.getMongoClientProd2_2(sServers2_2);
 				conn = mongoClient.getDB(sDatabaseName2_2);
-				//	System.out.println("Connection is established...."+ mongoClient.getAllAddress() + " " + conn.getName());
 				LOGGER.info("Connection is established ...."+ mongoClient.getAllAddress() + " " + conn.getName());
 				conn.authenticate(sUserName2_2, sPassword.toCharArray());
 				return conn;
 			}
 		
+			//Connection to Mongo Server 8,12 and 13
 			if("server2".equals(server)&&sServerName2!=null&&!sServerName2.isEmpty())
 			{
-				
+				MongoClient mongoClient;
 				String serverlist2 = properties.getString("server2.list"); 
 				List<ServerAddress> sServers2 = new ArrayList<ServerAddress>();
 				writeconcern2 = Integer.parseInt( properties.getString("server2.user.writeconcern"));
@@ -96,12 +104,18 @@ public class DBConnection {
 				for (String serverurl2 : servers2) {
 					sServers2.add(new ServerAddress(serverurl2, sPort));
 				}
-				mongoClient	= new MongoClient(sServers2);
+				mongoClient	= MongoConnectionHelper.getMongoClientProd2(sServers2);
 				mongoClient.setWriteConcern(new WriteConcern(writeconcern2,100));
 				
-				//mongoClient = new MongoClient(sServerName2, sPort);
+				conn = mongoClient.getDB(sDatabaseName);
+				LOGGER.info("Connection is established...."+ mongoClient.getAllAddress() + " " + conn.getName());
+				conn.authenticate(sUserName, sPassword.toCharArray());
+				return conn;
 			}
+			
+			//Connection to Mongo Server 7,9 and 11
 			else{
+				MongoClient mongoClient;
 				String serverlist = properties.getString("servers.list"); 
 				//Following is the logic to implement write concern.
 				List<ServerAddress> sServers = new ArrayList<ServerAddress>();
@@ -115,27 +129,23 @@ public class DBConnection {
 				//MongoClientOptions mongoClientOptions= new MongoClientOptions.Builder().writeConcern(new WriteConcern(writeconcern)).build();
 				//MongoClient mongoClient = new MongoClient(sServers, mongoClientOptions);
 						
-				mongoClient	= new MongoClient(sServers);
+				mongoClient	= MongoConnectionHelper.getMongoClientProd1(sServers);
 				//Setting the write concern timeout to 100 milli seconds
 				//After waiting for 100 milliseconds, each write will throw an exception 
 				mongoClient.setWriteConcern(new WriteConcern(writeconcern,100));
 				
+				conn = mongoClient.getDB(sDatabaseName);
+				LOGGER.info("Connection is established...."+ mongoClient.getAllAddress() + " " + conn.getName());
+				conn.authenticate(sUserName, sPassword.toCharArray());
+				return conn;
 				
 			}
-			/*// The code before write concern
-			else{
-				mongoClient = new MongoClient(sServerName, sPort);
-			}
-				*/
+
 		} catch (UnknownHostException e) {
 			LOGGER.error("Mongo host unknown",e);
 		}
-	
-			conn = mongoClient.getDB(sDatabaseName);
-		//	System.out.println("Connection is established...."+ mongoClient.getAllAddress() + " " + conn.getName());
-			LOGGER.info("Connection is established...."+ mongoClient.getAllAddress() + " " + conn.getName());
-			conn.authenticate(sUserName, sPassword.toCharArray());
-			return conn;
+		//Never reached here
+		return null;
 	}
 	
 }
