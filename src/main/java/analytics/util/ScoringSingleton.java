@@ -532,18 +532,23 @@ public class ScoringSingleton {
 	public Map<String, Date> getMinMaxExpiry(Integer modelId, Map<String, Change> allChanges) {
 	Date minDate = null;
 	Date maxDate = null;
+	StringBuilder vars = new StringBuilder();
 	Map<String, Date> minMaxMap = new HashMap<String, Date>();
 
 	for (Map.Entry<String, Change> entry : allChanges.entrySet()) {
 		String key = entry.getKey();
 		Change value = entry.getValue();
+		
 		if (!variableModelsMap.containsKey(key)) {
 			LOGGER.error("Could not find variable in variableModelsMap " + key);
 			continue;
 		}
+		
+		vars.append(key +" |");
 		// variable models map
 		//if (variableModelsMap.containsKey(key) && variableModelsMap.get(key).contains(modelId)) {
 		if (variableModelsMap.get(key).contains(modelId)) {
+		
 			Date exprDate = value.getExpirationDate();
 			if (minDate == null) {
 				minDate = exprDate;
@@ -557,6 +562,10 @@ public class ScoringSingleton {
 				}
 			}
 		}
+	}
+	
+	if(minDate == null || maxDate == null){
+		LOGGER.info("NULL MIN MAX FOR MODELiD " + modelId + "WITH VARS " + vars);
 	}
 		// IF THE MODEL IS MONTH SPECIFIC AND THE MIN/MAX DATE IS AFTER THE
 		// END OF THE MONTH SET TO THE LAST DAY OF THIS MONTH
@@ -572,6 +581,7 @@ public class ScoringSingleton {
 		}
 			minMaxMap.put("minExpiry", minDate);
 			minMaxMap.put("maxExpiry", maxDate);
+		
 		return minMaxMap;
 	}
 

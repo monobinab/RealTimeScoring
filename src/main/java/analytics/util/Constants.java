@@ -75,5 +75,8 @@ public class Constants {
 	
 	//SignalTopology constants
 	public static final String SIGNAL_URL = "http://semantictec.com/message/consume?topic=user.activities.signal&size=10000&consumerGroup=RTS&timeout=60";
-
+	public static final Integer CPS_QUEUE_LENGTH = 20;
+	
+	public static final Integer INTERRUPTED = 3;
+	public static final Integer SENT = 1;
 }

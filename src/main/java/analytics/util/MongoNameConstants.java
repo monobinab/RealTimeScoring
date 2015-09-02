@@ -126,7 +126,6 @@ public class MongoNameConstants {
      public static final String MODEL_PERC = "percentile";
      public static final String MAX_SCORE = "maxScore";
      
-     
      //tagVaraible collections
      public static final String TAG_VAR_VAR = "v";
      public static final String TAG_VAR_MDTAG = "t";
@@ -146,8 +145,7 @@ public class MongoNameConstants {
      public static final String KMART_OPT_IN = "kmte";
      public static final String SYW_OPT_IN = "sywe";
      public static final String TEXT_OPT_IN = "mblo";
-     
-     
+
      //Occasion Custome Event Collection
      public static final String OCCASION = "occasion";
      public static final String INTERACT_CUSTOME_EVENT = "intCustEvent";
@@ -173,6 +171,8 @@ public class MongoNameConstants {
      public static final String DC_AID_VAR_AID = "a";
      public static final String DC_AID_VAR_MODEL = "m";
      public static final String DC_AID_VAR_SCORE = "s";
+     
+     public static final String top5PercentTag = "8";
 
      //emailBlackoutVariables collection
      public static final String EMAIL_BU = "bu";
@@ -180,3 +180,4 @@ public class MongoNameConstants {
      public static final String STORE_FORMAT = "f";
      public static final String EMAIL_MODEL_ID = "m";
 }
+

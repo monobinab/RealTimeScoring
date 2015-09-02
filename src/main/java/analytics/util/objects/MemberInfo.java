@@ -10,6 +10,28 @@ public class MemberInfo {
 		private String syw_opt_in;
 		private String text_opt_in;
 		
+		public MemberInfo(){
+			
+		}
+		
+		/**
+		 * @param eid
+		 * @param emailOptIn
+		 * @param state
+		 * @param srs_opt_in
+		 * @param kmt_opt_in
+		 * @param syw_opt_in
+		 */
+		public MemberInfo(String eid, String emailOptIn, String state,
+				String srs_opt_in, String kmt_opt_in, String syw_opt_in) {
+			this.eid = eid;
+			this.emailOptIn = emailOptIn;
+			this.state = state;
+			this.srs_opt_in = srs_opt_in;
+			this.kmt_opt_in = kmt_opt_in;
+			this.syw_opt_in = syw_opt_in;
+		}
+		
 		/**
 		 * @return the text_opt_in
 		 */

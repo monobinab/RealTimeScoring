@@ -61,7 +61,7 @@ public abstract class ResponsysBolt  extends EnvironmentBolt{
 			
 			//responsys need eid in its xml, so checked for its nullness before rtsapi call
 			MemberInfo memberInfo = memberInfoDao.getMemberInfo(l_id);
-		    String eid = memberInfo.getEid();
+		    String eid = (memberInfo !=null ? memberInfo.getEid() : null);
 		    if(eid == null){
 		    	LOGGER.info("PERSIST: No Eid found for loyalty id : "+lyl_id_no);
 		    	outputCollector.ack(input);
@@ -87,7 +87,7 @@ public abstract class ResponsysBolt  extends EnvironmentBolt{
 
 			responsysUtil.getResponsysServiceResult(responsysObj);
 			
-			addRtsMemberTag(l_id, responsysObj.getTagMetadata().getMdTags());
+			addRtsMemberTag(l_id, responsysObj.getTagMetadata().getMdTag());
 			
 		    redisCountIncr("data_to_responsys");
 		

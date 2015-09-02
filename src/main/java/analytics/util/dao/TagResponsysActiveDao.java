@@ -47,7 +47,7 @@ public class TagResponsysActiveDao extends AbstractDao {
 		return activeTagsList;
 	}
 	
-	public List<String> tagsResponsysList(){
+	public List<String> getActiveResponsysTagsList(){
 		DBCursor dbCursor = tagResponsysActiveCollection.find();
 		DBObject dbObj = null;
 		List<String> activeTags = new ArrayList<String>();

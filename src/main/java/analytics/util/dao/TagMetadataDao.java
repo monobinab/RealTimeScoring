@@ -41,7 +41,7 @@ public class TagMetadataDao extends AbstractDao {
 		TagMetadata metaDataObj = null;
 		if(dbObj!=null && dbObj.containsField(MongoNameConstants.PURCHASE_OCCASSION)){
 			metaDataObj = new TagMetadata();
-			metaDataObj.setMdTags(tag);
+			metaDataObj.setMdTag(tag);
 			metaDataObj.setBusinessUnit((String)dbObj.get(MongoNameConstants.BUSINESS_UNIT));
 			metaDataObj.setSubBusinessUnit((String)dbObj.get(MongoNameConstants.SUB_BUSINESS_UNIT));
 			metaDataObj.setPurchaseOccassion((String)dbObj.get(MongoNameConstants.PURCHASE_OCCASSION));
@@ -67,7 +67,7 @@ public class TagMetadataDao extends AbstractDao {
 			
 			if(record!=null && record.containsField(MongoNameConstants.PURCHASE_OCCASSION)){
 				metaDataObj = new TagMetadata();
-				metaDataObj.setMdTags((String)record.get(MongoNameConstants.SEG));
+				metaDataObj.setMdTag((String)record.get(MongoNameConstants.SEG));
 				metaDataObj.setBusinessUnit((String)record.get(MongoNameConstants.BUSINESS_UNIT));
 				metaDataObj.setSubBusinessUnit((String)record.get(MongoNameConstants.SUB_BUSINESS_UNIT));
 				metaDataObj.setPurchaseOccassion((String)record.get(MongoNameConstants.PURCHASE_OCCASSION));
@@ -91,7 +91,7 @@ public class TagMetadataDao extends AbstractDao {
 			//zeros added to indicate Unknown
 			//needs to be replaced when proper collection is created 
 			//metaDataObj.setMdTags(tag+"0000000000");
-			metaDataObj.setMdTags((String)dbObj.get(MongoNameConstants.SEG));
+			metaDataObj.setMdTag((String)dbObj.get(MongoNameConstants.SEG));
 			metaDataObj.setBusinessUnit((String)dbObj.get(MongoNameConstants.BUSINESS_UNIT));
 			metaDataObj.setSubBusinessUnit((String)dbObj.get(MongoNameConstants.SUB_BUSINESS_UNIT));
 			metaDataObj.setPurchaseOccassion((String)dbObj.get(MongoNameConstants.PURCHASE_OCCASSION));
