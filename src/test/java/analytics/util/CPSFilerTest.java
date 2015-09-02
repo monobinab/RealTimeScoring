@@ -669,6 +669,7 @@ public class CPSFilerTest {
 	//TEST - Incoming Occasions - {Duress, Sears camera top 5%, Sears Electronics top 5%}
 	//Criteria: Duress is in progress already
 	//Expected - only Duress should be returned.
+	@Ignore
 	@Test
 	public void testFilterTop5PercentOccasionsWhenInProgressIsActive(){
 		inProgressEmailPackage = emailPackages.get(0);
