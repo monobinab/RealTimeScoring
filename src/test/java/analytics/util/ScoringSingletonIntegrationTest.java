@@ -15,7 +15,6 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.joda.time.LocalDate;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import analytics.util.objects.Change;
@@ -500,7 +499,6 @@ public class ScoringSingletonIntegrationTest {
 	 * does not have proper record for it in the variables collection, so there will be no proper name or VID for it
 	 * then, the model (model 48 int his case) which gets affected by the variable will NOT be scored
 	 */
-	@Ignore
 	@Test
 	public void calcRTSChangesTestInvalidVar() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
 		String l_id = "SearsIntegrationTesting7";
@@ -669,7 +667,7 @@ public class ScoringSingletonIntegrationTest {
 	 *if allChanges is null, calcScore will throw exception, which gets caught in calcRTSChanges method
 	 *so, changedMemberScoreList will be empty
 	 ***/
-	@Ignore
+	
 	@Test
 	public void executeWithNullAllChangesTest() throws ParseException{
 		
