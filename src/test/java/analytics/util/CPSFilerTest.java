@@ -286,7 +286,7 @@ public class CPSFilerTest {
 	}
 	
 		//Test Case 3 - Received two occasions - Duress & Replacement & Browse ; Replacement is already in progress), 
-		//Expected Result - Replacement is interrupted as duress is of higher priority. Duress is set to be sent today
+		//Expected Result - Replacement is interrupted as duress is of higher priority. Duress is set to be sent tomorrow
 		@Test
 		public void testDecideSendDatesWhenHigherPriorityComesIn() throws RealTimeScoringException, ParseException{
 			SimpleDateFormat sdformat = new SimpleDateFormat("MM/dd/yyyy");
@@ -313,13 +313,13 @@ public class CPSFilerTest {
 			
 			Assert.assertNotNull(retEmailPackages);
 			assertEquals(retEmailPackages.size(),2);			
-			assertEquals(sdformat.format(retEmailPackages.get(0).getSendDate()),sdformat.format(new DateTime().toDate()));	//check if send date is set to be today's date		
-			assertEquals(sdformat.format(retEmailPackages.get(1).getSendDate()),sdformat.format(new DateTime().plusDays(8).toDate()));	
+			assertEquals(sdformat.format(retEmailPackages.get(0).getSendDate()),sdformat.format(new DateTime().plusDays(1).toDate()));	//check if send date is set to be today's date		
+			assertEquals(sdformat.format(retEmailPackages.get(1).getSendDate()),sdformat.format(new DateTime().plusDays(9).toDate()));	
 		}
 		
 		
 		//Test Case 4 - Received two occasions - Replacement & Browse ; Duress is already in progress; it didn't come in again today), 
-		//Expected Result - Duress is interrupted; Replacement is set to be sent today ; Browse is set to be sent after 8 days
+		//Expected Result - Duress is interrupted; Replacement is set to be sent tomorrow ; Browse is set to be sent after 8 days
 		@Test
 		public void testDecideSendDatesWhenInProgressIsNotActive() throws RealTimeScoringException, ParseException{
 			SimpleDateFormat sdformat = new SimpleDateFormat("MM/dd/yyyy");
@@ -341,8 +341,8 @@ public class CPSFilerTest {
 			
 			Assert.assertNotNull(retEmailPackages);			
 			assertEquals(retEmailPackages.size(),2);			
-			assertEquals(sdformat.format(retEmailPackages.get(0).getSendDate()),sdformat.format(new DateTime().toDate()));//check if send date is set to be today's date	
-			assertEquals(sdformat.format(retEmailPackages.get(1).getSendDate()),sdformat.format(new DateTime().plusDays(8).toDate()));	
+			assertEquals(sdformat.format(retEmailPackages.get(0).getSendDate()),sdformat.format(new DateTime().plusDays(1).toDate()));//check if send date is set to be tomorrow's date	
+			assertEquals(sdformat.format(retEmailPackages.get(1).getSendDate()),sdformat.format(new DateTime().plusDays(9).toDate()));	
 			
 		}
 		
@@ -482,7 +482,8 @@ public class CPSFilerTest {
 		assertEquals(retEmailPackages.get(0), temp);
 	}
 	
-	//Test - Incoming package is Duress which is sent within last 8 days, so it should be sent 
+	//Test - Incoming package is Duress which is sent within last 8 days, so it's communication
+	//should be in progress until its duration is exhausted or its communication is interrupted. 
 	@Test
 	public void testIgnorePackagesSentInHistoryWhenOccasionIsSentInLast2Days() throws SQLException, ParseException{
 		emailPackages = new ArrayList<EmailPackage>();
@@ -669,15 +670,44 @@ public class CPSFilerTest {
 	//TEST - Incoming Occasions - {Duress, Sears camera top 5%, Sears Electronics top 5%}
 	//Criteria: Duress is in progress already
 	//Expected - only Duress should be returned.
-	@Ignore
 	@Test
 	public void testFilterTop5PercentOccasionsWhenInProgressIsActive(){
-		inProgressEmailPackage = emailPackages.get(0);
+		sdformat = new SimpleDateFormat("MM/dd/yyyy");
+		emailPackages = new ArrayList<EmailPackage>();
+		tagMetadata = new TagMetadata("HADHS123600153010","Home Appliance","Sears Dishwasher","Duress","HADHS",91.0,"Y","", 1, 8, 30);
+		memberInfo = new MemberInfo("hiBSAglnyr3kI6kYrBXHmMy5WPE=","N","AZ","N","N","N");
+		emailPackage = new EmailPackage("7081103948483127",tagMetadata);
+		emailPackage.setCustEventNm("RTS_Duress");
+		emailPackage.setMemberInfo(memberInfo);		
+		emailPackages.add(emailPackage);
+		
+		tagMetadata = new TagMetadata("CECAS823600153010","Electronics","Sears Camera","Top 5% of MSM","CECAS",91.0,"Y","", 8, 3, 30);
+		memberInfo = new MemberInfo("hiBSAglnyr3kI6kYrBXHmMy5WPE=","N","AZ","N","N","N");
+		emailPackage = new EmailPackage("7081103948483127",tagMetadata);
+		emailPackage.setCustEventNm("RTS_Unknown");
+		emailPackage.setMemberInfo(memberInfo);		
+		emailPackages.add(emailPackage);
+		
+		tagMetadata = new TagMetadata("CEGES823600153010","Electronics","Sears Electronics","Top 5% of MSM","CEGES",91.0,"Y","", 8, 3, 30);
+		memberInfo = new MemberInfo("hiBSAglnyr3kI6kYrBXHmMy5WPE=","N","AZ","N","N","N");
+		emailPackage = new EmailPackage("7081103948483127",tagMetadata);
+		emailPackage.setCustEventNm("RTS_Top 5% of MSM");
+		emailPackage.setMemberInfo(memberInfo);		
+		emailPackages.add(emailPackage);
+		
+		
+		TagMetadata tagMetadata = new TagMetadata("HADHS123600153010","Home Appliance","Sears Dishwasher","Duress","HADHS",91.0,"Y","", 1, 8, 30);
+		memberInfo = new MemberInfo("hiBSAglnyr3kI6kYrBXHmMy5WPE=","N","AZ","N","N","N");
+		inProgressEmailPackage = new EmailPackage("7081103948483127",tagMetadata);
+		inProgressEmailPackage.setCustEventNm("RTS_Duress");
+		inProgressEmailPackage.setMemberInfo(memberInfo);
+		inProgressEmailPackage.setSendDate(new DateTime().minusDays(3).toDate());
 		 
 		List<EmailPackage> retEmailPackages = cpsFiler.filterTop5PercentOccasions(emailPackages, inProgressEmailPackage);
 		Assert.assertNotNull(retEmailPackages);
 		Assert.assertEquals(retEmailPackages.size(), 1);
-		assertEquals(retEmailPackages.get(0), inProgressEmailPackage);
+		assertEquals(retEmailPackages.get(0).getMdTagMetaData().getMdTag(), inProgressEmailPackage.getMdTagMetaData().getMdTag());
+		//assertEquals(sdformat.format(retEmailPackages.get(0).getSendDate()), sdformat.format(inProgressEmailPackage.getSendDate()));
 		
 	}
 	
@@ -717,14 +747,14 @@ public class CPSFilerTest {
 
 	//TEST - Incoming Occasions - {Duress,Sears camera top 5%, Sears Electronics top 5%}
 	//Criteria: No occasion is in progress
-	//Expected - Duress should be the only one returned.
+	//Expected - Duress should be the only one returned with today's date as the send date.
 	@Test
 	public void testFilterTop5PercentOccasionsWhenNoOccasionInProgress(){
 		
-		emailPackages = new ArrayList<EmailPackage>();
-		tagMetadata = new TagMetadata("HADHS123600153010","Home Appliance","Sears Dishwasher","Duress","HADHS",91.0,"Y","", 1, 8, 30);
+		List<EmailPackage>emailPackages = new ArrayList<EmailPackage>();
+		TagMetadata tagMetadata = new TagMetadata("HADHS123600153010","Home Appliance","Sears Dishwasher","Duress","HADHS",91.0,"Y","", 1, 8, 30);
 		memberInfo = new MemberInfo("hiBSAglnyr3kI6kYrBXHmMy5WPE=","N","AZ","N","N","N");
-		emailPackage = new EmailPackage("7081103948483127",tagMetadata);
+		EmailPackage emailPackage = new EmailPackage("7081103948483127",tagMetadata);
 		emailPackage.setCustEventNm("RTS_Duress");
 		emailPackage.setMemberInfo(memberInfo);
 		EmailPackage temp = emailPackage;

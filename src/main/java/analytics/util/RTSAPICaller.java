@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -15,7 +17,7 @@ import org.slf4j.LoggerFactory;
 public class RTSAPICaller {
 	
 	private static RTSAPICaller instance = null;
-	public static final String RTS_API_PRE = "http://rtsapi301p.qa.ch3.s.com:8180/rtsapi/v1/top/categories/";
+	//public static final String RTS_API_PRE = "http://realtimescoring.intra.searshc.com/rtsapi/v1/top/categories/";
 	private static final Logger LOGGER = LoggerFactory.getLogger(RTSAPICaller.class);
 	
 	public static RTSAPICaller getInstance() {
@@ -33,7 +35,27 @@ public class RTSAPICaller {
 	}
 	
 	
-	public String getRTSAPIResponse(String lyl_l_id,String level, String key, String format, boolean isTags, String tags ){
+	public String getRTSAPIResponse(String lyl_l_id,String level, String key, String format, boolean isTags, String tags ) throws ConfigurationException{
+		
+		PropertiesConfiguration properties = null;
+		String isProd = System.getProperty(MongoNameConstants.IS_PROD);
+			
+		if(isProd!=null && "PROD".equals(isProd)){
+			properties=  new PropertiesConfiguration("resources/connection_config_prod.properties");
+			LOGGER.info("~~~~~~~Using production properties in DBConnection~~~~~~~~~");
+		}
+		
+		else if(isProd!=null && "QA".equals(isProd)){
+			properties=  new PropertiesConfiguration("resources/connection_config.properties");
+			LOGGER.info("Using test properties");	
+		}
+		
+		else if(isProd!=null && "LOCAL".equals(isProd)){
+			properties=  new PropertiesConfiguration("resources/connection_config_local.properties");
+			LOGGER.info("Using test properties");	
+		}
+			
+		String RTS_API_PRE = properties.getString("rts_api_pre_url");	
 		String baseURL = RTS_API_PRE+lyl_l_id+"/"+level+"?key="+key+"&format="+format;
 		
 		if(isTags)
