@@ -77,6 +77,11 @@ public class ScoringSingletonIntegrationTest {
 		dbList3.add(new BasicDBObject("name", "invalidVariable").append("coefficient", 0.015));
 		modeVarColl.insert(new BasicDBObject("modelId", 48).append("modelName", "Model_Name3").append("modelDescription", "Home Appliances").append("constant", 5).append("month", 0).append("variable", dbList3));
 		
+		BasicDBList dbList4 = new BasicDBList();
+		dbList4.add(new BasicDBObject("name", "variable12").append("coefficient", 0.015));
+		dbList4.add(new BasicDBObject("name", "variable40").append("coefficient", 0.015));
+		modeVarColl.insert(new BasicDBObject("modelId", 50).append("modelName", "Model_Name3").append("modelDescription", "Home Appliances").append("constant", 5).append("month", 0).append("variable", dbList4));
+		
 		//fake regionalFactors collection
 		DBCollection regionalAdjFactorsColl = db.getCollection("regionalAdjustmentFactors");
 		regionalAdjFactorsColl.insert(new BasicDBObject("state", "TN").append("modelName", "Model_Name").append("modelId", "35").append("factor", "0.1"));
@@ -720,7 +725,15 @@ public class ScoringSingletonIntegrationTest {
 		Assert.assertEquals(simpleDateFormat.format(new Date()), changedMemScoresUpdated.get("maxEx"));
 		Assert.assertEquals(0.9935358588660986, actuaModelIdStringScoreMap.get("35"));
 		changedMemberScore.remove(new BasicDBObject("l_id", l_id));
+	}
+	
+	@Test
+	public void calcRTSChangesWithAllVarsOfNONEStrategy(){
 		
+		String l_id = "SearsIntegrationTesting10";
+		//Fake memberVariables collection
+		DBCollection memVarColl = db.getCollection("memberVariables");
+		memVarColl.insert(new BasicDBObject("l_id", l_id).append("12", 1).append("40",0.4));
 	}
 	
 	@AfterClass
