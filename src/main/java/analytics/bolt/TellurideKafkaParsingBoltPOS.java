@@ -48,11 +48,11 @@ public class TellurideKafkaParsingBoltPOS extends TellurideParsingBoltPOS {
 	@Override
 	public void logPersist(String memberNumber, String pickUpStoreNumber,
 			String tenderStoreNumber, String orderStoreNumber,
-			String registerNumber, String transactionNumber,
+			String registerNumber, String transactionNumber, String requestorId, 
 			String transactionTime, String queueType) {
 		
 		super.logPersist(memberNumber, pickUpStoreNumber, tenderStoreNumber,
-				orderStoreNumber, registerNumber, transactionNumber, transactionTime, "kafka");
+				orderStoreNumber, registerNumber, transactionNumber, requestorId, transactionTime, "kafka");
 	}
 
     

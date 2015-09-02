@@ -18,6 +18,7 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Values;
 
 import com.ibm.jms.JMSBytesMessage;
 import com.ibm.jms.JMSMessage;
@@ -30,7 +31,7 @@ import com.ibm.mq.jms.MQQueueSession;
 public class WebsphereMQSpout extends BaseRichSpout {
 
 	
-//	private SpoutOutputCollector collector;
+	private SpoutOutputCollector collector;
 	private MQQueueReceiver receiver;
 	private MQQueueSession queueSession;
 	private MQQueueConnection queueConnection;
@@ -71,7 +72,7 @@ public class WebsphereMQSpout extends BaseRichSpout {
 	public void open(@SuppressWarnings("rawtypes") final Map conf, final TopologyContext context, final SpoutOutputCollector collector) {
 		LOGGER.info("Spout connecting to MQ queue");
 		try {
-		//	this.collector = collector;
+			this.collector = collector;
 			MQQueueConnectionFactory cf = new MQQueueConnectionFactory();
 			cf.setHostName(hostNanme);
 			cf.setPort(port);
@@ -98,7 +99,7 @@ public class WebsphereMQSpout extends BaseRichSpout {
 			String messageID = receivedMessage.getJMSMessageID();
 			LOGGER.info("TIME:" + messageID + "-Entering spout-" + System.currentTimeMillis());
 			String transactionXmlString = getTransactionString(receivedMessage);
-			//collector.emit(new Values(transactionXmlString,messageID), transactionXmlString);
+			collector.emit(new Values(transactionXmlString,messageID), transactionXmlString);
 			LOGGER.info("incoming xml in spout from MQ: " + transactionXmlString);
 
 			logAllTransaction(transactionXmlString);
