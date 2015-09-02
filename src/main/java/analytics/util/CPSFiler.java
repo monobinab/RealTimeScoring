@@ -2,11 +2,13 @@ package analytics.util;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +67,8 @@ public class CPSFiler {
 						}
 						
 					}
+				}else{
+				logger.info("There are no valid mdtags for this member: " + lyl_id_no);
 				}
 				
 				if(emailPackages != null && emailPackages.size() > 0){
@@ -95,7 +99,7 @@ public class CPSFiler {
 		}
 		else
 		{
-			logger.info("Occasions are not queued for member - " + lyl_id_no + ". There is no memeberInfo found for member - " + lyl_id_no );
+			logger.info("PERSIST: Occasions are not queued for member - " + lyl_id_no + " in CPS. There is no memeberInfo found for member - " + lyl_id_no );
 		}
 		
 		
@@ -169,16 +173,21 @@ public class CPSFiler {
 		}
 		
 		//Rule1 1 - If the inProgressPackage is not active or if there is no inProgress occasion - queue the incoming 
-		if(!inProgressActive || inProgressPackage == null){
+		if(inProgressPackage == null){
 			return queueStartingToday(emailPackagesToBeSent);			
 		}
+		
+		if(!inProgressActive){			
+			return queueStartingTomorrow(emailPackagesToBeSent);			
+		}
+		
 		
 		EmailPackage previousOccasion = inProgressPackage;
 		for(EmailPackage emailPackage : emailPackagesToBeSent){			
 				
 			//Rule - if incoming occasion is of higher priority - interrupt the in progress occasion
 			if( emailPackage.getMdTagMetaData().getPriority() < previousOccasion.getMdTagMetaData().getPriority()){
-				emailPackage.setSendDate(CalendarUtil.getTodaysDate());								
+				emailPackage.setSendDate(new DateTime().plusDays(1).toDate());
 			}			
 			//Rule - if incoming occasion is of same priority as the inProgress occasion - (check for same bu, sub bu ??) and queue the incoming occasion
 			//Rule - if incoming occasion is of lesser priority than the inProgress occasion - queue the incoming occasion
@@ -202,7 +211,23 @@ public class CPSFiler {
 		previousOccasion = null;
 		for(EmailPackage emailPackage : emailPackagesToBeSent){
 			if(previousOccasion == null){
-				emailPackage.setSendDate(CalendarUtil.getTodaysDate());						
+				emailPackage.setSendDate(new DateTime().toDate());						
+			}
+			else{
+				emailPackage.setSendDate(CalendarUtil.getNewDate(previousOccasion.getSendDate(), previousOccasion.getMdTagMetaData().getSendDuration()));				
+			}
+			previousOccasion = emailPackage;	
+		}
+		
+		return emailPackagesToBeSent;
+	}
+	
+	protected List<EmailPackage> queueStartingTomorrow(List<EmailPackage> emailPackagesToBeSent) {
+		EmailPackage previousOccasion;
+		previousOccasion = null;
+		for(EmailPackage emailPackage : emailPackagesToBeSent){
+			if(previousOccasion == null){
+				emailPackage.setSendDate(new DateTime().plusDays(1).toDate());				
 			}
 			else{
 				emailPackage.setSendDate(CalendarUtil.getNewDate(previousOccasion.getSendDate(), previousOccasion.getMdTagMetaData().getSendDuration()));				
