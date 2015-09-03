@@ -12,7 +12,6 @@ import redis.clients.jedis.Jedis;
 import analytics.util.Constants;
 import analytics.util.MongoNameConstants;
 import backtype.storm.command.list;
-import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -29,7 +28,6 @@ public class ResponsysSpout extends BaseRichSpout{
 	private String searchKey;
 
     private SpoutOutputCollector collector;
-    protected MultiCountMetric countMetric;
 
 	public ResponsysSpout(String systemProperty, String redisServer, Integer redisPort) {
 			System.setProperty(MongoNameConstants.IS_PROD, systemProperty);
@@ -43,9 +41,6 @@ public class ResponsysSpout extends BaseRichSpout{
 			SpoutOutputCollector collector) {
 		this.collector = collector;
 		topologyName = (String) conf.get("metrics_topology");
-		
-		countMetric = new MultiCountMetric();
-		context.registerMetric("custome_metrics", countMetric, 60);
 		
 		//Determine the Search Key to find on Redis
 		if(topologyName.equalsIgnoreCase(Constants.UNKNOWN_OCCASION))
@@ -66,7 +61,7 @@ public class ResponsysSpout extends BaseRichSpout{
 				Iterator<String> it = names.iterator();
 			    while (it.hasNext()) {
 
-			    	countMetric.scope("incoming_tuples").incr();
+			    	LOGGER.info("Incoming Message " + topologyName);
 			    	String s = it.next();
 			    	String loyaltyId = s.substring(s.indexOf(searchKey)+searchKey.length()+1, s.length());
 			    	
@@ -82,7 +77,7 @@ public class ResponsysSpout extends BaseRichSpout{
 					value = null;
 					s = null;
 					listToEmit = null;
-					
+
 			    }
 			    jedis.disconnect();
 
