@@ -27,7 +27,7 @@ public class OutboxDao extends AbstractMySQLDao{
 			try {
 				statement = connection.prepareStatement(query.toString());
 				statement.setString(1, lyl_id_no);
-		        ResultSet rs = statement.executeQuery();
+				ResultSet rs = statement.executeQuery();
 		        
 		        while (rs.next()) {
 		             //System.out.println("loyalty id: " + rs.getString("loy_id"));
@@ -183,8 +183,7 @@ public class OutboxDao extends AbstractMySQLDao{
 		String query = "SELECT count(*) FROM rts_member.cp_outbox WHERE loy_id=? AND status=1";
 		PreparedStatement statement = connection.prepareStatement(query);
 		statement.setString(1, lyl_id_no);
-		System.out.println("query: "+ statement);
-			ResultSet rs = statement.executeQuery();
+		ResultSet rs = statement.executeQuery();
 		if(rs.next() && rs.getInt(1) > 0){
 			query = "SELECT bu,sub_bu,md_tag,occasion_name, added_datetime, send_date,status, max(sent_datetime) FROM rts_member.cp_outbox WHERE loy_id=? AND status=1;";
 			statement = connection.prepareStatement(query);

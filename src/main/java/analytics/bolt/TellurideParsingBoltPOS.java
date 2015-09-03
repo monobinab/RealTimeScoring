@@ -274,7 +274,7 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
 
                         String line = divLnItmDao.getLnFromDivItem(div, item);
                         if (line == null) {
-                            /*logger.info("Line is null");*/
+                            LOGGER.info("PERSIST: Line is null");
                             continue;
                         }
                         //Adding the div line info to the buffer to be used by Responsys Bolts to
@@ -341,6 +341,7 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
             for (TransactionLineItem lnItm : lineItemList) {
                 List<String> varList = lnItm.getVariableList();
                 if (varList == null || varList.isEmpty()) {
+                	LOGGER.info("PERSIST : varList is empty");
                     continue;
                 }
                 for (String v : varList) {
