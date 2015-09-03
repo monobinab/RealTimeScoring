@@ -19,7 +19,7 @@ import backtype.storm.tuple.Tuple;
 
 public class CPProcessingBolt extends EnvironmentBolt  {
 	private static final long serialVersionUID = 1L;
-	private static final String api_Key_Param="email";
+	private static final String api_Key_Param="CPS";
 	private static final Logger LOGGER = LoggerFactory.getLogger(CPProcessingBolt.class);
 	private OutputCollector outputCollector;
 	private RTSAPICaller rtsApiCaller;
@@ -64,7 +64,7 @@ public class CPProcessingBolt extends EnvironmentBolt  {
 				if(emailPackages!= null && emailPackages.size()>0)
 				{
 					cpsFiler.fileEmailPackages(emailPackages);
-					LOGGER.info("PERSIST: Input Tags for lyl_id_no " + lyl_id_no+ " : "+getLogMsg(emailPackages));
+					LOGGER.info("PERSIST: Queued Tags in CPS Outbox for lyl_id_no " + lyl_id_no+ " : "+getLogMsg(emailPackages));
 					outputCollector.ack(input);
 				}					
 			} catch (SQLException e){

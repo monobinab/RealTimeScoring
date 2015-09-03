@@ -35,7 +35,7 @@ public class MemberTraitsDao extends AbstractDao{
 		DBObject memberTraitsDBO = memberTraitsCollection.findOne(new BasicDBObject().append(MongoNameConstants.L_ID, l_id));
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-		if(memberTraitsDBO != null && memberTraitsDBO.keySet().contains(l_id)) {
+		if(memberTraitsDBO != null) {
 			
 			BasicDBList dates = (BasicDBList) memberTraitsDBO.get(MongoNameConstants.MT_DATES_ARR);
 			
