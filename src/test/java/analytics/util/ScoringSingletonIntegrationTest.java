@@ -15,7 +15,6 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.joda.time.LocalDate;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import analytics.util.objects.Change;
@@ -77,6 +76,11 @@ public class ScoringSingletonIntegrationTest {
 		BasicDBList dbList3 = new BasicDBList();
 		dbList3.add(new BasicDBObject("name", "invalidVariable").append("coefficient", 0.015));
 		modeVarColl.insert(new BasicDBObject("modelId", 48).append("modelName", "Model_Name3").append("modelDescription", "Home Appliances").append("constant", 5).append("month", 0).append("variable", dbList3));
+		
+		BasicDBList dbList4 = new BasicDBList();
+		dbList4.add(new BasicDBObject("name", "variable12").append("coefficient", 0.015));
+		dbList4.add(new BasicDBObject("name", "variable40").append("coefficient", 0.015));
+		modeVarColl.insert(new BasicDBObject("modelId", 50).append("modelName", "Model_Name3").append("modelDescription", "Home Appliances").append("constant", 5).append("month", 0).append("variable", dbList4));
 		
 		//fake regionalFactors collection
 		DBCollection regionalAdjFactorsColl = db.getCollection("regionalAdjustmentFactors");
@@ -500,7 +504,6 @@ public class ScoringSingletonIntegrationTest {
 	 * does not have proper record for it in the variables collection, so there will be no proper name or VID for it
 	 * then, the model (model 48 int his case) which gets affected by the variable will NOT be scored
 	 */
-	@Ignore
 	@Test
 	public void calcRTSChangesTestInvalidVar() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
 		String l_id = "SearsIntegrationTesting7";
@@ -669,7 +672,7 @@ public class ScoringSingletonIntegrationTest {
 	 *if allChanges is null, calcScore will throw exception, which gets caught in calcRTSChanges method
 	 *so, changedMemberScoreList will be empty
 	 ***/
-	@Ignore
+	
 	@Test
 	public void executeWithNullAllChangesTest() throws ParseException{
 		
@@ -722,7 +725,15 @@ public class ScoringSingletonIntegrationTest {
 		Assert.assertEquals(simpleDateFormat.format(new Date()), changedMemScoresUpdated.get("maxEx"));
 		Assert.assertEquals(0.9935358588660986, actuaModelIdStringScoreMap.get("35"));
 		changedMemberScore.remove(new BasicDBObject("l_id", l_id));
+	}
+	
+	@Test
+	public void calcRTSChangesWithAllVarsOfNONEStrategy(){
 		
+		String l_id = "SearsIntegrationTesting10";
+		//Fake memberVariables collection
+		DBCollection memVarColl = db.getCollection("memberVariables");
+		memVarColl.insert(new BasicDBObject("l_id", l_id).append("12", 1).append("40",0.4));
 	}
 	
 	@AfterClass
