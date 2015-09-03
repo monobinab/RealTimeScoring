@@ -82,8 +82,18 @@ public class ScoringSingletonIntegrationTest {
 		BasicDBList dbList4 = new BasicDBList();
 		dbList4.add(new BasicDBObject("name", "variable12").append("coefficient", 0.015));
 		dbList4.add(new BasicDBObject("name", "variable40").append("coefficient", 0.015));
-		modeVarColl.insert(new BasicDBObject("modelId", 50).append("modelName", "Model_Name3").append("modelDescription", "Home Appliances").append("constant", 5).append("month", 0).append("variable", dbList4));
+		modeVarColl.insert(new BasicDBObject("modelId", 50).append("modelName", "Model_Name4").append("modelDescription", "Home Appliances").append("constant", 5).append("month", 0).append("variable", dbList4));
 		
+		BasicDBList dbList5 = new BasicDBList();
+		dbList5.add(new BasicDBObject("name", "variable12").append("coefficient", 0.015));
+		dbList5.add(new BasicDBObject("name", "variable4").append("coefficient", 0.015));
+		modeVarColl.insert(new BasicDBObject("modelId", 55).append("modelName", "Model_Name5").append("modelDescription", "Home Appliances2").append("constant", 5).append("month", 0).append("variable", dbList5));
+		
+	/*	BasicDBList dbList6 = new BasicDBList();
+		dbList6.add(new BasicDBObject("name", "variable12").append("coefficient", 0.015));
+		dbList6.add(new BasicDBObject("name", "variable10").append("coefficient", 0.015));
+		modeVarColl.insert(new BasicDBObject("modelId", 55).append("modelName", "Model_Name6").append("modelDescription", "Home Appliances3").append("constant", 5).append("month", 0).append("variable", dbList6));
+		*/
 		//fake regionalFactors collection
 		DBCollection regionalAdjFactorsColl = db.getCollection("regionalAdjustmentFactors");
 		regionalAdjFactorsColl.insert(new BasicDBObject("state", "TN").append("modelName", "Model_Name").append("modelId", "35").append("factor", "0.1"));
@@ -757,7 +767,80 @@ public class ScoringSingletonIntegrationTest {
 				fail("Got null minDate");
 			}
 		}
-		Assert.assertEquals(1, changedMemberScoresList.size());
+		Assert.assertEquals(2, changedMemberScoresList.size());
+	}
+	
+	/*@Test
+	public void calcRTSChangesWithSomeVarsOfNONEStrategy() throws ParseException{
+		
+		String l_id = "SearsIntegrationTesting11";
+		//Fake memberVariables collection
+		DBCollection memVarColl = db.getCollection("memberVariables");
+		memVarColl.insert(new BasicDBObject("l_id", l_id).append("12", 1).append("40",0.4).append("4", .1).append("10", 0.1));
+		
+		DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Change expected = new Change("4", 12,
+				simpleDateFormat.parse("2999-09-23"),
+				simpleDateFormat.parse("2014-09-01"));
+		
+		changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
+				"4",
+				new BasicDBObject("v", expected.getValue()).append("e",
+						expected.getExpirationDateAsString()).append("f",
+						expected.getEffectiveDateAsString())));
+		
+		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
+		newChangesVarValueMap.put("VARIABLE12", "0.01");
+		newChangesVarValueMap.put("VARIABLE40", "0.1");
+		newChangesVarValueMap.put("VARIABLE4", "0.01");
+		newChangesVarValueMap.put("VARIABLE10", "0.1");
+		
+		MemberRTSChanges memberRTSChanges = scoringSingletonObj.calcRTSChanges(l_id, newChangesVarValueMap, null, "TEST");
+		
+		List<ChangedMemberScore> changedMemberScoresList = memberRTSChanges.getChangedMemberScoreList();
+		for(ChangedMemberScore changedMemScore : changedMemberScoresList){
+			if(changedMemScore.getMinDate() == null){
+				fail("Got null minDate");
+			}
+		}
+		Assert.assertEquals(2, changedMemberScoresList.size());
+	}*/
+	
+	@Test
+	public void calcRTSChangesWithSharedVarsOfNONEStrategy() throws ParseException{
+		
+		String l_id = "SearsIntegrationTesting12";
+		//Fake memberVariables collection
+		DBCollection memVarColl = db.getCollection("memberVariables");
+		memVarColl.insert(new BasicDBObject("l_id", l_id).append("12", 1).append("40",0.4).append("4", .1).append("10", 0.1));
+		
+		DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Change expected = new Change("4", 12,
+				simpleDateFormat.parse("2014-08-23"),
+				simpleDateFormat.parse("2014-08-01"));
+		
+		changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
+				"4",
+				new BasicDBObject("v", expected.getValue()).append("e",
+						expected.getExpirationDateAsString()).append("f",
+						expected.getEffectiveDateAsString())));
+		
+		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
+		newChangesVarValueMap.put("VARIABLE12", "0.01");
+		newChangesVarValueMap.put("VARIABLE4", "0.01");
+		newChangesVarValueMap.put("VARIABLE10", "0.1");
+		
+		MemberRTSChanges memberRTSChanges = scoringSingletonObj.calcRTSChanges(l_id, newChangesVarValueMap, null, "TEST");
+		
+		List<ChangedMemberScore> changedMemberScoresList = memberRTSChanges.getChangedMemberScoreList();
+		for(ChangedMemberScore changedMemScore : changedMemberScoresList){
+			if(changedMemScore.getMinDate() == null){
+				fail("Got null minDate");
+			}
+		}
+		Assert.assertEquals(2, changedMemberScoresList.size());
 	}
 	
 	@AfterClass
