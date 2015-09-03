@@ -31,8 +31,8 @@ public class ConsideredPurchaseTopology {
 			System.exit(0);
 		}
 		
-		//String kafkaTopic="rts_cp_membertags";
-		String kafkaTopic="stormtopic";
+		String kafkaTopic="rts_cp_membertags";
+		//String kafkaTopic="stormtopic";
 		String env = System.getProperty(MongoNameConstants.IS_PROD);
 		TopologyBuilder topologyBuilder = new TopologyBuilder();		
 				
