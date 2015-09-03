@@ -89,11 +89,6 @@ public class ScoringSingletonIntegrationTest {
 		dbList5.add(new BasicDBObject("name", "variable4").append("coefficient", 0.015));
 		modeVarColl.insert(new BasicDBObject("modelId", 55).append("modelName", "Model_Name5").append("modelDescription", "Home Appliances2").append("constant", 5).append("month", 0).append("variable", dbList5));
 		
-	/*	BasicDBList dbList6 = new BasicDBList();
-		dbList6.add(new BasicDBObject("name", "variable12").append("coefficient", 0.015));
-		dbList6.add(new BasicDBObject("name", "variable10").append("coefficient", 0.015));
-		modeVarColl.insert(new BasicDBObject("modelId", 55).append("modelName", "Model_Name6").append("modelDescription", "Home Appliances3").append("constant", 5).append("month", 0).append("variable", dbList6));
-		*/
 		//fake regionalFactors collection
 		DBCollection regionalAdjFactorsColl = db.getCollection("regionalAdjustmentFactors");
 		regionalAdjFactorsColl.insert(new BasicDBObject("state", "TN").append("modelName", "Model_Name").append("modelId", "35").append("factor", "0.1"));
@@ -770,7 +765,7 @@ public class ScoringSingletonIntegrationTest {
 		Assert.assertEquals(2, changedMemberScoresList.size());
 	}
 	
-	/*@Test
+	@Test
 	public void calcRTSChangesWithSomeVarsOfNONEStrategy() throws ParseException{
 		
 		String l_id = "SearsIntegrationTesting11";
@@ -805,7 +800,7 @@ public class ScoringSingletonIntegrationTest {
 			}
 		}
 		Assert.assertEquals(2, changedMemberScoresList.size());
-	}*/
+	}
 	
 	@Test
 	public void calcRTSChangesWithSharedVarsOfNONEStrategy() throws ParseException{
