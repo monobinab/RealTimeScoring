@@ -125,6 +125,7 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 				
 				
 		} catch (Exception e) {
+			e.printStackTrace();
 			LOGGER.error("exception in parsing: " + e.getMessage() + "   "+ e);
 		
 		} 
