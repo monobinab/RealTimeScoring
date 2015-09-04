@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -167,6 +168,13 @@ public class ScoringSingleton {
 						
 			//Find all models affected by the new incoming changes if newChangesVarValueMap is null
 			if(  newChangesVarValueMap !=  null && !newChangesVarValueMap.isEmpty() ){
+				Iterator<String> itr = newChangesVarValueMap.keySet().iterator();
+				while(itr.hasNext()){
+					String var = itr.next();
+					if(variableNameToStrategyMap.get(var).equalsIgnoreCase("NONE")){
+						itr.remove();
+					}
+				}
 				 modelIdsList = this.getModelIdList(newChangesVarValueMap);
 			}
 		
