@@ -38,6 +38,7 @@ public class ConsideredPurchaseTopology {
 				
 		try {
 			topologyBuilder.setSpout("CPKafkaSpout", new RTSKafkaSpout(KafkaUtil.getSpoutConfig(env, kafkaTopic)), 1);
+			LOGGER.info("CPS Topology listening to kafka topic : " + kafkaTopic);
 		} catch (ConfigurationException e) {
 			LOGGER.error(e.getClass() + ": " + e.getMessage(), e);
 			System.exit(0);	
