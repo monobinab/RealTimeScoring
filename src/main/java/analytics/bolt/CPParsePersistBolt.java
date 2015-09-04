@@ -27,7 +27,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
-public class CPParsePersistBolt extends ParsingBoltOccassion{
+public class CPParsePersistBolt extends EnvironmentBolt{
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = LoggerFactory
@@ -35,6 +35,7 @@ public class CPParsePersistBolt extends ParsingBoltOccassion{
 	private OutputCollector outputCollector;
 	private TagMetadataDao tagsMetaDataDao;
 	private TagResponsysActiveDao tagResponsysActiveDao;
+	private MemberMDTags2Dao memberMDTags2Dao;
 	private List<String> activeTags;
 	
 	public CPParsePersistBolt(String env) {
@@ -64,7 +65,7 @@ public class CPParsePersistBolt extends ParsingBoltOccassion{
 				messageID = input.getStringByField("messageID");
 				LOGGER.info("messageID = " + messageID);
 			}
-			LOGGER.debug("TIME:" + messageID + "-Entering ParsingboltOccasion-"
+			LOGGER.debug("TIME:" + messageID + "-Entering CPParsePersistBolt-"
 					+ System.currentTimeMillis());
 			
 			LOGGER.info("Message Being Received " + input.getString(0));
@@ -116,7 +117,7 @@ public class CPParsePersistBolt extends ParsingBoltOccassion{
 				this.outputCollector.emit(listToEmit);
 			}
 			else{
-				LOGGER.info("PERSIST: No Tags found for lyl_id_no " + input.getStringByField("lyl_id_no"));
+				LOGGER.info("PERSIST: No Tags found for lyl_id_no " + lyl_id_no);
 				countMetric.scope("no_lyl_id_no").incr();
 			}
 			
@@ -124,7 +125,8 @@ public class CPParsePersistBolt extends ParsingBoltOccassion{
 				
 				
 		} catch (Exception e) {
-			LOGGER.error("exception in parsing: " + e);
+			LOGGER.error("exception in parsing: " + e.getMessage() + "   "+ e);
+		
 		} 
 		// LOGGER.info("TIME:" + messageID + "-Exiting ParsingboltOccasion-" +
 		outputCollector.ack(input);

@@ -31,7 +31,7 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 	private MemberMDTagsDao memberTagDao;
 	Map<String, TagVariable> tagVariablesMap = new HashMap<String, TagVariable>();
 	Map<String, String> modelScoreMap = new HashMap<String, String>();
-	protected MemberMDTags2Dao memberMDTags2Dao;
+	private MemberMDTags2Dao memberMDTags2Dao;
 	
 
 	public ParsingBoltOccassion(String systemProperty, String host, int port) {
@@ -116,7 +116,7 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 				memberTagDao.addMemberMDTags(l_id, tagsLst);
 				
 				//Write to the mdTags with dates collection as well...
-				memberMDTags2Dao.addMemberMDTags(l_id, tagsLst);
+				//memberMDTags2Dao.addMemberMDTags(l_id, tagsLst);
 			}
 			else{
 				memberTagDao.deleteMemberMDTags(l_id);
