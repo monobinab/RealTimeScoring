@@ -32,13 +32,14 @@ public class EmailFeedbackTopology {
 			System.exit(0);
 		}
 		String kafkaTopic = "rts_emailnofeedback";
+		String zkroot="emailTopic";
 		String env = System.getProperty(MongoNameConstants.IS_PROD);
 		TopologyBuilder builder = new TopologyBuilder();
 		
 		//prepare the kafka spout configuration			
 		try {
-			builder.setSpout("RTSKafkaSpout", new RTSKafkaSpout(KafkaUtil.getSpoutConfig(				
-								System.getProperty(MongoNameConstants.IS_PROD), kafkaTopic)), 1);
+			builder.setSpout("RTSKafkaSpout", new RTSKafkaSpout(new KafkaUtil(System.getProperty(MongoNameConstants.IS_PROD)).getSpoutConfig(				
+								kafkaTopic,zkroot)), 1);
 		} catch (ConfigurationException e1) {				
 				LOGGER.error(e1.getClass() + ": " + e1.getMessage(), e1);
 				LOGGER.error("Kafka Not Initialised ");

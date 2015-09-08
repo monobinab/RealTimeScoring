@@ -49,14 +49,13 @@ public class PurchaseOccassionTopology {
 			
 			//Newly added code for adding kafka to the topology
 			String kafkaTopic="rts_cp_membertags";
+			String zkroot="poTopic";
 			//String kafkaTopic="stormtopic";
 
 			topologyBuilder.setSpout(
 					"RTSKafkaSpout",
-					new RTSKafkaSpout(KafkaUtil.getSpoutConfig(
-							
-							System.getProperty(MongoNameConstants.IS_PROD),
-							kafkaTopic)), 1);	
+					new RTSKafkaSpout(new KafkaUtil(System.getProperty(MongoNameConstants.IS_PROD)).getSpoutConfig(
+							kafkaTopic,zkroot)), 1);	
 			
 			
 			topologyBuilder.setBolt("RTSInterceptorBolt", new RTSInterceptorBolt(System.getProperty(MongoNameConstants.IS_PROD)), 6)
