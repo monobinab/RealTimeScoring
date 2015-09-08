@@ -403,6 +403,9 @@ public class ScoringSingleton {
 			for (Map.Entry<String, Change> entry : allChanges.entrySet()) {
 				String ch = entry.getKey();
 				Change value = entry.getValue();
+				if(ch == null){
+					LOGGER.error("variable in allChanges is null for " + ch + "modelId " + modelId);
+				}
 			if (ch.startsWith(MongoNameConstants.BLACKOUT_VAR_PREFIX) && variableMap.containsKey(ch)) 
 				blackFlag = Integer.valueOf(value.getValue().toString());
 				if(blackFlag==1)
