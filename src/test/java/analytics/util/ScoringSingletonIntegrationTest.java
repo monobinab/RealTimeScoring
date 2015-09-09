@@ -17,6 +17,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.joda.time.LocalDate;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import analytics.util.objects.Change;
@@ -507,9 +508,11 @@ public class ScoringSingletonIntegrationTest {
 	
 	/*
 	 * to test if a variable (INVALIDVARIABLE)which is associated with a model 48 is there in our modelVariables collection )
-	 * but not in variables collection at all, it will be gotten in the strategy check
-	 * and will throw exception, so memberRTSChanegs returned will be null
+	 * but not in variables collection at all, calcBaseScore throws exception which get caught in calcRTSChanges
+	 * and the corresponding model will not be populated in changedMemberScore list
+	 * Here, we have only one model to be scored and the variable is not in variables coll, so we get changedMemberScore list with size 0
 	 */
+	
 	@Test
 	public void calcRTSChangesTestInvalidVar() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
 		String l_id = "SearsIntegrationTesting7";
@@ -533,7 +536,8 @@ public class ScoringSingletonIntegrationTest {
 		newChangesVarValueMap.put("INVALIDVARIABLE", "0.01");
 		
 		MemberRTSChanges memberRTSChanges = scoringSingletonObj.calcRTSChanges(l_id, newChangesVarValueMap, null, "TEST");
-		Assert.assertEquals(null, memberRTSChanges);
+		List<ChangedMemberScore> changedMemScoresList = memberRTSChanges.getChangedMemberScoreList();
+		Assert.assertEquals(0, changedMemScoresList.size());
 	}
 	
 	/*
