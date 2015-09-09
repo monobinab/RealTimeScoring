@@ -23,6 +23,7 @@ import backtype.storm.tuple.Tuple;
 
 
 
+
 import org.apache.commons.configuration.ConfigurationException;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -30,6 +31,7 @@ import org.junit.Test;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
 
 import static org.junit.Assert.assertTrue;
 
@@ -78,8 +80,10 @@ public class StrategyScoringBoltTest {
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
 		
 		boltUnderTest.prepare(SystemPropertyUtility.getStormConf(), context, outputCollector);
+		
+		/*DBObject obj = memVarColl.findOne(new BasicDBObject("l_id", l_id));
+		System.out.println(obj);*/
 		boltUnderTest.execute(tuple);
-	
 		List<Object> outputTuple = outputCollector.getTuple().get("score_stream");
 		System.out.println(outputTuple.get(0));
 		System.out.println(outputTuple.get(1));

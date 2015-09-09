@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mongodb.DB;
+import com.mongodb.DBObject;
 
 import analytics.exception.RealTimeScoringException;
 import analytics.util.dao.ChangedMemberScoresDao;
@@ -98,6 +99,8 @@ public class ScoringSingleton {
 			modelVariablesDao = new ModelVariablesDao();
 			changedVariablesDao = new ChangedMemberVariablesDao();
 			memberVariablesDao = new MemberVariablesDao();
+			DBObject obj = memberVariablesDao.getMemVars("testingLid");
+			System.out.println(obj);
 			changedMemberScoresDao = new ChangedMemberScoresDao();
 		
 			// populate the variableVidToNameMap

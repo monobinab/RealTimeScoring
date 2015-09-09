@@ -54,4 +54,11 @@ public class MemberVariablesDao extends AbstractDao {
 		return memberVariablesMap;
 				
 	}
+    
+    public DBObject getMemVars(String lid){
+    	DBObject mbrVariables = memberVariablesCollection.findOne(
+				new BasicDBObject("l_id", "testingLid"));
+    	return mbrVariables;
+    	
+    }
 }

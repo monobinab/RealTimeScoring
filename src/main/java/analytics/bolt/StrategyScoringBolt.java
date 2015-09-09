@@ -2,6 +2,7 @@ package analytics.bolt;
 
 import analytics.util.JsonUtils;
 import analytics.util.ScoringSingleton;
+import analytics.util.dao.MemberVariablesDao;
 import analytics.util.objects.ChangedMemberScore;
 import analytics.util.objects.MemberRTSChanges;
 import backtype.storm.task.OutputCollector;
@@ -9,8 +10,14 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
 
 import redis.clients.jedis.Jedis;
 
@@ -33,6 +40,9 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	private OutputCollector outputCollector;
 	private String topologyName;
 	ScoringSingleton scoringSingleton;
+	MemberVariablesDao memDao;
+	DB db;
+	DBCollection coll;
 	
 	private String respHost;
 	private int respPort;
@@ -58,11 +68,14 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	  	this.outputCollector = collector;
 	  	topologyName = (String) stormConf.get("metrics_topology");
 	  	scoringSingleton = ScoringSingleton.getInstance();
+	    	
 	  }
 	
 	@SuppressWarnings("unchecked")
 	@Override
 	public void execute(Tuple input) {
+		DBObject obj = coll.findOne(new BasicDBObject("l_id", "testingLid"));
+	  	System.out.println(obj);
 			
 		if(LOGGER.isDebugEnabled()){
 			LOGGER.debug("The time it enters inside Strategy Bolt execute method "	+ System.currentTimeMillis());
