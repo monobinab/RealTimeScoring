@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -171,7 +172,10 @@ public class ScoringSingleton {
 				Iterator<String> itr = newChangesVarValueMap.keySet().iterator();
 				while(itr.hasNext()){
 					String var = itr.next();
-					if(variableNameToStrategyMap.get(var).equalsIgnoreCase("NONE")){
+					if(!variableNameToStrategyMap.containsKey(var)){
+						LOGGER.info("var NOT in variables collection " + var);
+					}
+					if(variableNameToStrategyMap.containsKey(var) && variableNameToStrategyMap.get(var).equalsIgnoreCase("NONE")){
 						itr.remove();
 					}
 				}
@@ -246,8 +250,8 @@ public class ScoringSingleton {
 							   LOGGER.error("Exception scoring modelId " + modelId +" for lId " + lId + " " + e2.getErrorMessage());
 						   }
 						   catch(Exception e){
-							   LOGGER.error("Exception scoring modelId " + modelId +" for lId " + lId + " " , e.getCause());
 							   e.printStackTrace();
+							   LOGGER.error("Exception scoring modelId " + modelId +" for lId " + lId );
 						   }
 						}
 							 memberRTSChanges.setlId(lId);
@@ -257,8 +261,9 @@ public class ScoringSingleton {
 			 	}	
 			}
 		catch(Exception e){
-			LOGGER.error("Exception scoring lId " + lId + " " + e.getCause());
 			e.printStackTrace();
+			LOGGER.error("Exception scoring lId " + e.getMessage() + "cause: " + e.getCause());
+			LOGGER.error(ExceptionUtils.getMessage(e) + "root cause-"+ ExceptionUtils.getRootCauseMessage(e) + ExceptionUtils.getStackTrace(e));
 		}
 			return memberRTSChanges;
 	}
@@ -347,7 +352,7 @@ public class ScoringSingleton {
 	 * @return
 	 */
 	public Map<String, Change> executeStrategy(Map<String, Change> allChanges, Map<String, String> newChangesVarValueMap, Map<String, Object> memberVariablesMap) {
-		try{
+		
 			for (String variableName : newChangesVarValueMap.keySet()) {
 				variableName = variableName.toUpperCase();
 				if (variableModelsMap.containsKey(variableName)) {
@@ -391,12 +396,7 @@ public class ScoringSingleton {
 					allChanges.put(variableName, executedValue);
 				}
 			}
-		}
-		catch(Exception e){
-			LOGGER.error("Exception in executeStrategy " + e.getStackTrace());
-			e.printStackTrace();
-		}
-			return allChanges;
+					return allChanges;
 	}
 	
 	public boolean isBlackOutModel(Map<String, Change> allChanges,	Integer modelId) {
