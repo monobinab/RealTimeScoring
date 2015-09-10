@@ -1,26 +1,12 @@
 package analytics.bolt;
 
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.util.Constants;
-import analytics.util.MongoNameConstants;
-import analytics.util.ResponsysUtil;
-import analytics.util.SecurityUtils;
-import analytics.util.dao.MemberInfoDao;
-import analytics.util.dao.TagMetadataDao;
 import analytics.util.objects.MemberInfo;
 import analytics.util.objects.ResponsysPayload;
 import analytics.util.objects.TagMetadata;
-import backtype.storm.task.OutputCollector;
-import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.tuple.Tuple;
-
-import org.apache.commons.lang3.StringUtils;
-import org.json.JSONException;
 
 public class POSPurchaseBolt  extends ResponsysBolt{
 
@@ -50,9 +36,10 @@ public class POSPurchaseBolt  extends ResponsysBolt{
 			custEventNm = "RTS_Purchase";
 			
 			for(int i=0; i <divLineArr.length ; i++){
-				tagMetadata.setDivLine(tagMetadata.getDivLine()!=null ? tagMetadata.getDivLine()+"," +divLineArr[i]: divLineArr[i]);
-
+				//tagMetadata.setDivLine(tagMetadata.getDivLine()!=null ? tagMetadata.getDivLine()+"," +divLineArr[i]: divLineArr[i]);
 				responsysUtil.getTagMetadata(tagMetadata,divLineArr[i]);
+				if (tagMetadata.getDivLine() == null || tagMetadata.getDivLine().equals("")||tagMetadata.getDivLine().isEmpty())
+					return "P";
 			}
 			
 			setResponsysObj(lyl_id_no, responsysObj, l_id, memberInfo, o, tagMetadata, value, custEventNm, topologyName);
