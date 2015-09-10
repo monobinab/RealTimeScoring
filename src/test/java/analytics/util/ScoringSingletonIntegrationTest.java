@@ -540,6 +540,33 @@ public class ScoringSingletonIntegrationTest {
 		Assert.assertEquals(0, changedMemScoresList.size());
 	}
 	
+	@Test
+	public void calcRTSChangesTestInvalidVarInChangedMemVar() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
+		String l_id = "SearsIntegrationTesting17";
+		
+		getMemberVarCollection(l_id);
+
+		//fake changedMemberVariables Collection
+		DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Change expected = new Change("4000", 12,
+				simpleDateFormat.parse("2999-09-23"),
+				simpleDateFormat.parse("2014-09-01"));
+		
+		changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
+				"4000",
+				new BasicDBObject("v", expected.getValue()).append("e",
+						expected.getExpirationDateAsString()).append("f",
+						expected.getEffectiveDateAsString())));
+						
+		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
+		newChangesVarValueMap.put("VARIABLE4", "0.01");
+		
+		MemberRTSChanges memberRTSChanges = scoringSingletonObj.calcRTSChanges(l_id, newChangesVarValueMap, null, "TEST");
+		List<ChangedMemberScore> changedMemScoresList = memberRTSChanges.getChangedMemberScoreList();
+		Assert.assertEquals(2, changedMemScoresList.size());
+	}
+	
 	/*
 	 * if a variable "variable4" is expired in changedMemberVariable, 
 	 * its value should be picked up from MemberVariable collection, if exists

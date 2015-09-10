@@ -279,13 +279,13 @@ public class ScoringSingleton {
 					continue;
 				}
 				for (String var : variables.keySet()) {
-						if (variableNameToVidMap.get(var) == null) {
+						if (!variableNameToVidMap.containsKey(var) || variableNameToVidMap.get(var) == null) {
 							LOGGER.error("VID is null for variable " + var);
 						} else {
 							filteredVariables.add(variableNameToVidMap.get(var));
 						}
-					}
 				}
+			}
 			catch(Exception e){
 				LOGGER.error("Exception in createMemberVariableValueMap method ", e);
 			}
@@ -322,7 +322,7 @@ public class ScoringSingleton {
 				Change value = entry.getValue();
 				// key is VID
 				// skip expired changes
-				if (value.getExpirationDate().after(new Date())) {
+				if (value.getExpirationDate().after(new Date()) && variableVidToNameMap.containsKey(key)) {
 					changedMemberVariablesMap.put(variableVidToNameMap.get(key), value);
 				} else {
 					LOGGER.debug("Got an expired value for " + value);
@@ -409,7 +409,7 @@ public class ScoringSingleton {
 				if(ch == null){
 					LOGGER.error("variable in allChanges is null for " + ch + "modelId " + modelId);
 				}
-			if (ch != null && ch.startsWith(MongoNameConstants.BLACKOUT_VAR_PREFIX) && variableMap.containsKey(ch)) 
+			if ( ch != null && ch.startsWith(MongoNameConstants.BLACKOUT_VAR_PREFIX) && variableMap.containsKey(ch)) 
 				blackFlag = Integer.valueOf(value.getValue().toString());
 				if(blackFlag==1)
 				{
@@ -444,7 +444,7 @@ public class ScoringSingleton {
 		for (Map.Entry<String, Change> entry : allChanges.entrySet()) {
 			String ch = entry.getKey();
 			Change value = entry.getValue();
-			if (ch.substring(0, MongoNameConstants.BOOST_VAR_PREFIX.length()).toUpperCase().equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
+			if (ch != null && ch.substring(0, MongoNameConstants.BOOST_VAR_PREFIX.length()).toUpperCase().equals(MongoNameConstants.BOOST_VAR_PREFIX) && varMap.containsKey(ch)) {
 				Boost boost;
 				if (varMap.get(ch) instanceof Boost) {
 					boost = (Boost) varMap.get(ch);
