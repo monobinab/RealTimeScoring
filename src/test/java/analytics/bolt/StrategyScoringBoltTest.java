@@ -16,14 +16,6 @@ import analytics.util.SystemPropertyUtility;
 import analytics.util.objects.Change;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.tuple.Tuple;
-
-
-
-
-
-
-
-
 import org.apache.commons.configuration.ConfigurationException;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -31,9 +23,7 @@ import org.junit.Test;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
 
-import static org.junit.Assert.assertTrue;
 
 public class StrategyScoringBoltTest {
 	@SuppressWarnings("unused")
