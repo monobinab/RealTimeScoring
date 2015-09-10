@@ -409,7 +409,7 @@ public class ScoringSingleton {
 				if(ch == null){
 					LOGGER.error("variable in allChanges is null for " + ch + "modelId " + modelId);
 				}
-			if (ch.startsWith(MongoNameConstants.BLACKOUT_VAR_PREFIX) && variableMap.containsKey(ch)) 
+			if (ch != null && ch.startsWith(MongoNameConstants.BLACKOUT_VAR_PREFIX) && variableMap.containsKey(ch)) 
 				blackFlag = Integer.valueOf(value.getValue().toString());
 				if(blackFlag==1)
 				{
