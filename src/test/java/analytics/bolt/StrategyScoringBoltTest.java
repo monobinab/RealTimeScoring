@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import junit.framework.Assert;
 import analytics.MockOutputCollector;
 import analytics.MockTopologyContext;
 import analytics.StormTestUtils;
@@ -16,6 +17,7 @@ import analytics.util.SystemPropertyUtility;
 import analytics.util.objects.Change;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.tuple.Tuple;
+
 import org.apache.commons.configuration.ConfigurationException;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -23,6 +25,8 @@ import org.junit.Test;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
 
 
 public class StrategyScoringBoltTest {
@@ -36,8 +40,9 @@ public class StrategyScoringBoltTest {
 			InvocationTargetException, ParseException, ConfigurationException, SecurityException, NoSuchFieldException {
 			
 		SystemPropertyUtility.setSystemProperty();
-		db = SystemPropertyUtility.getDb();
 		fakeMongoStaticCollection = new FakeMongoStaticCollection();
+		db = SystemPropertyUtility.getDb();
+		
 	}
 	
 	@Test
@@ -47,7 +52,7 @@ public class StrategyScoringBoltTest {
 		//fake memberVariables collection
 		DBCollection memVarColl = db.getCollection("memberVariables");
 		memVarColl.insert(new BasicDBObject("l_id", l_id).append("15", 1));
-		
+	
 		//fake changedMemberVariables collection
 		DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -60,23 +65,34 @@ public class StrategyScoringBoltTest {
 						expected.getExpirationDateAsString()).append("f",
 						expected.getEffectiveDateAsString())));
 		
+		//fake changedMemberVariables collection
+		DBCollection changedMemberScoreColl = db.getCollection("changedMemberScores");
+		
 		StrategyScoringBolt boltUnderTest = new StrategyScoringBolt(System.getProperty("rtseprod"));
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("BOOST_DC_VAR", "10000.0");
 		String varObjString = (String) JsonUtils.createJsonFromStringObjectMap(map);
-		Tuple tuple = StormTestUtils.mockTuple(l_id, varObjString, "DC", "testingLoyaltyId");
+		Tuple tuple = StormTestUtils.mockTuple("testingLid", varObjString, "DC", "testingLoyaltyId");
 		
 		TopologyContext context = new MockTopologyContext();
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
 		
 		boltUnderTest.prepare(SystemPropertyUtility.getStormConf(), context, outputCollector);
 		
-		/*DBObject obj = memVarColl.findOne(new BasicDBObject("l_id", l_id));
-		System.out.println(obj);*/
 		boltUnderTest.execute(tuple);
 		List<Object> outputTuple = outputCollector.getTuple().get("score_stream");
-		System.out.println(outputTuple.get(0));
-		System.out.println(outputTuple.get(1));
+	
+		DBObject changedMemScoreObj = null;
+		DBCursor updatedMemScoreColl = changedMemberScoreColl.find();
+		while(updatedMemScoreColl.hasNext()){
+			changedMemScoreObj = updatedMemScoreColl.next();
+		}
+		
+		//updated collections testing
+		Assert.assertEquals("testingLid", changedMemScoreObj.get("l_id"));
+		
+		//tuple emitted in outputcollector testing
+		Assert.assertEquals(1.0, outputTuple.get(1));
 	}
 
 }

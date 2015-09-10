@@ -1,5 +1,10 @@
 package analytics.util;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
+import analytics.util.objects.Change;
+
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
@@ -8,6 +13,21 @@ import com.mongodb.DBCollection;
 public class FakeMongoStaticCollection {
 	static DBCollection varColl;
 	static DBCollection modelVarCollection;
+	static DBCollection memberVarsColl;
+	static DBCollection changedMemberVarsColl;
+	
+	public static DBCollection getMemberVarsColl() {
+		return memberVarsColl;
+	}
+	public static void setMemberVarsColl(DBCollection memberVarsColl) {
+		FakeMongoStaticCollection.memberVarsColl = memberVarsColl;
+	}
+	public static DBCollection getChangedMemberVarsColl() {
+		return changedMemberVarsColl;
+	}
+	public static void setChangedMemberVarsColl(DBCollection changedMemberVarsColl) {
+		FakeMongoStaticCollection.changedMemberVarsColl = changedMemberVarsColl;
+	}
 	public DBCollection getVarColl() {
 		return varColl;
 	}
@@ -22,7 +42,7 @@ public class FakeMongoStaticCollection {
 	}
 	static Boolean flag = false;
 	static DB db;
-	public FakeMongoStaticCollection(){
+	public FakeMongoStaticCollection() throws ParseException{
 		
 		if(!flag == true){
 		SystemPropertyUtility.setSystemProperty();
@@ -73,10 +93,13 @@ public class FakeMongoStaticCollection {
 		BasicDBList dbList6 = new BasicDBList();
 		dbList6.add(new BasicDBObject("name", "BOOST_DC_VAR").append("coefficient", 0.015).append("intercept", 0.0));
 		modeVarColl.insert(new BasicDBObject("modelId", 65).append("modelName", "Model_Name6").append("modelDescription", "Electronics").append("constant", 5).append("month", 0).append("variable", dbList6));
+	
 			
 		setVarColl(varColl);
 		setModelVarCollection(modeVarColl);
-		
+		/*setMemberVarsColl(memVarColl);
+		setChangedMemberVarsColl(changedMemberVar);
+		*/
 		flag = true;
 		}
 	}

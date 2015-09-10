@@ -74,9 +74,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void execute(Tuple input) {
-		DBObject obj = coll.findOne(new BasicDBObject("l_id", "testingLid"));
-	  	System.out.println(obj);
-			
+					
 		if(LOGGER.isDebugEnabled()){
 			LOGGER.debug("The time it enters inside Strategy Bolt execute method "	+ System.currentTimeMillis());
 		}
