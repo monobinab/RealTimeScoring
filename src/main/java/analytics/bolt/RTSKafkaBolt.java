@@ -27,11 +27,13 @@ public class RTSKafkaBolt extends EnvironmentBolt {
 	private static final String KAFKA_MSG="message";
 	private OutputCollector outputCollector;
 	private String currentTopic;
+	private KafkaUtil kafkaUtil;
 	//private String env;
 
 	public RTSKafkaBolt(String environment, String topic){
 		super(environment);
 		this.currentTopic = topic;
+
 		//env = environment;		
 	}
 
@@ -42,11 +44,10 @@ public class RTSKafkaBolt extends EnvironmentBolt {
 	public void execute(Tuple input) {
 		if (input.contains(KAFKA_MSG)) {
 			String message = input.getStringByField(KAFKA_MSG);
-
 			if (message != null && !"".equals(message)) {
 				try {
 					
-					KafkaUtil.sendKafkaMSGs(message, currentTopic);
+					kafkaUtil.sendKafkaMSGs(message, currentTopic);
 				//	System.out.println("MSG SENT");
 				} catch (ConfigurationException e) {
 					LOGGER.error(e.getMessage(), e);
@@ -72,7 +73,7 @@ public class RTSKafkaBolt extends EnvironmentBolt {
 			OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
 		this.outputCollector = collector;
-		KafkaUtil.initiateKafkaProperties(System.getProperty(MongoNameConstants.IS_PROD));
+		kafkaUtil= new KafkaUtil(System.getProperty(MongoNameConstants.IS_PROD));
 		LOGGER.info("RTSKafkaBolt Preparing to Launch");
 	}
 

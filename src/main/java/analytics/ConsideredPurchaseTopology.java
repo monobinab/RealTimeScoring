@@ -31,13 +31,15 @@ public class ConsideredPurchaseTopology {
 			System.exit(0);
 		}
 		
-		//String kafkaTopic="rts_cp_membertags";
-		String kafkaTopic="stormtopic";
+		String kafkaTopic="rts_cp_membertags";
+		String zkroot="cpsTopic";
+		//String kafkaTopic="stormtopic";
 		String env = System.getProperty(MongoNameConstants.IS_PROD);
 		TopologyBuilder topologyBuilder = new TopologyBuilder();		
 				
 		try {
-			topologyBuilder.setSpout("CPKafkaSpout", new RTSKafkaSpout(KafkaUtil.getSpoutConfig(env, kafkaTopic)), 1);
+			topologyBuilder.setSpout("CPKafkaSpout", new RTSKafkaSpout(new KafkaUtil(env).getSpoutConfig(kafkaTopic,zkroot)), 1);
+			LOGGER.info("CPS Topology listening to kafka topic : " + kafkaTopic);
 		} catch (ConfigurationException e) {
 			LOGGER.error(e.getClass() + ": " + e.getMessage(), e);
 			System.exit(0);	

@@ -19,7 +19,7 @@ import backtype.storm.tuple.Tuple;
 
 public class CPProcessingBolt extends EnvironmentBolt  {
 	private static final long serialVersionUID = 1L;
-	private static final String api_Key_Param="CPS";
+	private static final String api_Key_Param="email";
 	private static final Logger LOGGER = LoggerFactory.getLogger(CPProcessingBolt.class);
 	private OutputCollector outputCollector;
 	private RTSAPICaller rtsApiCaller;

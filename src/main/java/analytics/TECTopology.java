@@ -43,6 +43,7 @@ public class TECTopology {
 			System.exit(0);
 		}
 		String kafkaTopic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;
+		String zkroot="tecTopic";
 		String env = System.getProperty(MongoNameConstants.IS_PROD);
 		TopologyBuilder builder = new TopologyBuilder();		
 				
@@ -51,10 +52,8 @@ public class TECTopology {
 		try {
 			builder.setSpout(
 					"RTSKafkaSpout",
-					new RTSKafkaSpout(KafkaUtil.getSpoutConfig(
-							
-							System.getProperty(MongoNameConstants.IS_PROD),
-							kafkaTopic)), 1);
+					new RTSKafkaSpout(new KafkaUtil(System.getProperty(MongoNameConstants.IS_PROD)).getSpoutConfig(
+							kafkaTopic,zkroot)), 1);
 		} catch (ConfigurationException e1) {
 			// TODO Auto-generated catch block
 			LOGGER.error(e1.getClass() + ": " + e1.getMessage(), e1);

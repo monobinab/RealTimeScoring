@@ -996,12 +996,21 @@ public class ScoringSingletonTest {
 
 		monthModelMap.put(0, new Model(35, "Model_Name", 0, 5,
 				variablesMap));
-		Map<Integer, Map<Integer, Model>> modelsMapContentBoost = new HashMap<Integer, Map<Integer, Model>>();
-		modelsMapContentBoost.put(35, monthModelMap);
+		Map<Integer, Map<Integer, Model>> modelsMapContentBlackout = new HashMap<Integer, Map<Integer, Model>>();
+		modelsMapContentBlackout.put(35, monthModelMap);
+		
+		List<Integer> modelLists = new ArrayList<Integer>();
+		modelLists.add(35);
+		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
+		variableModelsMapContents.put("BLACKOUT_HA_COOK", modelLists);
+	
+		Field variableModelsMap = ScoringSingleton.class.getDeclaredField("variableModelsMap");
+		variableModelsMap.setAccessible(true);
+		variableModelsMap.set(scoringSingletonObj, variableModelsMapContents);
 
 		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
 		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContentBoost);
+		modelsMap.set(scoringSingletonObj, modelsMapContentBlackout);
 		Boolean value = scoringSingletonObj.isBlackOutModel(allChanges, 35);
 		Assert.assertEquals(Boolean.TRUE, value);
 		modelsMap.setAccessible(false);

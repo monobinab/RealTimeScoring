@@ -92,7 +92,9 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	
 			MemberRTSChanges memberRTSChanges = scoringSingleton.calcRTSChanges(lId, newChangesVarValueMap, null, source);
 			
-			if(memberRTSChanges == null){
+			
+			if(memberRTSChanges == null || memberRTSChanges.getChangedMemberScoreList() == null || memberRTSChanges.getChangedMemberScoreList().isEmpty()){
+				redisCountIncr("failure");
 				outputCollector.ack(input);
 				return;
 			}
@@ -108,7 +110,9 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			//Persisting to Redis to be retrieved quicker than getting from Mongo.
 			//Perform the below operation only when the Redis is configured
 			//Long timeBefore = System.currentTimeMillis();
-			if(host!=null){
+			
+			//check for map
+			if(host!=null && !modelIdScoreStringMap.isEmpty()){
 				jedis = new Jedis(host, port, 1800);
 				jedis.connect();
 				jedis.hmset("RTS:Telluride:"+lId, modelIdScoreStringMap);
@@ -125,6 +129,8 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 				scoringSingleton.updateChangedMemberScore(lId, changedMemberScoresList, source);
 	      	
 	      	//emitting to logging bolt
+			
+			//null check
 	      	for(ChangedMemberScore changedMemberScore : changedMemberScoresList){
 	      		List<Object> listToEmit = new ArrayList<Object>();
 				listToEmit.add(lId);
