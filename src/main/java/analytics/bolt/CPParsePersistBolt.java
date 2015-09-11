@@ -31,7 +31,7 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = LoggerFactory
-			.getLogger(ParsingBoltOccassion.class);
+			.getLogger(CPParsePersistBolt.class);
 	private OutputCollector outputCollector;
 	private TagMetadataDao tagsMetaDataDao;
 	private TagResponsysActiveDao tagResponsysActiveDao;
@@ -126,7 +126,7 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 				
 		} catch (Exception e) {
 			e.printStackTrace();
-			LOGGER.error("exception in parsing: " + e.getMessage() + "   "+ e);
+			LOGGER.error("CPParsePersistBolt: exception in parsing: " + e.getMessage() + "   "+ e);
 		
 		} 
 		// LOGGER.info("TIME:" + messageID + "-Exiting ParsingboltOccasion-" +
