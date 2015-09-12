@@ -33,7 +33,7 @@ public class ConsideredPurchaseTopology {
 		}
 		
 		String kafkaTopic="rts_cp_membertags";
-		String zkroot="cpsTopic";
+		String zkroot="rts_cp_Topic";
 		//String kafkaTopic="stormtopic";
 		String env = System.getProperty(MongoNameConstants.IS_PROD);
 		TopologyBuilder topologyBuilder = new TopologyBuilder();		
@@ -41,8 +41,8 @@ public class ConsideredPurchaseTopology {
 		try {
 			SpoutConfig spoutConfig = null;
 			spoutConfig = new KafkaUtil(env).getSpoutConfig(kafkaTopic,zkroot);
-			spoutConfig.forceFromStart = true; //TODO - this needs to be removed.
-			spoutConfig.startOffsetTime = kafka.api.OffsetRequest.EarliestTime();
+			//spoutConfig.forceFromStart = true; //TODO - this needs to be removed.
+			//spoutConfig.startOffsetTime = kafka.api.OffsetRequest.EarliestTime();
 			topologyBuilder.setSpout("CPKafkaSpout", new RTSKafkaSpout(spoutConfig), 1);
 			LOGGER.info("CPS Topology listening to kafka topic : " + kafkaTopic);
 		} catch (ConfigurationException e) {
