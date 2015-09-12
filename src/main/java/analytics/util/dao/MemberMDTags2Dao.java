@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,6 +94,7 @@ public class MemberMDTags2Dao extends AbstractDao {
 	public void addMemberMDTags(String l_id, List<String> tags) {
 		
 		Date dNow = new Date( );
+		Date newDate = DateUtils.addMonths(new Date(), 6);
 		SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd");
 		
 		BasicDBObject query = new BasicDBObject();
@@ -119,7 +121,7 @@ public class MemberMDTags2Dao extends AbstractDao {
 						newObj = new BasicDBObject();
 						newObj.append("t", tag);
 						newObj.append("f", ft.format(dNow));
-						newObj.append("e", ft.format(dNow));
+						newObj.append("e", ft.format(newDate));
 						newMdTagsList.add(newObj);
 					}
 				}
@@ -130,7 +132,7 @@ public class MemberMDTags2Dao extends AbstractDao {
 				newObj = new BasicDBObject();
 				newObj.append("t", tag);
 				newObj.append("f", ft.format(dNow));
-				newObj.append("e", ft.format(dNow));
+				newObj.append("e", ft.format(newDate));
 				newMdTagsList.add(newObj);
 			}
 		}
