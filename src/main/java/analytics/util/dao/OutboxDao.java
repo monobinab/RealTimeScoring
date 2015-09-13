@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import analytics.exception.RealTimeScoringException;
 import analytics.util.Constants;
@@ -15,7 +17,8 @@ import analytics.util.objects.OccasionInfo;
 import analytics.util.objects.TagMetadata;
 
 public class OutboxDao extends AbstractMySQLDao{
-	
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(OutboxDao.class);
 	public List<EmailPackage> getQueuedEmailPackages(String lyl_id_no, List<OccasionInfo> occasionsInfo) throws RealTimeScoringException {
 		// This method returns all pending emails from the outbox
 		List<EmailPackage>emlPackageList = new ArrayList<EmailPackage>();
@@ -75,15 +78,49 @@ public class OutboxDao extends AbstractMySQLDao{
 				statement.setString(4, emlPack.getMdTagMetaData().getMdTag());
 				statement.setString(5, emlPack.getMdTagMetaData().getPurchaseOccasion());
 				statement.setTimestamp(6, new java.sql.Timestamp(Calendar.getInstance().getTimeInMillis()));
-				statement.setDate(7,  new java.sql.Date(emlPack.getSendDate().getTime()));
+				if(emlPack.getSendDate()!=null){
+					statement.setDate(7,  new java.sql.Date(emlPack.getSendDate().getTime()));
+				}
+				else
+					LOGGER.error("Send date is set to null for memberid: " + emlPack.getMemberId());
 				statement.setString(8, emlPack.getStatus().toString());
 				if(emlPack.getMemberInfo()!=null){
-					statement.setString(9, emlPack.getMemberInfo().getEid());
-					statement.setString(10, emlPack.getMemberInfo().getSrs_opt_in());
-					statement.setString(11, emlPack.getMemberInfo().getKmt_opt_in());
-					statement.setString(12, emlPack.getMemberInfo().getSyw_opt_in());
+					if(emlPack.getMemberInfo().getEid()!=null){
+						statement.setString(9, emlPack.getMemberInfo().getEid());
+					}
+					else
+					{
+						LOGGER.error("emlPack.getMemberInfo().getEid() is set to null for memberid: " + emlPack.getMemberId() + "EID is saved as empty string to outbox.");
+						statement.setString(9, "");
+					}
+					if(emlPack.getMemberInfo().getSrs_opt_in()!=null){
+						statement.setString(10, emlPack.getMemberInfo().getSrs_opt_in());
+					}
+					else
+					{
+						LOGGER.error("emlPack.getMemberInfo().getSrs_opt_in() is set to null for memberid: " + emlPack.getMemberId() + "Srs_opt_in is saved as empty string to outbox.");
+						statement.setString(10, "");
+					}
+					if(emlPack.getMemberInfo().getKmt_opt_in()!=null){
+						statement.setString(11, emlPack.getMemberInfo().getKmt_opt_in());
+					}
+					else
+					{
+						LOGGER.error("emlPack.getMemberInfo().getKmt_opt_in() is set to null for memberid: " + emlPack.getMemberId() + "Kmt_opt_in is saved as empty string to outbox.");
+						statement.setString(11, "");
+					}
+					if(emlPack.getMemberInfo().getSyw_opt_in()!=null){
+						statement.setString(12, emlPack.getMemberInfo().getSyw_opt_in());
+					}
+					else
+					{
+						LOGGER.error("emlPack.getMemberInfo().getSyw_opt_in() is set to null for memberid: " + emlPack.getMemberId() + "Syw_opt_in is saved as empty string to outbox.");
+						statement.setString(12, "");
+					}					
+					
 				}
 				else{
+					LOGGER.error("emlPack.getMemberInfo() is set to null for memberid: " + emlPack.getMemberId() + "Fields of memberInfo are saved as empty strings to outbox.");
 					statement.setString(9, "");
 					statement.setString(10,"");
 					statement.setString(11, "");
