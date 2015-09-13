@@ -13,7 +13,9 @@ import analytics.MockTopologyContext;
 import analytics.StormTestUtils;
 import analytics.util.FakeMongoStaticCollection;
 import analytics.util.JsonUtils;
+import analytics.util.StubJedisFactory;
 import analytics.util.SystemPropertyUtility;
+import analytics.util.jedis.JedisFactoryStubImpl;
 import analytics.util.objects.Change;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.tuple.Tuple;
@@ -22,6 +24,9 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import redis.clients.jedis.Jedis;
+
+import com.fiftyonred.mock_jedis.MockJedis;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -68,7 +73,9 @@ public class StrategyScoringBoltTest {
 		//fake changedMemberVariables collection
 		DBCollection changedMemberScoreColl = db.getCollection("changedMemberScores");
 		
-		StrategyScoringBolt boltUnderTest = new StrategyScoringBolt(System.getProperty("rtseprod"));
+		StrategyScoringBolt boltUnderTest = new StrategyScoringBolt(System.getProperty("rtseprod"), "0.0.0.0", 6379, "0.0.0.0", 6379 );
+	
+		boltUnderTest.setJedisInterface(new JedisFactoryStubImpl());
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("BOOST_DC_VAR", "10000.0");
 		String varObjString = (String) JsonUtils.createJsonFromStringObjectMap(map);
@@ -76,6 +83,7 @@ public class StrategyScoringBoltTest {
 		
 		TopologyContext context = new MockTopologyContext();
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
+		
 		
 		boltUnderTest.prepare(SystemPropertyUtility.getStormConf(), context, outputCollector);
 		
