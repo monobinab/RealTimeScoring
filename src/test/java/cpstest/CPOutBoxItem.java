@@ -1,5 +1,8 @@
 package cpstest;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class CPOutBoxItem {
 	int email_pkg_id;
 	String loy_id, bu, sub_bu, md_tag, occasion_name;
@@ -8,6 +11,14 @@ public class CPOutBoxItem {
 	int status;
 	String cust_event_name, customer_id, sears_opt_in, kmart_opt_in,
 			syw_opt_in;
+    List mdTagList=new ArrayList();
+	public List getMdTagList() {
+		return mdTagList;
+	}
+
+	public void setMdTagList(List mdTagList) {
+		this.mdTagList = mdTagList;
+	}
 
 	public int getEmail_pkg_id() {
 		return email_pkg_id;
