@@ -76,6 +76,7 @@ public class StrategyScoringBoltTest {
 		StrategyScoringBolt boltUnderTest = new StrategyScoringBolt(System.getProperty("rtseprod"), "0.0.0.0", 6379, "0.0.0.0", 6379 );
 	
 		boltUnderTest.setJedisInterface(new JedisFactoryStubImpl());
+		
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("BOOST_DC_VAR", "10000.0");
 		String varObjString = (String) JsonUtils.createJsonFromStringObjectMap(map);
