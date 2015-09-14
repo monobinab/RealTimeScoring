@@ -68,10 +68,10 @@ public class CPProcessingBolt extends EnvironmentBolt  {
 					outputCollector.ack(input);
 				}					
 			} catch (SQLException e){
-				LOGGER.error("SQLException Occured in CPProcessingBolt :: ", e);
+				LOGGER.error("SQLException Occured in CPProcessingBolt :: " + e.getMessage()+ "  SATCKTRACE : "+ e.getStackTrace());
 				outputCollector.fail(input);					
 			} catch (Exception e){
-				LOGGER.error("Exception Occured in CPProcessingBolt :: ", e);
+				LOGGER.error("Exception Occured in CPProcessingBolt :: " +  e.getMessage()+ "  SATCKTRACE : "+ e.getStackTrace());
 				outputCollector.fail(input);	
 			}
 				

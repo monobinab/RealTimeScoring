@@ -4,6 +4,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import storm.kafka.SpoutConfig;
 import analytics.bolt.CPParsePersistBolt;
 import analytics.bolt.ParsingBoltOccassion;
 import analytics.bolt.CPProcessingBolt;
@@ -32,13 +33,17 @@ public class ConsideredPurchaseTopology {
 		}
 		
 		String kafkaTopic="rts_cp_membertags";
-		String zkroot="cpsTopic";
+		String zkroot="rts_cp_Topic";
 		//String kafkaTopic="stormtopic";
 		String env = System.getProperty(MongoNameConstants.IS_PROD);
 		TopologyBuilder topologyBuilder = new TopologyBuilder();		
 				
 		try {
-			topologyBuilder.setSpout("CPKafkaSpout", new RTSKafkaSpout(new KafkaUtil(env).getSpoutConfig(kafkaTopic,zkroot)), 1);
+			SpoutConfig spoutConfig = null;
+			spoutConfig = new KafkaUtil(env).getSpoutConfig(kafkaTopic,zkroot);
+			//spoutConfig.forceFromStart = true; //TODO - this needs to be removed.
+			//spoutConfig.startOffsetTime = kafka.api.OffsetRequest.EarliestTime();
+			topologyBuilder.setSpout("CPKafkaSpout", new RTSKafkaSpout(spoutConfig), 1);
 			LOGGER.info("CPS Topology listening to kafka topic : " + kafkaTopic);
 		} catch (ConfigurationException e) {
 			LOGGER.error(e.getClass() + ": " + e.getMessage(), e);
