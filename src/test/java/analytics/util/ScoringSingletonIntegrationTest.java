@@ -93,7 +93,7 @@ public class ScoringSingletonIntegrationTest {
 		BasicDBList dbList6 = new BasicDBList();
 		dbList6.add(new BasicDBObject("name", "variable40").append("coefficient", 0.015));
 		dbList6.add(new BasicDBObject("name", "variable4").append("coefficient", 0.015));
-		modeVarColl.insert(new BasicDBObject("modelId", 65).append("modelName", "Model_Name6").append("modelDescription", "Home Appliances2").append("constant", 5).append("month", 0).append("variable", dbList5));
+		modeVarColl.insert(new BasicDBObject("modelId", 65).append("modelName", "Model_Name6").append("modelDescription", "Home Appliances2").append("constant", 5).append("month", 0).append("variable", dbList6));
 		
 		//fake regionalFactors collection
 		DBCollection regionalAdjFactorsColl = db.getCollection("regionalAdjustmentFactors");
