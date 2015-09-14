@@ -11,12 +11,16 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 
 
 
 
+
+
+import java.util.Map;
 
 import org.apache.commons.configuration.ConfigurationException;
 
@@ -26,22 +30,16 @@ import analytics.util.dao.CPOutBoxDAO;
 
 public class CPSUtil {
 
-	public void processFile(String filename, String testPhase) {
+	public void processFile(String presetFile, String testFile, String verifyFile) {
 		FileReader fileReader = null;
-		String currentTopic = "rts_cp_membertags";
+		String currentTopic = "stormtopic";
 		String outputFile = "C:\\CPTest\\testresults_"+System.currentTimeMillis()+".txt";
 		File result =new File(outputFile);
-		try {
-			fileReader = new FileReader(filename);
-		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
-			System.exit(0);
-		}
-		BufferedReader buffReader = new BufferedReader(fileReader);
-		int count = 0;
-		String line = new String();
 		PrintWriter printWriter = null;
-		if ("VERIFY".equalsIgnoreCase(testPhase))
+		Map<String, List<CPOutBoxItem>> presetMap=loadFile(presetFile, "PRESET");
+		Map<String, List<CPOutBoxItem>> testMap=loadFile(testFile, "TEST");
+		Map<String, List<CPOutBoxItem>> verifyMap=loadFile(verifyFile, "VERIFY");
+		
 			try {
 				printWriter = new PrintWriter(result, "UTF-8");
 			} catch (FileNotFoundException e) {
@@ -49,70 +47,126 @@ public class CPSUtil {
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}
-		try {
-			while ((line = buffReader.readLine()) != null) {
-				count++;
+				
+		for (List<CPOutBoxItem> presetList: presetMap.values())
+		{
+			try {
+				//PRESET
+
+				System.out.println(presetList.size());
+				String loyID=presetList.get(0).getLoy_id();
+				for (CPOutBoxItem cpItem: presetList )
+				{
+					new CPOutBoxDAO().insertRow(cpItem);
+								
+				}
+				// TEST
+				if(!testMap.containsKey(loyID))
+					break;
+				List<CPOutBoxItem> testList=testMap.get(loyID);
+				
+				CPOutBoxItem testItem=testList.get(0);
+				String kafkaMSG = createJson(testItem.getLoy_id(),
+						testItem.getMdTagList());
 				try {
-					CPOutBoxItem cpOutBoxItem = parseLine(line, testPhase);
-					List<String> mdTags = new ArrayList<String>();
-					if ("PRESET".equalsIgnoreCase(testPhase)) {
-						// Insert entry to the database
-						new CPOutBoxDAO().insertRow(cpOutBoxItem);
-
-					} else if ("TEST".equalsIgnoreCase(testPhase)) {
-						//create a json and push to kafka topic
-						mdTags.add(cpOutBoxItem.getMd_tag());
-						String kafkaMSG = createJson(cpOutBoxItem.getLoy_id(),
-								mdTags);
-						new KafkaUtil("PROD").sendKafkaMSGs(kafkaMSG, currentTopic);
-
-					} else if ("VERIFY".equalsIgnoreCase(testPhase)) {
-						//Compare the input data with the one in database to determine success or failure
-						cpOutBoxItem.setStatus(0);
-						CPOutBoxItem queuedItem = new CPOutBoxDAO()
-								.getQueuedItem(cpOutBoxItem.getLoy_id(),
-										cpOutBoxItem.getMd_tag(),
-										cpOutBoxItem.getStatus());
-						String testresult = null;
-						if (queuedItem.getSend_date().equalsIgnoreCase(
-								cpOutBoxItem.getSend_date())) {
-							testresult = "success:" + cpOutBoxItem.getLoy_id()
-									+ ", " + cpOutBoxItem.getMd_tag() + ", "
-									+ cpOutBoxItem.getSend_date() + "";
-						} else {
-
-							testresult = "failure:" + cpOutBoxItem.getLoy_id()
-									+ ", " + cpOutBoxItem.getMd_tag() + ", "
-									+ cpOutBoxItem.getSend_date() + " vs "
-									+ queuedItem.getSend_date();
-						}
-
-						printWriter.println(testresult);
-						printWriter.flush();
-
-					}
-
-				} catch (ConfigurationException ce) {
-					System.err.println("Failed to send messages to Kafka ");
-					ce.printStackTrace();
-				} catch (Exception e) {
-					System.err.println("Exception in processFile "+e.getMessage());
+					new KafkaUtil("PROD").sendKafkaMSGs(kafkaMSG, currentTopic);
+				} catch (ConfigurationException e) {
+					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				
+				//VERIFY
+				
+				if(!verifyMap.containsKey(loyID))
+					break;
+				//Compare the input data with the one in database to determine success or failure
+				// In case of hyphen, the row should not be there in the outbox
+				List<CPOutBoxItem> verifyList=verifyMap.get(loyID);
+				
+				for (CPOutBoxItem verifyItem: verifyList )
+				{
+					//new CPOutBoxDAO().insertRow(cpItem);
+					verifyItem.setStatus(0);
+					CPOutBoxItem queuedItem = new CPOutBoxDAO()
+					.getQueuedItem(verifyItem.getLoy_id(),
+							verifyItem.getMd_tag(),
+							verifyItem.getStatus());
+					
+					String testresult = null;
+					if(queuedItem!=null)
+					{	if (queuedItem.getSend_date().equalsIgnoreCase(
+							verifyItem.getSend_date())) {
+						testresult = "success:" + verifyItem.getLoy_id()
+								+ ", " + verifyItem.getMd_tag() + ", "
+								+ verifyItem.getSend_date() + "";
+					} else {
 
-			}
+						testresult = "failure:" + verifyItem.getLoy_id()
+								+ ", " + verifyItem.getMd_tag() + ", "
+								+ verifyItem.getSend_date() + " vs queued entry :"
+								+ queuedItem.getSend_date();
+					}
+					}
+					else
+					{
+						testresult = "failure: The item is not queued " + verifyItem.getLoy_id()
+								+ ", " + verifyItem.getMd_tag() + ", "
+								+ verifyItem.getSend_date() ;
+					}
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (printWriter != null) {
-				printWriter.close();
-			}
+					printWriter.println(testresult);
+					printWriter.flush();
+					
+								
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}		
+			
+			
+			
 		}
+		
+	}
 
-		System.out.println("Test phase is " + testPhase + " and Total count: "
-				+ count);
-
+	private Map<String,List <CPOutBoxItem>> loadFile(String filename, String testPhase) {
+		FileReader fileReader = null;
+		Map<String, List <CPOutBoxItem>> fileMap = new HashMap<String,List <CPOutBoxItem>>();
+		String line = new String();
+		try {
+			fileReader = new FileReader(filename);
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+			System.exit(0);
+		}
+		BufferedReader buffReader = new BufferedReader(fileReader);	
+		
+		try {
+			while ((line = buffReader.readLine()) != null) {
+				
+				CPOutBoxItem cpOutBoxItem = parseLine(line, testPhase);
+				if(fileMap.containsKey(cpOutBoxItem.getLoy_id()))
+				{
+					List<CPOutBoxItem> existingList=fileMap.get(cpOutBoxItem.getLoy_id());
+					existingList.add(cpOutBoxItem);
+					
+				}
+				else{
+					List<CPOutBoxItem> newList= new ArrayList<CPOutBoxItem>();
+					newList.add(cpOutBoxItem);
+				fileMap.put(cpOutBoxItem.getLoy_id(), newList);
+				}
+				
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+				
+		// TODO Auto-generated method stub
+		return fileMap;
 	}
 
 	private CPOutBoxItem parseLine(String line, String testPhase) {
@@ -124,20 +178,39 @@ public class CPSUtil {
 		CPOutBoxItem cpBoxItem = new CPOutBoxItem();
 		String[] variables = line.split(",");
 		if (variables.length > 0) {
+			    //******  Combine all tags for the test part and send it as a single JSON object
+			if("TEST".equalsIgnoreCase(testPhase))
+			{
 				cpBoxItem.setLoy_id(variables[0]);
+				for(int i=1;i<variables.length;i++)
+				{
+					cpBoxItem.getMdTagList().add(variables[i]);
+				}
+				
+			}
+			else {	cpBoxItem.setLoy_id(variables[0]);
 				cpBoxItem.setMd_tag(variables[1]);
 			// Variable 2 need to be mapped
 			if ("PRESET".equalsIgnoreCase(testPhase)) {
 				// Member number,Existing Tag,Effective Date,Send Date,Sent flag
-				String sendDT=getDate(Integer.parseInt(variables[3]));
+				String sendDT=null;
+				if(variables.length>3)
+				sendDT=getDate(Integer.parseInt(variables[3]));
 				cpBoxItem.setSend_date(sendDT);
+				if(variables.length>4)
 				cpBoxItem.setStatus(Integer.parseInt(variables[4]));
 
 			} else if ("VERIFY".equalsIgnoreCase(testPhase)) {
 				// Member number,Incoming tags,Send Date
+				if(variables.length>2)
+				if(variables[2].trim().equalsIgnoreCase("-"))
+					cpBoxItem.setSend_date(null);
+				else{
 				String sendDT=getDate(Integer.parseInt(variables[2]));
 				cpBoxItem.setSend_date(sendDT);
+				}
 
+			}
 			}
 		}
 		return cpBoxItem;
