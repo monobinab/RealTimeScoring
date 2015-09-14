@@ -272,8 +272,7 @@ public class ScoringSingleton {
 		Set<String> filteredVariables = new HashSet<String>();
 		
 		for (Integer modelId : modelIdList) {
-			try{
-				Map<String, Variable> variables = getModelVariables(modelId);
+			Map<String, Variable> variables = getModelVariables(modelId);
 				if(variables == null){
 					LOGGER.error("variables is null for the modelId " + modelId);
 					continue;
@@ -286,10 +285,7 @@ public class ScoringSingleton {
 						}
 				}
 			}
-			catch(Exception e){
-				LOGGER.error("Exception in createMemberVariableValueMap method ", e);
-			}
-		}
+			
 		return memberVariablesDao.getMemberVariablesFiltered(loyaltyId, filteredVariables);
 	}
 
