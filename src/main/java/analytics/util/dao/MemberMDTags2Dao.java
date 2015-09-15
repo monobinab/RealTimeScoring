@@ -114,17 +114,18 @@ public class MemberMDTags2Dao extends AbstractDao {
 			for(String tag : tags){
 				//Check if the Tag is already there in the document.
 				//If yes, retain the effective and expiration dates. Else create a new sub-document
+
 				newObj = isTagExists(tag, mdTagsList);
 				if(newObj!=null)
 					newMdTagsList.add(newObj);
 				else{
-						newObj = new BasicDBObject();
-						newObj.append("t", tag);
-						newObj.append("f", ft.format(dNow));
-						newObj.append("e", ft.format(newDate));
-						newMdTagsList.add(newObj);
-					}
-				}
+					newObj = new BasicDBObject();
+					newObj.append("t", tag);
+					newObj.append("f", ft.format(dNow));
+					newObj.append("e", ft.format(newDate));
+					newMdTagsList.add(newObj);
+				}							
+			}
 		}
 		//If there is NO document in the Collection for that Lid
 		else{
@@ -139,7 +140,8 @@ public class MemberMDTags2Dao extends AbstractDao {
 	
 		DBObject tagstoUpdate = new BasicDBObject();
 		tagstoUpdate.put("l_id", l_id);
-		tagstoUpdate.put("tags", newMdTagsList);
+		if(newMdTagsList!=null && newMdTagsList.size()>0)
+			tagstoUpdate.put("tags", newMdTagsList);
 		if(rtsTagsList!=null && rtsTagsList.size()>0)
 			tagstoUpdate.put("rtsTags", rtsTagsList);
 		LOGGER.info("tags are getting updated in " +  memberMDTagsCollection.getDB().getName());
@@ -147,15 +149,18 @@ public class MemberMDTags2Dao extends AbstractDao {
 				MongoNameConstants.L_ID, l_id), tagstoUpdate, true, false);
 	}
 
-	private BasicDBObject isTagExists(String tag, BasicDBList mdTagsList){
+	private BasicDBObject isTagExists(String tag, BasicDBList tagsList){
 		
 		BasicDBObject obj = null;
-		for (Object tagObj : mdTagsList) {
-			BasicDBObject obj1 = (BasicDBObject) tagObj;
-			if(obj1.containsValue(tag)){
-				return obj1;
+		if(tagsList != null && tagsList.size()>0){
+			for (Object tagObj : tagsList) {
+				BasicDBObject obj1 = (BasicDBObject) tagObj;
+				if(obj1.containsValue(tag)){
+					return obj1;
+				}
 			}
 		}
+		
 		return obj;
 	}
 	
@@ -205,7 +210,8 @@ public void addRtsMemberTags(String l_id, List<String> tags) {
 	
 		DBObject tagstoUpdate = new BasicDBObject();
 		tagstoUpdate.put("l_id", l_id);
-		tagstoUpdate.put("rtsTags", newRtsTagsList);
+		if(newRtsTagsList!=null && newRtsTagsList.size()>0)
+			tagstoUpdate.put("rtsTags", newRtsTagsList);
 		if(mdTagsList!=null && mdTagsList.size()>0)
 			tagstoUpdate.put("tags", mdTagsList);
 		LOGGER.info("tags are getting updated in " +  memberMDTagsCollection.getDB().getName());
@@ -247,8 +253,7 @@ private void updateTags(String l_id, List<String> tagsToBeRemoved, DBObject doc,
 		if(tagObjToBeDeleted!=null) {				
 			rtsTagsList.remove(tagObjToBeDeleted);
 		}
-	}
-	
+	}	
 
 	DBObject tagstoUpdate = new BasicDBObject();
 	tagstoUpdate.put("l_id", l_id);

@@ -1,6 +1,7 @@
 package analytics;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,17 +42,15 @@ public class ConsideredPurchaseTopology {
 		try {
 			SpoutConfig spoutConfig = null;
 			spoutConfig = new KafkaUtil(env).getSpoutConfig(kafkaTopic,zkroot);
-			//spoutConfig.forceFromStart = true; //TODO - this needs to be removed.
-			//spoutConfig.startOffsetTime = kafka.api.OffsetRequest.EarliestTime();
 			topologyBuilder.setSpout("CPKafkaSpout", new RTSKafkaSpout(spoutConfig), 1);
 			LOGGER.info("CPS Topology listening to kafka topic : " + kafkaTopic);
 		} catch (ConfigurationException e) {
-			LOGGER.error(e.getClass() + ": " + e.getMessage(), e);
+			LOGGER.error(e.getClass() + ": " + e.getMessage() +" STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 			System.exit(0);	
 		}	
 		
-		topologyBuilder.setBolt("CPParsePersistBolt", new CPParsePersistBolt(env), 1).shuffleGrouping("CPKafkaSpout");	
-		topologyBuilder.setBolt("CPProcessingBolt", new CPProcessingBolt(env),1).localOrShuffleGrouping("CPParsePersistBolt");
+		topologyBuilder.setBolt("CPParsePersistBolt", new CPParsePersistBolt(env), 15).shuffleGrouping("CPKafkaSpout");	
+		topologyBuilder.setBolt("CPProcessingBolt", new CPProcessingBolt(env),15).localOrShuffleGrouping("CPParsePersistBolt");
 		
 		Config conf = new Config();
 		conf.put("metrics_topology", "CPS");
@@ -61,9 +60,9 @@ public class ConsideredPurchaseTopology {
 			try {
 				StormSubmitter.submitTopology(args[0], conf, topologyBuilder.createTopology());
 			} catch (AlreadyAliveException e) {
-				LOGGER.error(e.getClass() + ": " + e.getMessage(), e);
+				LOGGER.error(e.getClass() + ": " + e.getMessage() +" STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 			} catch (InvalidTopologyException e) {
-				LOGGER.error(e.getClass() + ": " + e.getMessage(), e);
+				LOGGER.error(e.getClass() + ": " + e.getMessage() +" STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 			}
 		} else {
 			conf.setDebug(false);

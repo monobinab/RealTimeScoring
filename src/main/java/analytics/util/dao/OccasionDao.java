@@ -20,7 +20,7 @@ public class OccasionDao extends AbstractMongoDao{
 	private static OccasionDao occasionDao;
 	
 	private OccasionDao() {
-		super("server2_2");
+		super();
 		try {
 			occasionInfos = this.getOccasionsInfo();
 		} catch (RealTimeScoringException e) {
@@ -37,7 +37,7 @@ public class OccasionDao extends AbstractMongoDao{
 	
 	public List<OccasionInfo> getOccasionsInfo() throws RealTimeScoringException{
 		List<OccasionInfo> occasionInfos = new ArrayList<OccasionInfo>();
-		occasionInfoCollection = db.getCollection("cps_occasions");
+		occasionInfoCollection = db.getCollection("cpsOccasions");
 		if(occasionInfoCollection != null){
 			DBCursor cursor = occasionInfoCollection.find();
 			cursor.sort(new BasicDBObject("priority", 1));

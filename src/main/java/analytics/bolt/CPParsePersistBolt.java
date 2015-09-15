@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +57,7 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 	@Override
 	public void execute(Tuple input) {
 		
-		redisCountIncr("CPParsePersistBolt_input_count");	
+		redisCountIncr("input_count");	
 		
 		try {
 			
@@ -65,12 +66,10 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 				messageID = input.getStringByField("messageID");
 				LOGGER.info("messageID = " + messageID);
 			}
-			LOGGER.debug("TIME:" + messageID + "-Entering CPParsePersistBolt-"
+			LOGGER.debug("TIME:" + messageID + "- Entering CPParsePersistBolt-"
 					+ System.currentTimeMillis());
 			
 			LOGGER.info("Message Being Received " + input.getString(0));
-			redisCountIncr("incoming_tuples");
-			
 			JsonParser parser = new JsonParser();
 			JsonElement jsonElement = null;
 			jsonElement = getParsedJson(input, parser);
@@ -103,9 +102,9 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 				if(filteredTagsList != null && filteredTagsList.size()>0)
 					memberMDTags2Dao.addMemberMDTags(l_id, filteredTagsList);				
 			}
-			else{
+			if(tagsList != null && tagsList.size()==0){
 				memberMDTags2Dao.deleteMemberMDTags(l_id);
-				LOGGER.info("PERSIST OCCASION DELETE: " + l_id);
+				LOGGER.info("PERSIST: OCCASION DELETE: " + l_id);
 			}
 
 
@@ -118,15 +117,15 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 			}
 			else{
 				LOGGER.info("PERSIST: No Tags found for lyl_id_no " + lyl_id_no);
-				countMetric.scope("no_lyl_id_no").incr();
 			}
 			
-			redisCountIncr("CPParsePersistBolt_output_count");	
+			redisCountIncr("output_count");	
 				
 				
-		} catch (Exception e) {
-			e.printStackTrace();
-			LOGGER.error("CPParsePersistBolt: exception in parsing: " +  e.getMessage()+ "  SATCKTRACE : "+ e.getStackTrace());
+		} catch (Exception e) {			
+			LOGGER.error("CPParsePersistBolt: exception in parsing: " +  e.getMessage()+ "  SATCKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
+			redisCountIncr("exception_count");	
+			outputCollector.fail(input);
 		
 		} 
 		// LOGGER.info("TIME:" + messageID + "-Exiting ParsingboltOccasion-" +

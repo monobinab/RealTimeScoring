@@ -44,6 +44,20 @@ public class KafkaUtil {
 
 	}
 
+	public SpoutConfig getSpoutConfig(String topic, String zkroot,String groupId)
+			throws ConfigurationException {
+		SpoutConfig spoutConfig = null;
+		BrokerHosts hosts = new ZkHosts(kafkaProperties.getString(ZOOKEEPER));
+		//String kafka_id = kafkaProperties.getString(KAFKA_ID);
+		spoutConfig = new SpoutConfig(hosts, topic, "/" + zkroot, groupId);
+		spoutConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
+		// Temporary test change to see if multiple consumers work
+		//spoutConfig.forceFromStart = true;
+		spoutConfig.startOffsetTime = kafka.api.OffsetRequest.LatestTime();
+		return spoutConfig;
+
+	}
+
 	public SpoutConfig getSpoutConfig(String topic, String zkroot)
 			throws ConfigurationException {
 		SpoutConfig spoutConfig = null;
@@ -57,7 +71,6 @@ public class KafkaUtil {
 		return spoutConfig;
 
 	}
-
 	public void sendKafkaMSGs(String message, String currentTopic)
 			throws ConfigurationException {
 
