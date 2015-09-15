@@ -236,25 +236,90 @@ public class CPSFilerTest {
 	public void testDecideSendDatesWhenNoOccasionInProgress() throws SQLException, RealTimeScoringException{
 		SimpleDateFormat sdformat = new SimpleDateFormat("MM/dd/yyyy");
 		emailPackages = new ArrayList<EmailPackage>();
-		memberInfo = new MemberInfo("hiBSAglnyr3kI6kYrBXHmMy5WPE=","N","AZ","N","N","N");	
-		
-		tagMetadata = new TagMetadata("HADHS123600153010","Home Appliance","Sears Dishwasher","Duress","HADHS",91.0,"Y","", 1, 8,30);	
-		emailPackage = new EmailPackage("7081103948483127",tagMetadata);
-		emailPackage.setCustEventNm("RTS_Duress");
+		memberInfo = new MemberInfo("13551883","Y","NJ","Y","N","Y");	
+		//{"lyl_id_no":"7081010070442369","tags":["CECAS723600153010","CELPS823600153010","CETVS723600153010",
+		                                        //"HALAS823600153010","HMMTS723600153010","LGSWS823600153010",
+												//"ODGRS823600153010","SPFTS823600153010","SPGMS823600153010",
+												//"TLHTS823600153010","TLPTS823600153010","TLTSS823600153010"]}
+		tagMetadata = new TagMetadata("CECAS723600153010","Electronics","Sears Camera","Replace_by_age","CECAS",91.0,"Y","", 7, 3,30);	
+		emailPackage = new EmailPackage("7081010070442369",tagMetadata);
+		emailPackage.setCustEventNm("RTS_Browse");
 		emailPackage.setMemberInfo(memberInfo);		
 		emailPackages.add(emailPackage);
 		
-		tagMetadata = new TagMetadata("HAGAS2610072010","Home Appliance","Sears appliance","Replacement","HAGAS",81.0,"Y","",2, 8, 30);
-		emailPackage = new EmailPackage("7081103948483127",tagMetadata);
+	/*	tagMetadata = new TagMetadata("CELPS823600153010","Electronics","Sears Laptop","Top 5% of MSM","CELPS",81.0,"Y","",8, 3, 30);
+		emailPackage = new EmailPackage("7081010070442369",tagMetadata);
+		emailPackage.setCustEventNm("RTS_Unknown");
+		emailPackage.setMemberInfo(memberInfo);	
+		emailPackages.add(emailPackage);*/
+		
+		tagMetadata = new TagMetadata("CETVS723600153010","Electronics","Sears Television","Replace_by_age","CETVS",81.0,"Y","", 7, 3,30);
+		emailPackage = new EmailPackage("7081010070442369",tagMetadata);
 		emailPackage.setCustEventNm("RTS_Replacement");
 		emailPackage.setMemberInfo(memberInfo);	
 		emailPackages.add(emailPackage);
 	
+		/*tagMetadata = new TagMetadata("HALAS823600153010","Home Appliance","Sears Laundry","Top 5% of MSM","HALAS",81.0,"Y","",8, 3, 30);
+		emailPackage = new EmailPackage("7081010070442369",tagMetadata);
+		emailPackage.setCustEventNm("RTS_Unknown");
+		emailPackage.setMemberInfo(memberInfo);	
+		emailPackages.add(emailPackage);
+		*/
+		tagMetadata = new TagMetadata("HMMTS723600153010","Home-Big Tickets","Sears Mattress","Replace_by_age","HMMTS",81.0,"Y","", 7, 3,30);
+		emailPackage = new EmailPackage("7081010070442369",tagMetadata);
+		emailPackage.setCustEventNm("RTS_Replacement");
+		emailPackage.setMemberInfo(memberInfo);	
+		emailPackages.add(emailPackage);
+		
+		/*tagMetadata = new TagMetadata("LGSWS823600153010","Lawn & Garden","Sears Snowblower","Top 5% of MSM","LGSWS",81.0,"Y","",8, 3, 30);
+		emailPackage = new EmailPackage("7081010070442369",tagMetadata);
+		emailPackage.setCustEventNm("RTS_Unknown");
+		emailPackage.setMemberInfo(memberInfo);	
+		emailPackages.add(emailPackage);*/
+		
+		/*tagMetadata = new TagMetadata("ODGRS823600153010","outdoor Living","Sears Grill","Top 5% of MSM","ODGRS",81.0,"Y","",8, 3, 30);
+		emailPackage = new EmailPackage("7081010070442369",tagMetadata);
+		emailPackage.setCustEventNm("RTS_Unknown");
+		emailPackage.setMemberInfo(memberInfo);	
+		emailPackages.add(emailPackage);
+		*/
+		/*tagMetadata = new TagMetadata("SPFTS823600153010","Sporting Goods","Sears Fitness","Top 5% of MSM","SPFTS",81.0,"Y","",8, 3, 30);
+		emailPackage = new EmailPackage("7081010070442369",tagMetadata);
+		emailPackage.setCustEventNm("RTS_Unknown");
+		emailPackage.setMemberInfo(memberInfo);	
+		emailPackages.add(emailPackage);
+		*/
+		/*tagMetadata = new TagMetadata("SPGMS823600153010","Sporting Goods","Sears Gameroom","Top 5% of MSM","SPGMS",81.0,"Y","",8, 3, 30);
+		emailPackage = new EmailPackage("7081010070442369",tagMetadata);
+		emailPackage.setCustEventNm("RTS_Unknown");
+		emailPackage.setMemberInfo(memberInfo);	
+		emailPackages.add(emailPackage);
+		*/
+		/*tagMetadata = new TagMetadata("TLHTS823600153010","Tools","Sears Hand tools","Top 5% of MSM","TLHTS",81.0,"Y","",8, 3, 30);
+		emailPackage = new EmailPackage("7081010070442369",tagMetadata);
+		emailPackage.setCustEventNm("RTS_Unknown");
+		emailPackage.setMemberInfo(memberInfo);	
+		emailPackages.add(emailPackage);
+		*/
+		/*tagMetadata = new TagMetadata("TLPTS823600153010","Tools","Sears Power Tools","Top 5% of MSM","TLPTS",81.0,"Y","",8, 3, 30);
+		emailPackage = new EmailPackage("7081010070442369",tagMetadata);
+		emailPackage.setCustEventNm("RTS_Unknown");
+		emailPackage.setMemberInfo(memberInfo);	
+		emailPackages.add(emailPackage);
+		*/
+	
+	/*	tagMetadata = new TagMetadata("TLTSS823600153010","Tools","Sears Tool Storage","Top 5% of MSM","TLTSS",81.0,"Y","",8, 3, 30);
+		emailPackage = new EmailPackage("7081010070442369",tagMetadata);
+		emailPackage.setCustEventNm("RTS_Unknown");
+		emailPackage.setMemberInfo(memberInfo);	
+		emailPackages.add(emailPackage);
+		*/
 		List<EmailPackage> retEmailPackages = cpsFiler.decideSendDates(emailPackages,null);
 		Assert.assertNotNull(retEmailPackages);
-		assertEquals(retEmailPackages.size(),2);
+		assertEquals(retEmailPackages.size(),3);
 		assertEquals(sdformat.format(retEmailPackages.get(0).getSendDate()),sdformat.format(Calendar.getInstance().getTime()));
-		assertEquals(sdformat.format(retEmailPackages.get(1).getSendDate()),sdformat.format(new DateTime(retEmailPackages.get(0).getSendDate()).plusDays(8).toDate()));			
+		assertEquals(sdformat.format(retEmailPackages.get(1).getSendDate()),sdformat.format(new DateTime(retEmailPackages.get(0).getSendDate()).plusDays(3).toDate()));	
+		assertEquals(sdformat.format(retEmailPackages.get(2).getSendDate()),sdformat.format(new DateTime(retEmailPackages.get(1).getSendDate()).plusDays(3).toDate()));			
 		
 	}
 	
@@ -643,6 +708,144 @@ public class CPSFilerTest {
 		}
 		
 	}
+	
+	
+		@Test
+		public void testPrepareEmailPackages1() throws JSONException, SQLException, RealTimeScoringException{
+			 sdformat = new SimpleDateFormat("MM/dd/yyyy");
+			 memberInfo = new MemberInfo("13551883","Y","NJ","Y","N","Y");
+			//String resp = "{\"status\":\"success\", \"statusCode\":\"200\", \"memberId\":\"7081035007675781\", \"lastUpdated\":\"2015-07-17 18:40:06\", \"scoresInfo\":[{\"modelId\":\"61\", \"modelName\":\"S_SCR_TV\", \"format\":\"Sears\", \"category\":\"TV Model\", \"tag\":\"0000\",\"mdTag\":\"CETVS823600153010\",\"occassion\":\"Top 5% of MSM\",\"subBusinessUnit\":\"Sears Television\",\"businessUnit\":\"Electronics\",\"scoreDate\":\"2015-08-18\",\"score\":0.002288 ,\"percentile\":95, \"rank\":1},{\"modelId\":\"28\", \"modelName\":\"S_SCR_CE_CAMERA\", \"format\":\"Sears\", \"category\":\"Consumer Electronics - camera\", \"tag\":\"0000\",\"businessUnit\":\"Electronics\",\"scoreDate\":\"2015-08-18\",\"mdTag\":\"CECAS823600153010\",\"occassion\":\"Top 5% of MSM\",\"subBusinessUnit\":\"Sears Camera\",\"score\":0.0005054076 ,\"percentile\":100, \"rank\":2}]}";
+			String resp = "{\"status\":\"success\", \"statusCode\":\"200\", \"memberId\":\"7081010070442369\", \"lastUpdated\":\"2015-09-13 14:28:03\", \"scoresInfo\":[{\"modelId\":\"61\", \"modelName\":\"S_SCR_TV\", \"format\":\"Sears\", \"category\":\"TV Model\", \"tag\":\"0000\",\"mdTag\":\"CETVS723600153010\",\"occassion\":\"Browse\",\"subBusinessUnit\":\"Sears Television\",\"businessUnit\":\"Electronics\",\"scoreDate\":\"2015-09-12\",\"score\":0.0049554 ,\"percentile\":99, \"rank\":1},{\"modelId\":\"53\", \"modelName\":\"S_SCR_MATTRESS\", \"format\":\"Sears\", \"category\":\"Mattress Model\", \"tag\":\"0132\",\"mdTag\":\"HMMTS723600153010\",\"occassion\":\"Browse\",\"subBusinessUnit\":\"Sears Mattress\",\"businessUnit\":\"Home-Big Tickets\",\"scoreDate\":\"2015-09-12\",\"score\":0.0003313 ,\"percentile\":79, \"rank\":2},{\"modelId\":\"28\", \"modelName\":\"S_SCR_CE_CAMERA\", \"format\":\"Sears\", \"category\":\"Consumer Electronics - camera\", \"tag\":\"0000\",\"subBusinessUnit\":\"Sears Camera\",\"businessUnit\":\"Electronics\",\"scoreDate\":\"2015-09-12\",\"mdTag\":\"CECAS723600153010\",\"occassion\":\"Browse\",\"score\":0.0017315591 ,\"percentile\":100, \"rank\":3},{\"modelId\":\"30\", \"modelName\":\"S_SCR_FIT_EQUIP\", \"format\":\"Sears\", \"category\":\"Fitness Equipment Model\", \"tag\":\"0138\",\"businessUnit\":\"Sporting Goods\",\"scoreDate\":\"2015-09-12\",\"mdTag\":\"SPFTS823600153010\",\"occassion\":\"Top 5% of MSM\",\"subBusinessUnit\":\"Sears Fitness\",\"score\":0.4128320604 ,\"percentile\":100, \"rank\":4},{\"modelId\":\"76\", \"modelName\":\"S_SCR_LG_SNOW_BLOWER\", \"format\":\"Sears\", \"category\":\"Lawn & Garden - snow blower\", \"tag\":\"0148\",\"businessUnit\":\"Lawn & Garden\",\"scoreDate\":\"2015-09-12\",\"mdTag\":\"LGSWS823600153010\",\"occassion\":\"Top 5% of MSM\",\"subBusinessUnit\":\"Sears Snowblower\",\"score\":0.1097999375 ,\"percentile\":100, \"rank\":5},{\"modelId\":\"39\", \"modelName\":\"S_SCR_HAND_TOOLS\", \"format\":\"Sears\", \"category\":\"Hand Tools\", \"tag\":\"0252\",\"subBusinessUnit\":\"Sears Hand tools\",\"businessUnit\":\"Tools\",\"scoreDate\":\"2015-09-12\",\"mdTag\":\"TLHTS823600153010\",\"occassion\":\"Top 5% of MSM\",\"score\":0.2427226745 ,\"percentile\":100, \"rank\":6},{\"modelId\":\"63\", \"modelName\":\"S_SCR_WASH_DRY\", \"format\":\"Sears\", \"category\":\"Washer/Dryer Model\", \"tag\":\"0099\",\"mdTag\":\"HALAS823600153010\",\"occassion\":\"Top 5% of MSM\",\"subBusinessUnit\":\"Sears Laundry\",\"businessUnit\":\"Home Appliance\",\"scoreDate\":\"2015-09-12\",\"score\":0.0049481 ,\"percentile\":99, \"rank\":7},{\"modelId\":\"56\", \"modelName\":\"S_SCR_POWER_TOOLS\", \"format\":\"Sears\", \"category\":\"Power Tools Model\", \"tag\":\"0140\",\"occassion\":\"Top 5% of MSM\",\"subBusinessUnit\":\"Sears Power Tools\",\"businessUnit\":\"Tools\",\"scoreDate\":\"2015-09-12\",\"mdTag\":\"TLPTS823600153010\",\"score\":0.026339435 ,\"percentile\":100, \"rank\":8},{\"modelId\":\"58\", \"modelName\":\"S_SCR_TOOL_STRG\", \"format\":\"Sears\", \"category\":\"Tool storage\", \"tag\":\"0186\",\"mdTag\":\"TLTSS823600153010\",\"occassion\":\"Top 5% of MSM\",\"subBusinessUnit\":\"Sears Tool Storage\",\"businessUnit\":\"Tools\",\"scoreDate\":\"2015-09-12\",\"score\":0.0093385 ,\"percentile\":100, \"rank\":9},{\"modelId\":\"54\", \"modelName\":\"S_SCR_OD_GRILL\", \"format\":\"Sears\", \"category\":\"Grill\", \"tag\":\"0251\",\"businessUnit\":\"outdoor Living\",\"scoreDate\":\"2015-09-12\",\"mdTag\":\"ODGRS823600153010\",\"occassion\":\"Top 5% of MSM\",\"subBusinessUnit\":\"Sears Grill\",\"score\":0.0014657085 ,\"percentile\":100, \"rank\":10},{\"modelId\":\"29\", \"modelName\":\"S_SCR_CE_LAPTOP\", \"format\":\"Sears\", \"category\":\"Consumer Electronics - laptop\", \"tag\":\"0000\",\"mdTag\":\"CELPS823600153010\",\"occassion\":\"Top 5% of MSM\",\"subBusinessUnit\":\"Sears Laptop\",\"businessUnit\":\"Electronics\",\"scoreDate\":\"2015-09-12\",\"score\":0.0009827 ,\"percentile\":100, \"rank\":11},{\"modelId\":\"74\", \"modelName\":\"S_SCR_GAME_ROOM\", \"format\":\"Sears\", \"category\":\"Game Room\", \"tag\":\"0000\",\"occassion\":\"Top 5% of MSM\",\"subBusinessUnit\":\"Sears Gameroom\",\"businessUnit\":\"Sporting Goods\",\"scoreDate\":\"2015-09-12\",\"mdTag\":\"SPGMS823600153010\",\"score\":0.0006694 ,\"percentile\":99, \"rank\":12},{\"modelId\":\"34\", \"modelName\":\"S_SCR_HA_ALL\", \"format\":\"Sears\", \"category\":\"Home Appliance\", \"tag\":\"0208\",\"score\":0.1016076054 ,\"percentile\":100, \"rank\":13},{\"modelId\":\"51\", \"modelName\":\"S_SCR_LG_TRIM_EDG\", \"format\":\"Sears\", \"category\":\"Trimmer Model\", \"tag\":\"0161\",\"score\":0.2598379892 ,\"percentile\":100, \"rank\":14},{\"modelId\":\"62\", \"modelName\":\"S_SCR_WAPP\", \"format\":\"Sears\", \"category\":\"Womens Apparel\", \"tag\":\"0126\",\"score\":0.6453446403 ,\"percentile\":100, \"rank\":15},{\"modelId\":\"44\", \"modelName\":\"S_SCR_KAPP\", \"format\":\"Sears\", \"category\":\"Kids apparel\", \"tag\":\"0122\",\"score\":0.3151331 ,\"percentile\":100, \"rank\":16},{\"modelId\":\"52\", \"modelName\":\"S_SCR_MAPP\", \"format\":\"Sears\", \"category\":\"Mens apparel\", \"tag\":\"0124\",\"score\":0.2157557 ,\"percentile\":100, \"rank\":17},{\"modelId\":\"21\", \"modelName\":\"S_SCR_ALL_APP\", \"format\":\"Sears\", \"category\":\"Apparel\", \"tag\":\"0145\",\"score\":0.4596802 ,\"percentile\":100, \"rank\":18},{\"modelId\":\"27\", \"modelName\":\"S_SCR_CE\", \"format\":\"Sears\", \"category\":\"Consumer Electronics\", \"tag\":\"0127\",\"score\":0.3432151309 ,\"percentile\":100, \"rank\":19},{\"modelId\":\"59\", \"modelName\":\"S_SCR_TOOLS\", \"format\":\"Sears\", \"category\":\"Tools\", \"tag\":\"0143\",\"score\":0.2582408343 ,\"percentile\":100, \"rank\":20}]}";		
+		
+			when(memberInfoDao.getMemberInfo(anyString())).thenReturn(memberInfo);
+			when(occasionDao.getOccasionsInfo()).thenReturn(occasionInfos);
+			when(occasionDao.getOccasionInfo("Duress")).thenReturn(this.getOccasionInfo("Duress"));
+			when(occasionDao.getOccasionInfo("Replacement")).thenReturn(this.getOccasionInfo("Replacement"));
+			when(occasionDao.getOccasionInfo("Browse")).thenReturn(this.getOccasionInfo("Browse"));
+			when(occasionDao.getOccasionInfo("Pre-move")).thenReturn(this.getOccasionInfo("Pre-move"));
+			when(occasionDao.getOccasionInfo("Post-move")).thenReturn(this.getOccasionInfo("Post-move"));
+			when(occasionDao.getOccasionInfo("Remodel")).thenReturn(this.getOccasionInfo("Remodel"));
+			when(occasionDao.getOccasionInfo("Replace_by_age")).thenReturn(this.getOccasionInfo("Replace_by_age"));
+			when(occasionDao.getOccasionInfo("Top 5% of MSM")).thenReturn(this.getOccasionInfo("Top 5% of MSM"));
+			
+			
+			/*List<EmailPackage> validemails = new ArrayList<EmailPackage>();
+			emailPackages = new ArrayList<EmailPackage>();
+			tagMetadata = new TagMetadata("HARFS111700153010","Home Appliance","Sears Refrigerator","Duress","HARFS",100.0,"Y","", 1, 8,30);		
+			emailPackage = new EmailPackage("7081057547176153",tagMetadata);
+			emailPackage.setSendDate(new DateTime().toDate());
+			validemails.add(emailPackage);
+			tagMetadata = new TagMetadata("CETVS623600153010","Electronics","Sears Television","Replace_by_age","CETVS",94.0,"Y","", 7, 3,30);		
+			emailPackage = new EmailPackage("7081057547176153",tagMetadata);
+			emailPackage.setSendDate(new DateTime().plusDays(8).toDate());
+			validemails.add(emailPackage);
+			tagMetadata = new TagMetadata("CECAS623600153010","Electronics","Sears Camera","Replace_by_age","CECAS",100.0,"Y","", 7, 3,30);		
+			emailPackage = new EmailPackage("7081057547176153",tagMetadata);
+			emailPackage.setSendDate(new DateTime().plusDays(11).toDate());
+			validemails.add(emailPackage);*/
+			
+			emailPackages = new ArrayList<EmailPackage>();
+				
+			//{"lyl_id_no":"7081010070442369","tags":["CECAS723600153010","CELPS823600153010","CETVS723600153010",
+			                                        //"HALAS823600153010","HMMTS723600153010","LGSWS823600153010",
+													//"ODGRS823600153010","SPFTS823600153010","SPGMS823600153010",
+													//"TLHTS823600153010","TLPTS823600153010","TLTSS823600153010"]}
+			
+			
+		/*	tagMetadata = new TagMetadata("CELPS823600153010","Electronics","Sears Laptop","Top 5% of MSM","CELPS",81.0,"Y","",8, 3, 30);
+			emailPackage = new EmailPackage("7081010070442369",tagMetadata);
+			emailPackage.setCustEventNm("RTS_Unknown");
+			emailPackage.setMemberInfo(memberInfo);	
+			emailPackages.add(emailPackage);*/
+			
+			tagMetadata = new TagMetadata("CETVS723600153010","Electronics","Sears Television","Browse","CETVS",81.0,"Y","", 6, 8,30);
+			emailPackage = new EmailPackage("7081010070442369",tagMetadata);
+			emailPackage.setCustEventNm("RTS_Browse");
+			emailPackage.setMemberInfo(memberInfo);	
+			emailPackage.setSendDate(new DateTime().toDate());
+			emailPackages.add(emailPackage);
+			
+			tagMetadata = new TagMetadata("HMMTS723600153010","Home-Big Tickets","Sears Mattress","Browse","HMMTS",81.0,"Y","", 6, 8,30);
+			emailPackage = new EmailPackage("7081010070442369",tagMetadata);
+			emailPackage.setCustEventNm("RTS_Browse");
+			emailPackage.setMemberInfo(memberInfo);	
+			emailPackage.setSendDate(new DateTime().plusDays(8).toDate());
+			emailPackages.add(emailPackage);
+			
+			tagMetadata = new TagMetadata("CECAS723600153010","Electronics","Sears Camera","Browse","CECAS",91.0,"Y","",6, 8,30);	
+			emailPackage = new EmailPackage("7081010070442369",tagMetadata);
+			emailPackage.setCustEventNm("RTS_Browse");
+			emailPackage.setMemberInfo(memberInfo);	
+			emailPackage.setSendDate(new DateTime().plusDays(16).toDate());
+			emailPackages.add(emailPackage);
+		
+			/*tagMetadata = new TagMetadata("HALAS823600153010","Home Appliance","Sears Laundry","Top 5% of MSM","HALAS",81.0,"Y","",8, 3, 30);
+			emailPackage = new EmailPackage("7081010070442369",tagMetadata);
+			emailPackage.setCustEventNm("RTS_Unknown");
+			emailPackage.setMemberInfo(memberInfo);	
+			emailPackages.add(emailPackage);
+			*/
+		
+			
+			/*tagMetadata = new TagMetadata("LGSWS823600153010","Lawn & Garden","Sears Snowblower","Top 5% of MSM","LGSWS",81.0,"Y","",8, 3, 30);
+			emailPackage = new EmailPackage("7081010070442369",tagMetadata);
+			emailPackage.setCustEventNm("RTS_Unknown");
+			emailPackage.setMemberInfo(memberInfo);	
+			emailPackages.add(emailPackage);*/
+			
+			/*tagMetadata = new TagMetadata("ODGRS823600153010","outdoor Living","Sears Grill","Top 5% of MSM","ODGRS",81.0,"Y","",8, 3, 30);
+			emailPackage = new EmailPackage("7081010070442369",tagMetadata);
+			emailPackage.setCustEventNm("RTS_Unknown");
+			emailPackage.setMemberInfo(memberInfo);	
+			emailPackages.add(emailPackage);
+			*/
+			/*tagMetadata = new TagMetadata("SPFTS823600153010","Sporting Goods","Sears Fitness","Top 5% of MSM","SPFTS",81.0,"Y","",8, 3, 30);
+			emailPackage = new EmailPackage("7081010070442369",tagMetadata);
+			emailPackage.setCustEventNm("RTS_Unknown");
+			emailPackage.setMemberInfo(memberInfo);	
+			emailPackages.add(emailPackage);
+			*/
+			/*tagMetadata = new TagMetadata("SPGMS823600153010","Sporting Goods","Sears Gameroom","Top 5% of MSM","SPGMS",81.0,"Y","",8, 3, 30);
+			emailPackage = new EmailPackage("7081010070442369",tagMetadata);
+			emailPackage.setCustEventNm("RTS_Unknown");
+			emailPackage.setMemberInfo(memberInfo);	
+			emailPackages.add(emailPackage);
+			*/
+			/*tagMetadata = new TagMetadata("TLHTS823600153010","Tools","Sears Hand tools","Top 5% of MSM","TLHTS",81.0,"Y","",8, 3, 30);
+			emailPackage = new EmailPackage("7081010070442369",tagMetadata);
+			emailPackage.setCustEventNm("RTS_Unknown");
+			emailPackage.setMemberInfo(memberInfo);	
+			emailPackages.add(emailPackage);
+			*/
+			/*tagMetadata = new TagMetadata("TLPTS823600153010","Tools","Sears Power Tools","Top 5% of MSM","TLPTS",81.0,"Y","",8, 3, 30);
+			emailPackage = new EmailPackage("7081010070442369",tagMetadata);
+			emailPackage.setCustEventNm("RTS_Unknown");
+			emailPackage.setMemberInfo(memberInfo);	
+			emailPackages.add(emailPackage);
+			*/
+		
+		/*	tagMetadata = new TagMetadata("TLTSS823600153010","Tools","Sears Tool Storage","Top 5% of MSM","TLTSS",81.0,"Y","",8, 3, 30);
+			emailPackage = new EmailPackage("7081010070442369",tagMetadata);
+			emailPackage.setCustEventNm("RTS_Unknown");
+			emailPackage.setMemberInfo(memberInfo);	
+			emailPackages.add(emailPackage);
+			*/
+			
+			OutboxDao spy = spy(new OutboxDao());
+			doNothing().when(spy).deleteQueuedEmailPackages(anyString());
+			EmailPackage inProgressEmailPackage = null;
+			List<EmailPackage> queuedEmailPackages = new ArrayList<EmailPackage>();
+			when(outboxDao.getInProgressPackage("7081010070442369", occasionInfos)).thenReturn(inProgressEmailPackage);
+			when(spy.getQueuedEmailPackages("7081010070442369", occasionInfos)).thenReturn(queuedEmailPackages);
+			List<EmailPackage> retEmailPackages = cpsFiler.prepareEmailPackages(resp, "7081010070442369","iTdmURpMBx+gx+PZ5LzSAk0D78A=");
+			
+			Assert.assertNotNull(retEmailPackages);
+			Assert.assertEquals(retEmailPackages.size(), 3);
+			for(int i=0; i<retEmailPackages.size(); i++){
+				assertEquals(sdformat.format(retEmailPackages.get(i).getSendDate()), sdformat.format(emailPackages.get(i).getSendDate()));				
+			}
+			
+		}
 	
 	private OccasionInfo getOccasionInfo(String occ){
 		if(occasionInfos != null && occasionInfos.size() > 0){

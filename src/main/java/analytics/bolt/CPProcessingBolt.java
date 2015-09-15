@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +40,7 @@ public class CPProcessingBolt extends EnvironmentBolt  {
 		try {
 			cpsFiler.initDAO();
 		} catch (RealTimeScoringException e) {
-			LOGGER.error("Exception Occured in CPProcessingBolt Prepare :: ", e);
+			LOGGER.error("Exception Occured in CPProcessingBolt Prepare :: ", ExceptionUtils.getFullStackTrace(e));
 		}
 	}
 
@@ -48,8 +49,6 @@ public class CPProcessingBolt extends EnvironmentBolt  {
 		redisCountIncr("CPProcessingBolt_input_count");
 		String lyl_id_no = null; 
 		String l_id = null; 
-		countMetric.scope("entering_CPProcessing_bolt").incr();		
-		//LOGGER.info("cps input contains message : " + lyl_id_no );
 			
 		if(input != null && input.contains("lyl_id_no"))
 		{
@@ -65,13 +64,16 @@ public class CPProcessingBolt extends EnvironmentBolt  {
 				{
 					cpsFiler.fileEmailPackages(emailPackages);
 					LOGGER.info("PERSIST: Queued Tags in CPS Outbox for lyl_id_no " + lyl_id_no+ " : "+getLogMsg(emailPackages));
+					redisCountIncr("queued_tags_count");
 					outputCollector.ack(input);
 				}					
 			} catch (SQLException e){
-				LOGGER.error("SQLException Occured in CPProcessingBolt :: " + e.getMessage()+ "  SATCKTRACE : "+ e.getStackTrace());
+				LOGGER.error("SQLException Occured in CPProcessingBolt :: " + e.getMessage()+ "  SATCKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
+				redisCountIncr("SQLException_count");	
 				outputCollector.fail(input);					
 			} catch (Exception e){
-				LOGGER.error("Exception Occured in CPProcessingBolt :: " +  e.getMessage()+ "  SATCKTRACE : "+ e.getStackTrace());
+				LOGGER.error("Exception Occured in CPProcessingBolt :: " +  e.getMessage()+ "  SATCKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
+				redisCountIncr("Exception_count");	
 				outputCollector.fail(input);	
 			}
 				

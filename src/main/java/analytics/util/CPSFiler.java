@@ -253,8 +253,12 @@ public class CPSFiler {
 
 	protected void compareAndDelete(String lyl_id_no, List<EmailPackage> emailPackagesToBeSent, List<EmailPackage> currentPackages) throws SQLException {
 		//if exisitng queue and incoming is same - do nothing.		
-		if(!arePackagesSame(emailPackagesToBeSent, currentPackages))			
-			outboxDao.deleteQueuedEmailPackages(lyl_id_no);				
+		if(!arePackagesSame(emailPackagesToBeSent, currentPackages))	
+		{
+			if(currentPackages.size()>0)
+				outboxDao.deleteQueuedEmailPackages(lyl_id_no);	
+		}
+						
 	}
 
 	protected boolean arePackagesSame(List<EmailPackage> emailPackagesToBeSent,List<EmailPackage> currentPackages) {		

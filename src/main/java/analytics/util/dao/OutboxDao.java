@@ -82,7 +82,7 @@ public class OutboxDao extends AbstractMySQLDao{
 					statement.setDate(7,  new java.sql.Date(emlPack.getSendDate().getTime()));
 				}
 				else
-					LOGGER.error("Send date is set to null for memberid: " + emlPack.getMemberId());
+					LOGGER.error("Send date is set to null for memberid: " + emlPack.getMemberId() + " with mdtag - "+ emlPack.getMdTagMetaData().getMdTag());
 				statement.setString(8, emlPack.getStatus().toString());
 				if(emlPack.getMemberInfo()!=null){
 					if(emlPack.getMemberInfo().getEid()!=null){
@@ -145,7 +145,6 @@ public class OutboxDao extends AbstractMySQLDao{
 		// TODO Auto-generated method stub
 		
 	}
-
 	public java.sql.Date getSentDate(EmailPackage emailPackage) {
 		// TODO Auto-generated method stub
 		return null;
