@@ -102,7 +102,7 @@ public class WebsphereMQSpout extends BaseRichSpout {
 			collector.emit(new Values(transactionXmlString,messageID), transactionXmlString);
 		//	LOGGER.info("incoming xml in spout from MQ: " + transactionXmlString);
 
-			logAllTransaction(transactionXmlString);
+		//	logAllTransaction(transactionXmlString);
 		} catch (JMSException e) {
 			LOGGER.error("Exception occurred while receiving message from queue ", e);
 		}
@@ -121,7 +121,7 @@ public class WebsphereMQSpout extends BaseRichSpout {
 		  return transactionXmlAsString;
 	}
 
-	private void logAllTransaction(String xmlString) {
+	/*private void logAllTransaction(String xmlString) {
 		
 		ProcessTransaction processTransaction = null;
  	    processTransaction = parseXMLAndExtractProcessTransaction(processTransaction, xmlString);
@@ -137,7 +137,7 @@ public class WebsphereMQSpout extends BaseRichSpout {
 	        String earnFlag = (processTransaction.getEarnFlag() != null) ? processTransaction.getEarnFlag() : "NONE";
 	        LOGGER.info("PERSIST: " + memberNumber +", " + pickUpStoreNumber + ", " + tenderStoreNumber +", " + orderStoreNumber + ", " + registerNumber +", " + transactionNumber +", " + transactionTime +", " + requestorId +", " + earnFlag + ", allTransactions in MQspout from MQQueue");
  	    }
-	}
+	}*/
 
 	@Override
 	public void ack(Object msgId) {
@@ -179,7 +179,7 @@ public class WebsphereMQSpout extends BaseRichSpout {
 	        return stringMessage;
 	    }
 	 
-	  private ProcessTransaction parseXMLAndExtractProcessTransaction(ProcessTransaction processTransaction, String transactionXmlAsString) {
+	  /*private ProcessTransaction parseXMLAndExtractProcessTransaction(ProcessTransaction processTransaction, String transactionXmlAsString) {
 	        LOGGER.debug("Parsing MQ message XML");
 	        if ((transactionXmlAsString.contains("<ProcessTransaction") || transactionXmlAsString.contains(":ProcessTransaction")) && !transactionXmlAsString.contains("AnswerTxt")) {
 
@@ -187,7 +187,7 @@ public class WebsphereMQSpout extends BaseRichSpout {
 	                    .parseXMLProcessTransaction(transactionXmlAsString);
 	        }
 	        return processTransaction;
-	  }
+	  }*/
 	/**
 	 * Close connections
 	 * 

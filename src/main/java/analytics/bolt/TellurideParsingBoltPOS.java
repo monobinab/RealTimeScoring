@@ -123,38 +123,34 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
         // AND PUT INTO LINE ITEM CLASS CONTAINER WITH HASHED LOYALTY ID + ALL
         // TRANSACTION LEVEL DATA
         // 5) EMIT LINE ITEMS
-        
-        //this needs to be removed, as we got NPE 
-        if(processTransaction != null && processTransaction.getEarnFlag() == null){
-        	LOGGER.info("LOGGING TO CHECK THE XML WITHOUT EARNFLAG " + transactionXmlAsString);
-        }
-         
-        if (processTransaction != null && processTransaction.getEarnFlag() != null && processTransaction.getEarnFlag().equalsIgnoreCase("E")) {
-        	
-        	redisCountIncr("valid_transactions");
-        	
+        if(processTransaction != null && processTransaction.getEarnFlag() != null ){
+       
         	logTransaction(processTransaction);
-        	
-            lyl_id_no = processTransaction.getMemberNumber();
-
-            if (lyl_id_no == null || StringUtils.isEmpty(lyl_id_no)) {
-                redisCountIncr("empty_lid");
-                outputCollector.ack(input);
-                return;
-            }
-           
-            // 6) HASH LOYALTY ID
-            String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no);
-            
-            // 7)FIND DIVISION #, ITEM #, AMOUNT AND
-            // FIND LINE FROM DIVISION # + ITEM #
-            // AND PUT INTO LINE ITEM CLASS CONTAINER WITH HASHED LOYALTY ID + ALL TRANSACTION LEVEL DATA
-            listLineItemsAndEmit(input, lyl_id_no, processTransaction, messageID, l_id);
-
-        } else {
-            redisCountIncr("empty_xml");
-            outputCollector.ack(input);
-            return;
+	        if ( processTransaction.getEarnFlag().equalsIgnoreCase("E")) {
+	        	
+	        	redisCountIncr("valid_transactions");
+	        	
+	        	lyl_id_no = processTransaction.getMemberNumber();
+	
+	            if (lyl_id_no == null || StringUtils.isEmpty(lyl_id_no)) {
+	                redisCountIncr("empty_lid");
+	                outputCollector.ack(input);
+	                return;
+	            }
+	           
+	            // 6) HASH LOYALTY ID
+	            String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no);
+	            
+	            // 7)FIND DIVISION #, ITEM #, AMOUNT AND
+	            // FIND LINE FROM DIVISION # + ITEM #
+	            // AND PUT INTO LINE ITEM CLASS CONTAINER WITH HASHED LOYALTY ID + ALL TRANSACTION LEVEL DATA
+	            listLineItemsAndEmit(input, lyl_id_no, processTransaction, messageID, l_id);
+	
+	        } else {
+	            redisCountIncr("empty_xml");
+	            outputCollector.ack(input);
+	            return;
+	        }
         }
     }
 
@@ -403,7 +399,7 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
 
     private ProcessTransaction parseXMLAndExtractProcessTransaction(ProcessTransaction processTransaction, String transactionXmlAsString) {
         LOGGER.debug("Parsing MQ message XML");
-        if ((transactionXmlAsString.contains("<ProcessTransaction") || transactionXmlAsString.contains(":ProcessTransaction")) && !transactionXmlAsString.contains("AnswerTxt")) {
+        if ((transactionXmlAsString.contains("<ProcessTransaction") || transactionXmlAsString.contains(":ProcessTransaction")) ) {
 
             processTransaction = XMLParser
                     .parseXMLProcessTransaction(transactionXmlAsString);
