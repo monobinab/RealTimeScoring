@@ -92,9 +92,9 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	
 			MemberRTSChanges memberRTSChanges = scoringSingleton.calcRTSChanges(lId, newChangesVarValueMap, null, source);
 			
-			
+			//memberRTSChanges can never be null as it is instantiated for every exception occurred or no models to be scored
 			if(memberRTSChanges == null || memberRTSChanges.getChangedMemberScoreList() == null || memberRTSChanges.getChangedMemberScoreList().isEmpty()){
-				redisCountIncr("failure");
+				redisCountIncr(memberRTSChanges.getMetricsString());
 				outputCollector.ack(input);
 				return;
 			}

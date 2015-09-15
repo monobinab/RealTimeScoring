@@ -248,22 +248,35 @@ public class ScoringSingleton {
 						 }
 						   catch(RealTimeScoringException e2){
 							   LOGGER.error("Exception scoring modelId " + modelId +" for lId " + lId + " " + e2.getErrorMessage());
+							   memberRTSChanges.setMetricsString("exception_per_model");
 						   }
 						   catch(Exception e){
 							   e.printStackTrace();
 							   LOGGER.error("Exception scoring modelId " + modelId +" for lId " + lId );
+							   memberRTSChanges.setMetricsString("exception_per_model");
+
 						   }
 						}
 							 memberRTSChanges.setlId(lId);
 							 memberRTSChanges.setChangedMemberScoreList(changedMemberScoreList);
 							 memberRTSChanges.setAllChangesMap(allChanges);
 				 	}
+				else{
+					memberRTSChanges = new MemberRTSChanges();
+					memberRTSChanges.setMetricsString("no_member_variables");
+				}
 			 	}	
+			else{
+				memberRTSChanges = new MemberRTSChanges();
+				memberRTSChanges.setMetricsString("no_vars_ofinterest");
+			}
 			}
 		catch(Exception e){
 			e.printStackTrace();
 			LOGGER.error("Exception scoring lId " + e.getMessage() + "cause: " + e.getCause());
 			LOGGER.error(ExceptionUtils.getMessage(e) + "root cause-"+ ExceptionUtils.getRootCauseMessage(e) + ExceptionUtils.getStackTrace(e));
+			memberRTSChanges = new MemberRTSChanges();
+			memberRTSChanges.setMetricsString("exception_per_member");
 		}
 			return memberRTSChanges;
 	}
