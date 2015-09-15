@@ -39,6 +39,8 @@ public class CPSUtil {
 		Map<String, List<CPOutBoxItem>> presetMap=loadFile(presetFile, "PRESET");
 		Map<String, List<CPOutBoxItem>> testMap=loadFile(testFile, "TEST");
 		Map<String, List<CPOutBoxItem>> verifyMap=loadFile(verifyFile, "VERIFY");
+		int successCount=0;
+		int failureCount=0;
 		
 			try {
 				printWriter = new PrintWriter(result, "UTF-8");
@@ -52,29 +54,41 @@ public class CPSUtil {
 		{
 			try {
 				//PRESET
-
+               
 				System.out.println(presetList.size());
 				String loyID=presetList.get(0).getLoy_id();
+				StringBuffer presetBuffer=new StringBuffer();
+				printWriter.println("PRESET OutBox Entries for Loyalty ID: "+loyID);
+				//presetBuffer.append("The Preset values are given below for Loyalty ID: "+loyID+"\n");
 				for (CPOutBoxItem cpItem: presetList )
 				{
 					new CPOutBoxDAO().insertRow(cpItem);
+					printWriter.println("tag:"+cpItem.getMd_tag()+"  Send Date:"+cpItem.getSend_date() +" Sent Flag:"+cpItem.getStatus() );
+					//presetBuffer.append("tag:"+cpItem.getMd_tag()+"  Send Date:"+cpItem.getSend_date() +" Sent Flag:"+cpItem.getStatus()+"/n" );
 								
 				}
+				//printWriter.println(presetBuffer);
 				// TEST
 				if(!testMap.containsKey(loyID))
 					break;
 				List<CPOutBoxItem> testList=testMap.get(loyID);
-				
 				CPOutBoxItem testItem=testList.get(0);
+				for (CPOutBoxItem cptestItem: testList )
+				{
+					testItem.getMdTagList().add(cptestItem.getMd_tag());
+								
+				}
+								
 				String kafkaMSG = createJson(testItem.getLoy_id(),
 						testItem.getMdTagList());
-				try {
-					new KafkaUtil("PROD").sendKafkaMSGs(kafkaMSG, currentTopic);
-				} catch (ConfigurationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 				
+//				try {
+//					new KafkaUtil("PROD").sendKafkaMSGs(kafkaMSG, currentTopic);
+//				} catch (ConfigurationException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//				
 				//VERIFY
 				
 				if(!verifyMap.containsKey(loyID))
@@ -82,7 +96,7 @@ public class CPSUtil {
 				//Compare the input data with the one in database to determine success or failure
 				// In case of hyphen, the row should not be there in the outbox
 				List<CPOutBoxItem> verifyList=verifyMap.get(loyID);
-				
+				printWriter.println("TEST RESULTS");
 				for (CPOutBoxItem verifyItem: verifyList )
 				{
 					//new CPOutBoxDAO().insertRow(cpItem);
@@ -93,40 +107,61 @@ public class CPSUtil {
 							verifyItem.getStatus());
 					
 					String testresult = null;
-					if(queuedItem!=null)
-					{	if (queuedItem.getSend_date().equalsIgnoreCase(
+					
+					// Printing the test file 
+					
+					
+					if(queuedItem!=null&&queuedItem.getSend_date()!=null)
+					{							
+						if(queuedItem.getSend_date().equalsIgnoreCase(
 							verifyItem.getSend_date())) {
-						testresult = "success:" + verifyItem.getLoy_id()
-								+ ", " + verifyItem.getMd_tag() + ", "
-								+ verifyItem.getSend_date() + "";
+							successCount++;
+						testresult = "SUCCESS Test Tag: " + verifyItem.getMd_tag()
+								+ " OutBox Send Date " + queuedItem.getSend_date() + " is SAME as Expected Send Date: "
+								+ verifyItem.getSend_date();
 					} else {
-
-						testresult = "failure:" + verifyItem.getLoy_id()
-								+ ", " + verifyItem.getMd_tag() + ", "
-								+ verifyItem.getSend_date() + " vs queued entry :"
-								+ queuedItem.getSend_date();
+						failureCount++;
+						testresult = "FAILURE Test Tag: " + verifyItem.getMd_tag()
+								+ " OutBox Send Date " + queuedItem.getSend_date() + " is NOT SAME as Expected Send Date: "
+								+ verifyItem.getSend_date();
 					}
 					}
 					else
 					{
-						testresult = "failure: The item is not queued " + verifyItem.getLoy_id()
-								+ ", " + verifyItem.getMd_tag() + ", "
-								+ verifyItem.getSend_date() ;
+						if(verifyItem.getSend_date()==null)
+						{
+							
+							successCount++;
+							testresult = "SUCCESS TestTag: " + verifyItem.getMd_tag()
+									+ " is removed from OutBox as Expected";
+									
+						}
+						else{
+							failureCount++;
+						testresult = "FAILURE Test tag: " + verifyItem.getMd_tag()
+								+ " is NOT Queued in OutBox with Expected Send Date : " 	+ verifyItem.getSend_date();
+						}
 					}
 
-					printWriter.println(testresult);
-					printWriter.flush();
+					
+					printWriter.println(testresult);		
 					
 								
 				}
+				printWriter.println();
+
+				
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}		
 			
-			
-			
+
 		}
+		
+		printWriter.println("TOTAL NUMBER OF SUCESSFULL TESTS :"+successCount);
+		printWriter.println("TOTAL NUMBER OF FAILED TESTS :     "+failureCount);
+		printWriter.flush();
 		
 	}
 
@@ -182,11 +217,12 @@ public class CPSUtil {
 			if("TEST".equalsIgnoreCase(testPhase))
 			{
 				cpBoxItem.setLoy_id(variables[0]);
-				for(int i=1;i<variables.length;i++)
-				{
-					cpBoxItem.getMdTagList().add(variables[i]);
-				}
-				
+				cpBoxItem.setMd_tag(variables[1]);
+//				for(int i=1;i<variables.length;i++)
+//				{
+//					cpBoxItem.getMdTagList().add(variables[i]);
+//				}
+//				
 			}
 			else {	cpBoxItem.setLoy_id(variables[0]);
 				cpBoxItem.setMd_tag(variables[1]);
@@ -194,6 +230,8 @@ public class CPSUtil {
 			if ("PRESET".equalsIgnoreCase(testPhase)) {
 				// Member number,Existing Tag,Effective Date,Send Date,Sent flag
 				String sendDT=null;
+				String addedDate=getDate(Integer.parseInt(variables[2]));
+				//cpBoxItem.setAdded_datetime(new Date(addedDate));
 				if(variables.length>3)
 				sendDT=getDate(Integer.parseInt(variables[3]));
 				cpBoxItem.setSend_date(sendDT);
