@@ -131,6 +131,8 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
          
         if (processTransaction != null && processTransaction.getEarnFlag() != null && processTransaction.getEarnFlag().equalsIgnoreCase("E")) {
         	
+        	redisCountIncr("valid_transactions");
+        	
         	logTransaction(processTransaction);
         	
             lyl_id_no = processTransaction.getMemberNumber();
