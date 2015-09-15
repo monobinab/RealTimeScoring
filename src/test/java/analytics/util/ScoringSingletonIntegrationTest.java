@@ -480,8 +480,8 @@ public class ScoringSingletonIntegrationTest {
 		Map<String, String> newChangesVarValueMap = newChangesVarValueMap();
 				
 		MemberRTSChanges memberRTSChanges = scoringSingletonObj.calcRTSChanges(l_id, newChangesVarValueMap, null, "TEST");
-		
-		Assert.assertEquals("Expecting null memberRTSChanges, as memberVariablesMap is null", null, memberRTSChanges);
+			
+		Assert.assertEquals("Expecting memberRTSChanges with metricsString 'no_member_variables'", "no_member_variables", memberRTSChanges.getMetricsString());
 	}
 	
 	/*to test a black out model
@@ -659,7 +659,7 @@ public class ScoringSingletonIntegrationTest {
 	public void calcRTSChangesWithEmptyNewChangesMapTest() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
 		String l_id = "SearsIntegrationTesting9";
 		MemberRTSChanges memberRTSChanges = scoringSingletonObj.calcRTSChanges(l_id, new HashMap<String, String>(), null, "TEST");
-		Assert.assertEquals(null, memberRTSChanges);;
+		Assert.assertEquals("no_vars_ofinterest", memberRTSChanges.getMetricsString());;
 	}
 	
 	/*
@@ -771,6 +771,7 @@ public class ScoringSingletonIntegrationTest {
 	
 	/*
 	 * If all newChangesVarValueMap variables are of NONE strategy, no models will be populated for scoring
+	 * memberRTSChanges will be instantiated with no_vars_ofinterest as metricsString
 	 */
 	@Test
 	public void calcRTSChangesWithAllVarsOfNONEStrategy() throws ParseException{
@@ -798,7 +799,7 @@ public class ScoringSingletonIntegrationTest {
 		
 		MemberRTSChanges memberRTSChanges = scoringSingletonObj.calcRTSChanges(l_id, newChangesVarValueMap, null, "TEST");
 	
-		Assert.assertEquals(null, memberRTSChanges);
+		Assert.assertEquals("no_vars_ofinterest", memberRTSChanges.getMetricsString());
 	}
 	
 
