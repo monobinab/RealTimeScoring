@@ -17,15 +17,7 @@ public class CPSTester {
 
 		CPSUtil cpsUtil=new CPSUtil();	
 		cpsUtil.processFile(presetFile, testFile,verifyFile);
-			
-		
-		//Changes 
-		//Multiple tags should be sent in test step
-		// preset,test and verify should run at same time - add it to lists and consolidate at end
-		// For hyphen in tags, do not send any message
-		// Set up this as a stand alone project
-		
-		
+
 		
 	}
 	
