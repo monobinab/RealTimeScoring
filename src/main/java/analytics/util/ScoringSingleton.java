@@ -263,6 +263,7 @@ public class ScoringSingleton {
 				 	}
 				else{
 					memberRTSChanges = new MemberRTSChanges();
+					LOGGER.info("PERSIST: no member variabls for " + lId);
 					memberRTSChanges.setMetricsString("no_member_variables");
 				}
 			 	}	
