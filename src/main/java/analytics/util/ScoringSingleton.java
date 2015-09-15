@@ -12,11 +12,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mongodb.DB;
-import com.mongodb.DBObject;
 
 import analytics.exception.RealTimeScoringException;
 import analytics.util.dao.ChangedMemberScoresDao;
@@ -99,8 +99,6 @@ public class ScoringSingleton {
 			modelVariablesDao = new ModelVariablesDao();
 			changedVariablesDao = new ChangedMemberVariablesDao();
 			memberVariablesDao = new MemberVariablesDao();
-			DBObject obj = memberVariablesDao.getMemVars("testingLid");
-			System.out.println(obj);
 			changedMemberScoresDao = new ChangedMemberScoresDao();
 		
 			// populate the variableVidToNameMap
@@ -174,7 +172,10 @@ public class ScoringSingleton {
 				Iterator<String> itr = newChangesVarValueMap.keySet().iterator();
 				while(itr.hasNext()){
 					String var = itr.next();
-					if(variableNameToStrategyMap.get(var).equalsIgnoreCase("NONE")){
+					if(!variableNameToStrategyMap.containsKey(var)){
+						LOGGER.info("var NOT in variables collection " + var);
+					}
+					if(variableNameToStrategyMap.containsKey(var) && variableNameToStrategyMap.get(var).equalsIgnoreCase("NONE")){
 						itr.remove();
 					}
 				}
@@ -247,21 +248,35 @@ public class ScoringSingleton {
 						 }
 						   catch(RealTimeScoringException e2){
 							   LOGGER.error("Exception scoring modelId " + modelId +" for lId " + lId + " " + e2.getErrorMessage());
+							   memberRTSChanges.setMetricsString("exception_per_model");
 						   }
 						   catch(Exception e){
-							   LOGGER.error("Exception scoring modelId " + modelId +" for lId " + lId + " " , e.getCause());
 							   e.printStackTrace();
+							   LOGGER.error("Exception scoring modelId " + modelId +" for lId " + lId );
+							   memberRTSChanges.setMetricsString("exception_per_model");
+
 						   }
 						}
 							 memberRTSChanges.setlId(lId);
 							 memberRTSChanges.setChangedMemberScoreList(changedMemberScoreList);
 							 memberRTSChanges.setAllChangesMap(allChanges);
 				 	}
+				else{
+					memberRTSChanges = new MemberRTSChanges();
+					memberRTSChanges.setMetricsString("no_member_variables");
+				}
 			 	}	
+			else{
+				memberRTSChanges = new MemberRTSChanges();
+				memberRTSChanges.setMetricsString("no_vars_ofinterest");
+			}
 			}
 		catch(Exception e){
-			LOGGER.error("Exception scoring lId " + lId + " " + e.getCause());
 			e.printStackTrace();
+			LOGGER.error("Exception scoring lId " + e.getMessage() + "cause: " + e.getCause());
+			LOGGER.error(ExceptionUtils.getMessage(e) + "root cause-"+ ExceptionUtils.getRootCauseMessage(e) + ExceptionUtils.getStackTrace(e));
+			memberRTSChanges = new MemberRTSChanges();
+			memberRTSChanges.setMetricsString("exception_per_member");
 		}
 			return memberRTSChanges;
 	}
@@ -270,24 +285,20 @@ public class ScoringSingleton {
 		Set<String> filteredVariables = new HashSet<String>();
 		
 		for (Integer modelId : modelIdList) {
-			try{
-				Map<String, Variable> variables = getModelVariables(modelId);
+			Map<String, Variable> variables = getModelVariables(modelId);
 				if(variables == null){
 					LOGGER.error("variables is null for the modelId " + modelId);
 					continue;
 				}
 				for (String var : variables.keySet()) {
-						if (variableNameToVidMap.get(var) == null) {
+						if (!variableNameToVidMap.containsKey(var) || variableNameToVidMap.get(var) == null) {
 							LOGGER.error("VID is null for variable " + var);
 						} else {
 							filteredVariables.add(variableNameToVidMap.get(var));
 						}
-					}
 				}
-			catch(Exception e){
-				LOGGER.error("Exception in createMemberVariableValueMap method ", e);
 			}
-		}
+			
 		return memberVariablesDao.getMemberVariablesFiltered(loyaltyId, filteredVariables);
 	}
 
@@ -320,7 +331,7 @@ public class ScoringSingleton {
 				Change value = entry.getValue();
 				// key is VID
 				// skip expired changes
-				if (value.getExpirationDate().after(new Date())) {
+				if (value.getExpirationDate().after(new Date()) && variableVidToNameMap.containsKey(key)) {
 					changedMemberVariablesMap.put(variableVidToNameMap.get(key), value);
 				} else {
 					LOGGER.debug("Got an expired value for " + value);
@@ -350,7 +361,7 @@ public class ScoringSingleton {
 	 * @return
 	 */
 	public Map<String, Change> executeStrategy(Map<String, Change> allChanges, Map<String, String> newChangesVarValueMap, Map<String, Object> memberVariablesMap) {
-		try{
+		
 			for (String variableName : newChangesVarValueMap.keySet()) {
 				variableName = variableName.toUpperCase();
 				if (variableModelsMap.containsKey(variableName)) {
@@ -394,12 +405,7 @@ public class ScoringSingleton {
 					allChanges.put(variableName, executedValue);
 				}
 			}
-		}
-		catch(Exception e){
-			LOGGER.error("Exception in executeStrategy " + e.getStackTrace());
-			e.printStackTrace();
-		}
-			return allChanges;
+					return allChanges;
 	}
 	
 	public boolean isBlackOutModel(Map<String, Change> allChanges,	Integer modelId) {
@@ -412,7 +418,7 @@ public class ScoringSingleton {
 				if(ch == null){
 					LOGGER.error("variable in allChanges is null for " + ch + "modelId " + modelId);
 				}
-			if (ch.startsWith(MongoNameConstants.BLACKOUT_VAR_PREFIX) && variableMap.containsKey(ch)) 
+			if ( ch != null && ch.startsWith(MongoNameConstants.BLACKOUT_VAR_PREFIX) && variableMap.containsKey(ch)) 
 				blackFlag = Integer.valueOf(value.getValue().toString());
 				if(blackFlag==1)
 				{
@@ -447,7 +453,7 @@ public class ScoringSingleton {
 		for (Map.Entry<String, Change> entry : allChanges.entrySet()) {
 			String ch = entry.getKey();
 			Change value = entry.getValue();
-			if (ch.substring(0, MongoNameConstants.BOOST_VAR_PREFIX.length()).toUpperCase().equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
+			if (ch != null && ch.substring(0, MongoNameConstants.BOOST_VAR_PREFIX.length()).toUpperCase().equals(MongoNameConstants.BOOST_VAR_PREFIX) && varMap.containsKey(ch)) {
 				Boost boost;
 				if (varMap.get(ch) instanceof Boost) {
 					boost = (Boost) varMap.get(ch);

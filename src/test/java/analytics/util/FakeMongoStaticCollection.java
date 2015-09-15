@@ -65,6 +65,8 @@ public class FakeMongoStaticCollection {
 		varColl.insert(new BasicDBObject("name", "variable13").append("VID", 13).append("strategy","StrategyCountTraitDates"));
 		varColl.insert(new BasicDBObject("name", "variable14").append("VID", 14).append("strategy","StrategyDCStrengthSum"));
 		varColl.insert(new BasicDBObject("name", "BOOST_DC_VAR").append("VID", 15).append("strategy","StrategyDCStrengthSum"));
+		
+		varColl.insert(new BasicDBObject("name", "S_SRS_VAR").append("VID", 16).append("strategy","StrategyCountTransactions"));
 			
 		//fake modelVariables collection
 		DBCollection modeVarColl = db.getCollection("modelVariables");
@@ -91,9 +93,13 @@ public class FakeMongoStaticCollection {
 		modeVarColl.insert(new BasicDBObject("modelId", 55).append("modelName", "Model_Name5").append("modelDescription", "Refrigerator").append("constant", 5).append("month", 0).append("variable", dbList5));
 		
 		BasicDBList dbList6 = new BasicDBList();
-		dbList6.add(new BasicDBObject("name", "BOOST_DC_VAR").append("coefficient", 0.015).append("intercept", 0.0));
-		modeVarColl.insert(new BasicDBObject("modelId", 65).append("modelName", "Model_Name6").append("modelDescription", "Electronics").append("constant", 5).append("month", 0).append("variable", dbList6));
-	
+		dbList6.add(new BasicDBObject("name", "variable40").append("coefficient", 0.015));
+		dbList6.add(new BasicDBObject("name", "variable4").append("coefficient", 0.015));
+		modeVarColl.insert(new BasicDBObject("modelId", 65).append("modelName", "Model_Name6").append("modelDescription", "Home Appliances2").append("constant", 5).append("month", 0).append("variable", dbList6));
+		
+		BasicDBList dbList7 = new BasicDBList();
+		dbList7.add(new BasicDBObject("name", "S_SRS_VAR").append("coefficient", 1.0));
+		modeVarColl.insert(new BasicDBObject("modelId", 70).append("modelName", "Model_Name7").append("modelDescription", "Kids apparel").append("constant", 5).append("month", 0).append("variable", dbList7));
 			
 		setVarColl(varColl);
 		setModelVarCollection(modeVarColl);

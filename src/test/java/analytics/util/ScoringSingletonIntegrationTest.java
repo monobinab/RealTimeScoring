@@ -17,6 +17,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.joda.time.LocalDate;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import analytics.util.objects.Change;
@@ -88,6 +89,11 @@ public class ScoringSingletonIntegrationTest {
 		dbList5.add(new BasicDBObject("name", "variable12").append("coefficient", 0.015));
 		dbList5.add(new BasicDBObject("name", "variable4").append("coefficient", 0.015));
 		modeVarColl.insert(new BasicDBObject("modelId", 55).append("modelName", "Model_Name5").append("modelDescription", "Home Appliances2").append("constant", 5).append("month", 0).append("variable", dbList5));
+		
+		BasicDBList dbList6 = new BasicDBList();
+		dbList6.add(new BasicDBObject("name", "variable40").append("coefficient", 0.015));
+		dbList6.add(new BasicDBObject("name", "variable4").append("coefficient", 0.015));
+		modeVarColl.insert(new BasicDBObject("modelId", 65).append("modelName", "Model_Name6").append("modelDescription", "Home Appliances2").append("constant", 5).append("month", 0).append("variable", dbList6));
 		
 		//fake regionalFactors collection
 		DBCollection regionalAdjFactorsColl = db.getCollection("regionalAdjustmentFactors");
@@ -507,9 +513,11 @@ public class ScoringSingletonIntegrationTest {
 	
 	/*
 	 * to test if a variable (INVALIDVARIABLE)which is associated with a model 48 is there in our modelVariables collection )
-	 * but not in variables collection at all, it will be gotten in the strategy check
-	 * and will throw exception, so memberRTSChanegs returned will be null
+	 * but not in variables collection at all, calcBaseScore throws exception which get caught in calcRTSChanges
+	 * and the corresponding model will not be populated in changedMemberScore list from calcRTSChanges() method
+	 * Here, we have only one model to be scored and the variable is not in variables coll, so we get changedMemberScore list with size 0
 	 */
+	
 	@Test
 	public void calcRTSChangesTestInvalidVar() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
 		String l_id = "SearsIntegrationTesting7";
@@ -533,7 +541,40 @@ public class ScoringSingletonIntegrationTest {
 		newChangesVarValueMap.put("INVALIDVARIABLE", "0.01");
 		
 		MemberRTSChanges memberRTSChanges = scoringSingletonObj.calcRTSChanges(l_id, newChangesVarValueMap, null, "TEST");
-		Assert.assertEquals(null, memberRTSChanges);
+		List<ChangedMemberScore> changedMemScoresList = memberRTSChanges.getChangedMemberScoreList();
+		Assert.assertEquals(0, changedMemScoresList.size());
+	}
+	
+	/*
+	 * If changedMemvar collection contains non-expired invalid variable for this member
+	 * i.e. a variable NOT in Variables collection, faced this problem and got exception in PRODUCTION
+	 * code handles it by having  a check in createChangedMemberVariablesMap method to discard that variable to get populated in the map
+	*/
+	@Test
+	public void calcRTSChangesTestInvalidVarInChangedMemVar() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
+		String l_id = "SearsIntegrationTesting7_1";
+		
+		getMemberVarCollection(l_id);
+
+		//fake changedMemberVariables Collection
+		DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Change expected = new Change("4000", 12,
+				simpleDateFormat.parse("2999-09-23"),
+				simpleDateFormat.parse("2014-09-01"));
+		
+		changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
+				"4000",
+				new BasicDBObject("v", expected.getValue()).append("e",
+						expected.getExpirationDateAsString()).append("f",
+						expected.getEffectiveDateAsString())));
+						
+		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
+		newChangesVarValueMap.put("VARIABLE4", "0.01");
+		
+		MemberRTSChanges memberRTSChanges = scoringSingletonObj.calcRTSChanges(l_id, newChangesVarValueMap, null, "TEST");
+		List<ChangedMemberScore> changedMemScoresList = memberRTSChanges.getChangedMemberScoreList();
+		Assert.assertEquals(3, changedMemScoresList.size());
 	}
 	
 	/*
@@ -728,6 +769,9 @@ public class ScoringSingletonIntegrationTest {
 		changedMemberScore.remove(new BasicDBObject("l_id", l_id));
 	}
 	
+	/*
+	 * If all newChangesVarValueMap variables are of NONE strategy, no models will be populated for scoring
+	 */
 	@Test
 	public void calcRTSChangesWithAllVarsOfNONEStrategy() throws ParseException{
 		
@@ -751,20 +795,17 @@ public class ScoringSingletonIntegrationTest {
 		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
 		newChangesVarValueMap.put("VARIABLE12", "0.01");
 		newChangesVarValueMap.put("VARIABLE40", "0.1");
-		newChangesVarValueMap.put("VARIABLE4", "0.01");
-		newChangesVarValueMap.put("VARIABLE10", "0.1");
 		
 		MemberRTSChanges memberRTSChanges = scoringSingletonObj.calcRTSChanges(l_id, newChangesVarValueMap, null, "TEST");
-		
-		List<ChangedMemberScore> changedMemberScoresList = memberRTSChanges.getChangedMemberScoreList();
-		for(ChangedMemberScore changedMemScore : changedMemberScoresList){
-			if(changedMemScore.getMinDate() == null){
-				fail("Got null minDate");
-			}
-		}
-		Assert.assertEquals(2, changedMemberScoresList.size());
+	
+		Assert.assertEquals(null, memberRTSChanges);
 	}
 	
+
+	/*
+	 * variable 40 and variable 12 associated with model 50 are of NONE strategy, so these variables will be filtered out in modelLists
+	 * model 50 will not be populated for scoring
+	 */
 	@Test
 	public void calcRTSChangesWithSomeVarsOfNONEStrategy() throws ParseException{
 		
@@ -799,11 +840,15 @@ public class ScoringSingletonIntegrationTest {
 				fail("Got null minDate");
 			}
 		}
-		Assert.assertEquals(2, changedMemberScoresList.size());
+		Assert.assertEquals(3, changedMemberScoresList.size());
 	}
-	
+	/*
+	 * variable4 = [35, 55, 65], variable10 = [50, 65]
+	 * variable10 has NONE strategy, will be discarded
+	 * model 50 has only variable10 associated and hence will not be populated for scoring
+	 */
 	@Test
-	public void calcRTSChangesWithSharedVarsOfNONEStrategy() throws ParseException{
+	public void calcRTSChangesWithSharedVarsOfNONEStrategyForOneModel() throws ParseException{
 		
 		String l_id = "SearsIntegrationTesting12";
 		//Fake memberVariables collection
@@ -823,7 +868,6 @@ public class ScoringSingletonIntegrationTest {
 						expected.getEffectiveDateAsString())));
 		
 		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
-		newChangesVarValueMap.put("VARIABLE12", "0.01");
 		newChangesVarValueMap.put("VARIABLE4", "0.01");
 		newChangesVarValueMap.put("VARIABLE10", "0.1");
 		
@@ -835,7 +879,7 @@ public class ScoringSingletonIntegrationTest {
 				fail("Got null minDate");
 			}
 		}
-		Assert.assertEquals(2, changedMemberScoresList.size());
+		Assert.assertEquals(3, changedMemberScoresList.size());
 	}
 	
 	@AfterClass

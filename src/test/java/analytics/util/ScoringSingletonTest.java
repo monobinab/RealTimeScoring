@@ -83,7 +83,7 @@ public class ScoringSingletonTest {
 	}
 
 	/*this test ensures that there will be no modelIds to get scored, when there are no new variables from the incoming feed
-	i.e. newChangesVarValueMap is null, ideally it should not happen as null variableValueMap will not be emitted from strategybolt for scoring at all*/
+	i.e. newChangesVarValueMap is null, ideally it should not happen as null variableValueMap will not be emitted from parsingBolt for scoring at all*/
 	@Test
 	public void getModelIdListNullNewChangesVarValueMapTest1() {
 		Map<String, String> newChangesVarValueMap = null;
@@ -415,7 +415,7 @@ public class ScoringSingletonTest {
 		variableNameToVidMap.setAccessible(false);
 	}
 	
-	/*model 48 is month model but not correspond to current month, so the associated variables will not be fetched from memberVariables collection
+	/*model 48 is month model but does not correspond to current month, so the associated variables will not be fetched from memberVariables collection
 	Ideally, this will not happen as those models will be filtered in getModelIdList() method itself*/
 	@Test
 	public void createMemberVariableValueMapInvalidMonthModelTest()
@@ -661,7 +661,7 @@ public class ScoringSingletonTest {
 
 		Map<String, Change> changedVars = scoringSingletonObj
 				.createChangedMemberVariablesMap(l_id);
-		Assert.assertEquals("Expecting an empty map as no record in changedMemVar collection for this member", new HashMap<String, Change>(), changedVars);
+		Assert.assertEquals("Expecting an empty map as there is no record in changedMemVar collection for this member", new HashMap<String, Change>(), changedVars);
 		varIdToNameMap.setAccessible(false);
 	}
 	
@@ -701,7 +701,7 @@ public class ScoringSingletonTest {
 		modelsMap.setAccessible(false);
 	}
 
-	/*if the model does not have variables for this specific month*/
+	/*if the model does not have variables for this specific month -- null varMap*/
 	@Test
 	public void getBoostScoreWithNullVarMapForModelOfInterestTest()
 			throws ParseException, SecurityException, NoSuchFieldException,
@@ -733,7 +733,7 @@ public class ScoringSingletonTest {
 		modelsMap.setAccessible(false);
 	}
 	
-	/*if the model does not have variables for this specific month*/
+	/*if the model does not have variables for this specific month -- with empty varMap */
 	@Test
 	public void getBoostScoreWithEmptyVarMapForModelOfInterestTest()
 			throws ParseException, SecurityException, NoSuchFieldException,
@@ -974,6 +974,50 @@ public class ScoringSingletonTest {
 		Assert.assertEquals("Expecting boost value of 0 as the model of interest is not in our modelVar collectio", compareVal, 0);
 		modelsMap.setAccessible(false);
 	}
+	
+	/*
+	 * If a variable in allChanges is NOT in variables collection
+	 * This can happen if changedMemVar collection has a variable, which got deleted in variables as well as modelVariables collection
+	 * THIS CASE WAS IDENTIFIED IN PRODUCTION WITH EXCEPTION THROW, AND THE CODE WAS CHANGED TO HANDLE IT
+	 * In this case, allChanges map is populated with null for VID 3270 as there is no record for 3270 in varaibles collection
+	 */
+	@Test
+	public void getBoostScoreBoostWithNullVarNameInallChangesTest()
+			throws ParseException, SecurityException, NoSuchFieldException,
+			IllegalArgumentException, IllegalAccessException {
+
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd");
+		Change change = new Change("2270", 12,
+				simpleDateFormat.parse("2999-10-21"),
+				simpleDateFormat.parse("2014-10-01"));
+		Change change2 = new Change("3270", 12,
+				simpleDateFormat.parse("2999-10-21"),
+				simpleDateFormat.parse("2014-10-01"));
+
+		HashMap<String, Change> allChanges = new HashMap<String, Change>();
+		allChanges.put("BOOST_S_DSL_APP_INT_ACC", change);
+		allChanges.put(null, change2);
+
+		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
+		variablesMap.put("BOOST_S_DSL_APP_INT_ACC", new Boost(
+				"BOOST_S_DSL_APP_INT_ACC", 0.002, 2));
+		Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
+		monthModelMap.put(
+				Calendar.getInstance().get(Calendar.MONTH) + 1,
+				new Model(27, "Model_Name", Calendar.getInstance().get(
+						Calendar.MONTH) + 1, 5, variablesMap));
+
+		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
+		modelsMapContent.put(27, monthModelMap);
+
+		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
+		modelsMap.setAccessible(true);
+		modelsMap.set(scoringSingletonObj, modelsMapContent);
+		double boost = scoringSingletonObj.getBoostScore(allChanges, 27);
+		int comapreVal = new Double(2.024).compareTo(new Double(boost));
+		Assert.assertEquals(comapreVal, 0);
+		modelsMap.setAccessible(false);
+	}
 
 	//this test expects TRUE to be returned as allChanges for this member has blackout variable associated with model of interest
 	@Test
@@ -996,12 +1040,21 @@ public class ScoringSingletonTest {
 
 		monthModelMap.put(0, new Model(35, "Model_Name", 0, 5,
 				variablesMap));
-		Map<Integer, Map<Integer, Model>> modelsMapContentBoost = new HashMap<Integer, Map<Integer, Model>>();
-		modelsMapContentBoost.put(35, monthModelMap);
+		Map<Integer, Map<Integer, Model>> modelsMapContentBlackout = new HashMap<Integer, Map<Integer, Model>>();
+		modelsMapContentBlackout.put(35, monthModelMap);
+		
+		List<Integer> modelLists = new ArrayList<Integer>();
+		modelLists.add(35);
+		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
+		variableModelsMapContents.put("BLACKOUT_HA_COOK", modelLists);
+	
+		Field variableModelsMap = ScoringSingleton.class.getDeclaredField("variableModelsMap");
+		variableModelsMap.setAccessible(true);
+		variableModelsMap.set(scoringSingletonObj, variableModelsMapContents);
 
 		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
 		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContentBoost);
+		modelsMap.set(scoringSingletonObj, modelsMapContentBlackout);
 		Boolean value = scoringSingletonObj.isBlackOutModel(allChanges, 35);
 		Assert.assertEquals(Boolean.TRUE, value);
 		modelsMap.setAccessible(false);
@@ -1037,7 +1090,7 @@ public class ScoringSingletonTest {
 		modelsMap.setAccessible(false);
 	}
 
-	/*if the blackout variable is not in modelVariables collection*/
+	/*if the blackout variable is not in modelVariables collection for the model of interest*/
 	@Test
 	public void isBlackoutModelForBlackoutVarNotInModelVarMapTest()
 			throws ParseException, SecurityException, NoSuchFieldException,
@@ -1050,6 +1103,43 @@ public class ScoringSingletonTest {
 
 		HashMap<String, Change> allChanges = new HashMap<String, Change>();
 		allChanges.put("BLACKOUT_HA_COOK", change);
+
+		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
+		variablesMap.put("HA_COOK", new Boost(
+				"HA_COOK", 0.002, 0.1));
+		Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
+
+		monthModelMap.put(0, new Model(35, "Model_Name", 0, 5,
+				variablesMap));
+		Map<Integer, Map<Integer, Model>> modelsMapContentBoost = new HashMap<Integer, Map<Integer, Model>>();
+		modelsMapContentBoost.put(35, monthModelMap);
+
+		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
+		modelsMap.setAccessible(true);
+		modelsMap.set(scoringSingletonObj, modelsMapContentBoost);
+		Boolean value = scoringSingletonObj.isBlackOutModel(allChanges, 35);
+		Assert.assertEquals(Boolean.FALSE, value);
+		modelsMap.setAccessible(false);
+	}
+	
+	/*
+	 * If a variable in allChanges is NOT in variables collection
+	 * This can happen if changedMemVar collection has a variable, which got deleted in variables as well as modelVariables collection
+	 * THIS CASE WAS IDENTIFIED IN PRODUCTION WITH EXCEPTION THROW, AND THE CODE WAS CHANGED TO HANDLE IT
+	 * In this case, allChanges map is populated with null for VID 3272 as there is no record for 3272 in varaibles collection
+	 */
+	@Test
+	public void isBlackoutModelWithNullVarNameInallChangesTest()
+			throws ParseException, SecurityException, NoSuchFieldException,
+			IllegalArgumentException, IllegalAccessException {
+
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd");
+		Change change = new Change("3272", 1,
+				simpleDateFormat.parse("2999-10-21"),
+				simpleDateFormat.parse("2014-10-01"));
+
+		HashMap<String, Change> allChanges = new HashMap<String, Change>();
+		allChanges.put(null, change);
 
 		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
 		variablesMap.put("HA_COOK", new Boost(
@@ -1204,7 +1294,8 @@ public class ScoringSingletonTest {
 	}
 	
 	/* If memberVariables is empty, was expected to throw RealTimeScoringException, now changed with the fact that scoring can be done with allChanges values
-	 allChanges mentioned here is unexpired member variables..Note: null memberVarMap is not checked as null memberVarMap was checked even before scoring part */
+	 allChanges mentioned here is unexpired member variables..
+	 Note: null memberVarMap is not checked as null memberVarMap was checked even before scoring part */
 	@Test
 	public void calcScoreForEmptyMemberVariablesTest() throws ParseException,
 			SecurityException, NoSuchFieldException, IllegalArgumentException,
@@ -1410,7 +1501,9 @@ public class ScoringSingletonTest {
 		varNameToVidMap.setAccessible(false);
 	}
 	
-	//to test a seasonal model which does not belong to current month (invalid month model), method throws exception, which gets caught in the bolt and in api's method
+	/*to test a seasonal model which does not belong to current month (invalid month model), method throws exception, 
+	which gets caught in the bolt and in api's execute method
+	Ideally, this case will NOT happen at all as invalid month model gets filtered out in getModeIdList() method itself*/
 	@Test(expected = RealTimeScoringException.class)
 	public void calcBaseScoreInvalidMonthModelTest() throws SecurityException,
 			NoSuchFieldException, ParseException, IllegalArgumentException,
@@ -1458,7 +1551,71 @@ public class ScoringSingletonTest {
 		varNameToVidMap.setAccessible(false);
 	}
 	
-	// tests the baseScore for null variable name or null VID
+	@Test(expected = RealTimeScoringException.class)
+	public void calcBaseScoreForNullVarMapforModelOfInterestTest() throws SecurityException,
+			NoSuchFieldException, ParseException, IllegalArgumentException,
+			IllegalAccessException, RealTimeScoringException {
+
+		Map<String, Object> memVariables = new HashMap<String, Object>();
+		memVariables.put("2269", 1);
+		memVariables.put("2270", 0.10455);
+		memVariables.put("2271", 0.10455);
+
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd");
+		Change change2 = new Change("2271", 0.2,
+				simpleDateFormat.parse("2999-10-21"),
+				simpleDateFormat.parse("2014-10-01"));
+		Map<String, Change> allChanges = new HashMap<String, Change>();
+		allChanges.put("S_HOME_6M_IND_ALL", change2);
+
+		Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
+		monthModelMap.put(Calendar.getInstance().get(Calendar.MONTH)+1 , new Model(35, "Model_Name", Calendar.getInstance().get(Calendar.MONTH)+1 , 3, null));
+		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
+		modelsMapContent.put(35, monthModelMap);
+
+		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
+		modelsMap.setAccessible(true);
+		modelsMap.set(scoringSingletonObj, modelsMapContent);
+		
+		scoringSingletonObj.calcBaseScore(memVariables,	allChanges, 35);
+		modelsMap.setAccessible(false);
+	}
+	
+	@Test(expected = RealTimeScoringException.class)
+	public void calcBaseScoreForEmptyVarMapforModelOfInterestTest() throws SecurityException,
+			NoSuchFieldException, ParseException, IllegalArgumentException,
+			IllegalAccessException, RealTimeScoringException {
+
+		Map<String, Object> memVariables = new HashMap<String, Object>();
+		memVariables.put("2269", 1);
+		memVariables.put("2270", 0.10455);
+		memVariables.put("2271", 0.10455);
+
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd");
+		Change change2 = new Change("2271", 0.2,
+				simpleDateFormat.parse("2999-10-21"),
+				simpleDateFormat.parse("2014-10-01"));
+		Map<String, Change> allChanges = new HashMap<String, Change>();
+		allChanges.put("S_HOME_6M_IND_ALL", change2);
+
+		Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
+		monthModelMap.put(Calendar.getInstance().get(Calendar.MONTH)+1 , new Model(35, "Model_Name", Calendar.getInstance().get(Calendar.MONTH)+1 , 3, new HashMap<String, Variable>()));
+		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
+		modelsMapContent.put(35, monthModelMap);
+
+		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
+		modelsMap.setAccessible(true);
+		modelsMap.set(scoringSingletonObj, modelsMapContent);
+		
+		scoringSingletonObj.calcBaseScore(memVariables,	allChanges, 35);
+		modelsMap.setAccessible(false);
+	}
+	
+	/* tests the baseScore for null variable name or null VID
+	 * if one var does not have proper record or does not have record at all in variables collection,
+	 * that model is expected NOT TO BE SCORED
+	 * in this case, model 35 has a variable with null varName
+	 * */
 	@Test(expected = RealTimeScoringException.class)
 	public void calcBaseScoreForNullVarName() throws SecurityException,
 			NoSuchFieldException, ParseException, IllegalArgumentException,
@@ -1481,7 +1638,7 @@ public class ScoringSingletonTest {
 				0.002));
 		variablesMap.put("S_HOME_6M_IND_ALL", new Variable("S_HOME_6M_IND_ALL",
 				0.0915));
-		variablesMap.put(null, new Variable(null, 0.0915)); //variable name is passed as nu
+		variablesMap.put(null, new Variable(null, 0.0915)); //variable name is passed as null
 		Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
 		monthModelMap.put(0, new Model(35, "Model_Name", 0, 5, variablesMap));
 		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
@@ -1828,9 +1985,13 @@ public class ScoringSingletonTest {
 		Assert.assertEquals(simpleDateFormat.parse("2888-10-21"), minMaxMap.get("minExpiry"));
 		Assert.assertEquals(simpleDateFormat.parse("2999-10-21"), minMaxMap.get("maxExpiry"));
 	}
-	
+	/*
+	 * If all variables in allChanges associated for a model of interest is not variableModelsMap,
+	 * min max exp will not be set for that model
+	 * Ideally, this will not happen as models to be scored are picked from variableModelsMap only
+	 */
 	@Test
-	public void getMinMaxExpAllVarsNotInVarModelsMapTest() throws ParseException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
+	public void getMinMaxExpAllAllChangesVarsNotInVarModelsMapTest() throws ParseException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd");
 		Change change = new Change("2271", 0.2,	simpleDateFormat.parse("2777-10-21"), simpleDateFormat.parse("2014-10-01"));
 	
@@ -1865,7 +2026,8 @@ public class ScoringSingletonTest {
 	}
 	
 	/*if variables of interest are there in variableModelsMap but of none of them are associated with model of interest, then minDate, maxDate will be null
-	Ideally, this should not happen when the flow reaches this point of code, testing as if an external class calling this method*/
+	Ideally, this should not happen when the flow reaches this point of code again, as models to b e scored are picked from variableModels map only
+	testing as if an external class calling this method*/
 	@Test
 	public void getMinMaxExpForNonExistentCurrentMonthModelInVarModelsMapTest() throws ParseException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd");
@@ -1901,6 +2063,9 @@ public class ScoringSingletonTest {
 		Assert.assertEquals(null, minMaxMap.get("maxExpiry"));
 	}
 	
+	/*
+	 * Testing as an external class, this case will not happen
+	 */
 	@Test
 	public void getMinMaxExpForNonExistentNonMonthModelInVarModelsMapTest() throws ParseException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd");

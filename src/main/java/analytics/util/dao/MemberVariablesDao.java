@@ -36,7 +36,7 @@ public class MemberVariablesDao extends AbstractDao {
     	DBObject mbrVariables = memberVariablesCollection.findOne(
 				new BasicDBObject("l_id", l_id), variableFilterDBO);
     	DBObject dbObj = memberVariablesCollection.findOne(new BasicDBObject("l_id", l_id));
-    	System.out.println(dbObj);
+    //	System.out.println(dbObj);
 
 		if (mbrVariables == null) {
 			return null;

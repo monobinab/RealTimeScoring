@@ -8,9 +8,16 @@ public class MemberRTSChanges {
 	private String lId; 
 	private List<ChangedMemberScore> changedMemberScoreList;
 	private Map<String, Change> allChangesMap;
+	private String metricsString;
 	//private String source;
 	
 	
+	public String getMetricsString() {
+		return metricsString;
+	}
+	public void setMetricsString(String metricsString) {
+		this.metricsString = metricsString;
+	}
 	public String getlId() {
 		return lId;
 	}
