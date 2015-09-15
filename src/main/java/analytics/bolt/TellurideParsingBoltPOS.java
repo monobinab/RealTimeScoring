@@ -403,7 +403,7 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
 
     private ProcessTransaction parseXMLAndExtractProcessTransaction(ProcessTransaction processTransaction, String transactionXmlAsString) {
         LOGGER.debug("Parsing MQ message XML");
-        if (transactionXmlAsString.contains("<ProcessTransaction") || transactionXmlAsString.contains(":ProcessTransaction")) {
+        if ((transactionXmlAsString.contains("<ProcessTransaction") || transactionXmlAsString.contains(":ProcessTransaction")) && (!transactionXmlAsString.contains("AnswerTxt"))) {
 
             processTransaction = XMLParser
                     .parseXMLProcessTransaction(transactionXmlAsString);
