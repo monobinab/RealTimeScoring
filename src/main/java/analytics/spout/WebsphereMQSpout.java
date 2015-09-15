@@ -125,17 +125,18 @@ public class WebsphereMQSpout extends BaseRichSpout {
 		
 		ProcessTransaction processTransaction = null;
  	    processTransaction = parseXMLAndExtractProcessTransaction(processTransaction, xmlString);
-
-    	String memberNumber = (processTransaction.getMemberNumber() != null) ? processTransaction.getMemberNumber() : "NONE";
-    	String pickUpStoreNumber = (processTransaction.getOrderStoreNumber() != null) ? processTransaction.getOrderStoreNumber() : "NONE";
-    	String tenderStoreNumber = (processTransaction.getTenderStoreNumber() != null) ? processTransaction.getTenderStoreNumber() : "NONE";
-    	String orderStoreNumber = (processTransaction.getOrderStoreNumber() != null) ? processTransaction.getOrderStoreNumber() : "NONE";
-        String registerNumber = (processTransaction.getRegisterNumber() != null) ? processTransaction.getRegisterNumber() : "NONE";
-        String transactionNumber = (processTransaction.getTransactionNumber() != null) ? processTransaction.getTransactionNumber() : "NONE";
-        String transactionTime = (processTransaction.getTransactionTime() != null) ? processTransaction.getTransactionTime() : "NONE";
-        String requestorId = (processTransaction.getRequestorID() != null) ? processTransaction.getRequestorID() : "NONE";
-        String earnFlag = (processTransaction.getEarnFlag() != null) ? processTransaction.getEarnFlag() : "NONE";
-        LOGGER.info("PERSIST: " + memberNumber +", " + pickUpStoreNumber + ", " + tenderStoreNumber +", " + orderStoreNumber + ", " + registerNumber +", " + transactionNumber +", " + transactionTime +", " + requestorId +", " + earnFlag + ", allTransactions in MQspout from MQQueue");
+ 	    if(processTransaction != null){
+	    	String memberNumber = (processTransaction.getMemberNumber() != null) ? processTransaction.getMemberNumber() : "NONE";
+	    	String pickUpStoreNumber = (processTransaction.getOrderStoreNumber() != null) ? processTransaction.getOrderStoreNumber() : "NONE";
+	    	String tenderStoreNumber = (processTransaction.getTenderStoreNumber() != null) ? processTransaction.getTenderStoreNumber() : "NONE";
+	    	String orderStoreNumber = (processTransaction.getOrderStoreNumber() != null) ? processTransaction.getOrderStoreNumber() : "NONE";
+	        String registerNumber = (processTransaction.getRegisterNumber() != null) ? processTransaction.getRegisterNumber() : "NONE";
+	        String transactionNumber = (processTransaction.getTransactionNumber() != null) ? processTransaction.getTransactionNumber() : "NONE";
+	        String transactionTime = (processTransaction.getTransactionTime() != null) ? processTransaction.getTransactionTime() : "NONE";
+	        String requestorId = (processTransaction.getRequestorID() != null) ? processTransaction.getRequestorID() : "NONE";
+	        String earnFlag = (processTransaction.getEarnFlag() != null) ? processTransaction.getEarnFlag() : "NONE";
+	        LOGGER.info("PERSIST: " + memberNumber +", " + pickUpStoreNumber + ", " + tenderStoreNumber +", " + orderStoreNumber + ", " + registerNumber +", " + transactionNumber +", " + transactionTime +", " + requestorId +", " + earnFlag + ", allTransactions in MQspout from MQQueue");
+ 	    }
 	}
 
 	@Override
