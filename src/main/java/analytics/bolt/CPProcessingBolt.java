@@ -5,12 +5,14 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.exception.RealTimeScoringException;
 import analytics.util.CPSFiler;
+import analytics.util.MongoNameConstants;
 import analytics.util.RTSAPICaller;
 import analytics.util.dao.ClientApiKeysDAO;
 import analytics.util.objects.EmailPackage;
@@ -20,7 +22,7 @@ import backtype.storm.tuple.Tuple;
 
 public class CPProcessingBolt extends EnvironmentBolt  {
 	private static final long serialVersionUID = 1L;
-	private static final String api_Key_Param="email";
+	private static String api_Key_Param;
 	private static final Logger LOGGER = LoggerFactory.getLogger(CPProcessingBolt.class);
 	private OutputCollector outputCollector;
 	private RTSAPICaller rtsApiCaller;
@@ -33,14 +35,35 @@ public class CPProcessingBolt extends EnvironmentBolt  {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,	OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
-		this.outputCollector = collector;
-		rtsApiCaller = RTSAPICaller.getInstance();
-		api_key = new ClientApiKeysDAO().findkey(api_Key_Param);
-		cpsFiler = new CPSFiler();
+		this.outputCollector = collector;		
 		try {
-			cpsFiler.initDAO();
-		} catch (RealTimeScoringException e) {
-			LOGGER.error("Exception Occured in CPProcessingBolt Prepare :: ", ExceptionUtils.getFullStackTrace(e));
+			rtsApiCaller = RTSAPICaller.getInstance();
+			
+			cpsFiler = new CPSFiler();
+			cpsFiler.initDAO();	
+			
+			PropertiesConfiguration properties = null;
+			String isProd = System.getProperty(MongoNameConstants.IS_PROD);
+			if(isProd!=null && "PROD".equals(isProd)){
+					
+					properties=  new PropertiesConfiguration("resources/connection_config_prod.properties");
+				
+				LOGGER.info("~~~~~~~Using production properties in DBConnection~~~~~~~~~");
+			}
+			
+			else if(isProd!=null && "QA".equals(isProd)){
+				properties=  new PropertiesConfiguration("resources/connection_config.properties");
+				LOGGER.info("Using test properties");	
+			}
+			
+			else if(isProd!=null && "LOCAL".equals(isProd)){
+				properties=  new PropertiesConfiguration("resources/connection_config_local.properties");
+				LOGGER.info("Using test properties");	
+			}
+			api_Key_Param = properties.getString("api_Key_Param");
+			api_key = new ClientApiKeysDAO().findkey(api_Key_Param);
+		} catch (Exception e) {
+			LOGGER.error(e.getClass() + ": " + e.getMessage() +" STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 		}
 	}
 

@@ -2,6 +2,7 @@ package analytics.util.dao;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -106,5 +107,28 @@ public class TagVariableDao extends AbstractDao {
 		 * tagModelsCursor.next().get(MongoNameConstants.TAG_VAR_MDTAG)); }
 		 */
 		return tagModelMap;
+	}
+	
+/*	public Set<Integer> getModels(){
+		Set<Integer> models = new HashSet<Integer>();
+		DBCursor cursor = tagVariablesCollection.find();
+		while(cursor.hasNext()){
+			DBObject modelObj = cursor.next();
+			if(modelObj != null)
+				models.add((Integer) modelObj.get(MongoNameConstants.TAG_VAR_MODEL));
+		}
+		return models;
+	}*/
+	
+	public Map<Integer,String> getModelTags(){
+		Map<Integer,String> modelTags = new HashMap<Integer,String>();
+		DBCursor cursor = tagVariablesCollection.find();
+		while(cursor.hasNext()){
+			DBObject modelObj = cursor.next();
+			if(modelObj != null){
+				modelTags.put((Integer) modelObj.get(MongoNameConstants.TAG_VAR_MODEL), (String) modelObj.get(MongoNameConstants.TAG_VAR_MDTAG));
+			}
+		}
+		return modelTags;
 	}
 }

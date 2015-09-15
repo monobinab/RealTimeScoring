@@ -99,8 +99,15 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 				List<String> filteredTagsList = filterResponsysNotReadyTop5PercentTags(l_id,tagsList);
 				
 				//Persist filtered MdTags into memberMdTagsWithDates collection
-				if(filteredTagsList != null && filteredTagsList.size()>0)
-					memberMDTags2Dao.addMemberMDTags(l_id, filteredTagsList);				
+			    if(filteredTagsList != null && filteredTagsList.size()>0){
+			    	//jsonElement.getAsJsonObject().get("tagIdentifier").getAsString()
+			    	
+			     if(jsonElement.getAsJsonObject().has("tagIdentifier") && 
+			    		 jsonElement.getAsJsonObject().get("tagIdentifier").toString().contains("RTS"))
+			      memberMDTags2Dao.addRtsMemberTags(l_id, filteredTagsList);
+			     else
+			      memberMDTags2Dao.addMemberMDTags(l_id, filteredTagsList);
+			    }			
 			}
 			if(tagsList != null && tagsList.size()==0){
 				memberMDTags2Dao.deleteMemberMDTags(l_id);

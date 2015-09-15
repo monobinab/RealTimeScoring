@@ -30,7 +30,7 @@ public class MemberMDTags2Dao extends AbstractDao {
 	
 	}
 
-	public List<String> getMemberMDTagsForVariables(String l_id) {
+	public List<String> getMemberMDTagsBuSubBuList(String l_id) {
 		DBObject dbObj = memberMDTagsCollection.findOne(new BasicDBObject(
 				MongoNameConstants.L_ID, l_id));
 		if(dbObj != null){
@@ -49,14 +49,17 @@ public class MemberMDTags2Dao extends AbstractDao {
 	}
 	
 	public List<String> getMemberMDTags(String l_id) {
+		
+		BasicDBObject field = new BasicDBObject();
+		field.put("tags.t", 1);
 		DBObject dbObj = memberMDTagsCollection.findOne(new BasicDBObject(
-				MongoNameConstants.L_ID, l_id));
+				MongoNameConstants.L_ID, l_id), field);
 		if(dbObj != null){
 			BasicDBList dbListTags = (BasicDBList) dbObj.get("tags");
 			List<String> mdTags = new ArrayList<String>();
-			for(Object tag:dbListTags){
-				if(tag instanceof String){
-					mdTags.add(tag.toString());
+			for(Object tag: dbListTags){
+				if(tag instanceof BasicDBObject){
+					mdTags.add(((BasicDBObject) tag).getString("t").toString());
 				}
 			}
 			//List<String> mdTags = (List<String>) dbObj.get("tags");
@@ -167,6 +170,7 @@ public class MemberMDTags2Dao extends AbstractDao {
 public void addRtsMemberTags(String l_id, List<String> tags) {
 		
 		Date dNow = new Date( );
+		Date tomorrow = new Date(dNow.getTime() + (1000 * 60 * 60 * 24));
 		SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd");
 		
 		BasicDBObject query = new BasicDBObject();
@@ -186,32 +190,33 @@ public void addRtsMemberTags(String l_id, List<String> tags) {
 				//Check if the Tag is already there in the document.
 				//If yes, retain the effective and expiration dates. Else create a new sub-document
 				newObj = isTagExists(tag, rtsTagsList);
-				if(newObj!=null)
-					newRtsTagsList.add(newObj);
-				else{
-						newObj = new BasicDBObject();
-						newObj.append("t", tag);
-						newObj.append("f", ft.format(dNow));
-						newObj.append("e", ft.format(dNow));
-						newRtsTagsList.add(newObj);
-					}
+				if(newObj == null){
+					newObj = new BasicDBObject();
+					newObj.append("t", tag);
+					newObj.append("f", ft.format(dNow));
+					newObj.append("e", ft.format(tomorrow));
+					
+					if(rtsTagsList == null)
+						rtsTagsList = new BasicDBList();
+					rtsTagsList.add(newObj);
 				}
+			}
 		}
 		//If there is NO document in the Collection for that Lid
 		else{
+			rtsTagsList = new BasicDBList();
 			for(String tag : tags){
 				newObj = new BasicDBObject();
 				newObj.append("t", tag);
 				newObj.append("f", ft.format(dNow));
-				newObj.append("e", ft.format(dNow));
-				newRtsTagsList.add(newObj);
+				newObj.append("e", ft.format(tomorrow));
+				rtsTagsList.add(newObj);
 			}
 		}
 	
 		DBObject tagstoUpdate = new BasicDBObject();
 		tagstoUpdate.put("l_id", l_id);
-		if(newRtsTagsList!=null && newRtsTagsList.size()>0)
-			tagstoUpdate.put("rtsTags", newRtsTagsList);
+		tagstoUpdate.put("rtsTags", rtsTagsList);
 		if(mdTagsList!=null && mdTagsList.size()>0)
 			tagstoUpdate.put("tags", mdTagsList);
 		LOGGER.info("tags are getting updated in " +  memberMDTagsCollection.getDB().getName());
