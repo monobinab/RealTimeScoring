@@ -190,6 +190,7 @@ public class XMLParser {
 
 		} catch (XMLStreamException e) {
 			LOGGER.error(e.getClass() + ": " +  e.getMessage(), e);
+			LOGGER.info("exception in xml " + fileName);
 		}
 		return processTransaction;
 

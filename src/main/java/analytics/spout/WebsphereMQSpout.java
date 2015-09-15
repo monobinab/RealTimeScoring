@@ -100,7 +100,7 @@ public class WebsphereMQSpout extends BaseRichSpout {
 			LOGGER.info("TIME:" + messageID + "-Entering spout-" + System.currentTimeMillis());
 			String transactionXmlString = getTransactionString(receivedMessage);
 			collector.emit(new Values(transactionXmlString,messageID), transactionXmlString);
-			LOGGER.info("incoming xml in spout from MQ: " + transactionXmlString);
+		//	LOGGER.info("incoming xml in spout from MQ: " + transactionXmlString);
 
 			logAllTransaction(transactionXmlString);
 		} catch (JMSException e) {
