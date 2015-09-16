@@ -95,11 +95,12 @@ public class WebsphereMQSpout extends BaseRichSpout {
 		LOGGER.debug("Fetching a message from MQ");
 		try {
 			JMSMessage receivedMessage = (JMSMessage) receiver.receive();
-			LOGGER.info("PERSIST: incoming tuples in spout from MQ TELLURIDE");
+			
 			String messageID = receivedMessage.getJMSMessageID();
 			LOGGER.info("TIME:" + messageID + "-Entering spout-" + System.currentTimeMillis());
 			String transactionXmlString = getTransactionString(receivedMessage);
 			collector.emit(new Values(transactionXmlString,messageID), transactionXmlString);
+			LOGGER.info("PERSIST: incoming tuples in spout from MQ TELLURIDE");
 		//	LOGGER.info("incoming xml in spout from MQ: " + transactionXmlString);
 
 		//	logAllTransaction(transactionXmlString);
@@ -140,16 +141,14 @@ public class WebsphereMQSpout extends BaseRichSpout {
 	}*/
 
 	@Override
+	public void fail(Object msgId) {
+	       LOGGER.info("PERSIST: Telluride Spout Failed : " + msgId);
+    }
+	
+	@Override
 	public void ack(Object msgId) {
-		//System.out.println("spout acked : " + msgId);
 	}
 
-	@Override
-	public void fail(Object msgId) {
-		// do nothing for now
-        //System.out.println("spout failed : " + msgId);
-
-    }
 
 	@Override
 	public void close() {
