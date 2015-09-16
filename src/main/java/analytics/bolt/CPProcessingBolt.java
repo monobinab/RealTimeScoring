@@ -22,11 +22,11 @@ import backtype.storm.tuple.Tuple;
 
 public class CPProcessingBolt extends EnvironmentBolt  {
 	private static final long serialVersionUID = 1L;
-	private static String api_Key_Param;
+	private static String cps_api_key;
 	private static final Logger LOGGER = LoggerFactory.getLogger(CPProcessingBolt.class);
 	private OutputCollector outputCollector;
 	private RTSAPICaller rtsApiCaller;
-	private String api_key;
+	private String cps_api_key_param;
 	private CPSFiler cpsFiler;
 	public CPProcessingBolt(String env) {
 		super(env);
@@ -53,15 +53,15 @@ public class CPProcessingBolt extends EnvironmentBolt  {
 			
 			else if(isProd!=null && "QA".equals(isProd)){
 				properties=  new PropertiesConfiguration("resources/connection_config.properties");
-				LOGGER.info("Using test properties");	
+				LOGGER.info("Using QA properties");	
 			}
 			
 			else if(isProd!=null && "LOCAL".equals(isProd)){
 				properties=  new PropertiesConfiguration("resources/connection_config_local.properties");
-				LOGGER.info("Using test properties");	
+				LOGGER.info("Using local properties");	
 			}
-			api_Key_Param = properties.getString("api_Key_Param");
-			api_key = new ClientApiKeysDAO().findkey(api_Key_Param);
+			cps_api_key_param = properties.getString("cps_api_Key_param");
+			cps_api_key = new ClientApiKeysDAO().findkey(cps_api_key_param);
 		} catch (Exception e) {
 			LOGGER.error(e.getClass() + ": " + e.getMessage() +" STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 		}
@@ -81,7 +81,7 @@ public class CPProcessingBolt extends EnvironmentBolt  {
 			try{
 				//call rts api and get response for this l_id 
 				//20 - level, rtsTOtec is the apikey for internal calls to RTS API from topologies
-				String rtsAPIResponse = rtsApiCaller.getRTSAPIResponse(lyl_id_no, "20", api_key, "sears", Boolean.FALSE, "");
+				String rtsAPIResponse = rtsApiCaller.getRTSAPIResponse(lyl_id_no, "20", cps_api_key, "sears", Boolean.FALSE, "");
 				List<EmailPackage> emailPackages = cpsFiler.prepareEmailPackages(rtsAPIResponse,lyl_id_no,l_id);
 				if(emailPackages!= null && emailPackages.size()>0)
 				{
@@ -95,7 +95,7 @@ public class CPProcessingBolt extends EnvironmentBolt  {
 				redisCountIncr("SQLException_count");	
 				//outputCollector.fail(input);					
 			} catch (Exception e){
-				LOGGER.error("Exception Occured in CPProcessingBolt :: " +  e.getMessage()+ "  SATCKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
+				LOGGER.error("Exception Occured in CPProcessingBolt :: " +  e.getMessage()+ "  STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 				redisCountIncr("Exception_count");	
 				//outputCollector.fail(input);	
 			}

@@ -147,7 +147,7 @@ public class MemberMDTags2Dao extends AbstractDao {
 			tagstoUpdate.put("tags", newMdTagsList);
 		if(rtsTagsList!=null && rtsTagsList.size()>0)
 			tagstoUpdate.put("rtsTags", rtsTagsList);
-		LOGGER.info("tags are getting updated in " +  memberMDTagsCollection.getDB().getName());
+		LOGGER.info("rtsTags are getting updated in "+  memberMDTagsCollection.getDB().getName() + " for memberId : '" + l_id +"'");
 		memberMDTagsCollection.update(new BasicDBObject(
 				MongoNameConstants.L_ID, l_id), tagstoUpdate, true, false);
 	}
@@ -219,7 +219,7 @@ public void addRtsMemberTags(String l_id, List<String> tags) {
 		tagstoUpdate.put("rtsTags", rtsTagsList);
 		if(mdTagsList!=null && mdTagsList.size()>0)
 			tagstoUpdate.put("tags", mdTagsList);
-		LOGGER.info("tags are getting updated in " +  memberMDTagsCollection.getDB().getName());
+		LOGGER.info("rtsTags are getting updated in "+  memberMDTagsCollection.getDB().getName() + " for memberId : '" + l_id +"'");
 		memberMDTagsCollection.update(new BasicDBObject(
 				MongoNameConstants.L_ID, l_id), tagstoUpdate, true, false);
 	}
@@ -263,7 +263,7 @@ private void updateTags(String l_id, List<String> tagsToBeRemoved, DBObject doc,
 	DBObject tagstoUpdate = new BasicDBObject();
 	tagstoUpdate.put("l_id", l_id);
 	tagstoUpdate.put(docName, rtsTagsList);
-	LOGGER.info("tags are getting updated in " +  memberMDTagsCollection.getDB().getName());
+	LOGGER.info("tags are getting updated in " +  memberMDTagsCollection.getDB().getName() + "for memberId : '" + l_id +"'");
 	memberMDTagsCollection.update(new BasicDBObject(
 			MongoNameConstants.L_ID, l_id), tagstoUpdate, true, false);
 }

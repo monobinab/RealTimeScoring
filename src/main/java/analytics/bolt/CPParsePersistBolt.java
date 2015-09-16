@@ -130,7 +130,7 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 				
 				
 		} catch (Exception e) {			
-			LOGGER.error("CPParsePersistBolt: exception in parsing: " +  e.getMessage()+ "  SATCKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
+			LOGGER.error("CPParsePersistBolt: exception in parsing: " +  e.getMessage()+ "  STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 			redisCountIncr("exception_count");	
 			//outputCollector.fail(input);
 		
