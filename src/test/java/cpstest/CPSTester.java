@@ -13,10 +13,10 @@ public class CPSTester {
 		
 		String presetFile=args[0];
 		String testFile=args[1];
-		String verifyFile=args[2];
+		String testresults=args[2];
 
 		CPSUtil cpsUtil=new CPSUtil();	
-		cpsUtil.processFile(presetFile, testFile,verifyFile);
+		cpsUtil.processFile(presetFile, testFile,testresults);
 
 		
 	}

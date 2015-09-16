@@ -30,15 +30,15 @@ import analytics.util.dao.CPOutBoxDAO;
 
 public class CPSUtil {
 
-	public void processFile(String presetFile, String testFile, String verifyFile) {
+	public void processFile(String presetFile, String testFile, String outputfile) {
 		FileReader fileReader = null;
 		String currentTopic = "stormtopic";
-		String outputFile = "C:\\CPTest\\testresults_"+System.currentTimeMillis()+".txt";
+		String outputFile = outputfile+System.currentTimeMillis()+".txt";
 		File result =new File(outputFile);
 		PrintWriter printWriter = null;
 		Map<String, List<CPOutBoxItem>> presetMap=loadFile(presetFile, "PRESET");
 		Map<String, List<CPOutBoxItem>> testMap=loadFile(testFile, "TEST");
-		Map<String, List<CPOutBoxItem>> verifyMap=loadFile(verifyFile, "VERIFY");
+		Map<String, List<CPOutBoxItem>> verifyMap=loadFile(testFile, "VERIFY");
 		int successCount=0;
 		int failureCount=0;
 		
@@ -58,19 +58,22 @@ public class CPSUtil {
 				System.out.println(presetList.size());
 				String loyID=presetList.get(0).getLoy_id();
 				StringBuffer presetBuffer=new StringBuffer();
-				printWriter.println("PRESET OutBox Entries for Loyalty ID: "+loyID);
+				printWriter.println("PRESET OutBox Entries for LOYALTY ID: "+loyID);
 				//presetBuffer.append("The Preset values are given below for Loyalty ID: "+loyID+"\n");
 				for (CPOutBoxItem cpItem: presetList )
 				{
 					new CPOutBoxDAO().insertRow(cpItem);
+					//printWriter.println("tag:"+cpItem.getMd_tag()+"Added Date:"+cpItem.getAdded_datetime()+"  Send Date:"+cpItem.getSend_date() +" Sent Flag:"+cpItem.getStatus() );
 					printWriter.println("tag:"+cpItem.getMd_tag()+"  Send Date:"+cpItem.getSend_date() +" Sent Flag:"+cpItem.getStatus() );
 					//presetBuffer.append("tag:"+cpItem.getMd_tag()+"  Send Date:"+cpItem.getSend_date() +" Sent Flag:"+cpItem.getStatus()+"/n" );
 								
 				}
 				//printWriter.println(presetBuffer);
 				// TEST
-				if(!testMap.containsKey(loyID))
-					break;
+//				if(!testMap.containsKey(loyID))
+//					break;
+				if(testMap.containsKey(loyID))
+				{
 				List<CPOutBoxItem> testList=testMap.get(loyID);
 				CPOutBoxItem testItem=testList.get(0);
 				for (CPOutBoxItem cptestItem: testList )
@@ -82,17 +85,19 @@ public class CPSUtil {
 				String kafkaMSG = createJson(testItem.getLoy_id(),
 						testItem.getMdTagList());
 				
-//				try {
-//					new KafkaUtil("PROD").sendKafkaMSGs(kafkaMSG, currentTopic);
-//				} catch (ConfigurationException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//				
+				try {
+					new KafkaUtil("PROD").sendKafkaMSGs(kafkaMSG, currentTopic);
+				} catch (ConfigurationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				Thread.sleep(5000);
+				
 				//VERIFY
 				
-				if(!verifyMap.containsKey(loyID))
-					break;
+//				if(!verifyMap.containsKey(loyID))
+//					break;
 				//Compare the input data with the one in database to determine success or failure
 				// In case of hyphen, the row should not be there in the outbox
 				List<CPOutBoxItem> verifyList=verifyMap.get(loyID);
@@ -121,9 +126,16 @@ public class CPSUtil {
 								+ verifyItem.getSend_date();
 					} else {
 						failureCount++;
-						testresult = "FAILURE Test Tag: " + verifyItem.getMd_tag()
+						if(verifyItem.getSend_date()==null)
+						{
+							testresult = "FAILURE TestTag: " + verifyItem.getMd_tag()
+									+ " is NOT removed from OutBox as Expected";
+						}
+						else
+							{testresult = "FAILURE Test Tag: " + verifyItem.getMd_tag()
 								+ " OutBox Send Date " + queuedItem.getSend_date() + " is NOT SAME as Expected Send Date: "
 								+ verifyItem.getSend_date();
+							}
 					}
 					}
 					else
@@ -150,7 +162,7 @@ public class CPSUtil {
 				}
 				printWriter.println();
 
-				
+				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -230,11 +242,12 @@ public class CPSUtil {
 			if ("PRESET".equalsIgnoreCase(testPhase)) {
 				// Member number,Existing Tag,Effective Date,Send Date,Sent flag
 				String sendDT=null;
-				String addedDate=getDate(Integer.parseInt(variables[2]));
-				//cpBoxItem.setAdded_datetime(new Date(addedDate));
+//				Date addedDate=getDate(Integer.parseInt(variables[2]));
+//				cpBoxItem.setAdded_datetime(addedDate);
 				if(variables.length>3)
-				sendDT=getDate(Integer.parseInt(variables[3]));
+				{sendDT=getDateString(Integer.parseInt(variables[3]));
 				cpBoxItem.setSend_date(sendDT);
+				}
 				if(variables.length>4)
 				cpBoxItem.setStatus(Integer.parseInt(variables[4]));
 
@@ -244,7 +257,7 @@ public class CPSUtil {
 				if(variables[2].trim().equalsIgnoreCase("-"))
 					cpBoxItem.setSend_date(null);
 				else{
-				String sendDT=getDate(Integer.parseInt(variables[2]));
+				String sendDT=getDateString(Integer.parseInt(variables[2]));
 				cpBoxItem.setSend_date(sendDT);
 				}
 
@@ -276,12 +289,20 @@ public class CPSUtil {
 	}
 
 	
-	private String getDate(int numofdays)
+	private String getDateString(int numofdays)
 	{
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.DATE, numofdays); 
 		SimpleDateFormat s = new SimpleDateFormat("yyyy-MM-dd"); 
 		return s.format(new Date(cal.getTimeInMillis()));
+	}
+	
+	private Date getDate(int numofdays)
+	{
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.DATE, numofdays); 
+		
+		return new Date(cal.getTimeInMillis());
 	}
 	
 	

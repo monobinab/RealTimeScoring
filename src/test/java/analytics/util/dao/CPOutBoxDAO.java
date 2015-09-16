@@ -226,6 +226,11 @@ public class CPOutBoxDAO extends AbstractMySQLDao {
 		Date dNow = new Date();
 		SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd");
 		String today = ft.format(dNow);
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+        
+       
+      //  java.sql.Date sqlDate = new Date(date.getTime());
 		try {
 
 			statement = connection
@@ -235,6 +240,8 @@ public class CPOutBoxDAO extends AbstractMySQLDao {
 			statement.setString(2, cpOutBoxItem.getMd_tag());
 			statement.setString(3, cpOutBoxItem.getSend_date());
 			statement.setInt(4, cpOutBoxItem.getStatus());
+//			java.util.Date date = sdf.parse(cpOutBoxItem.getAdded_datetime());
+//			statement.setDate(5, new java.sql.Date((cpOutBoxItem.getAdded_datetime().toString())));
 			//Question on BU and subbu
 			statement.setString(5, "T");
 			statement.setString(6, "T");
