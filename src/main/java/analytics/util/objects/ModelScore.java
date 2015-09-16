@@ -3,27 +3,51 @@
  */
 package analytics.util.objects;
 
+import com.google.gson.annotations.Expose;
+
 /**
  * @author spannal
  *
  */
 public class ModelScore {
-
-	int modelId;
-	String score;
 	
-	public int getModelId() {
+	@Expose
+	private String modelId;
+	@Expose
+	private double score;
+	@Expose
+	private int percentile;
+	
+	public String getModelId() {
 		return modelId;
 	}
-	public void setModelId(int modelId) {
+	public void setModelId(String modelId) {
 		this.modelId = modelId;
 	}
-	public String getScore() {
+	public double getScore() {
 		return score;
 	}
-	public void setScore(String score) {
+	public void setScore(double score) {
 		this.score = score;
 	}
+	/**
+	* 
+	* @return
+	* The percentile
+	*/
+	public int getPercentile() {
+	return percentile;
+	}
+
+	/**
+	* 
+	* @param percentile
+	* The percentile
+	*/
+	public void setPercentile(int percentile) {
+	this.percentile = percentile;
+	}
+
 
 	
 }

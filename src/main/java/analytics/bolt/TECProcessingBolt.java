@@ -2,6 +2,8 @@ package analytics.bolt;
 
 import java.util.Map;
 
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +41,11 @@ public class TECProcessingBolt extends EnvironmentBolt {
 		LOGGER.info("Preparing TECProcessingBolt");
 		super.prepare(stormConf, context, collector);
 		this.outputCollector = collector;
-		rtsApiCaller = RTSAPICaller.getInstance();
+		try {
+			rtsApiCaller = RTSAPICaller.getInstance();
+		} catch (ConfigurationException e) {
+			LOGGER.error(e.getClass() + ": " + e.getMessage() +" STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
+		}
 		tecPostClient = TECPostClient.getInstance();
 		api_key=new ClientApiKeysDAO().findkey(api_Key_Param);
 		

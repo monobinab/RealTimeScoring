@@ -5,12 +5,14 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.exception.RealTimeScoringException;
 import analytics.util.CPSFiler;
+import analytics.util.MongoNameConstants;
 import analytics.util.RTSAPICaller;
 import analytics.util.dao.ClientApiKeysDAO;
 import analytics.util.objects.EmailPackage;
@@ -20,11 +22,11 @@ import backtype.storm.tuple.Tuple;
 
 public class CPProcessingBolt extends EnvironmentBolt  {
 	private static final long serialVersionUID = 1L;
-	private static final String api_Key_Param="email";
+	private static String cps_api_key;
 	private static final Logger LOGGER = LoggerFactory.getLogger(CPProcessingBolt.class);
 	private OutputCollector outputCollector;
 	private RTSAPICaller rtsApiCaller;
-	private String api_key;
+	private String cps_api_key_param;
 	private CPSFiler cpsFiler;
 	public CPProcessingBolt(String env) {
 		super(env);
@@ -33,20 +35,41 @@ public class CPProcessingBolt extends EnvironmentBolt  {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,	OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
-		this.outputCollector = collector;
-		rtsApiCaller = RTSAPICaller.getInstance();
-		api_key = new ClientApiKeysDAO().findkey(api_Key_Param);
-		cpsFiler = new CPSFiler();
+		this.outputCollector = collector;		
 		try {
-			cpsFiler.initDAO();
-		} catch (RealTimeScoringException e) {
-			LOGGER.error("Exception Occured in CPProcessingBolt Prepare :: ", ExceptionUtils.getFullStackTrace(e));
+			rtsApiCaller = RTSAPICaller.getInstance();
+			
+			cpsFiler = new CPSFiler();
+			cpsFiler.initDAO();	
+			
+			PropertiesConfiguration properties = null;
+			String isProd = System.getProperty(MongoNameConstants.IS_PROD);
+			if(isProd!=null && "PROD".equals(isProd)){
+					
+					properties=  new PropertiesConfiguration("resources/connection_config_prod.properties");
+				
+				LOGGER.info("~~~~~~~Using production properties in DBConnection~~~~~~~~~");
+			}
+			
+			else if(isProd!=null && "QA".equals(isProd)){
+				properties=  new PropertiesConfiguration("resources/connection_config.properties");
+				LOGGER.info("Using QA properties");	
+			}
+			
+			else if(isProd!=null && "LOCAL".equals(isProd)){
+				properties=  new PropertiesConfiguration("resources/connection_config_local.properties");
+				LOGGER.info("Using local properties");	
+			}
+			cps_api_key_param = properties.getString("cps_api_Key_param");
+			cps_api_key = new ClientApiKeysDAO().findkey(cps_api_key_param);
+		} catch (Exception e) {
+			LOGGER.error(e.getClass() + ": " + e.getMessage() +" STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 		}
 	}
 
 	@Override
 	public void execute(Tuple input) {
-		redisCountIncr("CPProcessingBolt_input_count");
+		redisCountIncr("input_count");
 		String lyl_id_no = null; 
 		String l_id = null; 
 			
@@ -58,29 +81,31 @@ public class CPProcessingBolt extends EnvironmentBolt  {
 			try{
 				//call rts api and get response for this l_id 
 				//20 - level, rtsTOtec is the apikey for internal calls to RTS API from topologies
-				String rtsAPIResponse = rtsApiCaller.getRTSAPIResponse(lyl_id_no, "20", api_key, "sears", Boolean.FALSE, "");
+				String rtsAPIResponse = rtsApiCaller.getRTSAPIResponse(lyl_id_no, "20", cps_api_key, "sears", Boolean.FALSE, "");
 				List<EmailPackage> emailPackages = cpsFiler.prepareEmailPackages(rtsAPIResponse,lyl_id_no,l_id);
 				if(emailPackages!= null && emailPackages.size()>0)
 				{
 					cpsFiler.fileEmailPackages(emailPackages);
 					LOGGER.info("PERSIST: Queued Tags in CPS Outbox for lyl_id_no " + lyl_id_no+ " : "+getLogMsg(emailPackages));
 					redisCountIncr("queued_tags_count");
-					outputCollector.ack(input);
+					
 				}					
 			} catch (SQLException e){
 				LOGGER.error("SQLException Occured in CPProcessingBolt :: " + e.getMessage()+ "  SATCKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 				redisCountIncr("SQLException_count");	
-				outputCollector.fail(input);					
+				//outputCollector.fail(input);					
 			} catch (Exception e){
-				LOGGER.error("Exception Occured in CPProcessingBolt :: " +  e.getMessage()+ "  SATCKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
+				LOGGER.error("Exception Occured in CPProcessingBolt :: " +  e.getMessage()+ "  STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 				redisCountIncr("Exception_count");	
-				outputCollector.fail(input);	
+				//outputCollector.fail(input);	
 			}
 				
 		} else {
 			redisCountIncr("null_lid");			
-			outputCollector.fail(input);				
+			//outputCollector.fail(input);				
 		}
+		redisCountIncr("output_count");	
+		outputCollector.ack(input);
 	}
 
 	private String getLogMsg(List<EmailPackage> emailPackages) {
