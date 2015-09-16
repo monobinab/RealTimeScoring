@@ -69,7 +69,7 @@ public class CPProcessingBolt extends EnvironmentBolt  {
 
 	@Override
 	public void execute(Tuple input) {
-		redisCountIncr("CPProcessingBolt_input_count");
+		redisCountIncr("input_count");
 		String lyl_id_no = null; 
 		String l_id = null; 
 			
@@ -88,22 +88,24 @@ public class CPProcessingBolt extends EnvironmentBolt  {
 					cpsFiler.fileEmailPackages(emailPackages);
 					LOGGER.info("PERSIST: Queued Tags in CPS Outbox for lyl_id_no " + lyl_id_no+ " : "+getLogMsg(emailPackages));
 					redisCountIncr("queued_tags_count");
-					outputCollector.ack(input);
+					
 				}					
 			} catch (SQLException e){
 				LOGGER.error("SQLException Occured in CPProcessingBolt :: " + e.getMessage()+ "  SATCKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 				redisCountIncr("SQLException_count");	
-				outputCollector.fail(input);					
+				//outputCollector.fail(input);					
 			} catch (Exception e){
 				LOGGER.error("Exception Occured in CPProcessingBolt :: " +  e.getMessage()+ "  SATCKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 				redisCountIncr("Exception_count");	
-				outputCollector.fail(input);	
+				//outputCollector.fail(input);	
 			}
 				
 		} else {
 			redisCountIncr("null_lid");			
-			outputCollector.fail(input);				
+			//outputCollector.fail(input);				
 		}
+		redisCountIncr("output_count");	
+		outputCollector.ack(input);
 	}
 
 	private String getLogMsg(List<EmailPackage> emailPackages) {
