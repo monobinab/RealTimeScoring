@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import junit.framework.Assert;
 import analytics.MockOutputCollector;
@@ -48,7 +49,6 @@ public class StrategyScoringBoltTest {
 		SystemPropertyUtility.setSystemProperty();
 		fakeMongoStaticCollection = new FakeMongoStaticCollection();
 		db = SystemPropertyUtility.getDb();
-		
 	}
 	
 	//a positive case
@@ -76,12 +76,11 @@ public class StrategyScoringBoltTest {
 		StrategyScoringBolt boltUnderTest = new StrategyScoringBolt(System.getProperty("rtseprod"), "0.0.0.0", 0000, "0.0.0.0", 0000 );
 	
 		boltUnderTest.setJedisInterface(new JedisFactoryStubImpl());
-		boltUnderTest.setTestMode(Boolean.TRUE);
-		
+			
 		Map<String, Object> newChangesVarValuemap = new HashMap<String, Object>();
 		newChangesVarValuemap.put("S_SRS_VAR", "102.0");
 		String varObjString = (String) JsonUtils.createJsonFromStringObjectMap(newChangesVarValuemap);
-		Tuple tuple = StormTestUtils.mockTuple(l_id, varObjString, "TestingTelluride", "testingLoyaltyId");
+		Tuple tuple = StormTestUtils.mockTuple(l_id, varObjString, "testingTopology", "testingLoyaltyId");
 		
 		TopologyContext context = new MockTopologyContext();
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
@@ -89,9 +88,7 @@ public class StrategyScoringBoltTest {
 		boltUnderTest.prepare(SystemPropertyUtility.getStormConf(), context, outputCollector);
 		
 		boltUnderTest.execute(tuple);
-		List<Object> outputTuple = outputCollector.getTuple().get("score_stream");
 	
-		
 		//fake changedMemberScores collection with no record in it
 		DBCollection changedMemberScoreColl = db.getCollection("changedMemberScores");
 		DBObject changedMemScoreObj = null;
@@ -106,7 +103,7 @@ public class StrategyScoringBoltTest {
 			Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), changedMemScores70Updated.get("minEx"));
 			Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), changedMemScores70Updated.get("maxEx"));
 			Assert.assertEquals(simpleDateFormat.format(new Date()), changedMemScores70Updated.get("f"));
-			Assert.assertEquals("TestingTelluride", changedMemScores70Updated.get("c"));
+			Assert.assertEquals("testingTopology", changedMemScores70Updated.get("c"));
 		}
 		
 		//testing the updated changedMemberVariables collection
@@ -117,24 +114,44 @@ public class StrategyScoringBoltTest {
 		Assert.assertEquals(simpleDateFormat.format(new Date()), varObj.get("f"));
 		
 			
-		//testing the tuple emitted in outputcollector 
-		Assert.assertEquals(l_id, outputTuple.get(0));
-		Assert.assertEquals(0.9999999847700205, outputTuple.get(1));
-		Assert.assertEquals("70", outputTuple.get(2));
-		Assert.assertEquals("TestingTelluride", outputTuple.get(3));
-		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), outputTuple.get(5));
-		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), outputTuple.get(6));
+		//testing the tuple emitted in score_stream of the outputcollector (emitted to Logging Bolt) 
+		List<Object> outputTupleScoreStream = outputCollector.getTuple().get("score_stream");
+		Assert.assertEquals(l_id, outputTupleScoreStream.get(0));
+		Assert.assertEquals(0.9999999847700205, outputTupleScoreStream.get(1));
+		Assert.assertEquals("70", outputTupleScoreStream.get(2));
+		Assert.assertEquals("testingTopology", outputTupleScoreStream.get(3));
+		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), outputTupleScoreStream.get(5));
+		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), outputTupleScoreStream.get(6));
+		
+		//testing the tuple emitted in kafka_stream of the outputcollector (emitted to kafka for TEC to listen to) 
+		//lyl_id_no+"~"+topologyName
+		List<Object> outputTupleKafkaStream = outputCollector.getTuple().get("kafka_stream");
+		Assert.assertEquals("testingLoyaltyId~testingTopology", outputTupleKafkaStream.get(0));
 		
 		//testing the fake redis for TI_POS
-		boltUnderTest.getFakeJedis().hgetAll("RTS:Telluride:"+l_id);
-		//Assert.assertEquals(0.9999999847700205, actualRedisMap.get("70"));
+		Jedis fakeJedis = boltUnderTest.getJedisInterface().createJedis("0.0.0.0", 0000);
+		Map<String, String> actualRedisMap = fakeJedis.hgetAll("RTS:Telluride:"+l_id);
+		Assert.assertEquals("0.9999999847700205", actualRedisMap.get("70"));
+		
+		//testing the fake redis for unknown occasion
+		Set<String> keys = fakeJedis.keys("Unknown");
+		Assert.assertTrue(keys.contains("Unknown:testingLoyaltyId"));
+		
+		//clearing the fake redis
+		fakeJedis.del("Unknown:testingLoyaltyId");
+		fakeJedis.del("RTS:Telluride:"+l_id);
+		
+		//clearing the fake mongo
+		changedMemberScoreColl.remove(new BasicDBObject("l_id", "testingLid"));
+		changedMemberVar.remove(new BasicDBObject("l_id", "testingLid"));
+		memVarColl.remove(new BasicDBObject("l_id", "testingLid"));
 	}
 	
 	@Test
 	public void strategyScoringBoltWithNoMemberFoundTest() throws ParseException {
 		
 		String l_id = "testingLid2";
-		//fake memberVariables collection 
+		//fake memberVariables collection, does not contain the memberId in testing 
 		DBCollection memVarColl = db.getCollection("memberVariables");
 		memVarColl.insert(new BasicDBObject("l_id", "testingLid").append("15", 1));
 		
@@ -149,20 +166,17 @@ public class StrategyScoringBoltTest {
 				new BasicDBObject("v", expected.getValue()).append("e",
 						expected.getExpirationDateAsString()).append("f",
 						expected.getEffectiveDateAsString())));
-			
-		StrategyScoringBolt boltUnderTest = new StrategyScoringBolt(System.getProperty("rtseprod"), "0.0.0.0", 6379, "0.0.0.0", 6379 );
-		boltUnderTest.setTestMode(Boolean.TRUE);
-	
-		boltUnderTest.setJedisInterface(new JedisFactoryStubImpl());
 		
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("VARIABLE4", "102.0");
 		String varObjString = (String) JsonUtils.createJsonFromStringObjectMap(map);
-		Tuple tuple = StormTestUtils.mockTuple("testingLid2", varObjString, "TestingTelluride", "testingLoyaltyId2");
+		Tuple tuple = StormTestUtils.mockTuple("testingLid2", varObjString, "testingTopology", "testingLoyaltyId2");
 		
 		TopologyContext context = new MockTopologyContext();
 		MockOutputCollector outputCollector = new MockOutputCollector(null);
 			
+		StrategyScoringBolt boltUnderTest = new StrategyScoringBolt(System.getProperty("rtseprod"), "0.0.0.0", 6379, "0.0.0.0", 6379 );
+		boltUnderTest.setJedisInterface(new JedisFactoryStubImpl());	
 		boltUnderTest.prepare(SystemPropertyUtility.getStormConf(), context, outputCollector);
 		
 		boltUnderTest.execute(tuple);

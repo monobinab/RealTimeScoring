@@ -32,6 +32,7 @@ public class SystemPropertyUtility {
 		System.setProperty(MongoNameConstants.REQ_SOURCE, StringUtils.EMPTY);
 		stormConf = new HashMap<String, String>();
 		stormConf.put("nimbus.host", "test");
+		stormConf.put("metrics_topology", "testingTopology");
 		FakeMongo.setDBConn(new Fongo("test db").getDB("test"));	
 		try {
 			db = DBConnection.getDBConnection();

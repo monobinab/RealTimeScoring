@@ -48,27 +48,6 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	private int respPort;
 	JedisFactory jedisInterface;
 	
-	private Jedis fakeJedis;
-	private Boolean testMode;
-
-	public Jedis getFakeJedis() {
-		return fakeJedis;
-	}
-
-	public void setFakeJedis(Jedis fakeJedis) {
-		this.fakeJedis = fakeJedis;
-	}
-	
-	
-
-	public Boolean getTestMode() {
-		return testMode;
-	}
-
-	public void setTestMode(Boolean testMode) {
-		this.testMode = testMode;
-	}
-
 	public JedisFactory getJedisInterface() {
 		return jedisInterface;
 	}
@@ -169,14 +148,12 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 				jedis = getJedisInterface().createJedis(host, port);
 				jedis.connect();
 				jedis.hmset("RTS:Telluride:"+lId, modelIdScoreStringMap);
-				if(testMode){
-					setFakeJedis(jedis);
-					Jedis jedis2 = getFakeJedis();
-					jedis2.hgetAll("RTS:Telluride:"+lId);
-				}
+				/*if(testMode){
+					setFakeRedis(jedis);
+				}*/
 				
-				/*jedis.expire("RTS:Telluride:"+lId, 600);
-				jedis.disconnect();*/
+				jedis.expire("RTS:Telluride:"+lId, 600);
+				jedis.disconnect();
 			}
 		
 		
@@ -202,16 +179,16 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			}
 	   			
 			//persisting the loyalty id to redis for UnknownOccasionsTopology to pick up the loyalty id
-			/*if(respHost != null){
+			if(respHost != null){
 					jedis = getJedisInterface().createJedis(respHost, respPort);
-					if(testMode)
-						setFakeJedis(jedis);
+					/*if(testMode)
+						setFakeJedis(jedis);*/
 					jedis.connect();
 					jedis.set("Unknown:"+lyl_id_no,"");
 					jedis.disconnect();
 				
 			}
-			*/
+			
 			//Adding logic to set up a Stream that the KafkaBolt can listen to...
 			List<Object> listToEmit = new ArrayList<Object>();
 			listToEmit.add(lyl_id_no+"~"+topologyName);
@@ -228,6 +205,11 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 				jedis.disconnect();
 		}
 	}
+/*	
+	private void setFakeRedis(Jedis jedis){
+		fakeJedis = jedis;
+		setFakeJedis(fakeJedis);
+	}*/
 	
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {

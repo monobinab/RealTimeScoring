@@ -6,8 +6,24 @@ import redis.clients.jedis.Jedis;
 
 public class JedisFactoryStubImpl implements JedisFactory{
 	
-	 public Jedis createJedis(String host, int port){
-		 Jedis	jedis = new MockJedis("test");
+	Jedis jedis;
+	
+
+	public Jedis getJedis() {
+		return jedis;
+	}
+
+
+	public void setJedis(Jedis jedis) {
+		this.jedis = jedis;
+	}
+
+
+	public Jedis createJedis(String host, int port){
+		 if(getJedis() == null){
+			 jedis = new MockJedis("test");
+			 setJedis(jedis);
+		 }
 		 return jedis;
 	 }
 	 
