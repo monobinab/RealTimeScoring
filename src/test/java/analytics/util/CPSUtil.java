@@ -30,9 +30,8 @@ import analytics.util.dao.CPOutBoxDAO;
 
 public class CPSUtil {
 
-	public void processFile(String presetFile, String testFile, String outputfile) {
+	public void processFile(String presetFile, String testFile, String outputfile, String topicName) {
 		FileReader fileReader = null;
-		String currentTopic = "stormtopic";
 		String outputFile = outputfile+System.currentTimeMillis()+".txt";
 		File result =new File(outputFile);
 		PrintWriter printWriter = null;
@@ -86,7 +85,7 @@ public class CPSUtil {
 						testItem.getMdTagList());
 				
 				try {
-					new KafkaUtil("PROD").sendKafkaMSGs(kafkaMSG, currentTopic);
+					new KafkaUtil("PROD").sendKafkaMSGs(kafkaMSG, topicName);
 				} catch (ConfigurationException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

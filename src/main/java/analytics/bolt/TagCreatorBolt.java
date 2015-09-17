@@ -54,13 +54,9 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 	@Override
 	public void execute(Tuple input) {
 		redisCountIncr("TagCreatorBolt_input_count");
-		//String lyl_id_no = null; 
-
-		countMetric.scope("entering_TagCreator_bolt").incr();			
-			
 		if(input != null)
 		{
-				try{
+			try{
 				JsonElement jsonElement = TupleParser.getParsedJson(input);
 				LOGGER.info("Input from PurchaseScoreKafkaBolt :" + jsonElement.toString());
 				JsonElement lyl_id_no = jsonElement.getAsJsonObject().get("memberId");
