@@ -26,6 +26,8 @@ import org.joda.time.LocalDate;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import redis.clients.jedis.Jedis;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -57,16 +59,16 @@ public class StrategyScoringBoltTest {
 		String l_id = "testingLid";
 		//fake memberVariables collection
 		DBCollection memVarColl = db.getCollection("memberVariables");
-		memVarColl.insert(new BasicDBObject("l_id", l_id).append("15", 1));
+		memVarColl.insert(new BasicDBObject("l_id", l_id).append("16", 1));
 	
 		//fake changedMemberVariables collection
 		DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		Change expected = new Change("15", 12,
+		Change expected = new Change("16", 12,
 				simpleDateFormat.parse("2999-09-23"),
 				simpleDateFormat.parse("2014-09-01"));
 		changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
-				"15",
+				"16",
 				new BasicDBObject("v", expected.getValue()).append("e",
 						expected.getExpirationDateAsString()).append("f",
 						expected.getEffectiveDateAsString())));
@@ -74,10 +76,11 @@ public class StrategyScoringBoltTest {
 		StrategyScoringBolt boltUnderTest = new StrategyScoringBolt(System.getProperty("rtseprod"), "0.0.0.0", 0000, "0.0.0.0", 0000 );
 	
 		boltUnderTest.setJedisInterface(new JedisFactoryStubImpl());
+		boltUnderTest.setTestMode(Boolean.TRUE);
 		
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("S_SRS_VAR", "102.0");
-		String varObjString = (String) JsonUtils.createJsonFromStringObjectMap(map);
+		Map<String, Object> newChangesVarValuemap = new HashMap<String, Object>();
+		newChangesVarValuemap.put("S_SRS_VAR", "102.0");
+		String varObjString = (String) JsonUtils.createJsonFromStringObjectMap(newChangesVarValuemap);
 		Tuple tuple = StormTestUtils.mockTuple(l_id, varObjString, "TestingTelluride", "testingLoyaltyId");
 		
 		TopologyContext context = new MockTopologyContext();
@@ -99,7 +102,7 @@ public class StrategyScoringBoltTest {
 					.get("70");
 			// testing the updated changedMemberScore collection
 			Assert.assertEquals("testingLid", changedMemScoreObj.get("l_id"));
-			Assert.assertEquals(0.9975273768433652, changedMemScores70Updated.get("s"));
+			Assert.assertEquals(0.9999999847700205, changedMemScores70Updated.get("s"));
 			Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), changedMemScores70Updated.get("minEx"));
 			Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), changedMemScores70Updated.get("maxEx"));
 			Assert.assertEquals(simpleDateFormat.format(new Date()), changedMemScores70Updated.get("f"));
@@ -107,16 +110,24 @@ public class StrategyScoringBoltTest {
 		}
 		
 		//testing the updated changedMemberVariables collection
-		
+		DBObject changedMemVars = changedMemberVar.findOne(new BasicDBObject("l_id", l_id));
+		DBObject varObj = (DBObject) changedMemVars.get("16");
+		Assert.assertEquals(13, varObj.get("v"));
+		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), varObj.get("e"));
+		Assert.assertEquals(simpleDateFormat.format(new Date()), varObj.get("f"));
 		
 			
 		//testing the tuple emitted in outputcollector 
 		Assert.assertEquals(l_id, outputTuple.get(0));
-		Assert.assertEquals(0.9975273768433652, outputTuple.get(1));
+		Assert.assertEquals(0.9999999847700205, outputTuple.get(1));
 		Assert.assertEquals("70", outputTuple.get(2));
 		Assert.assertEquals("TestingTelluride", outputTuple.get(3));
 		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), outputTuple.get(5));
 		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), outputTuple.get(6));
+		
+		//testing the fake redis for TI_POS
+		boltUnderTest.getFakeJedis().hgetAll("RTS:Telluride:"+l_id);
+		//Assert.assertEquals(0.9999999847700205, actualRedisMap.get("70"));
 	}
 	
 	@Test
@@ -140,6 +151,7 @@ public class StrategyScoringBoltTest {
 						expected.getEffectiveDateAsString())));
 			
 		StrategyScoringBolt boltUnderTest = new StrategyScoringBolt(System.getProperty("rtseprod"), "0.0.0.0", 6379, "0.0.0.0", 6379 );
+		boltUnderTest.setTestMode(Boolean.TRUE);
 	
 		boltUnderTest.setJedisInterface(new JedisFactoryStubImpl());
 		
