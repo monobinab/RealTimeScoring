@@ -698,7 +698,7 @@ public class CPSFilerTest {
 		EmailPackage inProgressEmailPackage = null;
 		List<EmailPackage> queuedEmailPackages = new ArrayList<EmailPackage>();
 		when(outboxDao.getInProgressPackage("7081057547176153", occasionInfos)).thenReturn(inProgressEmailPackage);
-		when(spy.getQueuedEmailPackages("7081057547176153", occasionInfos)).thenReturn(queuedEmailPackages);
+		when(outboxDao.getQueuedEmailPackages("7081057547176153", occasionInfos)).thenReturn(queuedEmailPackages);
 		List<EmailPackage> retEmailPackages = cpsFiler.prepareEmailPackages(resp, "7081057547176153","Oj8kOFFTCkcrljYSO/srjUeGk3A=");
 		
 		Assert.assertNotNull(retEmailPackages);
@@ -836,7 +836,7 @@ public class CPSFilerTest {
 			EmailPackage inProgressEmailPackage = null;
 			List<EmailPackage> queuedEmailPackages = new ArrayList<EmailPackage>();
 			when(outboxDao.getInProgressPackage("7081010070442369", occasionInfos)).thenReturn(inProgressEmailPackage);
-			when(spy.getQueuedEmailPackages("7081010070442369", occasionInfos)).thenReturn(queuedEmailPackages);
+			when(outboxDao.getQueuedEmailPackages("7081010070442369", occasionInfos)).thenReturn(queuedEmailPackages);
 			List<EmailPackage> retEmailPackages = cpsFiler.prepareEmailPackages(resp, "7081010070442369","iTdmURpMBx+gx+PZ5LzSAk0D78A=");
 			
 			Assert.assertNotNull(retEmailPackages);

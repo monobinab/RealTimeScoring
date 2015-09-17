@@ -26,7 +26,7 @@ public class CPProcessingBolt extends EnvironmentBolt  {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CPProcessingBolt.class);
 	private OutputCollector outputCollector;
 	private RTSAPICaller rtsApiCaller;
-	private String cps_api_key_param;
+	private static final String cps_api_key_param = "CPS";
 	private CPSFiler cpsFiler;
 	public CPProcessingBolt(String env) {
 		super(env);
@@ -37,30 +37,9 @@ public class CPProcessingBolt extends EnvironmentBolt  {
 		super.prepare(stormConf, context, collector);
 		this.outputCollector = collector;		
 		try {
-			rtsApiCaller = RTSAPICaller.getInstance();
-			
+			rtsApiCaller = RTSAPICaller.getInstance();			
 			cpsFiler = new CPSFiler();
 			cpsFiler.initDAO();	
-			
-			PropertiesConfiguration properties = null;
-			String isProd = System.getProperty(MongoNameConstants.IS_PROD);
-			if(isProd!=null && "PROD".equals(isProd)){
-					
-					properties=  new PropertiesConfiguration("resources/connection_config_prod.properties");
-				
-				LOGGER.info("~~~~~~~Using production properties in DBConnection~~~~~~~~~");
-			}
-			
-			else if(isProd!=null && "QA".equals(isProd)){
-				properties=  new PropertiesConfiguration("resources/connection_config.properties");
-				LOGGER.info("Using QA properties");	
-			}
-			
-			else if(isProd!=null && "LOCAL".equals(isProd)){
-				properties=  new PropertiesConfiguration("resources/connection_config_local.properties");
-				LOGGER.info("Using local properties");	
-			}
-			cps_api_key_param = properties.getString("cps_api_Key_param");
 			cps_api_key = new ClientApiKeysDAO().findkey(cps_api_key_param);
 		} catch (Exception e) {
 			LOGGER.error(e.getClass() + ": " + e.getMessage() +" STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
