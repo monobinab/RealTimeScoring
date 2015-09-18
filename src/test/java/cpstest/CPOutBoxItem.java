@@ -2,12 +2,12 @@ package cpstest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Date;
 
 public class CPOutBoxItem {
 	int email_pkg_id;
 	String loy_id, bu, sub_bu, md_tag, occasion_name;
-	java.util.Date added_datetime;
-	String send_date, sent_datetime;
+	Date added_datetime, send_date, sent_datetime;
 	int status;
 	String cust_event_name, customer_id, sears_opt_in, kmart_opt_in,
 			syw_opt_in;
@@ -76,19 +76,19 @@ public class CPOutBoxItem {
 		this.added_datetime = added_datetime;
 	}
 
-	public String getSend_date() {
+	public Date getSend_date() {
 		return send_date;
 	}
 
-	public void setSend_date(String send_date) {
+	public void setSend_date(Date send_date) {
 		this.send_date = send_date;
 	}
 
-	public String getSent_datetime() {
+	public Date getSent_datetime() {
 		return sent_datetime;
 	}
 
-	public void setSent_datetime(String sent_datetime) {
+	public void setSent_datetime(Date sent_datetime) {
 		this.sent_datetime = sent_datetime;
 	}
 

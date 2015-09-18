@@ -147,7 +147,7 @@ public class MemberMDTags2Dao extends AbstractDao {
 			tagstoUpdate.put("tags", newMdTagsList);
 		if(rtsTagsList!=null && rtsTagsList.size()>0)
 			tagstoUpdate.put("rtsTags", rtsTagsList);
-		LOGGER.info("rtsTags are getting updated in "+  memberMDTagsCollection.getDB().getName() + " for memberId : '" + l_id +"'");
+		LOGGER.info("Tags are getting updated in "+  memberMDTagsCollection.getDB().getName() + " for memberId : '" + l_id +"'");
 		memberMDTagsCollection.update(new BasicDBObject(
 				MongoNameConstants.L_ID, l_id), tagstoUpdate, true, false);
 	}

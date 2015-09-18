@@ -29,8 +29,7 @@ public class ConsideredPurchaseTopology {
 	public static void main(String[] args) {		
 
 		if (!SystemUtility.setEnvironment(args)) {
-			System.out
-					.println("Please pass the environment variable argument- 'PROD' or 'QA' or 'LOCAL'");
+			LOGGER.error("Please pass the environment variable argument- 'PROD' or 'QA' or 'LOCAL'");
 			System.exit(0);
 		}
 		
@@ -46,14 +45,14 @@ public class ConsideredPurchaseTopology {
 				
 		try {
 			SpoutConfig spoutConfig1 = null;
-			SpoutConfig spoutConfig2 = null;
+			//SpoutConfig spoutConfig2 = null;
 			SpoutConfig spoutConfig3 = null;
 			spoutConfig1 = new KafkaUtil(env).getSpoutConfig(kafkaTopic1,zkroot1,group_id);
 			//spoutConfig2 = new KafkaUtil(env).getSpoutConfig(kafkaTopic2,zkroot2,group_id);
-			spoutConfig3 = new KafkaUtil(env).getSpoutConfig(cpsPurchaseScoresTopic,zkroot_cp_purchase);			
+			spoutConfig3 = new KafkaUtil(env).getSpoutConfig(cpsPurchaseScoresTopic,zkroot_cp_purchase,group_id);			
 			topologyBuilder.setSpout("CPKafkaSpout1", new RTSKafkaSpout(spoutConfig1), 1);
 			//topologyBuilder.setSpout("CPKafkaSpout2", new RTSKafkaSpout(spoutConfig2), 1);
-			spoutConfig2 = new KafkaUtil(env).getSpoutConfig(cpsPurchaseScoresTopic,zkroot_cp_purchase);
+			//spoutConfig2 = new KafkaUtil(env).getSpoutConfig(cpsPurchaseScoresTopic,zkroot_cp_purchase);
 			topologyBuilder.setSpout("CPPurchaseFeedbackSpout", new RTSKafkaSpout(spoutConfig3), 1);
 			//LOGGER.info("CPS Topology listening to kafka topics : " + kafkaTopic1 + ", "+kafkaTopic2 +" , "+ cpsPurchaseScoresTopic);
 			LOGGER.info("CPS Topology listening to kafka topics : " + kafkaTopic1 + ", "+ cpsPurchaseScoresTopic);
@@ -71,15 +70,15 @@ public class ConsideredPurchaseTopology {
 		conf.put("metrics_topology", "CPS");
 		conf.registerMetricsConsumer(MetricsListener.class, env, partition_num);
 		conf.setDebug(false);
-		if (env.equalsIgnoreCase("PROD")|| env.equalsIgnoreCase("QA")) {	
+	/*	if (env.equalsIgnoreCase("PROD")|| env.equalsIgnoreCase("QA")) {	
 			try {
 				StormSubmitter.submitTopology(args[0], conf, topologyBuilder.createTopology());
 			} catch (AlreadyAliveException e) {
-				LOGGER.error(e.getClass() + ": " + e.getMessage() +" STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
+				LOGGER.error(e.getClass() + ": "+ ExceptionUtils.getMessage(e) + "Rootcause-"+ ExceptionUtils.getRootCauseMessage(e) +"  STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 			} catch (InvalidTopologyException e) {
-				LOGGER.error(e.getClass() + ": " + e.getMessage() +" STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
+				LOGGER.error(e.getClass() + ": " + ExceptionUtils.getMessage(e) + "Rootcause-"+ ExceptionUtils.getRootCauseMessage(e) +"  STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 			}
-		} else {
+		} else {*/
 			conf.setDebug(false);
 			conf.setMaxTaskParallelism(partition_num);
 			LocalCluster cluster = new LocalCluster();
@@ -90,7 +89,7 @@ public class ConsideredPurchaseTopology {
 				LOGGER.debug("Unable to wait for topology", e);
 			}
 			cluster.shutdown();
-		}
+		//}
 	
 	}
 

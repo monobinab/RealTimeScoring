@@ -100,13 +100,14 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 					}
 				}
 			} catch (Exception e){
-				LOGGER.error("Exception Occured in TagCreatorBolt :: " +  e.getMessage()+ "  STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
-				outputCollector.fail(input);	
+				redisCountIncr("exception_count");
+				LOGGER.error("Exception Occured in TagCreatorBolt :: " + ExceptionUtils.getMessage(e) + ". Rootcause-"+ ExceptionUtils.getRootCauseMessage(e)+ "  STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
+				//outputCollector.fail(input);	
 			}
 				
 		} else {
 			redisCountIncr("null_lid");			
-			outputCollector.fail(input);				
+			//outputCollector.fail(input);				
 		}
 		outputCollector.ack(input);
 		
