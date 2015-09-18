@@ -119,9 +119,8 @@ public class MemberMDTags2Dao extends AbstractDao {
 				//If yes, retain the effective and expiration dates. Else create a new sub-document
 
 				newObj = isTagExists(tag, mdTagsList);
-				if(newObj!=null)
-					newMdTagsList.add(newObj);
-				else{
+				if(newObj==null)
+				{
 					newObj = new BasicDBObject();
 					newObj.append("t", tag);
 					newObj.append("f", ft.format(dNow));
