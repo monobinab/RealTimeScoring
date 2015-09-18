@@ -70,7 +70,7 @@ public class ConsideredPurchaseTopology {
 		conf.put("metrics_topology", "CPS");
 		conf.registerMetricsConsumer(MetricsListener.class, env, partition_num);
 		conf.setDebug(false);
-	/*	if (env.equalsIgnoreCase("PROD")|| env.equalsIgnoreCase("QA")) {	
+		if (env.equalsIgnoreCase("PROD")|| env.equalsIgnoreCase("QA")) {	
 			try {
 				StormSubmitter.submitTopology(args[0], conf, topologyBuilder.createTopology());
 			} catch (AlreadyAliveException e) {
@@ -78,7 +78,7 @@ public class ConsideredPurchaseTopology {
 			} catch (InvalidTopologyException e) {
 				LOGGER.error(e.getClass() + ": " + ExceptionUtils.getMessage(e) + "Rootcause-"+ ExceptionUtils.getRootCauseMessage(e) +"  STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 			}
-		} else {*/
+		} else {
 			conf.setDebug(false);
 			conf.setMaxTaskParallelism(partition_num);
 			LocalCluster cluster = new LocalCluster();
@@ -89,7 +89,7 @@ public class ConsideredPurchaseTopology {
 				LOGGER.debug("Unable to wait for topology", e);
 			}
 			cluster.shutdown();
-		//}
+		}
 	
 	}
 
