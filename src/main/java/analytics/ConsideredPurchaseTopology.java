@@ -35,7 +35,8 @@ public class ConsideredPurchaseTopology {
 		
 		String kafkaTopic1="rts_cp_membertags";
 		String zkroot1="rts_cp_membertags_zkroot";		
-		String kafkaTopic2="stormtopic";
+	//	String kafkaTopic2="stormtopic";
+		String kafkaTopic2="rts_cp_membertags_qa";
 		String zkroot2="rts_cp_stormtopic_zkroot";
 		String cpsPurchaseScoresTopic="rts_cp_purchase_scores";
 		String zkroot_cp_purchase = "rts_cp_purchase_zkroot";
@@ -62,7 +63,7 @@ public class ConsideredPurchaseTopology {
 		}
 		//topologyBuilder.setBolt("CPParsePersistBolt", new CPParsePersistBolt(env), 15).shuffleGrouping("CPKafkaSpout1").shuffleGrouping("CPTagCreatorBolt", "rtsTags_stream" );	
 		topologyBuilder.setBolt("CPParsePersistBolt", new CPParsePersistBolt(env), 15).shuffleGrouping("CPKafkaSpout1").shuffleGrouping("CPKafkaSpout2").shuffleGrouping("CPTagCreatorBolt", "rtsTags_stream" );	
-		topologyBuilder.setBolt("CPProcessingBolt", new CPProcessingBolt(env),15).localOrShuffleGrouping("CPParsePersistBolt");
+		topologyBuilder.setBolt("CPProcessingBolt", new CPProcessingBolt(env),15).shuffleGrouping("CPParsePersistBolt");
 		topologyBuilder.setBolt("CPTagCreatorBolt", new TagCreatorBolt(env), 1).shuffleGrouping("CPPurchaseFeedbackSpout");		
 		
 		Config conf = new Config();

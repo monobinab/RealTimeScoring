@@ -627,7 +627,7 @@ public class CPSFilerTest {
 	//			 CETV Replace_by_age - send Date = today+8
 	//			 CECA Replace_by_age - send Date = today+11
 	@Test
-	public void testPrepareEmailPackages() throws JSONException, SQLException, RealTimeScoringException{
+	public void testPrepareEmailPackages() throws JSONException, SQLException, Exception{
 		 sdformat = new SimpleDateFormat("MM/dd/yyyy");
 		
 		//String resp = "{\"status\":\"success\", \"statusCode\":\"200\", \"memberId\":\"7081035007675781\", \"lastUpdated\":\"2015-07-17 18:40:06\", \"scoresInfo\":[{\"modelId\":\"61\", \"modelName\":\"S_SCR_TV\", \"format\":\"Sears\", \"category\":\"TV Model\", \"tag\":\"0000\",\"mdTag\":\"CETVS823600153010\",\"occassion\":\"Top 5% of MSM\",\"subBusinessUnit\":\"Sears Television\",\"businessUnit\":\"Electronics\",\"scoreDate\":\"2015-08-18\",\"score\":0.002288 ,\"percentile\":95, \"rank\":1},{\"modelId\":\"28\", \"modelName\":\"S_SCR_CE_CAMERA\", \"format\":\"Sears\", \"category\":\"Consumer Electronics - camera\", \"tag\":\"0000\",\"businessUnit\":\"Electronics\",\"scoreDate\":\"2015-08-18\",\"mdTag\":\"CECAS823600153010\",\"occassion\":\"Top 5% of MSM\",\"subBusinessUnit\":\"Sears Camera\",\"score\":0.0005054076 ,\"percentile\":100, \"rank\":2}]}";
@@ -711,7 +711,7 @@ public class CPSFilerTest {
 	
 	
 		@Test
-		public void testPrepareEmailPackages1() throws JSONException, SQLException, RealTimeScoringException{
+		public void testPrepareEmailPackages1() throws JSONException, SQLException, Exception{
 			 sdformat = new SimpleDateFormat("MM/dd/yyyy");
 			 memberInfo = new MemberInfo("13551883","Y","NJ","Y","N","Y");
 			//String resp = "{\"status\":\"success\", \"statusCode\":\"200\", \"memberId\":\"7081035007675781\", \"lastUpdated\":\"2015-07-17 18:40:06\", \"scoresInfo\":[{\"modelId\":\"61\", \"modelName\":\"S_SCR_TV\", \"format\":\"Sears\", \"category\":\"TV Model\", \"tag\":\"0000\",\"mdTag\":\"CETVS823600153010\",\"occassion\":\"Top 5% of MSM\",\"subBusinessUnit\":\"Sears Television\",\"businessUnit\":\"Electronics\",\"scoreDate\":\"2015-08-18\",\"score\":0.002288 ,\"percentile\":95, \"rank\":1},{\"modelId\":\"28\", \"modelName\":\"S_SCR_CE_CAMERA\", \"format\":\"Sears\", \"category\":\"Consumer Electronics - camera\", \"tag\":\"0000\",\"businessUnit\":\"Electronics\",\"scoreDate\":\"2015-08-18\",\"mdTag\":\"CECAS823600153010\",\"occassion\":\"Top 5% of MSM\",\"subBusinessUnit\":\"Sears Camera\",\"score\":0.0005054076 ,\"percentile\":100, \"rank\":2}]}";

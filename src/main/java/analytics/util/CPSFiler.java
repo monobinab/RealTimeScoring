@@ -39,7 +39,7 @@ public class CPSFiler {
 		occasionDao = OccasionDao.getInstance();
 	}
 	
-	public List<EmailPackage> prepareEmailPackages(String rtsAPIResponse, String lyl_id_no,String l_id) throws JSONException, SQLException, RealTimeScoringException {
+	public List<EmailPackage> prepareEmailPackages(String rtsAPIResponse, String lyl_id_no,String l_id) throws JSONException, SQLException, Exception {
 		
 		List<EmailPackage> emailPackages = new ArrayList<EmailPackage>(); 
 		OccasionInfo occasionInfo;		
@@ -246,7 +246,7 @@ public class CPSFiler {
 		return false;
 	}
 
-	protected List<EmailPackage> getQueuedPackages(String lyl_id_no) throws RealTimeScoringException, SQLException {
+	protected List<EmailPackage> getQueuedPackages(String lyl_id_no) throws Exception, SQLException {
 		List<OccasionInfo> occasionsInfo = occasionDao.getOccasionsInfo();
 		return outboxDao.getQueuedEmailPackages(lyl_id_no, occasionsInfo);
 	}
@@ -273,7 +273,7 @@ public class CPSFiler {
 		return true;
 	}
 
-	protected EmailPackage getInProgressOccasion(String lyl_id_no) throws SQLException, RealTimeScoringException {
+	protected EmailPackage getInProgressOccasion(String lyl_id_no) throws SQLException, Exception {
 		List<OccasionInfo> occasionsInfo = occasionDao.getOccasionsInfo();
 		return outboxDao.getInProgressPackage(lyl_id_no,occasionsInfo);
 	}

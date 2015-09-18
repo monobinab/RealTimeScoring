@@ -23,7 +23,7 @@ public class OccasionDao extends AbstractMongoDao{
 		super();
 		try {
 			occasionInfos = this.getOccasionsInfo();
-		} catch (RealTimeScoringException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -35,8 +35,10 @@ public class OccasionDao extends AbstractMongoDao{
         return occasionDao;
     }
 	
-	public List<OccasionInfo> getOccasionsInfo() throws RealTimeScoringException{
+	public List<OccasionInfo> getOccasionsInfo() throws Exception{
 		List<OccasionInfo> occasionInfos = new ArrayList<OccasionInfo>();
+		  if(occasionInfos!= null && occasionInfos.size()>0)
+			   return occasionInfos;
 		occasionInfoCollection = db.getCollection("cpsOccasions");
 		if(occasionInfoCollection != null){
 			DBCursor cursor = occasionInfoCollection.find();
