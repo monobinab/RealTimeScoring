@@ -115,6 +115,11 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			
 			//Create map of new changes from the input
 			Map<String, String> newChangesVarValueMap = JsonUtils.restoreVariableListFromJson(input.getString(1));
+			
+			if(newChangesVarValueMap == null || newChangesVarValueMap.isEmpty()){
+				outputCollector.ack(input);
+				return;
+			}
 	
 			MemberRTSChanges memberRTSChanges = scoringSingleton.calcRTSChanges(lId, newChangesVarValueMap, null, source);
 			

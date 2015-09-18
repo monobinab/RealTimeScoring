@@ -13,21 +13,7 @@ import com.mongodb.DBCollection;
 public class FakeMongoStaticCollection {
 	static DBCollection varColl;
 	static DBCollection modelVarCollection;
-	static DBCollection memberVarsColl;
-	static DBCollection changedMemberVarsColl;
 	
-	public static DBCollection getMemberVarsColl() {
-		return memberVarsColl;
-	}
-	public static void setMemberVarsColl(DBCollection memberVarsColl) {
-		FakeMongoStaticCollection.memberVarsColl = memberVarsColl;
-	}
-	public static DBCollection getChangedMemberVarsColl() {
-		return changedMemberVarsColl;
-	}
-	public static void setChangedMemberVarsColl(DBCollection changedMemberVarsColl) {
-		FakeMongoStaticCollection.changedMemberVarsColl = changedMemberVarsColl;
-	}
 	public DBCollection getVarColl() {
 		return varColl;
 	}
@@ -67,7 +53,8 @@ public class FakeMongoStaticCollection {
 		varColl.insert(new BasicDBObject("name", "BOOST_DC_VAR").append("VID", 15).append("strategy","StrategyDCStrengthSum"));
 		
 		varColl.insert(new BasicDBObject("name", "S_SRS_VAR").append("VID", 16).append("strategy","StrategyCountTransactions"));
-			
+		varColl.insert(new BasicDBObject("name", "Blackout_variable2").append("VID", 17).append("strategy","StrategyBlackout"));
+	
 		//fake modelVariables collection
 		DBCollection modeVarColl = db.getCollection("modelVariables");
 		BasicDBList dbList = new BasicDBList();
@@ -101,6 +88,11 @@ public class FakeMongoStaticCollection {
 		dbList7.add(new BasicDBObject("name", "S_SRS_VAR").append("coefficient", 1.0));
 		modeVarColl.insert(new BasicDBObject("modelId", 70).append("modelName", "Model_Name7").append("modelDescription", "Kids apparel").append("constant", 5).append("month", 0).append("variable", dbList7));
 			
+		BasicDBList dbList8 = new BasicDBList();
+		dbList8.add(new BasicDBObject("name", "S_SRS_VAR").append("coefficient", 0.015));
+		dbList8.add(new BasicDBObject("name", "Blackout_variable2").append("coefficient", 0.015));
+		modeVarColl.insert(new BasicDBObject("modelId", 75).append("modelName", "Model_Name8").append("modelDescription", "Home Appliances2").append("constant", 5).append("month", 0).append("variable", dbList8));
+		
 		setVarColl(varColl);
 		setModelVarCollection(modeVarColl);
 		/*setMemberVarsColl(memVarColl);
