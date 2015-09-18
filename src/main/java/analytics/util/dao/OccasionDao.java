@@ -16,7 +16,7 @@ import analytics.util.objects.OccasionInfo;
 public class OccasionDao extends AbstractMongoDao{
 	
 	private DBCollection occasionInfoCollection;
-	private List<OccasionInfo> occasionInfos;
+	private List<OccasionInfo> occasionInfos = new ArrayList<OccasionInfo>();
 	private static OccasionDao occasionDao;
 	
 	private OccasionDao() {
@@ -37,8 +37,10 @@ public class OccasionDao extends AbstractMongoDao{
 	
 	public List<OccasionInfo> getOccasionsInfo() throws Exception{
 	//	List<OccasionInfo> occasionInfos = new ArrayList<OccasionInfo>();
-		  if(occasionInfos!= null && occasionInfos.size()>0)
-			   return occasionInfos;
+		  if(occasionInfos!= null && occasionInfos.size()>0){
+			  System.out.println("Got occasionInfos"); 
+			  return occasionInfos;
+		  }
 		occasionInfoCollection = db.getCollection("cpsOccasions");
 		if(occasionInfoCollection != null){
 			DBCursor cursor = occasionInfoCollection.find();
@@ -80,6 +82,7 @@ public class OccasionDao extends AbstractMongoDao{
 				}
 			}
 		}
+		System.out.println("OccasionInfos size = " + occasionInfos.size()); 
 		return occasionInfos;
 	}
 	
