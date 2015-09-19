@@ -128,6 +128,8 @@ public class CPSFiler {
 				//consider sending the top5 occasion only if it comes as the first occasion in the list
 				if(isOccasionTop5Percent(emailPackagesToBeSent.get(0).getMdTagMetaData().getMdTag())){
 					filteredList.add(emailPackagesToBeSent.get(0));
+				}else{
+					filteredList = removeTop5PercentOccasion(emailPackagesToBeSent);
 				}
 			}
 		}
@@ -137,7 +139,7 @@ public class CPSFiler {
 				filteredList.add(emailPackagesToBeSent.get(0));
 			}
 			else
-				filteredList = removeTop5PercentOccasion(emailPackagesToBeSent);;
+				filteredList = removeTop5PercentOccasion(emailPackagesToBeSent);
 			
 		}
 		return filteredList;		
