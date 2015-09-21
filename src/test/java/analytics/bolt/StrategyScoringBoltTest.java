@@ -74,7 +74,7 @@ public class StrategyScoringBoltTest {
 	}
 	
 	/*
-	 * If all incoming variables are not of RTS interest, there won't be any models to be scored
+	 * If all incoming variables are not of RTS interest (with NONE strategy), there won't be any models to be scored
 	 * so, null object will be returned from SS and the input will be acked by the strategybolt
 	 * output collector will be empty
 	 */
@@ -255,7 +255,7 @@ public class StrategyScoringBoltTest {
 	}
 	
 	/*
-	 * If the member exits but with no vars of interest, he will be scored by RTS, if he has non-expired vars of interest
+	 * If the member exists but with no vars of interest, he will be scored by RTS, if he has non-expired vars of interest (in changedMemVars collection)
 	 */
 	@SuppressWarnings("unchecked")
 	@Test
@@ -560,6 +560,7 @@ public class StrategyScoringBoltTest {
 	/*
 	 * If a member has an non-expired change var based on previous activity, which is removed from RTS system (i.e. from variables and modelVariables collection)
 	 * it will be skipped in scoring, expiration dates etc. Here, VID 18 is not in our collections, so only the incoming S_SRS_VAR will be used
+	 * Got NPE in PRODUCTION and the null check was included
 	 */
 	@SuppressWarnings("unchecked")
 	@Test
