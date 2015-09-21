@@ -73,38 +73,10 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 					List<ModelScore> modelScoreList = new Gson().fromJson(jsonElement.getAsJsonObject().get("scoresInfo"), token.getType());
 					
 					//List<ModelScore> modelScoreList = (List<ModelScore>) jsonElement.getAsJsonObject().get("scoresInfo");
-					if(modelScoreList != null && !modelScoreList.isEmpty()){
-						List<Object> rtsTagsListToEmit = new ArrayList<Object>();
-						List<String> rtsTags = new ArrayList<String>();
-						JSONArray jsonArray = new JSONArray();
-						JSONObject mainJsonObj = new JSONObject();
-						boolean blackListed = false;
-						for(ModelScore modelScore :  modelScoreList){	
-							
-							if(modelScore.getScore()==0.0)
-								blackListed = true;
-							
-							if(modelScore.getPercentile() > 95){
-								String rtsTag = createTag(modelScore,l_id,Constants.TOP5PRIORITY);
-								rtsTags.add(rtsTag);
-							}
-						}
-						if(rtsTags.size()>0){
-							mainJsonObj.put("lyl_id_no", lyl_id_no);
-							mainJsonObj.put("tags", rtsTags);
-							mainJsonObj.put("tagIdentifier", "RTS");
-							rtsTagsListToEmit.add(mainJsonObj.toString());
-							this.outputCollector.emit("rtsTags_stream",rtsTagsListToEmit);	
-						}
-						else if(rtsTags.size()==0 && blackListed){
-							List<Object> blackedoutListToEmit = new ArrayList<Object>();
-							blackedoutListToEmit.add(lyl_id_no);
-							this.outputCollector.emit("blackedout_stream",blackedoutListToEmit);
-						}
-					}
+					process(lyl_id_no, l_id, modelScoreList);
 				}
 			} catch (Exception e){
-				LOGGER.error("Exception Occured in TagCreatorBolt :: " +  e.getMessage()+ "  SATCKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
+				LOGGER.error("Exception Occured in TagCreatorBolt :: " +  e.getMessage()+ "  STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 				outputCollector.fail(input);	
 			}
 				
@@ -114,6 +86,39 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 		}
 		outputCollector.ack(input);
 		
+	}
+
+	private void process(JsonElement lyl_id_no, String l_id,
+			List<ModelScore> modelScoreList) {
+		if(modelScoreList != null && !modelScoreList.isEmpty()){
+			List<Object> rtsTagsListToEmit = new ArrayList<Object>();
+			List<String> rtsTags = new ArrayList<String>();
+			JSONArray jsonArray = new JSONArray();
+			JSONObject mainJsonObj = new JSONObject();
+			boolean blackListed = false;
+			for(ModelScore modelScore :  modelScoreList){	
+				
+				if(modelScore.getScore()==0.0)
+					blackListed = true;
+				
+				if(modelScore.getPercentile() > 95){
+					String rtsTag = createTag(modelScore,l_id,Constants.TOP5PRIORITY);
+					rtsTags.add(rtsTag);
+				}
+			}
+			if(rtsTags.size()>0){
+				mainJsonObj.put("lyl_id_no", lyl_id_no);
+				mainJsonObj.put("tags", rtsTags);
+				mainJsonObj.put("tagIdentifier", "RTS");
+				rtsTagsListToEmit.add(mainJsonObj.toString());
+				this.outputCollector.emit("rtsTags_stream",rtsTagsListToEmit);	
+			}
+			else if(rtsTags.size()==0 && blackListed){
+				List<Object> blackedoutListToEmit = new ArrayList<Object>();
+				blackedoutListToEmit.add(lyl_id_no);
+				this.outputCollector.emit("blackedout_stream",blackedoutListToEmit);
+			}
+		}
 	}
 	
 	private String createTag(ModelScore modelScore, String l_id , int priority) {
