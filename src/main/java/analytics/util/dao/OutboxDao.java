@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,45 +21,40 @@ import analytics.util.objects.TagMetadata;
 public class OutboxDao extends AbstractMySQLDao{
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(OutboxDao.class);
-	public List<EmailPackage> getQueuedEmailPackages(String lyl_id_no, List<OccasionInfo> occasionsInfo) throws RealTimeScoringException {
+	public List<EmailPackage> getQueuedEmailPackages(String lyl_id_no, List<OccasionInfo> occasionsInfo) throws RealTimeScoringException, SQLException {
 		// This method returns all pending emails from the outbox
 		List<EmailPackage>emlPackageList = new ArrayList<EmailPackage>();
-			StringBuilder query = new StringBuilder();
-			query.append("SELECT * ")
-				.append("FROM cp_outbox ")
-				.append("WHERE loy_id= ? AND status=0;");
-        	PreparedStatement statement;
-			try {
-				statement = connection.prepareStatement(query.toString());
-				statement.setString(1, lyl_id_no);
-				ResultSet rs = statement.executeQuery();
-		        
-		        while (rs.next()) {
-		             //System.out.println("loyalty id: " + rs.getString("loy_id"));
-		             TagMetadata tagMetadata = new TagMetadata(rs.getString("md_tag"),rs.getString("bu"),rs.getString("sub_bu"),rs.getString("occasion_name"));
-		             for(OccasionInfo occasion :occasionsInfo){
-		            	 if(rs.getString("occasion_name").equals(occasion.getOccasion()))
-		            	 {
-		            		 tagMetadata.setPriority(Integer.parseInt(occasion.getPriority()));
-		    	             tagMetadata.setSendDuration(Integer.parseInt(occasion.getDuration()));
-		    	             emlPackageList.add(new EmailPackage(rs.getString("loy_id")
-		    		             		, tagMetadata
-		    		             		, rs.getTimestamp("added_datetime") /*addedDateTime*/
-		    		             		, rs.getDate("send_date") /*sendDate*/	             		
-		    		             		, rs.getInt("status")));
-		    	             break;
-		            	 }
-		             }
-		            
-		             
-		        }
-		        statement.close();
-			} catch (SQLException e) {
-				throw new RealTimeScoringException("SQL Exception occured in getting queued EmailPackages : errorcode - " + e.getErrorCode() + " , " + e.getMessage());
-			}
-					
+		StringBuilder query = new StringBuilder();
+		query.append("SELECT * ")
+			.append("FROM cp_outbox ")
+			.append("WHERE loy_id= ? AND status=0;");
+    	PreparedStatement statement;
 		
-		return emlPackageList;
+			statement = connection.prepareStatement(query.toString());
+			statement.setString(1, lyl_id_no);
+			
+			LOGGER.info("query being executed for getting queued email packages: " + statement);
+			ResultSet rs = statement.executeQuery();
+	        
+	        while (rs.next()) {
+	             //System.out.println("loyalty id: " + rs.getString("loy_id"));
+	             TagMetadata tagMetadata = new TagMetadata(rs.getString("md_tag"),rs.getString("bu"),rs.getString("sub_bu"),rs.getString("occasion_name"));
+	             for(OccasionInfo occasion :occasionsInfo){
+	            	 if(rs.getString("occasion_name").equals(occasion.getOccasion()))
+	            	 {
+	            		 tagMetadata.setPriority(Integer.parseInt(occasion.getPriority()));
+	    	             tagMetadata.setSendDuration(Integer.parseInt(occasion.getDuration()));
+	    	             emlPackageList.add(new EmailPackage(rs.getString("loy_id")
+	    		             		, tagMetadata
+	    		             		, rs.getTimestamp("added_datetime") /*addedDateTime*/
+	    		             		, rs.getDate("send_date") /*sendDate*/	             		
+	    		             		, rs.getInt("status")));
+	    	             break;
+	            	 }
+	             }	             
+	        }
+	        statement.close();
+	        return emlPackageList;
 	}
 
 	public void queueEmailPackages(List<EmailPackage> emailPackages) throws SQLException {
@@ -126,6 +123,7 @@ public class OutboxDao extends AbstractMySQLDao{
 					statement.setString(11, "");
 					statement.setString(12, "");
 				}
+				LOGGER.info("query being executed for queing email package: " + statement);
 				
 				statement.executeUpdate();	
 				queueLength = queueLength+ emlPack.getMdTagMetaData().getSendDuration();
@@ -185,6 +183,8 @@ public class OutboxDao extends AbstractMySQLDao{
     	PreparedStatement statement = connection.prepareStatement(query.toString());
 		statement.setString(1, lyl_id_no);
 		statement.setString(2, occasionName);
+		LOGGER.info("query being executed to get the sentDate for history check :" + statement);
+		
         ResultSet rs = statement.executeQuery();
         while (rs.next()) {   
         	sentDate= rs.getTimestamp("sent_datetime"); /*sentDateTime*/
@@ -201,10 +201,11 @@ public class OutboxDao extends AbstractMySQLDao{
 			.append("FROM rts_member.cp_outbox ")
 			.append("WHERE loy_id=? AND status=1 AND occasion_name = ? AND bu = ? AND sub_bu = ?;");
     	PreparedStatement statement = connection.prepareStatement(query.toString());
-		statement.setString(1, emailPackage.getMemberId());
+    	statement.setString(1, emailPackage.getMemberId());
 		statement.setString(2, emailPackage.getMdTagMetaData().getPurchaseOccasion());
 		statement.setString(3,emailPackage.getMdTagMetaData().getBusinessUnit());
 		statement.setString(4,emailPackage.getMdTagMetaData().getSubBusinessUnit());
+		LOGGER.info("query to get the sentDate for history check : " + statement);
         ResultSet rs = statement.executeQuery();
         while (rs.next()) {   
         	sentDate = rs.getTimestamp("sent_datetime"); /*sentDateTime*/
@@ -219,11 +220,13 @@ public class OutboxDao extends AbstractMySQLDao{
 		String query = "SELECT count(*) FROM rts_member.cp_outbox WHERE loy_id=? AND status=1";
 		PreparedStatement statement = connection.prepareStatement(query);
 		statement.setString(1, lyl_id_no);
+		LOGGER.info("query to check if there is an inProgressOccasion : " + statement);
 		ResultSet rs = statement.executeQuery();
 		if(rs.next() && rs.getInt(1) > 0){
 			query = "SELECT bu,sub_bu,md_tag,occasion_name, added_datetime, send_date,status, max(sent_datetime) FROM rts_member.cp_outbox WHERE loy_id=? AND status=1;";
 			statement = connection.prepareStatement(query);
 			statement.setString(1, lyl_id_no);
+			LOGGER.info("query to get the latest emailPackage sent for this member : " + statement);
 			ResultSet rs1 = statement.executeQuery();
 			 
 			while (rs1.next()) { 

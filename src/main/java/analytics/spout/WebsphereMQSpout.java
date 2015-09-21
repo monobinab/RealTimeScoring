@@ -95,14 +95,15 @@ public class WebsphereMQSpout extends BaseRichSpout {
 		LOGGER.debug("Fetching a message from MQ");
 		try {
 			JMSMessage receivedMessage = (JMSMessage) receiver.receive();
-			LOGGER.info("PERSIST: incoming tuples in spout from MQ TELLURIDE");
+			
 			String messageID = receivedMessage.getJMSMessageID();
 			LOGGER.info("TIME:" + messageID + "-Entering spout-" + System.currentTimeMillis());
 			String transactionXmlString = getTransactionString(receivedMessage);
 			collector.emit(new Values(transactionXmlString,messageID), transactionXmlString);
+			LOGGER.info("PERSIST: incoming tuples in spout from MQ TELLURIDE");
 		//	LOGGER.info("incoming xml in spout from MQ: " + transactionXmlString);
 
-			logAllTransaction(transactionXmlString);
+		//	logAllTransaction(transactionXmlString);
 		} catch (JMSException e) {
 			LOGGER.error("Exception occurred while receiving message from queue ", e);
 		}
@@ -121,7 +122,7 @@ public class WebsphereMQSpout extends BaseRichSpout {
 		  return transactionXmlAsString;
 	}
 
-	private void logAllTransaction(String xmlString) {
+	/*private void logAllTransaction(String xmlString) {
 		
 		ProcessTransaction processTransaction = null;
  	    processTransaction = parseXMLAndExtractProcessTransaction(processTransaction, xmlString);
@@ -137,19 +138,17 @@ public class WebsphereMQSpout extends BaseRichSpout {
 	        String earnFlag = (processTransaction.getEarnFlag() != null) ? processTransaction.getEarnFlag() : "NONE";
 	        LOGGER.info("PERSIST: " + memberNumber +", " + pickUpStoreNumber + ", " + tenderStoreNumber +", " + orderStoreNumber + ", " + registerNumber +", " + transactionNumber +", " + transactionTime +", " + requestorId +", " + earnFlag + ", allTransactions in MQspout from MQQueue");
  	    }
-	}
-
-	@Override
-	public void ack(Object msgId) {
-		//System.out.println("spout acked : " + msgId);
-	}
+	}*/
 
 	@Override
 	public void fail(Object msgId) {
-		// do nothing for now
-        //System.out.println("spout failed : " + msgId);
-
+	       LOGGER.info("PERSIST: Telluride Spout Failed : " + msgId);
     }
+	
+	@Override
+	public void ack(Object msgId) {
+	}
+
 
 	@Override
 	public void close() {
@@ -179,7 +178,7 @@ public class WebsphereMQSpout extends BaseRichSpout {
 	        return stringMessage;
 	    }
 	 
-	  private ProcessTransaction parseXMLAndExtractProcessTransaction(ProcessTransaction processTransaction, String transactionXmlAsString) {
+	  /*private ProcessTransaction parseXMLAndExtractProcessTransaction(ProcessTransaction processTransaction, String transactionXmlAsString) {
 	        LOGGER.debug("Parsing MQ message XML");
 	        if ((transactionXmlAsString.contains("<ProcessTransaction") || transactionXmlAsString.contains(":ProcessTransaction")) && !transactionXmlAsString.contains("AnswerTxt")) {
 
@@ -187,7 +186,7 @@ public class WebsphereMQSpout extends BaseRichSpout {
 	                    .parseXMLProcessTransaction(transactionXmlAsString);
 	        }
 	        return processTransaction;
-	  }
+	  }*/
 	/**
 	 * Close connections
 	 * 

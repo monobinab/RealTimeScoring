@@ -155,6 +155,4 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 		declarer.declareStream("blackedout_stream", new Fields("lyl_id_no"));
 
 	}
-		
-
 }

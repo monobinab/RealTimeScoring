@@ -16,14 +16,14 @@ import analytics.util.objects.OccasionInfo;
 public class OccasionDao extends AbstractMongoDao{
 	
 	private DBCollection occasionInfoCollection;
-	private List<OccasionInfo> occasionInfos;
+	private List<OccasionInfo> occasionInfos = new ArrayList<OccasionInfo>();
 	private static OccasionDao occasionDao;
 	
 	private OccasionDao() {
 		super();
 		try {
 			occasionInfos = this.getOccasionsInfo();
-		} catch (RealTimeScoringException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -35,8 +35,12 @@ public class OccasionDao extends AbstractMongoDao{
         return occasionDao;
     }
 	
-	public List<OccasionInfo> getOccasionsInfo() throws RealTimeScoringException{
-		List<OccasionInfo> occasionInfos = new ArrayList<OccasionInfo>();
+	public List<OccasionInfo> getOccasionsInfo() throws Exception{
+	//	List<OccasionInfo> occasionInfos = new ArrayList<OccasionInfo>();
+		  if(occasionInfos!= null && occasionInfos.size()>0){
+			  System.out.println("Got occasionInfos"); 
+			  return occasionInfos;
+		  }
 		occasionInfoCollection = db.getCollection("cpsOccasions");
 		if(occasionInfoCollection != null){
 			DBCursor cursor = occasionInfoCollection.find();
@@ -78,6 +82,7 @@ public class OccasionDao extends AbstractMongoDao{
 				}
 			}
 		}
+		System.out.println("OccasionInfos size = " + occasionInfos.size()); 
 		return occasionInfos;
 	}
 	

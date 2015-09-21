@@ -14,6 +14,7 @@ import analytics.util.dao.AbstractMySQLDao;
 
 
 public class CPOutBoxDAO extends AbstractMySQLDao {
+	
 
 	public int getCPRecordCount() {
 		int count = 0;
@@ -97,8 +98,8 @@ public class CPOutBoxDAO extends AbstractMySQLDao {
 				cpOutBoxItem.setMd_tag(rs.getString("md_tag"));
 				cpOutBoxItem.setOccasion_name(rs.getString("occasion_name"));
 				cpOutBoxItem.setSears_opt_in(rs.getString("sears_opt_in"));
-				cpOutBoxItem.setSend_date(rs.getString("send_date"));
-				cpOutBoxItem.setSent_datetime(rs.getString("sent_datetime"));
+				cpOutBoxItem.setSend_date(rs.getDate("send_date"));
+				cpOutBoxItem.setSent_datetime(rs.getTimestamp("sent_datetime"));
 				cpOutBoxItem.setStatus(rs.getInt("status"));
 				cpOutBoxItem.setSub_bu(rs.getString("sub_bu"));
 				cpOutBoxItem.setSyw_opt_in(rs.getString("syw_opt_in"));
@@ -143,7 +144,7 @@ public class CPOutBoxDAO extends AbstractMySQLDao {
 
 			statement = connection
 					.prepareStatement("update cp_outbox set sent_datetime=? status=? where email_pkg_id=? and loy_id=?");
-			statement.setString(1, cpOutBoxItem.getSent_datetime());
+			statement.setTimestamp(1, new java.sql.Timestamp(cpOutBoxItem.getSent_datetime().getTime()));
 			statement.setInt(2, cpOutBoxItem.getStatus());
 			statement.setInt(3, cpOutBoxItem.getEmail_pkg_id());
 			statement.setString(4, cpOutBoxItem.getLoy_id());
@@ -226,15 +227,22 @@ public class CPOutBoxDAO extends AbstractMySQLDao {
 		Date dNow = new Date();
 		SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd");
 		String today = ft.format(dNow);
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+        
+       
+      //  java.sql.Date sqlDate = new Date(date.getTime());
 		try {
 
 			statement = connection
-					.prepareStatement("INSERT INTO cp_outbox (loy_id,md_tag,send_date,status,bu,sub_bu,occasion_name) VALUES (?,?,?,?,?,?,?)");
+					.prepareStatement("INSERT INTO rts_member.cp_outbox (loy_id,md_tag,send_date,status,bu,sub_bu,occasion_name) VALUES (?,?,?,?,?,?,?)");
 			
 			statement.setString(1, cpOutBoxItem.getLoy_id());
 			statement.setString(2, cpOutBoxItem.getMd_tag());
-			statement.setString(3, cpOutBoxItem.getSend_date());
+			statement.setDate(3,  new java.sql.Date(cpOutBoxItem.getSend_date().getTime()));
 			statement.setInt(4, cpOutBoxItem.getStatus());
+//			java.util.Date date = sdf.parse(cpOutBoxItem.getAdded_datetime());
+//			statement.setDate(5, new java.sql.Date((cpOutBoxItem.getAdded_datetime().toString())));
 			//Question on BU and subbu
 			statement.setString(5, "T");
 			statement.setString(6, "T");
@@ -303,8 +311,8 @@ public class CPOutBoxDAO extends AbstractMySQLDao {
 				cpOutBoxItem.setMd_tag(rs.getString("md_tag"));
 				cpOutBoxItem.setOccasion_name(rs.getString("occasion_name"));
 				cpOutBoxItem.setSears_opt_in(rs.getString("sears_opt_in"));
-				cpOutBoxItem.setSend_date(rs.getString("send_date"));
-				cpOutBoxItem.setSent_datetime(rs.getString("sent_datetime"));
+				cpOutBoxItem.setSend_date(rs.getDate("send_date"));
+				cpOutBoxItem.setSent_datetime(rs.getDate("sent_datetime"));
 				cpOutBoxItem.setStatus(rs.getInt("status"));
 				cpOutBoxItem.setSub_bu(rs.getString("sub_bu"));
 				cpOutBoxItem.setSyw_opt_in(rs.getString("syw_opt_in"));
