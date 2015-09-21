@@ -295,19 +295,19 @@ public class StrategyScoringBoltTest {
 		//fake changedMemberScores collection with no record in it
 		DBCollection changedMemberScoreColl = db.getCollection("changedMemberScores");
 		DBObject changedMemScoreObj = null;
-		DBCursor updatedMemScoreColl = changedMemberScoreColl.find();
-		while(updatedMemScoreColl.hasNext()){
-			changedMemScoreObj = updatedMemScoreColl.next();
-			HashMap<String, ChangedMemberScore> changedMemScores70Updated = (HashMap<String, ChangedMemberScore>) changedMemScoreObj
+		DBObject updatedMemScoreObj = changedMemberScoreColl.findOne(new BasicDBObject("l_id", l_id));
+	//	while(updatedMemScoreColl.hasNext()){
+	//		changedMemScoreObj = updatedMemScoreColl.next();
+			HashMap<String, ChangedMemberScore> changedMemScores70Updated = (HashMap<String, ChangedMemberScore>) updatedMemScoreObj
 					.get("70");
 			// testing the updated changedMemberScore collection
-			Assert.assertEquals("testingLid3", changedMemScoreObj.get("l_id"));
+			// Assert.assertEquals("testingLid3", changedMemScoreObj.get("l_id"));
 			Assert.assertEquals(0.9999999847700205, changedMemScores70Updated.get("s"));
 			Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), changedMemScores70Updated.get("minEx"));
 			Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), changedMemScores70Updated.get("maxEx"));
 			Assert.assertEquals(simpleDateFormat.format(new Date()), changedMemScores70Updated.get("f"));
 			Assert.assertEquals("testingTopology", changedMemScores70Updated.get("c"));
-		}
+	//	}
 		
 		//testing the updated changedMemberVariables collection
 		DBObject changedMemVars = changedMemberVar.findOne(new BasicDBObject("l_id", l_id));
