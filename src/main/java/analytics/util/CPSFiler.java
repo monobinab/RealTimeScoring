@@ -87,7 +87,9 @@ public class CPSFiler {
 					compareAndDelete(lyl_id_no,emailPackagesToBeSent, currentPackages);
 					
 					//Rule - top 5 % occasions are not queued
-					emailPackagesToBeSent = filterTop5PercentOccasions(emailPackagesToBeSent, inProgressPackage);
+					if(emailPackagesToBeSent != null && emailPackagesToBeSent.size() > 0){
+						emailPackagesToBeSent = filterTop5PercentOccasions(emailPackagesToBeSent, inProgressPackage);
+					}
 					
 					if(emailPackagesToBeSent != null && emailPackagesToBeSent.size() > 0){
 						return this.decideSendDates(emailPackagesToBeSent,inProgressPackage);
@@ -121,7 +123,7 @@ public class CPSFiler {
 				}
 			}
 			
-			if(emailPackagesToBeSent != null && emailPackagesToBeSent.size() > 0 && inProgressActive){
+			if( inProgressActive){
 				filteredList = removeTop5PercentOccasion(emailPackagesToBeSent);				
 			}	
 			else{
@@ -348,7 +350,20 @@ public class CPSFiler {
 	}
 	
 	public void fileEmailPackages(List<EmailPackage> emailPackages) throws SQLException {
-		outboxDao.queueEmailPackages(emailPackages);
+		if(emailPackages != null && emailPackages.size() > 0){			
+			outboxDao.queueEmailPackages(filterNullDatePackages(emailPackages));
+		}
+	}
+	
+	public List<EmailPackage> filterNullDatePackages(List<EmailPackage> emailPackages){
+		Iterator<EmailPackage> emailPackagesItr = emailPackages.iterator();
+        while(emailPackagesItr.hasNext()){
+        	EmailPackage emailPackage = emailPackagesItr.next();
+	        if(emailPackage.getSendDate() == null){
+	        	emailPackagesItr.remove();
+			}
+        }
+		return emailPackages;
 	}
 	
 	/*public List<EmailPackage> decideSendDates(List<EmailPackage> emailPackages, EmailPackage inProgressPackage) throws SQLException, RealTimeScoringException {
