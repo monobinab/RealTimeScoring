@@ -220,7 +220,7 @@ public class OutboxDao extends AbstractMySQLDao{
 				
 		EmailPackage inProgressOccasion = null;
 
-		String query = "SELECT bu,sub_bu,md_tag,occasion_name, added_datetime, send_date,status, max(sent_datetime) FROM rts_member.cp_outbox WHERE loy_id=? AND status=1;";
+		String query = "SELECT bu,sub_bu,md_tag,occasion_name, added_datetime, send_date,status, max(sent_datetime) as recentSentDate FROM rts_member.cp_outbox WHERE loy_id=? AND status=1;";
 		PreparedStatement statement = connection.prepareStatement(query);
 			statement.setString(1, lyl_id_no);
 			LOGGER.info("query to get the latest emailPackage sent for this member : " + statement);
@@ -229,7 +229,7 @@ public class OutboxDao extends AbstractMySQLDao{
 			while (rs1.next()) {				
 				
 				//get the latest sent package
-				java.util.Date sentDate = rs1.getTime("sent_datetime");
+				java.util.Date sentDate = rs1.getTime("recentSentDate");
 				//add the send duration to the sent date and see if it is less than today's date
 				//if it is less - it means it is not in progress anymore				
 				
