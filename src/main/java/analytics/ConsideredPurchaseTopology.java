@@ -36,7 +36,8 @@ public class ConsideredPurchaseTopology {
 		String kafkaTopic1="rts_cp_membertags";
 		String zkroot1="rts_cp_membertags_zkroot";		
 	//	String kafkaTopic2="stormtopic";
-		String kafkaTopic2="rts_cp_membertags_qa";
+	//	String kafkaTopic2="rts_cp_membertags_qa";
+		String kafkaTopic2="cps_rtstags_qa";
 		String zkroot2="rts_cp_membertags_qa_zkroot";
 		String cpsPurchaseScoresTopic="rts_cp_purchase_scores";
 		String zkroot_cp_purchase = "rts_cp_purchase_zkroot";
@@ -62,7 +63,7 @@ public class ConsideredPurchaseTopology {
 			System.exit(0);	
 		}
 		//topologyBuilder.setBolt("CPParsePersistBolt", new CPParsePersistBolt(env), 15).shuffleGrouping("CPKafkaSpout1").shuffleGrouping("CPTagCreatorBolt", "rtsTags_stream" );	
-		topologyBuilder.setBolt("CPParsePersistBolt", new CPParsePersistBolt(env), 15).shuffleGrouping("CPKafkaSpout1").shuffleGrouping("CPKafkaSpout2").shuffleGrouping("CPTagCreatorBolt", "rtsTags_stream" );	
+		topologyBuilder.setBolt("CPParsePersistBolt", new CPParsePersistBolt(env), 15).shuffleGrouping("CPKafkaSpout2").shuffleGrouping("CPTagCreatorBolt", "rtsTags_stream" );	
 		topologyBuilder.setBolt("CPProcessingBolt", new CPProcessingBolt(env),15).shuffleGrouping("CPParsePersistBolt");
 		topologyBuilder.setBolt("CPTagCreatorBolt", new TagCreatorBolt(env), 1).shuffleGrouping("CPPurchaseFeedbackSpout");		
 		
@@ -70,7 +71,7 @@ public class ConsideredPurchaseTopology {
 		conf.put("metrics_topology", "CPS");
 		conf.registerMetricsConsumer(MetricsListener.class, env, partition_num);
 		conf.setDebug(false);
-		if (env.equalsIgnoreCase("PROD")|| env.equalsIgnoreCase("QA")) {	
+		/*if (env.equalsIgnoreCase("PROD")|| env.equalsIgnoreCase("QA")) {	
 			try {
 				StormSubmitter.submitTopology(args[0], conf, topologyBuilder.createTopology());
 			} catch (AlreadyAliveException e) {
@@ -78,7 +79,7 @@ public class ConsideredPurchaseTopology {
 			} catch (InvalidTopologyException e) {
 				LOGGER.error(e.getClass() + ": " + ExceptionUtils.getMessage(e) + "Rootcause-"+ ExceptionUtils.getRootCauseMessage(e) +"  STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 			}
-		} else {
+		} else {*/
 			conf.setDebug(false);
 			conf.setMaxTaskParallelism(partition_num);
 			LocalCluster cluster = new LocalCluster();
@@ -91,6 +92,6 @@ public class ConsideredPurchaseTopology {
 			cluster.shutdown();
 		}
 	
-	}
+//	}
 
 }
