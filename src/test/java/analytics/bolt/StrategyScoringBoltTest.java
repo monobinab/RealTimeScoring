@@ -25,7 +25,6 @@ import backtype.storm.tuple.Tuple;
 import org.apache.commons.configuration.ConfigurationException;
 import org.joda.time.LocalDate;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import redis.clients.jedis.Jedis;
@@ -33,7 +32,6 @@ import redis.clients.jedis.Jedis;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
 
@@ -54,7 +52,7 @@ public class StrategyScoringBoltTest {
 	
 	/*
 	 * If there is no incoming variables from the parsing bolt, i.e. newChangesVarValueMap is empty
-	 * strategyBolt will ack the input, so output collector will be empty
+	 * strategyBolt will ack the input, thereby output collector will be empty
 	 */
 	@Test
 	public void strategyScoringBoltWithEmptyNewChangesVarValueMapTest() throws ParseException {
@@ -207,9 +205,9 @@ public class StrategyScoringBoltTest {
 		fakeJedis.del("RTS:Telluride:"+l_id);
 		
 		//clearing the fake mongo
-		changedMemberScoreColl.remove(new BasicDBObject("l_id", "testingLid"));
-		changedMemberVar.remove(new BasicDBObject("l_id", "testingLid"));
-		memVarColl.remove(new BasicDBObject("l_id", "testingLid"));
+		changedMemberScoreColl.remove(new BasicDBObject("l_id", l_id));
+		changedMemberVar.remove(new BasicDBObject("l_id", l_id));
+		memVarColl.remove(new BasicDBObject("l_id", l_id));
 	}
 	
 	/*
