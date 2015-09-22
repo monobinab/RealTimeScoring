@@ -226,7 +226,7 @@ public class OutboxDao extends AbstractMySQLDao{
 			LOGGER.info("query to get the latest emailPackage sent for this member : " + statement);
 			ResultSet rs1 = statement.executeQuery();
 			 
-			while (rs1.next()) {				
+			while (rs1.next() && rs1.getFetchSize() > 0) {				
 				
 				//get the latest sent package
 				java.util.Date sentDate = rs1.getTime("recentSentDate");
