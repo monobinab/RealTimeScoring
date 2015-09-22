@@ -9,7 +9,7 @@ import analytics.util.objects.RealTimeScoringContext;
 
 public class StrategyBlackout implements Strategy {
 
-	private int daysToExpiration = 30;
+	private int daysToExpiration = 730;
 	private Object value = 1;
 
     @Override
