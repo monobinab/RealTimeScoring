@@ -25,6 +25,7 @@ import backtype.storm.tuple.Tuple;
 import org.apache.commons.configuration.ConfigurationException;
 import org.joda.time.LocalDate;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import redis.clients.jedis.Jedis;
@@ -159,11 +160,8 @@ public class StrategyScoringBoltTest {
 	
 		//fake changedMemberScores collection with no record in it
 		DBCollection changedMemberScoreColl = db.getCollection("changedMemberScores");
-		DBObject changedMemScoreObj = null;
-		DBCursor updatedMemScoreColl = changedMemberScoreColl.find();
-		while(updatedMemScoreColl.hasNext()){
-			changedMemScoreObj = updatedMemScoreColl.next();
-			HashMap<String, ChangedMemberScore> changedMemScores70Updated = (HashMap<String, ChangedMemberScore>) changedMemScoreObj
+		DBObject changedMemScoreObj = changedMemberScoreColl.findOne(new BasicDBObject("l_id", l_id));
+		HashMap<String, ChangedMemberScore> changedMemScores70Updated = (HashMap<String, ChangedMemberScore>) changedMemScoreObj
 					.get("70");
 			// testing the updated changedMemberScore collection
 			Assert.assertEquals("testingLid", changedMemScoreObj.get("l_id"));
@@ -172,8 +170,7 @@ public class StrategyScoringBoltTest {
 			Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), changedMemScores70Updated.get("maxEx"));
 			Assert.assertEquals(simpleDateFormat.format(new Date()), changedMemScores70Updated.get("f"));
 			Assert.assertEquals("testingTopology", changedMemScores70Updated.get("c"));
-		}
-		
+				
 		//testing the updated changedMemberVariables collection
 		DBObject changedMemVars = changedMemberVar.findOne(new BasicDBObject("l_id", l_id));
 		DBObject varObj = (DBObject) changedMemVars.get("16");
@@ -222,7 +219,7 @@ public class StrategyScoringBoltTest {
 	public void strategyScoringBoltWithNoMemberVarsFoundTest() throws ParseException {
 		
 		String l_id = "testingLid2";
-		//fake memberVariables collection, does not contain the memberId "testingLid2" in testing 
+		//fake memberVariables collection, does not contain the memberId "testingLid2" which is tested 
 		DBCollection memVarColl = db.getCollection("memberVariables");
 		memVarColl.insert(new BasicDBObject("l_id", "testingLid").append("16", 1));
 		
@@ -296,19 +293,15 @@ public class StrategyScoringBoltTest {
 		DBCollection changedMemberScoreColl = db.getCollection("changedMemberScores");
 		DBObject changedMemScoreObj = null;
 		DBObject updatedMemScoreObj = changedMemberScoreColl.findOne(new BasicDBObject("l_id", l_id));
-	//	while(updatedMemScoreColl.hasNext()){
-	//		changedMemScoreObj = updatedMemScoreColl.next();
-			HashMap<String, ChangedMemberScore> changedMemScores70Updated = (HashMap<String, ChangedMemberScore>) updatedMemScoreObj
+		HashMap<String, ChangedMemberScore> changedMemScores70Updated = (HashMap<String, ChangedMemberScore>) updatedMemScoreObj
 					.get("70");
 			// testing the updated changedMemberScore collection
-			// Assert.assertEquals("testingLid3", changedMemScoreObj.get("l_id"));
 			Assert.assertEquals(0.9999999847700205, changedMemScores70Updated.get("s"));
 			Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), changedMemScores70Updated.get("minEx"));
 			Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), changedMemScores70Updated.get("maxEx"));
 			Assert.assertEquals(simpleDateFormat.format(new Date()), changedMemScores70Updated.get("f"));
 			Assert.assertEquals("testingTopology", changedMemScores70Updated.get("c"));
-	//	}
-		
+			
 		//testing the updated changedMemberVariables collection
 		DBObject changedMemVars = changedMemberVar.findOne(new BasicDBObject("l_id", l_id));
 		DBObject varObj = (DBObject) changedMemVars.get("16");
@@ -351,7 +344,7 @@ public class StrategyScoringBoltTest {
 	}
 	
 	/*
-	 * If the incoming variable is blackout variable, the model associated will be blacked out with a score of 0.0
+	 * If the incoming variable is a blackout variable, the model associated will be blacked out with a score of 0.0
 	 * expiration will be set for 30 days based on blackout strategy
 	 */
 	@SuppressWarnings("unchecked")
@@ -391,20 +384,17 @@ public class StrategyScoringBoltTest {
 		
 		//fake changedMemberScores collection with no record in it
 		DBCollection changedMemberScoreColl = db.getCollection("changedMemberScores");
-		DBObject changedMemScoreObj = null;
-		DBCursor updatedMemScoreColl = changedMemberScoreColl.find();
-		while(updatedMemScoreColl.hasNext()){
-			changedMemScoreObj = updatedMemScoreColl.next();
+		DBObject changedMemScoreObj = changedMemberScoreColl.findOne(new BasicDBObject("l_id", l_id));
+	
 			HashMap<String, ChangedMemberScore> changedMemScores46Updated = (HashMap<String, ChangedMemberScore>) changedMemScoreObj
 					.get("46");
 			// testing the updated changedMemberScore collection
-			Assert.assertEquals("testingLid4", changedMemScoreObj.get("l_id"));
 			Assert.assertEquals(0.0, changedMemScores46Updated.get("s"));
 			Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(30).toDateMidnight().toDate()), changedMemScores46Updated.get("minEx"));
 			Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(30).toDateMidnight().toDate()), changedMemScores46Updated.get("maxEx"));
 			Assert.assertEquals(simpleDateFormat.format(new Date()), changedMemScores46Updated.get("f"));
 			Assert.assertEquals("testingTopology", changedMemScores46Updated.get("c"));
-		}
+		
 		
 		//testing the updated changedMemberVariables collection
 		DBObject changedMemVars = changedMemberVar.findOne(new BasicDBObject("l_id", l_id));
@@ -465,17 +455,17 @@ public class StrategyScoringBoltTest {
 		//fake changedMemberVariables collection
 		DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		Change expected = new Change("17", 1,
+		Change expected = new Change("18", 1,
 				simpleDateFormat.parse(simpleDateFormat.format(new LocalDate(new Date()).plusDays(30).toDateMidnight().toDate())),
 				simpleDateFormat.parse("2014-09-01"));
 		changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
-				"17",
+				"18",
 				new BasicDBObject("v", expected.getValue()).append("e",
 						expected.getExpirationDateAsString()).append("f",
 						expected.getEffectiveDateAsString())));
 		
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("S_SRS_VAR", "102.0");
+		map.put("S_SRS_VAR2", "102.0");
 		String varObjString = (String) JsonUtils.createJsonFromStringObjectMap(map);
 		Tuple tuple = StormTestUtils.mockTuple("testingLid5", varObjString, "testingTopology", "testingLoyaltyId5");
 		
@@ -502,22 +492,22 @@ public class StrategyScoringBoltTest {
 			Assert.assertEquals("testingTopology", changedMemScores75Updated.get("c"));
 					
 			HashMap<String, ChangedMemberScore> changedMemScores70Updated = (HashMap<String, ChangedMemberScore>) updatedMemScoreObject
-					.get("70");
+					.get("75");
 			// testing the updated changedMemberScore collection
-			Assert.assertEquals(0.9975273768433652, changedMemScores70Updated.get("s"));
+			Assert.assertEquals(0.0, changedMemScores70Updated.get("s"));
 			Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), changedMemScores70Updated.get("minEx"));
-			Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), changedMemScores70Updated.get("maxEx"));
+			Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(30).toDateMidnight().toDate()), changedMemScores70Updated.get("maxEx"));
 			Assert.assertEquals(simpleDateFormat.format(new Date()), changedMemScores70Updated.get("f"));
 			Assert.assertEquals("testingTopology", changedMemScores70Updated.get("c"));
 		
 		//testing the updated changedMemberVariables collection
 		DBObject changedMemVars = changedMemberVar.findOne(new BasicDBObject("l_id", l_id));
-		DBObject varObj = (DBObject) changedMemVars.get("17");
+		DBObject varObj = (DBObject) changedMemVars.get("18");
 		Assert.assertEquals(1, varObj.get("v"));
 		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(30).toDateMidnight().toDate()), varObj.get("e"));
 		Assert.assertEquals("2014-09-01", varObj.get("f"));
 		
-		DBObject varObj2 = (DBObject) changedMemVars.get("16");
+		DBObject varObj2 = (DBObject) changedMemVars.get("17");
 		Assert.assertEquals(1, varObj2.get("v"));
 		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), varObj2.get("e"));
 		Assert.assertEquals(simpleDateFormat.format(new Date()), varObj2.get("f"));
@@ -541,8 +531,7 @@ public class StrategyScoringBoltTest {
 		Jedis fakeJedis = boltUnderTest.getJedisInterface().createJedis("0.0.0.0", 0000);
 		Map<String, String> actualRedisMap = fakeJedis.hgetAll("RTS:Telluride:"+l_id);
 		Assert.assertEquals("0.0", actualRedisMap.get("75"));
-		Assert.assertEquals("0.9975273768433652", actualRedisMap.get("70"));
-		
+			
 		//testing the fake redis for unknown occasion
 		Set<String> keys = fakeJedis.keys("Unknown");
 		Assert.assertTrue(keys.contains("Unknown:testingLoyaltyId5"));
@@ -559,7 +548,8 @@ public class StrategyScoringBoltTest {
 		
 	/*
 	 * If a member has an non-expired change var based on previous activity, which is removed from RTS system (i.e. from variables and modelVariables collection)
-	 * it will be skipped in scoring, expiration dates etc. Here, VID 18 is not in our collections, so only the incoming S_SRS_VAR will be used
+	 * it won't be populated in changedMemVars at all
+	 * hence, it will be skipped in scoring, expiration dates etc. Here, VID 19 is not in our collections, so only the incoming S_SRS_VAR will be used
 	 * Got NPE in PRODUCTION and the null check was included
 	 */
 	@SuppressWarnings("unchecked")
@@ -574,11 +564,11 @@ public class StrategyScoringBoltTest {
 		//fake changedMemberVariables collection
 		DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		Change expected = new Change("18", 12,
+		Change expected = new Change("19", 12,
 				simpleDateFormat.parse("2999-09-23"),
 				simpleDateFormat.parse("2014-09-01"));
 		changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
-				"18",
+				"19",
 				new BasicDBObject("v", expected.getValue()).append("e",
 						expected.getExpirationDateAsString()).append("f",
 						expected.getEffectiveDateAsString())));
@@ -599,37 +589,33 @@ public class StrategyScoringBoltTest {
 		
 		//fake changedMemberScores collection with no record in it
 		DBCollection changedMemberScoreColl = db.getCollection("changedMemberScores");
-		DBObject changedMemScoreObj = null;
-		DBCursor updatedMemScoreColl = changedMemberScoreColl.find();
-		while(updatedMemScoreColl.hasNext()){
-			changedMemScoreObj = updatedMemScoreColl.next();
-			HashMap<String, ChangedMemberScore> changedMemScores75Updated = (HashMap<String, ChangedMemberScore>) changedMemScoreObj
-					.get("75");
+		DBObject changedMemScoreObj = changedMemberScoreColl.findOne(new BasicDBObject("l_id", l_id));
+			
+			HashMap<String, ChangedMemberScore> changedMemScores70Updated = (HashMap<String, ChangedMemberScore>) changedMemScoreObj
+					.get("70");
 			// testing the updated changedMemberScore collection
 			Assert.assertEquals("testingLid6", changedMemScoreObj.get("l_id"));
-			Assert.assertEquals(0.0, changedMemScores75Updated.get("s"));
-			Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(30).toDateMidnight().toDate()), changedMemScores75Updated.get("minEx"));
-			Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(30).toDateMidnight().toDate()), changedMemScores75Updated.get("maxEx"));
-			Assert.assertEquals(simpleDateFormat.format(new Date()), changedMemScores75Updated.get("f"));
-			Assert.assertEquals("testingTopology", changedMemScores75Updated.get("c"));
-		}
-		
+			Assert.assertEquals(0.9975273768433652, changedMemScores70Updated.get("s"));
+			Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), changedMemScores70Updated.get("minEx"));
+			Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), changedMemScores70Updated.get("maxEx"));
+			Assert.assertEquals(simpleDateFormat.format(new Date()), changedMemScores70Updated.get("f"));
+			Assert.assertEquals("testingTopology", changedMemScores70Updated.get("c"));
+			
 		//testing the updated changedMemberVariables collection
 		DBObject changedMemVars = changedMemberVar.findOne(new BasicDBObject("l_id", l_id));
-		DBObject varObj = (DBObject) changedMemVars.get("11");
-		Assert.assertEquals(1, varObj.get("v"));
-		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(30).toDateMidnight().toDate()), varObj.get("e"));
-		Assert.assertEquals(simpleDateFormat.format(new Date()), varObj.get("f"));
-		
-			
+		DBObject varObj11 = (DBObject) changedMemVars.get("16");
+		Assert.assertEquals(1, varObj11.get("v"));
+		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), varObj11.get("e"));
+		Assert.assertEquals(simpleDateFormat.format(new Date()), varObj11.get("f"));
+	
 		//testing the tuple emitted in score_stream of the outputcollector (emitted to Logging Bolt) 
 		List<Object> outputTupleScoreStream = outputCollector.getTuple().get("score_stream");
 		Assert.assertEquals(l_id, outputTupleScoreStream.get(0));
-		Assert.assertEquals(0.0, outputTupleScoreStream.get(1));
-		Assert.assertEquals("75", outputTupleScoreStream.get(2));
+		Assert.assertEquals(0.9975273768433652, outputTupleScoreStream.get(1));
+		Assert.assertEquals("70", outputTupleScoreStream.get(2));
 		Assert.assertEquals("testingTopology", outputTupleScoreStream.get(3));
-		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(30).toDateMidnight().toDate()), outputTupleScoreStream.get(5));
-		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(30).toDateMidnight().toDate()), outputTupleScoreStream.get(6));
+		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), outputTupleScoreStream.get(5));
+		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), outputTupleScoreStream.get(6));
 		
 		//testing the tuple emitted in kafka_stream of the outputcollector (emitted to kafka for TEC to listen to) 
 		//lyl_id_no+"~"+topologyName
@@ -639,7 +625,7 @@ public class StrategyScoringBoltTest {
 		//testing the fake redis for TI_POS
 		Jedis fakeJedis = boltUnderTest.getJedisInterface().createJedis("0.0.0.0", 0000);
 		Map<String, String> actualRedisMap = fakeJedis.hgetAll("RTS:Telluride:"+l_id);
-		Assert.assertEquals("0.0", actualRedisMap.get("75"));
+		Assert.assertEquals("0.9975273768433652", actualRedisMap.get("70"));
 		
 		//testing the fake redis for unknown occasion
 		Set<String> keys = fakeJedis.keys("Unknown");

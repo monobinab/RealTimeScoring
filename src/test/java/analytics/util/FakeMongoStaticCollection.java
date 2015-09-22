@@ -50,10 +50,10 @@ public class FakeMongoStaticCollection {
 		varColl.insert(new BasicDBObject("name", "variable40").append("VID", 40).append("strategy","NONE"));
 		varColl.insert(new BasicDBObject("name", "variable13").append("VID", 13).append("strategy","StrategyCountTraitDates"));
 		varColl.insert(new BasicDBObject("name", "variable14").append("VID", 14).append("strategy","StrategyDCStrengthSum"));
-		varColl.insert(new BasicDBObject("name", "BOOST_DC_VAR").append("VID", 15).append("strategy","StrategyDCStrengthSum"));
-		
+			
 		varColl.insert(new BasicDBObject("name", "S_SRS_VAR").append("VID", 16).append("strategy","StrategyCountTransactions"));
-		varColl.insert(new BasicDBObject("name", "Blackout_variable2").append("VID", 17).append("strategy","StrategyBlackout"));
+		varColl.insert(new BasicDBObject("name", "S_SRS_VAR2").append("VID", 17).append("strategy","StrategyCountTransactions"));
+		varColl.insert(new BasicDBObject("name", "Blackout_variable2").append("VID", 18).append("strategy","StrategyBlackout"));
 	
 		//fake modelVariables collection
 		DBCollection modeVarColl = db.getCollection("modelVariables");
@@ -89,7 +89,7 @@ public class FakeMongoStaticCollection {
 		modeVarColl.insert(new BasicDBObject("modelId", 70).append("modelName", "Model_Name7").append("modelDescription", "Kids apparel").append("constant", 5).append("month", 0).append("variable", dbList7));
 			
 		BasicDBList dbList8 = new BasicDBList();
-		dbList8.add(new BasicDBObject("name", "S_SRS_VAR").append("coefficient", 0.015));
+		dbList8.add(new BasicDBObject("name", "S_SRS_VAR2").append("coefficient", 0.015));
 		dbList8.add(new BasicDBObject("name", "Blackout_variable2").append("coefficient", 0.015));
 		modeVarColl.insert(new BasicDBObject("modelId", 75).append("modelName", "Model_Name8").append("modelDescription", "Home Appliances2").append("constant", 5).append("month", 0).append("variable", dbList8));
 		
