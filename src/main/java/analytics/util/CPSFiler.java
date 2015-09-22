@@ -270,7 +270,6 @@ public class CPSFiler {
 	}
 
 	protected boolean arePackagesSame(List<EmailPackage> emailPackagesToBeSent,List<EmailPackage> currentPackages) {	
-	
 			if(emailPackagesToBeSent.size() != currentPackages.size())
 				return false;
 			
@@ -279,8 +278,7 @@ public class CPSFiler {
 					return false;
 			}
 			
-			return true;	
-		
+			return true;			
 	}
 
 	protected EmailPackage getInProgressOccasion(String lyl_id_no) throws SQLException, Exception {
@@ -357,7 +355,20 @@ public class CPSFiler {
 	
 	public void fileEmailPackages(List<EmailPackage> emailPackages) throws SQLException {
 		//don't queue if sendDate is null
-		outboxDao.queueEmailPackages(emailPackages);
+		if(emailPackages != null && emailPackages.size() > 0){			
+			outboxDao.queueEmailPackages(filterNullDatePackages(emailPackages));
+		}
+	}
+	
+	public List<EmailPackage> filterNullDatePackages(List<EmailPackage> emailPackages){
+		Iterator<EmailPackage> emailPackagesItr = emailPackages.iterator();
+        while(emailPackagesItr.hasNext()){
+        	EmailPackage emailPackage = emailPackagesItr.next();
+	        if(emailPackage.getSendDate() == null){
+	        	emailPackagesItr.remove();
+			}
+        }
+		return emailPackages;
 	}
 	
 	/*public List<EmailPackage> decideSendDates(List<EmailPackage> emailPackages, EmailPackage inProgressPackage) throws SQLException, RealTimeScoringException {
