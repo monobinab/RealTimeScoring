@@ -244,13 +244,13 @@ public class CPOutBoxDAO extends AbstractMySQLDao {
 //			java.util.Date date = sdf.parse(cpOutBoxItem.getAdded_datetime());
 //			statement.setDate(5, new java.sql.Date((cpOutBoxItem.getAdded_datetime().toString())));
 			//Question on BU and subbu
-			statement.setString(5, "T");
-			statement.setString(6, "T");
-			statement.setString(7, "T");	
+			//statement.setString(5, "T");
+			//statement.setString(6, "T");
+			//statement.setString(7, "T");	
 			
-//			statement.setString(5, cpOutBoxItem.getBu());
-//			statement.setString(6, cpOutBoxItem.getSub_bu());
-//			statement.setString(7, cpOutBoxItem.getOccasion_name());
+			statement.setString(5, cpOutBoxItem.getBu());
+			statement.setString(6, cpOutBoxItem.getSub_bu());
+			statement.setString(7, cpOutBoxItem.getOccasion_name());
 			statement.executeUpdate();
 
 		} catch (SQLException e) {

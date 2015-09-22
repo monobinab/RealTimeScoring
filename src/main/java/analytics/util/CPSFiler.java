@@ -257,24 +257,30 @@ public class CPSFiler {
 
 	protected void compareAndDelete(String lyl_id_no, List<EmailPackage> emailPackagesToBeSent, List<EmailPackage> currentPackages) throws SQLException {
 		//if exisitng queue and incoming is same - do nothing.		
-		if(!arePackagesSame(emailPackagesToBeSent, currentPackages))	
-		{
-			if(currentPackages.size()>0)
-				outboxDao.deleteQueuedEmailPackages(lyl_id_no);	
+		if(emailPackagesToBeSent != null && currentPackages != null){
+			if(!arePackagesSame(emailPackagesToBeSent, currentPackages))	
+			{
+				if(currentPackages.size()>0)
+					outboxDao.deleteQueuedEmailPackages(lyl_id_no);	
+			}
+			
 		}
+		
 						
 	}
 
-	protected boolean arePackagesSame(List<EmailPackage> emailPackagesToBeSent,List<EmailPackage> currentPackages) {		
-		if(emailPackagesToBeSent.size() != currentPackages.size())
-			return false;
-		
-		for(int i = 0; i<emailPackagesToBeSent.size();i++){
-			if(!emailPackagesToBeSent.get(i).getMdTagMetaData().getMdTag().equals(currentPackages.get(i).getMdTagMetaData().getMdTag()))
+	protected boolean arePackagesSame(List<EmailPackage> emailPackagesToBeSent,List<EmailPackage> currentPackages) {	
+	
+			if(emailPackagesToBeSent.size() != currentPackages.size())
 				return false;
-		}
+			
+			for(int i = 0; i<emailPackagesToBeSent.size();i++){
+				if(!emailPackagesToBeSent.get(i).getMdTagMetaData().getMdTag().equals(currentPackages.get(i).getMdTagMetaData().getMdTag()))
+					return false;
+			}
+			
+			return true;	
 		
-		return true;
 	}
 
 	protected EmailPackage getInProgressOccasion(String lyl_id_no) throws SQLException, Exception {
@@ -350,6 +356,7 @@ public class CPSFiler {
 	}
 	
 	public void fileEmailPackages(List<EmailPackage> emailPackages) throws SQLException {
+		//don't queue if sendDate is null
 		outboxDao.queueEmailPackages(emailPackages);
 	}
 	

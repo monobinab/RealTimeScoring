@@ -65,7 +65,7 @@ public class CPSUtil {
 					// printWriter.println("tag:"+cpItem.getMd_tag()+"Added Date:"+cpItem.getAdded_datetime()+"  Send Date:"+cpItem.getSend_date()
 					// +" Sent Flag:"+cpItem.getStatus() );
 					printWriter.println("tag:" + cpItem.getMd_tag()
-							+ "  Send Date:" + cpItem.getSend_date()
+							+ "  Send Date:" + sdformat.format(cpItem.getSend_date())
 							+ " Sent Flag:" + cpItem.getStatus());
 					// presetBuffer.append("tag:"+cpItem.getMd_tag()+"  Send Date:"+cpItem.getSend_date()
 					// +" Sent Flag:"+cpItem.getStatus()+"/n" );
@@ -120,8 +120,8 @@ public class CPSUtil {
 
 							// if(queuedItem.getSend_date()==
 							// verifyItem.getSend_date()) {
-							if (sdformat.format(queuedItem.getSend_date()).equals(verifyItem
-									.getSend_date())  ) {
+							if (sdformat.format(queuedItem.getSend_date()).equals(sdformat.format(verifyItem
+									.getSend_date()))  ) {
 								successCount++;
 								testresult = "SUCCESS Test Tag: "
 										+ verifyItem.getMd_tag()
@@ -218,11 +218,6 @@ public class CPSUtil {
 	}
 
 	private CPOutBoxItem parseLine(String line, String testPhase) {
-
-		Date dNow = new Date();
-		SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd");
-		String today = ft.format(dNow);
-
 		CPOutBoxItem cpBoxItem = new CPOutBoxItem();
 		String[] variables = line.split(",");
 		if (variables.length > 0) {
@@ -252,6 +247,12 @@ public class CPSUtil {
 					}
 					if (variables.length > 4)
 						cpBoxItem.setStatus(Integer.parseInt(variables[4]));
+					if (variables.length > 5)
+						cpBoxItem.setBu(variables[5]);
+					if (variables.length > 6)
+						cpBoxItem.setSub_bu(variables[6]);
+					if (variables.length > 7)
+						cpBoxItem.setOccasion_name(variables[7]);
 
 				} else if ("VERIFY".equalsIgnoreCase(testPhase)) {
 					// Member number,Incoming tags,Send Date

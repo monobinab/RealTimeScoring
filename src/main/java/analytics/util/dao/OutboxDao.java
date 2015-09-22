@@ -9,10 +9,12 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.exception.RealTimeScoringException;
+import analytics.util.CalendarUtil;
 import analytics.util.Constants;
 import analytics.util.objects.EmailPackage;
 import analytics.util.objects.OccasionInfo;
@@ -217,21 +219,20 @@ public class OutboxDao extends AbstractMySQLDao{
 	public EmailPackage getInProgressPackage(String lyl_id_no, List<OccasionInfo> occasionsInfo) throws SQLException {
 				
 		EmailPackage inProgressOccasion = null;
-		String query = "SELECT count(*) FROM rts_member.cp_outbox WHERE loy_id=? AND status=1";
+
+		String query = "SELECT bu,sub_bu,md_tag,occasion_name, added_datetime, send_date,status, max(sent_datetime) FROM rts_member.cp_outbox WHERE loy_id=? AND status=1;";
 		PreparedStatement statement = connection.prepareStatement(query);
-		statement.setString(1, lyl_id_no);
-		LOGGER.info("query to check if there is an inProgressOccasion : " + statement);
-		ResultSet rs = statement.executeQuery();
-		if(rs.next() && rs.getInt(1) > 0){
-			query = "SELECT bu,sub_bu,md_tag,occasion_name, added_datetime, send_date,status, max(sent_datetime) FROM rts_member.cp_outbox WHERE loy_id=? AND status=1;";
-			statement = connection.prepareStatement(query);
 			statement.setString(1, lyl_id_no);
 			LOGGER.info("query to get the latest emailPackage sent for this member : " + statement);
 			ResultSet rs1 = statement.executeQuery();
 			 
-			while (rs1.next()) { 
-	        	inProgressOccasion = new EmailPackage();
-	        	inProgressOccasion.setMemberId(lyl_id_no);
+			while (rs1.next()) {				
+				
+				//get the latest sent package
+				java.util.Date sentDate = rs1.getTime("sent_datetime");
+				//add the send duration to the sent date and see if it is less than today's date
+				//if it is less - it means it is not in progress anymore				
+				
 	        	TagMetadata tagMetadata = new TagMetadata(rs1.getString("md_tag"),rs1.getString("bu"),rs1.getString("sub_bu"),rs1.getString("occasion_name"));	  
 	        	 for(OccasionInfo occasion :occasionsInfo){
 	            	 if(rs1.getString("occasion_name").equals(occasion.getOccasion()))
@@ -242,13 +243,19 @@ public class OutboxDao extends AbstractMySQLDao{
 	    	             break;
 	            	 }
 	             }
-	        	inProgressOccasion.setMdTagMetaData(tagMetadata);
-	        	inProgressOccasion.setAddedDateTime( rs1.getTimestamp("added_datetime"));
-	        	inProgressOccasion.setSendDate(rs1.getDate("send_date"));
-	        	inProgressOccasion.setStatus( rs1.getInt("status")); 		        	
+	        	if( CalendarUtil.getNewDate(sentDate, tagMetadata.getSendDuration()).after(CalendarUtil.getTodaysDate()) ||
+	        			CalendarUtil.getNewDate(sentDate, tagMetadata.getSendDuration()).equals(CalendarUtil.getTodaysDate())){
+	        		inProgressOccasion = new EmailPackage();
+		        	inProgressOccasion.setMemberId(lyl_id_no);		        	
+		        	inProgressOccasion.setMdTagMetaData(tagMetadata);
+		        	inProgressOccasion.setAddedDateTime( rs1.getTimestamp("added_datetime"));
+		        	inProgressOccasion.setSendDate(rs1.getDate("send_date"));
+		        	inProgressOccasion.setStatus( rs1.getInt("status")); 
+	        	}	
+	        			        	
 	       }	
 		
-		}
+		//}
 		
 		 statement.close();
 		return inProgressOccasion;
