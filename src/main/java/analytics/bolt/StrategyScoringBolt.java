@@ -106,11 +106,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			if (input.contains("lyl_id_no")) {
 				lyl_id_no = input.getStringByField("lyl_id_no");
 			}
-			else if(!input.contains("lyl_id_no") || input.getStringByField("lyl_id_no").equals(null)){
-				outputCollector.ack(input);
-				return;
-			}
-			
+					
 			if(input.contains("source")){
 				source = input.getStringByField("source");
 			}
