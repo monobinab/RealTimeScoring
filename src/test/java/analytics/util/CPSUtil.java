@@ -232,11 +232,14 @@ public class CPSUtil {
 				if ("PRESET".equalsIgnoreCase(testPhase)) {
 					// Member number,Existing Tag,Added Date,Send Date,Sent flag
 					String sendDT = null;
+					 Date sentDateTime=null;
 					String addedDate=getTimeStampString(Integer.parseInt(variables[2]));
 					cpBoxItem.setAdded_datetime(addedDate);
 					if (variables.length > 3) {
 						sendDT = getDateString(Integer.parseInt(variables[3]));
 						cpBoxItem.setSend_date(sendDT);
+						sentDateTime=getDate(Integer.parseInt(variables[3]));
+						cpBoxItem.setSent_datetime(sentDateTime);
 					}
 					if (variables.length > 4)
 						cpBoxItem.setStatus(Integer.parseInt(variables[4]));
