@@ -228,16 +228,17 @@ public class CPOutBoxDAO extends AbstractMySQLDao {
 		try {
 
 			statement = connection
-					.prepareStatement("INSERT INTO rts_member.cp_outbox (loy_id,md_tag,send_date,status,added_datetime,bu,sub_bu,occasion_name) VALUES (?,?,?,?,?,?,?,?)");
+					.prepareStatement("INSERT INTO rts_member.cp_outbox (loy_id,md_tag,send_date,status,added_datetime,sent_datetime,bu,sub_bu,occasion_name) VALUES (?,?,?,?,?,?,?,?,?)");
 			
 			statement.setString(1, cpOutBoxItem.getLoy_id());
 			statement.setString(2, cpOutBoxItem.getMd_tag());
 			statement.setDate(3,  new java.sql.Date(ft.parse(cpOutBoxItem.getSend_date()).getTime()));
 			statement.setInt(4, cpOutBoxItem.getStatus());
-			statement.setTimestamp(5, new java.sql.Timestamp(sdf.parse(cpOutBoxItem.getAdded_datetime()).getTime()));			
-			statement.setString(6, cpOutBoxItem.getBu());
-			statement.setString(7, cpOutBoxItem.getSub_bu());
-			statement.setString(8, cpOutBoxItem.getOccasion_name());
+			statement.setTimestamp(5, new java.sql.Timestamp(sdf.parse(cpOutBoxItem.getAdded_datetime()).getTime()));	
+			statement.setTimestamp(6, new java.sql.Timestamp(sdf.parse(cpOutBoxItem.getSend_date()).getTime()));	
+			statement.setString(7, cpOutBoxItem.getBu());
+			statement.setString(8, cpOutBoxItem.getSub_bu());
+			statement.setString(9, cpOutBoxItem.getOccasion_name());
 			statement.executeUpdate();
 
 		} catch (SQLException e) {
