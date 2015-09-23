@@ -81,17 +81,20 @@ public class EmailFeedbackParsingBolt extends EnvironmentBolt {
 				}*/
 				
 				String key = bu+"~"+format;
-				for (VariableModel var : emailBUVariablesMap.get(key)) {
-					if (var.getVariable().toUpperCase().contains("BLACK"))
-						variableValueMap.put(var.getVariable(), "1");			
-				}
+				if(emailBUVariablesMap.get(key)!=null && emailBUVariablesMap.get(key).size()>0)
+					for (VariableModel var : emailBUVariablesMap.get(key)) {
+						if (var.getVariable().toUpperCase().contains("BLACK"))
+							variableValueMap.put(var.getVariable(), "1");			
+					}
 			}
 			else if(emailFeedback.equals("YES")){//boost
 				//Sree. get email boost variables
 				String key = bu+"~"+format;
-				for (VariableModel var : emailBUVariablesMap.get(key)) {									
-					variableValueMap.put(var.getVariable(), isBlackOutVariable(var.getVariable()) ? "0" : getVariableValue(var.getModelId()));			
-				}
+				if(emailBUVariablesMap.get(key)!=null && emailBUVariablesMap.get(key).size()>0)
+					for (VariableModel var : emailBUVariablesMap.get(key)) {									
+						variableValueMap.put(var.getVariable(), isBlackOutVariable(var.getVariable()) ? "0" : 
+							getVariableValue(var.getModelId()));			
+					}
 				
 			}
 			
