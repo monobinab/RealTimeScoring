@@ -1,9 +1,6 @@
 package analytics.util;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-
-import analytics.util.objects.Change;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
