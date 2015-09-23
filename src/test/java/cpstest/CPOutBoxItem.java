@@ -1,5 +1,6 @@
 package cpstest;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Date;
@@ -7,16 +8,18 @@ import java.util.Date;
 public class CPOutBoxItem {
 	int email_pkg_id;
 	String loy_id, bu, sub_bu, md_tag, occasion_name;
-	Date added_datetime, send_date, sent_datetime;
+	String added_datetime;
+	Date sent_datetime;
+	String send_date;
 	int status;
 	String cust_event_name, customer_id, sears_opt_in, kmart_opt_in,
 			syw_opt_in;
-    List mdTagList=new ArrayList();
-	public List getMdTagList() {
+    List<String> mdTagList=new ArrayList<String>();
+	public List<String> getMdTagList() {
 		return mdTagList;
 	}
 
-	public void setMdTagList(List mdTagList) {
+	public void setMdTagList(List<String> mdTagList) {
 		this.mdTagList = mdTagList;
 	}
 
@@ -68,20 +71,20 @@ public class CPOutBoxItem {
 		this.occasion_name = occasion_name;
 	}
 
-	public java.util.Date getAdded_datetime() {
+	public String getAdded_datetime() {
 		return added_datetime;
 	}
 
-	public void setAdded_datetime(java.util.Date added_datetime) {
-		this.added_datetime = added_datetime;
+	public void setAdded_datetime(String timestamp) {
+		this.added_datetime = timestamp;
 	}
 
-	public Date getSend_date() {
+	public String getSend_date() {
 		return send_date;
 	}
 
-	public void setSend_date(Date send_date) {
-		this.send_date = send_date;
+	public void setSend_date(String sendDT) {
+		this.send_date = sendDT;
 	}
 
 	public Date getSent_datetime() {

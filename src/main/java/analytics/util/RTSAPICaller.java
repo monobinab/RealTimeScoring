@@ -78,7 +78,8 @@ public class RTSAPICaller {
 			InputStream instream = response.getEntity().getContent();
 			jsonRespString = read(instream);
 			//LOGGER.info(jsonRespString);	
-
+			httpget.releaseConnection();
+	
 		} catch (IOException e3) {
 			e3.printStackTrace();
 			LOGGER.error("IO Exception Occured " + baseURL + "\n" + e3);

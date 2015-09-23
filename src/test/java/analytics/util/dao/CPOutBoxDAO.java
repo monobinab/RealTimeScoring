@@ -3,8 +3,10 @@ package analytics.util.dao;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -67,6 +69,7 @@ public class CPOutBoxDAO extends AbstractMySQLDao {
 		ResultSet rs = null;
 		Date dNow = new Date();
 		SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String today = ft.format(dNow);
 		try {
 			StringBuffer query = new StringBuffer();
@@ -87,10 +90,9 @@ public class CPOutBoxDAO extends AbstractMySQLDao {
 			}
 			while (rs.next()) {
 				CPOutBoxItem cpOutBoxItem = new CPOutBoxItem();
-				cpOutBoxItem.setAdded_datetime(rs.getDate("added_datetime"));
+				cpOutBoxItem.setAdded_datetime(sdf.format(rs.getTimestamp("added_datetime")));
 				cpOutBoxItem.setBu(rs.getString("bu"));
-				cpOutBoxItem
-						.setCust_event_name(rs.getString("cust_event_name"));
+				cpOutBoxItem.setCust_event_name(rs.getString("cust_event_name"));
 				cpOutBoxItem.setCustomer_id(rs.getString("customer_id"));
 				cpOutBoxItem.setEmail_pkg_id(rs.getInt("email_pkg_id"));
 				cpOutBoxItem.setKmart_opt_in(rs.getString("kmart_opt_in"));
@@ -98,7 +100,7 @@ public class CPOutBoxDAO extends AbstractMySQLDao {
 				cpOutBoxItem.setMd_tag(rs.getString("md_tag"));
 				cpOutBoxItem.setOccasion_name(rs.getString("occasion_name"));
 				cpOutBoxItem.setSears_opt_in(rs.getString("sears_opt_in"));
-				cpOutBoxItem.setSend_date(rs.getDate("send_date"));
+				cpOutBoxItem.setSend_date(ft.format(rs.getDate("send_date")));
 				cpOutBoxItem.setSent_datetime(rs.getTimestamp("sent_datetime"));
 				cpOutBoxItem.setStatus(rs.getInt("status"));
 				cpOutBoxItem.setSub_bu(rs.getString("sub_bu"));
@@ -218,42 +220,30 @@ public class CPOutBoxDAO extends AbstractMySQLDao {
 	}
 
 	public void insertRow(CPOutBoxItem cpOutBoxItem) {
-		
 
-		// TODO Auto-generated method stub
-		int count = 0;
 		PreparedStatement statement = null;
-		ResultSet resultSet = null;
-		Date dNow = new Date();
 		SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd");
-		String today = ft.format(dNow);
-		
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
-        
-       
-      //  java.sql.Date sqlDate = new Date(date.getTime());
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
 		try {
 
 			statement = connection
-					.prepareStatement("INSERT INTO rts_member.cp_outbox (loy_id,md_tag,send_date,status,bu,sub_bu,occasion_name) VALUES (?,?,?,?,?,?,?)");
+					.prepareStatement("INSERT INTO rts_member.cp_outbox (loy_id,md_tag,send_date,status,added_datetime,bu,sub_bu,occasion_name) VALUES (?,?,?,?,?,?,?,?)");
 			
 			statement.setString(1, cpOutBoxItem.getLoy_id());
 			statement.setString(2, cpOutBoxItem.getMd_tag());
-			statement.setDate(3,  new java.sql.Date(cpOutBoxItem.getSend_date().getTime()));
+			statement.setDate(3,  new java.sql.Date(ft.parse(cpOutBoxItem.getSend_date()).getTime()));
 			statement.setInt(4, cpOutBoxItem.getStatus());
-//			java.util.Date date = sdf.parse(cpOutBoxItem.getAdded_datetime());
-//			statement.setDate(5, new java.sql.Date((cpOutBoxItem.getAdded_datetime().toString())));
-			//Question on BU and subbu
-			//statement.setString(5, "T");
-			//statement.setString(6, "T");
-			//statement.setString(7, "T");	
-			
-			statement.setString(5, cpOutBoxItem.getBu());
-			statement.setString(6, cpOutBoxItem.getSub_bu());
-			statement.setString(7, cpOutBoxItem.getOccasion_name());
+			statement.setTimestamp(5, new java.sql.Timestamp(sdf.parse(cpOutBoxItem.getAdded_datetime()).getTime()));			
+			statement.setString(6, cpOutBoxItem.getBu());
+			statement.setString(7, cpOutBoxItem.getSub_bu());
+			statement.setString(8, cpOutBoxItem.getOccasion_name());
 			statement.executeUpdate();
 
 		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
 			if (statement != null)
@@ -283,6 +273,7 @@ public class CPOutBoxDAO extends AbstractMySQLDao {
 		PreparedStatement statement = null;
 		ResultSet rs = null;
 		Date dNow = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd");
 		String today = ft.format(dNow);
 		CPOutBoxItem cpOutBoxItem = new CPOutBoxItem();
@@ -300,7 +291,7 @@ public class CPOutBoxDAO extends AbstractMySQLDao {
 			//while (rs.next()) {
 			if(rs.next())
 				{ 
-				cpOutBoxItem.setAdded_datetime(rs.getDate("added_datetime"));
+				cpOutBoxItem.setAdded_datetime(sdf.format(rs.getDate("added_datetime")));
 				cpOutBoxItem.setBu(rs.getString("bu"));
 				cpOutBoxItem
 						.setCust_event_name(rs.getString("cust_event_name"));
@@ -311,7 +302,7 @@ public class CPOutBoxDAO extends AbstractMySQLDao {
 				cpOutBoxItem.setMd_tag(rs.getString("md_tag"));
 				cpOutBoxItem.setOccasion_name(rs.getString("occasion_name"));
 				cpOutBoxItem.setSears_opt_in(rs.getString("sears_opt_in"));
-				cpOutBoxItem.setSend_date(rs.getDate("send_date"));
+				cpOutBoxItem.setSend_date(ft.format(rs.getDate("send_date")));
 				cpOutBoxItem.setSent_datetime(rs.getDate("sent_datetime"));
 				cpOutBoxItem.setStatus(rs.getInt("status"));
 				cpOutBoxItem.setSub_bu(rs.getString("sub_bu"));

@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 
 import storm.kafka.SpoutConfig;
 import analytics.bolt.CPParsePersistBolt;
-import analytics.bolt.ParsingBoltOccassion;
 import analytics.bolt.CPProcessingBolt;
 import analytics.bolt.TagCreatorBolt;
 import analytics.spout.RTSKafkaSpout;
@@ -29,7 +28,8 @@ public class ConsideredPurchaseTopology {
 	public static void main(String[] args) {		
 
 		if (!SystemUtility.setEnvironment(args)) {
-			LOGGER.error("Please pass the environment variable argument- 'PROD' or 'QA' or 'LOCAL'");
+			System.out
+					.println("Please pass the environment variable argument- 'PROD' or 'QA' or 'LOCAL'");
 			System.exit(0);
 		}
 		
@@ -38,7 +38,7 @@ public class ConsideredPurchaseTopology {
 	//	String kafkaTopic2="stormtopic";
 	//	String kafkaTopic2="rts_cp_membertags_qa";
 		String kafkaTopic2="cps_rtstags_qa";
-		String zkroot2="rts_cp_membertags_qa_zkroot";
+		String zkroot2="rts_cp_rtstags_qa_zkroot";
 		String cpsPurchaseScoresTopic="rts_cp_purchase_scores";
 		String zkroot_cp_purchase = "rts_cp_purchase_zkroot";
 		String group_id = "cps_groupid";
@@ -51,10 +51,11 @@ public class ConsideredPurchaseTopology {
 			SpoutConfig spoutConfig3 = null;
 			spoutConfig1 = new KafkaUtil(env).getSpoutConfig(kafkaTopic1,zkroot1,group_id);
 			spoutConfig2 = new KafkaUtil(env).getSpoutConfig(kafkaTopic2,zkroot2,group_id);
-			spoutConfig3 = new KafkaUtil(env).getSpoutConfig(cpsPurchaseScoresTopic,zkroot_cp_purchase,group_id);			
+			spoutConfig3 = new KafkaUtil(env).getSpoutConfig(cpsPurchaseScoresTopic,zkroot_cp_purchase,group_id);	
+			
 			topologyBuilder.setSpout("CPKafkaSpout1", new RTSKafkaSpout(spoutConfig1), 1);
 			topologyBuilder.setSpout("CPKafkaSpout2", new RTSKafkaSpout(spoutConfig2), 1);
-			spoutConfig2 = new KafkaUtil(env).getSpoutConfig(cpsPurchaseScoresTopic,zkroot_cp_purchase);
+			//spoutConfig2 = new KafkaUtil(env).getSpoutConfig(cpsPurchaseScoresTopic,zkroot_cp_purchase);
 			topologyBuilder.setSpout("CPPurchaseFeedbackSpout", new RTSKafkaSpout(spoutConfig3), 1);
 			LOGGER.info("CPS Topology listening to kafka topics : " + kafkaTopic1 + ", "+kafkaTopic2 +" , "+ cpsPurchaseScoresTopic);
 			//LOGGER.info("CPS Topology listening to kafka topics : " + kafkaTopic1 + ", "+ cpsPurchaseScoresTopic);
@@ -63,7 +64,7 @@ public class ConsideredPurchaseTopology {
 			System.exit(0);	
 		}
 		//topologyBuilder.setBolt("CPParsePersistBolt", new CPParsePersistBolt(env), 15).shuffleGrouping("CPKafkaSpout1").shuffleGrouping("CPTagCreatorBolt", "rtsTags_stream" );	
-		topologyBuilder.setBolt("CPParsePersistBolt", new CPParsePersistBolt(env), 15).shuffleGrouping("CPKafkaSpout2").shuffleGrouping("CPTagCreatorBolt", "rtsTags_stream" );	
+		topologyBuilder.setBolt("CPParsePersistBolt", new CPParsePersistBolt(env), 15).shuffleGrouping("CPKafkaSpout1").shuffleGrouping("CPKafkaSpout2").shuffleGrouping("CPTagCreatorBolt", "rtsTags_stream" );	
 		topologyBuilder.setBolt("CPProcessingBolt", new CPProcessingBolt(env),15).shuffleGrouping("CPParsePersistBolt");
 		topologyBuilder.setBolt("CPTagCreatorBolt", new TagCreatorBolt(env), 1).shuffleGrouping("CPPurchaseFeedbackSpout");		
 		
@@ -71,7 +72,7 @@ public class ConsideredPurchaseTopology {
 		conf.put("metrics_topology", "CPS");
 		conf.registerMetricsConsumer(MetricsListener.class, env, partition_num);
 		conf.setDebug(false);
-		/*if (env.equalsIgnoreCase("PROD")|| env.equalsIgnoreCase("QA")) {	
+		if (env.equalsIgnoreCase("PROD")|| env.equalsIgnoreCase("QA")) {	
 			try {
 				StormSubmitter.submitTopology(args[0], conf, topologyBuilder.createTopology());
 			} catch (AlreadyAliveException e) {
@@ -79,7 +80,7 @@ public class ConsideredPurchaseTopology {
 			} catch (InvalidTopologyException e) {
 				LOGGER.error(e.getClass() + ": " + ExceptionUtils.getMessage(e) + "Rootcause-"+ ExceptionUtils.getRootCauseMessage(e) +"  STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 			}
-		} else {*/
+		} else {
 			conf.setDebug(false);
 			conf.setMaxTaskParallelism(partition_num);
 			LocalCluster cluster = new LocalCluster();
@@ -92,6 +93,6 @@ public class ConsideredPurchaseTopology {
 			cluster.shutdown();
 		}
 	
-//	}
+	}
 
 }
