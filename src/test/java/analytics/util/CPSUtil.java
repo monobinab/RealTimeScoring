@@ -238,11 +238,15 @@ public class CPSUtil {
 					if (variables.length > 3) {
 						sendDT = getDateString(Integer.parseInt(variables[3]));
 						cpBoxItem.setSend_date(sendDT);
-						sentDateTime=getDate(Integer.parseInt(variables[3]));
-						cpBoxItem.setSent_datetime(sentDateTime);
+						
 					}
 					if (variables.length > 4)
 						cpBoxItem.setStatus(Integer.parseInt(variables[4]));
+					    if(cpBoxItem.getStatus()==1)
+						{
+					    	sentDateTime=getDate(Integer.parseInt(variables[3]));
+					    	cpBoxItem.setSent_datetime(sentDateTime);
+						}
 				
 
 				} else if ("VERIFY".equalsIgnoreCase(testPhase)) {

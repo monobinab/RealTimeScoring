@@ -235,7 +235,10 @@ public class CPOutBoxDAO extends AbstractMySQLDao {
 			statement.setDate(3,  new java.sql.Date(ft.parse(cpOutBoxItem.getSend_date()).getTime()));
 			statement.setInt(4, cpOutBoxItem.getStatus());
 			statement.setTimestamp(5, new java.sql.Timestamp(sdf.parse(cpOutBoxItem.getAdded_datetime()).getTime()));	
+			if(cpOutBoxItem.getStatus()==1)
 			statement.setTimestamp(6, new java.sql.Timestamp((cpOutBoxItem.getSent_datetime()).getTime()));	
+			else
+				statement.setTimestamp(6,null);
 			statement.setString(7, cpOutBoxItem.getBu());
 			statement.setString(8, cpOutBoxItem.getSub_bu());
 			statement.setString(9, cpOutBoxItem.getOccasion_name());
