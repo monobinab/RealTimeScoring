@@ -16,6 +16,7 @@ import redis.clients.jedis.JedisPubSub;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,9 +95,13 @@ public class RedisPubSubSpout extends BaseRichSpout {
             //Jedis jedis = pool.getResource();
             try {
                 jedis.psubscribe(listener, pattern);
-            } finally {
+            } 
+            catch(Exception e){
+            	LOGGER.error("Exception in getting jedis connection " + ExceptionUtils.getFullStackTrace(e));
+            }
+            finally {
                 //pool.returnResource(jedis);
-            	//jedis.disconnect();
+            	jedis.disconnect();
             }
         }
     };
