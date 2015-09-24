@@ -2,6 +2,7 @@ package analytics.util.dao;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -216,20 +217,23 @@ public class OutboxDao extends AbstractMySQLDao{
 		return sentDate;	
 	}
 
-	public EmailPackage getInProgressPackage(String lyl_id_no, List<OccasionInfo> occasionsInfo) throws SQLException {
-				
+	public EmailPackage getInProgressPackage(String lyl_id_no, List<OccasionInfo> occasionsInfo) throws SQLException, ParseException {
+		SimpleDateFormat sdformat = new SimpleDateFormat("yyyy-MM-dd");
+ 		String todaysDateStr = sdformat.format(new DateTime().toDate());
+ 		Date todaysDate = sdformat.parse(todaysDateStr);
+		
 		EmailPackage inProgressOccasion = null;
 
-		String query = "SELECT bu,sub_bu,md_tag,occasion_name, added_datetime, send_date,status, max(sent_datetime) as recentSentDate FROM rts_member.cp_outbox WHERE loy_id=? AND status=1;";
+		String query = "SELECT bu,sub_bu,md_tag,occasion_name, added_datetime, send_date,status, sent_datetime recentSentDate FROM rts_member.cp_outbox WHERE loy_id=? AND status=1 order by sent_datetime desc limit 1;";
 		PreparedStatement statement = connection.prepareStatement(query);
 			statement.setString(1, lyl_id_no);
 			LOGGER.info("query to get the latest emailPackage sent for this member : " + statement);
 			ResultSet rs1 = statement.executeQuery();
 			 
-			while (rs1.next() && rs1.getFetchSize() > 0) {				
+			while (rs1.next() ) {				
 				
-				//get the latest sent package
-				java.util.Date sentDate = rs1.getTime("recentSentDate");
+				//get the latest sent package				
+				java.util.Date sentDate = sdformat.parse(sdformat.format(rs1.getDate("recentSentDate")));
 				//add the send duration to the sent date and see if it is less than today's date
 				//if it is less - it means it is not in progress anymore				
 				
@@ -242,9 +246,10 @@ public class OutboxDao extends AbstractMySQLDao{
 	    	             tagMetadata.setDaysToCheckInHistory(Integer.parseInt(occasion.getDaysToCheckInHistory()));
 	    	             break;
 	            	 }
-	             }
-	        	if( CalendarUtil.getNewDate(sentDate, tagMetadata.getSendDuration()).after(CalendarUtil.getTodaysDate()) ||
-	        			CalendarUtil.getNewDate(sentDate, tagMetadata.getSendDuration()).equals(CalendarUtil.getTodaysDate())){
+	             }	     		
+	     			     		
+	        	if( CalendarUtil.getNewDate(sentDate, tagMetadata.getSendDuration()).after(todaysDate) ||
+	        			CalendarUtil.getNewDate(sentDate, tagMetadata.getSendDuration()).equals(todaysDate)){
 	        		inProgressOccasion = new EmailPackage();
 		        	inProgressOccasion.setMemberId(lyl_id_no);		        	
 		        	inProgressOccasion.setMdTagMetaData(tagMetadata);
