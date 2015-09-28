@@ -71,6 +71,22 @@ public class KafkaUtil {
 		return spoutConfig;
 
 	}
+	
+	
+	public SpoutConfig getSpoutConfig(String topic, String zkroot, boolean readcurrentOnly)
+			throws ConfigurationException {
+		SpoutConfig spoutConfig = null;
+		BrokerHosts hosts = new ZkHosts(kafkaProperties.getString(ZOOKEEPER));
+		String kafka_id = kafkaProperties.getString(KAFKA_ID);
+		spoutConfig = new SpoutConfig(hosts, topic, "", kafka_id);
+		spoutConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
+		spoutConfig.startOffsetTime = kafka.api.OffsetRequest.LatestTime();
+		return spoutConfig;
+
+	}
+	
+	
+	
 	public void sendKafkaMSGs(String message, String currentTopic)
 			throws ConfigurationException {
 

@@ -4,6 +4,7 @@ package analytics;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
+import java.util.Map;
 
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
@@ -39,6 +40,18 @@ public class StormTestUtils {
 		 Tuple tuple = mock(Tuple.class);
 		 when(tuple.getString(0)).thenReturn((String) input.get(0));
 		 when(tuple.getString(1)).thenReturn((String) input.get(1));
+		 return tuple;
+	 }
+	 
+	 public static Tuple mockTuple(String lId, String varJsonString, String source, String loyaltyId){
+		 Tuple tuple = mock(Tuple.class);
+		 when(tuple.getStringByField("l_id")).thenReturn(lId);
+		 when(tuple.contains("lyl_id_no")).thenReturn(true);
+		 when(tuple.contains("source")).thenReturn(true);
+	//	 when(tuple.contains("messageID")).thenReturn(true);
+		 when(tuple.getStringByField("source")).thenReturn(source);
+		 when(tuple.getStringByField("lyl_id_no")).thenReturn(loyaltyId);
+		 when(tuple.getString(1)).thenReturn(varJsonString);
 		 return tuple;
 	 }
 	 

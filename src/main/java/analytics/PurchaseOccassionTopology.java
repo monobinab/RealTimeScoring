@@ -51,11 +51,18 @@ public class PurchaseOccassionTopology {
 			String kafkaTopic="rts_cp_membertags";
 			String zkroot="poTopic";
 			//String kafkaTopic="stormtopic";
+			
+			boolean readcurrentOnly =true;
+			
+//			topologyBuilder.setSpout(
+//					"RTSKafkaSpout",
+//					new RTSKafkaSpout(new KafkaUtil(System.getProperty(MongoNameConstants.IS_PROD)).getSpoutConfig(
+//							kafkaTopic,zkroot)), 1);	
 
 			topologyBuilder.setSpout(
 					"RTSKafkaSpout",
 					new RTSKafkaSpout(new KafkaUtil(System.getProperty(MongoNameConstants.IS_PROD)).getSpoutConfig(
-							kafkaTopic,zkroot)), 1);	
+							kafkaTopic,zkroot,readcurrentOnly)), 1);	
 			
 			
 			topologyBuilder.setBolt("RTSInterceptorBolt", new RTSInterceptorBolt(System.getProperty(MongoNameConstants.IS_PROD)), 6)

@@ -65,7 +65,11 @@ public class ScoringSingletonIntegrationTest {
 		varColl.insert(new BasicDBObject("name", "variable40").append("VID", 40).append("strategy","NONE"));
 		varColl.insert(new BasicDBObject("name", "variable13").append("VID", 13).append("strategy","StrategyCountTraitDates"));
 		varColl.insert(new BasicDBObject("name", "variable14").append("VID", 14).append("strategy","StrategyDCStrengthSum"));
-			
+		
+		varColl.insert(new BasicDBObject("name", "S_SRS_VAR").append("VID", 16).append("strategy","StrategyCountTransactions"));
+		varColl.insert(new BasicDBObject("name", "S_SRS_VAR2").append("VID", 17).append("strategy","StrategyCountTransactions"));
+		varColl.insert(new BasicDBObject("name", "Blackout_variable2").append("VID", 18).append("strategy","StrategyBlackout"));
+				
 		//fake modelVariables collection
 		DBCollection modeVarColl = db.getCollection("modelVariables");
 		BasicDBList dbList = new BasicDBList();
@@ -94,6 +98,15 @@ public class ScoringSingletonIntegrationTest {
 		dbList6.add(new BasicDBObject("name", "variable40").append("coefficient", 0.015));
 		dbList6.add(new BasicDBObject("name", "variable4").append("coefficient", 0.015));
 		modeVarColl.insert(new BasicDBObject("modelId", 65).append("modelName", "Model_Name6").append("modelDescription", "Home Appliances2").append("constant", 5).append("month", 0).append("variable", dbList6));
+
+		BasicDBList dbList7 = new BasicDBList();
+		dbList7.add(new BasicDBObject("name", "S_SRS_VAR").append("coefficient", 1.0));
+		modeVarColl.insert(new BasicDBObject("modelId", 70).append("modelName", "Model_Name7").append("modelDescription", "Kids apparel").append("constant", 5).append("month", 0).append("variable", dbList7));
+			
+		BasicDBList dbList8 = new BasicDBList();
+		dbList8.add(new BasicDBObject("name", "S_SRS_VAR2").append("coefficient", 0.015));
+		dbList8.add(new BasicDBObject("name", "Blackout_variable2").append("coefficient", 0.015));
+		modeVarColl.insert(new BasicDBObject("modelId", 75).append("modelName", "Model_Name8").append("modelDescription", "Home Appliances2").append("constant", 5).append("month", 0).append("variable", dbList8));
 		
 		//fake regionalFactors collection
 		DBCollection regionalAdjFactorsColl = db.getCollection("regionalAdjustmentFactors");
@@ -503,7 +516,7 @@ public class ScoringSingletonIntegrationTest {
 		List<ChangedMemberScore> changedMemberScoreList = memberRTSChanges.getChangedMemberScoreList();
 		ChangedMemberScore changedMemberScore = changedMemberScoreList.get(0);
 		
-		Date expDate = new LocalDate(new Date()).plusDays(30).toDateMidnight().toDate();
+		Date expDate = new LocalDate(new Date()).plusDays(730).toDateMidnight().toDate();
 		String expirationDate = simpleDateFormat.format(expDate);
 		
 		Assert.assertEquals("Expecting score of 0 as this model is blacked out", 0.0, changedMemberScore.getScore());

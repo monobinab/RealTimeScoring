@@ -233,7 +233,7 @@ public class CPSFilerTest {
 	//Test Case 1 - Received two occasions - Duress & Replacement  & no occasion is in progress, 
 	//Expected Result - queue both occasions with duress to be sent today and replacement after 8 days	
 	@Test
-	public void testDecideSendDatesWhenNoOccasionInProgress() throws SQLException, RealTimeScoringException{
+	public void testDecideSendDatesWhenNoOccasionInProgress() throws SQLException, RealTimeScoringException, ParseException{
 		SimpleDateFormat sdformat = new SimpleDateFormat("MM/dd/yyyy");
 		emailPackages = new ArrayList<EmailPackage>();
 		memberInfo = new MemberInfo("13551883","Y","NJ","Y","N","Y");	
@@ -382,14 +382,47 @@ public class CPSFilerTest {
 			assertEquals(sdformat.format(retEmailPackages.get(1).getSendDate()),sdformat.format(new DateTime().plusDays(9).toDate()));	
 		}
 		
+		//Test Case 3 - Received 3 occasions - Duress & Replacement & Browse ; Replacement is already in progress), 
+		//Expected Result - Replacement is interrupted as duress is of higher priority. Duress is set to be sent tomorrow
+		@Test
+		public void testDecideSendDatesWhenHigherPriorityComesIn1() throws RealTimeScoringException, ParseException{
+			SimpleDateFormat sdformat = new SimpleDateFormat("MM/dd/yyyy");
+			emailPackages = new ArrayList<EmailPackage>();
+			memberInfo = new MemberInfo("hiBSAglnyr3kI6kYrBXHmMy5WPE=","N","AZ","N","N","N");	
+			
+			tagMetadata = new TagMetadata("HADHS123600153010","Home Appliance","Sears Dishwasher","Duress","HADHS",91.0,"Y","", 1, 8,30);	
+			emailPackage = new EmailPackage("7081103948483127",tagMetadata);
+			emailPackages.add(emailPackage);
+			
+			tagMetadata = new TagMetadata("HAGAS2610072010","Home Appliance","Sears appliance","Replacement","HAGAS",81.0,"Y","",2, 8, 30);
+			emailPackage = new EmailPackage("7081103948483127",tagMetadata);
+			emailPackages.add(emailPackage);
+			
+			tagMetadata = new TagMetadata("HADHS723600153010","Home Appliance","Sears Dishwasher","Browse","HADHS",91.0,"Y","", 7, 8,30);	
+			emailPackage = new EmailPackage("7081103948483127",tagMetadata);
+			emailPackages.add(emailPackage);
+			
+			tagMetadata = new TagMetadata("HAGAS2610072010","Home Appliance","Sears appliance","Replacement","HAGAS",81.0,"Y","",2, 8, 30);
+			inProgressEmailPackage = new EmailPackage("7081103948483127",tagMetadata);		
+			inProgressEmailPackage.setSendDate(new DateTime().toDate());//today 
 		
-		//Test Case 4 - Received two occasions - Replacement & Browse ; Duress is already in progress; it didn't come in again today), 
+			List<EmailPackage> retEmailPackages = cpsFiler.decideSendDates(emailPackages,inProgressEmailPackage);	
+			
+			Assert.assertNotNull(retEmailPackages);
+			assertEquals(retEmailPackages.size(),2);			
+			assertEquals(sdformat.format(retEmailPackages.get(0).getSendDate()),sdformat.format(new DateTime().plusDays(1).toDate()));	//check if send date is set to be today's date		
+			assertEquals(sdformat.format(retEmailPackages.get(1).getSendDate()),sdformat.format(new DateTime().plusDays(9).toDate()));	
+		}
+		
+		
+		//Test Case 4 - Received 2 occasions - Replacement & Browse ; Duress is already in progress; it didn't come in again today), 
 		//Expected Result - Duress is interrupted; Replacement is set to be sent tomorrow ; Browse is set to be sent after 8 days
 		@Test
 		public void testDecideSendDatesWhenInProgressIsNotActive() throws RealTimeScoringException, ParseException{
 			SimpleDateFormat sdformat = new SimpleDateFormat("MM/dd/yyyy");
 			emailPackages = new ArrayList<EmailPackage>();
-						
+			
+		
 			tagMetadata = new TagMetadata("HAGAS2610072010","Home Appliance","Sears appliance","Replacement","HAGAS",81.0,"Y","",2, 8, 30);
 			emailPackage = new EmailPackage("7081103948483127",tagMetadata);
 			emailPackages.add(emailPackage);
@@ -409,6 +442,46 @@ public class CPSFilerTest {
 			assertEquals(sdformat.format(retEmailPackages.get(0).getSendDate()),sdformat.format(new DateTime().plusDays(1).toDate()));//check if send date is set to be tomorrow's date	
 			assertEquals(sdformat.format(retEmailPackages.get(1).getSendDate()),sdformat.format(new DateTime().plusDays(9).toDate()));	
 			
+		}
+		
+		/*
+		 *  tag:HARFS1  Send Date:2015-08-26 Sent Flag:1
+			tag:HALAS1  Send Date:2015-09-03 Sent Flag:1
+			tag:HADHS1  Send Date:2015-09-11 Sent Flag:1
+			tag:SPFTS6  Send Date:2015-09-23 Sent Flag:1
+			
+			HMMTS7 , SPFTS6 are incoming tags for today
+			Expected RESULTS
+			HMMTS7 should be sent today
+			SPFTS6 is NOT Expected to be queued
+		 * 
+		 */
+		
+		@Test
+		public void testDecideSendDatesWhenInProgressIsActive() throws RealTimeScoringException, ParseException{
+			SimpleDateFormat sdformat = new SimpleDateFormat("MM/dd/yyyy");
+			List<EmailPackage> emailPackages1 = new ArrayList<EmailPackage>();
+			tagMetadata = new TagMetadata("HMMTS7236000153010","Home-Big Tickets","Sears Mattress","Browse","HMMTS",81.0,"Y","",6, 8, 30);
+			emailPackage = new EmailPackage("7081103948483127",tagMetadata);
+			emailPackages1.add(emailPackage);	
+			
+			tagMetadata = new TagMetadata("SPFTS623600153010","Sporting Goods","Sears Fitness","Replace_by_age","SPFTS",91.0,"Y","", 7, 3,30);
+			emailPackage = new EmailPackage("7081103948483127",tagMetadata);	
+			emailPackages1.add(emailPackage);
+			
+		
+			
+			tagMetadata = new TagMetadata("SPFTS623600153010","Sporting Goods","Sears Fitness","Replace_by_age","SPFTS",91.0,"Y","", 7, 3,30);
+			EmailPackage inProgressEmailPack = new EmailPackage("7081103948483127",tagMetadata);		
+			inProgressEmailPack.setSendDate(new DateTime().minusDays(1).toDate());//today - 1
+		
+			List<EmailPackage> retEmailPackages = cpsFiler.decideSendDates(emailPackages1,inProgressEmailPack);	
+			
+			Assert.assertNotNull(retEmailPackages);			
+			assertEquals(1,retEmailPackages.size());	
+			assertEquals("HMMTS7236000153010",retEmailPackages.get(0).getMdTagMetaData().getMdTag());
+			assertEquals(sdformat.format(retEmailPackages.get(0).getSendDate()),sdformat.format(new DateTime().plusDays(1).toDate()));//check if send date is set to be today's date	
+						
 		}
 		
 		//Test Case 5 - Received three occasions - CK Replacement, DH Replacement, FT Browse ;  DH Replacement is already in progress), 

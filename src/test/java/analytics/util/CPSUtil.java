@@ -13,34 +13,31 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-
 import java.util.Map;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.lang.StringUtils;
 
 import cpstest.CPOutBoxItem;
 import analytics.util.KafkaUtil;
 import analytics.util.dao.CPOutBoxDAO;
+import analytics.util.dao.TagMetadataDao;
+import analytics.util.objects.TagMetadata;
 
 public class CPSUtil {
 
 	public void processFile(String presetFile, String testFile,
-			String outputfile, String topicName) {
-		FileReader fileReader = null;
-		SimpleDateFormat sdformat = new SimpleDateFormat("MM/dd/yyyy");
-		// SimpleDateFormat sdformat = new
-		// SimpleDateFormat("MM-dd-yyyy-hhmmss-z");
-		// sdformat.format(new Date(Calendar.getInstance().getTimeInMillis()))
+							String outputfile, String topicName) {
+
 		String outputFile = outputfile + System.currentTimeMillis() + ".txt";
-		// String outputFile =
-		// outputfile+Date(System.currentTimeMillis())+".txt";
 		File result = new File(outputFile);
 		PrintWriter printWriter = null;
+		int successCount = 0;
+		int failureCount = 0;
+		
 		Map<String, List<CPOutBoxItem>> presetMap = loadFile(presetFile, "PRESET");
 		Map<String, List<CPOutBoxItem>> testMap = loadFile(testFile, "TEST");
 		Map<String, List<CPOutBoxItem>> verifyMap = loadFile(testFile, "VERIFY");
-		int successCount = 0;
-		int failureCount = 0;
 
 		try {
 			printWriter = new PrintWriter(result, "UTF-8");
@@ -53,25 +50,32 @@ public class CPSUtil {
 		for (List<CPOutBoxItem> presetList : presetMap.values()) {
 			try {
 				// PRESET
-
-				System.out.println(presetList.size());
 				String loyID = presetList.get(0).getLoy_id();
-				StringBuffer presetBuffer = new StringBuffer();
-				printWriter.println("PRESET OutBox Entries for LOYALTY ID: "
-						+ loyID);
-				// presetBuffer.append("The Preset values are given below for Loyalty ID: "+loyID+"\n");
+
+				printWriter.println("PRESET OutBox Entries for LOYALTY ID: "+ loyID);
+
 				for (CPOutBoxItem cpItem : presetList) {
-					new CPOutBoxDAO().insertRow(cpItem);
-					// printWriter.println("tag:"+cpItem.getMd_tag()+"Added Date:"+cpItem.getAdded_datetime()+"  Send Date:"+cpItem.getSend_date()
-					// +" Sent Flag:"+cpItem.getStatus() );
+					
+					TagMetadata tagMetadata = new TagMetadataDao().getDetails(cpItem.getMd_tag());
+					//ToDO - if metadata is not found intagMetadata collection populate the 
+					//       tagMetadata object by getting the metadata from Teradata
+					if(tagMetadata==null){
+						System.out.println("metadata is not found for tag: "+cpItem.getMd_tag() );
+						// ToDO - populate the tagMetadata object by getting the metadata from Teradata
+					}
+					if(StringUtils.isBlank(cpItem.getBu()))
+						cpItem.setBu(tagMetadata.getBusinessUnit());
+					if(StringUtils.isBlank(cpItem.getSub_bu()))
+						cpItem.setSub_bu(tagMetadata.getSubBusinessUnit());
+					if(StringUtils.isBlank(cpItem.getOccasion_name()))
+						cpItem.setOccasion_name(tagMetadata.getPurchaseOccasion());
+								new CPOutBoxDAO().insertRow(cpItem);
+
 					printWriter.println("tag:" + cpItem.getMd_tag()
 							+ "  Send Date:" + cpItem.getSend_date()
 							+ " Sent Flag:" + cpItem.getStatus());
-					// presetBuffer.append("tag:"+cpItem.getMd_tag()+"  Send Date:"+cpItem.getSend_date()
-					// +" Sent Flag:"+cpItem.getStatus()+"/n" );
-
 				}
-				// printWriter.println(presetBuffer);
+
 				// TEST
 				// if(!testMap.containsKey(loyID))
 				// break;
@@ -105,7 +109,6 @@ public class CPSUtil {
 					List<CPOutBoxItem> verifyList = verifyMap.get(loyID);
 					printWriter.println("TEST RESULTS");
 					for (CPOutBoxItem verifyItem : verifyList) {
-						// new CPOutBoxDAO().insertRow(cpItem);
 						verifyItem.setStatus(0);
 						CPOutBoxItem queuedItem = new CPOutBoxDAO()
 								.getQueuedItem(verifyItem.getLoy_id(),
@@ -114,21 +117,16 @@ public class CPSUtil {
 
 						String testresult = null;
 
-						// Printing the test file
-
+						// Printing the test result file
 						if (queuedItem != null && queuedItem.getSend_date() != null) {
-
-							// if(queuedItem.getSend_date()==
-							// verifyItem.getSend_date()) {
-							if (sdformat.format(queuedItem.getSend_date()).equals(verifyItem
-									.getSend_date())  ) {
+							if (queuedItem.getSend_date().equals(verifyItem.getSend_date()))   {
 								successCount++;
 								testresult = "SUCCESS Test Tag: "
 										+ verifyItem.getMd_tag()
 										+ " OutBox Send Date "
-										+ sdformat.format(queuedItem.getSend_date())
+										+ queuedItem.getSend_date()
 										+ " is SAME as Expected Send Date: "
-										+ sdformat.format(verifyItem.getSend_date());
+										+ verifyItem.getSend_date();
 							} else {
 								failureCount++;
 								if (verifyItem.getSend_date() == null) {
@@ -139,9 +137,9 @@ public class CPSUtil {
 									testresult = "FAILURE Test Tag: "
 											+ verifyItem.getMd_tag()
 											+ " OutBox Send Date "
-											+ sdformat.format(queuedItem.getSend_date())
+											+ queuedItem.getSend_date()
 											+ " is NOT SAME as Expected Send Date: "
-											+ sdformat.format(verifyItem.getSend_date());
+											+ verifyItem.getSend_date();
 								}
 							}
 						} else {
@@ -157,7 +155,7 @@ public class CPSUtil {
 								testresult = "FAILURE Test tag: "
 										+ verifyItem.getMd_tag()
 										+ " is NOT Queued in OutBox with Expected Send Date : "
-										+ sdformat.format(verifyItem.getSend_date());;
+										+ verifyItem.getSend_date();
 							}
 						}
 
@@ -208,6 +206,7 @@ public class CPSUtil {
 				}
 
 			}
+			buffReader.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -218,40 +217,37 @@ public class CPSUtil {
 	}
 
 	private CPOutBoxItem parseLine(String line, String testPhase) {
-
-		Date dNow = new Date();
-		SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd");
-		String today = ft.format(dNow);
-
 		CPOutBoxItem cpBoxItem = new CPOutBoxItem();
 		String[] variables = line.split(",");
 		if (variables.length > 0) {
-			// ****** Combine all tags for the test part and send it as a single
+			// Combine all tags for the test part and send it as a single
 			// JSON object
 			if ("TEST".equalsIgnoreCase(testPhase)) {
 				cpBoxItem.setLoy_id(variables[0]);
 				cpBoxItem.setMd_tag(variables[1]);
-				// for(int i=1;i<variables.length;i++)
-				// {
-				// cpBoxItem.getMdTagList().add(variables[i]);
-				// }
-				//
 			} else {
 				cpBoxItem.setLoy_id(variables[0]);
 				cpBoxItem.setMd_tag(variables[1]);
 				// Variable 2 need to be mapped
 				if ("PRESET".equalsIgnoreCase(testPhase)) {
-					// Member number,Existing Tag,Effective Date,Send Date,Sent
-					// flag
-					Date sendDT = null;
-					// Date addedDate=getDate(Integer.parseInt(variables[2]));
-					// cpBoxItem.setAdded_datetime(addedDate);
+					// Member number,Existing Tag,Added Date,Send Date,Sent flag
+					String sendDT = null;
+					 Date sentDateTime=null;
+					String addedDate=getTimeStampString(Integer.parseInt(variables[2]));
+					cpBoxItem.setAdded_datetime(addedDate);
 					if (variables.length > 3) {
-						sendDT = getDate(Integer.parseInt(variables[3]));
+						sendDT = getDateString(Integer.parseInt(variables[3]));
 						cpBoxItem.setSend_date(sendDT);
+						
 					}
 					if (variables.length > 4)
 						cpBoxItem.setStatus(Integer.parseInt(variables[4]));
+					    if(cpBoxItem.getStatus()==1)
+						{
+					    	sentDateTime=getDate(Integer.parseInt(variables[3]));
+					    	cpBoxItem.setSent_datetime(sentDateTime);
+						}
+				
 
 				} else if ("VERIFY".equalsIgnoreCase(testPhase)) {
 					// Member number,Incoming tags,Send Date
@@ -259,7 +255,7 @@ public class CPSUtil {
 						if (variables[2].trim().equalsIgnoreCase("-"))
 							cpBoxItem.setSend_date(null);
 						else {
-							Date sendDT = getDate(Integer
+							String sendDT = getDateString(Integer
 									.parseInt(variables[2]));
 							cpBoxItem.setSend_date(sendDT);
 						}
@@ -295,6 +291,13 @@ public class CPSUtil {
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.DATE, numofdays);
 		SimpleDateFormat s = new SimpleDateFormat("yyyy-MM-dd");
+		return s.format(new Date(cal.getTimeInMillis()));
+	}
+	
+	private String getTimeStampString(int numofdays) {
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.DATE, numofdays);
+		SimpleDateFormat s = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		return s.format(new Date(cal.getTimeInMillis()));
 	}
 

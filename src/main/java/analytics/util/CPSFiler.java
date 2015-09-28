@@ -1,6 +1,8 @@
 package analytics.util;
 
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -163,8 +165,14 @@ public class CPSFiler {
 		return emailPackagesToBeSent;
 	}
 	
-	protected List<EmailPackage> decideSendDates(	List<EmailPackage> emailPackagesToBeSent, EmailPackage inProgressPackage) {
+	protected List<EmailPackage> decideSendDates(	List<EmailPackage> emailPackagesToBeSent, EmailPackage inProgressPackage) throws ParseException {
+		
+		SimpleDateFormat sdformat = new SimpleDateFormat("yyyy-MM-dd");
+		String todaysDateStr = sdformat.format(new DateTime().toDate());
+		Date todaysDate = sdformat.parse(todaysDateStr);
+		
 		boolean inProgressActive = false;
+		
 		Iterator<EmailPackage> emailPackagesItr = emailPackagesToBeSent.iterator();
 		if(inProgressPackage != null){
 			while(emailPackagesItr.hasNext()){
@@ -181,8 +189,14 @@ public class CPSFiler {
 			return queueStartingToday(emailPackagesToBeSent);			
 		}
 		
-		if(!inProgressActive){			
-			return queueStartingTomorrow(emailPackagesToBeSent);			
+		if(!inProgressActive){
+			/*// 1. queueStartingTomorrow if inProgress is sent today
+			// 2. queueStartingToday if inProgress is sent before today
+			
+			if(sdformat.parse(sdformat.format(inProgressPackage.getSendDate())).before(todaysDate))
+				return queueStartingToday(emailPackagesToBeSent);	
+			else if(sdformat.parse(sdformat.format(inProgressPackage.getSendDate())).equals(todaysDate))*/
+				return queueStartingTomorrow(emailPackagesToBeSent);
 		}
 		
 		
@@ -190,8 +204,13 @@ public class CPSFiler {
 		for(EmailPackage emailPackage : emailPackagesToBeSent){			
 				
 			//Rule - if incoming occasion is of higher priority - interrupt the in progress occasion
+			//       and send it tomorrow			//
 			if( emailPackage.getMdTagMetaData().getPriority() < previousOccasion.getMdTagMetaData().getPriority()){
-				emailPackage.setSendDate(new DateTime().plusDays(1).toDate());
+				
+				/*if(sdformat.parse(sdformat.format(previousOccasion.getSendDate())).before(todaysDate))
+					emailPackage.setSendDate(new DateTime().toDate());	
+				else if(sdformat.parse(sdformat.format(previousOccasion.getSendDate())).equals(todaysDate))*/
+					emailPackage.setSendDate(new DateTime().plusDays(1).toDate());
 			}			
 			//Rule - if incoming occasion is of same priority as the inProgress occasion - (check for same bu, sub bu ??) and queue the incoming occasion
 			//Rule - if incoming occasion is of lesser priority than the inProgress occasion - queue the incoming occasion
@@ -257,24 +276,28 @@ public class CPSFiler {
 
 	protected void compareAndDelete(String lyl_id_no, List<EmailPackage> emailPackagesToBeSent, List<EmailPackage> currentPackages) throws SQLException {
 		//if exisitng queue and incoming is same - do nothing.		
-		if(!arePackagesSame(emailPackagesToBeSent, currentPackages))	
-		{
-			if(currentPackages.size()>0)
-				outboxDao.deleteQueuedEmailPackages(lyl_id_no);	
+		if(emailPackagesToBeSent != null && currentPackages != null){
+			if(!arePackagesSame(emailPackagesToBeSent, currentPackages))	
+			{
+				if(currentPackages.size()>0)
+					outboxDao.deleteQueuedEmailPackages(lyl_id_no);	
+			}
+			
 		}
+		
 						
 	}
 
-	protected boolean arePackagesSame(List<EmailPackage> emailPackagesToBeSent,List<EmailPackage> currentPackages) {		
-		if(emailPackagesToBeSent.size() != currentPackages.size())
-			return false;
-		
-		for(int i = 0; i<emailPackagesToBeSent.size();i++){
-			if(!emailPackagesToBeSent.get(i).getMdTagMetaData().getMdTag().equals(currentPackages.get(i).getMdTagMetaData().getMdTag()))
+	protected boolean arePackagesSame(List<EmailPackage> emailPackagesToBeSent,List<EmailPackage> currentPackages) {	
+			if(emailPackagesToBeSent.size() != currentPackages.size())
 				return false;
-		}
-		
-		return true;
+			
+			for(int i = 0; i<emailPackagesToBeSent.size();i++){
+				if(!emailPackagesToBeSent.get(i).getMdTagMetaData().getMdTag().equals(currentPackages.get(i).getMdTagMetaData().getMdTag()))
+					return false;
+			}
+			
+			return true;			
 	}
 
 	protected EmailPackage getInProgressOccasion(String lyl_id_no) throws SQLException, Exception {
@@ -322,7 +345,11 @@ public class CPSFiler {
 		
 	}
 	
-	protected List<EmailPackage> ignorePackagesSentInHistory(List<EmailPackage> emailPackages) throws SQLException {
+	protected List<EmailPackage> ignorePackagesSentInHistory(List<EmailPackage> emailPackages) throws SQLException, ParseException {
+		SimpleDateFormat sdformat = new SimpleDateFormat("yyyy-MM-dd");
+ 		String todaysDateStr = sdformat.format(new DateTime().toDate());
+ 		Date todaysDate = sdformat.parse(todaysDateStr);
+		
 		// this method ignores all the packages that are sent between sendDuration days and 60 + sendDuration
 		// ex :if the incoming occasion is duress - it will not send the occasion, if duress occasion was sent in > 8 and < 68 days
 		if(emailPackages != null && emailPackages.size() > 0){
@@ -330,14 +357,17 @@ public class CPSFiler {
 			while(emailPackagesItr.hasNext()){
 			EmailPackage emailPackage = emailPackagesItr.next();
 			if(emailPackage!= null){
+				
 				Date sentDate = outboxDao.getSentDate(emailPackage);
+				
+				
 				//First Rule - Check that when the package was last sent and is it sent with-in sendDuration
 				if(sentDate != null){
 					OccasionInfo occasionInfo = occasionDao.getOccasionInfo(emailPackage.getMdTagMetaData().getPurchaseOccasion());
 					if(occasionInfo  != null){
 					    int sendDuration = Integer.parseInt(occasionInfo.getDuration());
 					    int daysToCheckInHistory = Integer.parseInt(occasionInfo.getDaysToCheckInHistory());
-						int dateDiffDays = CalendarUtil.getDatesDiff(CalendarUtil.getTodaysDate(), sentDate);
+						int dateDiffDays = CalendarUtil.getDatesDiff(todaysDate, sdformat.parse(sdformat.format(sentDate)));
 							if((dateDiffDays >sendDuration ) &&(dateDiffDays < daysToCheckInHistory+sendDuration)){
 								emailPackagesItr.remove();
 							}
@@ -350,6 +380,7 @@ public class CPSFiler {
 	}
 	
 	public void fileEmailPackages(List<EmailPackage> emailPackages) throws SQLException {
+		//don't queue if sendDate is null
 		if(emailPackages != null && emailPackages.size() > 0){			
 			outboxDao.queueEmailPackages(filterNullDatePackages(emailPackages));
 		}

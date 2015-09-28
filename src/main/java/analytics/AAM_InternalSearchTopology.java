@@ -40,7 +40,7 @@ public static void main(String[] args) {
 		
 		//Sree. Spout that wakes up every 5 mins and process the Traits
 		topologyBuilder.setSpout("internalSearchSpout", new WebHDFSSpout(servers[1], TopicConstants.PORT, Constants.AAM_INTERNAL_SEARCH_PATH, "aamInternalSearch"), 1);
-		topologyBuilder.setBolt("ParsingBoltAAM_InternalSearch",new ParsingBoltAAM_InternalSearch(System.getProperty(MongoNameConstants.IS_PROD), source),10).shuffleGrouping("internalSearchSpout");
+		topologyBuilder.setBolt("ParsingBoltAAM_InternalSearch",new ParsingBoltAAM_InternalSearch(System.getProperty(MongoNameConstants.IS_PROD), source),10).shuffleGrouping("internalSearchSpout").setNumTasks(20).setDebug(true);
 
 		topologyBuilder.setBolt("strategy_bolt", new StrategyScoringBolt(System.getProperty(MongoNameConstants.IS_PROD)), 10)
 				.shuffleGrouping("ParsingBoltAAM_InternalSearch");
@@ -55,6 +55,7 @@ public static void main(String[] args) {
 		
 		Config conf = new Config();
 		conf.put("metrics_topology", "InternalSearch");
+		conf.setDebug(true);
 		
 		conf.registerMetricsConsumer(MetricsListener.class, System.getProperty(MongoNameConstants.IS_PROD), 3);
 		if (System.getProperty(MongoNameConstants.IS_PROD)
