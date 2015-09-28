@@ -3,22 +3,30 @@ package analytics.bolt;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import junit.framework.Assert;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.codehaus.jettison.json.JSONException;
+import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mortbay.util.ajax.JSON;
 
 import analytics.util.DBConnection;
 import analytics.util.FakeMongo;
+import analytics.util.MongoNameConstants;
 import analytics.util.SystemPropertyUtility;
 import analytics.util.dao.MemberMDTags2Dao;
 import analytics.util.dao.MemberMDTagsDao;
+import analytics.util.dao.TagVariableDao;
+import analytics.util.objects.ModelScore;
 
 import com.github.fakemongo.Fongo;
 import com.mongodb.BasicDBList;
@@ -32,6 +40,9 @@ public class TagCreatorBoltTest {
 	//static DB db;
 	DBCollection memberMDTagsWithDatesColl;
 	MemberMDTags2Dao memberMDTags2Dao;
+	TagVariableDao tagVariableDao;
+	TagCreatorBolt tagCreatorBolt;
+	Map<Integer, String> modelTagsMap = new HashMap<Integer, String>();
 	Date dNow = new Date( );
 	Date tomorrow = new Date(dNow.getTime() + (1000 * 60 * 60 * 24));
 	SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd");
@@ -62,7 +73,7 @@ public class TagCreatorBoltTest {
 		//MDTags
 		BasicDBList mdTagsList = new BasicDBList();
 		BasicDBObject newObj3 = new BasicDBObject();
-		newObj3.append("t", "SPFTK823600153010");
+		newObj3.append("t", "SPFTK8");
 		newObj3.append("f", ft.format(dNow));
 		newObj3.append("e", ft.format(tomorrow));
 		
@@ -79,10 +90,16 @@ public class TagCreatorBoltTest {
 			.append("rtsTags", rtsTagsList));
 
 		memberMDTags2Dao = new MemberMDTags2Dao();
+		tagVariableDao = new TagVariableDao();
+		
+		tagCreatorBolt = new TagCreatorBolt(System.getProperty("rtseprod"));
+		
+		modelTagsMap.put(28,"SPGMS");
+		modelTagsMap.put(29,"HAGAS");
 	}
 
 	@Test
-	public void addMemberRtsTagsAlreadyExistingTest() {
+	public void addMemberRtsTagsAlreadyExistingTest() throws JSONException {
 		List<String> tags = new ArrayList<String>();
 		tags.add("SPGMS8");
 		
@@ -92,6 +109,7 @@ public class TagCreatorBoltTest {
 		DBObject obj = cursor.next();
 		BasicDBList list = (BasicDBList) obj.get("rtsTags");
 		Assert.assertEquals(1, cursor.size());
+		Assert.assertEquals((new org.codehaus.jettison.json.JSONObject(list.get(1).toString()).get("t")).equals("SPGMS8"), true);
 		Assert.assertEquals(list.size(), 2);
 	}
 
@@ -110,7 +128,7 @@ public class TagCreatorBoltTest {
 	}
 
 	@Test
-	public void addMemberRtsTagsNewTagNewLidTest() {
+	public void addMemberRtsTagsNewTagNewLidTest() throws JSONException {
 		List<String> tags = new ArrayList<String>();
 		tags.add("HALAS8");
 		
@@ -121,6 +139,29 @@ public class TagCreatorBoltTest {
 		BasicDBList list = (BasicDBList) obj.get("rtsTags");
 		Assert.assertEquals(1, cursor.size());
 		Assert.assertEquals(list.size(), 1);
+		Assert.assertEquals((new org.codehaus.jettison.json.JSONObject(list.get(0).toString()).get("t")).equals("HALAS8"), true);
+	}
+	
+	@Test
+	public void testCreateTagWithExistingMDTag() {
+		
+		ModelScore modelScore = new ModelScore();
+		modelScore.setModelId("28");;
+		tagCreatorBolt.setModelTagsMap(modelTagsMap);
+		tagCreatorBolt.setMemberMDTags2Dao(memberMDTags2Dao);
+		String tag = tagCreatorBolt.createTag(modelScore, "OccassionTopologyTestingl_id", 8);
+		Assert.assertEquals(tag, "SPGMS823600153010");
+	}
+	
+	@Test
+	public void testCreateTagWithNewRtsTag() {
+		
+		ModelScore modelScore = new ModelScore();
+		modelScore.setModelId("29");;
+		tagCreatorBolt.setModelTagsMap(modelTagsMap);
+		tagCreatorBolt.setMemberMDTags2Dao(memberMDTags2Dao);
+		String tag = tagCreatorBolt.createTag(modelScore, "OccassionTopologyTestingl_id", 8);
+		Assert.assertEquals(tag, "HAGAS8");
 	}
 
 	@AfterClass

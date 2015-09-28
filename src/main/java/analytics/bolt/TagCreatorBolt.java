@@ -51,6 +51,20 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 		memberMDTags2Dao = new MemberMDTags2Dao();
 	}
 
+	/**
+	 * @return the modelTagsMap
+	 */
+	public Map<Integer, String> getModelTagsMap() {
+		return modelTagsMap;
+	}
+
+	/**
+	 * @param modelTagsMap the modelTagsMap to set
+	 */
+	public void setModelTagsMap(Map<Integer, String> modelTagsMap) {
+		this.modelTagsMap = modelTagsMap;
+	}
+
 	@Override
 	public void execute(Tuple input) {
 		redisCountIncr("TagCreatorBolt_input_count");
@@ -121,7 +135,7 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 		}
 	}
 	
-	private String createTag(ModelScore modelScore, String l_id , int priority) {
+	public String createTag(ModelScore modelScore, String l_id , int priority) {
 		String tag = modelTagsMap.get(new Integer (modelScore.getModelId()));
 		
 		String mdTag = null;
@@ -141,12 +155,27 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 		
 		ArrayList<String> tagList = (ArrayList<String>) memberMDTags2Dao.getMemberMDTags(l_id);
 		
-		for(String tagFromLst : tagList){
-			if(tagFromLst.substring(0, 6).equalsIgnoreCase(tag)){
-				return tagFromLst; 
+		if(tagList!= null && tagList.size()>0)
+			for(String tagFromLst : tagList){
+				if(tagFromLst.substring(0, 6).equalsIgnoreCase(tag)){
+					return tagFromLst; 
+				}
 			}
-		}
 		return null;
+	}
+
+	/**
+	 * @return the memberMDTags2Dao
+	 */
+	public MemberMDTags2Dao getMemberMDTags2Dao() {
+		return memberMDTags2Dao;
+	}
+
+	/**
+	 * @param memberMDTags2Dao the memberMDTags2Dao to set
+	 */
+	public void setMemberMDTags2Dao(MemberMDTags2Dao memberMDTags2Dao) {
+		this.memberMDTags2Dao = memberMDTags2Dao;
 	}
 
 	@Override
