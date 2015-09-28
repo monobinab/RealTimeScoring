@@ -34,7 +34,7 @@ public class ConsideredPurchaseTopology {
 		}
 		
 		String kafkaTopic1="rts_cp_membertags";
-		String zkroot1="rts_cp_membertags_zk";		
+		String zkroot1="rts_cp_membertags_zk1";		
 	//	String kafkaTopic2="stormtopic";
 	//	String kafkaTopic2="rts_cp_membertags_qa";
 		String kafkaTopic2="cps_rtstags_qa";
