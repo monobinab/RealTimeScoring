@@ -102,6 +102,8 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		String source = "";
 		String lyl_id_no = "";
 		
+		LOGGER.info("Incoming Message to StrategyScoringBolt " + input.toString());
+		
 		try{
 			if (input.contains("lyl_id_no")) {
 				lyl_id_no = input.getStringByField("lyl_id_no");

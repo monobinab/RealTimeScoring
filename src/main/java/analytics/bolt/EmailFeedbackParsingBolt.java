@@ -60,7 +60,9 @@ public class EmailFeedbackParsingBolt extends EnvironmentBolt {
 		String lyl_id_no = emailFeedbackObject.getAsJsonObject().get("lyl_id_no").getAsString();
 		String bu = emailFeedbackObject.getAsJsonObject().get("BU").getAsString();//HA, AA
 		String format = emailFeedbackObject.getAsJsonObject().get("format").getAsString();//S/K
-		String emailFeedback = emailFeedbackObject.getAsJsonObject().get("emailFeedbackResponse").getAsString();//YES/NO			
+		String emailFeedback = emailFeedbackObject.getAsJsonObject().get("emailFeedbackResponse").getAsString();//YES/NO	
+		
+		LOGGER.info("Incoming Message to EmailFeedbackParsingBolt: " + input.toString());
 			
 		if (lyl_id_no == null) {
 			redisCountIncr("null_lid");
@@ -81,18 +83,24 @@ public class EmailFeedbackParsingBolt extends EnvironmentBolt {
 				}*/
 				
 				String key = bu+"~"+format;
-				for (VariableModel var : emailBUVariablesMap.get(key)) {
-					if (var.getVariable().toUpperCase().contains("BLACK"))
-						variableValueMap.put(var.getVariable(), "1");			
+				if(emailBUVariablesMap.get(key)!=null && emailBUVariablesMap.get(key).size()>0){
+					System.out.println("NO - Email list for " + key + " is "+emailBUVariablesMap.get(key));
+					for (VariableModel var : emailBUVariablesMap.get(key)) {
+						if (var.getVariable().toUpperCase().contains("BLACK"))
+							variableValueMap.put(var.getVariable(), "1");			
+					}
 				}
 			}
 			else if(emailFeedback.equals("YES")){//boost
 				//Sree. get email boost variables
 				String key = bu+"~"+format;
-				for (VariableModel var : emailBUVariablesMap.get(key)) {									
-					variableValueMap.put(var.getVariable(), isBlackOutVariable(var.getVariable()) ? "0" : getVariableValue(var.getModelId()));			
+				if(emailBUVariablesMap.get(key)!=null && emailBUVariablesMap.get(key).size()>0){
+					System.out.println("YES - Email list for " + key + " is "+emailBUVariablesMap.get(key));
+					for (VariableModel var : emailBUVariablesMap.get(key)) {									
+						variableValueMap.put(var.getVariable(), isBlackOutVariable(var.getVariable()) ? "0" : 
+							getVariableValue(var.getModelId()));			
+					}
 				}
-				
 			}
 			
 			if (variableValueMap != null && !variableValueMap.isEmpty()) {
