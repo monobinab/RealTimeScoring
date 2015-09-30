@@ -116,10 +116,11 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 				memberTagDao.addMemberMDTags(l_id, tagsLst);
 				
 				//Write to the mdTags with dates collection as well...
-				//memberMDTags2Dao.addMemberMDTags(l_id, tagsLst);
+				memberMDTags2Dao.addMemberMDTags(l_id, tagsLst);
 			}
 			else{
 				memberTagDao.deleteMemberMDTags(l_id);
+				memberMDTags2Dao.deleteMemberMDTags(l_id);
 				LOGGER.info("PERSIST OCCATION DELETE: " + l_id);
 			}
 

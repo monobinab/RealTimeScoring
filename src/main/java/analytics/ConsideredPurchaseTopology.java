@@ -70,11 +70,15 @@ public class ConsideredPurchaseTopology {
 		
 		Config conf = new Config();
 		conf.put("metrics_topology", "CPS");
+		//Added the timeout so that topology will not read the message again
+		conf.setMessageTimeoutSecs(86400);	
+		conf.put("topology_environment", System.getProperty(MongoNameConstants.IS_PROD));
 		conf.registerMetricsConsumer(MetricsListener.class, env, partition_num);
-		conf.setDebug(false);
+		
 		if (env.equalsIgnoreCase("PROD")|| env.equalsIgnoreCase("QA")) {	
 			try {
-				StormSubmitter.submitTopology(args[0], conf, topologyBuilder.createTopology());
+				conf.setNumWorkers(6);
+				StormSubmitter.submitTopology(args[0], conf, topologyBuilder.createTopology());				
 			} catch (AlreadyAliveException e) {
 				LOGGER.error(e.getClass() + ": "+ ExceptionUtils.getMessage(e) + "Rootcause-"+ ExceptionUtils.getRootCauseMessage(e) +"  STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 			} catch (InvalidTopologyException e) {
