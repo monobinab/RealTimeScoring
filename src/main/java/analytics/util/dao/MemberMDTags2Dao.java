@@ -80,8 +80,22 @@ public class MemberMDTags2Dao extends AbstractDao {
 	public void deleteMemberMDTags(String l_id) {
 		DBObject doc = memberMDTagsCollection.findOne(new BasicDBObject(
 				MongoNameConstants.L_ID, l_id)); // get first document
-		if (doc != null)
-			memberMDTagsCollection.remove(doc);
+		if (doc != null){
+			BasicDBList rtsTagsList = (BasicDBList) doc.get("rtsTags");
+			if(rtsTagsList == null || rtsTagsList.size() == 0)
+				memberMDTagsCollection.remove(doc);
+			else{
+				DBObject tagstoUpdate = new BasicDBObject();
+				tagstoUpdate.put("l_id", l_id);
+				tagstoUpdate.put("rtsTags", rtsTagsList);
+				
+				LOGGER.info("Tags are getting updated in "
+						+ memberMDTagsCollection.getDB().getName()
+						+ " for memberId : '" + l_id + "'");
+				memberMDTagsCollection.update(new BasicDBObject(
+						MongoNameConstants.L_ID, l_id), tagstoUpdate, true, false);
+			}
+		}
 	}
 
 	/*

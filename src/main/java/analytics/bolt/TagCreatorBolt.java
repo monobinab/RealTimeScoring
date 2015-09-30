@@ -141,12 +141,12 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 		String mdTag = null;
 		//Check if there is an MDTag already in the collection.
 		if (tag != null) {
-			tag+=priority;
+			//tag+=priority;
 			mdTag = getMdTagIfExists(tag,l_id);
 		}
 		
 		if(tag != null && mdTag == null)
-			mdTag = tag;
+			mdTag = tag + priority;
 		
 		return mdTag;
 	}
@@ -157,7 +157,7 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 		
 		if(tagList!= null && tagList.size()>0)
 			for(String tagFromLst : tagList){
-				if(tagFromLst.substring(0, 6).equalsIgnoreCase(tag)){
+				if(tagFromLst.substring(0, 5).equalsIgnoreCase(tag)){
 					return tagFromLst; 
 				}
 			}
