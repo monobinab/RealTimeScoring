@@ -43,7 +43,7 @@ public class OutboxDao extends AbstractMySQLDao{
 	             //System.out.println("loyalty id: " + rs.getString("loy_id"));
 	             TagMetadata tagMetadata = new TagMetadata(rs.getString("md_tag"),rs.getString("bu"),rs.getString("sub_bu"),rs.getString("occasion_name"));
 	             for(OccasionInfo occasion :occasionsInfo){
-	            	 if(rs.getString("occasion_name").equals(occasion.getOccasion()))
+	            	 if(rs.getString("occasion_name").equalsIgnoreCase(occasion.getOccasion()))
 	            	 {
 	            		 tagMetadata.setPriority(Integer.parseInt(occasion.getPriority()));
 	    	             tagMetadata.setSendDuration(Integer.parseInt(occasion.getDuration()));
@@ -239,7 +239,7 @@ public class OutboxDao extends AbstractMySQLDao{
 				
 	        	TagMetadata tagMetadata = new TagMetadata(rs1.getString("md_tag"),rs1.getString("bu"),rs1.getString("sub_bu"),rs1.getString("occasion_name"));	  
 	        	 for(OccasionInfo occasion :occasionsInfo){
-	            	 if(rs1.getString("occasion_name").equals(occasion.getOccasion()))
+	            	 if(rs1.getString("occasion_name").equalsIgnoreCase(occasion.getOccasion()))
 	            	 {
 	            		 tagMetadata.setPriority(Integer.parseInt(occasion.getPriority()));
 	    	             tagMetadata.setSendDuration(Integer.parseInt(occasion.getDuration()));	
