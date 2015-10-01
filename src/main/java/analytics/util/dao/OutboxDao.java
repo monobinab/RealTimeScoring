@@ -82,7 +82,7 @@ public class OutboxDao extends AbstractMySQLDao{
 					statement.setDate(7,  new java.sql.Date(emlPack.getSendDate().getTime()));
 				}
 				else
-					LOGGER.error("Send date is set to null for memberid: " + emlPack.getMemberId() + " with mdtag - "+ emlPack.getMdTagMetaData().getMdTag());
+					LOGGER.error("PERSIST:Send date is set to null for memberid: " + emlPack.getMemberId() + " with mdtag - "+ emlPack.getMdTagMetaData().getMdTag());
 				statement.setString(8, emlPack.getStatus().toString());
 				if(emlPack.getMemberInfo()!=null){
 					if(emlPack.getMemberInfo().getEid()!=null){
@@ -90,7 +90,7 @@ public class OutboxDao extends AbstractMySQLDao{
 					}
 					else
 					{
-						LOGGER.error("emlPack.getMemberInfo().getEid() is set to null for memberid: " + emlPack.getMemberId() + "EID is saved as empty string to outbox.");
+						LOGGER.error("PERSIST:emlPack.getMemberInfo().getEid() is set to null for memberid: " + emlPack.getMemberId() + "EID is saved as empty string to outbox.");
 						statement.setString(9, "");
 					}
 					if(emlPack.getMemberInfo().getSrs_opt_in()!=null){
@@ -98,7 +98,7 @@ public class OutboxDao extends AbstractMySQLDao{
 					}
 					else
 					{
-						LOGGER.error("emlPack.getMemberInfo().getSrs_opt_in() is set to null for memberid: " + emlPack.getMemberId() + "Srs_opt_in is saved as empty string to outbox.");
+						LOGGER.error("PERSIST:emlPack.getMemberInfo().getSrs_opt_in() is set to null for memberid: " + emlPack.getMemberId() + "Srs_opt_in is saved as empty string to outbox.");
 						statement.setString(10, "");
 					}
 					if(emlPack.getMemberInfo().getKmt_opt_in()!=null){
@@ -106,7 +106,7 @@ public class OutboxDao extends AbstractMySQLDao{
 					}
 					else
 					{
-						LOGGER.error("emlPack.getMemberInfo().getKmt_opt_in() is set to null for memberid: " + emlPack.getMemberId() + "Kmt_opt_in is saved as empty string to outbox.");
+						LOGGER.error("PERSIST:emlPack.getMemberInfo().getKmt_opt_in() is set to null for memberid: " + emlPack.getMemberId() + "Kmt_opt_in is saved as empty string to outbox.");
 						statement.setString(11, "");
 					}
 					if(emlPack.getMemberInfo().getSyw_opt_in()!=null){
@@ -114,13 +114,13 @@ public class OutboxDao extends AbstractMySQLDao{
 					}
 					else
 					{
-						LOGGER.error("emlPack.getMemberInfo().getSyw_opt_in() is set to null for memberid: " + emlPack.getMemberId() + "Syw_opt_in is saved as empty string to outbox.");
+						LOGGER.error("PERSIST:emlPack.getMemberInfo().getSyw_opt_in() is set to null for memberid: " + emlPack.getMemberId() + "Syw_opt_in is saved as empty string to outbox.");
 						statement.setString(12, "");
 					}					
 					
 				}
 				else{
-					LOGGER.error("emlPack.getMemberInfo() is set to null for memberid: " + emlPack.getMemberId() + "Fields of memberInfo are saved as empty strings to outbox.");
+					LOGGER.error("PERSIST:emlPack.getMemberInfo() is set to null for memberid: " + emlPack.getMemberId() + "Fields of memberInfo are saved as empty strings to outbox.");
 					statement.setString(9, "");
 					statement.setString(10,"");
 					statement.setString(11, "");

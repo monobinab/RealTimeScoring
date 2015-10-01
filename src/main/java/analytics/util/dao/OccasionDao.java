@@ -38,7 +38,6 @@ public class OccasionDao extends AbstractMongoDao{
 	public List<OccasionInfo> getOccasionsInfo() throws Exception{
 	//	List<OccasionInfo> occasionInfos = new ArrayList<OccasionInfo>();
 		  if(occasionInfos!= null && occasionInfos.size()>0){
-			  System.out.println("Got occasionInfos"); 
 			  return occasionInfos;
 		  }
 		occasionInfoCollection = db.getCollection("cpsOccasions");
