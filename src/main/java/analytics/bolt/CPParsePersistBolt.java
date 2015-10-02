@@ -16,6 +16,7 @@ import analytics.util.SecurityUtils;
 import analytics.util.dao.MemberMDTags2Dao;
 import analytics.util.dao.TagMetadataDao;
 import analytics.util.dao.TagResponsysActiveDao;
+import analytics.util.objects.EmailPackage;
 import analytics.util.objects.TagMetadata;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -83,7 +84,7 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 				return;
 			}
 			if (lyl_id_no.getAsString().length() != 16) {
-				LOGGER.error("PERSIST:invalid loyalty id -" +lyl_id_no);
+				LOGGER.error("PERSIST:invalid loyalty id -" +lyl_id_no.getAsString());
 				outputCollector.ack(input);
 				return;
 			}
@@ -96,7 +97,7 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 			
 			if(tagsList != null && tagsList.size()>0){
 				//filter top5% tags that responsys is not ready for.
-				List<String> filteredTagsList = filterResponsysNotReadyTop5PercentTags(l_id,tagsList);
+				List<String> filteredTagsList = filterResponsysNotReadyTop5PercentTags(lyl_id_no.getAsString(), l_id,tagsList);
 				
 				//Persist filtered MdTags into memberMdTagsWithDates collection
 			    if(filteredTagsList != null && filteredTagsList.size()>0){
@@ -140,7 +141,7 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 	}
 
 	
-	private List<String> filterResponsysNotReadyTop5PercentTags(String l_id, List<String> tagsList) {
+	private List<String> filterResponsysNotReadyTop5PercentTags(String lyl_id_no, String l_id, List<String> tagsList) {
 		List<String> filteredTagsLst = new ArrayList<String>();
 		List<String> inactiveTop5TagsLst = new ArrayList<String>();
 		for(String mdtag : tagsList){
@@ -157,6 +158,7 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 		}
 		//Delete the top5percent mdtags that responsys is not ready for, from mdTagsWithDates collection.
 		if(inactiveTop5TagsLst.size() > 0)
+			LOGGER.info("PERSIST: Removing top5% tags that responsys is not ready for :: MemberId : "+ lyl_id_no + " Tags: " + getLogMsg(inactiveTop5TagsLst));
 			memberMDTags2Dao.deleteMemberMDTags(l_id,inactiveTop5TagsLst);
 		return filteredTagsLst;
 	}
@@ -211,4 +213,20 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		declarer.declare(new Fields("lyl_id_no", "l_id"));
 	}
+	
+	private String getLogMsg(List<String> notReadyTags) {
+		String logMsg = "  ";
+		int i =0;
+		for(String tag : notReadyTags)
+		{
+			if (i ==0)
+				logMsg = logMsg.concat(tag);
+			else if ( i == notReadyTags.size()-1)
+				logMsg = logMsg.concat(tag);
+			else
+				logMsg = logMsg.concat(", ").concat(tag);
+		}
+		return logMsg;
+	}
+	
 }

@@ -42,7 +42,7 @@ public class CPProcessingBolt extends EnvironmentBolt  {
 			cpsFiler.initDAO();	
 			cps_api_key = new ClientApiKeysDAO().findkey(cps_api_key_param);
 		} catch (Exception e) {
-			LOGGER.error(e.getClass() + ": " + ExceptionUtils.getMessage(e) + "Rootcause-"+ ExceptionUtils.getRootCauseMessage(e) +" STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
+			LOGGER.error("PERSIST: "+e.getClass() + ": " + ExceptionUtils.getMessage(e) + "Rootcause-"+ ExceptionUtils.getRootCauseMessage(e) +" STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 		}
 	}
 
