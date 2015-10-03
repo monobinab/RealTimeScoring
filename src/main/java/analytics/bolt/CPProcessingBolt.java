@@ -72,12 +72,12 @@ public class CPProcessingBolt extends EnvironmentBolt  {
 					
 				}					
 			} catch (SQLException e){
-				LOGGER.error("PERSIST:SQLException Occured in CPProcessingBolt for memberId :: "+ lyl_id_no + " : "+ ExceptionUtils.getMessage(e) + "Rootcause-"+ ExceptionUtils.getRootCauseMessage(e) + "  SATCKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
+				LOGGER.error("PERSIST: SQLException Occured in CPProcessingBolt for memberId :: "+ lyl_id_no + " : "+ ExceptionUtils.getMessage(e) + "Rootcause-"+ ExceptionUtils.getRootCauseMessage(e) + "  SATCKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 				redisCountIncr("SQLException_count");	
 				e.printStackTrace();
 				//outputCollector.fail(input);					
 			} catch (Exception e){
-				LOGGER.error("PERSIST:Exception Occured in CPProcessingBolt for memberId:: " + lyl_id_no + " : "+  ExceptionUtils.getMessage(e) + "Rootcause-"+ ExceptionUtils.getRootCauseMessage(e) + "  STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
+				LOGGER.error("PERSIST: Exception Occured in CPProcessingBolt for memberId:: " + lyl_id_no + " : "+  ExceptionUtils.getMessage(e) + "Rootcause-"+ ExceptionUtils.getRootCauseMessage(e) + "  STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 				redisCountIncr("exception_count");
 				e.printStackTrace();
 				//outputCollector.fail(input);	

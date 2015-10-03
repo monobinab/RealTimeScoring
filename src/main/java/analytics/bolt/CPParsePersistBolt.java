@@ -10,13 +10,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import scala.actors.threadpool.Arrays;
-import analytics.bolt.ParsingBoltOccassion;
 import analytics.util.MongoNameConstants;
 import analytics.util.SecurityUtils;
 import analytics.util.dao.MemberMDTags2Dao;
 import analytics.util.dao.TagMetadataDao;
 import analytics.util.dao.TagResponsysActiveDao;
-import analytics.util.objects.EmailPackage;
 import analytics.util.objects.TagMetadata;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -81,11 +79,13 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 			if (lyl_id_no == null) {
 				LOGGER.error("Invalid incoming json with empty loyalty id");
 				outputCollector.ack(input);
+				redisCountIncr("invalid_loy_id_count");
 				return;
 			}
 			if (lyl_id_no.getAsString().length() != 16) {
-				LOGGER.error("PERSIST:invalid loyalty id -" +lyl_id_no.getAsString());
+				LOGGER.error("PERSIST: Invalid loyalty id -" +lyl_id_no.getAsString());
 				outputCollector.ack(input);
+				redisCountIncr("invalid_loy_id_count");
 				return;
 			}
 			
@@ -131,7 +131,7 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 				
 				
 		} catch (Exception e) {			
-			LOGGER.error("PERSIST:CPParsePersistBolt: exception in parsing for memberId :: "+ input.getString(0) + " : " + ExceptionUtils.getMessage(e) + "Rootcause-"+ ExceptionUtils.getRootCauseMessage(e) +"  STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
+			LOGGER.error("PERSIST: CPParsePersistBolt: exception in parsing for memberId :: "+ input.getString(0) + " : " + ExceptionUtils.getMessage(e) + "Rootcause-"+ ExceptionUtils.getRootCauseMessage(e) +"  STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 			redisCountIncr("exception_count");	
 			//outputCollector.fail(input);
 		

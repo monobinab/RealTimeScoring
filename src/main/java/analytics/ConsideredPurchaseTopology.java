@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import storm.kafka.SpoutConfig;
 import analytics.bolt.CPParsePersistBolt;
 import analytics.bolt.CPProcessingBolt;
+import analytics.bolt.PurchaseBolt;
 import analytics.bolt.TagCreatorBolt;
 import analytics.spout.RTSKafkaSpout;
 import analytics.util.KafkaUtil;
@@ -36,9 +37,10 @@ public class ConsideredPurchaseTopology {
 		//String kafkaTopic1="rts_cp_membertags";
 		//String zkroot1="rts_cp_membertags_zk1";		
 		//String kafkaTopic2="stormtopic";
+		//String zkroot2="rts_stormtopic_zkroot";
 		//String kafkaTopic2="rts_cp_membertags_qa";
 		//String kafkaTopic2="cps_rtstags_qa";
-		//String zkroot2="rts_stormtopic_zkroot";
+		
 		String kafkaTopic2="cps_rtstags_qa";
 		String zkroot2="cps_rtstags_qa_zkroot";
 		String cpsPurchaseScoresTopic="rts_cp_purchase_scores";
@@ -58,17 +60,23 @@ public class ConsideredPurchaseTopology {
 			//topologyBuilder.setSpout("CPKafkaSpout1", new RTSKafkaSpout(spoutConfig1), 1);
 			topologyBuilder.setSpout("CPKafkaSpout2", new RTSKafkaSpout(spoutConfig2), 1);
 			//spoutConfig2 = new KafkaUtil(env).getSpoutConfig(cpsPurchaseScoresTopic,zkroot_cp_purchase);
-			topologyBuilder.setSpout("CPPurchaseFeedbackSpout", new RTSKafkaSpout(spoutConfig3), 1);
+			//topologyBuilder.setSpout("CPPurchaseFeedbackSpout", new RTSKafkaSpout(spoutConfig3), 1);
+			topologyBuilder.setSpout("CPPurchaseSpout", new RTSKafkaSpout(spoutConfig3), 1);
 			//LOGGER.info("CPS Topology listening to kafka topics : " + kafkaTopic1 + ", "+kafkaTopic2 +" , "+ cpsPurchaseScoresTopic);
 			LOGGER.info("CPS Topology listening to kafka topics : " + kafkaTopic2 + ", "+ cpsPurchaseScoresTopic);
 		} catch (ConfigurationException e) {
 			LOGGER.error(e.getClass() + ": " + e.getMessage() +" STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 			System.exit(0);	
 		}
-		topologyBuilder.setBolt("CPParsePersistBolt", new CPParsePersistBolt(env), 15).shuffleGrouping("CPKafkaSpout2").shuffleGrouping("CPTagCreatorBolt", "rtsTags_stream" );	
+		topologyBuilder.setBolt("CPParsePersistBolt", new CPParsePersistBolt(env), 15).shuffleGrouping("CPKafkaSpout2");	
+		topologyBuilder.setBolt("CPPurchaseBolt", new PurchaseBolt(env), 15).shuffleGrouping("CPPurchaseSpout");
+		topologyBuilder.setBolt("CPProcessingBolt", new CPProcessingBolt(env),15).shuffleGrouping("CPPurchaseBolt").shuffleGrouping("CPParsePersistBolt");
+		
+		//topologyBuilder.setBolt("CPParsePersistBolt", new CPParsePersistBolt(env), 15).shuffleGrouping("CPKafkaSpout2").shuffleGrouping("CPTagCreatorBolt", "rtsTags_stream" );	
 		//topologyBuilder.setBolt("CPParsePersistBolt", new CPParsePersistBolt(env), 15).shuffleGrouping("CPKafkaSpout1").shuffleGrouping("CPKafkaSpout2").shuffleGrouping("CPTagCreatorBolt", "rtsTags_stream" );	
-		topologyBuilder.setBolt("CPProcessingBolt", new CPProcessingBolt(env),15).shuffleGrouping("CPParsePersistBolt");
-		topologyBuilder.setBolt("CPTagCreatorBolt", new TagCreatorBolt(env), 1).shuffleGrouping("CPPurchaseFeedbackSpout");		
+		//topologyBuilder.setBolt("CPProcessingBolt", new CPProcessingBolt(env),15).shuffleGrouping("CPPurchaseFeedbackSpout").shuffleGrouping("CPParsePersistBolt").shuffleGrouping("CPTagCreatorBolt", "blackedout_stream" );
+		//topologyBuilder.setBolt("CPTagCreatorBolt", new TagCreatorBolt(env), 1).shuffleGrouping("CPPurchaseFeedbackSpout");		
+			
 		
 		Config conf = new Config();
 		conf.put("metrics_topology", "CPS");
