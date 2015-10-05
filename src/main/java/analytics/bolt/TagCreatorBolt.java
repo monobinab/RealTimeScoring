@@ -76,7 +76,7 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 		{
 				try{
 				JsonElement jsonElement = TupleParser.getParsedJson(input);
-				System.out.println("Input from PurchaseScoreKafkaBolt :" + jsonElement.toString());
+				LOGGER.info("Input from PurchaseScoreKafkaBolt :" + jsonElement.toString());
 				JsonElement lyl_id_no = jsonElement.getAsJsonObject().get("memberId");
 				
 				String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no.getAsString());
@@ -90,13 +90,14 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 					process(lyl_id_no, l_id, modelScoreList);
 				}
 			} catch (Exception e){
-				LOGGER.error("Exception Occured in TagCreatorBolt :: " +  e.getMessage()+ "  STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
-				outputCollector.fail(input);	
+				LOGGER.error("PERSIST:Exception Occured in TagCreatorBolt :: " +  e.getMessage()+ "  STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
+				redisCountIncr("exception_count");
+				//outputCollector.fail(input);	
 			}
 				
 		} else {
 			redisCountIncr("null_lid");			
-			outputCollector.fail(input);				
+			//outputCollector.fail(input);				
 		}
 		outputCollector.ack(input);
 		
