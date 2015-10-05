@@ -89,11 +89,15 @@ public class RedisPubSubSpout extends BaseRichSpout {
                 }
             };
 
-            Jedis jedis = new Jedis(redisServers[number], 6379, 604800);
-			jedis.connect();
+           /* Jedis jedis = new Jedis(redisServers[number], 6379, 604800);
+			jedis.connect();*/
 
             //Jedis jedis = pool.getResource();
+            
+            Jedis jedis = null;
             try {
+            	 jedis = new Jedis(redisServers[number], 6379, 604800);
+     			jedis.connect();
                 jedis.psubscribe(listener, pattern);
             } 
             catch(Exception e){
@@ -101,7 +105,8 @@ public class RedisPubSubSpout extends BaseRichSpout {
             }
             finally {
                 //pool.returnResource(jedis);
-            	jedis.disconnect();
+            	if(null != jedis)
+            		jedis.disconnect();
             }
         }
     };
