@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -33,29 +34,50 @@ public class SignalSpout extends BaseRichSpout{
 			JSONArray feedJsonArray = new JSONArray( HttpClientUtils.httpGetCallJsonString(Constants.SIGNAL_URL));
 			//System.out.println("incoming json " + feedJsonArray);
 			for(int i=0; i<feedJsonArray.length();i++){
+				try{
 				List<Object> listToEmit = new ArrayList<Object>();
 				JSONObject jsonObj = (JSONObject) feedJsonArray.get(i);
 				LOGGER.info(jsonObj.toString());
 				String valueString = (String) jsonObj.get("value");
 				JSONObject valueJsonObj = new JSONObject(valueString);
 				JSONObject userJsonObj = (JSONObject) valueJsonObj.get("user");
-				listToEmit.add(valueJsonObj.get("channel"));
-				listToEmit.add(valueJsonObj.get("products"));
-				listToEmit.add(valueJsonObj.get("searchTerm"));
-				listToEmit.add(valueJsonObj.get("signalTime"));
-				listToEmit.add(valueJsonObj.get("source"));
-				listToEmit.add(valueJsonObj.get("taxonomy"));
-				listToEmit.add(userJsonObj.get("uuid"));
-				listToEmit.add(valueJsonObj.get("type"));
-				listToEmit.add(jsonObj.get("offset"));
+			//	if(valueJsonObj.has("channel"))
+					listToEmit.add(valueJsonObj.get("channel"));
+				if(valueJsonObj.has("products"))
+					listToEmit.add(valueJsonObj.get("products"));
+				else
+					listToEmit.add(null);
+				if(valueJsonObj.has("searchTerm"))
+					listToEmit.add(null);
+				else
+					listToEmit.add(null);
+				if(valueJsonObj.has("signalTime"))
+					listToEmit.add(valueJsonObj.get("signalTime"));
+				if(valueJsonObj.has("source"))
+					listToEmit.add(valueJsonObj.get("source"));
+				if(valueJsonObj.has("taxonomy"))
+					listToEmit.add(valueJsonObj.get("taxonomy"));
+				else
+					listToEmit.add(null);
+		//		if(valueJsonObj.has("uuid"))
+					listToEmit.add(userJsonObj.get("uuid"));
+		//		if(valueJsonObj.has("type"))
+					listToEmit.add(valueJsonObj.get("type"));
+		//		if(valueJsonObj.has("offset"))
+					listToEmit.add(jsonObj.get("offset"));
 				collector.emit(listToEmit);
 				//nullifying the objects once emitted successfully 
 				listToEmit = null;
 				valueJsonObj = null;
+				}
+				catch(Exception e2){
+					LOGGER.error("Exception in json ", ExceptionUtils.getMessage(e2));
+				}
 			}
 			feedJsonArray = null;
 	} catch (Exception e) {
-			LOGGER.error("Exception in SignalSpout " , e.getClass() + ": " + e.getMessage());
+			LOGGER.error("Exception in SignalSpout " , ExceptionUtils.getMessage(e) );
+			e.printStackTrace();
 		}
 	}
 
