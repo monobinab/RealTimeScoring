@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -33,6 +34,7 @@ public class SignalSpout extends BaseRichSpout{
 			JSONArray feedJsonArray = new JSONArray( HttpClientUtils.httpGetCallJsonString(Constants.SIGNAL_URL));
 			//System.out.println("incoming json " + feedJsonArray);
 			for(int i=0; i<feedJsonArray.length();i++){
+				try{
 				List<Object> listToEmit = new ArrayList<Object>();
 				JSONObject jsonObj = (JSONObject) feedJsonArray.get(i);
 				LOGGER.info(jsonObj.toString());
@@ -40,11 +42,20 @@ public class SignalSpout extends BaseRichSpout{
 				JSONObject valueJsonObj = new JSONObject(valueString);
 				JSONObject userJsonObj = (JSONObject) valueJsonObj.get("user");
 				listToEmit.add(valueJsonObj.get("channel"));
-				listToEmit.add(valueJsonObj.get("products"));
-				listToEmit.add(valueJsonObj.get("searchTerm"));
+				if(valueJsonObj.has("products"))
+					listToEmit.add(valueJsonObj.get("products"));
+				else
+					listToEmit.add(null);
+				if(valueJsonObj.has("searchTerm"))
+					listToEmit.add(null);
+				else
+					listToEmit.add(null);
 				listToEmit.add(valueJsonObj.get("signalTime"));
 				listToEmit.add(valueJsonObj.get("source"));
-				listToEmit.add(valueJsonObj.get("taxonomy"));
+				if(valueJsonObj.has("taxonomy"))
+					listToEmit.add(valueJsonObj.get("taxonomy"));
+				else
+					listToEmit.add(null);
 				listToEmit.add(userJsonObj.get("uuid"));
 				listToEmit.add(valueJsonObj.get("type"));
 				listToEmit.add(jsonObj.get("offset"));
@@ -52,10 +63,16 @@ public class SignalSpout extends BaseRichSpout{
 				//nullifying the objects once emitted successfully 
 				listToEmit = null;
 				valueJsonObj = null;
+				}
+				catch(Exception e2){
+					e2.printStackTrace();
+					LOGGER.error("Exception in json ", ExceptionUtils.getFullStackTrace(e2) +": " + ExceptionUtils.getRootCauseMessage(e2) + ": " + ExceptionUtils.getMessage(e2));
+				}
 			}
 			feedJsonArray = null;
 	} catch (Exception e) {
-			LOGGER.error("Exception in SignalSpout " , e.getClass() + ": " + e.getMessage());
+			LOGGER.error("Exception in SignalSpout " , ExceptionUtils.getMessage(e) );
+			e.printStackTrace();
 		}
 	}
 
