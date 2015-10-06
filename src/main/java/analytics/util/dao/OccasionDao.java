@@ -81,7 +81,7 @@ public class OccasionDao extends AbstractMongoDao{
 				}
 			}
 		}
-		System.out.println("OccasionInfos size = " + occasionInfos.size()); 
+		//System.out.println("OccasionInfos size = " + occasionInfos.size()); 
 		return occasionInfos;
 	}
 	

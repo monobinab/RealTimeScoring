@@ -110,9 +110,9 @@ public class MemberMDTags2Dao extends AbstractDao {
 		SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd");
 		BasicDBObject query = new BasicDBObject();
 		query.put(MongoNameConstants.L_ID, l_id);
-		DBObject doc = memberMDTagsCollection.findOne(new BasicDBObject(
-				MongoNameConstants.L_ID, l_id));
+		DBObject doc = memberMDTagsCollection.findOne(query);
 		BasicDBList mdTagsList = null;
+		BasicDBList newMdTagsList = new BasicDBList();
 		BasicDBObject newObj = null;
 		BasicDBList rtsTagsList = new BasicDBList();
 		// If there is a document already in the Collection for that Lid
@@ -129,29 +129,25 @@ public class MemberMDTags2Dao extends AbstractDao {
 					newObj = new BasicDBObject();
 					newObj.append("t", tag);
 					newObj.append("f", ft.format(dNow));
-					newObj.append("e", ft.format(newDate));
-					if (mdTagsList == null)
-						mdTagsList = new BasicDBList();
-					mdTagsList.add(newObj);
+					newObj.append("e", ft.format(newDate));					
 				}
-
+				newMdTagsList.add(newObj);
 			}
 		}
 		// If there is NO document in the Collection for that Lid
 		else {
-			mdTagsList = new BasicDBList();
 			for (String tag : tags) {
 				newObj = new BasicDBObject();
 				newObj.append("t", tag);
 				newObj.append("f", ft.format(dNow));
 				newObj.append("e", ft.format(newDate));
-				mdTagsList.add(newObj);
+				newMdTagsList.add(newObj);
 			}
 		}
 		DBObject tagstoUpdate = new BasicDBObject();
 		tagstoUpdate.put("l_id", l_id);
-		if (mdTagsList != null && mdTagsList.size() > 0)
-			tagstoUpdate.put("tags", mdTagsList);
+		if (newMdTagsList != null && newMdTagsList.size() > 0)
+			tagstoUpdate.put("tags", newMdTagsList);
 		if (rtsTagsList != null && rtsTagsList.size() > 0)
 			tagstoUpdate.put("rtsTags", rtsTagsList);
 		LOGGER.info("Tags are getting updated in "

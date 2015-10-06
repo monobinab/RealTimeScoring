@@ -101,13 +101,11 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 				
 				//Persist filtered MdTags into memberMdTagsWithDates collection
 			    if(filteredTagsList != null && filteredTagsList.size()>0){
-			    	//jsonElement.getAsJsonObject().get("tagIdentifier").getAsString()
-			    	
-			     if(jsonElement.getAsJsonObject().has("tagIdentifier") && 
+			    	if(jsonElement.getAsJsonObject().has("tagIdentifier") && 
 			    		 jsonElement.getAsJsonObject().get("tagIdentifier").toString().contains("RTS"))
-			      memberMDTags2Dao.addRtsMemberTags(l_id, filteredTagsList);
-			     else
-			      memberMDTags2Dao.addMemberMDTags(l_id, filteredTagsList);
+			    		memberMDTags2Dao.addRtsMemberTags(l_id, filteredTagsList);
+			    	else
+			    		memberMDTags2Dao.addMemberMDTags(l_id, filteredTagsList);
 			    }			
 			}
 			if(tagsList != null && tagsList.size()==0){
@@ -157,9 +155,10 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 				filteredTagsLst.add(mdtag);
 		}
 		//Delete the top5percent mdtags that responsys is not ready for, from mdTagsWithDates collection.
-		if(inactiveTop5TagsLst.size() > 0)
+		if(inactiveTop5TagsLst.size() > 0){
 			LOGGER.info("PERSIST: Removing top5% tags that responsys is not ready for :: MemberId : "+ lyl_id_no + " Tags: " + getLogMsg(inactiveTop5TagsLst));
 			memberMDTags2Dao.deleteMemberMDTags(l_id,inactiveTop5TagsLst);
+		}
 		return filteredTagsLst;
 	}
 
