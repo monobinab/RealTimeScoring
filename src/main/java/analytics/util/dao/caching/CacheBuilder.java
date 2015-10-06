@@ -1,25 +1,31 @@
-package analytics.caching;
+package analytics.util.dao.caching;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
 
 public class CacheBuilder {
 
 	private static CacheBuilder cacheBuilder;
 	
-	private static CacheManager cacheManager;
+	private static List<Cache> caches = null;
 	
 	private CacheBuilder(){}
 	
 	public static CacheBuilder getInstance(){
         if(cacheBuilder == null){
-        	cacheManager = CacheManager.newInstance();
         	cacheBuilder = new CacheBuilder();
+        	caches = new ArrayList<Cache>();
         }
         return cacheBuilder;
 	}
 	
-	public Cache getCache(String cacheName){
-		return cacheManager.getCache(cacheName);
+	public void setCaches(Cache cache){
+		caches.add(cache);
+	}
+	
+	public List<Cache> getCaches(){
+		return caches;
 	}
 }

@@ -1,6 +1,6 @@
-package analytics.caching;
+package analytics.util.dao.caching;
 
-import analytics.caching.CacheBuilder;
+import analytics.util.dao.caching.CacheBuilder;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
 
@@ -8,9 +8,10 @@ public class TestEhCache{
 	
 	public TestEhCache(){
 		for(int i = 0; i< 10; i++){
-			this.testCache();
+			//this.testCache();
 		}
 	}
+	/**
 	public void testCache(){
 		System.out.println("Called");
 		Cache cache = CacheBuilder.getInstance().getCache(RTSCacheConstant.RTS_CACHE_MODELPERCENTILECACHE);
@@ -40,7 +41,7 @@ public class TestEhCache{
 			}
 		}
 	}
-	
+	*/
 	public static void main(String[] args) {
 		new TestEhCache();
 	}

@@ -1,4 +1,4 @@
-package analytics.caching;
+package analytics.util.dao.caching;
 
 public class RTSCacheConstant {
 

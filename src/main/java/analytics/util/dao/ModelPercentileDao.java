@@ -8,15 +8,16 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.caching.CacheBuilder;
-import analytics.caching.CacheWrapper;
-import analytics.caching.RTSCacheConstant;
+import analytics.util.dao.caching.CacheBuilder;
+import analytics.util.dao.caching.CacheWrapper;
+import analytics.util.dao.caching.RTSCacheConstant;
 import analytics.util.MongoNameConstants;
 
 import com.mongodb.BasicDBObject;
@@ -35,7 +36,8 @@ public class ModelPercentileDao extends AbstractDao{
     public ModelPercentileDao() {
     	super();
     	modelPercentileCollection = db.getCollection("modelPercentile");
-    	cache = CacheBuilder.getInstance().getCache(RTSCacheConstant.RTS_CACHE_MODELPERCENTILECACHE);
+    	cache = CacheManager.newInstance().getCache(RTSCacheConstant.RTS_CACHE_MODELPERCENTILECACHE);
+    	CacheBuilder.getInstance().setCaches(cache);
     }
     
 	@SuppressWarnings("unchecked")

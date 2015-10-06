@@ -5,6 +5,7 @@ package analytics.bolt;
 
 import analytics.util.dao.MemberScoreDao;
 import analytics.util.dao.ModelPercentileDao;
+import analytics.util.dao.caching.CacheBuilder;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -29,7 +30,7 @@ public class LoggingBolt extends EnvironmentBolt {
 	private OutputCollector outputCollector;
 	private MemberScoreDao memberScoreDao;
 	private ModelPercentileDao modelPercentileDao;
-	private Map<Integer,TreeMap<Integer,Double>> modelScorePercentileMap;
+	//private Map<Integer,TreeMap<Integer,Double>> modelScorePercentileMap;
 	
 	public LoggingBolt() {
 	}
@@ -51,7 +52,7 @@ public class LoggingBolt extends EnvironmentBolt {
    		this.outputCollector = collector;
 		memberScoreDao = new MemberScoreDao();
 		modelPercentileDao = new ModelPercentileDao();
-		modelScorePercentileMap = getModelScorePercentileMap();
+		//modelScorePercentileMap = getModelScorePercentileMap();
 	}
 		/*
 	 * (non-Javadoc)
@@ -84,15 +85,14 @@ public class LoggingBolt extends EnvironmentBolt {
 		redisCountIncr("score_logged");
 		outputCollector.ack(input);	}
 
-	
+	/**
 	private HashMap<Integer,TreeMap<Integer,Double>> getModelScorePercentileMap(){
-		
 		HashMap<Integer,TreeMap<Integer,Double>> modelScorePercentileMap = modelPercentileDao.getModelScorePercentilesMap();
 		return modelScorePercentileMap;
-	}
+	}*/
 	
 	private int getPercentileForScore(double score, int modelId){
-		TreeMap<Integer,Double> percMap = modelScorePercentileMap.get(modelId);
+		TreeMap<Integer,Double> percMap = modelPercentileDao.getModelScorePercentilesMap().get(modelId);
 		int p = 0;
 		if (percMap != null && percMap.size() > 0) {
 			for (int i = percMap.size() - 1; i >= 1; i--) {
