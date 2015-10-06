@@ -179,5 +179,8 @@ public class MongoNameConstants {
      public static final String EMAIL_VAR = "v";
      public static final String STORE_FORMAT = "f";
      public static final String EMAIL_MODEL_ID = "m";
+     
+     //memberBrowse collection
+     
 }
 
