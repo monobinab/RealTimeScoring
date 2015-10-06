@@ -5,16 +5,18 @@ import java.util.List;
 
 import net.sf.ehcache.Cache;
 
-public class CacheStatistics implements Runnable{
-	
-	private Thread thread;
-	private String threadName;
-	
-	public CacheStatistics(String threadName){
-		this.threadName = threadName;
-	}
+public class CacheStatistics{
 
-	public void printCacheStatistics(String cacheName){
+	private static CacheStatistics cacheStatistics;
+	
+	public static CacheStatistics getInstance(){
+        if(cacheStatistics == null){
+        	cacheStatistics = new CacheStatistics();
+        }
+        return cacheStatistics;
+	}
+	
+	public void printCacheStatistics(){
 		List<Cache> caches = CacheBuilder.getInstance().getCaches();
 		if(caches != null && caches.size() > 0){
 			for(Cache cache : caches){
@@ -30,30 +32,5 @@ public class CacheStatistics implements Runnable{
 				System.out.println(cacheStatsBuilder.toString());
 			}
 		}
-	}
-
-	@Override
-	public void run() {
-		for(;;){
-			try {
-			this.printCacheStatistics(RTSCacheConstant.RTS_CACHE_MODELPERCENTILECACHE);
-			Thread.sleep(6000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-	
-	public void start(){
-		System.out.println("Starting " +  threadName );
-	      if (thread == null){
-	    	  thread = new Thread (this, threadName);
-	    	  thread.start ();
-	      }
-	}
-	
-	public static void main(String args[]){
-		CacheStatistics cacheStatistics = new CacheStatistics("Cache Stats Thread");
-		cacheStatistics.start();
 	}
 }

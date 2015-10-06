@@ -45,7 +45,7 @@ public class SywScoringBolt extends BaseRichBolt {
 	private Map dcBoostModelMap;
 	//TODO: Change this after refactoring
 	private Map boostModelMap;
-	private Map<Integer, Map<Integer, Double>> modelPercentileMap;
+	//private Map<Integer, Map<Integer, Double>> modelPercentileMap;
 	private SimpleDateFormat simpleDateFormat;
 	private OutputCollector outputCollector;
 	private List<Integer> monthlyModelsMap;
@@ -75,7 +75,7 @@ public class SywScoringBolt extends BaseRichBolt {
 		modelBoostDao = new ModelSywBoostDao();
 		sywBoostModelMap = modelBoostDao.getVarModelMap();
 		dcBoostModelMap = new DCDao().getDCModelMap();
-		modelPercentileMap = modelPercentileDao.getModelPercentiles();
+		//modelPercentileMap = modelPercentileDao.getModelPercentiles();
 		
 		variableNameToVidMap = new HashMap<String, String>();
 		List<Variable> variables = variableDao.getVariables();
@@ -180,7 +180,7 @@ public class SywScoringBolt extends BaseRichBolt {
 		}
 		oldScore = modelIdToScore.get(modelId);
 		if (source.equals("SYW_OWN")) {
-			Double maxScore = modelPercentileMap.get(modelId).get(50);
+			Double maxScore = modelPercentileDao.getModelPercentiles().get(modelId).get(50);
 
 			if (Double.valueOf(modelIdToScore.get(modelId)) > maxScore) {
 				modelIdToScore.put(modelId, maxScore.toString());
@@ -191,7 +191,7 @@ public class SywScoringBolt extends BaseRichBolt {
 			} else {
 				boostPercetages = 5;
 			}
-			Double maxScore = modelPercentileMap.get(modelId).get(90 + boostPercetages);
+			Double maxScore = modelPercentileDao.getModelPercentiles().get(modelId).get(90 + boostPercetages);
 			if (Double.valueOf(modelIdToScore.get(modelId)) < maxScore) {
 				modelIdToScore.put(modelId, maxScore.toString());
 			}
@@ -201,7 +201,7 @@ public class SywScoringBolt extends BaseRichBolt {
 			} else {
 				boostPercetages = 4;
 			}
-			Double maxScore = modelPercentileMap.get(modelId).get(96 + boostPercetages);
+			Double maxScore = modelPercentileDao.getModelPercentiles().get(modelId).get(96 + boostPercetages);
 
 			if (Double.valueOf(modelIdToScore.get(modelId)) < maxScore) {
 				modelIdToScore.put(modelId, maxScore.toString());
@@ -213,7 +213,7 @@ public class SywScoringBolt extends BaseRichBolt {
 			} else {
 				boostPercetages = 5;
 			}
-			Double maxScore = modelPercentileMap.get(modelId).get(90 + boostPercetages);
+			Double maxScore = modelPercentileDao.getModelPercentiles().get(modelId).get(90 + boostPercetages);
 			if (Double.valueOf(modelIdToScore.get(modelId)) < maxScore) {
 				modelIdToScore.put(modelId, maxScore.toString());
 			}

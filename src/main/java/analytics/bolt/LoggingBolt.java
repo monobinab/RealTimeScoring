@@ -6,6 +6,7 @@ package analytics.bolt;
 import analytics.util.dao.MemberScoreDao;
 import analytics.util.dao.ModelPercentileDao;
 import analytics.util.dao.caching.CacheBuilder;
+import analytics.util.dao.caching.CacheStatistics;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -83,7 +84,8 @@ public class LoggingBolt extends EnvironmentBolt {
 				", newScore: "+newScore+", minExpiry: "+minExpiry+", maxExpiry: "+maxExpiry+", source: " + source+", "
 						+ "oldPercentile: " + oldPercentile+", newPercentile: " + newPercentile);
 		redisCountIncr("score_logged");
-		outputCollector.ack(input);	}
+		outputCollector.ack(input);	
+		}
 
 	/**
 	private HashMap<Integer,TreeMap<Integer,Double>> getModelScorePercentileMap(){

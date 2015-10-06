@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import analytics.util.dao.caching.CacheBuilder;
 import analytics.util.dao.caching.CacheWrapper;
-import analytics.util.dao.caching.RTSCacheConstant;
+import analytics.util.dao.caching.CacheConstant;
 import analytics.util.MongoNameConstants;
 
 import com.mongodb.BasicDBObject;
@@ -36,7 +36,7 @@ public class ModelPercentileDao extends AbstractDao{
     public ModelPercentileDao() {
     	super();
     	modelPercentileCollection = db.getCollection("modelPercentile");
-    	cache = CacheManager.newInstance().getCache(RTSCacheConstant.RTS_CACHE_MODELPERCENTILECACHE);
+    	cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_MODELPERCENTILECACHE);
     	CacheBuilder.getInstance().setCaches(cache);
     }
     
