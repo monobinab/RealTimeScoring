@@ -48,7 +48,7 @@ public class CPSFiler {
 		MemberInfo memberInfo  = memberInfoDao.getMemberInfo(l_id);
 		
 		if(memberInfo!=null){
-			if(StringUtils.isNotBlank(memberInfo.getEid())){
+			if(StringUtils.isNotBlank(memberInfo.getEid())&& memberInfo.getEid()!="0"){
 				List<TagMetadata> validOccasions = this.getValidOccasionsList(rtsAPIResponse);
 				
 				if(validOccasions != null && validOccasions.size() > 0){
@@ -98,6 +98,10 @@ public class CPSFiler {
 					}
 				}
 				
+			}
+			else
+			{
+				logger.info("PERSIST: Occasions are not queued for member - " + lyl_id_no + " in CPS. Eid for member - " + lyl_id_no + " is either null, blank or 0.");
 			}
 			
 		}
@@ -154,13 +158,21 @@ public class CPSFiler {
 	 */
 	protected List<EmailPackage> removeTop5PercentOccasion(List<EmailPackage> emailPackagesToBeSent) {
 		Iterator<EmailPackage> emailPackagesItr = emailPackagesToBeSent.iterator();
+		String removedTop5tags = "";
+		String memberId = null;
 		while(emailPackagesItr.hasNext()){
 			EmailPackage emailPackage = emailPackagesItr.next();
 			if(emailPackage!= null){
 				if(isOccasionTop5Percent(emailPackage.getMdTagMetaData().getMdTag())){
+					memberId = emailPackage.getMemberId();
+					removedTop5tags = removedTop5tags+ emailPackage.getMdTagMetaData().getMdTag()+ " ";
 					emailPackagesItr.remove();							
 				}
 			}
+		}
+		if(StringUtils.isNotBlank(memberId))
+		{
+			logger.info("PERSIST: Top5tags that were not queued for MemberId : "+ memberId + "because of higher priority tags in queue :: " + removedTop5tags);
 		}
 		return emailPackagesToBeSent;
 	}

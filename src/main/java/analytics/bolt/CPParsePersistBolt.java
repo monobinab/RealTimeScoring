@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import scala.actors.threadpool.Arrays;
-import analytics.bolt.ParsingBoltOccassion;
 import analytics.util.MongoNameConstants;
 import analytics.util.SecurityUtils;
 import analytics.util.dao.MemberMDTags2Dao;
@@ -80,11 +79,13 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 			if (lyl_id_no == null) {
 				LOGGER.error("Invalid incoming json with empty loyalty id");
 				outputCollector.ack(input);
+				redisCountIncr("invalid_loy_id_count");
 				return;
 			}
 			if (lyl_id_no.getAsString().length() != 16) {
-				LOGGER.error("invalid loyalty id");
+				LOGGER.error("PERSIST: Invalid loyalty id -" +lyl_id_no.getAsString());
 				outputCollector.ack(input);
+				redisCountIncr("invalid_loy_id_count");
 				return;
 			}
 			
@@ -96,17 +97,15 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 			
 			if(tagsList != null && tagsList.size()>0){
 				//filter top5% tags that responsys is not ready for.
-				List<String> filteredTagsList = filterResponsysNotReadyTop5PercentTags(l_id,tagsList);
+				List<String> filteredTagsList = filterResponsysNotReadyTop5PercentTags(lyl_id_no.getAsString(), l_id,tagsList);
 				
 				//Persist filtered MdTags into memberMdTagsWithDates collection
 			    if(filteredTagsList != null && filteredTagsList.size()>0){
-			    	//jsonElement.getAsJsonObject().get("tagIdentifier").getAsString()
-			    	
-			     if(jsonElement.getAsJsonObject().has("tagIdentifier") && 
+			    	if(jsonElement.getAsJsonObject().has("tagIdentifier") && 
 			    		 jsonElement.getAsJsonObject().get("tagIdentifier").toString().contains("RTS"))
-			      memberMDTags2Dao.addRtsMemberTags(l_id, filteredTagsList);
-			     else
-			      memberMDTags2Dao.addMemberMDTags(l_id, filteredTagsList);
+			    		memberMDTags2Dao.addRtsMemberTags(l_id, filteredTagsList);
+			    	else
+			    		memberMDTags2Dao.addMemberMDTags(l_id, filteredTagsList);
 			    }			
 			}
 			if(tagsList != null && tagsList.size()==0){
@@ -130,7 +129,7 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 				
 				
 		} catch (Exception e) {			
-			LOGGER.error("CPParsePersistBolt: exception in parsing for memberId :: "+ input.getString(0) + " : " + ExceptionUtils.getMessage(e) + "Rootcause-"+ ExceptionUtils.getRootCauseMessage(e) +"  STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
+			LOGGER.error("PERSIST: CPParsePersistBolt: exception in parsing for memberId :: "+ input.getString(0) + " : " + ExceptionUtils.getMessage(e) + "Rootcause-"+ ExceptionUtils.getRootCauseMessage(e) +"  STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 			redisCountIncr("exception_count");	
 			//outputCollector.fail(input);
 		
@@ -140,7 +139,7 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 	}
 
 	
-	private List<String> filterResponsysNotReadyTop5PercentTags(String l_id, List<String> tagsList) {
+	private List<String> filterResponsysNotReadyTop5PercentTags(String lyl_id_no, String l_id, List<String> tagsList) {
 		List<String> filteredTagsLst = new ArrayList<String>();
 		List<String> inactiveTop5TagsLst = new ArrayList<String>();
 		for(String mdtag : tagsList){
@@ -156,8 +155,10 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 				filteredTagsLst.add(mdtag);
 		}
 		//Delete the top5percent mdtags that responsys is not ready for, from mdTagsWithDates collection.
-		if(inactiveTop5TagsLst.size() > 0)
+		if(inactiveTop5TagsLst.size() > 0){
+			LOGGER.info("PERSIST: Removing top5% tags that responsys is not ready for :: MemberId : "+ lyl_id_no + " Tags: " + getLogMsg(inactiveTop5TagsLst));
 			memberMDTags2Dao.deleteMemberMDTags(l_id,inactiveTop5TagsLst);
+		}
 		return filteredTagsLst;
 	}
 
@@ -211,4 +212,20 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		declarer.declare(new Fields("lyl_id_no", "l_id"));
 	}
+	
+	private String getLogMsg(List<String> notReadyTags) {
+		String logMsg = "  ";
+		int i =0;
+		for(String tag : notReadyTags)
+		{
+			if (i ==0)
+				logMsg = logMsg.concat(tag);
+			else if ( i == notReadyTags.size()-1)
+				logMsg = logMsg.concat(tag);
+			else
+				logMsg = logMsg.concat(", ").concat(tag);
+		}
+		return logMsg;
+	}
+	
 }

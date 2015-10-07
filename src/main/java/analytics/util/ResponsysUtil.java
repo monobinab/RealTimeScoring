@@ -203,8 +203,9 @@ public class ResponsysUtil {
 	 * @return the web service response as a JSON String
 	 * @throws IOException
 	 */
-	public String callRtsAPI(String lyl_l_id) {
-		String baseURL = Constants.SCORING_API_PRE+lyl_l_id+Constants.SCORING_API_POST;
+	public String callRtsAPI(String lyl_l_id, String topologyName) {
+	//	String baseURL = Constants.SCORING_API_PRE+lyl_l_id+Constants.SCORING_API_POST;
+		String baseURL = Constants.SCORING_API_PRE+lyl_l_id+AuthPropertiesReader.getProperty(topologyName+"PostapiUrl");
 		String jsonRespString = null;
 		try {
 			HttpClient httpclient = new DefaultHttpClient();

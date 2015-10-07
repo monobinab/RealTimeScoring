@@ -21,7 +21,11 @@ import org.apache.commons.lang.StringUtils;
 import cpstest.CPOutBoxItem;
 import analytics.util.KafkaUtil;
 import analytics.util.dao.CPOutBoxDAO;
+import analytics.util.dao.ChangedMemberScoresDao;
+import analytics.util.dao.MemberScoreDao;
 import analytics.util.dao.TagMetadataDao;
+import analytics.util.dao.TagVariableDao;
+import analytics.util.objects.ChangedMemberScore;
 import analytics.util.objects.TagMetadata;
 
 public class CPSUtil {
@@ -82,7 +86,23 @@ public class CPSUtil {
 				if (testMap.containsKey(loyID)) {
 					List<CPOutBoxItem> testList = testMap.get(loyID);
 					CPOutBoxItem testItem = testList.get(0);
+					ChangedMemberScoresDao changedMemberScoresDao = new ChangedMemberScoresDao();
+					TagVariableDao tagVariableDao = new TagVariableDao();
+					MemberScoreDao memberScoreDao = new MemberScoreDao();
 					for (CPOutBoxItem cptestItem : testList) {
+						
+						if(cptestItem.getMd_tag().contains("Purchase")){
+							Integer modelId = tagVariableDao.getmodelIdFromTag(cptestItem.getMd_tag().substring(0,5));
+							if(modelId !=null){
+								Map<Integer, ChangedMemberScore>  changedScores = changedMemberScoresDao.getChangedMemberScores(loyID,modelId);
+								changedMemberScoresDao.upsertUpdateChangedScores(loyID, changedScores);
+								
+								Map<String, String> memScores = memberScoreDao.getMemberScores(loyID, modelId);
+								memberScoreDao.upsertUpdateMemberScores(loyID, memScores);
+							}
+							continue;
+						}
+
 						testItem.getMdTagList().add(cptestItem.getMd_tag());
 					}
 

@@ -30,6 +30,7 @@ public class ResponseBolt extends EnvironmentBolt{
 	private ResponsysUtil responsysUtil;
 	private EventsVibesActiveDao eventsVibesActiveDao;
 	HashMap<String, HashMap<String, String>> eventVibesActiveMap = new HashMap<String, HashMap<String, String>>();
+	private String topologyName;
 	
 	public ResponseBolt(String systemProperty, String host, int port) {
 		super(systemProperty);
@@ -45,6 +46,7 @@ public class ResponseBolt extends EnvironmentBolt{
 		this.outputCollector = collector;
 		eventsVibesActiveDao = new EventsVibesActiveDao();
 		eventVibesActiveMap = eventsVibesActiveDao.getVibesActiveEventsList();
+		topologyName = (String) stormConf.get("metrics_topology");
 		
 		//JedisPoolConfig poolConfig = new JedisPoolConfig();
         //poolConfig.setMaxActive(100);
@@ -69,7 +71,7 @@ public class ResponseBolt extends EnvironmentBolt{
 			
 			if(input != null && input.contains("lyl_id_no")){
 				lyl_id_no = input.getString(0);
-				String scoreInfoJsonString = responsysUtil.callRtsAPI(lyl_id_no);
+				String scoreInfoJsonString = responsysUtil.callRtsAPI(lyl_id_no, topologyName);
 				String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no);
 				
 				LOGGER.debug("TIME:" + messageID + "-Calling API complete-" + System.currentTimeMillis());

@@ -53,7 +53,7 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 		super.prepare(stormConf, context, collector);
 		this.outputCollector = collector;
 		memberTagDao = new MemberMDTagsDao();
-		//memberMDTags2Dao = new MemberMDTags2Dao();
+		memberMDTags2Dao = new MemberMDTags2Dao();
 	}
 
 	@Override

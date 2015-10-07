@@ -44,7 +44,7 @@ public class UnknownResponsysBolt  extends ResponsysBolt{
 		String retString = null;
 		
 	    try{
-			String scoreInfoJsonString = responsysUtil.callRtsAPI(lyl_id_no);
+			String scoreInfoJsonString = responsysUtil.callRtsAPI(lyl_id_no, topologyName);
 			
 			if(StringUtils.isEmpty(scoreInfoJsonString) ||  !scoreInfoJsonString.startsWith("{")){
 				LOGGER.error("Exception occured in api " + scoreInfoJsonString);

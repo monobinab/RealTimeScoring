@@ -131,4 +131,21 @@ public class TagVariableDao extends AbstractDao {
 		}
 		return modelTags;
 	}
+	
+	public Integer getmodelIdFromTag(String tag) {
+		DBObject tagVariable = tagVariablesCollection
+				.findOne(new BasicDBObject(MongoNameConstants.TAG_VAR_MDTAG,
+						tag.substring(0, 5)));
+		if (tagVariable != null
+				&& tagVariable.containsField(MongoNameConstants.TAG_VAR_VAR)
+				&& tagVariable.containsField(MongoNameConstants.TAG_VAR_MODEL)) {
+
+			return (Integer) tagVariable.get(MongoNameConstants.TAG_VAR_MODEL);
+
+		} else {
+			LOGGER.info("No Tag Variable for tag " + tag);
+		}
+		return null;
+	}
+
 }
