@@ -7,6 +7,7 @@ public class MemberBrowse {
 
 	private String lId;
 	Map<String, List<BrowseTag>> browseTags;
+	
 	public String getlId() {
 		return lId;
 	}

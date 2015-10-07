@@ -154,6 +154,18 @@ public class ScoringSingleton {
 				}
 			}*/
 			
+			
+			/*memberBrowseDao = new MemberBrowseDao();
+			MemberBrowse memberBrowse = memberBrowseDao.getMemberBrowse("9a5rMKMCyTjL1KHHxF5c0v7SREI=");
+			System.out.println(memberBrowse.getlId());
+			Map<String, List<BrowseTag>> dateSpeTags = memberBrowse.getBrowseTags();
+			for (Map.Entry<String, List<BrowseTag>> entry : dateSpeTags.entrySet()) {
+				if(entry.getKey().equals(getDateFormat(new Date()))){
+					List<BrowseTag> browseTags = dateSpeTags.get(entry.getKey());
+					
+				}
+			}
+			*/
 		}
 	}
 
