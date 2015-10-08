@@ -26,7 +26,7 @@ public class TECProcessingBolt extends EnvironmentBolt {
 	private static final Logger LOGGER = LoggerFactory.getLogger(TECProcessingBolt.class);
 	private OutputCollector outputCollector;
 	private RTSAPICaller rtsApiCaller;
-	private TECPostClient tecPostClient;
+	//private TECPostClient tecPostClient;
 
 	public TECProcessingBolt(String env) {
 		super(env);
@@ -46,7 +46,7 @@ public class TECProcessingBolt extends EnvironmentBolt {
 		} catch (ConfigurationException e) {
 			LOGGER.error(e.getClass() + ": " + e.getMessage() +" STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 		}
-		tecPostClient = TECPostClient.getInstance();
+		//tecPostClient = TECPostClient.getInstance();
 		api_key=new ClientApiKeysDAO().findkey(api_Key_Param);
 		
 	}
@@ -72,13 +72,14 @@ public class TECProcessingBolt extends EnvironmentBolt {
 					TECPostClient.postToTEC(scoreInfoKmartJsonString, l_id);	
 					redisCountIncr("sent_to_tec_process");						
 				} catch (Exception e){
-					LOGGER.error("Exception Occured in TECProcessingBolt :: ", e);
-					outputCollector.fail(input);					
+					redisCountIncr("exceptionCount");		
+					LOGGER.error("PERSIST:Exception Occured in TECProcessingBolt :: ", ExceptionUtils.getMessage(e) + "Rootcause-"+ ExceptionUtils.getRootCauseMessage(e) +"  STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
+					//outputCollector.fail(input);					
 				}				
 				
 			} else {
 				redisCountIncr("null_lid");			
-				outputCollector.fail(input);				
+			//outputCollector.fail(input);				
 			}
 		
 		

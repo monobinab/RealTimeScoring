@@ -55,7 +55,6 @@ public class TECTopology {
 					new RTSKafkaSpout(new KafkaUtil(System.getProperty(MongoNameConstants.IS_PROD)).getSpoutConfig(
 							kafkaTopic,zkroot)), 1);
 		} catch (ConfigurationException e1) {
-			// TODO Auto-generated catch block
 			LOGGER.error(e1.getClass() + ": " + e1.getMessage(), e1);
 			LOGGER.error("Kafka Not Initialised ");
 			   System.exit(0);
@@ -71,6 +70,7 @@ public class TECTopology {
 		conf.setDebug(false);
 		if (env.equalsIgnoreCase("PROD")|| env.equalsIgnoreCase("QA")) {	
 			try {
+				conf.setNumWorkers(6);
 				StormSubmitter.submitTopology(args[0], conf, builder.createTopology());
 			} catch (AlreadyAliveException e) {
 				LOGGER.error(e.getClass() + ": " + e.getMessage(), e);
