@@ -71,6 +71,7 @@ public class TECTopology {
 		conf.setDebug(false);
 		if (env.equalsIgnoreCase("PROD")|| env.equalsIgnoreCase("QA")) {	
 			try {
+				conf.setNumWorkers(6);
 				StormSubmitter.submitTopology(args[0], conf, builder.createTopology());
 			} catch (AlreadyAliveException e) {
 				LOGGER.error(e.getClass() + ": " + e.getMessage(), e);

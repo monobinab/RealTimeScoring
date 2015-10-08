@@ -31,10 +31,10 @@ public class TestingSpout extends BaseRichSpout{
 	public void nextTuple() {
 		
 		Map<String, String> varaibleValueMap = new HashMap<String, String>();
-		varaibleValueMap.put("BLACKOUT_HA_COOK", "0.0");
-		varaibleValueMap.put("BLACKOUT_HA_DISH", "0.0");
-		varaibleValueMap.put("BLACKOUT_WASH_DRY", "0.0");
-		varaibleValueMap.put("BLACKOUT_REGRIG", "0.0");
+		varaibleValueMap.put("BLACKOUT_S_TV", "0.0");
+		varaibleValueMap.put("BLACKOUT_MATTRESS", "0.0");
+		/*varaibleValueMap.put("BLACKOUT_WASH_DRY", "0.0");
+		varaibleValueMap.put("BLACKOUT_REGRIG", "0.0");*/
 	//	varaibleValueMap.put("BLACKOUT_WASH_DRY", "0.0");
 		
 		List<Object> listToEmit = new ArrayList<Object>();

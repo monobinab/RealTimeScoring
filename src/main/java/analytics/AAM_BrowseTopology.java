@@ -70,6 +70,7 @@ public class AAM_BrowseTopology {
 				|| System.getProperty(MongoNameConstants.IS_PROD)
 						.equalsIgnoreCase("QA")) {
 			try {
+				conf.setNumWorkers(6);
 				StormSubmitter.submitTopology(args[0], conf,
 						topologyBuilder.createTopology());
 			} catch (AlreadyAliveException e) {
