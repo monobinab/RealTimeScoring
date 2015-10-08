@@ -86,6 +86,7 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 			// query MongoDB for division and line associated with the pid
 			DivLn divLnObj = pidMatchUtil.getDivInformation(pid);
 			if(divLnObj == null) {
+				LOGGER.info("No Div Info found for Pid : " + pid);
 				continue;
 			}
 			if(divLnBoostVariblesMap.containsKey(divLnObj.getDiv())) {

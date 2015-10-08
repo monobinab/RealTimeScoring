@@ -280,10 +280,10 @@ public class CPOutBoxDAO extends AbstractMySQLDao {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd");
 		String today = ft.format(dNow);
-		CPOutBoxItem cpOutBoxItem = new CPOutBoxItem();
+		CPOutBoxItem cpOutBoxItem = null;
 		try {
 			StringBuffer query = new StringBuffer();
-			query.append("SELECT * FROM cp_outbox where loy_id=? and md_tag=? and status=? ");
+			query.append("SELECT * FROM cp_outbox where loy_id=? and md_tag like ? and status=? ");
 			statement = connection.prepareStatement(query.toString());
 			statement.setString(1, loy_id);
 			statement.setString(2, md_tag);
@@ -294,7 +294,8 @@ public class CPOutBoxDAO extends AbstractMySQLDao {
 			}
 			//while (rs.next()) {
 			if(rs.next())
-				{ 
+				{
+				cpOutBoxItem = new CPOutBoxItem();
 				cpOutBoxItem.setAdded_datetime(sdf.format(rs.getDate("added_datetime")));
 				cpOutBoxItem.setBu(rs.getString("bu"));
 				cpOutBoxItem
