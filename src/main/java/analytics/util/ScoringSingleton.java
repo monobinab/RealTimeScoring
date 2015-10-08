@@ -21,6 +21,7 @@ import com.mongodb.DB;
 import analytics.exception.RealTimeScoringException;
 import analytics.util.dao.ChangedMemberScoresDao;
 import analytics.util.dao.ChangedMemberVariablesDao;
+import analytics.util.dao.MemberBrowseDao;
 import analytics.util.dao.MemberInfoDao;
 import analytics.util.dao.MemberVariablesDao;
 import analytics.util.dao.MemberBoostsDao;
@@ -30,8 +31,10 @@ import analytics.util.dao.MongoDBConnectionWrapper;
 import analytics.util.dao.RegionalFactorDao;
 import analytics.util.dao.VariableDao;
 import analytics.util.objects.Boost;
+import analytics.util.objects.BrowseTag;
 import analytics.util.objects.Change;
 import analytics.util.objects.ChangedMemberScore;
+import analytics.util.objects.MemberBrowse;
 import analytics.util.objects.MemberInfo;
 import analytics.util.objects.MemberRTSChanges;
 import analytics.util.objects.Model;
@@ -62,6 +65,7 @@ public class ScoringSingleton {
 	ModelSywBoostDao modelSywBoostDao;
 	MemberBoostsDao memberBoostsDao;
 	
+	private MemberBrowseDao memberBrowseDao;
 
 	private boolean isExecuted = Boolean.FALSE;
 	
@@ -130,6 +134,38 @@ public class ScoringSingleton {
 			regionalFactorsMap = regionalFactorDao.populateRegionalFactors();
 			
 			memberInfoDao = new MemberInfoDao();
+			
+			
+			//code for checking MemberBrowse collection
+			/*memberBrowseDao = new MemberBrowseDao();
+			MemberBrowse memberBrowse = memberBrowseDao.getMemberBrowse("9a5rMKMCyTjL1KHHxF5c0v7SREI=");
+			System.out.println(memberBrowse.getlId());
+			Map<String, List<BrowseTag>> dateSpeTags = memberBrowse.getBrowseTags();
+			for(String key : dateSpeTags.keySet()){
+				System.out.println("date: " + key);
+				List<BrowseTag> brwTags = dateSpeTags.get(key);
+				for(int i=0; i<brwTags.size(); i++){
+					BrowseTag tag = brwTags.get(i);
+					Map<String, Object> count = tag.getFeedCounts();
+					System.out.println(tag.getBrowseTag() + ": ");
+					for(String key2 : count.keySet()){
+						System.out.println("feed: " + key2 +", " + count.get(key2));
+					}
+				}
+			}*/
+			
+			
+			/*memberBrowseDao = new MemberBrowseDao();
+			MemberBrowse memberBrowse = memberBrowseDao.getMemberBrowse("9a5rMKMCyTjL1KHHxF5c0v7SREI=");
+			System.out.println(memberBrowse.getlId());
+			Map<String, List<BrowseTag>> dateSpeTags = memberBrowse.getBrowseTags();
+			for (Map.Entry<String, List<BrowseTag>> entry : dateSpeTags.entrySet()) {
+				if(entry.getKey().equals(getDateFormat(new Date()))){
+					List<BrowseTag> browseTags = dateSpeTags.get(entry.getKey());
+					
+				}
+			}
+			*/
 		}
 	}
 

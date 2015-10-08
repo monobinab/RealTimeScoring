@@ -95,11 +95,14 @@ public class CPSUtil {
 							Integer modelId = tagVariableDao.getmodelIdFromTag(cptestItem.getMd_tag().substring(0,5));
 							if(modelId !=null){
 								Map<Integer, ChangedMemberScore>  changedScores = changedMemberScoresDao.getChangedMemberScores(loyID,modelId);
-								changedMemberScoresDao.upsertUpdateChangedScores(loyID, changedScores);
+								if(changedScores!=null && changedScores.size()>0)
+									changedMemberScoresDao.upsertUpdateChangedScores(loyID, changedScores);
 								
 								Map<String, String> memScores = memberScoreDao.getMemberScores(loyID, modelId);
-								memberScoreDao.upsertUpdateMemberScores(loyID, memScores);
+								if(memScores!=null && memScores.size()>0)
+									memberScoreDao.upsertUpdateMemberScores(loyID, memScores);
 							}
+							
 							continue;
 						}
 
@@ -110,8 +113,12 @@ public class CPSUtil {
 					System.out.println("message sent to kafka: "+ kafkaMSG);
 
 					try {
-						new KafkaUtil("PROD")
+						if(testItem.getMdTagList().size()>0)
+							new KafkaUtil("PROD")
 								.sendKafkaMSGs(kafkaMSG, topicName);
+						else
+							new KafkaUtil("PROD")
+								.sendKafkaMSGs(kafkaMSG, "rts_cp_purchase_scores");
 					} catch (ConfigurationException e) {						
 						e.printStackTrace();
 					}
@@ -130,15 +137,49 @@ public class CPSUtil {
 					printWriter.println("TEST RESULTS");
 					for (CPOutBoxItem verifyItem : verifyList) {
 						verifyItem.setStatus(0);
-						CPOutBoxItem queuedItem = new CPOutBoxDAO()
+						
+						CPOutBoxItem queuedItem = null;
+						if(verifyItem.getMd_tag().contains("Purchase")){
+							queuedItem = new CPOutBoxDAO()
+							.getQueuedItem(verifyItem.getLoy_id(),
+									verifyItem.getMd_tag().substring(0,5),
+									verifyItem.getStatus());
+						}
+						
+						else 
+							queuedItem = new CPOutBoxDAO()
 								.getQueuedItem(verifyItem.getLoy_id(),
 										verifyItem.getMd_tag(),
 										verifyItem.getStatus());
 
 						String testresult = null;
+						
+						if(verifyItem.getMd_tag().contains("Purchase")){
+							if(queuedItem == null ){
+
+								successCount++;
+								testresult = "SUCCESS TestTag: "
+										+ verifyItem.getMd_tag()
+										+ " is not queued to OutBox as Expected";
+							}
+							else {
+								if(!verifyItem.getMd_tag().substring(0,5).equalsIgnoreCase(queuedItem.getMd_tag().substring(0,5))){
+									successCount++;
+									testresult = "SUCCESS TestTag: "
+											+ verifyItem.getMd_tag()
+											+ " is not affecting the queued tag " +queuedItem.getMd_tag();
+								}
+								else{
+									failureCount++;
+									testresult = "FAILURE Test tag: "
+										+ verifyItem.getMd_tag()
+										+ " is Queued in OutBox which is not expected" ;
+								}
+							}
+						}
 
 						// Printing the test result file
-						if (queuedItem != null && queuedItem.getSend_date() != null) {
+						else if (queuedItem != null && queuedItem.getSend_date() != null) {
 							if (queuedItem.getSend_date().equals(verifyItem.getSend_date()))   {
 								successCount++;
 								testresult = "SUCCESS Test Tag: "
@@ -197,6 +238,7 @@ public class CPSUtil {
 		printWriter.flush();
 
 	}
+
 
 	private Map<String, List<CPOutBoxItem>> loadFile(String filename,
 			String testPhase) {
@@ -290,9 +332,10 @@ public class CPSUtil {
 		StringBuilder jsonBuilder = new StringBuilder();
 
 		jsonBuilder.append("{\"lyl_id_no\":\"").append(lyl_id_no)
-				.append("\",\"tags\":[");
+				.append("\"");
 		if (!tagList.isEmpty()) {
 			boolean firstTag = true;
+			jsonBuilder.append(",\"tags\":[");
 			for (String tag : tagList) {
 				if (firstTag) {
 					firstTag = false;
@@ -301,8 +344,9 @@ public class CPSUtil {
 					jsonBuilder.append(",\"").append(tag).append("\"");
 				}
 			}
+			jsonBuilder.append("]");
 		}
-		jsonBuilder.append("]}");
+		jsonBuilder.append("}");
 
 		return jsonBuilder.toString();
 	}

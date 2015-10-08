@@ -339,31 +339,5 @@ public class CPOutBoxDAO extends AbstractMySQLDao {
 		return cpOutBoxItem;
 	}
 
-	public int getQueuedCount(String lyl_id_no) {
-		PreparedStatement statement = null;
-		ResultSet rs = null;
-		int queueCount = 0;
-		String query = "SELECT count(*) as queuedCount FROM cp_outbox where loy_id=? ;";
-		try {
-			statement = connection.prepareStatement(query);
-			statement.setString(1, lyl_id_no);
-			rs = statement.executeQuery();
-			while(rs.next()){
-				queueCount = rs.getInt("queuedCount");
-			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}finally {
-			try {
-				statement.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		return queueCount;
-		
-	}
-
 }
+

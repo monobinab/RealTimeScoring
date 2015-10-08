@@ -32,16 +32,16 @@ public class TestingSpout extends BaseRichSpout{
 		
 		Map<String, String> varaibleValueMap = new HashMap<String, String>();
 		varaibleValueMap.put("BLACKOUT_S_TV", "0.0");
-		varaibleValueMap.put("BLACKOUT_S_LG_TRIM_EDG", "0.0");
-		varaibleValueMap.put("BLACKOUT_HA_COOK", "0.0");
 		varaibleValueMap.put("BLACKOUT_MATTRESS", "0.0");
-		varaibleValueMap.put("BLACKOUT_WASH_DRY", "0.0");
+		/*varaibleValueMap.put("BLACKOUT_WASH_DRY", "0.0");
+		varaibleValueMap.put("BLACKOUT_REGRIG", "0.0");*/
+	//	varaibleValueMap.put("BLACKOUT_WASH_DRY", "0.0");
 		
 		List<Object> listToEmit = new ArrayList<Object>();
-		 listToEmit.add("x9/QBJZJLHHXJhSze9s12Hc82ds=");
+		 listToEmit.add("+gG4eW5Pt3rfD+C//YCeGvX5cfQ=");
          listToEmit.add(JsonUtils.createJsonFromStringStringMap(varaibleValueMap));
          listToEmit.add("Telluride");
-        listToEmit.add("7081285724292671");
+        listToEmit.add("7081237551308377");
         
         this.outputCollector.emit(listToEmit);
 	}
