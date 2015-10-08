@@ -42,7 +42,7 @@ public class ModelPercentileDao extends AbstractDao{
     
 	@SuppressWarnings("unchecked")
 	public Map<Integer, Map<Integer, Double>> getModelPercentiles(){
-		String cacheKey = "getModelPercentiles";
+		String cacheKey = CacheConstant.RTS_MODEL_PERCENTILES_CACHE_KEY;
 		Element element = CacheWrapper.getInstance().isCacheKeyExist(cache, cacheKey);
 		if(element != null && element.getObjectKey().equals(cacheKey)){
 			return (Map<Integer, Map<Integer, Double>>) element.getObjectValue();
@@ -92,7 +92,7 @@ public class ModelPercentileDao extends AbstractDao{
 	
 	@SuppressWarnings("unchecked")
 	public HashMap<String,String> getModelWith98Percentile(){
-		String cacheKey = "getModelWith98Percentile";
+		String cacheKey = CacheConstant.RTS_MODEL_WITH_98_PERCENTILE_CACHE_KEY;
 		Element element = CacheWrapper.getInstance().isCacheKeyExist(cache, cacheKey);
 		if(element != null && element.getObjectKey().equals(cacheKey)){
 			return (HashMap<String,String>) element.getObjectValue();
@@ -118,7 +118,7 @@ public class ModelPercentileDao extends AbstractDao{
 	
 	@SuppressWarnings("unchecked")
 	public HashMap<Integer, TreeMap<Integer, Double>> getModelScorePercentilesMap(){
-		String cacheKey = "getModelScorePercentilesMap";
+		String cacheKey = CacheConstant.RTS_MODEL_PERCENTILES_MAP_CACHE_KEY;
 		Element element = CacheWrapper.getInstance().isCacheKeyExist(cache, cacheKey);
 		if(element != null && element.getObjectKey().equals(cacheKey)){
 			return (HashMap<Integer, TreeMap<Integer, Double>>) element.getObjectValue();
