@@ -462,7 +462,7 @@ public class ResponsysUtil {
 		}
 		else
 		{
-			emailstatus="F";
+			emailstatus="R";
 		}
 		//StringBuffer strBuff = new StringBuffer();
 		
@@ -481,7 +481,7 @@ public class ResponsysUtil {
 		//Persist info to Mongo after successfully transmission of message to Oracle.
 		occasionResponsesDao.addOccasionResponse(l_id, memberInfo.getEid(), customEventName, 
 				!topologyName.equalsIgnoreCase("unknownOccasions")?tagMetadata.getPurchaseOccasion():"Unknown", 
-						tagMetadata, strBuff.toString().contains("<success>true</success>") ? "Y" : "N", topologyName);
+						tagMetadata, strBuff.toString().contains("<success>true</success>") ? "Y" : emailstatus, topologyName);
 	
 		LOGGER.info("PERSIST: Winning Tag for Lid: " + lyl_l_id +" : "+tagMetadata.getMdTag());
 		
