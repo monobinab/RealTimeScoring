@@ -90,11 +90,14 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 				continue;
 			}
 			
-			//populate tagsMap for BrowseTags
-			if(!tagsMap.containsKey(divLnObj.getTag()))
-				tagsMap.put(divLnObj.getTag(), 1);
-			else
-				tagsMap.get((divLnObj.getTag()) + 1);
+		//populate tagsMap for BrowseTags
+		if(!tagsMap.containsKey(divLnObj.getTag()))
+			tagsMap.put(divLnObj.getTag(), 1);
+		else
+			tagsMap.get((divLnObj.getTag()) + 1);
+		
+		
+		//variableValueMap populating for scoring	
 			if(divLnBoostVariblesMap.containsKey(divLnObj.getDiv())) {
 				for(String b: divLnBoostVariblesMap.get(divLnObj.getDiv())) {
 					if (boostList.contains(b))
@@ -131,43 +134,6 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 			}
 			variableValueMap.put(b, createJsonDoc(allBoostValuesMap.get(b)));
 		}
-		
-		
-			//Map<String, Map<String, Integer>>memberBoostMap = new MemberBoostDao.getMemberBoosts(sourceTopic);
-
-//			if (divLnObj != null) {
-//				// get division and division/line concatenation from query
-//				// results
-//				String div = divLnObj.getDiv();
-//				String divLn = divLnObj.getDivLn();
-//				Collection<String> var = new ArrayList<String>();
-//				if (divLnBoostVariblesMap.containsKey(div)) {
-//					var = divLnBoostVariblesMap.get(div);
-//					for (String v : var) {
-//						if (variableValueMap.containsKey(var)) {
-//							int value = 1 + Integer.valueOf(variableValueMap
-//									.get(v));
-//							variableValueMap.remove(v);
-//							variableValueMap.put(v, String.valueOf(value));
-//						} else {
-//							variableValueMap.put(v, "1");
-//						}
-//					}
-//				}
-//				if (divLnBoostVariblesMap.containsKey(divLn)) {
-//					var = divLnBoostVariblesMap.get(divLn);
-//					for (String v : var) {
-//						if (variableValueMap.containsKey(var)) {
-//							int value = 1 + Integer.valueOf(variableValueMap
-//									.get(v));
-//							variableValueMap.remove(v);
-//							variableValueMap.put(v, String.valueOf(value));
-//						} else {
-//							variableValueMap.put(v, "1");
-//						}
-//					}
-//				}
-//			}
 		return variableValueMap;
 	}
 	
@@ -180,29 +146,10 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 		}.getType();
 		return gson.toJson(dateValuesMap, boostValueType);
 	}
-
-	/*@Override
-	protected String[] splitRec(String webRec) {
-		//TODO: See if other fields in the record are relevant. It was anyway not being used, so made this change
-    	webRec = webRec.replaceAll("[']",""); 
-	        String split[]=StringUtils.split(webRec,",");
-	       
-	        if(split !=null && split.length>0) {
-	        	String [] splits = new String[split.length-2];
-	        	for(int i=0; i<split.length-2; i++){
-	        		splits[i]=split[i+1];
-	        	}
-	            return  splits;
-			}
-			else {
-				return null;
-			}
-		}*/
 	
 	@Override
 	protected String[] splitRec(String webRec) {
-		//TODO: See if other fields in the record are relevant. It was anyway not being used, so made this change
-    	webRec = webRec.replaceAll("[']",""); 
+	   	webRec = webRec.replaceAll("[']",""); 
 	        String split[]=StringUtils.split(webRec,",");
 	       
 	        if(split !=null && split.length>0) {

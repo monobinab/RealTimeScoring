@@ -39,6 +39,16 @@ public class JsonUtils {
 
 		return gson.toJson(variableValuesMap, varValueType);
 	}
+	
+	public static final Object createJsonFromStringIntMap(Map<String, Integer> variableValuesMap) {
+
+		Gson gson = new Gson();
+		Type varValueType = new TypeToken<Map<String, Integer>>() {
+			private static final long serialVersionUID = 1L;
+		}.getType();
+
+		return gson.toJson(variableValuesMap, varValueType);
+	}
 
 	public static Map<String, List<String>> restoreDateTraitsMapFromJson(String json) {
 		Type dateTraitType = new TypeToken<Map<String, Collection<String>>>() {

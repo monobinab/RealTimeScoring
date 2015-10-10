@@ -106,17 +106,30 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
     		redisCountIncr("no_variables_affected");
     	}
     	redisCountIncr("total_processing");
+    	
+    	//emitted to BrowseCountPersistBolt
+    	if(!tagsMap.isEmpty()){
+    		Object tagsJSON = JsonUtils.createJsonFromStringIntMap(tagsMap);
+    		List<Object> listToEmit = new ArrayList<Object>();
+        	listToEmit.add(l_id);
+        	listToEmit.add(tagsJSON);
+        	listToEmit.add(source);
+        	this.outputCollector.emit("browse_tag_stream", listToEmit);
+        	redisCountIncr("emitted_browse_tag");
+    	}
     	outputCollector.ack(input);
     	return;
         
 	}
 
-	protected abstract Map<String, String> processList(String current_l_id, Map<String, Integer> tagsMap);
-
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		declarer.declare(new Fields("l_id","lineItemAsJsonString","source","lyl_id_no"));
+		declarer.declareStream("browse_tag_stream", new Fields("l_id","tagsJSON","source"));
 	}
+	
     abstract protected String[] splitRec(String webRec);
+	protected abstract Map<String, String> processList(String current_l_id, Map<String, Integer> tagsMap);
+
 }    
 
