@@ -87,7 +87,9 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 			l_idToValueCollectionMap.get(l_id).add(splitRecArray[i].trim());
 		}
 		LOGGER.debug("processing found traits...");
-    	Map<String,String> variableValueMap = processList(l_id); //LIST OF VARIABLES FOUND DURING TRAITS PROCESSING
+		
+		Map<String, Integer> tagsMap = new HashMap<String, Integer>();
+    	Map<String,String> variableValueMap = processList(l_id, tagsMap); //LIST OF VARIABLES FOUND DURING TRAITS PROCESSING
     	if(variableValueMap !=null && !variableValueMap.isEmpty()) {
         	Object variableValueJSON = JsonUtils.createJsonFromStringStringMap(variableValueMap);
         	List<Object> listToEmit = new ArrayList<Object>();
@@ -109,7 +111,7 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
         
 	}
 
-	protected abstract Map<String, String> processList(String current_l_id);
+	protected abstract Map<String, String> processList(String current_l_id, Map<String, Integer> tagsMap);
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {

@@ -71,7 +71,7 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 	}
 
 	@Override
-	protected Map<String, String> processList(String current_l_id) {
+	protected Map<String, String> processList(String current_l_id, Map<String, Integer> tagsMap) {
 		Map<String, String> variableValueMap = new HashMap<String, String>();
 		Map<String, List<String>> boostValuesMap = new HashMap<String, List<String>>();
 		
@@ -89,6 +89,12 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 				LOGGER.info("No Div Info found for Pid : " + pid);
 				continue;
 			}
+			
+			//populate tagsMap for BrowseTags
+			if(!tagsMap.containsKey(divLnObj.getTag()))
+				tagsMap.put(divLnObj.getTag(), 1);
+			else
+				tagsMap.get((divLnObj.getTag()) + 1);
 			if(divLnBoostVariblesMap.containsKey(divLnObj.getDiv())) {
 				for(String b: divLnBoostVariblesMap.get(divLnObj.getDiv())) {
 					if (boostList.contains(b))

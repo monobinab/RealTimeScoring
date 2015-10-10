@@ -3,7 +3,6 @@ package analytics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.bolt.FlumeRPCBolt;
 import analytics.bolt.LoggingBolt;
 import analytics.bolt.ParsingBoltAAM_Browse;
 import analytics.bolt.RTSKafkaBolt;
