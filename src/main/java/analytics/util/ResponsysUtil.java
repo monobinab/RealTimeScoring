@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -45,6 +46,7 @@ import org.xml.sax.SAXException;
 
 import analytics.util.dao.DivLineBuSubDao;
 import analytics.util.dao.EventsVibesActiveDao;
+import analytics.util.dao.HoldMembersDAO;
 import analytics.util.dao.MemberInfoDao;
 import analytics.util.dao.MemberMDTags2Dao;
 import analytics.util.dao.MemberMDTagsDao;
@@ -85,6 +87,9 @@ public class ResponsysUtil {
 	
 	private XMLResponsysDAO xmlResponsysDAO;
 	
+	private HoldMembersDAO holdMembersDAO;
+	private List<String> holdMembers;
+	
 	//ArrayList<TagMetadata> metaDataList = new ArrayList<TagMetadata>();
 	//ArrayList<String> readyTags = new ArrayList<String>();
 
@@ -111,7 +116,8 @@ public class ResponsysUtil {
 		memberMDTags2Dao = new MemberMDTags2Dao();
 		
 		xmlResponsysDAO=new XMLResponsysDAO();
- 
+		holdMembersDAO=new HoldMembersDAO();
+		holdMembers=holdMembersDAO.getHoldMembersList();
 	}
 	
 	
@@ -444,7 +450,20 @@ public class ResponsysUtil {
 		String xmlWithoutBOM = removeUTF8BOM(customXml);
 	
 		//System.out.println("customXml = " + customXml);
-		StringBuffer strBuff = sendToResponsys(xmlWithoutBOM,memberInfo);
+		
+		//If a member is in hold list, skip the responsys 'SEND' process and add the record with 'F' status to XMLResponsys collection
+		
+		boolean holdEmail=checkinHoldList(lyl_l_id);
+		StringBuffer strBuff=new StringBuffer();
+		String emailstatus="N";
+		if(!holdEmail)
+		{
+			strBuff = sendToResponsys(xmlWithoutBOM,memberInfo);
+		}
+		else
+		{
+			emailstatus="R";
+		}
 		//StringBuffer strBuff = new StringBuffer();
 		
 		//Code to handle timeouts
@@ -453,7 +472,8 @@ public class ResponsysUtil {
 		{
 			String hashedXML = createCustomXml("", memberInfo, customEventName, tagMetadata, l_id, topologyName);
 			String hashxmlWithoutBOM = removeUTF8BOM(hashedXML);
-			xmlResponsysDAO.addXMLResponsys(l_id,hashxmlWithoutBOM,memberInfo.getWinningOptIn(),"N", topologyName);
+			//xmlResponsysDAO.addXMLResponsys(l_id,hashxmlWithoutBOM,memberInfo.getWinningOptIn(),"N", topologyName);
+			xmlResponsysDAO.addXMLResponsys(l_id,hashxmlWithoutBOM,memberInfo.getWinningOptIn(),emailstatus, topologyName);
 			nullifyObjects(hashxmlWithoutBOM, hashedXML);
 		}
 		
@@ -461,7 +481,7 @@ public class ResponsysUtil {
 		//Persist info to Mongo after successfully transmission of message to Oracle.
 		occasionResponsesDao.addOccasionResponse(l_id, memberInfo.getEid(), customEventName, 
 				!topologyName.equalsIgnoreCase("unknownOccasions")?tagMetadata.getPurchaseOccasion():"Unknown", 
-						tagMetadata, strBuff.toString().contains("<success>true</success>") ? "Y" : "N", topologyName);
+						tagMetadata, strBuff.toString().contains("<success>true</success>") ? "Y" : emailstatus, topologyName);
 	
 		LOGGER.info("PERSIST: Winning Tag for Lid: " + lyl_l_id +" : "+tagMetadata.getMdTag());
 		
@@ -474,6 +494,18 @@ public class ResponsysUtil {
 		//return strBuff;
 	}
 	
+	private boolean checkinHoldList(String lyl_l_id) {
+		
+		for(String member: holdMembers) {
+		    if(member.trim().contains(lyl_l_id))
+		       return true;
+		}
+		return false;
+			
+		
+	}
+
+
 	/**
 	 * 
 	 * @param xml
