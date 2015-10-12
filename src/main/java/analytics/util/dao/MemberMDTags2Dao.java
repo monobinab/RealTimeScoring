@@ -23,7 +23,6 @@ public class MemberMDTags2Dao extends AbstractDao {
 	DBCollection memberMDTagsCollection;
 
 	public MemberMDTags2Dao() {
-		// super("server2");
 		super();
 		memberMDTagsCollection = db.getCollection("memberMdTagsWithDates");
 		LOGGER.info("collection in tagMetadataDao: "

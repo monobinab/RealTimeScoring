@@ -24,17 +24,18 @@ public abstract class AbstractDao {
 			LOGGER.info("~~~~~~~~~~~~~~~ABSTRACT DAO~~~~~~~: " + System.getProperty(MongoNameConstants.IS_PROD));
 			MongoDBConnectionWrapper mongoDBConnectionWrapper = MongoDBConnectionWrapper.getInstance();
 			if(mongoDBConnectionWrapper != null){
-				if(StringUtils.isNotEmpty(server) && server.equalsIgnoreCase("default")){
+				//if(StringUtils.isNotEmpty(server) && server.equalsIgnoreCase("default")){
+				if(StringUtils.isNotEmpty(server)){
 					db = mongoDBConnectionWrapper.db1;
 					if(null == db){
 						db = DBConnection.getDBConnection(server);
 					}
-				}if(StringUtils.isNotEmpty(server) && server.equalsIgnoreCase("server2") || server.equalsIgnoreCase("server2_2")){
+				}/*if(StringUtils.isNotEmpty(server) && server.equalsIgnoreCase("static.collections.servers.list")){
 					db = mongoDBConnectionWrapper.db2;
 					if(null == db){
 						db = DBConnection.getDBConnection(server);
 					}
-				}
+				}*/
 			}
 		} catch (Exception e) {
 			LOGGER.error("Unable to get DB connection", e);

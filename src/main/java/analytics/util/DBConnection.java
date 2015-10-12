@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,21 +19,20 @@ public class DBConnection {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DBConnection.class);
 	//private static MongoClient mongoClient;
-	private static String sServerName = "";
+	//private static String sServerName = "";
 	private static String sServerName2 = "";
-	private static String sServerName2_2 = "";
+	//private static String sServerName2_2 = "";
 	private static int sPort = 0;
 	//Write concern
 	private static int writeconcern = 0;
-	private static int writeconcern2 = 0;
-	
 	private static String sDatabaseName = "";
 	private static String sUserName = "";
 	private static String sPassword = "";
+	private static String serversStr = "";
 	
 	//Connection variables for connecting to Mongo2 incase of MemberVariables
-	private static String sDatabaseName2_2 = "";
-	private static String sUserName2_2 = "";
+	/*private static String sDatabaseName2_2 = "";
+	private static String sUserName2_2 = "";*/
 	
 	
 	public static DB getDBConnection() throws ConfigurationException{
@@ -65,20 +65,55 @@ public class DBConnection {
 		}
 
 		try {
-			sServerName2 = properties.getString("server2.name");
-			sPort = Integer.parseInt( properties.getString("port.no"));
-			//sServerName = properties.getString("server.name");
 			
+			sPort = Integer.parseInt( properties.getString("port.no"));
 			sDatabaseName = properties.getString("database.name");
 			sUserName = properties.getString("user.name");
 			sPassword = properties.getString("user.password");
 			
-			//Code to connect to Mongo2 incase of MemberVariables
-			sServerName2_2 = properties.getString("server2_2.name");
-			sDatabaseName2_2 = properties.getString("database2_2.name");
-			sUserName2_2 = properties.getString("user.name2_2");
+			if(server.equals("static.replicaset.listt")){
+				serversStr = properties.getString("static.replicaset.list"); 
+				writeconcern = Integer.parseInt( properties.getString("static.servers.writeconcern"));				
+			}
+			else if(server.equals("default")){
+				serversStr = properties.getString("dynamic.replicaset.list"); 
+				writeconcern = Integer.parseInt( properties.getString("dynamic.servers.writeconcern"));				
+			}
 			
-			//Connection to Mongo Server 2
+			MongoClient mongoClient;
+			List<ServerAddress> serversList = new ArrayList<ServerAddress>();
+			if(StringUtils.isNotBlank(serversStr)){
+				String[] servers = serversStr.split(";");
+				for (String serverUrl : servers) {
+					serversList.add(new ServerAddress(serverUrl, sPort));
+				}
+				
+				if(server.equals("default")){
+					mongoClient	= MongoConnectionHelper.getMongoClientProd1(serversList);					
+				}else{
+					mongoClient	= MongoConnectionHelper.getMongoClientProd2(serversList);
+				}
+				
+				mongoClient.setWriteConcern(new WriteConcern(writeconcern,100));
+				
+				conn = mongoClient.getDB(sDatabaseName);
+				LOGGER.info("Connection is established...."+ mongoClient.getAllAddress() + " " + conn.getName());
+				conn.authenticate(sUserName, sPassword.toCharArray());
+				return conn;
+				
+			}
+			
+			
+			//sServerName2 = properties.getString("server2.name");
+			//sServerName = properties.getString("server.name");
+			
+			
+			//Code to connect to Mongo2 incase of MemberVariables
+			/*sServerName2_2 = properties.getString("server2_2.name");
+			sDatabaseName2_2 = properties.getString("database2_2.name");
+			sUserName2_2 = properties.getString("user.name2_2");*/
+			
+			/*	//Connection to Mongo Server 2
 			if("server2_2".equalsIgnoreCase(server) && sServerName2_2!=null&&!sServerName2_2.isEmpty()){
 				MongoClient mongoClient;
 				String[] servers2_2 = sServerName2_2.split(";");
@@ -87,36 +122,26 @@ public class DBConnection {
 					sServers2_2.add(new ServerAddress(serverurl2_2, sPort));
 				}
 				mongoClient = MongoConnectionHelper.getMongoClientProd2_2(sServers2_2);
+				
 				conn = mongoClient.getDB(sDatabaseName2_2);
 				LOGGER.info("Connection is established ...."+ mongoClient.getAllAddress() + " " + conn.getName());
 				conn.authenticate(sUserName2_2, sPassword.toCharArray());
 				return conn;
-			}
+			}*/
 		
 			//Connection to Mongo Server 8,12 and 13
-			if("server2".equals(server)&&sServerName2!=null&&!sServerName2.isEmpty())
-			{
-				MongoClient mongoClient;
-				String serverlist2 = properties.getString("server2.list"); 
-				List<ServerAddress> sServers2 = new ArrayList<ServerAddress>();
-				writeconcern2 = Integer.parseInt( properties.getString("server2.user.writeconcern"));
-				String[] servers2 = serverlist2.split(";");
-				for (String serverurl2 : servers2) {
-					sServers2.add(new ServerAddress(serverurl2, sPort));
-				}
-				mongoClient	= MongoConnectionHelper.getMongoClientProd2(sServers2);
-				mongoClient.setWriteConcern(new WriteConcern(writeconcern2,100));
-				
-				conn = mongoClient.getDB(sDatabaseName);
-				LOGGER.info("Connection is established...."+ mongoClient.getAllAddress() + " " + conn.getName());
-				conn.authenticate(sUserName, sPassword.toCharArray());
-				return conn;
-			}
+			/*if("server2".equals(server)&&sServerName2!=null&&!sServerName2.isEmpty())*/
 			
-			//Connection to Mongo Server 7,9 and 11
+				
+				
+			
+				
+			
+			
+			/*//Connection to Mongo Server 7,9 and 11
 			else{
 				MongoClient mongoClient;
-				String serverlist = properties.getString("servers.list"); 
+				String serverlist = properties.getString("dynamic.collections.servers.list"); 
 				//Following is the logic to implement write concern.
 				List<ServerAddress> sServers = new ArrayList<ServerAddress>();
 				writeconcern = Integer.parseInt( properties.getString("user.writeconcern"));
@@ -139,7 +164,7 @@ public class DBConnection {
 				conn.authenticate(sUserName, sPassword.toCharArray());
 				return conn;
 				
-			}
+			}*/
 
 		} catch (UnknownHostException e) {
 			LOGGER.error("Mongo host unknown",e);
