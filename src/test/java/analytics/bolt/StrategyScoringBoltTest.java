@@ -159,8 +159,7 @@ public class StrategyScoringBoltTest {
 		//fake changedMemberScores collection with no record in it
 		DBCollection changedMemberScoreColl = db.getCollection("changedMemberScores");
 		DBObject changedMemScoreObj = changedMemberScoreColl.findOne(new BasicDBObject("l_id", l_id));
-		HashMap<String, ChangedMemberScore> changedMemScores70Updated = (HashMap<String, ChangedMemberScore>) changedMemScoreObj
-					.get("70");
+		HashMap<String, ChangedMemberScore> changedMemScores70Updated = (HashMap<String, ChangedMemberScore>) changedMemScoreObj.get("70");
 			// testing the updated changedMemberScore collection
 			Assert.assertEquals("testingLid", changedMemScoreObj.get("l_id"));
 			Assert.assertEquals(0.9999999847700205, changedMemScores70Updated.get("s"));
@@ -179,12 +178,13 @@ public class StrategyScoringBoltTest {
 			
 		//testing the tuple emitted in score_stream of the outputcollector (emitted to Logging Bolt) 
 		List<Object> outputTupleScoreStream = outputCollector.getTuple().get("score_stream");
-		Assert.assertEquals(l_id, outputTupleScoreStream.get(0));
-		Assert.assertEquals(0.9999999847700205, outputTupleScoreStream.get(1));
-		Assert.assertEquals("70", outputTupleScoreStream.get(2));
-		Assert.assertEquals("testingTopology", outputTupleScoreStream.get(3));
-		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), outputTupleScoreStream.get(5));
-		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), outputTupleScoreStream.get(6));
+		List<ChangedMemberScore> changedMemberScores = (List<ChangedMemberScore>)outputTupleScoreStream.get(0);
+		Assert.assertEquals(l_id, changedMemberScores.get(0).getlId());
+		Assert.assertEquals(0.9999999847700205, changedMemberScores.get(0).getScore());
+		Assert.assertEquals("70", changedMemberScores.get(0).getModelId());
+		Assert.assertEquals("testingTopology", changedMemberScores.get(0).getSource());
+		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), changedMemberScores.get(0).getMaxDate());
+		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), changedMemberScores.get(0).getMinDate());
 		
 		//testing the tuple emitted in kafka_stream of the outputcollector (emitted to kafka for TEC to listen to) 
 		//lyl_id_no+"~"+topologyName
@@ -310,12 +310,13 @@ public class StrategyScoringBoltTest {
 			
 		//testing the tuple emitted in score_stream of the outputcollector (emitted to Logging Bolt) 
 		List<Object> outputTupleScoreStream = outputCollector.getTuple().get("score_stream");
-		Assert.assertEquals(l_id, outputTupleScoreStream.get(0));
-		Assert.assertEquals(0.9999999847700205, outputTupleScoreStream.get(1));
-		Assert.assertEquals("70", outputTupleScoreStream.get(2));
-		Assert.assertEquals("testingTopology", outputTupleScoreStream.get(3));
-		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), outputTupleScoreStream.get(5));
-		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), outputTupleScoreStream.get(6));
+		List<ChangedMemberScore> changedMemberScores = (List<ChangedMemberScore>)outputTupleScoreStream.get(0);
+		Assert.assertEquals(l_id, changedMemberScores.get(0).getlId());
+		Assert.assertEquals(0.9999999847700205, changedMemberScores.get(0).getScore());
+		Assert.assertEquals("70", changedMemberScores.get(0).getModelId());
+		Assert.assertEquals("testingTopology", changedMemberScores.get(0).getSource());
+		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), changedMemberScores.get(0).getMaxDate());
+		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), changedMemberScores.get(0).getMinDate());
 		
 		//testing the tuple emitted in kafka_stream of the outputcollector (emitted to kafka for TEC to listen to) 
 		//lyl_id_no+"~"+topologyName
@@ -404,12 +405,13 @@ public class StrategyScoringBoltTest {
 			
 		//testing the tuple emitted in score_stream of the outputcollector (emitted to Logging Bolt) 
 		List<Object> outputTupleScoreStream = outputCollector.getTuple().get("score_stream");
-		Assert.assertEquals(l_id, outputTupleScoreStream.get(0));
-		Assert.assertEquals(0.0, outputTupleScoreStream.get(1));
-		Assert.assertEquals("46", outputTupleScoreStream.get(2));
-		Assert.assertEquals("testingTopology", outputTupleScoreStream.get(3));
-		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(730).toDateMidnight().toDate()), outputTupleScoreStream.get(5));
-		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(730).toDateMidnight().toDate()), outputTupleScoreStream.get(6));
+		List<ChangedMemberScore> changedMemberScores = (List<ChangedMemberScore>)outputTupleScoreStream.get(0);
+		Assert.assertEquals(l_id, changedMemberScores.get(0).getlId());
+		Assert.assertEquals(0.0, changedMemberScores.get(0).getScore());
+		Assert.assertEquals("46", changedMemberScores.get(0).getModelId());
+		Assert.assertEquals("testingTopology", changedMemberScores.get(0).getSource());
+		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(730).toDateMidnight().toDate()), changedMemberScores.get(0).getMaxDate());
+		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(730).toDateMidnight().toDate()), changedMemberScores.get(0).getMinDate());
 		
 		//testing the tuple emitted in kafka_stream of the outputcollector (emitted to kafka for TEC to listen to) 
 		//lyl_id_no+"~"+topologyName
@@ -513,12 +515,13 @@ public class StrategyScoringBoltTest {
 			
 		//testing the tuple emitted in score_stream of the outputcollector (emitted to Logging Bolt) 
 		List<Object> outputTupleScoreStream = outputCollector.getTuple().get("score_stream");
-		Assert.assertEquals(l_id, outputTupleScoreStream.get(0));
-		Assert.assertEquals(0.0, outputTupleScoreStream.get(1));
-		Assert.assertEquals("75", outputTupleScoreStream.get(2));
-		Assert.assertEquals("testingTopology", outputTupleScoreStream.get(3));
-		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), outputTupleScoreStream.get(5));
-		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(730).toDateMidnight().toDate()), outputTupleScoreStream.get(6));
+		List<ChangedMemberScore> changedMemberScores = (List<ChangedMemberScore>)outputTupleScoreStream.get(0);
+		Assert.assertEquals(l_id, changedMemberScores.get(0).getlId());
+		Assert.assertEquals(0.0, changedMemberScores.get(0).getScore());
+		Assert.assertEquals("75", changedMemberScores.get(0).getModelId());
+		Assert.assertEquals("testingTopology", changedMemberScores.get(0).getSource());
+		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), changedMemberScores.get(0).getMinDate());
+		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(730).toDateMidnight().toDate()), changedMemberScores.get(0).getMaxDate());
 		
 		//testing the tuple emitted in kafka_stream of the outputcollector (emitted to kafka for TEC to listen to) 
 		//lyl_id_no+"~"+topologyName
@@ -608,12 +611,13 @@ public class StrategyScoringBoltTest {
 	
 		//testing the tuple emitted in score_stream of the outputcollector (emitted to Logging Bolt) 
 		List<Object> outputTupleScoreStream = outputCollector.getTuple().get("score_stream");
-		Assert.assertEquals(l_id, outputTupleScoreStream.get(0));
-		Assert.assertEquals(0.9975273768433652, outputTupleScoreStream.get(1));
-		Assert.assertEquals("70", outputTupleScoreStream.get(2));
-		Assert.assertEquals("testingTopology", outputTupleScoreStream.get(3));
-		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), outputTupleScoreStream.get(5));
-		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), outputTupleScoreStream.get(6));
+		List<ChangedMemberScore> changedMemberScores = (List<ChangedMemberScore>)outputTupleScoreStream.get(0);
+		Assert.assertEquals(l_id, changedMemberScores.get(0).getlId());
+		Assert.assertEquals(0.9975273768433652, changedMemberScores.get(0).getScore());
+		Assert.assertEquals("70", changedMemberScores.get(0).getModelId());
+		Assert.assertEquals("testingTopology", changedMemberScores.get(0).getSource());
+		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), changedMemberScores.get(0).getMaxDate());
+		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()), changedMemberScores.get(0).getMinDate());
 		
 		//testing the tuple emitted in kafka_stream of the outputcollector (emitted to kafka for TEC to listen to) 
 		//lyl_id_no+"~"+topologyName
