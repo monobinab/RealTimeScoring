@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.util.MongoNameConstants;
+import analytics.util.objects.DivLn;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
@@ -15,7 +16,7 @@ public class DivLnItmDao extends AbstractDao {
     DBCollection divLnItemCollection;
     public DivLnItmDao(){
     	super();
-		divLnItemCollection = db.getCollection("divLnItm");
+		divLnItemCollection = db.getCollection("divLnItmTest");
     }
     
     public String getLnFromDivItem(String div, String item) {
@@ -32,7 +33,23 @@ public class DivLnItmDao extends AbstractDao {
 		if(divLnItm==null || divLnItm.keySet()==null || divLnItm.keySet().isEmpty()) {
 			return null;
 		}
+		//return new DivLn(divLnItm.get(MongoNameConstants.DLI_LN).toString(), divLnItm.get(MongoNameConstants.DLI_TAG).toString());
 		return divLnItm.get(MongoNameConstants.DLI_LN).toString();
 		//System.out.println("  found line: " + line);
+	}
+      
+    public DivLn getLnFromDivItemTag(String div, String item) {
+		
+		BasicDBObject queryLine = new BasicDBObject();
+		queryLine.put(MongoNameConstants.DLI_DIV, div);
+		queryLine.put(MongoNameConstants.DLI_ITEM, item);
+	
+		DBObject divLnItm = divLnItemCollection.findOne(queryLine);
+		//System.out.println("line: " + divLnItm);
+		
+		if(divLnItm==null || divLnItm.keySet()==null || divLnItm.keySet().isEmpty()) {
+			return null;
+		}
+		return new DivLn(div, div+divLnItm.get(MongoNameConstants.DLI_LN).toString(), divLnItm.get(MongoNameConstants.DLI_TAG).toString());
 	}
 }

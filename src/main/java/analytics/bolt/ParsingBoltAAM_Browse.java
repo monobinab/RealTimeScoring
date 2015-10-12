@@ -93,9 +93,10 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 		//populate tagsMap for BrowseTags
 		if(!tagsMap.containsKey(divLnObj.getTag()))
 			tagsMap.put(divLnObj.getTag(), 1);
-		else
-			tagsMap.get((divLnObj.getTag()) + 1);
-		
+		else{
+			int count = (tagsMap.get(divLnObj.getTag())) + 1;
+			tagsMap.put(divLnObj.getTag(), count);
+		}
 		
 		//variableValueMap populating for scoring	
 			if(divLnBoostVariblesMap.containsKey(divLnObj.getDiv())) {

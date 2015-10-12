@@ -3,6 +3,7 @@ package analytics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import analytics.bolt.BrowseCountPersistBolt;
 import analytics.bolt.LoggingBolt;
 import analytics.bolt.ParsingBoltAAM_Browse;
 import analytics.bolt.ParsingSignalBrowseBolt;
@@ -43,6 +44,7 @@ public class SignalBrowseTopology{
 		builder.setBolt("parsingSignalBrowseBolt",new ParsingSignalBrowseBolt(System.getProperty(MongoNameConstants.IS_PROD)), 3)
 				.shuffleGrouping("signalBrowseSpout");
 		builder.setBolt("parsingBoltBrowse", new ParsingBoltAAM_Browse(System.getProperty(MongoNameConstants.IS_PROD), source), 3).shuffleGrouping("parsingSignalBrowseBolt");
+		builder.setBolt("browseCountPersist", new BrowseCountPersistBolt(System.getProperty(MongoNameConstants.IS_PROD), source), 3).shuffleGrouping("parsingBoltBrowse", "browse_tag_stream");
 		builder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System
 				.getProperty(MongoNameConstants.IS_PROD)), 3)
 				.localOrShuffleGrouping("parsingBoltBrowse");

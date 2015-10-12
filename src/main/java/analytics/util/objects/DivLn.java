@@ -11,7 +11,7 @@ public class DivLn{
 			this.div = div;
 			this.ln = ln;
 		}
-		
+				
 		String div;
 		String ln;
 		String tag;

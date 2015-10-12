@@ -1,104 +1,61 @@
 package analytics.util.dao;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import analytics.util.MongoNameConstants;
-import analytics.util.objects.BrowseTag;
 import analytics.util.objects.MemberBrowse;
-
-import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 
 public class MemberBrowseDao extends AbstractDao{
 
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(BoostDao.class);
     DBCollection memberBrowseCollection;
     
     public MemberBrowseDao(){
     	super();
     	memberBrowseCollection = db.getCollection("memberBrowse");
     }
-    
-    /*public MemberBrowse getMemberBrowse(String l_id){
-    	DBObject memberBrowseObj = memberBrowseCollection.findOne(new BasicDBObject("l_id", l_id));
-    	MemberBrowse memberBrowse = null;
-    	if(memberBrowseObj != null ){
-    		memberBrowse = new MemberBrowse();
-    		Map<String, List<BrowseTag>> dateSpecificBrowseTags = new HashMap<String, List<BrowseTag>>();
-    		memberBrowse.setlId((String) memberBrowseObj.get(MongoNameConstants.L_ID));
-    		for (String key : memberBrowseObj.keySet()) {
-    		
-    			if (MongoNameConstants.L_ID.equals(key) || MongoNameConstants.ID.equals(key) ) {
-					continue;
-				}
-    		
-    			else{
-	    			DBObject tagsList = (DBObject) memberBrowseObj.get(key);
-	    			List<BrowseTag> browseTagsList = new ArrayList<BrowseTag>();
-	    			for(String tag : tagsList.keySet()){
-	    				BrowseTag browseTag = new BrowseTag();
-	    				browseTag.setBrowseTag(tag);
-	    				Set<String> feeds = ((DBObject) tagsList.get(tag)).keySet();
-	    				Map<String, Object> feedCountsMap = new HashMap<String, Object>();
-	    				for(String feed : feeds){
-	    					int count =  (Integer) ((DBObject) tagsList.get(tag)).get(feed);
-	    					feedCountsMap.put(feed, (Integer) ((DBObject) tagsList.get(tag)).get(feed));
-	    				}
-	    				browseTag.setFeedCounts(feedCountsMap);
-	    				browseTagsList.add(browseTag);
-	    			}
-	    			dateSpecificBrowseTags.put(key, browseTagsList);
-     			}
-    		}	
-    		memberBrowse.setBrowseTags(dateSpecificBrowseTags);
-    	}
-		return memberBrowse;
-    }*/
-    
-    
-    public MemberBrowse getMemberBrowse(String l_id){
-    	DBObject memberBrowseObj = memberBrowseCollection.findOne(new BasicDBObject("l_id", l_id));
-    	MemberBrowse memberBrowse = null;
-    	if(memberBrowseObj != null ){
-    		memberBrowse = new MemberBrowse();
-    		Map<String, List<BrowseTag>> dateSpecificBrowseTags = new HashMap<String, List<BrowseTag>>();
-    		memberBrowse.setlId((String) memberBrowseObj.get(MongoNameConstants.L_ID));
-    		for (String key : memberBrowseObj.keySet()) {
-    		
-    			if (MongoNameConstants.L_ID.equals(key) || MongoNameConstants.ID.equals(key) ) {
-					continue;
-				}
-    		
-    			else{
-	    			DBObject tagsList = (DBObject) memberBrowseObj.get(key);
-	    			List<BrowseTag> browseTagsList = new ArrayList<BrowseTag>();
-	    			for(String tag : tagsList.keySet()){
-	    				BrowseTag browseTag = new BrowseTag();
-	    				browseTag.setBrowseTag(tag);
-	    				Set<String> feeds = ((DBObject) tagsList.get(tag)).keySet();
-	    				Map<String, Object> feedCountsMap = new HashMap<String, Object>();
-	    				for(String feed : feeds){
-	    					int count =  (Integer) ((DBObject) tagsList.get(tag)).get(feed);
-	    					feedCountsMap.put(feed, (Integer) ((DBObject) tagsList.get(tag)).get(feed));
-	    				}
-	    				browseTag.setFeedCounts(feedCountsMap);
-	    				browseTagsList.add(browseTag);
-	    			}
-	    			dateSpecificBrowseTags.put(key, browseTagsList);
-     			}
-    		}	
-    		memberBrowse.setBrowseTags(dateSpecificBrowseTags);
-    	}
-		return memberBrowse;
+   
+    @SuppressWarnings("unchecked")
+	public MemberBrowse getMemberBrowse(String lId, String date){
+    	MemberBrowse memberBrowse = new MemberBrowse();
+    	memberBrowse.setL_id(lId);
+	    memberBrowse.setDate(date);
+    	 DBObject dbo = memberBrowseCollection.findOne(new BasicDBObject("l_id", lId));
+    	 if(dbo != null){
+	    	 BasicDBObject dbObjToday = (BasicDBObject) dbo.get(date);
+	    	 if(dbObjToday != null)
+	    	 {	
+	    		 Map<String, Map<String, Integer>> browseTagfeedCountsMap = new HashMap<String, Map<String,Integer>>();
+	   	    	 for(String browseTag : dbObjToday.keySet()){
+	    		 Map<String, Integer> feedCountsMap =  (Map<String, Integer>) dbObjToday.get(browseTag);
+	    		 browseTagfeedCountsMap.put(browseTag, feedCountsMap);
+	   	    	}
+	   	      	memberBrowse.setTags(browseTagfeedCountsMap);
+	    	 }
+    	 }
+    	 return memberBrowse;
     }
+    
+	public void updateMemberBrowse( MemberBrowse memberBrowse){
+		BasicDBObject updateRec = new BasicDBObject();
+		BasicDBObject browseTagDbObj = new BasicDBObject();
+		
+		for(String browseTag : memberBrowse.getTags().keySet()){
+			BasicDBObject feedCountdbObj = new BasicDBObject();
+			for(String feedType : memberBrowse.getTags().get(browseTag).keySet()){
+				feedCountdbObj.append(feedType, memberBrowse.getTags().get(browseTag).get(feedType));
+			}
+			browseTagDbObj.append(browseTag, feedCountdbObj);
+		}
+		updateRec.append(memberBrowse.getDate(), browseTagDbObj);
+		if(!updateRec.isEmpty())
+		{
+			memberBrowseCollection.update(new BasicDBObject(MongoNameConstants.L_ID,
+				memberBrowse.getL_id()), new BasicDBObject("$set", updateRec), true,
+				false);
+		}
+	}
 }

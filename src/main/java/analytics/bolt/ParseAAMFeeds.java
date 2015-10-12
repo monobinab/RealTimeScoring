@@ -52,7 +52,7 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
         modelVariablesList = new ArrayList<String>();
      
 		//POPULATE MODEL VARIABLES LIST
-        modelVariablesList =modelVariablesDao.getVariableList();
+        modelVariablesList = modelVariablesDao.getVariableList();
     }
 
 	@Override

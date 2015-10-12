@@ -17,5 +17,9 @@ public class RedisInsert {
 		jedis.rpush(loyId, "00949062000P");
 		jedis.rpush(loyId, "09621914000P");
 		jedis.rpush(loyId, "07149683000P");
+		
+		jedis.rpush(loyId, "00949062000P");
+		jedis.rpush(loyId, "09621914000P");
+		jedis.rpush(loyId, "07149683000P");
 	}
 }
