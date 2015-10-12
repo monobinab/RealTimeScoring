@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,14 +59,17 @@ public class ChangedMemberScoresDao extends AbstractDao{
 		
 	}
 	
-	public void upsertUpdateChangedScores(String lId, List< ChangedMemberScore> changedMemberScoresList) {
+	public void upsertUpdateChangedScores(String lId, List< ChangedMemberScore> changedMemberScoresList, String source) {
 		SimpleDateFormat timestampForMongo = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
 		String timeStamp = timestampForMongo.format(new Date());
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		String today = dateFormat.format(new Date());
 		BasicDBObject updateRec = new BasicDBObject();
-	
+		
 		for(ChangedMemberScore changedMemberScore : changedMemberScoresList){
+			if(StringUtils.isEmpty(changedMemberScore.getSource())){
+				changedMemberScore.setSource(source);
+			}
 			updateRec.append(changedMemberScore.getModelId(), new BasicDBObject()
 							.append(MongoNameConstants.CMS_SCORE, changedMemberScore.getScore())
 							.append(MongoNameConstants.CMS_MIN_EXPIRY_DATE, changedMemberScore.getMinDate() != null?changedMemberScore.getMinDate() : today )

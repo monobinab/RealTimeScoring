@@ -8,6 +8,10 @@ public class ChangedMemberScore {
 	private String source;
 	private String modelId;
 	
+	//Additional parameters to emit to logging bolt
+	private String lId;
+	private String messageID;
+	
 	public ChangedMemberScore(){
 		
 	}
@@ -54,6 +58,16 @@ public class ChangedMemberScore {
 	public void setModelId(String modelId) {
 		this.modelId = modelId;
 	}
-	
-	
+	public String getlId() {
+		return lId;
+	}
+	public void setlId(String lId) {
+		this.lId = lId;
+	}
+	public String getMessageID() {
+		return messageID;
+	}
+	public void setMessageID(String messageID) {
+		this.messageID = messageID;
+	}
 }

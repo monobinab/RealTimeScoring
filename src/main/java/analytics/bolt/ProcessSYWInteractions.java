@@ -46,7 +46,6 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 	private DivLnBoostDao divLnBoostDao;
 	SywApiCalls sywApiCalls;
 	private Map<String, List<String>> divLnBoostVariblesMap;
-	//Map<Integer, Map<Integer, Double>> percentileScores;
 	private BoostDao boostDao;
 	private MemberBoostsDao memberBoostsDao;
 	private MemberScoreDao memberScoreDao;
@@ -83,7 +82,6 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 		feeds.add("SYW_OWN");
 		feeds.add("SYW_WANT");
 		boostListMap = boostDao.getBoostsMap(feeds);// Feed prefix
-		//percentileScores = modelPercentileDao.getModelPercentiles();
 	}
 
 	@Override

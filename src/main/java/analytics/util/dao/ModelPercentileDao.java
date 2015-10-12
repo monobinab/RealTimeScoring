@@ -32,6 +32,8 @@ public class ModelPercentileDao extends AbstractDao{
 	private DBCollection modelPercentileCollection;
     
 	private Cache cache = null;
+	
+	int i = 0;
     
     public ModelPercentileDao() {
     	super();

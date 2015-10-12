@@ -45,7 +45,6 @@ public class SywScoringBolt extends BaseRichBolt {
 	private Map dcBoostModelMap;
 	//TODO: Change this after refactoring
 	private Map boostModelMap;
-	//private Map<Integer, Map<Integer, Double>> modelPercentileMap;
 	private SimpleDateFormat simpleDateFormat;
 	private OutputCollector outputCollector;
 	private List<Integer> monthlyModelsMap;
@@ -75,7 +74,6 @@ public class SywScoringBolt extends BaseRichBolt {
 		modelBoostDao = new ModelSywBoostDao();
 		sywBoostModelMap = modelBoostDao.getVarModelMap();
 		dcBoostModelMap = new DCDao().getDCModelMap();
-		//modelPercentileMap = modelPercentileDao.getModelPercentiles();
 		
 		variableNameToVidMap = new HashMap<String, String>();
 		List<Variable> variables = variableDao.getVariables();
@@ -92,8 +90,6 @@ public class SywScoringBolt extends BaseRichBolt {
 		monthlyModelsMap.add(27);
 		monthlyModelsMap.add(30);
 		monthlyModelsMap.add(59);
-		
-
 	}
 
 	@Override
@@ -104,6 +100,7 @@ public class SywScoringBolt extends BaseRichBolt {
 		countMetric.scope("incoming_record").incr();
 		String lId = input.getStringByField("l_id");
 		String source = input.getStringByField("source");
+		
 		if(source == "DC"){
 			boostModelMap = dcBoostModelMap;
 		}
@@ -174,6 +171,7 @@ public class SywScoringBolt extends BaseRichBolt {
 
 	private Map<Integer, String> insertModelToScoreUpdate(String lId, String source, String messageID, Map<String, Integer> varToCountMap, Map<Integer, String> modelIdToScore,
 			String v, String oldScore, int boostPercetages, int modelId) {
+		
 		if (modelIdToScore == null || modelIdToScore.get(modelId) == null) {
 			// Getting next model since current one does not have score
 			return modelIdToScore;

@@ -619,7 +619,7 @@ public class ScoringSingleton {
 	 */
 		
 	public void updateChangedMemberScore(String l_id, List<ChangedMemberScore> changedMemberScoresList, String source) {
-		changedMemberScoresDao.upsertUpdateChangedScores(l_id, changedMemberScoresList);
+		changedMemberScoresDao.upsertUpdateChangedScores(l_id, changedMemberScoresList, source);
 	}
 
 	public void updateChangedMemberVariables(String lId, Map<String, Change> allChanges) {
