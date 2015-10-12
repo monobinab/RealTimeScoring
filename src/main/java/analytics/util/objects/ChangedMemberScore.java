@@ -1,6 +1,10 @@
 package analytics.util.objects;
 
-public class ChangedMemberScore {
+import java.io.Serializable;
+
+public class ChangedMemberScore implements Serializable{
+	
+	private static final long serialVersionUID = 1L;
 	private double score;
 	private String minDate;
 	private String maxDate;
