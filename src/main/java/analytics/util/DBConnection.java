@@ -71,7 +71,7 @@ public class DBConnection {
 			sUserName = properties.getString("user.name");
 			sPassword = properties.getString("user.password");
 			
-			if(server.equals("static.replicaset.listt")){
+			if(server.equals("static.replicaset.list")){
 				serversStr = properties.getString("static.replicaset.list"); 
 				writeconcern = Integer.parseInt( properties.getString("static.servers.writeconcern"));				
 			}
