@@ -86,9 +86,6 @@ public class LoggingBolt extends EnvironmentBolt {
 					LOGGER.info("PERSIST: " + new Date() + ": Topology: Changes Scores : lid: " + l_id + ", modelId: "+modelId + ", oldScore: "+oldScore +
 							", newScore: "+newScore+", minExpiry: "+minExpiry+", maxExpiry: "+maxExpiry+", source: " + source+", "
 									+ "oldPercentile: " + oldPercentile+", newPercentile: " + newPercentile);
-					System.out.println("PERSIST: " + new Date() + ": Topology: Changes Scores : lid: " + l_id + ", modelId: "+modelId + ", oldScore: "+oldScore +
-							", newScore: "+newScore+", minExpiry: "+minExpiry+", maxExpiry: "+maxExpiry+", source: " + source+", "
-									+ "oldPercentile: " + oldPercentile+", newPercentile: " + newPercentile);
 					redisCountIncr("score_logged");
 					outputCollector.ack(input);	
 				}
