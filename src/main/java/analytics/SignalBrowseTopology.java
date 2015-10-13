@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.bolt.BrowseCountPersistBolt;
+import analytics.bolt.BrowseCountPersistBolt_Old;
 import analytics.bolt.LoggingBolt;
 import analytics.bolt.ParsingBoltAAM_Browse;
 import analytics.bolt.ParsingSignalBrowseBolt;

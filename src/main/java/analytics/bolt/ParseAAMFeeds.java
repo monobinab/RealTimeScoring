@@ -107,7 +107,7 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
     	}
     	redisCountIncr("total_processing");
     	
-    	//emitted to BrowseCountPersistBolt
+    	//emitting to BrowseCountPersistBolt
     	if(!tagsMap.isEmpty()){
     		Object tagsJSON = JsonUtils.createJsonFromStringIntMap(tagsMap);
     		List<Object> listToEmit = new ArrayList<Object>();
