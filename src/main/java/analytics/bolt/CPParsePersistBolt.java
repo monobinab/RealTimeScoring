@@ -112,18 +112,12 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 				memberMDTags2Dao.deleteMemberMDTags(l_id);
 				LOGGER.info("PERSIST: OCCASION DELETE: " + l_id);
 			}
-
-
-			if ( StringUtils.isNotEmpty(tagsString)) {
-				List<Object> listToEmit = new ArrayList<Object>();
-				listToEmit = new ArrayList<Object>();
-				listToEmit.add(lyl_id_no.getAsString());
-				listToEmit.add(l_id);				
-				this.outputCollector.emit(listToEmit);
-			}
-			else{
-				LOGGER.info("PERSIST: No Tags found for lyl_id_no " + lyl_id_no);
-			}
+			
+			List<Object> listToEmit = new ArrayList<Object>();
+			listToEmit = new ArrayList<Object>();
+			listToEmit.add(lyl_id_no.getAsString());
+			listToEmit.add(l_id);				
+			this.outputCollector.emit(listToEmit);			
 			
 			redisCountIncr("output_count");	
 				
