@@ -23,7 +23,7 @@ public class MemberVariablesDao extends AbstractDao {
     DBCollection memberVariablesCollection;
     public MemberVariablesDao(){
     	//Connect to static collections replicaset
-    	super("static.replicaset.list");
+    	super("static");
 		memberVariablesCollection = db.getCollection("memberVariables");
     }
    

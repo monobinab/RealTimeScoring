@@ -16,7 +16,7 @@ public class MemberInfoDao extends AbstractDao {
 	DBCollection memberInfoCollection;
 
 	public MemberInfoDao() {
-		super("static.replicaset.list");
+		super("static");
 		memberInfoCollection = db.getCollection("memberInfo");
 	}
 

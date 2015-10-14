@@ -19,7 +19,7 @@ public class MemberUUIDDao extends AbstractDao{
     DBCollection memberUuidCollection;
     public MemberUUIDDao(){
     	//Connect to static collections replicaset
-    	super("static.replicaset.list");
+    	super("static");
 		memberUuidCollection = db.getCollection("memberUUID");
     }
     

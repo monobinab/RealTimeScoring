@@ -16,27 +16,17 @@ public abstract class AbstractDao {
 	protected DB db;
 
 	public AbstractDao() {
-		this("default");
+		this("dynamic");
 	}
 
 	public AbstractDao(String server) {
 		try {
 			LOGGER.info("~~~~~~~~~~~~~~~ABSTRACT DAO~~~~~~~: " + System.getProperty(MongoNameConstants.IS_PROD));
-			MongoDBConnectionWrapper mongoDBConnectionWrapper = MongoDBConnectionWrapper.getInstance();
-			if(mongoDBConnectionWrapper != null){
-				//if(StringUtils.isNotEmpty(server) && server.equalsIgnoreCase("default")){
-				if(StringUtils.isNotEmpty(server)){
-					db = mongoDBConnectionWrapper.db1;
-					if(null == db){
+			if(StringUtils.isNotEmpty(server)){
+				if(db == null){
 						db = DBConnection.getDBConnection(server);
 					}
-				}/*if(StringUtils.isNotEmpty(server) && server.equalsIgnoreCase("static.collections.servers.list")){
-					db = mongoDBConnectionWrapper.db2;
-					if(null == db){
-						db = DBConnection.getDBConnection(server);
-					}
-				}*/
-			}
+				}
 		} catch (Exception e) {
 			LOGGER.error("Unable to get DB connection", e);
 		}

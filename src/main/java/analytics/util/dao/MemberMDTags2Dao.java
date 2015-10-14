@@ -171,14 +171,14 @@ public class MemberMDTags2Dao extends AbstractDao {
 
 	public void addRtsMemberTags(String l_id, List<String> tags) {
 		Date dNow = new Date();
-		Date tomorrow = new Date(dNow.getTime() + (1000 * 60 * 60 * 24));
+		Date tomorrow = DateUtils.addDays(dNow, 1);
 		SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd");
 		BasicDBObject query = new BasicDBObject();
 		query.put(MongoNameConstants.L_ID, l_id);
 		DBObject doc = memberMDTagsCollection.findOne(new BasicDBObject(
 				MongoNameConstants.L_ID, l_id));
 		BasicDBList rtsTagsList = null;
-		BasicDBList newRtsTagsList = new BasicDBList();
+		//BasicDBList newRtsTagsList = new BasicDBList();
 		BasicDBList mdTagsList = new BasicDBList();
 		BasicDBObject newObj = null;
 		// If there is a document already in the Collection for that Lid
@@ -196,9 +196,12 @@ public class MemberMDTags2Dao extends AbstractDao {
 					newObj.append("f", ft.format(dNow));
 					newObj.append("e", ft.format(tomorrow));
 					if (rtsTagsList == null)
-						rtsTagsList = new BasicDBList();
-					rtsTagsList.add(newObj);
+						rtsTagsList = new BasicDBList();					
 				}
+				newObj.append("f", ft.format(dNow));
+				newObj.append("e", ft.format(tomorrow));
+				rtsTagsList.add(newObj);
+				
 			}
 		}
 		// If there is NO document in the Collection for that Lid
