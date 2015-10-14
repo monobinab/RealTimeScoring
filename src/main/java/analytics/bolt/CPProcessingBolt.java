@@ -1,6 +1,7 @@
 package analytics.bolt;
 
 
+import java.math.BigInteger;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import scala.math.BigInt;
 import analytics.exception.RealTimeScoringException;
 import analytics.util.CPSFiler;
 import analytics.util.MongoNameConstants;
@@ -28,6 +30,10 @@ public class CPProcessingBolt extends EnvironmentBolt  {
 	private RTSAPICaller rtsApiCaller;
 	private static final String cps_api_key_param = "CPS";
 	private CPSFiler cpsFiler;
+	
+	private static BigInteger startLoyalty = new BigInteger("7081010000647509"); 
+	private static BigInteger lastLoyalty = new BigInteger("7081021610457114");
+	
 	public CPProcessingBolt(String env) {
 		super(env);
 	}
@@ -54,7 +60,15 @@ public class CPProcessingBolt extends EnvironmentBolt  {
 			
 		if(input != null && input.contains("lyl_id_no"))
 		{
-			lyl_id_no = input.getStringByField("lyl_id_no");	
+			lyl_id_no = input.getStringByField("lyl_id_no");
+			
+			BigInteger loyaltyID =  new BigInteger(lyl_id_no);
+			
+			if ((loyaltyID.compareTo(startLoyalty) != -1 ) && ((loyaltyID.compareTo(lastLoyalty) != 1))){
+				outputCollector.ack(input);
+				return;
+			}
+			
 			l_id = input.getStringByField("l_id");
 			
 			try{

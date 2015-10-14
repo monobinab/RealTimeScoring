@@ -184,6 +184,7 @@ public class MongoNameConstants {
      public static final String PRIORITY = "priority";
      public static final String DURATION = "duration";
      public static final String TAGEXPIRESIN = "tagExpiresIn";
+     public static final String OCCASIONID = "occasionId";
      
      
 }
