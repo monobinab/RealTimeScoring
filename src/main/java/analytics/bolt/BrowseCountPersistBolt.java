@@ -29,6 +29,8 @@ import backtype.storm.tuple.Tuple;
 
 public class BrowseCountPersistBolt extends EnvironmentBolt{
 	
+	private static final int THRESHOLD = 4;
+	private static final int NUMBER_OF_DAYS = 1;
 	static final Logger LOGGER = LoggerFactory
 			.getLogger(BrowseCountPersistBolt.class);
 	private static final long serialVersionUID = 1L;
@@ -92,7 +94,7 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 		else{
 			Map<String, DateSpecificMemberBrowse> memberBrowseMap = memberBrowse.getMemberBrowse();
 		
-			for(int i=0; i<5; i++){
+			for(int i=0; i<NUMBER_OF_DAYS; i++){
 				Date currentdate = date.minusDays(i).toDateMidnight().toDate();
 				String stringDate = dateFormat.format(currentdate);
 				
@@ -194,15 +196,15 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 
 		
 		List<String> buSubBuList = new ArrayList<String>(); 
-		System.out.println("Previous counts: ");
+		/*System.out.println("Previous counts: ");
 		for(String key: buSubBuCountsMap.keySet()){
 			System.out.println(key +": " + buSubBuCountsMap.get(key));
-		}
+		}*/
 		if(!buSubBuCountsMap.isEmpty()){
 			for(String buSubBu : buSubBuCountsMap.keySet()){
 				int PC = buSubBuCountsMap.get(buSubBu);
 				int IC = incomingBuSubBuMap.get(buSubBu);
-				if(PC < 4 && (PC + IC) >= 4){
+				if(PC < THRESHOLD && (PC + IC) >= THRESHOLD){
 					buSubBuList.add(buSubBu+"7");
 				}
 			}
