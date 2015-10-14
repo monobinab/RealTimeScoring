@@ -1,24 +1,28 @@
 package analytics.util.objects;
 
-import java.util.List;
 import java.util.Map;
 
 public class MemberBrowse {
-
-	private String lId;
-	Map<String, List<BrowseTag>> browseTags;
 	
-	public String getlId() {
-		return lId;
+	private String l_id;
+	
+	public String getL_id() {
+		return l_id;
 	}
-	public void setlId(String lId) {
-		this.lId = lId;
+
+	public void setL_id(String l_id) {
+		this.l_id = l_id;
 	}
-	public Map<String, List<BrowseTag>> getBrowseTags() {
-		return browseTags;
+
+	Map<String, DateSpecificMemberBrowse> memberBrowseMap;
+
+	public Map<String, DateSpecificMemberBrowse> getMemberBrowse() {
+		return memberBrowseMap;
 	}
-	public void setBrowseTags(Map<String, List<BrowseTag>> browseTags) {
-		this.browseTags = browseTags;
+
+	public void setMemberBrowse(
+			Map<String, DateSpecificMemberBrowse> memberBrowseMap) {
+		this.memberBrowseMap = memberBrowseMap;
 	}
 	
 }

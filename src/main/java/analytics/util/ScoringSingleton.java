@@ -34,7 +34,7 @@ import analytics.util.objects.Boost;
 import analytics.util.objects.BrowseTag;
 import analytics.util.objects.Change;
 import analytics.util.objects.ChangedMemberScore;
-import analytics.util.objects.MemberBrowse;
+import analytics.util.objects.DateSpecificMemberBrowse;
 import analytics.util.objects.MemberInfo;
 import analytics.util.objects.MemberRTSChanges;
 import analytics.util.objects.Model;

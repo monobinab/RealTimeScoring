@@ -15,6 +15,7 @@ import com.google.gson.Gson;
 
 import analytics.util.MongoNameConstants;
 import analytics.util.PidMatchUtils;
+import analytics.util.dao.DivLnBuSubBuDao;
 import analytics.util.dao.DivLnVariableDao;
 import analytics.util.dao.MemberBoostsDao;
 import analytics.util.dao.VariableDao;
@@ -31,7 +32,9 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 	private DivLnVariableDao divLnVariableDao;
 	private VariableDao variableDao;
 	private MemberBoostsDao memberBoostsDao;
+	private DivLnBuSubBuDao divLnBuSubBuDao;
 	private HashMap<String, List<String>> divLnBoostVariblesMap;
+	private Map<String, String> divLnBuSubBuMap;
 	private Map<String,Variable>boostMap;
 	private PidMatchUtils pidMatchUtil;
 	private List<String> boostList;
@@ -68,10 +71,13 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 				boostList.add(v.getName());
 			}
 		}
+		
+		divLnBuSubBuDao = new DivLnBuSubBuDao();
+		divLnBuSubBuMap = divLnBuSubBuDao.getDvLnBuSubBu();
 	}
 
 	@Override
-	protected Map<String, String> processList(String current_l_id) {
+	protected Map<String, String> processList(String current_l_id, Map<String, Integer> buSubBuMap) {
 		Map<String, String> variableValueMap = new HashMap<String, String>();
 		Map<String, List<String>> boostValuesMap = new HashMap<String, List<String>>();
 		
@@ -89,6 +95,18 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 				LOGGER.info("No Div Info found for Pid : " + pid);
 				continue;
 			}
+			
+		//populate tagsMap for BrowseTags
+		String buSubBu = divLnBuSubBuMap.get(divLnObj.getDivLn());
+		if(buSubBu != null){
+			if(!buSubBuMap.containsKey(divLnBuSubBuMap.get(divLnObj.getDivLn())))
+				buSubBuMap.put(divLnBuSubBuMap.get(divLnObj.getDivLn()), 1);
+			else{
+				int count = (buSubBuMap.get(divLnBuSubBuMap.get(divLnObj.getDivLn()))) + 1;
+				buSubBuMap.put(divLnBuSubBuMap.get(divLnObj.getDivLn()), count);
+			}
+		}
+		//variableValueMap populating for scoring	
 			if(divLnBoostVariblesMap.containsKey(divLnObj.getDiv())) {
 				for(String b: divLnBoostVariblesMap.get(divLnObj.getDiv())) {
 					if (boostList.contains(b))
@@ -125,43 +143,6 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 			}
 			variableValueMap.put(b, createJsonDoc(allBoostValuesMap.get(b)));
 		}
-		
-		
-			//Map<String, Map<String, Integer>>memberBoostMap = new MemberBoostDao.getMemberBoosts(sourceTopic);
-
-//			if (divLnObj != null) {
-//				// get division and division/line concatenation from query
-//				// results
-//				String div = divLnObj.getDiv();
-//				String divLn = divLnObj.getDivLn();
-//				Collection<String> var = new ArrayList<String>();
-//				if (divLnBoostVariblesMap.containsKey(div)) {
-//					var = divLnBoostVariblesMap.get(div);
-//					for (String v : var) {
-//						if (variableValueMap.containsKey(var)) {
-//							int value = 1 + Integer.valueOf(variableValueMap
-//									.get(v));
-//							variableValueMap.remove(v);
-//							variableValueMap.put(v, String.valueOf(value));
-//						} else {
-//							variableValueMap.put(v, "1");
-//						}
-//					}
-//				}
-//				if (divLnBoostVariblesMap.containsKey(divLn)) {
-//					var = divLnBoostVariblesMap.get(divLn);
-//					for (String v : var) {
-//						if (variableValueMap.containsKey(var)) {
-//							int value = 1 + Integer.valueOf(variableValueMap
-//									.get(v));
-//							variableValueMap.remove(v);
-//							variableValueMap.put(v, String.valueOf(value));
-//						} else {
-//							variableValueMap.put(v, "1");
-//						}
-//					}
-//				}
-//			}
 		return variableValueMap;
 	}
 	
@@ -174,29 +155,10 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 		}.getType();
 		return gson.toJson(dateValuesMap, boostValueType);
 	}
-
-	/*@Override
-	protected String[] splitRec(String webRec) {
-		//TODO: See if other fields in the record are relevant. It was anyway not being used, so made this change
-    	webRec = webRec.replaceAll("[']",""); 
-	        String split[]=StringUtils.split(webRec,",");
-	       
-	        if(split !=null && split.length>0) {
-	        	String [] splits = new String[split.length-2];
-	        	for(int i=0; i<split.length-2; i++){
-	        		splits[i]=split[i+1];
-	        	}
-	            return  splits;
-			}
-			else {
-				return null;
-			}
-		}*/
 	
 	@Override
 	protected String[] splitRec(String webRec) {
-		//TODO: See if other fields in the record are relevant. It was anyway not being used, so made this change
-    	webRec = webRec.replaceAll("[']",""); 
+	   	webRec = webRec.replaceAll("[']",""); 
 	        String split[]=StringUtils.split(webRec,",");
 	       
 	        if(split !=null && split.length>0) {

@@ -16,14 +16,16 @@ public class PidDivLnDao extends AbstractDao{
     DBCollection pidDivLnCollection;
     public PidDivLnDao(){
     	super();
-		pidDivLnCollection = db.getCollection(MongoNameConstants.PID_DIV_LN_COLLECTION);
+		pidDivLnCollection = db.getCollection("pidDivLn");
     }
     public DivLn getDivLnFromPid(String pid){
 		BasicDBObject query = new BasicDBObject();
 		query.put(MongoNameConstants.PDL_PID, pid);
 		DBObject obj = pidDivLnCollection.findOne(query);
 		if (obj!=null) {
-		    return new DivLn(obj.get(MongoNameConstants.PDL_D).toString(),
+		    /*return new DivLn(obj.get(MongoNameConstants.PDL_D).toString(),
+		    		obj.get(MongoNameConstants.PDL_L).toString(), obj.get(MongoNameConstants.PDL_T).toString());*/
+			return new DivLn(obj.get(MongoNameConstants.PDL_D).toString(),
 		    		obj.get(MongoNameConstants.PDL_L).toString());
 		}
 		return null;

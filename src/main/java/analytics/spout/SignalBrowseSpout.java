@@ -73,7 +73,7 @@ public class SignalBrowseSpout extends BaseRichSpout{
 				        listToEmit.add(commonObj);
 						this.collector.emit(listToEmit);
 						listToEmit = null;
-						jedis.del(s);
+				//		jedis.del(s);
 			        }
 
 					s = null;

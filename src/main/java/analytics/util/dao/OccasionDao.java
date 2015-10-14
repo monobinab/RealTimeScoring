@@ -19,7 +19,7 @@ public class OccasionDao extends AbstractDao{
 	private List<OccasionInfo> occasionInfos = new ArrayList<OccasionInfo>();
 	private static OccasionDao occasionDao;
 	
-	private OccasionDao() {
+	public OccasionDao() {
 		super();
 		try {
 			occasionInfos = this.getOccasionsInfo();
