@@ -30,7 +30,7 @@ import backtype.storm.tuple.Tuple;
 public class BrowseCountPersistBolt extends EnvironmentBolt{
 	
 	static final Logger LOGGER = LoggerFactory
-			.getLogger(BrowseCountPersistBolt_Old.class);
+			.getLogger(BrowseCountPersistBolt.class);
 	private static final long serialVersionUID = 1L;
 	protected OutputCollector outputCollector;
 	Map<String, String> sourceMap = new HashMap<String, String>();

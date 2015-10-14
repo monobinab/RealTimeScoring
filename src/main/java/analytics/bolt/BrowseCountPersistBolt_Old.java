@@ -1,4 +1,4 @@
-package analytics.bolt;
+/*package analytics.bolt;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -55,7 +55,7 @@ public class BrowseCountPersistBolt_Old extends EnvironmentBolt{
 		//get the browseTags for today 
 		memberBrowse = memberBrowseDao.getMemberBrowse(l_id, todayDate);
 	
-		/*BrowseTags are created from the incoming feed, if the member does not have browseTags for the required date (today ideally)*/
+		BrowseTags are created from the incoming feed, if the member does not have browseTags for the required date (today ideally)
 		if(memberBrowse.getTags() == null){
 			 Map<String, Map<String, Integer>> browseTagfeedCountsMap = new HashMap<String, Map<String,Integer>>();
 			 for(String browseTag : incomingTagsMap.keySet()){
@@ -97,3 +97,4 @@ public class BrowseCountPersistBolt_Old extends EnvironmentBolt{
 			memberBrowseDao.updateMemberBrowse( memberBrowse);
 		}
 	}
+*/
