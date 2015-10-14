@@ -16,8 +16,7 @@ public class MemberInfoDao extends AbstractDao {
 	DBCollection memberInfoCollection;
 
 	public MemberInfoDao() {
-		super("server2_2");
-		//System.out.println("server2_2");
+		super("static");
 		memberInfoCollection = db.getCollection("memberInfo");
 	}
 

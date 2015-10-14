@@ -242,8 +242,7 @@ public class MemberMDTags2Dao extends AbstractDao {
 		retainedTags = retainPriorityBasedBuSubBuWithinList(tags,occasionPriorityMap);
 		retainedRtsTags = retainPriorityBasedBuSubBuWithinList(rtsTags,occasionPriorityMap);
 		
-		if((retainedTags==null || retainedTags.size()==0) 
-				&& (retainedRtsTags==null || retainedRtsTags.size()==0)){
+		if((retainedTags==null || retainedTags.size()==0) && (retainedRtsTags==null || retainedRtsTags.size()==0)){
 			return null;
 		}
 		else if(retainedRtsTags==null || retainedRtsTags.size()==0){

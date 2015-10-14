@@ -55,7 +55,7 @@ public class PurchaseBolt extends EnvironmentBolt  {
 				try{
 				JsonElement jsonElement = TupleParser.getParsedJson(input);
 				LOGGER.info("PERSIST: Input from PurchaseSpout :" + jsonElement.toString());
-				JsonElement lyl_id_no = jsonElement.getAsJsonObject().get("memberId");
+				JsonElement lyl_id_no = jsonElement.getAsJsonObject().get("lyl_id_no");
 				
 				if (lyl_id_no == null) {
 					LOGGER.error("Invalid incoming json with empty loyalty id");
