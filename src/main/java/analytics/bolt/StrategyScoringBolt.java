@@ -3,7 +3,6 @@ package analytics.bolt;
 import analytics.util.JsonUtils;
 import analytics.util.ScoringSingleton;
 import analytics.util.dao.MemberVariablesDao;
-import analytics.util.dao.caching.CacheStatistics;
 import analytics.util.jedis.JedisFactoryImpl;
 import analytics.util.jedis.JedisFactory;
 import analytics.util.objects.ChangedMemberScore;
@@ -216,7 +215,6 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		declarer.declareStream("kafka_stream", new Fields("message"));
 		
 	}
-
 }
 
 
