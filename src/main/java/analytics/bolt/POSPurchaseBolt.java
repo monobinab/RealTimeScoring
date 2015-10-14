@@ -1,5 +1,8 @@
 package analytics.bolt;
 
+import java.text.ParseException;
+import java.util.HashMap;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +70,8 @@ public class POSPurchaseBolt  extends ResponsysBolt{
 		responsysObj.setValue(value);
 	}
 	
-	public void addRtsMemberTag(String l_id, String rtsTag){}
+	public void addRtsMemberTag(String l_id, String rtsTag, HashMap<String, String> cpsOccasionDurationMap, 
+			HashMap<String, String> cpsOccasionPriorityMap) throws ParseException{}
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {

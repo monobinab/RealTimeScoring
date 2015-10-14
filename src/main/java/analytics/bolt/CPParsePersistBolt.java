@@ -1,6 +1,7 @@
 package analytics.bolt;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import scala.actors.threadpool.Arrays;
 import analytics.util.MongoNameConstants;
 import analytics.util.SecurityUtils;
+import analytics.util.dao.CpsOccasionsDao;
 import analytics.util.dao.MemberMDTags2Dao;
 import analytics.util.dao.TagMetadataDao;
 import analytics.util.dao.TagResponsysActiveDao;
@@ -37,6 +39,9 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 	private TagResponsysActiveDao tagResponsysActiveDao;
 	private MemberMDTags2Dao memberMDTags2Dao;
 	private List<String> activeTags;
+	private CpsOccasionsDao cpsOccasion;
+	private HashMap<String, String> cpsOccasionPriorityMap;
+	private HashMap<String, String> cpsOccasionDurationMap;
 	
 	public CPParsePersistBolt(String env) {
 		super(env);		
@@ -50,6 +55,9 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 		tagsMetaDataDao = new TagMetadataDao();
 		memberMDTags2Dao = new MemberMDTags2Dao();
 		tagResponsysActiveDao = new TagResponsysActiveDao();
+		cpsOccasion = new CpsOccasionsDao();
+		cpsOccasionPriorityMap = cpsOccasion.getcpsOccasionPriority();
+		cpsOccasionDurationMap = cpsOccasion.getcpsOccasionDurations();
 		activeTags= tagResponsysActiveDao.getActiveResponsysTagsList();
 	}
 
@@ -103,9 +111,9 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 			    if(filteredTagsList != null && filteredTagsList.size()>0){
 			    	if(jsonElement.getAsJsonObject().has("tagIdentifier") && 
 			    		 jsonElement.getAsJsonObject().get("tagIdentifier").toString().contains("RTS"))
-			    		memberMDTags2Dao.addRtsMemberTags(l_id, filteredTagsList);
+			    		memberMDTags2Dao.addRtsMemberTags(l_id, filteredTagsList, cpsOccasionDurationMap, cpsOccasionPriorityMap);
 			    	else
-			    		memberMDTags2Dao.addMemberMDTags(l_id, filteredTagsList);
+			    		memberMDTags2Dao.addMemberMDTags(l_id, filteredTagsList, cpsOccasionDurationMap, cpsOccasionPriorityMap);
 			    }			
 			}
 			if(tagsList != null && tagsList.size()==0){

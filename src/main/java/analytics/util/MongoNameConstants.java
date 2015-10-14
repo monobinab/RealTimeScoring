@@ -180,7 +180,11 @@ public class MongoNameConstants {
      public static final String STORE_FORMAT = "f";
      public static final String EMAIL_MODEL_ID = "m";
      
-     //memberBrowse collection
+     //cpsOccasion collection
+     public static final String PRIORITY = "priority";
+     public static final String DURATION = "duration";
+     public static final String TAGEXPIRESIN = "tagExpiresIn";
+     
      
 }
 

@@ -1,6 +1,8 @@
 package analytics.bolt;
 
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -93,10 +95,11 @@ public class UnknownResponsysBolt  extends ResponsysBolt{
 	}
 
 	
-	public void addRtsMemberTag(String l_id, String rtsTag){
+	public void addRtsMemberTag(String l_id, String rtsTag, HashMap<String, String> cpsOccasionDurationMap, 
+				HashMap<String, String> cpsOccasionPriorityMap) throws ParseException{
 		ArrayList<String> rtsTagLst = new ArrayList<String>();
 		rtsTagLst.add(rtsTag);
-		responsysUtil.getMemberMDTags2Dao().addRtsMemberTags(l_id, rtsTagLst);
+		responsysUtil.getMemberMDTags2Dao().addRtsMemberTags(l_id, rtsTagLst, cpsOccasionDurationMap, cpsOccasionPriorityMap);
 	}
 	
 

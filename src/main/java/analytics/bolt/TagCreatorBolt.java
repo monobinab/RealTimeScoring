@@ -139,7 +139,9 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 	public String createTag(ModelScore modelScore, String l_id , int priority) {
 		String tag = modelTagsMap.get(new Integer (modelScore.getModelId()));
 		
-		String mdTag = null;
+		return tag+priority;
+		
+		/*String mdTag = null;
 		//Check if there is an MDTag already in the collection.
 		if (tag != null) {
 			//tag+=priority;
@@ -149,7 +151,7 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 		if(tag != null && mdTag == null)
 			mdTag = tag + priority;
 		
-		return mdTag;
+		return mdTag;*/
 	}
 	
 	private String getMdTagIfExists(String tag, String l_id){
