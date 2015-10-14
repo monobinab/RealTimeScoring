@@ -37,6 +37,8 @@ public class SignalBrowseTopology{
 		TopologyBuilder builder = new TopologyBuilder();
 		String source = TopicConstants.SIGNAL_BROWSE_FEED;
 		String kafkatopic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;
+		String browseKafkaTopic = TopicConstants.BROWSE_KAFKA_TOPIC;
+		
 		builder.setSpout("signalBrowseSpout", new SignalBrowseSpout(System.getProperty(MongoNameConstants.IS_PROD),
 				AuthPropertiesReader.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
 						.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 1);
@@ -45,7 +47,7 @@ public class SignalBrowseTopology{
 		builder.setBolt("parsingSignalBrowseBolt",new ParsingSignalBrowseBolt(System.getProperty(MongoNameConstants.IS_PROD)), 3)
 				.shuffleGrouping("signalBrowseSpout");
 		builder.setBolt("parsingBoltBrowse", new ParsingBoltAAM_Browse(System.getProperty(MongoNameConstants.IS_PROD), source), 3).shuffleGrouping("parsingSignalBrowseBolt");
-		builder.setBolt("browseCountPersist", new BrowseCountPersistBolt(System.getProperty(MongoNameConstants.IS_PROD), source), 3).shuffleGrouping("parsingBoltBrowse", "browse_tag_stream");
+		builder.setBolt("browseCountPersist", new BrowseCountPersistBolt(System.getProperty(MongoNameConstants.IS_PROD), source, "Browse", browseKafkaTopic), 3).shuffleGrouping("parsingBoltBrowse", "browse_tag_stream");
 		builder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System
 				.getProperty(MongoNameConstants.IS_PROD)), 3)
 				.localOrShuffleGrouping("parsingBoltBrowse");
