@@ -3,10 +3,14 @@ package analytics.util.dao.caching;
 import java.util.Date;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.sf.ehcache.Cache;
 
 public class CacheStatistics{
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(CacheStatistics.class);
 	private static CacheStatistics cacheStatistics;
 	
 	public static CacheStatistics getInstance(){
@@ -29,7 +33,7 @@ public class CacheStatistics{
 				.append("Cache Put Count : " + cache.getStatistics().cachePutCount()).append("\n")
 				.append("Cache Remove Count : " + cache.getStatistics().cacheRemoveCount()).append("\n")
 				.append("Cache Heap Size : " + cache.getStatistics().getLocalHeapSize()).append("\n");
-				System.out.println(cacheStatsBuilder.toString());
+				LOGGER.info(cacheStatsBuilder.toString());
 			}
 		}
 	}

@@ -49,7 +49,6 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	private String respHost;
 	private int respPort;
 	JedisFactory jedisInterface;
-	private CacheStatistics cacheStatistics;
 	
 	public JedisFactory getJedisInterface() {
 		return jedisInterface;
@@ -86,7 +85,6 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	  
 	  	topologyName = (String) stormConf.get("metrics_topology");
 	  	scoringSingleton = ScoringSingleton.getInstance();
-	  	cacheStatistics = CacheStatistics.getInstance();
 	  }
 	
 	@SuppressWarnings("unchecked")
@@ -201,7 +199,6 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			this.outputCollector.emit("kafka_stream", listToEmit);
 		
 			redisCountIncr("member_scored_successfully");
-			cacheStatistics.printCacheStatistics();
 			this.outputCollector.ack(input);
 		}catch(Exception e){
 			e.printStackTrace();

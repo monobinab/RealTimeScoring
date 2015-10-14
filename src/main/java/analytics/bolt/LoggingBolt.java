@@ -5,6 +5,7 @@ package analytics.bolt;
 
 import analytics.util.dao.MemberScoreDao;
 import analytics.util.dao.ModelPercentileDao;
+import analytics.util.dao.caching.CacheStatistics;
 import analytics.util.objects.ChangedMemberScore;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -30,6 +31,7 @@ public class LoggingBolt extends EnvironmentBolt {
 	private OutputCollector outputCollector;
 	private MemberScoreDao memberScoreDao;
 	private ModelPercentileDao modelPercentileDao;
+	private CacheStatistics cacheStatistics;
 	
 	public LoggingBolt() {
 	}
@@ -51,6 +53,7 @@ public class LoggingBolt extends EnvironmentBolt {
    		this.outputCollector = collector;
 		memberScoreDao = new MemberScoreDao();
 		modelPercentileDao = new ModelPercentileDao();
+		cacheStatistics = CacheStatistics.getInstance();
 	}
 	
 	/*
@@ -91,6 +94,7 @@ public class LoggingBolt extends EnvironmentBolt {
 				}
 			}
 		}
+		cacheStatistics.printCacheStatistics();
 	}
 
 	/**
