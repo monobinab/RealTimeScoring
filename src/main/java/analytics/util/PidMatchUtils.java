@@ -35,10 +35,10 @@ public class PidMatchUtils{
 			//If PID length equals 12, then it is a Sears product and div and itm_no can be parsed out
 			div = pid.substring(0, 3);
 			item = pid.substring(3, 8);
-			/*divLn = div + divLnItm.getLnFromDivItem(div, item);
-			return new DivLn(div, divLn); */
-			DivLn divLnObj2 = divLnItm.getLnFromDivItemTag(div, item);
-			return divLnObj2;
+			divLn = div + divLnItm.getLnFromDivItem(div, item);
+			return new DivLn(div, divLn); 
+			/*DivLn divLnObj2 = divLnItm.getLnFromDivItemTag(div, item);
+			return divLnObj2;*/
 		}
 		
 		if(pid.length()==14 && pid.contains("CO")){

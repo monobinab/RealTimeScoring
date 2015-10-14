@@ -58,101 +58,157 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 		Map<String, Integer> incomingBuSubBuMap = JsonUtils.restoreTagsListFromJson(input.getString(1));
 		System.out.println(incomingBuSubBuMap);
 		String l_id = input.getStringByField("l_id");
-		MemberBrowse memberBrowse = new MemberBrowse();
-		
-		//get the browseTags for today 
-		memberBrowse = memberBrowseDao.getEntireMemberBrowse(l_id);
-		memberBrowse.setL_id(l_id);
-		Map<String, DateSpecificMemberBrowse> memberBrowseMap = memberBrowse.getMemberBrowse();
-		DateSpecificMemberBrowse dateSpecificMemberBrowse = new DateSpecificMemberBrowse();
-		
-			if(!memberBrowseMap.containsKey(todayDate)){
 			
-				Map<String, Map<String, Integer>> browseBuSubBufeedCountsMap = new HashMap<String, Map<String,Integer>>();
-				 for(String browseTag : incomingBuSubBuMap.keySet()){
-					 Map<String, Integer> newFeedCountsMap = new HashMap<String, Integer>();
-					 newFeedCountsMap.put(sourceMap.get(source), incomingBuSubBuMap.get(browseTag));
-					 browseBuSubBufeedCountsMap.put(browseTag, newFeedCountsMap);
-				 }
-				 dateSpecificMemberBrowse.setBuSubBu(browseBuSubBufeedCountsMap);
-				 memberBrowseMap.put(todayDate, dateSpecificMemberBrowse);
-			}
+		Map<String, Integer> buSubBuCountsMap = new HashMap<String, Integer>();
+	 
+		MemberBrowse memberBrowse = memberBrowseDao.getEntireMemberBrowse(l_id);
+		if(memberBrowse == null ){
+		
+			insertMemberBrowseToday(l_id, incomingBuSubBuMap);
 			
-			else{
-				for(String browseTag : incomingBuSubBuMap.keySet()){
-					 dateSpecificMemberBrowse = memberBrowseMap.get(todayDate);
-					//if the member already had the incoming tag, check whether the current source has a count
-					if(dateSpecificMemberBrowse.getBuSubBu().keySet().contains(browseTag)){
-						Map<String, Integer> feedCountsMap = dateSpecificMemberBrowse.getBuSubBu().get(browseTag);
-						
-						//if the current source has a count, add the incoming tag count to the existing one 
-						if(feedCountsMap.containsKey(sourceMap.get(source))){
-							int count = feedCountsMap.get(sourceMap.get(source)) + incomingBuSubBuMap.get(browseTag);
-							feedCountsMap.put(sourceMap.get(source), count);
-						}
-						
-						//if the current source does not have a count, create a map for it
-						else{
-							feedCountsMap.put(sourceMap.get(source), incomingBuSubBuMap.get(browseTag));
-						}
-					}
-					
-					//if the member does not have the incoming tag, create a document for the tag
-					else{
-						Map<String, Integer> newFeedCountsMap = new HashMap<String, Integer>();
-						newFeedCountsMap.put(sourceMap.get(source), incomingBuSubBuMap.get(browseTag));
-						dateSpecificMemberBrowse.getBuSubBu().put(browseTag, newFeedCountsMap);
-					}
-				}
-			
-			}
-			dateSpecificMemberBrowse.setDate(todayDate);
-			memberBrowseDao.updateMemberBrowse(l_id, dateSpecificMemberBrowse);
-		
-		
-	/*	for(String date :  dateSpecificMemberBrowseMap.keySet()){
-			DateSpecificMemberBrowse dateSpeMbrBrowseObj = dateSpecificMemberBrowseMap.get(date);
-		}
-		
-		BrowseTags are created from the incoming feed, if the member does not have browseTags for the required date (today ideally)
-		if(memberBrowse.getTags() == null){
-			 Map<String, Map<String, Integer>> browseTagfeedCountsMap = new HashMap<String, Map<String,Integer>>();
-			 for(String browseTag : incomingTagsMap.keySet()){
+			/*DateSpecificMemberBrowse dateSpeMemberBrowse = new DateSpecificMemberBrowse();
+			Map<String, Map<String, Integer>> browseBuSubBufeedCountsMap = new HashMap<String, Map<String,Integer>>();
+			 for(String browseBuSubBu : incomingBuSubBuMap.keySet()){
 				 Map<String, Integer> newFeedCountsMap = new HashMap<String, Integer>();
-				 newFeedCountsMap.put(sourceMap.get(source), incomingTagsMap.get(browseTag));
-				 browseTagfeedCountsMap.put(browseTag, newFeedCountsMap);
+				 newFeedCountsMap.put(sourceMap.get(source), incomingBuSubBuMap.get(browseBuSubBu));
+				 browseBuSubBufeedCountsMap.put(browseBuSubBu, newFeedCountsMap);
 			 }
-			 memberBrowse.setTags(browseTagfeedCountsMap);
+			 dateSpeMemberBrowse.setBuSubBu(browseBuSubBufeedCountsMap);
+			 updateMemberBrowse( dateSpeMemberBrowse, l_id);*/
 		}
-		
-		//BrowseTags are updated for the incoming feed, if the member has browseTags for the required date (today)
 		else{
-			for(String browseTag : incomingTagsMap.keySet()){
+			
+			Map<String, DateSpecificMemberBrowse> memberBrowseMap = memberBrowse.getMemberBrowse();
+		
+			for(int i=0; i<5; i++){
+				Date currentdate = date.minusDays(i).toDateMidnight().toDate();
+				String stringDate = dateFormat.format(currentdate);
 				
-				//if the member already had the incoming tag, check whether the current source has a count
-				if(memberBrowse.getTags().keySet().contains(browseTag)){
-					Map<String, Integer> feedCountsMap = memberBrowse.getTags().get(browseTag);
+				if(memberBrowseMap.containsKey(stringDate)){
+					DateSpecificMemberBrowse dateSpecificMemberBrowse = memberBrowseMap.get(stringDate);
 					
-					//if the current source has a count, add the incoming tag count to the existing one 
-					if(feedCountsMap.containsKey(sourceMap.get(source))){
-						int count = feedCountsMap.get(sourceMap.get(source)) + incomingTagsMap.get(browseTag);
-						feedCountsMap.put(sourceMap.get(source), count);
+					for(String buSubBu : incomingBuSubBuMap.keySet()){
+						int pc = 0;
+						if(dateSpecificMemberBrowse.getBuSubBu().containsKey(buSubBu)){
+							Map<String, Integer> feedCountsMap = dateSpecificMemberBrowse.getBuSubBu().get(buSubBu);
+							for(String feed : feedCountsMap.keySet()){
+								pc = pc + feedCountsMap.get(feed);
+							}
+							if(!buSubBuCountsMap.containsKey(buSubBu)){
+								buSubBuCountsMap.put(buSubBu, pc);
+							}
+							else{
+								int count = buSubBuCountsMap.get(buSubBu) + pc;
+								buSubBuCountsMap.put(buSubBu, count);
+							}
+						}
+						
+						else{
+							if(!buSubBuCountsMap.containsKey(buSubBu)){
+								buSubBuCountsMap.put(buSubBu, 0);
+							}
+						}
 					}
-					
-					//if the current source does not have a count, create a map for it
-					else{
-						feedCountsMap.put(sourceMap.get(source), incomingTagsMap.get(browseTag));
-					}
-				}
-				
-				//if the member does not have the incoming tag, create a document for the tag
-				else{
-					Map<String, Integer> newFeedCountsMap = new HashMap<String, Integer>();
-					newFeedCountsMap.put(sourceMap.get(source), incomingTagsMap.get(browseTag));
-					memberBrowse.getTags().put(browseTag, newFeedCountsMap);
 				}
 			}
-		}	
-			memberBrowseDao.updateMemberBrowse( memberBrowse);*/
+				emitToKafka(incomingBuSubBuMap, buSubBuCountsMap);
+				if(memberBrowseMap.containsKey(todayDate)){
+					updateMemberBrowseToday(incomingBuSubBuMap, l_id, memberBrowseMap);
+				}
+				else{
+					insertMemberBrowseToday(l_id, incomingBuSubBuMap);
+				}
+				
 		}
 	}
+
+	private void updateMemberBrowseToday(Map<String, Integer> incomingBuSubBuMap,
+			String l_id, Map<String, DateSpecificMemberBrowse> memberBrowseMap) {
+		if(memberBrowseMap.containsKey(todayDate)){
+		DateSpecificMemberBrowse dateSpecificMemberBrowse = memberBrowseMap.get(todayDate);
+		for(String browseTag : incomingBuSubBuMap.keySet()){
+			//if the member already had the incoming tag, check whether the current source has a count
+			if(dateSpecificMemberBrowse.getBuSubBu().keySet().contains(browseTag)){
+				Map<String, Integer> feedCountsMap = dateSpecificMemberBrowse.getBuSubBu().get(browseTag);
+				
+				//if the current source has a count, add the incoming tag count to the existing one 
+				if(feedCountsMap.containsKey(sourceMap.get(source))){
+					int count = feedCountsMap.get(sourceMap.get(source)) + incomingBuSubBuMap.get(browseTag);
+					feedCountsMap.put(sourceMap.get(source), count);
+				}
+				
+				//if the current source does not have a count, create a map for it
+				else{
+					feedCountsMap.put(sourceMap.get(source), incomingBuSubBuMap.get(browseTag));
+				}
+			}
+			
+			//if the member does not have the incoming tag, create a document for the tag
+			else{
+				Map<String, Integer> newFeedCountsMap = new HashMap<String, Integer>();
+				newFeedCountsMap.put(sourceMap.get(source), incomingBuSubBuMap.get(browseTag));
+				dateSpecificMemberBrowse.getBuSubBu().put(browseTag, newFeedCountsMap);
+			}
+		}
+			updateMemberBrowse( dateSpecificMemberBrowse, l_id);
+		}
+		/*else{
+			DateSpecificMemberBrowse dateSpecificMemberBrowse = new DateSpecificMemberBrowse();
+			Map<String, Map<String, Integer>> browseBuSubBufeedCountsMap = new HashMap<String, Map<String,Integer>>();
+			 for(String browseBuSubBu : incomingBuSubBuMap.keySet()){
+				 Map<String, Integer> newFeedCountsMap = new HashMap<String, Integer>();
+				 newFeedCountsMap.put(sourceMap.get(source), incomingBuSubBuMap.get(browseBuSubBu));
+				 browseBuSubBufeedCountsMap.put(browseBuSubBu, newFeedCountsMap);
+			 }
+		
+			 dateSpecificMemberBrowse.setBuSubBu(browseBuSubBufeedCountsMap);
+			 updateMemberBrowse( dateSpecificMemberBrowse, l_id);
+		}*/
+	}
+	
+	public void insertMemberBrowseToday(String l_id, Map<String, Integer> incomingBuSubBuMap){
+		DateSpecificMemberBrowse dateSpecificMemberBrowse = new DateSpecificMemberBrowse();
+		Map<String, Map<String, Integer>> browseBuSubBufeedCountsMap = new HashMap<String, Map<String,Integer>>();
+		 for(String browseBuSubBu : incomingBuSubBuMap.keySet()){
+			 Map<String, Integer> newFeedCountsMap = new HashMap<String, Integer>();
+			 newFeedCountsMap.put(sourceMap.get(source), incomingBuSubBuMap.get(browseBuSubBu));
+			 browseBuSubBufeedCountsMap.put(browseBuSubBu, newFeedCountsMap);
+		 }
+	
+		 dateSpecificMemberBrowse.setBuSubBu(browseBuSubBufeedCountsMap);
+		 updateMemberBrowse( dateSpecificMemberBrowse, l_id);
+	}
+	
+	public void updateMemberBrowse(DateSpecificMemberBrowse dateSpecificMemberBrowse, String l_id){
+		dateSpecificMemberBrowse.setDate(todayDate);
+		memberBrowseDao.updateMemberBrowse(l_id, dateSpecificMemberBrowse);
+	}
+	
+	public void emitToKafka(Map<String, Integer> incomingBuSubBuMap, Map<String, Integer> buSubBuCountsMap){
+		List<Object> listToEmitToKafka = new ArrayList<Object>(); 
+		if(!buSubBuCountsMap.isEmpty()){
+			for(String buSubBu : buSubBuCountsMap.keySet()){
+				int PC = buSubBuCountsMap.get(buSubBu);
+				int IC = incomingBuSubBuMap.get(buSubBu);
+				if(PC < 4 && (PC + IC) >= 4){
+					listToEmitToKafka.add(buSubBu);
+				}
+			}
+			
+		}
+		
+		else{
+			for(String buSubBu : incomingBuSubBuMap.keySet()){
+				if(incomingBuSubBuMap.get(buSubBu) >= 4){
+					listToEmitToKafka.add(buSubBu);
+				}
+			}
+		}
+		
+		if(!listToEmitToKafka.isEmpty()){
+			//code to kafka
+		}
+		
+	}
+
+}

@@ -14,12 +14,15 @@ public class RedisInsert {
 			jedis.rpush(loyId, Long.toString(System.currentTimeMillis()));
 		}
 	
-		jedis.rpush(loyId, "00949062000P");
+		/*jedis.rpush(loyId, "00949062000P");
 		jedis.rpush(loyId, "09621914000P");
 		jedis.rpush(loyId, "07149683000P");
 		
 		jedis.rpush(loyId, "00949062000P");
 		jedis.rpush(loyId, "09621914000P");
-		jedis.rpush(loyId, "07149683000P");
+		jedis.rpush(loyId, "07149683000P");*/
+		
+		jedis.rpush(loyId, "04684207000P");
+		jedis.rpush(loyId, "02687852000P");
 	}
 }

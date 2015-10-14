@@ -28,7 +28,8 @@ public class DivLn{
 
         public String toString()
         {
-            return " div = "+ div + ", ln = "+ln + ", tag " + tag;
+           /* return " div = "+ div + ", ln = "+ln + ", tag " + tag;*/
+        	 return " div = "+ div + ", ln = "+ln ;
         }
 
 	}

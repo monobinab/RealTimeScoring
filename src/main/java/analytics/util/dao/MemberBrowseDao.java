@@ -45,12 +45,14 @@ public class MemberBrowseDao extends AbstractDao{
     @SuppressWarnings("unchecked")
 	public MemberBrowse getEntireMemberBrowse(String lId){
     	
-    	MemberBrowse entireMemberBrowse = new MemberBrowse();
+    	MemberBrowse entireMemberBrowse = null;
     	Map<String, DateSpecificMemberBrowse> dateSpecificMemberBrowse = new HashMap<String, DateSpecificMemberBrowse>();
     	 DBObject dbo = memberBrowseCollection.findOne(new BasicDBObject("l_id", lId));
-    	 dbo.removeField("_id");
-    	 dbo.removeField("l_id");
+    	
     	 if(dbo != null){
+    		 entireMemberBrowse = new MemberBrowse();
+    		 dbo.removeField("_id");
+        	 dbo.removeField("l_id");
     		 for(String date :  dbo.keySet()){
     			 
     			 BasicDBObject dateSpedbObj = (BasicDBObject) dbo.get(date);

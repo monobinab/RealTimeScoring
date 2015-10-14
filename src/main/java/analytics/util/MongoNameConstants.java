@@ -184,5 +184,10 @@ public class MongoNameConstants {
      
      //memberBrowse collection
      
+     
+     //divLnBuSubBu collection
+     public static final String DIV_LN = "d";
+     public static final String BU_SUBBU = "bsb";
+     
 }
 

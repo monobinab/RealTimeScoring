@@ -16,7 +16,7 @@ public class DivLnItmDao extends AbstractDao {
     DBCollection divLnItemCollection;
     public DivLnItmDao(){
     	super();
-		divLnItemCollection = db.getCollection("divLnItmTest");
+		divLnItemCollection = db.getCollection("divLnItm");
     }
     
     public String getLnFromDivItem(String div, String item) {

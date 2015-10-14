@@ -15,6 +15,7 @@ import com.google.gson.Gson;
 
 import analytics.util.MongoNameConstants;
 import analytics.util.PidMatchUtils;
+import analytics.util.dao.DivLnBuSubBuDao;
 import analytics.util.dao.DivLnVariableDao;
 import analytics.util.dao.MemberBoostsDao;
 import analytics.util.dao.VariableDao;
@@ -31,7 +32,9 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 	private DivLnVariableDao divLnVariableDao;
 	private VariableDao variableDao;
 	private MemberBoostsDao memberBoostsDao;
+	private DivLnBuSubBuDao divLnBuSubBuDao;
 	private HashMap<String, List<String>> divLnBoostVariblesMap;
+	private Map<String, String> divLnBuSubBuMap;
 	private Map<String,Variable>boostMap;
 	private PidMatchUtils pidMatchUtil;
 	private List<String> boostList;
@@ -68,10 +71,13 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 				boostList.add(v.getName());
 			}
 		}
+		
+		divLnBuSubBuDao = new DivLnBuSubBuDao();
+		divLnBuSubBuMap = divLnBuSubBuDao.getDvLnBuSubBu();
 	}
 
 	@Override
-	protected Map<String, String> processList(String current_l_id, Map<String, Integer> tagsMap) {
+	protected Map<String, String> processList(String current_l_id, Map<String, Integer> buSubBuMap) {
 		Map<String, String> variableValueMap = new HashMap<String, String>();
 		Map<String, List<String>> boostValuesMap = new HashMap<String, List<String>>();
 		
@@ -91,13 +97,15 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 			}
 			
 		//populate tagsMap for BrowseTags
-		if(!tagsMap.containsKey(divLnObj.getTag()))
-			tagsMap.put(divLnObj.getTag(), 1);
-		else{
-			int count = (tagsMap.get(divLnObj.getTag())) + 1;
-			tagsMap.put(divLnObj.getTag(), count);
+		String buSubBu = divLnBuSubBuMap.get(divLnObj.getDivLn());
+		if(buSubBu != null){
+			if(!buSubBuMap.containsKey(divLnBuSubBuMap.get(divLnObj.getDivLn())))
+				buSubBuMap.put(divLnBuSubBuMap.get(divLnObj.getDivLn()), 1);
+			else{
+				int count = (buSubBuMap.get(divLnBuSubBuMap.get(divLnObj.getDivLn()))) + 1;
+				buSubBuMap.put(divLnBuSubBuMap.get(divLnObj.getDivLn()), count);
+			}
 		}
-		
 		//variableValueMap populating for scoring	
 			if(divLnBoostVariblesMap.containsKey(divLnObj.getDiv())) {
 				for(String b: divLnBoostVariblesMap.get(divLnObj.getDiv())) {
