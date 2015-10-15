@@ -77,9 +77,10 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 	public void execute(Tuple input) {
 		redisCountIncr("incoming_tuples");
 		Map<String, Integer> incomingBuSubBuMap = JsonUtils.restoreTagsListFromJson(input.getString(1));
-		System.out.println(incomingBuSubBuMap);
+		
 		String l_id = input.getStringByField("l_id");
-			
+		LOGGER.info("Incoming feed for Lid :" + l_id +" are "+incomingBuSubBuMap.toString());
+		
 		Map<String, Integer> buSubBuCountsMap = new HashMap<String, Integer>();
 	 
 		MemberBrowse memberBrowse = memberBrowseDao.getEntireMemberBrowse(l_id);
@@ -225,6 +226,8 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 			mapToBeSend.put("occasionId", 7); //TODO: occasionId hard coded, needs to be picked from the collection
 			mapToBeSend.put("buSubBu", buSubBuList);
 			String jsonToBeSend = new Gson().toJson(mapToBeSend );
+			
+			LOGGER.info("Sending JSON String to Kafka from BrowseCountPersistBolt : " + jsonToBeSend);
 			try {
 				kafkaUtil.sendKafkaMSGs(jsonToBeSend.toString(), browseKafkaTopic);
 			} catch (ConfigurationException e) {
