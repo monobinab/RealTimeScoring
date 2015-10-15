@@ -23,8 +23,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import cpstest.CPOutBoxItem;
-import analytics.util.KafkaUtil;
-import analytics.util.ScoringUtils;
+import analytics.util.KafkaUtil;	
 import analytics.util.dao.CPOutBoxDAO;
 import analytics.util.dao.ChangedMemberScoresDao;
 import analytics.util.dao.MemberScoreDao;
