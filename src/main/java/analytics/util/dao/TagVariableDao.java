@@ -109,7 +109,7 @@ public class TagVariableDao extends AbstractDao {
 		return tagModelMap;
 	}
 	
-/*	public Set<Integer> getModels(){
+	public Set<Integer> getModels(){
 		Set<Integer> models = new HashSet<Integer>();
 		DBCursor cursor = tagVariablesCollection.find();
 		while(cursor.hasNext()){
@@ -118,7 +118,7 @@ public class TagVariableDao extends AbstractDao {
 				models.add((Integer) modelObj.get(MongoNameConstants.TAG_VAR_MODEL));
 		}
 		return models;
-	}*/
+	}
 	
 	public Map<Integer,String> getModelTags(){
 		Map<Integer,String> modelTags = new HashMap<Integer,String>();

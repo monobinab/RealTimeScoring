@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Date;
 
+import analytics.util.objects.ChangedMemberScore;
+import analytics.util.objects.ModelScore;
+
 public class CPOutBoxItem {
 	int email_pkg_id;
 	String loy_id, bu, sub_bu, md_tag, occasion_name;
@@ -15,6 +18,17 @@ public class CPOutBoxItem {
 	String cust_event_name, customer_id, sears_opt_in, kmart_opt_in,
 			syw_opt_in;
     List<String> mdTagList=new ArrayList<String>();
+    List<ModelScore>modelScorePercentiles = new ArrayList<ModelScore>();
+	
+
+	public List<ModelScore> getModelScorePercentiles() {
+		return modelScorePercentiles;
+	}
+
+	public void setModelScorePercentiles(List<ModelScore> modelScorePercentiles) {
+		this.modelScorePercentiles = modelScorePercentiles;
+	}
+
 	public List<String> getMdTagList() {
 		return mdTagList;
 	}
