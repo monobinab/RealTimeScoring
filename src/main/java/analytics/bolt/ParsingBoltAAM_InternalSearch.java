@@ -99,7 +99,7 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
      */
 
 	@Override
-	protected Map<String, String> processList(String current_l_id) {
+	protected Map<String, String> processList(String current_l_id, Map<String, Integer> tagsMap) {
 	    	
     	String queryResultsDoc = new String();
     	Set<String> pidSet = new HashSet<String>();

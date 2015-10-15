@@ -19,6 +19,7 @@ public abstract class AbstractDao {
 		this("dynamic");
 	}
 
+	/**
 	public AbstractDao(String server) {
 		try {
 			LOGGER.info("~~~~~~~~~~~~~~~ABSTRACT DAO~~~~~~~: " + System.getProperty(MongoNameConstants.IS_PROD));
@@ -27,6 +28,32 @@ public abstract class AbstractDao {
 						db = DBConnection.getDBConnection(server);
 					}
 				}
+		} catch (Exception e) {
+			LOGGER.error("Unable to get DB connection", e);
+		}
+	}*/
+	
+	public AbstractDao(String server) {
+		try {
+			LOGGER.info("~~~~~~~~~~~~~~~ABSTRACT DAO~~~~~~~: " + System.getProperty(MongoNameConstants.IS_PROD));
+			//MongoDBConnectionWrapper class is used to take mongodb connections from API, 
+			//please do not modify this code without consulting
+			MongoDBConnectionWrapper mongoDBConnectionWrapper = MongoDBConnectionWrapper.getInstance();
+			if(mongoDBConnectionWrapper != null){
+				if(StringUtils.isNotEmpty(server) && server.equalsIgnoreCase("dynamic")){ 
+					db = mongoDBConnectionWrapper.db1;
+					if(null == db){
+						db = DBConnection.getDBConnection(server);
+					}
+				}if(StringUtils.isNotEmpty(server) && server.equalsIgnoreCase("static")){
+					db = mongoDBConnectionWrapper.db2;
+					if(null == db){
+						db = DBConnection.getDBConnection(server);
+					}
+				}if(StringUtils.isNotEmpty(server) && server.equalsIgnoreCase("mongo2")){
+						db = DBConnection.getDBConnection(server);
+				}
+			}
 		} catch (Exception e) {
 			LOGGER.error("Unable to get DB connection", e);
 		}

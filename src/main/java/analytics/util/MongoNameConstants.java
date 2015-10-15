@@ -36,6 +36,7 @@ public class MongoNameConstants {
 	public static final String PDL_PID="pid";
 	public static final String PDL_D="d";
 	public static final String PDL_L="l";
+	public static final String PDL_T="t";
 	
 	//Div ln var
 	public static final String DLV_DIV="d";
@@ -49,6 +50,7 @@ public class MongoNameConstants {
 	public static final String DLI_DIV="d";
 	public static final String DLI_LN="l";
 	public static final String DLI_ITEM="i";
+	public static final String DLI_TAG="t";
 	
 	//Trait variables
 	public static final String TV_TRAIT="t";
@@ -180,7 +182,17 @@ public class MongoNameConstants {
      public static final String STORE_FORMAT = "f";
      public static final String EMAIL_MODEL_ID = "m";
      
-     //memberBrowse collection
+     //cpsOccasion collection
+     public static final String PRIORITY = "priority";
+     public static final String DURATION = "duration";
+     public static final String TAGEXPIRESIN = "tagExpiresIn";
+     public static final String OCCASIONID = "occasionId";
+     
+     
+     
+     //divLnBuSubBu collection
+     public static final String DIV_LN = "d";
+     public static final String BU_SUBBU = "bsb";
      
 }
 

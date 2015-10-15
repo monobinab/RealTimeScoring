@@ -3,7 +3,6 @@ package analytics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.bolt.FlumeRPCBolt;
 import analytics.bolt.LoggingBolt;
 import analytics.bolt.ParsingBoltAAM_Browse;
 import analytics.bolt.RTSKafkaBolt;
@@ -44,6 +43,7 @@ public class AAM_BrowseTopology {
 		//Sree. Spout that wakes up every 5 mins and process the Traits
 		topologyBuilder.setSpout("browseSpout", new WebHDFSSpout(servers[1], TopicConstants.PORT, Constants.AAM_BROWSER_PATH, "aamBrowser"), 1);
 		topologyBuilder.setBolt("parsingBoltBrowse", new ParsingBoltAAM_Browse(System.getProperty(MongoNameConstants.IS_PROD), topic), 3).shuffleGrouping("browseSpout");
+//		topologyBuilder.setBolt("browseCountPersist", new BrowseCountPersistBolt_Old(System.getProperty(MongoNameConstants.IS_PROD)), 3).shuffleGrouping("parsingBoltBrowse", "browse_tag_stream");
 
 		
 		topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System

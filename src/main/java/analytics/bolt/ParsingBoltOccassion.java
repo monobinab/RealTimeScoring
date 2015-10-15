@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import scala.actors.threadpool.Arrays;
 import analytics.util.SecurityUtils;
+import analytics.util.dao.CpsOccasionsDao;
 import analytics.util.dao.MemberMDTags2Dao;
 import analytics.util.dao.MemberMDTagsDao;
 import analytics.util.objects.TagVariable;
@@ -32,6 +33,9 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 	Map<String, TagVariable> tagVariablesMap = new HashMap<String, TagVariable>();
 	Map<String, String> modelScoreMap = new HashMap<String, String>();
 	private MemberMDTags2Dao memberMDTags2Dao;
+	private CpsOccasionsDao cpsOccasion;
+	private HashMap<String, String> cpsOccasionPriorityMap;
+	private HashMap<String, String> cpsOccasionDurationMap;
 	
 
 	public ParsingBoltOccassion(String systemProperty, String host, int port) {
@@ -54,6 +58,9 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 		this.outputCollector = collector;
 		memberTagDao = new MemberMDTagsDao();
 		memberMDTags2Dao = new MemberMDTags2Dao();
+		cpsOccasion = new CpsOccasionsDao();
+		cpsOccasionPriorityMap = cpsOccasion.getcpsOccasionPriority();
+		cpsOccasionDurationMap = cpsOccasion.getcpsOccasionDurations();
 	}
 
 	@Override
@@ -116,7 +123,7 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 				memberTagDao.addMemberMDTags(l_id, tagsLst);
 				
 				//Write to the mdTags with dates collection as well...
-				memberMDTags2Dao.addMemberMDTags(l_id, tagsLst);
+				memberMDTags2Dao.addMemberMDTags(l_id, tagsLst,cpsOccasionDurationMap,cpsOccasionPriorityMap);
 			}
 			else{
 				memberTagDao.deleteMemberMDTags(l_id);

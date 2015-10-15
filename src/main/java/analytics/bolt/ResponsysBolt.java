@@ -1,5 +1,7 @@
 package analytics.bolt;
 
+import java.text.ParseException;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -7,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import analytics.util.ResponsysUtil;
 import analytics.util.SecurityUtils;
+import analytics.util.dao.CpsOccasionsDao;
 import analytics.util.dao.MemberInfoDao;
 import analytics.util.dao.TagMetadataDao;
 import analytics.util.objects.MemberInfo;
@@ -28,6 +31,9 @@ public abstract class ResponsysBolt  extends EnvironmentBolt{
 	private MemberInfoDao memberInfoDao;
 	private String topologyName;
 	protected Map<Integer, String> tagModelsMap;
+	private CpsOccasionsDao cpsOccasion;
+	private HashMap<String, String> cpsOccasionPriorityMap;
+	private HashMap<String, String> cpsOccasionDurationMap;
 	
 	public ResponsysBolt(String systemProperty) {
 		super(systemProperty);
@@ -44,6 +50,9 @@ public abstract class ResponsysBolt  extends EnvironmentBolt{
 		tagModelsMap = responsysUtil.getTagModelsMap();
 		tagMetadataDao = responsysUtil.getTagMetadataDao();
 		memberInfoDao = responsysUtil.getMemberInfoDao();
+		cpsOccasion = new CpsOccasionsDao();
+		cpsOccasionPriorityMap = cpsOccasion.getcpsOccasionPriority();
+		cpsOccasionDurationMap = cpsOccasion.getcpsOccasionDurations();
 	 }
 
 	@Override
@@ -87,7 +96,7 @@ public abstract class ResponsysBolt  extends EnvironmentBolt{
 
 			responsysUtil.getResponsysServiceResult(responsysObj);
 			
-			addRtsMemberTag(l_id, responsysObj.getTagMetadata().getMdTag());
+			addRtsMemberTag(l_id, responsysObj.getTagMetadata().getMdTag(),cpsOccasionDurationMap, cpsOccasionPriorityMap);
 			
 		    redisCountIncr("data_to_responsys");
 		
@@ -101,7 +110,8 @@ public abstract class ResponsysBolt  extends EnvironmentBolt{
 	
 	protected abstract String process(String lyl_id_no, ResponsysPayload responsysObj, String l_id, MemberInfo memberInfo, String value, String topologyName ) ;
 	
-	protected abstract void addRtsMemberTag(String l_id, String rtsTag);
+	protected abstract void addRtsMemberTag(String l_id, String rtsTag, HashMap<String, String> cpsOccasionDurationMap, 
+			HashMap<String, String> cpsOccasionPriorityMap) throws ParseException;
 	
 
 	@Override
