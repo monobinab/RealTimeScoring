@@ -96,16 +96,14 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 			LOGGER.info("PERSIST: Input Tags for Lid " + lyl_id_no + " : "+ tagsList.toString());
 			
 			if(tagsList != null && tagsList.size()>0){
-				//filter top5% tags that responsys is not ready for.
-				List<String> filteredTagsList = filterResponsysNotReadyTop5PercentTags(lyl_id_no.getAsString(), l_id,tagsList);
 				
-				//Persist filtered MdTags into memberMdTagsWithDates collection
-			    if(filteredTagsList != null && filteredTagsList.size()>0){
+				//Persist MdTags into memberMdTagsWithDates collection
+			    if(tagsList != null && tagsList.size()>0){
 			    	if(jsonElement.getAsJsonObject().has("tagIdentifier") && 
 			    		 jsonElement.getAsJsonObject().get("tagIdentifier").toString().contains("RTS"))
-			    		memberMDTags2Dao.addRtsMemberTags(l_id, filteredTagsList);
+			    		memberMDTags2Dao.addRtsMemberTags(l_id, tagsList);
 			    	else
-			    		memberMDTags2Dao.addMemberMDTags(l_id, filteredTagsList);
+			    		memberMDTags2Dao.addMemberMDTags(l_id, tagsList);
 			    }			
 			}
 			if(tagsList != null && tagsList.size()==0){

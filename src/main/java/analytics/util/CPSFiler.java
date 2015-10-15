@@ -20,6 +20,8 @@ import analytics.util.dao.MemberInfoDao;
 import analytics.util.dao.OccasionDao;
 import analytics.util.dao.OccationCustomeEventDao;
 import analytics.util.dao.OutboxDao;
+import analytics.util.dao.TagMetadataDao;
+import analytics.util.dao.TagResponsysActiveDao;
 import analytics.util.objects.APIResponseMapper;
 import analytics.util.objects.EmailPackage;
 import analytics.util.objects.MemberInfo;
@@ -34,11 +36,16 @@ public class CPSFiler {
 	private OutboxDao outboxDao;
 	private OccasionDao occasionDao;
 	private MemberInfoDao memberInfoDao;
+	private TagResponsysActiveDao tagResponsysActiveDao;
+	private TagMetadataDao tagsMetaDataDao;
+	private List<String> activeTags;
 
 	public void initDAO() throws RealTimeScoringException{
 		outboxDao = new OutboxDao();
-		memberInfoDao = new MemberInfoDao();		
+		memberInfoDao = new MemberInfoDao();
+		tagsMetaDataDao = new TagMetadataDao();
 		occasionDao = OccasionDao.getInstance();
+		activeTags= tagResponsysActiveDao.getActiveResponsysTagsList();
 	}
 	
 	public List<EmailPackage> prepareEmailPackages(String rtsAPIResponse, String lyl_id_no,String l_id) throws JSONException, SQLException, Exception {
@@ -328,19 +335,28 @@ public class CPSFiler {
 					for(ScoresInfo scoresInfo : scoresInfos){
 						if(scoresInfo != null){
 							//Check if the occasion has an mdtag
-							if(StringUtils.isNotBlank(scoresInfo.getMdTag())){
-								TagMetadata tagMetaData = new TagMetadata();
-								tagMetaData.setPurchaseOccassion(scoresInfo.getOccassion());
-								tagMetaData.setBusinessUnit(scoresInfo.getBusinessUnit());
-								tagMetaData.setSubBusinessUnit(scoresInfo.getSubBusinessUnit());
-								tagMetaData.setMdTag(scoresInfo.getMdTag());	
-								mdTagsList.add(tagMetaData);
+							String mdtag = scoresInfo.getMdTag();
+							if(StringUtils.isNotBlank(mdtag)){
+								
+								if(isTop5Percent(mdtag)){
+									if(isOccasionResponsysReady(mdtag))
+									{
+										TagMetadata tagMetaData = new TagMetadata();
+										tagMetaData.setPurchaseOccassion(scoresInfo.getOccassion());
+										tagMetaData.setBusinessUnit(scoresInfo.getBusinessUnit());
+										tagMetaData.setSubBusinessUnit(scoresInfo.getSubBusinessUnit());
+										tagMetaData.setMdTag(scoresInfo.getMdTag());
+										mdTagsList.add(tagMetaData);
+									}
+								}								
+								
 							}								
 						}
 					}
 				}
 			}
-		}	
+		}
+		
 		return mdTagsList;	
 	}
 
@@ -407,6 +423,22 @@ public class CPSFiler {
 			}
         }
 		return emailPackages;
+	}
+	
+	private boolean isOccasionResponsysReady(String mdtag) {
+		return activeTags.contains(mdtag.substring(0, 5));			
+	}
+
+	private boolean isTop5Percent(String mdtag) {
+		TagMetadata tagMetaData = tagsMetaDataDao.getDetails(mdtag);
+		if(tagMetaData != null){
+			//Check for the 6th char of the mdtag to be 8
+			if(tagMetaData.getMdTag().substring(5, 6).equals(MongoNameConstants.top5PercentTag))
+				return true;
+			else
+				return false;			
+		}
+		return false;		
 	}
 	
 	/*public List<EmailPackage> decideSendDates(List<EmailPackage> emailPackages, EmailPackage inProgressPackage) throws SQLException, RealTimeScoringException {
