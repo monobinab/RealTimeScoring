@@ -76,7 +76,7 @@ public class CPProcessingBolt extends EnvironmentBolt  {
 				//20 - level, rtsTOtec is the apikey for internal calls to RTS API from topologies
 				String rtsAPIResponse = rtsApiCaller.getRTSAPIResponse(lyl_id_no, "20", cps_api_key, "sears", Boolean.FALSE, "");
 				List<EmailPackage> emailPackages = cpsFiler.prepareEmailPackages(rtsAPIResponse,lyl_id_no,l_id);
-				LOGGER.info("Tags to be queued to outbox for lyl_id_no " + lyl_id_no+ " : ["+getLogMsg(emailPackages) + "]");
+				LOGGER.info("PERSIST:Tags to be queued to outbox for lyl_id_no " + lyl_id_no+ " : ["+getLogMsg(emailPackages) + "]");
 				
 				if(emailPackages!= null && emailPackages.size()>0)
 				{

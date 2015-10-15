@@ -165,12 +165,19 @@ public class MemberMDTags2Dao extends AbstractDao {
 		tagstoUpdate.put("l_id", l_id);
 		
 		if (tagList.getTags() != null && tagList.getTags().size() > 0)
+		{
 			tagstoUpdate.put("tags", tagList.getTags());
-		if (tagList.getRtsTags() != null && tagList.getRtsTags().size() > 0)
-			tagstoUpdate.put("rtsTags", tagList.getRtsTags());
-		LOGGER.info("Tags are getting updated in "
+			LOGGER.info("PERSIST:mdTags are getting updated in "
 				+ memberMDTagsCollection.getDB().getName()
 				+ " for memberId : '" + l_id + "'");
+		}
+		if (tagList.getRtsTags() != null && tagList.getRtsTags().size() > 0)
+		{
+			tagstoUpdate.put("rtsTags", tagList.getRtsTags());
+			LOGGER.info("PERSIST:rtsTags are getting updated in "
+				+ memberMDTagsCollection.getDB().getName()
+				+ " for memberId : '" + l_id +"'");
+		}
 		memberMDTagsCollection.update(new BasicDBObject(
 				MongoNameConstants.L_ID, l_id), tagstoUpdate, true, false);
 	}
@@ -490,5 +497,6 @@ public class MemberMDTags2Dao extends AbstractDao {
 			}
 		}
 	}
+	
 
 }

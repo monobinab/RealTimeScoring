@@ -84,7 +84,7 @@ public class CPSFiler {
 						
 					}
 				}else{
-				logger.info("There are no valid mdtags for this member: " + lyl_id_no);
+				logger.info("PERSIST:There are no valid mdtags for this member: " + lyl_id_no);
 				}
 				
 				if(emailPackages != null && emailPackages.size() > 0){
@@ -470,17 +470,17 @@ public class CPSFiler {
 		return false;		
 	}
 	
-	private String getLogMsg(List<String> notReadyTags) {
+	private String getLogMsg(List<String> listOfStrings) {
 		String logMsg = "  ";
 		int i =0;
-		for(String tag : notReadyTags)
+		for(String str : listOfStrings)
 		{
 			if (i ==0)
-				logMsg = logMsg.concat(tag);
-			else if ( i == notReadyTags.size()-1)
-				logMsg = logMsg.concat(tag);
+				logMsg = logMsg.concat(str);
+			else if ( i == listOfStrings.size()-1)
+				logMsg = logMsg.concat(str);
 			else
-				logMsg = logMsg.concat(", ").concat(tag);
+				logMsg = logMsg.concat(", ").concat(str);
 		}
 		return logMsg;
 	}
