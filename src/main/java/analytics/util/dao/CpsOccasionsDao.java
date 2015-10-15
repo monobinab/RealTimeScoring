@@ -37,7 +37,7 @@ public class CpsOccasionsDao extends AbstractDao {
 		DBCursor cpsOccasionsCursor = cpsOccasionsCollection.find();
     	for(DBObject cpsOccasionsDBObject: cpsOccasionsCursor) {
     		
-    		String occasion = cpsOccasionsDBObject.get(MongoNameConstants.OCCASION).toString();
+    		String occasion = cpsOccasionsDBObject.get(MongoNameConstants.OCCASIONID).toString();
     		String expDuration =  cpsOccasionsDBObject.get(MongoNameConstants.TAGEXPIRESIN).toString();
     		
     		cpsOccasionDurationsMap.put(occasion, expDuration);
@@ -53,7 +53,7 @@ public class CpsOccasionsDao extends AbstractDao {
     	for(DBObject cpsOccasionsDBObject: cpsOccasionsCursor) {
     		
     		String priority = cpsOccasionsDBObject.get(MongoNameConstants.PRIORITY).toString();
-    		String occasion =  cpsOccasionsDBObject.get(MongoNameConstants.OCCASION).toString();
+    		String occasion =  cpsOccasionsDBObject.get(MongoNameConstants.OCCASIONID).toString();
     		
     		cpsOccasionDurationsMap.put(occasion, priority);
     		
