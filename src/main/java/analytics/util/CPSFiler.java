@@ -87,7 +87,7 @@ public class CPSFiler {
 				logger.info("PERSIST:There are no valid mdtags for this member: " + lyl_id_no);
 				}
 				
-				if(emailPackages != null && emailPackages.size() > 0){
+				if(emailPackages != null ){
 					
 					//ignore sending an emailPackage if it has been sent in the history -( ex: duress > 0 & < 38)
 					List<EmailPackage> emailPackagesToBeSent = this.ignorePackagesSentInHistory(emailPackages);
@@ -322,6 +322,7 @@ public class CPSFiler {
 				if(!emailPackagesToBeSent.get(i).getMdTagMetaData().getMdTag().equals(currentPackages.get(i).getMdTagMetaData().getMdTag()))
 					return false;
 			}
+			
 			
 			return true;			
 	}
