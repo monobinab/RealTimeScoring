@@ -83,14 +83,22 @@ public class TagCreatorBoltTest {
 		//MDTags
 		BasicDBList mdTagsList = new BasicDBList();
 		BasicDBObject tagObj = new BasicDBObject();
-		tagObj.append("t", "SPFTK823600153010");
+/*		tagObj.append("t", "SPFTK823600153010");
 		tagObj.append("f", ft.format(dNow));
-		tagObj.append("e", ft.format(tomorrow));
+		tagObj.append("e", ft.format(tomorrow));*/
+		
+		tagObj.append("t", "CECAS723600153010");
+		tagObj.append("f", "2015-09-30");
+		tagObj.append("e", "2016-03-30");
 		
 		BasicDBObject tagObj2 = new BasicDBObject();
-		tagObj2.append("t", "SPLAS823600153010");
+		/*tagObj2.append("t", "SPLAS823600153010");
 		tagObj2.append("f", ft.format(dNow));
-		tagObj2.append("e", ft.format(dNow));
+		tagObj2.append("e", ft.format(dNow));*/
+		
+		tagObj2.append("t", "CETVS723600153010");
+		tagObj2.append("f", "2015-09-30");
+		tagObj2.append("e", "2016-03-30");
 		
 		/*BasicDBObject tagObj3 = new BasicDBObject();
 		tagObj3.append("t", "SPGMS723600153010");
@@ -216,7 +224,8 @@ public class TagCreatorBoltTest {
 	@Test
 	public void addMemberMdTagsAlreadyExistingTest() throws JSONException, ParseException {
 		List<String> tags = new ArrayList<String>();
-		tags.add("SPGMS523600153010");
+		//tags.add("SPGMS523600153010");
+		tags.add("CETVS823600153010");
 		
 		DBCursor cursor = memberMDTagsWithDatesColl.find(new BasicDBObject("l_id",
 				"OccassionTopologyTestingl_id"));
