@@ -35,10 +35,8 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(CPParsePersistBolt.class);
 	private OutputCollector outputCollector;
-	private TagMetadataDao tagsMetaDataDao;
-	private TagResponsysActiveDao tagResponsysActiveDao;
 	private MemberMDTags2Dao memberMDTags2Dao;
-	private List<String> activeTags;
+
 	private CpsOccasionsDao cpsOccasion;
 	private HashMap<String, String> cpsOccasionPriorityMap;
 	private HashMap<String, String> cpsOccasionDurationMap;
@@ -52,13 +50,9 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 			OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
 		this.outputCollector = collector;
-		tagsMetaDataDao = new TagMetadataDao();
+	
 		memberMDTags2Dao = new MemberMDTags2Dao();
-		tagResponsysActiveDao = new TagResponsysActiveDao();
-		cpsOccasion = new CpsOccasionsDao();
-		cpsOccasionPriorityMap = cpsOccasion.getcpsOccasionPriority();
-		cpsOccasionDurationMap = cpsOccasion.getcpsOccasionDurations();
-		activeTags= tagResponsysActiveDao.getActiveResponsysTagsList();
+
 		cpsOccasion = new CpsOccasionsDao();
 		cpsOccasionPriorityMap = cpsOccasion.getcpsOccasionPriority();
 		cpsOccasionDurationMap = cpsOccasion.getcpsOccasionDurations();
@@ -140,47 +134,6 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 		outputCollector.ack(input);
 	}
 
-	
-	private List<String> filterResponsysNotReadyTop5PercentTags(String lyl_id_no, String l_id, List<String> tagsList) {
-		List<String> filteredTagsLst = new ArrayList<String>();
-		List<String> inactiveTop5TagsLst = new ArrayList<String>();
-		for(String mdtag : tagsList){
-			if(isTop5Percent(mdtag)){
-				if(!isOccasionResponsysReady(mdtag))
-				{
-					inactiveTop5TagsLst.add(mdtag);
-				}
-				else
-					filteredTagsLst.add(mdtag);
-			}
-			else
-				filteredTagsLst.add(mdtag);
-		}
-		//Delete the top5percent mdtags that responsys is not ready for, from mdTagsWithDates collection.
-		if(inactiveTop5TagsLst.size() > 0){
-			LOGGER.info("PERSIST: Removing top5% tags that responsys is not ready for :: MemberId : "+ lyl_id_no + " Tags: " + getLogMsg(inactiveTop5TagsLst));
-			memberMDTags2Dao.deleteMemberMDTags(l_id,inactiveTop5TagsLst);
-		}
-		return filteredTagsLst;
-	}
-
-
-	private boolean isOccasionResponsysReady(String mdtag) {
-		return activeTags.contains(mdtag.substring(0, 5));			
-	}
-
-	private boolean isTop5Percent(String mdtag) {
-		TagMetadata tagMetaData = tagsMetaDataDao.getDetails(mdtag);
-		if(tagMetaData != null){
-			//Check for the 6th char of the mdtag to be 8
-			if(tagMetaData.getMdTag().substring(5, 6).equals(MongoNameConstants.top5PercentTag))
-				return true;
-			else
-				return false;			
-		}
-		return false;		
-	}
-
 	public JsonElement getParsedJson(Tuple input, JsonParser parser)
 			throws JsonSyntaxException {
 		JsonElement jsonElement = parser.parse(input.getString(0));
@@ -215,19 +168,6 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 		declarer.declare(new Fields("lyl_id_no", "l_id"));
 	}
 	
-	private String getLogMsg(List<String> notReadyTags) {
-		String logMsg = "  ";
-		int i =0;
-		for(String tag : notReadyTags)
-		{
-			if (i ==0)
-				logMsg = logMsg.concat(tag);
-			else if ( i == notReadyTags.size()-1)
-				logMsg = logMsg.concat(tag);
-			else
-				logMsg = logMsg.concat(", ").concat(tag);
-		}
-		return logMsg;
-	}
+
 	
 }

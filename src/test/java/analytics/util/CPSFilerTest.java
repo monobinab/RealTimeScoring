@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.RETURNS_SMART_NULLS;
+import static org.junit.matchers.JUnitMatchers.hasItem;
 
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -34,6 +35,8 @@ import analytics.util.CPSFiler;
 import analytics.util.dao.MemberInfoDao;
 import analytics.util.dao.OccasionDao;
 import analytics.util.dao.OutboxDao;
+import analytics.util.dao.TagMetadataDao;
+import analytics.util.dao.TagResponsysActiveDao;
 import analytics.util.objects.EmailPackage;
 import analytics.util.objects.MemberInfo;
 import analytics.util.objects.OccasionInfo;
@@ -51,6 +54,12 @@ public class CPSFilerTest {
 	@Mock
 	private OccasionDao occasionDao;
 	
+	@Mock
+	private TagResponsysActiveDao tagResponsysDao;
+	
+	@Mock
+	private TagMetadataDao tagsMetaDataDao;
+	
 	@InjectMocks
 	private CPSFiler cpsFiler;
 	
@@ -64,6 +73,7 @@ public class CPSFilerTest {
 	private static Date sendDate;
 	private static Date sentDateTime;
 	private static List<String> activeTags;
+	private static List<String> metaDataList;
 	private static List<OccasionInfo> occasionInfos;
 	private static OccasionInfo occasionInfo;
 	private SimpleDateFormat sdformat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
@@ -153,6 +163,8 @@ public class CPSFilerTest {
 		activeTags.add("HAARS");
 		activeTags.add("HACKS");
 		activeTags.add("HAVCS");
+		
+		metaDataList = new ArrayList<String>();
 		
 		occasionInfos = new ArrayList<OccasionInfo>();
 		occasionInfo = new OccasionInfo();
@@ -681,15 +693,34 @@ public class CPSFilerTest {
 		validtags.add("Duress");
 		validtags.add("Replace_by_age");
 		validtags.add("Replace_by_age");
-		validtags.add("Top 5% of MSM");
-		validtags.add("Top 5% of MSM");
+		cpsFiler.setActiveTags(activeTags);
+		TagMetadata tagMetadata1 = new TagMetadata("ODPFS823600153010","Home Appliance","Sears Dishwasher","Top 5% of MSM","ODPFS",91.0,"Y","", 0, 0,30);		
+		TagMetadata tagMetadata2 = new TagMetadata("SPFTS823600153010","Home Appliance","Sears Dishwasher","Top 5% of MSM","SPFTS",91.0,"Y","", 0, 0,30);		
+		when(tagsMetaDataDao.getDetails("ODPFS823600153010")).thenReturn(tagMetadata1);
+		when(tagsMetaDataDao.getDetails("SPFTS823600153010")).thenReturn(tagMetadata2);
 		List<TagMetadata> validOccasionsList = cpsFiler.getValidOccasionsList(resp);
-		Assert.assertNotNull(validOccasionsList);	
-		Assert.assertEquals(validOccasionsList.size(), validtags.size());
-		
 		for(int i=0; i<validOccasionsList.size(); i++){
-			Assert.assertEquals(validtags.get(i), validOccasionsList.get(i).getPurchaseOccasion());			
+			String mdtag = validOccasionsList.get(i).getMdTag();
+			System.out.println(mdtag);
+			
 		}
+		
+		Assert.assertNotNull(validOccasionsList);	
+		Assert.assertEquals(validOccasionsList.size(), validtags.size());		
+		for(int i=0; i<validOccasionsList.size(); i++){
+			String mdtag = validOccasionsList.get(i).getMdTag();
+			System.out.println(mdtag);
+			String occasion = validOccasionsList.get(i).getPurchaseOccasion();
+			Assert.assertEquals(validtags.get(i), occasion);	
+			if(mdtag.equalsIgnoreCase("Top 5% of MSM"))
+			{
+				Assert.assertTrue(activeTags.contains(mdtag.substring(0, 5)));
+				
+			}
+			
+		}
+		
+
 	}
 	
 	
@@ -750,7 +781,12 @@ public class CPSFilerTest {
 		when(occasionDao.getOccasionInfo("Replace_by_age")).thenReturn(this.getOccasionInfo("Replace_by_age"));
 		when(occasionDao.getOccasionInfo("Top 5% of MSM")).thenReturn(this.getOccasionInfo("Top 5% of MSM"));
 		
-		
+		cpsFiler.setActiveTags(activeTags);
+		TagMetadata tagMetadata1 = new TagMetadata("ODPFS823600153010","Home Appliance","Sears Dishwasher","Top 5% of MSM","ODPFS",91.0,"Y","", 0, 0,30);		
+		TagMetadata tagMetadata2 = new TagMetadata("SPFTS823600153010","Home Appliance","Sears Dishwasher","Top 5% of MSM","SPFTS",91.0,"Y","", 0, 0,30);		
+		when(tagsMetaDataDao.getDetails("ODPFS823600153010")).thenReturn(tagMetadata1);
+		when(tagsMetaDataDao.getDetails("SPFTS823600153010")).thenReturn(tagMetadata2);
+	
 		List<EmailPackage> validemails = new ArrayList<EmailPackage>();
 		emailPackages = new ArrayList<EmailPackage>();
 		tagMetadata = new TagMetadata("HARFS111700153010","Home Appliance","Sears Refrigerator","Duress","HARFS",100.0,"Y","", 1, 8,30);		
@@ -788,7 +824,76 @@ public class CPSFilerTest {
 			 sdformat = new SimpleDateFormat("MM/dd/yyyy");
 			 memberInfo = new MemberInfo("13551883","Y","NJ","Y","N","Y");
 			//String resp = "{\"status\":\"success\", \"statusCode\":\"200\", \"memberId\":\"7081035007675781\", \"lastUpdated\":\"2015-07-17 18:40:06\", \"scoresInfo\":[{\"modelId\":\"61\", \"modelName\":\"S_SCR_TV\", \"format\":\"Sears\", \"category\":\"TV Model\", \"tag\":\"0000\",\"mdTag\":\"CETVS823600153010\",\"occassion\":\"Top 5% of MSM\",\"subBusinessUnit\":\"Sears Television\",\"businessUnit\":\"Electronics\",\"scoreDate\":\"2015-08-18\",\"score\":0.002288 ,\"percentile\":95, \"rank\":1},{\"modelId\":\"28\", \"modelName\":\"S_SCR_CE_CAMERA\", \"format\":\"Sears\", \"category\":\"Consumer Electronics - camera\", \"tag\":\"0000\",\"businessUnit\":\"Electronics\",\"scoreDate\":\"2015-08-18\",\"mdTag\":\"CECAS823600153010\",\"occassion\":\"Top 5% of MSM\",\"subBusinessUnit\":\"Sears Camera\",\"score\":0.0005054076 ,\"percentile\":100, \"rank\":2}]}";
-			String resp = "{\"status\":\"success\", \"statusCode\":\"200\", \"memberId\":\"7081010070442369\", \"lastUpdated\":\"2015-09-13 14:28:03\", \"scoresInfo\":[{\"modelId\":\"61\", \"modelName\":\"S_SCR_TV\", \"format\":\"Sears\", \"category\":\"TV Model\", \"tag\":\"0000\",\"mdTag\":\"CETVS723600153010\",\"occassion\":\"Browse\",\"subBusinessUnit\":\"Sears Television\",\"businessUnit\":\"Electronics\",\"scoreDate\":\"2015-09-12\",\"score\":0.0049554 ,\"percentile\":99, \"rank\":1},{\"modelId\":\"53\", \"modelName\":\"S_SCR_MATTRESS\", \"format\":\"Sears\", \"category\":\"Mattress Model\", \"tag\":\"0132\",\"mdTag\":\"HMMTS723600153010\",\"occassion\":\"Browse\",\"subBusinessUnit\":\"Sears Mattress\",\"businessUnit\":\"Home-Big Tickets\",\"scoreDate\":\"2015-09-12\",\"score\":0.0003313 ,\"percentile\":79, \"rank\":2},{\"modelId\":\"28\", \"modelName\":\"S_SCR_CE_CAMERA\", \"format\":\"Sears\", \"category\":\"Consumer Electronics - camera\", \"tag\":\"0000\",\"subBusinessUnit\":\"Sears Camera\",\"businessUnit\":\"Electronics\",\"scoreDate\":\"2015-09-12\",\"mdTag\":\"CECAS723600153010\",\"occassion\":\"Browse\",\"score\":0.0017315591 ,\"percentile\":100, \"rank\":3},{\"modelId\":\"30\", \"modelName\":\"S_SCR_FIT_EQUIP\", \"format\":\"Sears\", \"category\":\"Fitness Equipment Model\", \"tag\":\"0138\",\"businessUnit\":\"Sporting Goods\",\"scoreDate\":\"2015-09-12\",\"mdTag\":\"SPFTS823600153010\",\"occassion\":\"Top 5% of MSM\",\"subBusinessUnit\":\"Sears Fitness\",\"score\":0.4128320604 ,\"percentile\":100, \"rank\":4},{\"modelId\":\"76\", \"modelName\":\"S_SCR_LG_SNOW_BLOWER\", \"format\":\"Sears\", \"category\":\"Lawn & Garden - snow blower\", \"tag\":\"0148\",\"businessUnit\":\"Lawn & Garden\",\"scoreDate\":\"2015-09-12\",\"mdTag\":\"LGSWS823600153010\",\"occassion\":\"Top 5% of MSM\",\"subBusinessUnit\":\"Sears Snowblower\",\"score\":0.1097999375 ,\"percentile\":100, \"rank\":5},{\"modelId\":\"39\", \"modelName\":\"S_SCR_HAND_TOOLS\", \"format\":\"Sears\", \"category\":\"Hand Tools\", \"tag\":\"0252\",\"subBusinessUnit\":\"Sears Hand tools\",\"businessUnit\":\"Tools\",\"scoreDate\":\"2015-09-12\",\"mdTag\":\"TLHTS823600153010\",\"occassion\":\"Top 5% of MSM\",\"score\":0.2427226745 ,\"percentile\":100, \"rank\":6},{\"modelId\":\"63\", \"modelName\":\"S_SCR_WASH_DRY\", \"format\":\"Sears\", \"category\":\"Washer/Dryer Model\", \"tag\":\"0099\",\"mdTag\":\"HALAS823600153010\",\"occassion\":\"Top 5% of MSM\",\"subBusinessUnit\":\"Sears Laundry\",\"businessUnit\":\"Home Appliance\",\"scoreDate\":\"2015-09-12\",\"score\":0.0049481 ,\"percentile\":99, \"rank\":7},{\"modelId\":\"56\", \"modelName\":\"S_SCR_POWER_TOOLS\", \"format\":\"Sears\", \"category\":\"Power Tools Model\", \"tag\":\"0140\",\"occassion\":\"Top 5% of MSM\",\"subBusinessUnit\":\"Sears Power Tools\",\"businessUnit\":\"Tools\",\"scoreDate\":\"2015-09-12\",\"mdTag\":\"TLPTS823600153010\",\"score\":0.026339435 ,\"percentile\":100, \"rank\":8},{\"modelId\":\"58\", \"modelName\":\"S_SCR_TOOL_STRG\", \"format\":\"Sears\", \"category\":\"Tool storage\", \"tag\":\"0186\",\"mdTag\":\"TLTSS823600153010\",\"occassion\":\"Top 5% of MSM\",\"subBusinessUnit\":\"Sears Tool Storage\",\"businessUnit\":\"Tools\",\"scoreDate\":\"2015-09-12\",\"score\":0.0093385 ,\"percentile\":100, \"rank\":9},{\"modelId\":\"54\", \"modelName\":\"S_SCR_OD_GRILL\", \"format\":\"Sears\", \"category\":\"Grill\", \"tag\":\"0251\",\"businessUnit\":\"outdoor Living\",\"scoreDate\":\"2015-09-12\",\"mdTag\":\"ODGRS823600153010\",\"occassion\":\"Top 5% of MSM\",\"subBusinessUnit\":\"Sears Grill\",\"score\":0.0014657085 ,\"percentile\":100, \"rank\":10},{\"modelId\":\"29\", \"modelName\":\"S_SCR_CE_LAPTOP\", \"format\":\"Sears\", \"category\":\"Consumer Electronics - laptop\", \"tag\":\"0000\",\"mdTag\":\"CELPS823600153010\",\"occassion\":\"Top 5% of MSM\",\"subBusinessUnit\":\"Sears Laptop\",\"businessUnit\":\"Electronics\",\"scoreDate\":\"2015-09-12\",\"score\":0.0009827 ,\"percentile\":100, \"rank\":11},{\"modelId\":\"74\", \"modelName\":\"S_SCR_GAME_ROOM\", \"format\":\"Sears\", \"category\":\"Game Room\", \"tag\":\"0000\",\"occassion\":\"Top 5% of MSM\",\"subBusinessUnit\":\"Sears Gameroom\",\"businessUnit\":\"Sporting Goods\",\"scoreDate\":\"2015-09-12\",\"mdTag\":\"SPGMS823600153010\",\"score\":0.0006694 ,\"percentile\":99, \"rank\":12},{\"modelId\":\"34\", \"modelName\":\"S_SCR_HA_ALL\", \"format\":\"Sears\", \"category\":\"Home Appliance\", \"tag\":\"0208\",\"score\":0.1016076054 ,\"percentile\":100, \"rank\":13},{\"modelId\":\"51\", \"modelName\":\"S_SCR_LG_TRIM_EDG\", \"format\":\"Sears\", \"category\":\"Trimmer Model\", \"tag\":\"0161\",\"score\":0.2598379892 ,\"percentile\":100, \"rank\":14},{\"modelId\":\"62\", \"modelName\":\"S_SCR_WAPP\", \"format\":\"Sears\", \"category\":\"Womens Apparel\", \"tag\":\"0126\",\"score\":0.6453446403 ,\"percentile\":100, \"rank\":15},{\"modelId\":\"44\", \"modelName\":\"S_SCR_KAPP\", \"format\":\"Sears\", \"category\":\"Kids apparel\", \"tag\":\"0122\",\"score\":0.3151331 ,\"percentile\":100, \"rank\":16},{\"modelId\":\"52\", \"modelName\":\"S_SCR_MAPP\", \"format\":\"Sears\", \"category\":\"Mens apparel\", \"tag\":\"0124\",\"score\":0.2157557 ,\"percentile\":100, \"rank\":17},{\"modelId\":\"21\", \"modelName\":\"S_SCR_ALL_APP\", \"format\":\"Sears\", \"category\":\"Apparel\", \"tag\":\"0145\",\"score\":0.4596802 ,\"percentile\":100, \"rank\":18},{\"modelId\":\"27\", \"modelName\":\"S_SCR_CE\", \"format\":\"Sears\", \"category\":\"Consumer Electronics\", \"tag\":\"0127\",\"score\":0.3432151309 ,\"percentile\":100, \"rank\":19},{\"modelId\":\"59\", \"modelName\":\"S_SCR_TOOLS\", \"format\":\"Sears\", \"category\":\"Tools\", \"tag\":\"0143\",\"score\":0.2582408343 ,\"percentile\":100, \"rank\":20}]}";		
+			String resp = "{\"status\":\"success\", \"statusCode\":\"200\", \"memberId\":\"7081010070442369\", \"lastUpdated\":\"2015-09-13 14:28:03\", \"scoresInfo\":"
+					+ "[{\"modelId\":\"61\", \"modelName\":\"S_SCR_TV\", \"format\":\"Sears\", "
+					+ "\"category\":\"TV Model\", \"tag\":\"0000\",\"mdTag\":\"CETVS723600153010\",\"occassion\":\"Browse\","
+					+ "\"subBusinessUnit\":\"Sears Television\",\"businessUnit\":\"Electronics\","
+					+ "\"scoreDate\":\"2015-09-12\",\"score\":0.0049554 ,\"percentile\":99, \"rank\":1},"
+					+ "{\"modelId\":\"53\", \"modelName\":\"S_SCR_MATTRESS\", \"format\":\"Sears\", "
+					+ "\"category\":\"Mattress Model\", \"tag\":\"0132\",\"mdTag\":\"HMMTS723600153010\",\"occassion\":\"Browse\","
+					+ "\"subBusinessUnit\":\"Sears Mattress\",\"businessUnit\":\"Home-Big Tickets\","
+					+ "\"scoreDate\":\"2015-09-12\",\"score\":0.0003313 ,\"percentile\":79, \"rank\":2},"
+					+ "{\"modelId\":\"28\", \"modelName\":\"S_SCR_CE_CAMERA\", \"format\":\"Sears\","
+					+ " \"category\":\"Consumer Electronics - camera\", \"tag\":\"0000\",\"subBusinessUnit\":\"Sears Camera\","
+					+ "\"businessUnit\":\"Electronics\",\"scoreDate\":\"2015-09-12\",\"mdTag\":\"CECAS723600153010\","
+					+ "\"occassion\":\"Browse\",\"score\":0.0017315591 ,\"percentile\":100, \"rank\":3},"
+					+ "{\"modelId\":\"30\", \"modelName\":\"S_SCR_FIT_EQUIP\", \"format\":\"Sears\", "
+					+ "\"category\":\"Fitness Equipment Model\", \"tag\":\"0138\",\"businessUnit\":\"Sporting Goods\","
+					+ "\"scoreDate\":\"2015-09-12\",\"mdTag\":\"SPFTS823600153010\",\"occassion\":\"Top 5% of MSM\","
+					+ "\"subBusinessUnit\":\"Sears Fitness\",\"score\":0.4128320604 ,\"percentile\":100, \"rank\":4},"
+					+ "{\"modelId\":\"76\", \"modelName\":\"S_SCR_LG_SNOW_BLOWER\", \"format\":\"Sears\","
+					+ " \"category\":\"Lawn & Garden - snow blower\", \"tag\":\"0148\",\"businessUnit\":\"Lawn & Garden\","
+					+ "\"scoreDate\":\"2015-09-12\",\"mdTag\":\"LGSWS823600153010\",\"occassion\":\"Top 5% of MSM\","
+					+ "\"subBusinessUnit\":\"Sears Snowblower\",\"score\":0.1097999375 ,\"percentile\":100, \"rank\":5},"
+					+ "{\"modelId\":\"39\", \"modelName\":\"S_SCR_HAND_TOOLS\", \"format\":\"Sears\","
+					+ " \"category\":\"Hand Tools\", \"tag\":\"0252\",\"subBusinessUnit\":\"Sears Hand tools\","
+					+ "\"businessUnit\":\"Tools\",\"scoreDate\":\"2015-09-12\",\"mdTag\":\"TLHTS823600153010\","
+					+ "\"occassion\":\"Top 5% of MSM\",\"score\":0.2427226745 ,\"percentile\":100, \"rank\":6},"
+					+ "{\"modelId\":\"63\", \"modelName\":\"S_SCR_WASH_DRY\", \"format\":\"Sears\", "
+					+ "\"category\":\"Washer/Dryer Model\", \"tag\":\"0099\",\"mdTag\":\"HALAS823600153010\","
+					+ "\"occassion\":\"Top 5% of MSM\",\"subBusinessUnit\":\"Sears Laundry\","
+					+ "\"businessUnit\":\"Home Appliance\",\"scoreDate\":\"2015-09-12\",\"score\":0.0049481 ,\"percentile\":99, \"rank\":7},"
+					+ "{\"modelId\":\"56\", \"modelName\":\"S_SCR_POWER_TOOLS\", \"format\":\"Sears\", "
+					+ "\"category\":\"Power Tools Model\", \"tag\":\"0140\",\"occassion\":\"Top 5% of MSM\","
+					+ "\"subBusinessUnit\":\"Sears Power Tools\",\"businessUnit\":\"Tools\",\"scoreDate\":\"2015-09-12\","
+					+ "\"mdTag\":\"TLPTS823600153010\",\"score\":0.026339435 ,\"percentile\":100, \"rank\":8},"
+					+ "{\"modelId\":\"58\", \"modelName\":\"S_SCR_TOOL_STRG\", \"format\":\"Sears\", "
+					+ "\"category\":\"Tool storage\", \"tag\":\"0186\",\"mdTag\":\"TLTSS823600153010\","
+					+ "\"occassion\":\"Top 5% of MSM\",\"subBusinessUnit\":\"Sears Tool Storage\","
+					+ "\"businessUnit\":\"Tools\",\"scoreDate\":\"2015-09-12\",\"score\":0.0093385 ,"
+					+ "\"percentile\":100, \"rank\":9},{\"modelId\":\"54\", \"modelName\":\"S_SCR_OD_GRILL\", "
+					+ "\"format\":\"Sears\", \"category\":\"Grill\", \"tag\":\"0251\","
+					+ "\"businessUnit\":\"outdoor Living\",\"scoreDate\":\"2015-09-12\","
+					+ "\"mdTag\":\"ODGRS823600153010\",\"occassion\":\"Top 5% of MSM\","
+					+ "\"subBusinessUnit\":\"Sears Grill\",\"score\":0.0014657085 ,"
+					+ "\"percentile\":100, \"rank\":10},"
+					+ "{\"modelId\":\"29\", \"modelName\":\"S_SCR_CE_LAPTOP\", \"format\":\"Sears\", "
+					+ "\"category\":\"Consumer Electronics - laptop\", \"tag\":\"0000\",\"mdTag\":\"CELPS823600153010\","
+					+ "\"occassion\":\"Top 5% of MSM\",\"subBusinessUnit\":\"Sears Laptop\","
+					+ "\"businessUnit\":\"Electronics\",\"scoreDate\":\"2015-09-12\",\"score\":0.0009827 ,"
+					+ "\"percentile\":100, \"rank\":11},{\"modelId\":\"74\", \"modelName\":\"S_SCR_GAME_ROOM\","
+					+ " \"format\":\"Sears\", \"category\":\"Game Room\", \"tag\":\"0000\","
+					+ "\"occassion\":\"Top 5% of MSM\",\"subBusinessUnit\":\"Sears Gameroom\","
+					+ "\"businessUnit\":\"Sporting Goods\",\"scoreDate\":\"2015-09-12\","
+					+ "\"mdTag\":\"SPGMS823600153010\",\"score\":0.0006694 ,\"percentile\":99, \"rank\":12},"
+					+ "{\"modelId\":\"34\", \"modelName\":\"S_SCR_HA_ALL\", \"format\":\"Sears\","
+					+ " \"category\":\"Home Appliance\", \"tag\":\"0208\",\"score\":0.1016076054 ,"
+					+ "\"percentile\":100, \"rank\":13},{\"modelId\":\"51\", \"modelName\":\"S_SCR_LG_TRIM_EDG\", "
+					+ "\"format\":\"Sears\", \"category\":\"Trimmer Model\", \"tag\":\"0161\","
+					+ "\"score\":0.2598379892 ,\"percentile\":100, \"rank\":14},"
+					+ "{\"modelId\":\"62\", \"modelName\":\"S_SCR_WAPP\", \"format\":\"Sears\", "
+					+ "\"category\":\"Womens Apparel\", \"tag\":\"0126\",\"score\":0.6453446403 ,"
+					+ "\"percentile\":100, \"rank\":15},{\"modelId\":\"44\", \"modelName\":\"S_SCR_KAPP\", "
+					+ "\"format\":\"Sears\", \"category\":\"Kids apparel\", \"tag\":\"0122\",\"score\":0.3151331 ,"
+					+ "\"percentile\":100, \"rank\":16},{\"modelId\":\"52\", \"modelName\":\"S_SCR_MAPP\", "
+					+ "\"format\":\"Sears\", \"category\":\"Mens apparel\", \"tag\":\"0124\",\"score\":0.2157557 ,"
+					+ "\"percentile\":100, \"rank\":17},{\"modelId\":\"21\", \"modelName\":\"S_SCR_ALL_APP\", "
+					+ "\"format\":\"Sears\", \"category\":\"Apparel\", \"tag\":\"0145\",\"score\":0.4596802 ,"
+					+ "\"percentile\":100, \"rank\":18},{\"modelId\":\"27\", \"modelName\":\"S_SCR_CE\", "
+					+ "\"format\":\"Sears\", \"category\":\"Consumer Electronics\", \"tag\":\"0127\","
+					+ "\"score\":0.3432151309 ,\"percentile\":100, \"rank\":19},{\"modelId\":\"59\", "
+					+ "\"modelName\":\"S_SCR_TOOLS\", \"format\":\"Sears\", \"category\":\"Tools\", "
+					+ "\"tag\":\"0143\",\"score\":0.2582408343 ,\"percentile\":100, \"rank\":20}]}";		
 		
 			when(memberInfoDao.getMemberInfo(anyString())).thenReturn(memberInfo);
 			when(occasionDao.getOccasionsInfo()).thenReturn(occasionInfos);
@@ -903,7 +1008,25 @@ public class CPSFilerTest {
 			emailPackage.setMemberInfo(memberInfo);	
 			emailPackages.add(emailPackage);
 			*/
+			cpsFiler.setActiveTags(activeTags);
+			TagMetadata tagMetadata1 = new TagMetadata("SPFTS823600153010","Home Appliance","Sears Dishwasher","Top 5% of MSM","SPFTS",91.0,"Y","", 0, 0,30);		
+			TagMetadata tagMetadata2 = new TagMetadata("LGSWS823600153010","Home Appliance","Sears Dishwasher","Top 5% of MSM","LGSWS",91.0,"Y","", 0, 0,30);		
+			TagMetadata tagMetadata3 = new TagMetadata("TLHTS823600153010","Home Appliance","Sears Dishwasher","Top 5% of MSM","TLHTS",91.0,"Y","", 0, 0,30);		
+			TagMetadata tagMetadata4 = new TagMetadata("TLPTS823600153010","Home Appliance","Sears Dishwasher","Top 5% of MSM","TLPTS",91.0,"Y","", 0, 0,30);		
+			TagMetadata tagMetadata5 = new TagMetadata("TLTSS823600153010","Home Appliance","Sears Dishwasher","Top 5% of MSM","TLTSS",91.0,"Y","", 0, 0,30);		
+			TagMetadata tagMetadata6 = new TagMetadata("ODGRS823600153010","Home Appliance","Sears Dishwasher","Top 5% of MSM","ODGRS",91.0,"Y","", 0, 0,30);		
+			TagMetadata tagMetadata7 = new TagMetadata("CELPS823600153010","Home Appliance","Sears Dishwasher","Top 5% of MSM","CELPS",91.0,"Y","", 0, 0,30);		
+			TagMetadata tagMetadata8 = new TagMetadata("SPGMS823600153010","Home Appliance","Sears Dishwasher","Top 5% of MSM","SPGMS",91.0,"Y","", 0, 0,30);		
 			
+			when(tagsMetaDataDao.getDetails("SPFTS823600153010")).thenReturn(tagMetadata1);
+			when(tagsMetaDataDao.getDetails("LGSWS823600153010")).thenReturn(tagMetadata2);
+			when(tagsMetaDataDao.getDetails("TLHTS823600153010")).thenReturn(tagMetadata3);
+			when(tagsMetaDataDao.getDetails("TLPTS823600153010")).thenReturn(tagMetadata4);
+			when(tagsMetaDataDao.getDetails("TLTSS823600153010")).thenReturn(tagMetadata5);
+			when(tagsMetaDataDao.getDetails("ODGRS823600153010")).thenReturn(tagMetadata6);
+			when(tagsMetaDataDao.getDetails("CELPS823600153010")).thenReturn(tagMetadata7);
+			when(tagsMetaDataDao.getDetails("SPGMS823600153010")).thenReturn(tagMetadata8);
+
 			OutboxDao spy = spy(new OutboxDao());
 			doNothing().when(spy).deleteQueuedEmailPackages(anyString());
 			EmailPackage inProgressEmailPackage = null;
@@ -1056,6 +1179,9 @@ public class CPSFilerTest {
 		assertEquals(retEmailPackages.get(0), temp);
 		
 	}
+	
+	
+	
 
 	
 }

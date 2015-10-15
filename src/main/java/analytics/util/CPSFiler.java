@@ -45,9 +45,14 @@ public class CPSFiler {
 		memberInfoDao = new MemberInfoDao();
 		tagsMetaDataDao = new TagMetadataDao();
 		occasionDao = OccasionDao.getInstance();
+		tagResponsysActiveDao = new TagResponsysActiveDao();
 		activeTags= tagResponsysActiveDao.getActiveResponsysTagsList();
+		
 	}
 	
+	public void setActiveTags(List<String> activeTags){
+		this.activeTags = activeTags;
+	}
 	public List<EmailPackage> prepareEmailPackages(String rtsAPIResponse, String lyl_id_no,String l_id) throws JSONException, SQLException, Exception {
 		
 		List<EmailPackage> emailPackages = new ArrayList<EmailPackage>(); 
@@ -57,6 +62,8 @@ public class CPSFiler {
 		if(memberInfo!=null){
 			if(StringUtils.isNotBlank(memberInfo.getEid())&& memberInfo.getEid()!="0"){
 				List<TagMetadata> validOccasions = this.getValidOccasionsList(rtsAPIResponse);
+				
+				
 				
 				if(validOccasions != null && validOccasions.size() > 0){
 					for(TagMetadata validOccasion : validOccasions){
@@ -337,19 +344,16 @@ public class CPSFiler {
 							//Check if the occasion has an mdtag
 							String mdtag = scoresInfo.getMdTag();
 							if(StringUtils.isNotBlank(mdtag)){
-								
-								if(isTop5Percent(mdtag)){
-									if(isOccasionResponsysReady(mdtag))
-									{
-										TagMetadata tagMetaData = new TagMetadata();
-										tagMetaData.setPurchaseOccassion(scoresInfo.getOccassion());
-										tagMetaData.setBusinessUnit(scoresInfo.getBusinessUnit());
-										tagMetaData.setSubBusinessUnit(scoresInfo.getSubBusinessUnit());
-										tagMetaData.setMdTag(scoresInfo.getMdTag());
-										mdTagsList.add(tagMetaData);
-									}
-								}								
-								
+								if(isTop5Percent(mdtag) && !isOccasionResponsysReady(mdtag)){
+									
+									continue;								
+								}	
+								TagMetadata tagMetaData = new TagMetadata();
+								tagMetaData.setPurchaseOccassion(scoresInfo.getOccassion());
+								tagMetaData.setBusinessUnit(scoresInfo.getBusinessUnit());
+								tagMetaData.setSubBusinessUnit(scoresInfo.getSubBusinessUnit());
+								tagMetaData.setMdTag(scoresInfo.getMdTag());							
+								mdTagsList.add(tagMetaData);								
 							}								
 						}
 					}
@@ -358,6 +362,29 @@ public class CPSFiler {
 		}
 		
 		return mdTagsList;	
+	}
+	
+	private List<String> filterResponsysNotReadyTop5PercentTags(String lyl_id_no, String l_id,List<String> tagsList) {
+		List<String> filteredTagsLst = new ArrayList<String>();
+		List<String> inactiveTop5TagsLst = new ArrayList<String>();
+		for(String mdtag : tagsList){
+			if(isTop5Percent(mdtag)){
+				if(!isOccasionResponsysReady(mdtag))
+				{
+					inactiveTop5TagsLst.add(mdtag);
+				}
+				else
+					filteredTagsLst.add(mdtag);
+			}
+			else
+				filteredTagsLst.add(mdtag);
+		}
+		//Delete the top5percent mdtags that responsys is not ready for, from mdTagsWithDates collection.
+		if(inactiveTop5TagsLst.size() > 0){
+			logger.info("PERSIST: Filtering top5% tags that responsys is not ready for :: MemberId : "+ lyl_id_no + " Tags: " + getLogMsg(inactiveTop5TagsLst));
+			
+		}
+		return filteredTagsLst;
 	}
 
 	protected boolean isOccasionTop5Percent(String mdtag) {
@@ -426,6 +453,8 @@ public class CPSFiler {
 	}
 	
 	private boolean isOccasionResponsysReady(String mdtag) {
+		System.out.println(mdtag);
+		System.out.println(activeTags);
 		return activeTags.contains(mdtag.substring(0, 5));			
 	}
 
@@ -439,6 +468,21 @@ public class CPSFiler {
 				return false;			
 		}
 		return false;		
+	}
+	
+	private String getLogMsg(List<String> notReadyTags) {
+		String logMsg = "  ";
+		int i =0;
+		for(String tag : notReadyTags)
+		{
+			if (i ==0)
+				logMsg = logMsg.concat(tag);
+			else if ( i == notReadyTags.size()-1)
+				logMsg = logMsg.concat(tag);
+			else
+				logMsg = logMsg.concat(", ").concat(tag);
+		}
+		return logMsg;
 	}
 	
 	/*public List<EmailPackage> decideSendDates(List<EmailPackage> emailPackages, EmailPackage inProgressPackage) throws SQLException, RealTimeScoringException {
