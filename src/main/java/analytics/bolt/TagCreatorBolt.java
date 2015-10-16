@@ -81,13 +81,14 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 			
 			try{
 				JsonElement jsonElement = TupleParser.getParsedJson(input);
-				LOGGER.info("Input from PurchaseScoreKafkaBolt :" + jsonElement.toString());
+				LOGGER.info("Input from TagCreatorBolt :" + jsonElement.toString());
 				JsonElement lyl_id_no = jsonElement.getAsJsonObject().get("memberId");
 				
 				BigInteger loyaltyID =  new BigInteger(lyl_id_no.toString());
 				//if (! (loyaltyID.compareTo(startLoyalty) != -1  && loyaltyID.compareTo(lastLoyalty) != 1) ){
 				
 				if (loyaltyID.compareTo(startLoyalty) == -1  || loyaltyID.compareTo(lastLoyalty) == 1) {
+					LOGGER.info("Not creating Tag as lid is out of the percentile range alloted");
 					redisCountIncr("OutOf_PO_CPS_PercSplit");	
 					outputCollector.ack(input);
 					return;
