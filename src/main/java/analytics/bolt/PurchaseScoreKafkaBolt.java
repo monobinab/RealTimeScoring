@@ -50,7 +50,6 @@ public class PurchaseScoreKafkaBolt extends EnvironmentBolt {
 		tagVariableDao = new TagVariableDao();
 		models = tagVariableDao.getModels();
 		scoringUtils = new ScoringUtils();
-		super.prepare(stormConf, context, collector);
 		this.outputCollector = collector;
 		kafkaUtil = new KafkaUtil(
 				System.getProperty(MongoNameConstants.IS_PROD));
