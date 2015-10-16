@@ -68,16 +68,15 @@ public class ConsideredPurchaseTopology {
 			LOGGER.error(e.getClass() + ": " + e.getMessage() +" STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 			System.exit(0);	
 		}
-		topologyBuilder.setBolt("CPParsePersistBolt", new CPParsePersistBolt(env), 15).shuffleGrouping("CPKafkaSpout2");	
-		topologyBuilder.setBolt("CPPurchaseBolt", new PurchaseBolt(env), 15).shuffleGrouping("CPPurchaseSpout");
-		topologyBuilder.setBolt("CPProcessingBolt", new CPProcessingBolt(env),15).shuffleGrouping("CPPurchaseBolt").shuffleGrouping("CPParsePersistBolt");
+		//topologyBuilder.setBolt("CPParsePersistBolt", new CPParsePersistBolt(env), 15).shuffleGrouping("CPKafkaSpout2");	
+		//topologyBuilder.setBolt("CPPurchaseBolt", new PurchaseBolt(env), 15).shuffleGrouping("CPPurchaseSpout");
+		//topologyBuilder.setBolt("CPProcessingBolt", new CPProcessingBolt(env),15).shuffleGrouping("CPTagCreatorBolt").shuffleGrouping("CPParsePersistBolt");
 		
-		//topologyBuilder.setBolt("CPParsePersistBolt", new CPParsePersistBolt(env), 15).shuffleGrouping("CPKafkaSpout2").shuffleGrouping("CPTagCreatorBolt", "rtsTags_stream" );	
+		topologyBuilder.setBolt("CPTagCreatorBolt", new TagCreatorBolt(env), 1).shuffleGrouping("CPPurchaseSpout");	
+		topologyBuilder.setBolt("CPParsePersistBolt", new CPParsePersistBolt(env), 15).shuffleGrouping("CPKafkaSpout2").shuffleGrouping("CPTagCreatorBolt", "rtsTags_stream" );	
 		//topologyBuilder.setBolt("CPParsePersistBolt", new CPParsePersistBolt(env), 15).shuffleGrouping("CPKafkaSpout1").shuffleGrouping("CPKafkaSpout2").shuffleGrouping("CPTagCreatorBolt", "rtsTags_stream" );	
-		//topologyBuilder.setBolt("CPProcessingBolt", new CPProcessingBolt(env),15).shuffleGrouping("CPPurchaseFeedbackSpout").shuffleGrouping("CPParsePersistBolt").shuffleGrouping("CPTagCreatorBolt", "blackedout_stream" );
-		//topologyBuilder.setBolt("CPTagCreatorBolt", new TagCreatorBolt(env), 1).shuffleGrouping("CPPurchaseFeedbackSpout");		
+		topologyBuilder.setBolt("CPProcessingBolt", new CPProcessingBolt(env),15).shuffleGrouping("CPParsePersistBolt").shuffleGrouping("CPTagCreatorBolt", "blackedout_stream" );
 			
-		
 		Config conf = new Config();
 		conf.put("metrics_topology", "CPS");
 		//Added the timeout so that topology will not read the message again

@@ -1,6 +1,7 @@
 package analytics.bolt;
 
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +37,8 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 	TagVariableDao tagVariableDao;
 	MemberMDTags2Dao memberMDTags2Dao;
 	Map<Integer, String> modelTagsMap = new HashMap<Integer, String>();
+	private static BigInteger startLoyalty = new BigInteger("7081010000647509"); 
+	private static BigInteger lastLoyalty = new BigInteger("7081021610457114");
 
 	public TagCreatorBolt(String env) {
 		super(env);
@@ -74,10 +77,21 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 			
 		if(input != null)
 		{
-				try{
+			
+			
+			try{
 				JsonElement jsonElement = TupleParser.getParsedJson(input);
 				LOGGER.info("Input from PurchaseScoreKafkaBolt :" + jsonElement.toString());
 				JsonElement lyl_id_no = jsonElement.getAsJsonObject().get("memberId");
+				
+				BigInteger loyaltyID =  new BigInteger(lyl_id_no.toString());
+				//if (! (loyaltyID.compareTo(startLoyalty) != -1  && loyaltyID.compareTo(lastLoyalty) != 1) ){
+				
+				if (loyaltyID.compareTo(startLoyalty) == -1  || loyaltyID.compareTo(lastLoyalty) == 1) {
+					redisCountIncr("OutOf_PO_CPS_PercSplit");	
+					outputCollector.ack(input);
+					return;
+				}
 				
 				String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no.getAsString());
 				

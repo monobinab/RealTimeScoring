@@ -4,6 +4,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import analytics.bolt.CPProcessingBolt;
 import analytics.bolt.RTSKafkaBolt;
 import analytics.bolt.TECProcessingBolt;
 import analytics.bolt.TagProcessingBolt;
@@ -53,10 +54,9 @@ public class TagBuilderTopology {
 			   System.exit(0);
 			}	
 		
-		builder.setBolt("tagProcessingBolt", new TagProcessingBolt(env),2).localOrShuffleGrouping("RTSKafkaSpout");
-		
-		/*builder.setBolt("RTSKafkaBolt", new RTSKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD), kafkatopic), 1)
-		.shuffleGrouping("tagProcessingBolt","kafka_stream");*/
+		builder.setBolt("tagProcessingBolt", new TagProcessingBolt(env),10).localOrShuffleGrouping("RTSKafkaSpout");
+		builder.setBolt("CPProcessingBolt", new CPProcessingBolt(env),10).shuffleGrouping("tagProcessingBolt");
+
 		
 		Config conf = new Config();
 		conf.put("metrics_topology", "TB");

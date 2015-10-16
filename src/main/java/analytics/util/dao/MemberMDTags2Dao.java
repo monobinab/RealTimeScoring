@@ -430,7 +430,7 @@ public class MemberMDTags2Dao extends AbstractDao {
 		if(occasionDurationMap!=null && occasionDurationMap.get(tag.substring(5, 6))!=null)
 				days = new Integer (occasionDurationMap.get(tag.substring(5, 6)));
 		
-		Date date = new Date(new Date().getTime() + ((1000 * 60 * 60 * 24) * days));
+		Date date = DateUtils.addDays(new Date(), days);
 		
 		return date;
 	}

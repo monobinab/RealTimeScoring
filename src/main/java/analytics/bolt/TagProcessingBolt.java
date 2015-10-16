@@ -114,6 +114,7 @@ public class TagProcessingBolt extends EnvironmentBolt {
 				List<Object> listToEmit = new ArrayList<Object>();
 				listToEmit = new ArrayList<Object>();
 				listToEmit.add(lyl_id_no);
+				listToEmit.add(l_id);
 				this.outputCollector.emit(listToEmit);
 			}
 			else{

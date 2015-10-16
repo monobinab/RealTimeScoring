@@ -64,7 +64,7 @@ public class CPProcessingBolt extends EnvironmentBolt  {
 			
 			BigInteger loyaltyID =  new BigInteger(lyl_id_no);
 			
-			if (!(loyaltyID.compareTo(startLoyalty) != -1 ) && ((loyaltyID.compareTo(lastLoyalty) != 1))){
+			if (! (loyaltyID.compareTo(startLoyalty) != -1  && loyaltyID.compareTo(lastLoyalty) != 1) ){
 				outputCollector.ack(input);
 				return;
 			}
