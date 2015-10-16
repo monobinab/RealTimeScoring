@@ -41,6 +41,22 @@ public class PurchaseScoreKafkaBolt extends EnvironmentBolt {
 		super(environment);
 		this.currentTopic = topic;
 	}
+	
+	
+	@Override
+	public void prepare(Map stormConf, TopologyContext context,
+			OutputCollector collector) {
+		super.prepare(stormConf, context, collector);
+		tagVariableDao = new TagVariableDao();
+		models = tagVariableDao.getModels();
+		scoringUtils = new ScoringUtils();
+		super.prepare(stormConf, context, collector);
+		this.outputCollector = collector;
+		kafkaUtil = new KafkaUtil(
+				System.getProperty(MongoNameConstants.IS_PROD));
+		// KafkaUtil.initiateKafkaProperties(System.getProperty(MongoNameConstants.IS_PROD));
+		LOGGER.info("RTSKafkaBolt Preparing to Launch");
+	}
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -99,19 +115,7 @@ public class PurchaseScoreKafkaBolt extends EnvironmentBolt {
 		outputCollector.ack(input);
 	}
 
-	@Override
-	public void prepare(Map stormConf, TopologyContext context,
-			OutputCollector collector) {
-		tagVariableDao = new TagVariableDao();
-		models = tagVariableDao.getModels();
-		scoringUtils = new ScoringUtils();
-		super.prepare(stormConf, context, collector);
-		this.outputCollector = collector;
-		kafkaUtil = new KafkaUtil(
-				System.getProperty(MongoNameConstants.IS_PROD));
-		// KafkaUtil.initiateKafkaProperties(System.getProperty(MongoNameConstants.IS_PROD));
-		LOGGER.info("RTSKafkaBolt Preparing to Launch");
-	}
+	
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
