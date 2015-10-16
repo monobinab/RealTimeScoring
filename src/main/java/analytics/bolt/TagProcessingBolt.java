@@ -144,6 +144,6 @@ public class TagProcessingBolt extends EnvironmentBolt {
 	
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		//declarer.declareStream("kafka_stream", new Fields("lyl_id_no"));
+		declarer.declare(new Fields("lyl_id_no", "l_id"));
 	}
 }
