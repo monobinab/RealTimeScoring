@@ -18,11 +18,10 @@ import com.google.gson.Gson;
 import analytics.util.JsonUtils;
 import analytics.util.KafkaUtil;
 import analytics.util.MongoNameConstants;
+import analytics.util.dao.CpsOccasionsDao;
 import analytics.util.dao.MemberBrowseDao;
-import analytics.util.dao.OccasionDao;
 import analytics.util.objects.DateSpecificMemberBrowse;
 import analytics.util.objects.MemberBrowse;
-import analytics.util.objects.OccasionInfo;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.tuple.Tuple;
@@ -39,15 +38,13 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 	private String source;
 	private String todayDate;
 	MemberBrowseDao memberBrowseDao;
-	OccasionDao occasionDao;
 	private LocalDate date;
 	SimpleDateFormat dateFormat;
-	private String web;
 	private KafkaUtil kafkaUtil;
 	private String browseKafkaTopic;
-	OccasionInfo occasionInfo;
-	
-	
+	private Map<String, String> occasionIdMap;
+	private CpsOccasionsDao cpsOccasionsDao;		
+	private String web;
 	public void setOutputCollector(OutputCollector outputCollector) {
         this.outputCollector = outputCollector;
     }
@@ -65,27 +62,25 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
         super.prepare(stormConf, context, collector);
         sourceMap.put("SB", "SG");
         memberBrowseDao = new MemberBrowseDao();
-        occasionDao = new OccasionDao();
-        occasionInfo = occasionDao.getOccasionInfo(web);
         dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         todayDate = dateFormat.format(new Date());
         date = new LocalDate(new Date());
-        
+        cpsOccasionsDao = new CpsOccasionsDao();
+        occasionIdMap = cpsOccasionsDao.getcpsOccasionId();
  	}
 	
 	@Override
 	public void execute(Tuple input) {
 		redisCountIncr("incoming_tuples");
 		Map<String, Integer> incomingBuSubBuMap = JsonUtils.restoreTagsListFromJson(input.getString(1));
-		
+		System.out.println(incomingBuSubBuMap);
 		String l_id = input.getStringByField("l_id");
-		LOGGER.info("Incoming feed for Lid :" + l_id +" are "+incomingBuSubBuMap.toString());
-		
+			
 		Map<String, Integer> buSubBuCountsMap = new HashMap<String, Integer>();
 	 
 		MemberBrowse memberBrowse = memberBrowseDao.getEntireMemberBrowse(l_id);
 		
-		//no record in memberBrowse for this member, insert the member and publish the kafka
+		//no record in memberBrowse for this member, insert the member and publish to kafka
 		if(memberBrowse == null ){
 			insertMemberBrowseToday(l_id, incomingBuSubBuMap);
 		}
@@ -206,7 +201,7 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 				int PC = buSubBuCountsMap.get(buSubBu);
 				int IC = incomingBuSubBuMap.get(buSubBu);
 				if(PC < THRESHOLD && (PC + IC) >= THRESHOLD){
-					buSubBuList.add(buSubBu+"7");
+					buSubBuList.add(buSubBu+occasionIdMap.get(web));
 				}
 			}
 		}
@@ -214,7 +209,7 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 		else{
 			for(String buSubBu : incomingBuSubBuMap.keySet()){
 				if(incomingBuSubBuMap.get(buSubBu) >= 4){
-					buSubBuList.add(buSubBu+"7");
+					buSubBuList.add(buSubBu+occasionIdMap.get(web));
 				}
 			}
 		}
@@ -223,11 +218,9 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 		if(!buSubBuList.isEmpty()){
 			Map<String, Object> mapToBeSend = new HashMap<String, Object>();
 			mapToBeSend.put("memberId", l_id);
-			mapToBeSend.put("occasionId", 7); //TODO: occasionId hard coded, needs to be picked from the collection
+			mapToBeSend.put("occasionId", occasionIdMap.get(web)); 
 			mapToBeSend.put("buSubBu", buSubBuList);
 			String jsonToBeSend = new Gson().toJson(mapToBeSend );
-			
-			LOGGER.info("Sending JSON String to Kafka from BrowseCountPersistBolt : " + jsonToBeSend);
 			try {
 				kafkaUtil.sendKafkaMSGs(jsonToBeSend.toString(), browseKafkaTopic);
 			} catch (ConfigurationException e) {

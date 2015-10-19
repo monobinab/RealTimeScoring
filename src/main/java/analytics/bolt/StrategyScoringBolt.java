@@ -202,6 +202,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			//Emitting changedMemberScoreList to cp_purchase_scores_stream
 			List<Object> objectToCps = new ArrayList<Object>();
 			objectToCps.add(lyl_id_no);
+			objectToCps.add(topologyName);
 			objectToCps.add(changedMemberScoresList);
 			this.outputCollector.emit("cp_purchase_scores_stream", objectToCps);
 	
@@ -221,7 +222,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		declarer.declareStream("score_stream",new Fields("l_id", "newScore", "model","source", "messageID", "minExpiry", "maxExpiry"));
 		declarer.declareStream("kafka_stream", new Fields("message"));
-		declarer.declareStream("cp_purchase_scores_stream", new Fields("loyaltyId", "cpsScoreMessage"));
+		declarer.declareStream("cp_purchase_scores_stream", new Fields("loyaltyId", "topology", "cpsScoreMessage"));
 	}
 
 }

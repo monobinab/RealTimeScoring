@@ -68,7 +68,9 @@ public class PurchaseScoreKafkaBolt extends EnvironmentBolt {
 			if (changedMemberScoreList != null
 					&& !changedMemberScoreList.isEmpty()) {
 				String loyId = input.getStringByField("loyaltyId");
+				String topology = input.getStringByField("topology");
 				mainJsonObj.put("memberId", loyId);
+				mainJsonObj.put("topology", topology);
 				JSONArray jsonArray = new JSONArray();
 				if (changedMemberScoreList != null
 						&& !changedMemberScoreList.isEmpty()) {
