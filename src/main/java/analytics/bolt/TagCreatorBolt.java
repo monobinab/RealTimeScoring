@@ -84,6 +84,12 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 				LOGGER.info("Input from TagCreatorBolt :" + jsonElement.toString());
 				JsonElement lyl_id_no = jsonElement.getAsJsonObject().get("memberId");
 				
+				
+				/*
+				 * topologyName is not needed as of now, but is there in the json emitted and can be used whenever needed
+				 */
+			//	String topology = jsonElement.getAsJsonObject().get("topology").getAsString();
+				
 				BigInteger loyaltyID =  new BigInteger(lyl_id_no.getAsString());
 				//if (! (loyaltyID.compareTo(startLoyalty) != -1  && loyaltyID.compareTo(lastLoyalty) != 1) ){
 				
