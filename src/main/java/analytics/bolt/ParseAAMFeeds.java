@@ -112,7 +112,7 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
     	if(!tagsMap.isEmpty()){
     		Object tagsJSON = JsonUtils.createJsonFromStringIntMap(tagsMap);
     		List<Object> listToEmit = new ArrayList<Object>();
-        	listToEmit.add(l_id);
+        	listToEmit.add(loyalty_id);
         	listToEmit.add(tagsJSON);
         	listToEmit.add(source);
         	this.outputCollector.emit("browse_tag_stream", listToEmit);
@@ -126,7 +126,7 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		declarer.declare(new Fields("l_id","lineItemAsJsonString","source","lyl_id_no"));
-		declarer.declareStream("browse_tag_stream", new Fields("l_id","tagsJSON","source"));
+		declarer.declareStream("browse_tag_stream", new Fields("loyalty_id","tagsJSON","source"));
 	}
 	
     abstract protected String[] splitRec(String webRec);

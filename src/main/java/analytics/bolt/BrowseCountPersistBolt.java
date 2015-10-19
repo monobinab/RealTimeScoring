@@ -18,6 +18,7 @@ import com.google.gson.Gson;
 import analytics.util.JsonUtils;
 import analytics.util.KafkaUtil;
 import analytics.util.MongoNameConstants;
+import analytics.util.SecurityUtils;
 import analytics.util.dao.CpsOccasionsDao;
 import analytics.util.dao.MemberBrowseDao;
 import analytics.util.objects.DateSpecificMemberBrowse;
@@ -74,7 +75,8 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 		redisCountIncr("incoming_tuples");
 		Map<String, Integer> incomingBuSubBuMap = JsonUtils.restoreTagsListFromJson(input.getString(1));
 		System.out.println(incomingBuSubBuMap);
-		String l_id = input.getStringByField("l_id");
+		String loyalty_id = input.getStringByField("loyalty_id");
+		String l_id =  SecurityUtils.hashLoyaltyId(loyalty_id);
 			
 		Map<String, Integer> buSubBuCountsMap = new HashMap<String, Integer>();
 	 
@@ -121,7 +123,7 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 					}
 				}
 			}
-				emitToKafka(l_id, incomingBuSubBuMap, buSubBuCountsMap);
+				emitToKafka(loyalty_id, incomingBuSubBuMap, buSubBuCountsMap);
 				/*
 				 * If the member has document for today, update the counts with incoming buSubBu counts
 				 */
@@ -188,7 +190,7 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 		memberBrowseDao.updateMemberBrowse(l_id, dateSpecificMemberBrowse);
 	}
 	
-	public void emitToKafka(String l_id, Map<String, Integer> incomingBuSubBuMap, Map<String, Integer> buSubBuCountsMap){
+	public void emitToKafka(String loyalty_id, Map<String, Integer> incomingBuSubBuMap, Map<String, Integer> buSubBuCountsMap){
 
 		
 		List<String> buSubBuList = new ArrayList<String>(); 
@@ -217,8 +219,8 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 		//publish to kafka
 		if(!buSubBuList.isEmpty()){
 			Map<String, Object> mapToBeSend = new HashMap<String, Object>();
-			mapToBeSend.put("memberId", l_id);
-			mapToBeSend.put("occasionId", occasionIdMap.get(web)); 
+			mapToBeSend.put("memberId", loyalty_id);
+			//mapToBeSend.put("occasionId", occasionIdMap.get(web)); 
 			mapToBeSend.put("buSubBu", buSubBuList);
 			String jsonToBeSend = new Gson().toJson(mapToBeSend );
 			try {
