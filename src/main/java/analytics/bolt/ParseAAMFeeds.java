@@ -27,7 +27,6 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 
     protected List<String> modelVariablesList;
     protected Map<String,Collection<String>> l_idToValueCollectionMap; // USED TO MAP BETWEEN l_id AND THE TRAITS OR PID OR SearchKeyword ASSOCIATED WITH THAT ID 
-    protected String loyalty_id;
     
     protected String source;
     protected String sourceTopic;
@@ -58,6 +57,8 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 	@Override
 	public void execute(Tuple input) {
 		
+		String loyalty_id;
+		
 		LOGGER.debug("PARSING DOCUMENT -- WEB TRAIT RECORD ");
 		redisCountIncr("incoming_tuples");
 		
@@ -72,9 +73,9 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
       
         String l_id = null;
         
-        this.loyalty_id = splitRecArray[0].trim();
+        loyalty_id = splitRecArray[0].trim();
         if(loyalty_id.length()!=16 || !loyalty_id.startsWith("7081")){
-        	LOGGER.info("Could not find Lid: " + this.loyalty_id);
+        	LOGGER.info("Could not find Lid: " + loyalty_id);
         	redisCountIncr("no_lids");
         	outputCollector.ack(input);
         	return;

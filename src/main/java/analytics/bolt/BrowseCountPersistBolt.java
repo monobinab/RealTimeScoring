@@ -58,8 +58,8 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         this.outputCollector = collector;
-        kafkaUtil= new KafkaUtil(System.getProperty(MongoNameConstants.IS_PROD));
         super.prepare(stormConf, context, collector);
+        kafkaUtil= new KafkaUtil(System.getProperty(MongoNameConstants.IS_PROD));
         sourceMap.put("SB", "SG");
         memberBrowseDao = new MemberBrowseDao();
         dateFormat = new SimpleDateFormat("yyyy-MM-dd");
