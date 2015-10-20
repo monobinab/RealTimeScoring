@@ -17,6 +17,7 @@ import org.codehaus.jettison.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import analytics.util.dao.DivLnBuSubBuDao;
 import analytics.util.dao.DivLnVariableDao;
 import analytics.util.dao.PidDivLnDao;
 import analytics.util.objects.DivLn;
@@ -36,7 +37,8 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
     private Map<String, List<String>> divLnVariablesMap;
 	private DivLnVariableDao divLnVariableDao;
 	private PidDivLnDao pidDivLnDao;
-
+	private DivLnBuSubBuDao divLnBuSubBuDao;
+	private Map<String, String> divLnBuSubBuMap;
     /*
          * (non-Javadoc)
          *
@@ -57,6 +59,9 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
 
         // populate divLnVariablesMap
         divLnVariablesMap = divLnVariableDao.getDivLnVariable();
+        
+        divLnBuSubBuDao = new DivLnBuSubBuDao();
+		divLnBuSubBuMap = divLnBuSubBuDao.getDvLnBuSubBu();
         
     }
 
@@ -99,7 +104,7 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
      */
 
 	@Override
-	protected Map<String, String> processList(String current_l_id, Map<String, Integer> tagsMap) {
+	protected Map<String, String> processList(String current_l_id, Map<String, Integer> buSubBuMap) {
 	    	
     	String queryResultsDoc = new String();
     	Set<String> pidSet = new HashSet<String>();
@@ -192,6 +197,20 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
     		if(divLnObj != null) {
 	    		String div = divLnObj.getDiv();
 	    		String divLn = divLnObj.getDivLn();
+	    		
+	    		// populate buSubBuMap for BrowseTags
+				if (divLn != null) {
+					if (!buSubBuMap.containsKey(divLnBuSubBuMap.get(divLnObj
+							.getDivLn())))
+						buSubBuMap.put(divLnBuSubBuMap.get(divLnObj.getDivLn()), 1);
+					else {
+						int count = (buSubBuMap.get(divLnBuSubBuMap.get(divLnObj
+								.getDivLn()))) + 1;
+						buSubBuMap.put(divLnBuSubBuMap.get(divLnObj.getDivLn()),
+								count);
+					}
+				}
+	    		
 	    		Collection<String> var = new ArrayList<String>();
 	    		if(divLnVariablesMap.containsKey(div)) {
 	    			var = divLnVariablesMap.get(div);

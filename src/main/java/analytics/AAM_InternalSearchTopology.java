@@ -2,6 +2,8 @@ package analytics;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import analytics.bolt.BrowseCountPersistBolt;
 import analytics.bolt.LoggingBolt;
 import analytics.bolt.ParsingBoltAAM_InternalSearch;
 import analytics.bolt.RTSKafkaBolt;
@@ -36,12 +38,13 @@ public static void main(String[] args) {
 		String kafkatopic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;
 		String[] servers = RedisConnection.getServers(System.getProperty(MongoNameConstants.IS_PROD));
 		String source = TopicConstants.AAM_CDF_INTERNALSEARCH;
+		String browseKafkaTopic = TopicConstants.BROWSE_KAFKA_TOPIC;
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 		
 		//Sree. Spout that wakes up every 5 mins and process the Traits
 		topologyBuilder.setSpout("internalSearchSpout", new WebHDFSSpout(servers[1], TopicConstants.PORT, Constants.AAM_INTERNAL_SEARCH_PATH, "aamInternalSearch"), 1);
 		topologyBuilder.setBolt("ParsingBoltAAM_InternalSearch",new ParsingBoltAAM_InternalSearch(System.getProperty(MongoNameConstants.IS_PROD), source),10).shuffleGrouping("internalSearchSpout").setNumTasks(20).setDebug(true);
-
+		topologyBuilder.setBolt("browseCountPersist", new BrowseCountPersistBolt(System.getProperty(MongoNameConstants.IS_PROD), source, "Browse", browseKafkaTopic), 3).shuffleGrouping("parsingBoltBrowse", "browse_tag_stream");
 		topologyBuilder.setBolt("strategy_bolt", new StrategyScoringBolt(System.getProperty(MongoNameConstants.IS_PROD)), 10)
 				.shuffleGrouping("ParsingBoltAAM_InternalSearch");
 		

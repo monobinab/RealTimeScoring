@@ -141,7 +141,6 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 					insertMemberBrowseToday(l_id, incomingBuSubBuMap);
 					LOGGER.info("Today's record getting inserted for " + l_id + " from " + sourceMap.get(source));
 				}
-				
 		}
 	}
 
