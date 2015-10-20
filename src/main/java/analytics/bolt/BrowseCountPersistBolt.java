@@ -61,6 +61,7 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
         kafkaUtil= new KafkaUtil(System.getProperty(MongoNameConstants.IS_PROD));
         super.prepare(stormConf, context, collector);
         sourceMap.put("SB", "SG");
+        sourceMap.put("InternalSearch", "IS");
         memberBrowseDao = new MemberBrowseDao();
         dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         todayDate = dateFormat.format(new Date());
@@ -73,15 +74,16 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 	public void execute(Tuple input) {
 		redisCountIncr("incoming_tuples");
 		Map<String, Integer> incomingBuSubBuMap = JsonUtils.restoreTagsListFromJson(input.getString(1));
-		System.out.println(incomingBuSubBuMap);
 		String l_id = input.getStringByField("l_id");
-			
+		LOGGER.info("Incoming buSubBu for " + l_id + " from " + sourceMap.get(source) +": " + incomingBuSubBuMap);	
 		Map<String, Integer> buSubBuCountsMap = new HashMap<String, Integer>();
 	 
 		MemberBrowse memberBrowse = memberBrowseDao.getEntireMemberBrowse(l_id);
 		
 		//no record in memberBrowse for this member, insert the member and publish to kafka
 		if(memberBrowse == null ){
+			LOGGER.info("Record getting inserted for " + l_id + " from " + sourceMap.get(source));
+			emitToKafka(l_id, incomingBuSubBuMap, buSubBuCountsMap);
 			insertMemberBrowseToday(l_id, incomingBuSubBuMap);
 		}
 		
@@ -127,12 +129,14 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 				 */
 				if(memberBrowseMap.containsKey(todayDate)){
 					updateMemberBrowseToday(incomingBuSubBuMap, l_id, memberBrowseMap);
+					LOGGER.info("Today's record getting updated for " + l_id + " from " + sourceMap.get(source));
 				}
 				/*
 				 * If the member does not have document for today, insert a new document for today
 				 */
 				else{
 					insertMemberBrowseToday(l_id, incomingBuSubBuMap);
+					LOGGER.info("Today's record getting inserted for " + l_id + " from " + sourceMap.get(source));
 				}
 				
 		}
@@ -223,6 +227,7 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 			String jsonToBeSend = new Gson().toJson(mapToBeSend );
 			try {
 				kafkaUtil.sendKafkaMSGs(jsonToBeSend.toString(), browseKafkaTopic);
+				LOGGER.info(l_id +" published to kafka for Browse");
 			} catch (ConfigurationException e) {
 				LOGGER.error("Exception in kakfa " + ExceptionUtils.getFullStackTrace(e));
 			}
