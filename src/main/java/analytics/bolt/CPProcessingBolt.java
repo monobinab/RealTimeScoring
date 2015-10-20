@@ -16,6 +16,7 @@ import analytics.exception.RealTimeScoringException;
 import analytics.util.CPSFiler;
 import analytics.util.MongoNameConstants;
 import analytics.util.RTSAPICaller;
+import analytics.util.SecurityUtils;
 import analytics.util.dao.ClientApiKeysDAO;
 import analytics.util.objects.EmailPackage;
 import backtype.storm.task.OutputCollector;
@@ -61,15 +62,7 @@ public class CPProcessingBolt extends EnvironmentBolt  {
 		if(input != null && input.contains("lyl_id_no"))
 		{
 			lyl_id_no = input.getStringByField("lyl_id_no");
-			
-			BigInteger loyaltyID =  new BigInteger(lyl_id_no);
-			
-			if (! (loyaltyID.compareTo(startLoyalty) != -1  && loyaltyID.compareTo(lastLoyalty) != 1) ){
-				outputCollector.ack(input);
-				return;
-			}
-			
-			l_id = input.getStringByField("l_id");
+			l_id = SecurityUtils.hashLoyaltyId(lyl_id_no);
 			
 			try{
 				//call rts api and get response for this l_id 

@@ -118,7 +118,7 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 			List<Object> listToEmit = new ArrayList<Object>();
 			listToEmit = new ArrayList<Object>();
 			listToEmit.add(lyl_id_no.getAsString());
-			listToEmit.add(l_id);				
+			//listToEmit.add(l_id);				
 			this.outputCollector.emit(listToEmit);			
 			
 			redisCountIncr("output_count");	
@@ -165,7 +165,7 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("lyl_id_no", "l_id"));
+		declarer.declare(new Fields("lyl_id_no"));
 	}
 	
 
