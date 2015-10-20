@@ -45,6 +45,7 @@ public class CPSUtil {
 		PrintWriter printWriter = null;
 		int successCount = 0;
 		int failureCount = 0;
+		String modPercentile = null;
 		
 		Map<String, List<CPOutBoxItem>> presetMap = loadFile(presetFile, "PRESET");
 		Map<String, List<CPOutBoxItem>> testMap = loadFile(testFile, "TEST");
@@ -102,70 +103,84 @@ public class CPSUtil {
 					for (CPOutBoxItem cptestItem : testList) {
 						//update the score of the model pertaining to the purchase to 0
 						// in changedMemberScore/memberScore to 0 if testList has a purchase tag 
-						ModelScore modelScorePercentile = new ModelScore();
+						String l_id = SecurityUtils.hashLoyaltyId(loyID);
 						if(cptestItem.getMd_tag().contains("Purchase")){
+									
+							ModelScore modelScorePercentile1 = new ModelScore();
 							Double newScore = 0.0;
 							Integer modelId = tagVariableDao.getmodelIdFromTag(cptestItem.getMd_tag().substring(0,5));
 							//Black out this model
 							if(modelId !=null){
-								Map<Integer, ChangedMemberScore>  changedScores = changedMemberScoresDao.getChangedMemberScores(loyID,modelId);
-								if(changedScores!=null && changedScores.size()>0)
-									changedMemberScoresDao.upsertUpdateChangedScores(loyID, changedScores);
-								
-								Map<String, String> memScores = memberScoreDao.getMemberScores(loyID, modelId);
-								if(memScores!=null && memScores.size()>0)
-									memberScoreDao.upsertUpdateMemberScores(loyID, memScores);								
-								
-								modelScorePercentile.setModelId(Integer.toString(modelId));
-								modelScorePercentile.setScore(newScore);	
-								modelScorePercentile.setPercentile(98);
+								Map<Integer, ChangedMemberScore>  changedScores = changedMemberScoresDao.getChangedMemberScores(l_id,modelId);
+								if(changedScores!=null && changedScores.size()>0){
+									changedMemberScoresDao.upsertUpdateChangedScores(l_id, changedScores);
+								}
+								else{
+									Map<String, String> memScores = memberScoreDao.getMemberScores(l_id, modelId);
+									if(memScores!=null && memScores.size()>0)
+										memScores.put(Integer.toString(modelId), "0.0");
+										memberScoreDao.upsertUpdateMemberScores(l_id, memScores);										
+								}
+								modelScorePercentile1.setModelId(Integer.toString(modelId));
+								modelScorePercentile1.setScore(newScore);	
+								modelScorePercentile1.setPercentile(1);
+								testItem.getModelScorePercentiles().add(modelScorePercentile1);
 								//modelScorePercentile.setPercentile(scoringUtils.getPercentileForScore(newScore,modelId));
 								
 							}
-							testItem.getModelScorePercentiles().add(modelScorePercentile);
+							
 							continue;
 						}
 						
 						//update the score of the model pertaining to top5 to maxscore of 98th percentile of that model
 						//in changedMemberScore/memberScore
 						if(cptestItem.getMd_tag().contains("Top5")){
+							ModelScore modelScorePercentile2 = new ModelScore();
+							double newScore = 0;
 							Integer modelId = tagVariableDao.getmodelIdFromTag(cptestItem.getMd_tag().substring(0,5));
 							//reset the score to be max(score) of 98th percentile for that model.
 							if(modelId !=null){
-								HashMap <String,String> modelPercentile = new HashMap<String, String>();modelPercentileDao.getModelWith98Percentile();
-								Double newScore = Double.parseDouble(modelPercentile.get(modelId));
-								//check if there is an entry for this member in changedMemberScores
-								//if so update it
-								Map<Integer, ChangedMemberScore>  changedScores = changedMemberScoresDao.getChangedMemberScores(loyID,modelId);
-								if(changedScores!=null && changedScores.size()>0){
-									//ChangedMemberScore scoreObj = changedScores.get(modelId);
-									ChangedMemberScore scoreObj = new ChangedMemberScore();
-									scoreObj.setModelId(Integer.toString(modelId));
-									scoreObj.setScore(newScore );
-									scoreObj.setEffDate(DateUtil.formatDate(new Date(), "yyyy-MM-dd"));
-									scoreObj.setMaxDate(DateUtil.formatDate(new Date(), "yyyy-MM-dd"));
-									scoreObj.setMinDate(DateUtil.formatDate(new Date(), "yyyy-MM-dd"));
-									Map<Integer,ChangedMemberScore> memberScores = new HashMap<Integer, ChangedMemberScore>();
-									memberScores.put(modelId, scoreObj);									
-									changedMemberScoresDao.upsertUpdateChangedScores(loyID, memberScores);
-								}
-								
-								//check if there is an entry for this member in memberScores
-								//if so update it								
-								Map<String, String> memScores = memberScoreDao.getMemberScores(loyID, modelId);
-								if(memScores!=null && memScores.size()>0){
-									Map<String, String> memberScores = new HashMap<String, String>();
-									memberScores.put(Integer.toString(modelId),Double.toString(newScore));
-									memberScoreDao.upsertUpdateMemberScores(loyID, memberScores);
-								}
-								
-								modelScorePercentile.setModelId(Integer.toString(modelId));
-								modelScorePercentile.setScore(newScore);
-								modelScorePercentile.setPercentile(0);
-								//modelScorePercentile.setPercentile(scoringUtils.getPercentileForScore(newScore,modelId));
+								HashMap <String,String> modelPercentile = new HashMap<String, String>();
+								modelPercentile = modelPercentileDao.getModelWith98Percentile();
+								if(modelPercentile!=null && modelPercentile.size()>0){
+									modPercentile = modelPercentile.get(Integer.toString(modelId));
+									if(StringUtils.isNotEmpty(modPercentile))
+										newScore = Double.parseDouble(modPercentile);
+									//check if there is an entry for this member in changedMemberScores
+									//if so update it
+									Map<Integer, ChangedMemberScore>  changedScores = changedMemberScoresDao.getChangedMemberScores(l_id,modelId);
+									if(changedScores!=null && changedScores.size()>0){
+										//ChangedMemberScore scoreObj = changedScores.get(modelId);
+										ChangedMemberScore scoreObj = new ChangedMemberScore();
+										scoreObj.setModelId(Integer.toString(modelId));
+										scoreObj.setScore(newScore );
+										scoreObj.setEffDate(DateUtil.formatDate(new Date(), "yyyy-MM-dd"));
+										scoreObj.setMaxDate(DateUtil.formatDate(new Date(), "yyyy-MM-dd"));
+										scoreObj.setMinDate(DateUtil.formatDate(new Date(), "yyyy-MM-dd"));
+										Map<Integer,ChangedMemberScore> memberScores = new HashMap<Integer, ChangedMemberScore>();
+										memberScores.put(modelId, scoreObj);									
+										changedMemberScoresDao.upsertUpdateChangedScores(l_id, memberScores);
+									}
+									else{
+										//check if there is an entry for this member in memberScores
+										//if so update it								
+										Map<String, String> memScores = memberScoreDao.getMemberScores(l_id, modelId);
+										if(memScores!=null && memScores.size()>0){
+											Map<String, String> memberScores = new HashMap<String, String>();
+											memberScores.put(Integer.toString(modelId),Double.toString(newScore));
+											memberScoreDao.upsertUpdateMemberScores(l_id, memberScores);
+										}
+									}
+									modelScorePercentile2.setModelId(Integer.toString(modelId));
+									modelScorePercentile2.setScore(newScore);
+									modelScorePercentile2.setPercentile(98);
+									//modelScorePercentile.setPercentile(scoringUtils.getPercentileForScore(newScore,modelId));
+									testItem.getModelScorePercentiles().add(modelScorePercentile2);
+									
+								}								
 								
 							}
-							testItem.getModelScorePercentiles().add(modelScorePercentile);
+							
 							continue;
 						}
 
@@ -180,12 +195,12 @@ public class CPSUtil {
 							System.out.println("message sent to kafka: "+ kafkaMSG);
 							new KafkaUtil("PROD")
 							.sendKafkaMSGs(kafkaMSG, topicName);
-						}else
-						{
+						}
+						if(testItem.getModelScorePercentiles().size()>0){
 							String kafkaMSG = createModelScorePercentileJson(testItem.getLoy_id(),testItem.getModelScorePercentiles());
 							System.out.println("message sent to kafka: "+ kafkaMSG);
 							new KafkaUtil("PROD")
-							.sendKafkaMSGs(kafkaMSG, "rts_cp_purchase_scores");
+							.sendKafkaMSGs(kafkaMSG, "rts_cp_membertags_qa");
 						}
 						
 							
