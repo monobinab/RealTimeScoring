@@ -18,6 +18,7 @@ import com.google.gson.Gson;
 import analytics.util.JsonUtils;
 import analytics.util.KafkaUtil;
 import analytics.util.MongoNameConstants;
+import analytics.util.SecurityUtils;
 import analytics.util.dao.CpsOccasionsDao;
 import analytics.util.dao.MemberBrowseDao;
 import analytics.util.objects.DateSpecificMemberBrowse;
@@ -58,9 +59,11 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         this.outputCollector = collector;
-        kafkaUtil= new KafkaUtil(System.getProperty(MongoNameConstants.IS_PROD));
         super.prepare(stormConf, context, collector);
+        kafkaUtil= new KafkaUtil(System.getProperty(MongoNameConstants.IS_PROD));
         sourceMap.put("SB", "SG");
+        sourceMap.put("InternalSearch", "IS");
+        sourceMap.put("BROWSE", "PR");
         memberBrowseDao = new MemberBrowseDao();
         dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         todayDate = dateFormat.format(new Date());
@@ -73,15 +76,17 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 	public void execute(Tuple input) {
 		redisCountIncr("incoming_tuples");
 		Map<String, Integer> incomingBuSubBuMap = JsonUtils.restoreTagsListFromJson(input.getString(1));
-		System.out.println(incomingBuSubBuMap);
-		String l_id = input.getStringByField("l_id");
-			
+		String loyalty_id = input.getStringByField("loyalty_id");
+		String l_id =  SecurityUtils.hashLoyaltyId(loyalty_id);
+		LOGGER.info("Incoming buSubBu for " + l_id + " from " + sourceMap.get(source) +": " + incomingBuSubBuMap);	
 		Map<String, Integer> buSubBuCountsMap = new HashMap<String, Integer>();
 	 
 		MemberBrowse memberBrowse = memberBrowseDao.getEntireMemberBrowse(l_id);
 		
 		//no record in memberBrowse for this member, insert the member and publish to kafka
 		if(memberBrowse == null ){
+			LOGGER.info("Record getting inserted for " + l_id + " from " + sourceMap.get(source));
+			emitToKafka(loyalty_id, l_id, incomingBuSubBuMap, buSubBuCountsMap);
 			insertMemberBrowseToday(l_id, incomingBuSubBuMap);
 		}
 		
@@ -121,20 +126,21 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 					}
 				}
 			}
-				emitToKafka(l_id, incomingBuSubBuMap, buSubBuCountsMap);
+				emitToKafka(loyalty_id, l_id, incomingBuSubBuMap, buSubBuCountsMap);
 				/*
 				 * If the member has document for today, update the counts with incoming buSubBu counts
 				 */
 				if(memberBrowseMap.containsKey(todayDate)){
 					updateMemberBrowseToday(incomingBuSubBuMap, l_id, memberBrowseMap);
+					LOGGER.info("Today's record getting updated for " + l_id + " from " + sourceMap.get(source));
 				}
 				/*
 				 * If the member does not have document for today, insert a new document for today
 				 */
 				else{
 					insertMemberBrowseToday(l_id, incomingBuSubBuMap);
+					LOGGER.info("Today's record getting inserted for " + l_id + " from " + sourceMap.get(source));
 				}
-				
 		}
 	}
 
@@ -188,7 +194,7 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 		memberBrowseDao.updateMemberBrowse(l_id, dateSpecificMemberBrowse);
 	}
 	
-	public void emitToKafka(String l_id, Map<String, Integer> incomingBuSubBuMap, Map<String, Integer> buSubBuCountsMap){
+	public void emitToKafka(String loyalty_id, String l_id, Map<String, Integer> incomingBuSubBuMap, Map<String, Integer> buSubBuCountsMap){
 
 		
 		List<String> buSubBuList = new ArrayList<String>(); 
@@ -217,15 +223,21 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 		//publish to kafka
 		if(!buSubBuList.isEmpty()){
 			Map<String, Object> mapToBeSend = new HashMap<String, Object>();
-			mapToBeSend.put("memberId", l_id);
-			mapToBeSend.put("occasionId", occasionIdMap.get(web)); 
+			mapToBeSend.put("memberId", loyalty_id);
+			//mapToBeSend.put("occasionId", occasionIdMap.get(web)); 
 			mapToBeSend.put("buSubBu", buSubBuList);
 			String jsonToBeSend = new Gson().toJson(mapToBeSend );
 			try {
 				kafkaUtil.sendKafkaMSGs(jsonToBeSend.toString(), browseKafkaTopic);
+				LOGGER.info(l_id + "--" + loyalty_id + " published to kafka for Browse");
+				redisCountIncr("browse_to_kafka");
 			} catch (ConfigurationException e) {
 				LOGGER.error("Exception in kakfa " + ExceptionUtils.getFullStackTrace(e));
 			}
+		}
+		
+		else{
+			redisCountIncr("browse_not_to_kafka");
 		}
 		
 	}

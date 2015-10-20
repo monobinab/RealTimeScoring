@@ -27,7 +27,6 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 
     protected List<String> modelVariablesList;
     protected Map<String,Collection<String>> l_idToValueCollectionMap; // USED TO MAP BETWEEN l_id AND THE TRAITS OR PID OR SearchKeyword ASSOCIATED WITH THAT ID 
-    protected String loyalty_id;
     
     protected String source;
     protected String sourceTopic;
@@ -58,6 +57,8 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 	@Override
 	public void execute(Tuple input) {
 		
+		String loyalty_id;
+		
 		LOGGER.debug("PARSING DOCUMENT -- WEB TRAIT RECORD ");
 		redisCountIncr("incoming_tuples");
 		
@@ -72,9 +73,9 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
       
         String l_id = null;
         
-        this.loyalty_id = splitRecArray[0].trim();
+        loyalty_id = splitRecArray[0].trim();
         if(loyalty_id.length()!=16 || !loyalty_id.startsWith("7081")){
-        	LOGGER.info("Could not find Lid: " + this.loyalty_id);
+        	LOGGER.info("Could not find Lid: " + loyalty_id);
         	redisCountIncr("no_lids");
         	outputCollector.ack(input);
         	return;
@@ -111,7 +112,7 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
     	if(!tagsMap.isEmpty()){
     		Object tagsJSON = JsonUtils.createJsonFromStringIntMap(tagsMap);
     		List<Object> listToEmit = new ArrayList<Object>();
-        	listToEmit.add(l_id);
+        	listToEmit.add(loyalty_id);
         	listToEmit.add(tagsJSON);
         	listToEmit.add(source);
         	this.outputCollector.emit("browse_tag_stream", listToEmit);
@@ -125,7 +126,7 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		declarer.declare(new Fields("l_id","lineItemAsJsonString","source","lyl_id_no"));
-		declarer.declareStream("browse_tag_stream", new Fields("l_id","tagsJSON","source"));
+		declarer.declareStream("browse_tag_stream", new Fields("loyalty_id","tagsJSON","source"));
 	}
 	
     abstract protected String[] splitRec(String webRec);

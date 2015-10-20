@@ -1,5 +1,6 @@
 package analytics.bolt;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +36,9 @@ public class TagProcessingBolt extends EnvironmentBolt {
 	private CpsOccasionsDao cpsOccasion;
 	private HashMap<String, String> cpsOccasionPriorityMap;
 	private HashMap<String, String> cpsOccasionDurationMap;
+	
+	private static BigInteger startLoyalty = new BigInteger("7081010000647509"); 
+	private static BigInteger lastLoyalty = new BigInteger("7081021610457114");
 	
 
 	public TagProcessingBolt(String systemProperty, String host, int port) {
@@ -83,6 +87,17 @@ public class TagProcessingBolt extends EnvironmentBolt {
 				outputCollector.ack(input);
 				return;
 			}
+			
+			//Do not create/process tags out of range alloted to CPS...
+			BigInteger loyaltyID =  new BigInteger(lyl_id_no);
+			if (loyaltyID.compareTo(startLoyalty) == -1  || loyaltyID.compareTo(lastLoyalty) == 1) {
+				LOGGER.info("Not creating Tag as lid is out of the percentile range alloted");
+				redisCountIncr("OutOf_PO_CPS_PercSplit");	
+				outputCollector.ack(input);
+				return;
+			}
+			
+			
 			String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no);
 
 			// Get list of tags from json
@@ -92,7 +107,7 @@ public class TagProcessingBolt extends EnvironmentBolt {
 			LOGGER.info("PERSIST: Input Tags for Lid " + lyl_id_no + " : "+ tags.toString());
 			
 			// List<Object> emitToPersist = new ArrayList<Object>();
-			persistTagsToMemberTagsColl(l_id, tagsString, tags);
+			buildTagsString(l_id, tagsString, tags);
 			LOGGER.debug("Scoring for " + l_id);
 			
 			//Persisting the MdTags into Mongo
@@ -133,7 +148,7 @@ public class TagProcessingBolt extends EnvironmentBolt {
 	}
 
 	
-	public void persistTagsToMemberTagsColl(String l_id,
+	public void buildTagsString(String l_id,
 			StringBuilder tagsString, JsonArray tags) {
 		for (int i = 0; i < tags.size(); i++) {
 			tagsString.append(tags.get(i).getAsString());
