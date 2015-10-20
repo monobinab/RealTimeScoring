@@ -169,16 +169,25 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
 		String requestorId = (processTransaction.getRequestorID() != null) ? processTransaction.getRequestorID() : "NONE";
 		String transactionTime = (processTransaction.getTransactionTime() != null) ? processTransaction.getTransactionTime() : "NONE";
 		String earnFlag = (processTransaction.getEarnFlag() != null) ? processTransaction.getEarnFlag() : "NONE";
-     	logPersist(memberNumber, pickUpStoreNumber, tenderStoreNumber,
+		List<LineItem> lineItemList = processTransaction.getLineItemList();
+		for(LineItem lineItem : lineItemList){
+			String division = lineItem.getDivision();
+			String itemNumber = lineItem.getItemNumber();
+			String value = lineItem.getDollarValuePostDisc();
+			logPersist(memberNumber, pickUpStoreNumber, tenderStoreNumber,
+					orderStoreNumber, registerNumber, transactionNumber, requestorId,
+					transactionTime, division, itemNumber, value, earnFlag, "MQQueue");
+		}
+     	/*logPersist(memberNumber, pickUpStoreNumber, tenderStoreNumber,
 				orderStoreNumber, registerNumber, transactionNumber, requestorId,
-				transactionTime, earnFlag, "MQQueue");
+				transactionTime, earnFlag, "MQQueue");*/
 	}
 
 	public void logPersist(String memberNumber, String pickUpStoreNumber,
 			String tenderStoreNumber, String orderStoreNumber,
 			String registerNumber, String transactionNumber,
-			String requestorId, String transactionTime, String earnFlag, String queueType) {
-		LOGGER.info("PERSIST: " + memberNumber +", " + pickUpStoreNumber + ", " + tenderStoreNumber +", " + orderStoreNumber + ", " + registerNumber +", " + transactionNumber +", " + transactionTime +", " + requestorId + ", " +", " + earnFlag +", "+ queueType);
+			String requestorId, String transactionTime, String division, String itemNumber, String value, String earnFlag, String queueType) {
+		LOGGER.info("PERSIST: " + memberNumber +", " + pickUpStoreNumber + ", " + tenderStoreNumber +", " + orderStoreNumber + ", " + registerNumber +", " + transactionNumber +", " + requestorId +", " + transactionTime + ", " +", " + division + ", " + itemNumber + ", " + value + ", " + earnFlag +", "+ queueType );
 	}
 
     private void listLineItemsAndEmit(Tuple input, String lyl_id_no, ProcessTransaction processTransaction, String messageID, String l_id) {
