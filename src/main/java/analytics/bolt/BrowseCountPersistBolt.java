@@ -63,6 +63,7 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
         kafkaUtil= new KafkaUtil(System.getProperty(MongoNameConstants.IS_PROD));
         sourceMap.put("SB", "SG");
         sourceMap.put("InternalSearch", "IS");
+        sourceMap.put("BROWSE", "PR");
         memberBrowseDao = new MemberBrowseDao();
         dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         todayDate = dateFormat.format(new Date());
@@ -234,6 +235,10 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 			} catch (ConfigurationException e) {
 				LOGGER.error("Exception in kakfa " + ExceptionUtils.getFullStackTrace(e));
 			}
+		}
+		
+		else{
+			redisCountIncr("browse_not_to_kafka");
 		}
 		
 	}
