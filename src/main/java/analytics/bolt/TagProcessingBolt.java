@@ -107,7 +107,7 @@ public class TagProcessingBolt extends EnvironmentBolt {
 			LOGGER.info("PERSIST: Input Tags for Lid " + lyl_id_no + " : "+ tags.toString());
 			
 			// List<Object> emitToPersist = new ArrayList<Object>();
-			persistTagsToMemberTagsColl(l_id, tagsString, tags);
+			buildTagsString(l_id, tagsString, tags);
 			LOGGER.debug("Scoring for " + l_id);
 			
 			//Persisting the MdTags into Mongo
@@ -148,7 +148,7 @@ public class TagProcessingBolt extends EnvironmentBolt {
 	}
 
 	
-	public void persistTagsToMemberTagsColl(String l_id,
+	public void buildTagsString(String l_id,
 			StringBuilder tagsString, JsonArray tags) {
 		for (int i = 0; i < tags.size(); i++) {
 			tagsString.append(tags.get(i).getAsString());
