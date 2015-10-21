@@ -16,15 +16,14 @@ import backtype.storm.generated.AlreadyAliveException;
 import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.topology.TopologyBuilder;
 
-public class TestingTopology {
+public class BlackoutTopology {
 	
 	public static void main(String[] args) throws ConfigurationException {
 	TopologyBuilder builder = new TopologyBuilder();
 	builder.setSpout("testSpout", new TestingSpout(), 1);
 	System.setProperty("rtseprod", "LOCAL");
 	builder.setBolt("strategyBolt", new StrategyScoringBolt("PROD"), 1).shuffleGrouping("testSpout");
-	
-	
+
 	Config conf = new Config();
 	conf.setDebug(false);
 	conf.setNumWorkers(3);
@@ -44,7 +43,7 @@ public class TestingTopology {
 		conf.setDebug(false);
 		conf.setMaxTaskParallelism(3);
 		LocalCluster cluster = new LocalCluster();
-		cluster.submitTopology("AAMTraitsTopology", conf,
+		cluster.submitTopology("TestingTopology", conf,
 				builder.createTopology());
 		try {
 			Thread.sleep(10000000);

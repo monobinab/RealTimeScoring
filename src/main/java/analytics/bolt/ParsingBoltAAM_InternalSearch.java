@@ -82,11 +82,13 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
     private boolean isJSONValid(String test) {
     	 
         try {
-            new JSONObject(test);
+            JSONObject jsonObj = new JSONObject(test);
+            jsonObj = null;
             return true;
         } catch (JSONException ex) {
             try {
-                new JSONArray(test);
+                JSONArray jsonArray = new JSONArray(test);
+                jsonArray = null;
                 return true;
             } catch (JSONException ex1) {
                 //System.out.println(test);
@@ -125,6 +127,7 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
 			query = URL1;
 			 StringBuilder sb_query = new StringBuilder(query);
 			int countKeyWords=0;
+		if(search.length != 0){
 			for(String keyWord:search) {
 				if(!keyWord.equalsIgnoreCase("N/A")) {
 					countKeyWords++;
@@ -137,6 +140,7 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
 					}
 				}
 			}
+    	}
 			query = sb_query.toString();
 			query = query + URL2;
 			
