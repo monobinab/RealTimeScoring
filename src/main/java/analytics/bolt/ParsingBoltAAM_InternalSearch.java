@@ -125,22 +125,30 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
 			String query = new String();
 			
 			query = URL1;
-			 StringBuilder sb_query = new StringBuilder(query);
+			StringBuilder sb_query = new StringBuilder(query);
 			int countKeyWords=0;
-		if(search.length != 0){
-			for(String keyWord:search) {
-				if(!keyWord.equalsIgnoreCase("N/A")) {
+		
+			//if(search != null){
+			//for(String keyWord:search) {
+			for(int i=0; i< search.length; i++){
+				
+				//check if the search key is null
+				if(search[i] == null)
+					continue;
+				
+				if(!search[i].equalsIgnoreCase("N/A")) {
 					countKeyWords++;
 					if(countKeyWords==1) {
-						sb_query.append(keyWord);
+						sb_query.append(search[i]);
 					}
 					else {
 						sb_query.append("%20");
-						sb_query.append(keyWord);
+						sb_query.append(search[i]);
 					}
 				}
 			}
-    	}
+    	
+    	//}
 			query = sb_query.toString();
 			query = query + URL2;
 			
