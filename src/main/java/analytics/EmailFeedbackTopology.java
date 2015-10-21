@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import analytics.bolt.EmailFeedbackParsingBolt;
 import analytics.bolt.LoggingBolt;
+import analytics.bolt.PurchaseScoreKafkaBolt;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.spout.RTSKafkaSpout;
 import analytics.util.KafkaUtil;
@@ -48,6 +49,11 @@ public class EmailFeedbackTopology {
 			
 		builder.setBolt("emailFeedbackParsingBolt", new EmailFeedbackParsingBolt(env),2).localOrShuffleGrouping("RTSKafkaSpout");
 		builder.setBolt("strategyScoringBolt", new StrategyScoringBolt(env), 2).shuffleGrouping("emailFeedbackParsingBolt",  "score_stream");
+		
+		//Adding the purchase kafka bolt to read from strategy scoring bolt...
+		/*builder.setBolt("purchaseScoreKafka_bolt", new PurchaseScoreKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD), purchase_Topic), 2)
+		.shuffleGrouping("strategyScoringBolt","cp_purchase_scores_stream");*/
+		
 		if(env.equals("PROD")){
 			builder.setBolt("loggingBolt", new LoggingBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
 		}
