@@ -130,7 +130,7 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
 		
 			//if(search != null){
 			//for(String keyWord:search) {
-			for(int i=0; i< search.length; i++){
+			for(int i=0; search!=null&& i< search.length; i++){
 				
 				//check if the search key is null
 				if(search[i] == null)
@@ -211,15 +211,16 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
 	    		String divLn = divLnObj.getDivLn();
 	    		
 	    		// populate buSubBuMap for BrowseTags
-				if (divLn != null) {
-					if (!buSubBuMap.containsKey(divLnBuSubBuMap.get(divLnObj
-							.getDivLn())))
-						buSubBuMap.put(divLnBuSubBuMap.get(divLnObj.getDivLn()), 1);
-					else {
-						int count = (buSubBuMap.get(divLnBuSubBuMap.get(divLnObj
-								.getDivLn()))) + 1;
-						buSubBuMap.put(divLnBuSubBuMap.get(divLnObj.getDivLn()),
-								count);
+	    		if (divLn != null) {
+					String buSubBu = divLnBuSubBuMap.get(divLn);
+					if(buSubBu != null){
+						if (!buSubBuMap.containsKey(buSubBu))
+							buSubBuMap.put(buSubBu, 1);
+						else {
+							int count = (buSubBuMap.get(buSubBu)) + 1;
+							buSubBuMap.put(buSubBu,
+									count);
+						}
 					}
 				}
 	    		
