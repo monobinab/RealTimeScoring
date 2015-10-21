@@ -92,7 +92,10 @@ public class ConsideredPurchaseTopology {
 			
 		//Browse Related Changes
 		/*topologyBuilder.setBolt("tagProcessingBolt", new TagProcessingBolt(env),10).localOrShuffleGrouping("BrowseKafkaSpout");*/
-		topologyBuilder.setBolt("CPProcessingBolt", new CPProcessingBolt(env),15).shuffleGrouping("CPParsePersistBolt").shuffleGrouping("tagProcessingBolt")
+		/*topologyBuilder.setBolt("CPProcessingBolt", new CPProcessingBolt(env),15).shuffleGrouping("CPParsePersistBolt").shuffleGrouping("tagProcessingBolt")
+		.shuffleGrouping("CPTagCreatorBolt", "blackedout_stream" );*/
+		
+		topologyBuilder.setBolt("CPProcessingBolt", new CPProcessingBolt(env),15).shuffleGrouping("CPParsePersistBolt")
 		.shuffleGrouping("CPTagCreatorBolt", "blackedout_stream" );
 		
 		
