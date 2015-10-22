@@ -141,8 +141,6 @@ public class ChangedMemberScoresDao extends AbstractDao{
 							score = (Double)scoreObj.get("s");
 						else if(scoreObj.get("s") instanceof Integer)
 							score = ((Integer)scoreObj.get("s")).doubleValue();
-						else if(new Integer(key) == modelId)
-							score = 0;
 						ChangedMemberScore changedMemberScore = new ChangedMemberScore(score, (String)scoreObj.get("minEx"), (String)scoreObj.get("maxEx"), (String)scoreObj.get("f"), (String)scoreObj.get("c"));
 						memberScores.put(new Integer(key), changedMemberScore);
 					}
