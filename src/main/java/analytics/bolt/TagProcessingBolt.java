@@ -38,7 +38,7 @@ public class TagProcessingBolt extends EnvironmentBolt {
 	private HashMap<String, String> cpsOccasionDurationMap;
 	
 	private static BigInteger startLoyalty = new BigInteger("7081010000647509"); 
-	private static BigInteger lastLoyalty = new BigInteger("7081021610457114");
+	private static BigInteger lastLoyalty = new BigInteger("7081046679059238");
 	
 
 	public TagProcessingBolt(String systemProperty, String host, int port) {

@@ -125,22 +125,30 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
 			String query = new String();
 			
 			query = URL1;
-			 StringBuilder sb_query = new StringBuilder(query);
+			StringBuilder sb_query = new StringBuilder(query);
 			int countKeyWords=0;
-		if(search.length != 0){
-			for(String keyWord:search) {
-				if(!keyWord.equalsIgnoreCase("N/A")) {
+		
+			//if(search != null){
+			//for(String keyWord:search) {
+			for(int i=0; search!=null&& i< search.length; i++){
+				
+				//check if the search key is null
+				if(search[i] == null)
+					continue;
+				
+				if(!search[i].equalsIgnoreCase("N/A")) {
 					countKeyWords++;
 					if(countKeyWords==1) {
-						sb_query.append(keyWord);
+						sb_query.append(search[i]);
 					}
 					else {
 						sb_query.append("%20");
-						sb_query.append(keyWord);
+						sb_query.append(search[i]);
 					}
 				}
 			}
-    	}
+    	
+    	//}
 			query = sb_query.toString();
 			query = query + URL2;
 			
@@ -203,15 +211,16 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
 	    		String divLn = divLnObj.getDivLn();
 	    		
 	    		// populate buSubBuMap for BrowseTags
-				if (divLn != null) {
-					if (!buSubBuMap.containsKey(divLnBuSubBuMap.get(divLnObj
-							.getDivLn())))
-						buSubBuMap.put(divLnBuSubBuMap.get(divLnObj.getDivLn()), 1);
-					else {
-						int count = (buSubBuMap.get(divLnBuSubBuMap.get(divLnObj
-								.getDivLn()))) + 1;
-						buSubBuMap.put(divLnBuSubBuMap.get(divLnObj.getDivLn()),
-								count);
+	    		if (divLn != null) {
+					String buSubBu = divLnBuSubBuMap.get(divLn);
+					if(buSubBu != null){
+						if (!buSubBuMap.containsKey(buSubBu))
+							buSubBuMap.put(buSubBu, 1);
+						else {
+							int count = (buSubBuMap.get(buSubBu)) + 1;
+							buSubBuMap.put(buSubBu,
+									count);
+						}
 					}
 				}
 	    		
