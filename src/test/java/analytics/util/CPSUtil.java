@@ -26,6 +26,8 @@ import cpstest.CPOutBoxItem;
 import analytics.util.KafkaUtil;	
 import analytics.util.dao.CPOutBoxDAO;
 import analytics.util.dao.ChangedMemberScoresDao;
+import analytics.util.dao.CpsOccasionsDao;
+import analytics.util.dao.MemberMDTags2Dao;
 import analytics.util.dao.MemberScoreDao;
 import analytics.util.dao.ModelPercentileDao;
 import analytics.util.dao.TagMetadataDao;
@@ -46,6 +48,17 @@ public class CPSUtil {
 		int successCount = 0;
 		int failureCount = 0;
 		String modPercentile = null;
+		MemberMDTags2Dao memberMDTags2Dao = new MemberMDTags2Dao();
+		CpsOccasionsDao cpsOccasion;
+		HashMap<String, String> cpsOccasionPriorityMap;
+		HashMap<String, String> cpsOccasionDurationMap;
+		cpsOccasion = new CpsOccasionsDao();
+		cpsOccasionPriorityMap = cpsOccasion.getcpsOccasionPriority();
+		cpsOccasionDurationMap = cpsOccasion.getcpsOccasionDurations();
+		ChangedMemberScoresDao changedMemberScoresDao = new ChangedMemberScoresDao();
+		TagVariableDao tagVariableDao = new TagVariableDao();
+		MemberScoreDao memberScoreDao = new MemberScoreDao();
+		ModelPercentileDao modelPercentileDao = new ModelPercentileDao();
 		
 		Map<String, List<CPOutBoxItem>> presetMap = loadFile(presetFile, "PRESET");
 		Map<String, List<CPOutBoxItem>> testMap = loadFile(testFile, "TEST");
@@ -63,6 +76,8 @@ public class CPSUtil {
 			try {
 				// PRESET
 				String loyID = presetList.get(0).getLoy_id();
+				String l_id = SecurityUtils.hashLoyaltyId(loyID);
+				CPOutBoxItem presetItem = presetList.get(0);
 
 				printWriter.println("PRESET OutBox Entries for LOYALTY ID: "+ loyID);
 
@@ -86,24 +101,31 @@ public class CPSUtil {
 					printWriter.println("tag:" + cpItem.getMd_tag()
 							+ "  Send Date:" + cpItem.getSend_date()
 							+ " Sent Flag:" + cpItem.getStatus());
+					
+					presetItem.getMdTagList().add(cpItem.getMd_tag());
+				}
+				//This is to make sure preset data is populated in membermdTags with Dates.
+				//For purchases and purchase Top5 preset data will not be available in membermdTags with Dates if we don't do this.
+				List<String> mdTags = memberMDTags2Dao.getMemberMDTags(l_id);
+				if(mdTags!=null && mdTags.size()>0){
+					memberMDTags2Dao.deleteMemberMDTags(l_id);
+					memberMDTags2Dao.addMemberMDTags(l_id, presetItem.getMdTagList(), cpsOccasionDurationMap, cpsOccasionPriorityMap);
 				}
 
 				// TEST
 				// if(!testMap.containsKey(loyID))
 				// break;
 				if (testMap.containsKey(loyID)) {
+					l_id = SecurityUtils.hashLoyaltyId(loyID);
 					List<CPOutBoxItem> testList = testMap.get(loyID);
 					CPOutBoxItem testItem = testList.get(0);
-					ChangedMemberScoresDao changedMemberScoresDao = new ChangedMemberScoresDao();
-					TagVariableDao tagVariableDao = new TagVariableDao();
-					MemberScoreDao memberScoreDao = new MemberScoreDao();
-					ModelPercentileDao modelPercentileDao = new ModelPercentileDao();
+				
 					//ScoringUtils scoringUtils = new ScoringUtils();
 					
 					for (CPOutBoxItem cptestItem : testList) {
 						//update the score of the model pertaining to the purchase to 0
 						// in changedMemberScore/memberScore to 0 if testList has a purchase tag 
-						String l_id = SecurityUtils.hashLoyaltyId(loyID);
+						
 						if(cptestItem.getMd_tag().contains("Purchase")){
 									
 							ModelScore modelScorePercentile1 = new ModelScore();
@@ -113,13 +135,21 @@ public class CPSUtil {
 							if(modelId !=null){
 								Map<Integer, ChangedMemberScore>  changedScores = changedMemberScoresDao.getChangedMemberScores(l_id,modelId);
 								if(changedScores!=null && changedScores.size()>0){
+									ChangedMemberScore changedMemberScoreObject = changedScores.get(Integer.toString(modelId));
+									if(changedMemberScoreObject==null){
+										changedMemberScoreObject = new ChangedMemberScore();
+									}
+									changedMemberScoreObject.setModelId(Integer.toString(modelId));
+									changedMemberScoreObject.setScore(newScore );
+									changedScores.put(modelId, changedMemberScoreObject);	
 									changedMemberScoresDao.upsertUpdateChangedScores(l_id, changedScores);
 								}
 								else{
-									Map<String, String> memScores = memberScoreDao.getMemberScores(l_id, modelId);
-									if(memScores!=null && memScores.size()>0)
-										memScores.put(Integer.toString(modelId), "0.0");
-										memberScoreDao.upsertUpdateMemberScores(l_id, memScores);										
+									Map<String, Double> memScores = memberScoreDao.getMemberScores(l_id, modelId);
+									if(memScores!=null && memScores.size()>0){
+										memScores.put(Integer.toString(modelId), newScore);
+										memberScoreDao.upsertUpdateMemberScores(l_id, memScores);	
+									}
 								}
 								modelScorePercentile1.setModelId(Integer.toString(modelId));
 								modelScorePercentile1.setScore(newScore);	
@@ -136,7 +166,7 @@ public class CPSUtil {
 						//in changedMemberScore/memberScore
 						if(cptestItem.getMd_tag().contains("Top5")){
 							ModelScore modelScorePercentile2 = new ModelScore();
-							double newScore = 0;
+							double newScore = 0.0;
 							Integer modelId = tagVariableDao.getmodelIdFromTag(cptestItem.getMd_tag().substring(0,5));
 							//reset the score to be max(score) of 98th percentile for that model.
 							if(modelId !=null){
@@ -150,25 +180,27 @@ public class CPSUtil {
 									//if so update it
 									Map<Integer, ChangedMemberScore>  changedScores = changedMemberScoresDao.getChangedMemberScores(l_id,modelId);
 									if(changedScores!=null && changedScores.size()>0){
-										//ChangedMemberScore scoreObj = changedScores.get(modelId);
-										ChangedMemberScore scoreObj = new ChangedMemberScore();
-										scoreObj.setModelId(Integer.toString(modelId));
-										scoreObj.setScore(newScore );
-										scoreObj.setEffDate(DateUtil.formatDate(new Date(), "yyyy-MM-dd"));
-										scoreObj.setMaxDate(DateUtil.formatDate(new Date(), "yyyy-MM-dd"));
-										scoreObj.setMinDate(DateUtil.formatDate(new Date(), "yyyy-MM-dd"));
-										Map<Integer,ChangedMemberScore> memberScores = new HashMap<Integer, ChangedMemberScore>();
-										memberScores.put(modelId, scoreObj);									
-										changedMemberScoresDao.upsertUpdateChangedScores(l_id, memberScores);
+										ChangedMemberScore changedMemberScoreObject = changedScores.get(Integer.toString(modelId));
+										if(changedMemberScoreObject==null){
+											changedMemberScoreObject = new ChangedMemberScore();
+										}
+										changedMemberScoreObject.setModelId(Integer.toString(modelId));
+										changedMemberScoreObject.setScore(newScore );
+										//scoreObj.setEffDate(DateUtil.formatDate(new Date(), "yyyy-MM-dd"));
+										//scoreObj.setMaxDate(DateUtil.formatDate(new Date(), "yyyy-MM-dd"));
+										//scoreObj.setMinDate(DateUtil.formatDate(new Date(), "yyyy-MM-dd"));
+										//Map<Integer,ChangedMemberScore> memberScores = new HashMap<Integer, ChangedMemberScore>();
+										changedScores.put(modelId, changedMemberScoreObject);									
+										changedMemberScoresDao.upsertUpdateChangedScores(l_id, changedScores);
 									}
 									else{
 										//check if there is an entry for this member in memberScores
 										//if so update it								
-										Map<String, String> memScores = memberScoreDao.getMemberScores(l_id, modelId);
+										Map<String, Double> memScores = memberScoreDao.getMemberScores(l_id, modelId);
 										if(memScores!=null && memScores.size()>0){
-											Map<String, String> memberScores = new HashMap<String, String>();
-											memberScores.put(Integer.toString(modelId),Double.toString(newScore));
-											memberScoreDao.upsertUpdateMemberScores(l_id, memberScores);
+										//	Map<String, String> memberScores = new HashMap<String, String>();
+											memScores.put(Integer.toString(modelId),newScore);
+											memberScoreDao.upsertUpdateMemberScores(l_id, memScores);
 										}
 									}
 									modelScorePercentile2.setModelId(Integer.toString(modelId));
@@ -200,7 +232,7 @@ public class CPSUtil {
 							String kafkaMSG = createModelScorePercentileJson(testItem.getLoy_id(),testItem.getModelScorePercentiles());
 							System.out.println("message sent to kafka: "+ kafkaMSG);
 							new KafkaUtil("PROD")
-							.sendKafkaMSGs(kafkaMSG, "rts_cp_membertags_qa");
+							.sendKafkaMSGs(kafkaMSG, "rts_cp_purchase_scores_qa");
 						}
 						
 							
@@ -208,7 +240,7 @@ public class CPSUtil {
 						e.printStackTrace();
 					}
 
-					Thread.sleep(5000);
+					Thread.sleep(25000);
 
 					// VERIFY
 
@@ -224,14 +256,14 @@ public class CPSUtil {
 						verifyItem.setStatus(0);
 						
 						CPOutBoxItem queuedItem = null;
-						if(verifyItem.getMd_tag().contains("Purchase")){
+						/*if(verifyItem.getMd_tag().contains("Purchase")){
 							queuedItem = new CPOutBoxDAO()
 							.getQueuedItem(verifyItem.getLoy_id(),
 									verifyItem.getMd_tag().substring(0,5),
 									verifyItem.getStatus());
 						}
 						
-						else 
+						else */
 							queuedItem = new CPOutBoxDAO()
 								.getQueuedItem(verifyItem.getLoy_id(),
 										verifyItem.getMd_tag(),
@@ -239,7 +271,7 @@ public class CPSUtil {
 
 						String testresult = null;
 						
-						if(verifyItem.getMd_tag().contains("Purchase")){
+					/*	if(verifyItem.getMd_tag().contains("Purchase")){
 							if(queuedItem!= null  && queuedItem.getSend_date() != null ){
 								if(!verifyItem.getMd_tag().substring(0,5).equalsIgnoreCase(queuedItem.getMd_tag().substring(0,5))){
 									successCount++;
@@ -261,7 +293,7 @@ public class CPSUtil {
 								testresult = "SUCCESS TestTag: "
 										+ verifyItem.getMd_tag()
 										+ " is not queued to OutBox as Expected";
-								/*if(!verifyItem.getMd_tag().substring(0,5).equalsIgnoreCase(queuedItem.getMd_tag().substring(0,5))){
+								if(!verifyItem.getMd_tag().substring(0,5).equalsIgnoreCase(queuedItem.getMd_tag().substring(0,5))){
 									successCount++;
 									testresult = "SUCCESS TestTag: "
 											+ verifyItem.getMd_tag()
@@ -272,12 +304,13 @@ public class CPSUtil {
 									testresult = "FAILURE Test tag: "
 										+ verifyItem.getMd_tag()
 										+ " is Queued in OutBox which is not expected" ;
-								}*/
+								}
 							}
 						}
 
 						// Printing the test result file
-						else if (queuedItem != null && queuedItem.getSend_date() != null) {
+						else*/
+						if (queuedItem != null && queuedItem.getSend_date() != null) {
 							if (queuedItem.getSend_date().equals(verifyItem.getSend_date()))   {
 								successCount++;
 								testresult = "SUCCESS Test Tag: "
