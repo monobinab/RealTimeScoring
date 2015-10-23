@@ -1,5 +1,7 @@
 package analytics.bolt;
 
+import analytics.jmx.AppMetricsBean;
+import analytics.jmx.JMXConnectionManager;
 import analytics.util.JsonUtils;
 import analytics.util.SecurityUtils;
 import analytics.util.XMLParser;
@@ -27,6 +29,7 @@ import javax.jms.Message;
 
 import java.io.ByteArrayOutputStream;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TellurideParsingBoltPOS extends EnvironmentBolt {
 
@@ -45,6 +48,8 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
     private Map<String, List<String>> divCatVariablesMap;
     private String host;
     private int port;
+    private AppMetricsBean appMetricsBean;
+    private AtomicInteger atomicInteger;
 
     public TellurideParsingBoltPOS(String systemProperty) {
         super(systemProperty);
@@ -55,6 +60,7 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
         super(systemProperty);
         this.host = host;
         this.port = port;
+        
     }
 
     public void setOutputCollector(OutputCollector outputCollector) {
@@ -88,6 +94,13 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
         LOGGER.trace("Populate div cat variables map");
         //populate divCatVariablesMap
         divCatVariablesMap = divCatVariableDao.getDivCatVariable();
+        JMXConnectionManager jmxConnectionManager = JMXConnectionManager.getInstance();
+        if(jmxConnectionManager != null){
+        	if(appMetricsBean == null && atomicInteger == null){
+        		appMetricsBean = jmxConnectionManager.getAppMetricsBean();
+        		atomicInteger = jmxConnectionManager.getAtomicIntegerInstance();
+        	}
+        }
     }
 
     /*
@@ -103,6 +116,9 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
           }
         LOGGER.info("PERSIST: incoming tuples in parsingbolt TELLURIDE");
         redisCountIncr("incoming_tuples");
+        if(appMetricsBean != null && atomicInteger != null){
+        	appMetricsBean.setTellurideTupCount(atomicInteger.incrementAndGet());
+        }
         String lyl_id_no = "";
         ProcessTransaction processTransaction = null;
         String messageID = "";
