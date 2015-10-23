@@ -47,7 +47,6 @@ public class JMXConnectionManager {
 	    		}
     		}catch(Exception ex){
     			LOGGER.error("Failed to register mbean, graphite metrices will not be available - " + ex.getMessage());
-    			System.out.println("@@@@@@@@@@@ ---->> ---->> Failed to register mbean, graphite metrices will not be available - " + ex.getMessage());
     		}
     	}
     }
