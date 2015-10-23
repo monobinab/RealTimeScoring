@@ -147,13 +147,13 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 				mainJsonObj.put("tags", rtsTags);
 				mainJsonObj.put("tagIdentifier", "RTS");
 				rtsTagsListToEmit.add(mainJsonObj.toString());
-				LOGGER.info("Tags being sent for loyalty Id : " +lyl_id_no+ " > 95% : " +rtsTags.toString());
+				LOGGER.info("Tags being sent for loyalty Id : " +lyl_id_no.getAsString()+ " > 95% : " +rtsTags.toString());
 				this.outputCollector.emit("rtsTags_stream",rtsTagsListToEmit);	
 			}
 			else if(rtsTags.size()==0 && blackListed){
 				List<Object> blackedoutListToEmit = new ArrayList<Object>();
-				blackedoutListToEmit.add(lyl_id_no);
-				LOGGER.info("Blackedout loyalty Id being sent to CP Processing : " +lyl_id_no);
+				blackedoutListToEmit.add(lyl_id_no.getAsString());
+				LOGGER.info("Blackedout loyalty Id being sent to CP Processing : " +lyl_id_no.getAsString());
 				this.outputCollector.emit("blackedout_stream",blackedoutListToEmit);
 			}
 		}

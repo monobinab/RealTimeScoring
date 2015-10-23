@@ -109,8 +109,9 @@ public class CPSUtil {
 				List<String> mdTags = memberMDTags2Dao.getMemberMDTags(l_id);
 				if(mdTags!=null && mdTags.size()>0){
 					memberMDTags2Dao.deleteMemberMDTags(l_id);
-					memberMDTags2Dao.addMemberMDTags(l_id, presetItem.getMdTagList(), cpsOccasionDurationMap, cpsOccasionPriorityMap);
 				}
+				memberMDTags2Dao.addMemberMDTags(l_id, presetItem.getMdTagList(), cpsOccasionDurationMap, cpsOccasionPriorityMap);
+				
 
 				// TEST
 				// if(!testMap.containsKey(loyID))
@@ -240,7 +241,7 @@ public class CPSUtil {
 						e.printStackTrace();
 					}
 
-					Thread.sleep(25000);
+					Thread.sleep(37000);
 
 					// VERIFY
 

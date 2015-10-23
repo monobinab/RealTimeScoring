@@ -63,13 +63,17 @@ public class MemberMDTags2Dao extends AbstractDao {
 		if (dbObj != null) {
 			BasicDBList dbListTags = (BasicDBList) dbObj.get("tags");
 			List<String> mdTags = new ArrayList<String>();
-			for (Object tag : dbListTags) {
-				if (tag instanceof BasicDBObject) {
-					mdTags.add(((BasicDBObject) tag).getString("t").toString());
+			if(dbListTags != null && dbListTags.size()>0){
+				for (Object tag : dbListTags) {
+					if (tag instanceof BasicDBObject) {
+						mdTags.add(((BasicDBObject) tag).getString("t").toString());
+					}
 				}
+				return mdTags;
+				
 			}
-			// List<String> mdTags = (List<String>) dbObj.get("tags");
-			return mdTags;
+			return null;
+		
 		} else
 			return null;
 	}
