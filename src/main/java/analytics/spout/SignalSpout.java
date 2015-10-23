@@ -56,7 +56,10 @@ public class SignalSpout extends BaseRichSpout{
 					listToEmit.add(valueJsonObj.get("taxonomy"));
 				else
 					listToEmit.add(null);
-				listToEmit.add(userJsonObj.get("uuid"));
+				if(valueJsonObj.has("uuid"))
+					listToEmit.add(userJsonObj.get("uuid"));
+				else
+					listToEmit.add(null);
 				listToEmit.add(valueJsonObj.get("type"));
 				listToEmit.add(jsonObj.get("offset"));
 				collector.emit(listToEmit);
