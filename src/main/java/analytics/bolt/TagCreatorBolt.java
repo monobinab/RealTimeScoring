@@ -38,7 +38,7 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 	MemberMDTags2Dao memberMDTags2Dao;
 	Map<Integer, String> modelTagsMap = new HashMap<Integer, String>();
 	private static BigInteger startLoyalty = new BigInteger("7081010000647509"); 
-	private static BigInteger lastLoyalty = new BigInteger("7081046679059238");
+	private static BigInteger lastLoyalty = new BigInteger("7081117556061439");
 
 	public TagCreatorBolt(String env) {
 		super(env);
@@ -147,13 +147,16 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 				mainJsonObj.put("tags", rtsTags);
 				mainJsonObj.put("tagIdentifier", "RTS");
 				rtsTagsListToEmit.add(mainJsonObj.toString());
-				LOGGER.info("Tags being sent for loyalty Id : " +lyl_id_no.getAsString()+ " > 95% : " +rtsTags.toString());
+				LOGGER.info("PERSIST:Tags being sent for loyalty Id : " +lyl_id_no.getAsString()+ " > 95% : " +rtsTags.toString());
+				if(blackListed){
+					LOGGER.info("PERSIST:Blackedout loyalty Id being sent to CP Processing : " +lyl_id_no.getAsString());
+				}
 				this.outputCollector.emit("rtsTags_stream",rtsTagsListToEmit);	
 			}
 			else if(rtsTags.size()==0 && blackListed){
 				List<Object> blackedoutListToEmit = new ArrayList<Object>();
 				blackedoutListToEmit.add(lyl_id_no.getAsString());
-				LOGGER.info("Blackedout loyalty Id being sent to CP Processing : " +lyl_id_no.getAsString());
+				LOGGER.info("PERSIST:Blackedout loyalty Id being sent to CP Processing : " +lyl_id_no.getAsString());
 				this.outputCollector.emit("blackedout_stream",blackedoutListToEmit);
 			}
 		}
