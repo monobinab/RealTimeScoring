@@ -45,7 +45,7 @@ public class SignalBrowseSpout extends BaseRichSpout{
 		this.collector = collector;
 		topologyName = (String) conf.get("metrics_topology");
 		if(topologyName.equalsIgnoreCase(Constants.SIGNAL_BROWSE_TOPOLOGY))
-			this.searchKey = "signalTestingFeed";
+			this.searchKey = "signalBrowseFeed";
 	}
 
 	@Override
