@@ -34,7 +34,7 @@ public class ScoringSingletonIntegrationTest {
 	
 	private static ScoringSingleton scoringSingletonObj;
 	private static DB db;
-
+	private static FakeMongoStaticCollection fakeMongoStaticCollection;
 	@SuppressWarnings("unchecked")
 	@BeforeClass
 	public static void initializeFakeMongo() throws InstantiationException,
@@ -42,13 +42,14 @@ public class ScoringSingletonIntegrationTest {
 			InvocationTargetException, ParseException, ConfigurationException, SecurityException, NoSuchFieldException {
 			
 		SystemPropertyUtility.setSystemProperty();
+		fakeMongoStaticCollection = new FakeMongoStaticCollection();
 		db = SystemPropertyUtility.getDb();
 		Constructor<ScoringSingleton> constructor = (Constructor<ScoringSingleton>) ScoringSingleton.class
 				.getDeclaredConstructors()[0];
 		constructor.setAccessible(true);
 		
 		//fake variables collection
-		DBCollection varColl = db.getCollection("Variables");
+		/*DBCollection varColl = db.getCollection("Variables");
 		varColl.insert(new BasicDBObject("name", "variable1").append("VID", 1).append("strategy","StrategyCountTransactions"));
 		varColl.insert(new BasicDBObject("name", "variable2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
 		varColl.insert(new BasicDBObject("name", "variable3").append("VID", 3).append("strategy","StrategyCountTraits"));
@@ -110,7 +111,7 @@ public class ScoringSingletonIntegrationTest {
 		
 		//fake regionalFactors collection
 		DBCollection regionalAdjFactorsColl = db.getCollection("regionalAdjustmentFactors");
-		regionalAdjFactorsColl.insert(new BasicDBObject("state", "TN").append("modelName", "Model_Name").append("modelId", "35").append("factor", "0.1"));
+		regionalAdjFactorsColl.insert(new BasicDBObject("state", "TN").append("modelName", "Model_Name").append("modelId", "35").append("factor", "0.1"));*/
 		scoringSingletonObj = constructor.newInstance();
 	}
 	

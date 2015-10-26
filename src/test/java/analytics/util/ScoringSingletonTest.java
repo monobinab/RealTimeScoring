@@ -44,6 +44,7 @@ import com.mongodb.DBObject;
 public class ScoringSingletonTest {
 	private static ScoringSingleton scoringSingletonObj;
 	private static DB db;
+	private static FakeMongoStaticCollection fakeMongoStaticCollection;
 	@SuppressWarnings("unchecked")
 	@BeforeClass
 	public static void initializeFakeMongo() throws InstantiationException,
@@ -52,6 +53,7 @@ public class ScoringSingletonTest {
 		
 		//this utility sets the system property and get the Db
 		SystemPropertyUtility.setSystemProperty();
+		fakeMongoStaticCollection = new FakeMongoStaticCollection();
 		db = SystemPropertyUtility.getDb();
 		// We do not need instance of scoring singleton created by previous
 		// tests. If different methods need different instances, move this to
@@ -62,7 +64,7 @@ public class ScoringSingletonTest {
 		scoringSingletonObj = constructor.newInstance();
 		
 		//fake variables collection
-		DBCollection varColl = db.getCollection("Variables");
+		/*DBCollection varColl = db.getCollection("Variables");
 		varColl.insert(new BasicDBObject("name", "variable1").append("VID", 1).append("strategy","StrategyCountTransactions"));
 		varColl.insert(new BasicDBObject("name", "variable2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
 		varColl.insert(new BasicDBObject("name", "variable3").append("VID", 3).append("strategy","StrategyCountTraits"));
@@ -78,7 +80,7 @@ public class ScoringSingletonTest {
 		varColl.insert(new BasicDBObject("name", "variable12").append("VID", 12).append("strategy","NONE"));
 		varColl.insert(new BasicDBObject("name", "variable40").append("VID", 40).append("strategy","NONE"));
 		varColl.insert(new BasicDBObject("name", "variable13").append("VID", 13).append("strategy","StrategyCountTraitDates"));
-		varColl.insert(new BasicDBObject("name", "variable14").append("VID", 14).append("strategy","StrategyDCStrengthSum"));
+		varColl.insert(new BasicDBObject("name", "variable14").append("VID", 14).append("strategy","StrategyDCStrengthSum"));*/
 		
 	}
 
