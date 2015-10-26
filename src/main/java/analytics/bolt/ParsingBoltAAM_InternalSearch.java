@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -106,7 +107,7 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
      */
 
 	@Override
-	protected Map<String, String> processList(String current_l_id, Map<String, Integer> buSubBuMap) {
+	protected Map<String, String> processList(String current_l_id, Hashtable<String, Integer> buSubBuMap) {
 	    	
     	String queryResultsDoc = new String();
     	Set<String> pidSet = new HashSet<String>();

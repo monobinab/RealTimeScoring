@@ -257,7 +257,7 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 			for(String buSubBu : existingBuSubBuCountsMap.keySet()){
 				int PC = existingBuSubBuCountsMap.get(buSubBu);
 				int IC = incomingBuSubBuMap.get(buSubBu);
-				if(PC < THRESHOLD && (PC + IC) >= THRESHOLD){
+				if(PC < THRESHOLD && (PC + IC) >= THRESHOLD && buSubBu.length() == 5){
 					buSubBuList.add(buSubBu+occasionIdMap.get(web));
 				}
 			}
@@ -265,7 +265,7 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 		
 		else{
 			for(String buSubBu : incomingBuSubBuMap.keySet()){
-				if(incomingBuSubBuMap.get(buSubBu) >= THRESHOLD){
+				if(incomingBuSubBuMap.get(buSubBu) >= THRESHOLD && buSubBu.length() == 5){
 					buSubBuList.add(buSubBu+occasionIdMap.get(web));
 				}
 			}
@@ -279,6 +279,7 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 				if(buSubBuListToKafka != null && !buSubBuListToKafka.isEmpty()){
 					Map<String, Object> mapToBeSend = new HashMap<String, Object>();
 					mapToBeSend.put("memberId", loyalty_id);
+					mapToBeSend.put("topology", source);
 					//mapToBeSend.put("occasionId", occasionIdMap.get(web)); 
 					mapToBeSend.put("buSubBu", buSubBuListToKafka);
 					String jsonToBeSend = new Gson().toJson(mapToBeSend );
