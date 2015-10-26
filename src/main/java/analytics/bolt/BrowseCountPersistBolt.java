@@ -285,8 +285,8 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 					String jsonToBeSend = new Gson().toJson(mapToBeSend );
 					try {
 						kafkaUtil.sendKafkaMSGs(jsonToBeSend.toString(), browseKafkaTopic);
-						System.out.println("to kafka " + buSubBuListToKafka);
-						LOGGER.info(l_id + "--" + loyalty_id + " published to kafka for " + sourceMap.get(source));
+					//	System.out.println("to kafka " + buSubBuListToKafka + ", " + source);
+						LOGGER.info( l_id + " --" + loyalty_id + " published to kafka for " + sourceMap.get(source) + ": " + buSubBuListToKafka);
 						redisCountIncr("browse_to_kafka");
 					} catch (ConfigurationException e) {
 						LOGGER.error("Exception in kakfa " + ExceptionUtils.getFullStackTrace(e));
