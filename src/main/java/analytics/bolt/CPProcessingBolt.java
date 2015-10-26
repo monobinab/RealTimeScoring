@@ -32,9 +32,6 @@ public class CPProcessingBolt extends EnvironmentBolt  {
 	private static final String cps_api_key_param = "CPS";
 	private CPSFiler cpsFiler;
 	
-	private static BigInteger startLoyalty = new BigInteger("7081010000647509"); 
-	private static BigInteger lastLoyalty = new BigInteger("7081021610457114");
-	
 	public CPProcessingBolt(String env) {
 		super(env);
 	}
