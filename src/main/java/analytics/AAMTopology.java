@@ -45,7 +45,7 @@ public class AAMTopology {
 	  	builder.setSpout("traitsSpout", new WebHDFSSpout(servers[1], TopicConstants.PORT, Constants.AAM_TRAITS_PATH, "aamTraits"), 1);
 	  	builder.setBolt("parsingBoltWebTraits", new ParsingBoltWebTraits(System.getProperty(MongoNameConstants.IS_PROD), source), 1)
 	  		.shuffleGrouping("traitsSpout");
-	  	builder.setBolt("browseCountPersist", new BrowseCountPersistBolt(System.getProperty(MongoNameConstants.IS_PROD), source, "Browse", browseKafkaTopic), 3).shuffleGrouping("parsingBoltBrowse", "browse_tag_stream");
+	  	builder.setBolt("browseCountPersist", new BrowseCountPersistBolt(System.getProperty(MongoNameConstants.IS_PROD), source, "Browse", browseKafkaTopic), 3).shuffleGrouping("parsingBoltWebTraits", "browse_tag_stream");
 	  	builder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System.getProperty(MongoNameConstants.IS_PROD)),1).shuffleGrouping("parsingBoltWebTraits");
 	    builder.setBolt("persistTraits" , new PersistTraitsBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("parsingBoltWebTraits");
 	    
