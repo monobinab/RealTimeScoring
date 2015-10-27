@@ -142,7 +142,8 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 			}
 				
 			for(String key : buSubBuCountsMap.keySet()){
-				System.out.println("PC " + key +": " + buSubBuCountsMap.get(key));
+				//System.out.println("PC " + key +": " + buSubBuCountsMap.get(key));
+				LOGGER.info("PC for " + l_id + "-- "+ key +": " + buSubBuCountsMap.get(key));
 			}
 			//validateAndEmitToKafka(loyalty_id, l_id, incomingBuSubBuMap, buSubBuCountsMap);
 			buSubBuListToKafka = getBuSubBuList(loyalty_id, l_id, incomingBuSubBuMap, buSubBuCountsMap);
@@ -232,7 +233,7 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 			String jsonToBeSend = new Gson().toJson(mapToBeSend );
 			try {
 				kafkaUtil.sendKafkaMSGs(jsonToBeSend.toString(), browseKafkaTopic);
-				System.out.println("to kafka " + buSubBuList);
+				System.out.println(l_id + "--" + loyalty_id + " published to kafka for " + sourceMap.get(source));
 				LOGGER.info(l_id + "--" + loyalty_id + " published to kafka for " + sourceMap.get(source));
 				redisCountIncr("browse_to_kafka");
 			} catch (ConfigurationException e) {
