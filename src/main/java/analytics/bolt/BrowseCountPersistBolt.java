@@ -91,7 +91,7 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 
 	public List<String> updateMemberBrowseAndKafkaList(String loyalty_id, String l_id, Map<String, Integer> incomingBuSubBuMap) {
 	
-		LOGGER.info("Incoming buSubBu for " + l_id + " from " + sourceMap.get(source) +": " + incomingBuSubBuMap);	
+		LOGGER.info("PERSIST: Incoming buSubBu for " + l_id + " from " + sourceMap.get(source) +": " + incomingBuSubBuMap);	
 		System.out.println("incoming " + incomingBuSubBuMap);
 		Map<String, Integer> buSubBuCountsMap = new HashMap<String, Integer>();
 	 
@@ -99,7 +99,7 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 		List<String> buSubBuListToKafka = new ArrayList<String>();
 		//no record in memberBrowse for this member, insert the member and publish to kafka
 		if(memberBrowse == null ){
-			LOGGER.info("Record getting inserted for " + l_id + " from " + sourceMap.get(source));
+			LOGGER.info("PERSIST: Record getting inserted for " + l_id + " from " + sourceMap.get(source));
 		//	validateAndEmitToKafka(loyalty_id, l_id, incomingBuSubBuMap, buSubBuCountsMap);
 			buSubBuListToKafka = getBuSubBuList(loyalty_id, l_id, incomingBuSubBuMap, buSubBuCountsMap);
 			insertMemberBrowseToday(l_id, incomingBuSubBuMap);
@@ -143,7 +143,7 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 				
 			for(String key : buSubBuCountsMap.keySet()){
 				//System.out.println("PC " + key +": " + buSubBuCountsMap.get(key));
-				LOGGER.info("PC for " + l_id + "-- "+ key +": " + buSubBuCountsMap.get(key));
+				LOGGER.info("PERSIST: PC for " + l_id + "-- "+ key +": " + buSubBuCountsMap.get(key));
 			}
 			//validateAndEmitToKafka(loyalty_id, l_id, incomingBuSubBuMap, buSubBuCountsMap);
 			buSubBuListToKafka = getBuSubBuList(loyalty_id, l_id, incomingBuSubBuMap, buSubBuCountsMap);
@@ -152,14 +152,14 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 			 */
 			if(dateSpeBuSubBuMap.containsKey(todayDate)){
 				updateMemberBrowseToday(l_id, incomingBuSubBuMap, memberBrowse);
-				LOGGER.info("Today's record getting updated for " + l_id + " from " + sourceMap.get(source));
+				LOGGER.info("PERSIST: Today's record getting updated for " + l_id + " from " + sourceMap.get(source));
 			}
 			/*
 			 * If the member does not have document for today, insert a new document for today
 			 */
 			else{
 				insertMemberBrowseToday(l_id, incomingBuSubBuMap);
-				LOGGER.info("Today's record getting inserted for " + l_id + " from " + sourceMap.get(source));
+				LOGGER.info("PERSIST: Today's record getting inserted for " + l_id + " from " + sourceMap.get(source));
 			}
 		}
 			return buSubBuListToKafka;
@@ -233,8 +233,8 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 			String jsonToBeSend = new Gson().toJson(mapToBeSend );
 			try {
 				kafkaUtil.sendKafkaMSGs(jsonToBeSend.toString(), browseKafkaTopic);
-				System.out.println(l_id + "--" + loyalty_id + " published to kafka for " + sourceMap.get(source));
-				LOGGER.info(l_id + "--" + loyalty_id + " published to kafka for " + sourceMap.get(source));
+			//	System.out.println(l_id + "--" + loyalty_id + " published to kafka for " + sourceMap.get(source));
+				LOGGER.info("PERSIST: " + l_id + "--" + loyalty_id + " published to kafka for " + sourceMap.get(source));
 				redisCountIncr("browse_to_kafka");
 			} catch (ConfigurationException e) {
 				LOGGER.error("Exception in kakfa " + ExceptionUtils.getFullStackTrace(e));
