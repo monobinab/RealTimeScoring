@@ -105,6 +105,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		String source = "";
 		String lyl_id_no = "";
 		
+		cacheStatistics.printCacheStatistics();
 		LOGGER.info("Incoming Message to StrategyScoringBolt " + input.toString());
 		
 		try{
@@ -208,7 +209,6 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			this.outputCollector.emit("cp_purchase_scores_stream", objectToCps);
 	
 			redisCountIncr("member_scored_successfully");
-			cacheStatistics.printCacheStatistics();
 			this.outputCollector.ack(input);
 		}catch(Exception e){
 			e.printStackTrace();
