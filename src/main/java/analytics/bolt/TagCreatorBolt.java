@@ -38,7 +38,7 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 	MemberMDTags2Dao memberMDTags2Dao;
 	Map<Integer, String> modelTagsMap = new HashMap<Integer, String>();
 	private static BigInteger startLoyalty = new BigInteger("7081010000647509"); 
-	private static BigInteger lastLoyalty = new BigInteger("7081117556061439");
+	private static BigInteger lastLoyalty = new BigInteger("7081216198457607");
 
 	public TagCreatorBolt(String env) {
 		super(env);
