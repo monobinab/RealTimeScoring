@@ -3,7 +3,7 @@ package analytics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.bolt.FlumeRPCBolt;
+import analytics.bolt.BrowseCountPersistBolt;
 import analytics.bolt.LoggingBolt;
 import analytics.bolt.ParsingBoltAAM_Browse;
 import analytics.bolt.RTSKafkaBolt;
@@ -37,13 +37,14 @@ public class AAM_BrowseTopology {
 
 		String topic = TopicConstants.AAM_BROWSE_PRODUCTS;
 		String kafkatopic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;
-	
+		String browseKafkaTopic = TopicConstants.BROWSE_KAFKA_TOPIC;
 		//RedisConnection redisConnection = new RedisConnection();
 		String[] servers = RedisConnection.getServers(System.getProperty(MongoNameConstants.IS_PROD));
 		
 		//Sree. Spout that wakes up every 5 mins and process the Traits
 		topologyBuilder.setSpout("browseSpout", new WebHDFSSpout(servers[1], TopicConstants.PORT, Constants.AAM_BROWSER_PATH, "aamBrowser"), 1);
 		topologyBuilder.setBolt("parsingBoltBrowse", new ParsingBoltAAM_Browse(System.getProperty(MongoNameConstants.IS_PROD), topic), 3).shuffleGrouping("browseSpout");
+		topologyBuilder.setBolt("browseCountPersist", new BrowseCountPersistBolt(System.getProperty(MongoNameConstants.IS_PROD), topic, "Browse", browseKafkaTopic), 3).shuffleGrouping("parsingBoltBrowse", "browse_tag_stream");
 
 		
 		topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System
@@ -70,6 +71,7 @@ public class AAM_BrowseTopology {
 				|| System.getProperty(MongoNameConstants.IS_PROD)
 						.equalsIgnoreCase("QA")) {
 			try {
+				conf.setNumWorkers(6);
 				StormSubmitter.submitTopology(args[0], conf,
 						topologyBuilder.createTopology());
 			} catch (AlreadyAliveException e) {

@@ -18,7 +18,8 @@ public class MemberUUIDDao extends AbstractDao{
 			.getLogger(MemberUUIDDao.class);
     DBCollection memberUuidCollection;
     public MemberUUIDDao(){
-    	super("server2_2");
+    	//Connect to static collections replicaset
+    	super("static");
 		memberUuidCollection = db.getCollection("memberUUID");
     }
     

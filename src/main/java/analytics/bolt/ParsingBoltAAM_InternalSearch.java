@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,6 +18,7 @@ import org.codehaus.jettison.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import analytics.util.dao.DivLnBuSubBuDao;
 import analytics.util.dao.DivLnVariableDao;
 import analytics.util.dao.PidDivLnDao;
 import analytics.util.objects.DivLn;
@@ -36,7 +38,8 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
     private Map<String, List<String>> divLnVariablesMap;
 	private DivLnVariableDao divLnVariableDao;
 	private PidDivLnDao pidDivLnDao;
-
+	private DivLnBuSubBuDao divLnBuSubBuDao;
+	private Map<String, String> divLnBuSubBuMap;
     /*
          * (non-Javadoc)
          *
@@ -58,6 +61,9 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
         // populate divLnVariablesMap
         divLnVariablesMap = divLnVariableDao.getDivLnVariable();
         
+        divLnBuSubBuDao = new DivLnBuSubBuDao();
+		divLnBuSubBuMap = divLnBuSubBuDao.getDvLnBuSubBu();
+        
     }
 
 
@@ -77,11 +83,13 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
     private boolean isJSONValid(String test) {
     	 
         try {
-            new JSONObject(test);
+            JSONObject jsonObj = new JSONObject(test);
+            jsonObj = null;
             return true;
         } catch (JSONException ex) {
             try {
-                new JSONArray(test);
+                JSONArray jsonArray = new JSONArray(test);
+                jsonArray = null;
                 return true;
             } catch (JSONException ex1) {
                 //System.out.println(test);
@@ -99,7 +107,7 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
      */
 
 	@Override
-	protected Map<String, String> processList(String current_l_id) {
+	protected Map<String, String> processList(String current_l_id, Hashtable<String, Integer> buSubBuMap) {
 	    	
     	String queryResultsDoc = new String();
     	Set<String> pidSet = new HashSet<String>();
@@ -118,20 +126,30 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
 			String query = new String();
 			
 			query = URL1;
-			 StringBuilder sb_query = new StringBuilder(query);
+			StringBuilder sb_query = new StringBuilder(query);
 			int countKeyWords=0;
-			for(String keyWord:search) {
-				if(!keyWord.equalsIgnoreCase("N/A")) {
+		
+			//if(search != null){
+			//for(String keyWord:search) {
+			for(int i=0; search!=null&& i< search.length; i++){
+				
+				//check if the search key is null
+				if(search[i] == null)
+					continue;
+				
+				if(!search[i].equalsIgnoreCase("N/A")) {
 					countKeyWords++;
 					if(countKeyWords==1) {
-						sb_query.append(keyWord);
+						sb_query.append(search[i]);
 					}
 					else {
 						sb_query.append("%20");
-						sb_query.append(keyWord);
+						sb_query.append(search[i]);
 					}
 				}
 			}
+    	
+    	//}
 			query = sb_query.toString();
 			query = query + URL2;
 			
@@ -192,6 +210,21 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
     		if(divLnObj != null) {
 	    		String div = divLnObj.getDiv();
 	    		String divLn = divLnObj.getDivLn();
+	    		
+	    		// populate buSubBuMap for BrowseTags
+	    		if (divLn != null) {
+					String buSubBu = divLnBuSubBuMap.get(divLn);
+					if(buSubBu != null){
+						if (!buSubBuMap.containsKey(buSubBu))
+							buSubBuMap.put(buSubBu, 1);
+						else {
+							int count = (buSubBuMap.get(buSubBu)) + 1;
+							buSubBuMap.put(buSubBu,
+									count);
+						}
+					}
+				}
+	    		
 	    		Collection<String> var = new ArrayList<String>();
 	    		if(divLnVariablesMap.containsKey(div)) {
 	    			var = divLnVariablesMap.get(div);

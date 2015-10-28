@@ -13,13 +13,13 @@ import com.mongodb.DBObject;
 import analytics.exception.RealTimeScoringException;
 import analytics.util.objects.OccasionInfo;
 
-public class OccasionDao extends AbstractMongoDao{
+public class OccasionDao extends AbstractDao{
 	
 	private DBCollection occasionInfoCollection;
 	private List<OccasionInfo> occasionInfos = new ArrayList<OccasionInfo>();
 	private static OccasionDao occasionDao;
 	
-	private OccasionDao() {
+	public OccasionDao() {
 		super();
 		try {
 			occasionInfos = this.getOccasionsInfo();
@@ -81,7 +81,7 @@ public class OccasionDao extends AbstractMongoDao{
 				}
 			}
 		}
-		System.out.println("OccasionInfos size = " + occasionInfos.size()); 
+		//System.out.println("OccasionInfos size = " + occasionInfos.size()); 
 		return occasionInfos;
 	}
 	

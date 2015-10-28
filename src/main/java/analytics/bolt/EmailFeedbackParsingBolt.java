@@ -90,6 +90,8 @@ public class EmailFeedbackParsingBolt extends EnvironmentBolt {
 							variableValueMap.put(var.getVariable(), "1");			
 					}
 				}
+				
+				redisCountIncr("email_feedback_no_count");
 			}
 			else if(emailFeedback.equals("YES")){//boost
 				//Sree. get email boost variables
@@ -101,6 +103,7 @@ public class EmailFeedbackParsingBolt extends EnvironmentBolt {
 							getVariableValue(var.getModelId()));			
 					}
 				}
+				redisCountIncr("email_feedback_yes_count");
 			}
 			
 			if (variableValueMap != null && !variableValueMap.isEmpty()) {

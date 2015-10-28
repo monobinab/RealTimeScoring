@@ -3,7 +3,7 @@ package analytics.util.objects;
 import java.io.Serializable;
 
 public class ChangedMemberScore implements Serializable{
-	
+
 	private static final long serialVersionUID = 1L;
 	private double score;
 	private String minDate;

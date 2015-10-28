@@ -68,6 +68,8 @@ public class SignalBrowseSpout extends BaseRichSpout{
 			        commonObj.setLyl_id_no(loyaltyId);
 			        commonObj.setPidList(new ArrayList<String> (jedis.lrange(s, 0,-1)));
 
+			        LOGGER.info("Signal Browse Spout : " + s + " pids : "+ jedis.lrange(s, 0,-1));
+			        
 			        if(shouldProceedWithProcessing(commonObj)){
 				        ArrayList<Object> listToEmit = new ArrayList<Object>();
 				        listToEmit.add(commonObj);

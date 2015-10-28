@@ -4,11 +4,8 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import storm.kafka.BrokerHosts;
-/*import storm.kafka.SpoutConfig;
-import storm.kafka.StringScheme;*/
-import storm.kafka.ZkHosts;
 import analytics.bolt.LoggingBolt;
+import analytics.bolt.PurchaseScoreKafkaBolt;
 import analytics.bolt.RTSKafkaBolt;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.bolt.TellurideParsingBoltPOS;
@@ -27,7 +24,6 @@ import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
 import backtype.storm.generated.AlreadyAliveException;
 import backtype.storm.generated.InvalidTopologyException;
-//import backtype.storm.spout.SchemeAsMultiScheme;
 import backtype.storm.topology.TopologyBuilder;
 
 
@@ -49,8 +45,9 @@ public class RealTimeScoringTellurideTopology {
 					.println("Please pass the environment variable argument- 'PROD' or 'QA' or 'LOCAL'");
 			System.exit(0);
 		}
-		
+
 		//String topologyId = "";
+		String purchase_Topic="rts_cp_purchase_scores";
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 		String kafkatopic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;
 		MQConnectionConfig mqConnection = new MQConnectionConfig();
@@ -101,7 +98,8 @@ public class RealTimeScoringTellurideTopology {
 				.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST),new Integer (AuthPropertiesReader
 					.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 12).shuffleGrouping("parsingBolt");
        
-		
+       topologyBuilder.setBolt("purchaseScoreKafka_bolt", new PurchaseScoreKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD), purchase_Topic), 2)
+		.shuffleGrouping("strategyScoringBolt","cp_purchase_scores_stream");
 		/*topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System.getProperty(MongoNameConstants.IS_PROD), "10.2.8.175", 11211,
 				"10.2.8.149", 11211), 12).shuffleGrouping("parsingBolt");*/
        

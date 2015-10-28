@@ -20,6 +20,8 @@ import analytics.util.dao.MemberInfoDao;
 import analytics.util.dao.OccasionDao;
 import analytics.util.dao.OccationCustomeEventDao;
 import analytics.util.dao.OutboxDao;
+import analytics.util.dao.TagMetadataDao;
+import analytics.util.dao.TagResponsysActiveDao;
 import analytics.util.objects.APIResponseMapper;
 import analytics.util.objects.EmailPackage;
 import analytics.util.objects.MemberInfo;
@@ -34,13 +36,23 @@ public class CPSFiler {
 	private OutboxDao outboxDao;
 	private OccasionDao occasionDao;
 	private MemberInfoDao memberInfoDao;
+	private TagResponsysActiveDao tagResponsysActiveDao;
+	private TagMetadataDao tagsMetaDataDao;
+	private List<String> activeTags;
 
 	public void initDAO() throws RealTimeScoringException{
 		outboxDao = new OutboxDao();
-		memberInfoDao = new MemberInfoDao();		
+		memberInfoDao = new MemberInfoDao();
+		tagsMetaDataDao = new TagMetadataDao();
 		occasionDao = OccasionDao.getInstance();
+		tagResponsysActiveDao = new TagResponsysActiveDao();
+		activeTags= tagResponsysActiveDao.getActiveResponsysTagsList();
+		
 	}
 	
+	public void setActiveTags(List<String> activeTags){
+		this.activeTags = activeTags;
+	}
 	public List<EmailPackage> prepareEmailPackages(String rtsAPIResponse, String lyl_id_no,String l_id) throws JSONException, SQLException, Exception {
 		
 		List<EmailPackage> emailPackages = new ArrayList<EmailPackage>(); 
@@ -50,6 +62,8 @@ public class CPSFiler {
 		if(memberInfo!=null){
 			if(StringUtils.isNotBlank(memberInfo.getEid())&& memberInfo.getEid()!="0"){
 				List<TagMetadata> validOccasions = this.getValidOccasionsList(rtsAPIResponse);
+				
+				
 				
 				if(validOccasions != null && validOccasions.size() > 0){
 					for(TagMetadata validOccasion : validOccasions){
@@ -70,10 +84,10 @@ public class CPSFiler {
 						
 					}
 				}else{
-				logger.info("There are no valid mdtags for this member: " + lyl_id_no);
+				logger.info("PERSIST:There are no valid mdtags for this member: " + lyl_id_no);
 				}
 				
-				if(emailPackages != null && emailPackages.size() > 0){
+				if(emailPackages != null ){
 					
 					//ignore sending an emailPackage if it has been sent in the history -( ex: duress > 0 & < 38)
 					List<EmailPackage> emailPackagesToBeSent = this.ignorePackagesSentInHistory(emailPackages);
@@ -309,6 +323,7 @@ public class CPSFiler {
 					return false;
 			}
 			
+			
 			return true;			
 	}
 
@@ -328,20 +343,49 @@ public class CPSFiler {
 					for(ScoresInfo scoresInfo : scoresInfos){
 						if(scoresInfo != null){
 							//Check if the occasion has an mdtag
-							if(StringUtils.isNotBlank(scoresInfo.getMdTag())){
+							String mdtag = scoresInfo.getMdTag();
+							if(StringUtils.isNotBlank(mdtag)){
+								if(isTop5Percent(mdtag) && !isOccasionResponsysReady(mdtag)){
+									
+									continue;								
+								}	
 								TagMetadata tagMetaData = new TagMetadata();
 								tagMetaData.setPurchaseOccassion(scoresInfo.getOccassion());
 								tagMetaData.setBusinessUnit(scoresInfo.getBusinessUnit());
 								tagMetaData.setSubBusinessUnit(scoresInfo.getSubBusinessUnit());
-								tagMetaData.setMdTag(scoresInfo.getMdTag());	
-								mdTagsList.add(tagMetaData);
+								tagMetaData.setMdTag(scoresInfo.getMdTag());							
+								mdTagsList.add(tagMetaData);								
 							}								
 						}
 					}
 				}
 			}
-		}	
+		}
+		
 		return mdTagsList;	
+	}
+	
+	private List<String> filterResponsysNotReadyTop5PercentTags(String lyl_id_no, String l_id,List<String> tagsList) {
+		List<String> filteredTagsLst = new ArrayList<String>();
+		List<String> inactiveTop5TagsLst = new ArrayList<String>();
+		for(String mdtag : tagsList){
+			if(isTop5Percent(mdtag)){
+				if(!isOccasionResponsysReady(mdtag))
+				{
+					inactiveTop5TagsLst.add(mdtag);
+				}
+				else
+					filteredTagsLst.add(mdtag);
+			}
+			else
+				filteredTagsLst.add(mdtag);
+		}
+		//Delete the top5percent mdtags that responsys is not ready for, from mdTagsWithDates collection.
+		if(inactiveTop5TagsLst.size() > 0){
+			logger.info("PERSIST: Filtering top5% tags that responsys is not ready for :: MemberId : "+ lyl_id_no + " Tags: " + getLogMsg(inactiveTop5TagsLst));
+			
+		}
+		return filteredTagsLst;
 	}
 
 	protected boolean isOccasionTop5Percent(String mdtag) {
@@ -407,6 +451,39 @@ public class CPSFiler {
 			}
         }
 		return emailPackages;
+	}
+	
+	private boolean isOccasionResponsysReady(String mdtag) {
+		System.out.println(mdtag);
+		System.out.println(activeTags);
+		return activeTags.contains(mdtag.substring(0, 5));			
+	}
+
+	private boolean isTop5Percent(String mdtag) {
+		TagMetadata tagMetaData = tagsMetaDataDao.getDetails(mdtag);
+		if(tagMetaData != null){
+			//Check for the 6th char of the mdtag to be 8
+			if(tagMetaData.getMdTag().substring(5, 6).equals(MongoNameConstants.top5PercentTag))
+				return true;
+			else
+				return false;			
+		}
+		return false;		
+	}
+	
+	private String getLogMsg(List<String> listOfStrings) {
+		String logMsg = "  ";
+		int i =0;
+		for(String str : listOfStrings)
+		{
+			if (i ==0)
+				logMsg = logMsg.concat(str);
+			else if ( i == listOfStrings.size()-1)
+				logMsg = logMsg.concat(str);
+			else
+				logMsg = logMsg.concat(", ").concat(str);
+		}
+		return logMsg;
 	}
 	
 	/*public List<EmailPackage> decideSendDates(List<EmailPackage> emailPackages, EmailPackage inProgressPackage) throws SQLException, RealTimeScoringException {

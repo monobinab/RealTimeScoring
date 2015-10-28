@@ -37,7 +37,10 @@ public class PidMatchUtils{
 			item = pid.substring(3, 8);
 			divLn = div + divLnItm.getLnFromDivItem(div, item);
 			return new DivLn(div, divLn); 
+			/*DivLn divLnObj2 = divLnItm.getLnFromDivItemTag(div, item);
+			return divLnObj2;*/
 		}
+		
 		if(pid.length()==14 && pid.contains("CO")){
 			div = pid.substring(0, 2);
 			return new DivLn(div, div);

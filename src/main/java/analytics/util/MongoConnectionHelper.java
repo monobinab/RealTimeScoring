@@ -18,7 +18,7 @@ public class MongoConnectionHelper {
         if (mongoSingletonProd1 == null) {
             synchronized (MongoConnectionHelper.class) {
                 if (mongoSingletonProd1 == null) {
-                	System.out.println("mongoSingletonProd1");
+                	//System.out.println("mongoSingletonProd1");
                 	mongoSingletonProd1 = new MongoClient(replicaSetServers);
                 }
             }
@@ -30,7 +30,7 @@ public class MongoConnectionHelper {
         if (mongoSingletonProd2 == null) {
             synchronized (MongoConnectionHelper.class) {
                 if (mongoSingletonProd2 == null) {
-                	System.out.println("mongoSingletonProd2");
+                	//System.out.println("mongoSingletonProd2");
                 	mongoSingletonProd2 = new MongoClient(replicaSetServers);
                 }
             }

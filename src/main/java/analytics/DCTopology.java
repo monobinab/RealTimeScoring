@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import storm.kafka.*;
 import analytics.bolt.LoggingBolt;
 import analytics.bolt.ParsingBoltDC;
+import analytics.bolt.PurchaseScoreKafkaBolt;
 import analytics.bolt.RTSKafkaBolt;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.util.MetricsListener;
@@ -26,6 +27,7 @@ public class DCTopology {
 	public static void main(String[] args) {
 		String kafkatopic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;
 		String topologyId = "";
+		String purchase_Topic="rts_cp_purchase_scores";
 		if (!SystemUtility.setEnvironment(args)) {
 			System.out
 					.println("Please pass the environment variable argument- 'PROD' or 'QA' or 'LOCAL'");
@@ -51,6 +53,9 @@ public class DCTopology {
 	    
 	    builder.setBolt("RTSKafkaBolt", new RTSKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD),kafkatopic), 1)
 		.shuffleGrouping("strategyScoringBolt","kafka_stream");
+	    
+	    builder.setBolt("purchaseScoreKafka_bolt", new PurchaseScoreKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD), purchase_Topic), 2)
+		.shuffleGrouping("strategyScoringBolt","cp_purchase_scores_stream");
 		if(System.getProperty(MongoNameConstants.IS_PROD).equals("PROD")){
 			builder.setBolt("loggingBolt", new LoggingBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
 		}	
@@ -63,6 +68,7 @@ public class DCTopology {
 				|| System.getProperty(MongoNameConstants.IS_PROD)
 						.equalsIgnoreCase("QA")) {	
 			try {
+				conf.setNumWorkers(6);
 				StormSubmitter.submitTopology(args[0], conf, builder.createTopology());
 			} catch (AlreadyAliveException e) {
 				LOGGER.error(e.getClass() + ": " + e.getMessage(), e);

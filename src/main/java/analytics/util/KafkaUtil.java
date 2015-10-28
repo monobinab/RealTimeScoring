@@ -8,6 +8,7 @@ import kafka.producer.ProducerConfig;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,7 +104,10 @@ public class KafkaUtil {
 
 		if (kafkaProperties != null) {
 			Properties properties = new Properties();
-			String kafkaserver = kafkaProperties.getString(KAFKA_METADATA);
+			//String kafkaserver = kafkaProperties.getString(KAFKA_METADATA);
+			String tempServer=kafkaProperties.getProperty(KAFKA_METADATA).toString();
+			String tempServer1 = StringUtils.remove(tempServer, '[');
+			String kafkaserver = StringUtils.remove(tempServer1, ']');
 			properties.put(KAFKA_METADATA, kafkaserver);
 			properties.put(SERIALIZER, kafkaProperties.getProperty(SERIALIZER));
 			properties.put(TYPE, "async");

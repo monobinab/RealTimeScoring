@@ -3,6 +3,7 @@ package analytics.bolt;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -27,7 +28,6 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 
     protected List<String> modelVariablesList;
     protected Map<String,Collection<String>> l_idToValueCollectionMap; // USED TO MAP BETWEEN l_id AND THE TRAITS OR PID OR SearchKeyword ASSOCIATED WITH THAT ID 
-    protected String loyalty_id;
     
     protected String source;
     protected String sourceTopic;
@@ -52,11 +52,13 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
         modelVariablesList = new ArrayList<String>();
      
 		//POPULATE MODEL VARIABLES LIST
-        modelVariablesList =modelVariablesDao.getVariableList();
+        modelVariablesList = modelVariablesDao.getVariableList();
     }
 
 	@Override
 	public void execute(Tuple input) {
+		
+		String loyalty_id;
 		
 		LOGGER.debug("PARSING DOCUMENT -- WEB TRAIT RECORD ");
 		redisCountIncr("incoming_tuples");
@@ -72,9 +74,9 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
       
         String l_id = null;
         
-        this.loyalty_id = splitRecArray[0].trim();
+        loyalty_id = splitRecArray[0].trim();
         if(loyalty_id.length()!=16 || !loyalty_id.startsWith("7081")){
-        	LOGGER.info("Could not find Lid: " + this.loyalty_id);
+        	LOGGER.info("Could not find Lid: " + loyalty_id);
         	redisCountIncr("no_lids");
         	outputCollector.ack(input);
         	return;
@@ -87,7 +89,9 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 			l_idToValueCollectionMap.get(l_id).add(splitRecArray[i].trim());
 		}
 		LOGGER.debug("processing found traits...");
-    	Map<String,String> variableValueMap = processList(l_id); //LIST OF VARIABLES FOUND DURING TRAITS PROCESSING
+		
+		Hashtable<String, Integer> tagsMap = new Hashtable<String, Integer>();
+    	Map<String,String> variableValueMap = processList(l_id, tagsMap); //LIST OF VARIABLES FOUND DURING TRAITS PROCESSING
     	if(variableValueMap !=null && !variableValueMap.isEmpty()) {
         	Object variableValueJSON = JsonUtils.createJsonFromStringStringMap(variableValueMap);
         	List<Object> listToEmit = new ArrayList<Object>();
@@ -104,17 +108,30 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
     		redisCountIncr("no_variables_affected");
     	}
     	redisCountIncr("total_processing");
+    	
+    	//emitting to BrowseCountPersistBolt
+    	if(!tagsMap.isEmpty()){
+    		Object tagsJSON = JsonUtils.createJsonFromStringIntMap(tagsMap);
+    		List<Object> listToEmit = new ArrayList<Object>();
+        	listToEmit.add(loyalty_id);
+        	listToEmit.add(tagsJSON);
+        	listToEmit.add(source);
+        	this.outputCollector.emit("browse_tag_stream", listToEmit);
+        	redisCountIncr("emitted_browse_tag");
+    	}
     	outputCollector.ack(input);
     	return;
         
 	}
 
-	protected abstract Map<String, String> processList(String current_l_id);
-
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		declarer.declare(new Fields("l_id","lineItemAsJsonString","source","lyl_id_no"));
+		declarer.declareStream("browse_tag_stream", new Fields("loyalty_id","tagsJSON","source"));
 	}
+	
     abstract protected String[] splitRec(String webRec);
+	protected abstract Map<String, String> processList(String current_l_id, Hashtable<String, Integer> tagsMap);
+
 }    
 

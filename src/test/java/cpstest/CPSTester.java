@@ -13,12 +13,13 @@ public class CPSTester {
 		
 		String presetFile=args[0];
 		String testFile=args[1];
-		String testresults=args[2];
-		String topicName=args[3];
-		String env = args[4];
+		String verifyFile=args[2];
+		String testresults=args[3];
+		String topicName=args[4];
+		String env = args[5];
 		System.setProperty(MongoNameConstants.IS_PROD, env);
 		CPSUtil cpsUtil=new CPSUtil();	
-		cpsUtil.processFile(presetFile, testFile,testresults,topicName);
+		cpsUtil.processFile(presetFile, testFile,verifyFile,testresults,topicName);
 		
 	}
 	

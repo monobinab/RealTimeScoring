@@ -29,7 +29,7 @@ public class RedisPubSubSpout extends BaseRichSpout {
     SpoutOutputCollector _collector;
      final String pattern;
     LinkedBlockingQueue<String> queue;
-    JedisPool pool;
+  //  JedisPool pool;
     final int number;
     String environment;
     String[] redisServers;
@@ -89,11 +89,15 @@ public class RedisPubSubSpout extends BaseRichSpout {
                 }
             };
 
-            Jedis jedis = new Jedis(redisServers[number], 6379, 604800);
-			jedis.connect();
+           /* Jedis jedis = new Jedis(redisServers[number], 6379, 604800);
+			jedis.connect();*/
 
             //Jedis jedis = pool.getResource();
+            
+            Jedis jedis = null;
             try {
+            	 jedis = new Jedis(redisServers[number], 6379, 800);
+     			jedis.connect();
                 jedis.psubscribe(listener, pattern);
             } 
             catch(Exception e){
@@ -101,7 +105,9 @@ public class RedisPubSubSpout extends BaseRichSpout {
             }
             finally {
                 //pool.returnResource(jedis);
-            	jedis.disconnect();
+            	if(null != jedis){
+            		jedis.disconnect();
+            	}
             }
         }
     };
@@ -120,7 +126,7 @@ public class RedisPubSubSpout extends BaseRichSpout {
     }
 
     public void close() {
-        pool.destroy();
+       // pool.destroy();
     }
 
     public void nextTuple() {

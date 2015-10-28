@@ -10,11 +10,13 @@ import analytics.bolt.CPParsePersistBolt;
 import analytics.bolt.CPProcessingBolt;
 import analytics.bolt.PurchaseBolt;
 import analytics.bolt.TagCreatorBolt;
+import analytics.bolt.TagProcessingBolt;
 import analytics.spout.RTSKafkaSpout;
 import analytics.util.KafkaUtil;
 import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
 import analytics.util.SystemUtility;
+import analytics.util.TopicConstants;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
@@ -47,7 +49,11 @@ public class ConsideredPurchaseTopology {
 		String zkroot_cp_purchase = "rts_cp_purchase_zkroot";
 		String group_id = "cps_groupid";
 		String env = System.getProperty(MongoNameConstants.IS_PROD);
-		TopologyBuilder topologyBuilder = new TopologyBuilder();		
+		TopologyBuilder topologyBuilder = new TopologyBuilder();	
+		
+		//Browse related changes...
+		String kafkaTopic = TopicConstants.BROWSE_KAFKA_TOPIC;
+		String zkroot="browseTopic";
 				
 		try {
 			//SpoutConfig spoutConfig1 = null;
@@ -63,20 +69,35 @@ public class ConsideredPurchaseTopology {
 			//topologyBuilder.setSpout("CPPurchaseFeedbackSpout", new RTSKafkaSpout(spoutConfig3), 1);
 			topologyBuilder.setSpout("CPPurchaseSpout", new RTSKafkaSpout(spoutConfig3), 1);
 			//LOGGER.info("CPS Topology listening to kafka topics : " + kafkaTopic1 + ", "+kafkaTopic2 +" , "+ cpsPurchaseScoresTopic);
+			
+			//Browse relate CHnages
+			topologyBuilder.setSpout(
+					"BrowseKafkaSpout",
+					new RTSKafkaSpout(new KafkaUtil(env).getSpoutConfig(kafkaTopic,zkroot,group_id)), 1);
+			
+			
 			LOGGER.info("CPS Topology listening to kafka topics : " + kafkaTopic2 + ", "+ cpsPurchaseScoresTopic);
 		} catch (ConfigurationException e) {
 			LOGGER.error(e.getClass() + ": " + e.getMessage() +" STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 			System.exit(0);	
 		}
-		topologyBuilder.setBolt("CPParsePersistBolt", new CPParsePersistBolt(env), 15).shuffleGrouping("CPKafkaSpout2");	
-		topologyBuilder.setBolt("CPPurchaseBolt", new PurchaseBolt(env), 15).shuffleGrouping("CPPurchaseSpout");
-		topologyBuilder.setBolt("CPProcessingBolt", new CPProcessingBolt(env),15).shuffleGrouping("CPPurchaseBolt").shuffleGrouping("CPParsePersistBolt");
+		//topologyBuilder.setBolt("CPParsePersistBolt", new CPParsePersistBolt(env), 15).shuffleGrouping("CPKafkaSpout2");	
+		//topologyBuilder.setBolt("CPPurchaseBolt", new PurchaseBolt(env), 15).shuffleGrouping("CPPurchaseSpout");
+		//topologyBuilder.setBolt("CPProcessingBolt", new CPProcessingBolt(env),15).shuffleGrouping("CPTagCreatorBolt").shuffleGrouping("CPParsePersistBolt");
 		
-		//topologyBuilder.setBolt("CPParsePersistBolt", new CPParsePersistBolt(env), 15).shuffleGrouping("CPKafkaSpout2").shuffleGrouping("CPTagCreatorBolt", "rtsTags_stream" );	
+		topologyBuilder.setBolt("CPTagCreatorBolt", new TagCreatorBolt(env), 1).shuffleGrouping("CPPurchaseSpout");	
+		topologyBuilder.setBolt("CPParsePersistBolt", new CPParsePersistBolt(env), 15).shuffleGrouping("CPKafkaSpout2").shuffleGrouping("CPTagCreatorBolt", "rtsTags_stream" );	
 		//topologyBuilder.setBolt("CPParsePersistBolt", new CPParsePersistBolt(env), 15).shuffleGrouping("CPKafkaSpout1").shuffleGrouping("CPKafkaSpout2").shuffleGrouping("CPTagCreatorBolt", "rtsTags_stream" );	
-		//topologyBuilder.setBolt("CPProcessingBolt", new CPProcessingBolt(env),15).shuffleGrouping("CPPurchaseFeedbackSpout").shuffleGrouping("CPParsePersistBolt").shuffleGrouping("CPTagCreatorBolt", "blackedout_stream" );
-		//topologyBuilder.setBolt("CPTagCreatorBolt", new TagCreatorBolt(env), 1).shuffleGrouping("CPPurchaseFeedbackSpout");		
+		
 			
+		//Browse Related Changes
+		/*topologyBuilder.setBolt("tagProcessingBolt", new TagProcessingBolt(env),10).localOrShuffleGrouping("BrowseKafkaSpout");*/
+		/*topologyBuilder.setBolt("CPProcessingBolt", new CPProcessingBolt(env),15).shuffleGrouping("CPParsePersistBolt").shuffleGrouping("tagProcessingBolt")
+		.shuffleGrouping("CPTagCreatorBolt", "blackedout_stream" );*/
+		
+		topologyBuilder.setBolt("CPProcessingBolt", new CPProcessingBolt(env),15).shuffleGrouping("CPParsePersistBolt")
+		.shuffleGrouping("CPTagCreatorBolt", "blackedout_stream" );
+		
 		
 		Config conf = new Config();
 		conf.put("metrics_topology", "CPS");

@@ -1,6 +1,7 @@
 package analytics.bolt;
 
 
+import java.math.BigInteger;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
@@ -10,10 +11,12 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import scala.math.BigInt;
 import analytics.exception.RealTimeScoringException;
 import analytics.util.CPSFiler;
 import analytics.util.MongoNameConstants;
 import analytics.util.RTSAPICaller;
+import analytics.util.SecurityUtils;
 import analytics.util.dao.ClientApiKeysDAO;
 import analytics.util.objects.EmailPackage;
 import backtype.storm.task.OutputCollector;
@@ -28,6 +31,7 @@ public class CPProcessingBolt extends EnvironmentBolt  {
 	private RTSAPICaller rtsApiCaller;
 	private static final String cps_api_key_param = "CPS";
 	private CPSFiler cpsFiler;
+	
 	public CPProcessingBolt(String env) {
 		super(env);
 	}
@@ -54,15 +58,15 @@ public class CPProcessingBolt extends EnvironmentBolt  {
 			
 		if(input != null && input.contains("lyl_id_no"))
 		{
-			lyl_id_no = input.getStringByField("lyl_id_no");	
-			l_id = input.getStringByField("l_id");
+			lyl_id_no = input.getStringByField("lyl_id_no");
+			l_id = SecurityUtils.hashLoyaltyId(lyl_id_no);
 			
 			try{
 				//call rts api and get response for this l_id 
 				//20 - level, rtsTOtec is the apikey for internal calls to RTS API from topologies
 				String rtsAPIResponse = rtsApiCaller.getRTSAPIResponse(lyl_id_no, "20", cps_api_key, "sears", Boolean.FALSE, "");
 				List<EmailPackage> emailPackages = cpsFiler.prepareEmailPackages(rtsAPIResponse,lyl_id_no,l_id);
-				LOGGER.info("Tags to be queued to outbox for lyl_id_no " + lyl_id_no+ " : ["+getLogMsg(emailPackages) + "]");
+				LOGGER.info("PERSIST:Tags to be queued to outbox for lyl_id_no " + lyl_id_no+ " : ["+getLogMsg(emailPackages) + "]");
 				
 				if(emailPackages!= null && emailPackages.size()>0)
 				{

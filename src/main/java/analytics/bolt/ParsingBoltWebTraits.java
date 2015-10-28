@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -53,7 +54,7 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
 
 	//Generalize with parsing bolt aam atc - processPidList
 	//[2014-29-08]:{Trait1,Trait2}, [2014-28-08]:{Trait3,Trait2}
-    protected Map<String,String> processList(String current_l_id) {
+    protected Map<String,String> processList(String current_l_id, Hashtable<String, Integer> tagsMap) {
     	LOGGER.debug("Processing list of traits");
     	Map<String, List<String>> dateTraitsMap = null; // MAP BETWEEN DATES AND SET OF TRAITS - HISTORICAL AND CURRENT TRAITS
 		List<String> variableList = new ArrayList<String>();
