@@ -86,6 +86,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	  
 	  	topologyName = (String) stormConf.get("metrics_topology");
 	  	scoringSingleton = ScoringSingleton.getInstance();
+	  	cacheStatistics = CacheStatistics.getInstance();
 	  }
 	
 	@SuppressWarnings("unchecked")
