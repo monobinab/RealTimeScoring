@@ -3,7 +3,6 @@ package analytics.bolt;
 import analytics.util.JsonUtils;
 import analytics.util.ScoringSingleton;
 import analytics.util.dao.MemberVariablesDao;
-import analytics.util.dao.caching.CacheStatistics;
 import analytics.util.jedis.JedisFactoryImpl;
 import analytics.util.jedis.JedisFactory;
 import analytics.util.objects.ChangedMemberScore;
@@ -49,7 +48,6 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	private String respHost;
 	private int respPort;
 	JedisFactory jedisInterface;
-	private CacheStatistics cacheStatistics;
 	
 	public JedisFactory getJedisInterface() {
 		return jedisInterface;
@@ -86,7 +84,6 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	  
 	  	topologyName = (String) stormConf.get("metrics_topology");
 	  	scoringSingleton = ScoringSingleton.getInstance();
-	  	cacheStatistics = CacheStatistics.getInstance();
 	  }
 	
 	@SuppressWarnings("unchecked")
@@ -105,7 +102,6 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		String source = "";
 		String lyl_id_no = "";
 		
-		cacheStatistics.printCacheStatistics();
 		LOGGER.info("Incoming Message to StrategyScoringBolt " + input.toString());
 		
 		try{
