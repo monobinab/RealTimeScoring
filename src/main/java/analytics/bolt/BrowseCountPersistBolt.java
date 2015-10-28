@@ -38,9 +38,9 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 	protected OutputCollector outputCollector;
 	Map<String, String> sourceMap = new HashMap<String, String>();
 	private String source;
-	private String todayDate;
+	
 	MemberBrowseDao memberBrowseDao;
-	private LocalDate date;
+	
 	SimpleDateFormat dateFormat;
 	private KafkaUtil kafkaUtil;
 	private String browseKafkaTopic;
@@ -64,13 +64,9 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
         this.outputCollector = collector;
         super.prepare(stormConf, context, collector);
         kafkaUtil= new KafkaUtil(System.getProperty(MongoNameConstants.IS_PROD));
-        /*sourceMap.put("SB", "SG");
-        sourceMap.put("InternalSearch", "IS");
-        sourceMap.put("BROWSE", "PR");*/
         memberBrowseDao = new MemberBrowseDao();
         dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        todayDate = dateFormat.format(new Date());
-        date = new LocalDate(new Date());
+     
         cpsOccasionsDao = new CpsOccasionsDao();
         occasionIdMap = cpsOccasionsDao.getcpsOccasionId();
         
@@ -91,8 +87,11 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 
 	public List<String> updateMemberBrowseAndKafkaList(String loyalty_id, String l_id, Map<String, Integer> incomingBuSubBuMap) {
 	
+		
+		String todayDate = dateFormat.format(new Date());
+		LocalDate  date = new LocalDate(new Date());
 		LOGGER.info("PERSIST: Incoming buSubBu for " + l_id + " from " + sourceMap.get(source) +": " + incomingBuSubBuMap);	
-		System.out.println("incoming " + incomingBuSubBuMap);
+	//	System.out.println("incoming " + incomingBuSubBuMap);
 		Map<String, Integer> buSubBuCountsMap = new HashMap<String, Integer>();
 	 
 		MemberBrowse memberBrowse = memberBrowseDao.getEntireMemberBrowse(l_id);
@@ -102,7 +101,7 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 			LOGGER.info("PERSIST: Record getting inserted for " + l_id + " from " + sourceMap.get(source));
 		//	validateAndEmitToKafka(loyalty_id, l_id, incomingBuSubBuMap, buSubBuCountsMap);
 			buSubBuListToKafka = getBuSubBuList(loyalty_id, l_id, incomingBuSubBuMap, buSubBuCountsMap);
-			insertMemberBrowseToday(l_id, incomingBuSubBuMap);
+			insertMemberBrowseToday(l_id, incomingBuSubBuMap, todayDate);
 		}
 		
 		/*If the member has records, iterate through the required number of dates and 
@@ -151,21 +150,21 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 			 * If the member has document for today, update the counts with incoming buSubBu counts
 			 */
 			if(dateSpeBuSubBuMap.containsKey(todayDate)){
-				updateMemberBrowseToday(l_id, incomingBuSubBuMap, memberBrowse);
+				updateMemberBrowseToday(l_id, incomingBuSubBuMap, memberBrowse, todayDate);
 				LOGGER.info("PERSIST: Today's record getting updated for " + l_id + " from " + sourceMap.get(source));
 			}
 			/*
 			 * If the member does not have document for today, insert a new document for today
 			 */
 			else{
-				insertMemberBrowseToday(l_id, incomingBuSubBuMap);
+				insertMemberBrowseToday(l_id, incomingBuSubBuMap, todayDate);
 				LOGGER.info("PERSIST: Today's record getting inserted for " + l_id + " from " + sourceMap.get(source));
 			}
 		}
 			return buSubBuListToKafka;
 	}
 
-	private void updateMemberBrowseToday(String l_id, Map<String, Integer> incomingBuSubBuMap, MemberBrowse memberBrowse) {
+	private void updateMemberBrowseToday(String l_id, Map<String, Integer> incomingBuSubBuMap, MemberBrowse memberBrowse, String todayDate) {
 	
 		Map<String, Map<String, Map<String, Integer>>> dateSpeBuSubBuMap = memberBrowse.getDateSpecificBuSubBu();
 		
@@ -198,13 +197,13 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 			}
 				memberBrowse.setL_id(l_id);
 				memberBrowse.setDateSpecificBuSubBu(dateSpeBuSubBuMap);
-				memberBrowseDao.updateMemberBrowse(memberBrowse);
+				memberBrowseDao.updateMemberBrowse(memberBrowse, todayDate);
 		}
 	}
 	
 	
 	
-	public void insertMemberBrowseToday(String l_id, Map<String, Integer> incomingBuSubBuMap){
+	public void insertMemberBrowseToday(String l_id, Map<String, Integer> incomingBuSubBuMap, String todayDate){
 		MemberBrowse memberBrowse = new MemberBrowse();
 		memberBrowse.setL_id(l_id);
 		Map<String, Map<String, Map<String, Integer>>> dateSpeBuSubBuMap = new HashMap<String, Map<String,Map<String,Integer>>>();
@@ -216,7 +215,7 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 		 }
 		 dateSpeBuSubBuMap.put(todayDate, browseBuSubBufeedCountsMap);
 		 memberBrowse.setDateSpecificBuSubBu(dateSpeBuSubBuMap);
-		 memberBrowseDao.updateMemberBrowse(memberBrowse);
+		 memberBrowseDao.updateMemberBrowse(memberBrowse, todayDate);
 	}
 	
 	public void validateAndEmitToKafka(String loyalty_id, String l_id, Map<String, Integer> incomingBuSubBuMap, Map<String, Integer> buSubBuCountsMap){
@@ -234,7 +233,7 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 			try {
 				kafkaUtil.sendKafkaMSGs(jsonToBeSend.toString(), browseKafkaTopic);
 			//	System.out.println(l_id + "--" + loyalty_id + " published to kafka for " + sourceMap.get(source));
-				LOGGER.info("PERSIST: " + l_id + "--" + loyalty_id + " published to kafka for " + sourceMap.get(source));
+				LOGGER.info("PERSIST: " + l_id + "--" + loyalty_id + " published to kafka for " + sourceMap.get(source) + " with buSubBus " + buSubBuList);
 				redisCountIncr("browse_to_kafka");
 			} catch (ConfigurationException e) {
 				LOGGER.error("Exception in kakfa " + ExceptionUtils.getFullStackTrace(e));
@@ -258,7 +257,7 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 			for(String buSubBu : existingBuSubBuCountsMap.keySet()){
 				int PC = existingBuSubBuCountsMap.get(buSubBu);
 				int IC = incomingBuSubBuMap.get(buSubBu);
-				if(PC < THRESHOLD && (PC + IC) >= THRESHOLD && buSubBu.length() == 5){
+				if(PC < THRESHOLD && (PC + IC) >= THRESHOLD ){
 					buSubBuList.add(buSubBu+occasionIdMap.get(web));
 				}
 			}
@@ -266,7 +265,7 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 		
 		else{
 			for(String buSubBu : incomingBuSubBuMap.keySet()){
-				if(incomingBuSubBuMap.get(buSubBu) >= THRESHOLD && buSubBu.length() == 5){
+				if(incomingBuSubBuMap.get(buSubBu) >= THRESHOLD ){
 					buSubBuList.add(buSubBu+occasionIdMap.get(web));
 				}
 			}

@@ -16,7 +16,7 @@ import com.mongodb.DBObject;
 public class MemberBrowseDao extends AbstractDao{
 
     DBCollection memberBrowseCollection;
-    private String todayDate;
+  //  private String todayDate;
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     
     public MemberBrowseDao(){
@@ -129,9 +129,8 @@ public class MemberBrowseDao extends AbstractDao{
 	}*/
     
     
-    public void updateMemberBrowse( MemberBrowse memberBrowse){
-    	   todayDate = dateFormat.format(new Date());
-		BasicDBObject updateRec = new BasicDBObject();
+    public void updateMemberBrowse( MemberBrowse memberBrowse, String todayDate){
+    	BasicDBObject updateRec = new BasicDBObject();
 		BasicDBObject browseTagDbObj = new BasicDBObject();
 		Map<String, Map<String, Map<String, Integer>>> dateSpeBuSubBuMap = memberBrowse.getDateSpecificBuSubBu();
 		Map<String, Map<String, Integer>> todaySpeBuSubBuMap = dateSpeBuSubBuMap.get(todayDate);

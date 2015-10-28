@@ -69,7 +69,7 @@ public class BrowseCountPersistboltTest {
 		//fake memberBrowse collection
 		DBCollection memberBrowseColl = db.getCollection("memberBrowse");
 			
-		DBObject testing = memberBrowseColl.findOne(new BasicDBObject("l_id", "testingLid"));
+		DBObject testing = memberBrowseColl.findOne(new BasicDBObject("l_id", l_id));
 		System.out.println("checking the memberBrowse before the method call: " + testing);
 		
 		List<String> buSubBuList = browseCountPersistBolt.updateMemberBrowseAndKafkaList(loyaltyId, l_id, incomingBuSubBuMap);
@@ -130,7 +130,7 @@ public class BrowseCountPersistboltTest {
 		//fake memberBrowse collection
 		DBCollection memberBrowseColl = db.getCollection("memberBrowse");
 			
-		DBObject testing = memberBrowseColl.findOne(new BasicDBObject("l_id", "testingLid"));
+		DBObject testing = memberBrowseColl.findOne(new BasicDBObject("l_id", l_id));
 		System.out.println("checking the memberBrowse before the method call: " + testing);
 		
 		List<String> buSubBuList = browseCountPersistBolt.updateMemberBrowseAndKafkaList(loyaltyId, l_id, incomingBuSubBuMap);
@@ -870,6 +870,7 @@ public class BrowseCountPersistboltTest {
 	}
 	/*
 	 * If the member has record with diff buSubBu and diff feed for today from incomingBuSubBu, incomingBuSubBu will be updated for today's date
+	 * PC+IC < TH for all buSubBu, will not be emitted to kafka
 	 */
 	@SuppressWarnings("unchecked")
 	@Test
@@ -934,6 +935,88 @@ public class BrowseCountPersistboltTest {
 		expectedBuSubBuMap.put("ABCDE", expectedFeedCountsMap3);
 		Map<String, Integer> expectedFeedCountsMap4 =  new HashMap<String, Integer>();
 		expectedFeedCountsMap4.put("testSG", 2);
+		expectedBuSubBuMap.put("EFGHI", expectedFeedCountsMap4);
+		
+		//Assertion
+		Assert.assertEquals(expectedBuSubBuMap.keySet(), actualBuSubBuMap.keySet());
+		
+		//Iterating through the expectedBuSubBuMap and checking with actualBuSubBuMap
+		for(String buSubBu : expectedBuSubBuMap.keySet()){
+			Map<String, Integer> feedCountsMap = expectedBuSubBuMap.get(buSubBu);
+			for(String feed :  feedCountsMap.keySet()){
+				Assert.assertEquals(feedCountsMap.get(feed), actualBuSubBuMap.get(buSubBu).get(feed));
+			}
+		}
+	}
+	
+	
+	/*
+	 * If the member has record with diff buSubBu and diff feed for today from incomingBuSubBu, incomingBuSubBu will be updated for today's date
+	 * IC = TH for ABCDE, will be emitted to kafka
+	 */
+	@SuppressWarnings("unchecked")
+	@Test
+	public void updateMemberBrowseAndKafkaListUpdateMbrBrowseTodayDiffTagDiffFeedINEQTHTest(){
+		
+		String l_id = "testingLid5_1";
+		String loyaltyId = "testingLoyaltyId5_1";
+		TopologyContext context = new MockTopologyContext();
+		MockOutputCollector outputCollector = new MockOutputCollector(null);
+		browseCountPersistBolt.prepare(SystemPropertyUtility.getStormConf(), context, outputCollector);
+		
+		//prepared incomingBuSubBuMap
+		Map<String, Integer> incomingBuSubBuMap = new HashMap<String, Integer>();
+		incomingBuSubBuMap.put("ABCDE", 1);
+		incomingBuSubBuMap.put("EFGHI", 4);
+		
+		//fake memberBrowse collection
+		DBCollection memberBrowseColl = db.getCollection("memberBrowse");
+		BasicDBObject feedCountDbObj = new BasicDBObject();
+		feedCountDbObj.append("testPR", 1);
+		BasicDBObject feedCountDbObj2 = new BasicDBObject();
+		feedCountDbObj2.append("testIS", 1);
+		
+		BasicDBObject browsebuSubBuDbObj = new BasicDBObject();
+		browsebuSubBuDbObj.append("XYZW1", feedCountDbObj);
+		browsebuSubBuDbObj.append("12345", feedCountDbObj2);
+	
+		String dateString = dateFormatter.format(new Date());
+	
+		BasicDBObject mainDbObj = new BasicDBObject();
+		mainDbObj.append("l_id", l_id).append(dateString, browsebuSubBuDbObj);
+		
+		memberBrowseColl.insert(mainDbObj);
+		
+		DBObject testing = memberBrowseColl.findOne(new BasicDBObject("l_id", l_id));
+		System.out.println(testing);
+		
+		browseCountPersistBolt.updateMemberBrowseAndKafkaList(loyaltyId, l_id, incomingBuSubBuMap);
+		
+		DBObject mbrBrowseDbObj = memberBrowseColl.findOne(new BasicDBObject("l_id", l_id));
+
+		DBObject todayDBObj = (DBObject) mbrBrowseDbObj.get(dateFormatter.format(new Date()));
+		System.out.println(todayDBObj.keySet());
+		Map<String, Map<String, Integer>> actualBuSubBuMap = new HashMap<String, Map<String,Integer>>();
+		for(String buSubBu: todayDBObj.keySet()){
+			Map<String, Integer> actualFeedCountsMap = new HashMap<String, Integer>();
+			actualFeedCountsMap = (HashMap<String, Integer>) todayDBObj.get(buSubBu);
+			actualBuSubBuMap.put(buSubBu, actualFeedCountsMap);
+		}
+		
+		System.out.println(actualBuSubBuMap);
+		
+		Map<String, Map<String, Integer>> expectedBuSubBuMap = new HashMap<String, Map<String,Integer>>();
+		Map<String, Integer> expectedFeedCountsMap =  new HashMap<String, Integer>();
+		expectedFeedCountsMap.put("testPR", 1);
+		expectedBuSubBuMap.put("XYZW1", expectedFeedCountsMap);
+		Map<String, Integer> expectedFeedCountsMap2 =  new HashMap<String, Integer>();
+		expectedFeedCountsMap2.put("testIS", 1);
+		expectedBuSubBuMap.put("12345", expectedFeedCountsMap2);
+		Map<String, Integer> expectedFeedCountsMap3 =  new HashMap<String, Integer>();
+		expectedFeedCountsMap3.put("testSG", 1);
+		expectedBuSubBuMap.put("ABCDE", expectedFeedCountsMap3);
+		Map<String, Integer> expectedFeedCountsMap4 =  new HashMap<String, Integer>();
+		expectedFeedCountsMap4.put("testSG", 4);
 		expectedBuSubBuMap.put("EFGHI", expectedFeedCountsMap4);
 		
 		//Assertion
