@@ -3,6 +3,7 @@ package analytics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import analytics.bolt.BrowseCountPersistBolt;
 import analytics.bolt.LoggingBolt;
 import analytics.bolt.ParsingBoltWebTraits;
 import analytics.bolt.PersistTraitsBolt;
@@ -37,12 +38,14 @@ public class AAMTopology {
 		
 			String source = TopicConstants.AAM_CDF_TRAITS;
 
+			String browseKafkaTopic = TopicConstants.BROWSE_KAFKA_TOPIC;
 	   	String[] servers = RedisConnection.getServers(System.getProperty(MongoNameConstants.IS_PROD));
 	   	String kafkatopic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;
 	   	//Sree. Spout that wakes up every 5 mins and process the Traits
 	  	builder.setSpout("traitsSpout", new WebHDFSSpout(servers[1], TopicConstants.PORT, Constants.AAM_TRAITS_PATH, "aamTraits"), 1);
 	  	builder.setBolt("parsingBoltWebTraits", new ParsingBoltWebTraits(System.getProperty(MongoNameConstants.IS_PROD), source), 1)
 	  		.shuffleGrouping("traitsSpout");
+	  	builder.setBolt("browseCountPersist", new BrowseCountPersistBolt(System.getProperty(MongoNameConstants.IS_PROD), source, "Browse", browseKafkaTopic), 3).shuffleGrouping("parsingBoltWebTraits", "browse_tag_stream");
 	  	builder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System.getProperty(MongoNameConstants.IS_PROD)),1).shuffleGrouping("parsingBoltWebTraits");
 	    builder.setBolt("persistTraits" , new PersistTraitsBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("parsingBoltWebTraits");
 	    

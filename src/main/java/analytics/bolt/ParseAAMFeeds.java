@@ -3,6 +3,7 @@ package analytics.bolt;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -89,7 +90,7 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 		}
 		LOGGER.debug("processing found traits...");
 		
-		Map<String, Integer> tagsMap = new HashMap<String, Integer>();
+		Hashtable<String, Integer> tagsMap = new Hashtable<String, Integer>();
     	Map<String,String> variableValueMap = processList(l_id, tagsMap); //LIST OF VARIABLES FOUND DURING TRAITS PROCESSING
     	if(variableValueMap !=null && !variableValueMap.isEmpty()) {
         	Object variableValueJSON = JsonUtils.createJsonFromStringStringMap(variableValueMap);
@@ -130,7 +131,7 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 	}
 	
     abstract protected String[] splitRec(String webRec);
-	protected abstract Map<String, String> processList(String current_l_id, Map<String, Integer> tagsMap);
+	protected abstract Map<String, String> processList(String current_l_id, Hashtable<String, Integer> tagsMap);
 
 }    
 

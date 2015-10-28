@@ -5,7 +5,7 @@ import java.util.Map;
 public class MemberBrowse {
 	
 	private String l_id;
-	
+	Map<String, Map<String,Map<String,Integer>>> dateSpecificBuSubBu;
 	public String getL_id() {
 		return l_id;
 	}
@@ -14,15 +14,15 @@ public class MemberBrowse {
 		this.l_id = l_id;
 	}
 
-	Map<String, DateSpecificMemberBrowse> memberBrowseMap;
-
-	public Map<String, DateSpecificMemberBrowse> getMemberBrowse() {
-		return memberBrowseMap;
+	public Map<String, Map<String, Map<String, Integer>>> getDateSpecificBuSubBu() {
+		return dateSpecificBuSubBu;
 	}
 
-	public void setMemberBrowse(
-			Map<String, DateSpecificMemberBrowse> memberBrowseMap) {
-		this.memberBrowseMap = memberBrowseMap;
+	public void setDateSpecificBuSubBu(
+			Map<String, Map<String, Map<String, Integer>>> dateSpecificBuSubBu) {
+		this.dateSpecificBuSubBu = dateSpecificBuSubBu;
 	}
+
+
 	
 }

@@ -4,6 +4,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -78,7 +79,7 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 
 	@Override
 	protected Map<String, String> processList(String current_l_id,
-			Map<String, Integer> buSubBuMap) {
+			Hashtable<String, Integer> buSubBuMap) {
 		Map<String, String> variableValueMap = new HashMap<String, String>();
 		Map<String, List<String>> boostValuesMap = new HashMap<String, List<String>>();
 

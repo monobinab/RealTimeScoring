@@ -9,25 +9,48 @@ import com.mongodb.DBCollection;
 
 public class FakeMongoStaticCollection {
 	static DBCollection varColl;
-	static DBCollection modelVarCollection;
+	static DBCollection modeVarColl;
+	static DBCollection sourceFeedColl;
+	static DBCollection cpsOccasionsColl;
+	static DBCollection regionalAdjFactorsColl;
 	
+	public static DBCollection getRegionalAdjFactorsColl() {
+		return regionalAdjFactorsColl;
+	}
+	public static void setRegionalAdjFactorsColl(DBCollection regionalAdjFactorsColl) {
+		FakeMongoStaticCollection.regionalAdjFactorsColl = regionalAdjFactorsColl;
+	}
+	public static DBCollection getCpsOccasionsColl() {
+		return cpsOccasionsColl;
+	}
+	public static void setCpsOccasionsColl(DBCollection cpsOccasionsColl) {
+		FakeMongoStaticCollection.cpsOccasionsColl = cpsOccasionsColl;
+	}
 	public DBCollection getVarColl() {
 		return varColl;
 	}
 	public static void setVarColl(DBCollection varColl) {
 		FakeMongoStaticCollection.varColl = varColl;
 	}
-	public DBCollection getModelVarCollection() {
-		return modelVarCollection;
+
+	public static DBCollection getModeVarColl() {
+		return modeVarColl;
 	}
-	public static void setModelVarCollection(DBCollection modelVarCollection) {
-		FakeMongoStaticCollection.modelVarCollection = modelVarCollection;
+	public static void setModeVarColl(DBCollection modeVarColl) {
+		FakeMongoStaticCollection.modeVarColl = modeVarColl;
 	}
+	public static DBCollection getSourceFeedColl() {
+		return sourceFeedColl;
+	}
+	public static void setSourceFeedColl(DBCollection sourceFeedColl) {
+		FakeMongoStaticCollection.sourceFeedColl = sourceFeedColl;
+	}
+
 	static Boolean flag = false;
 	static DB db;
 	public FakeMongoStaticCollection() throws ParseException{
 		
-		if(!flag == true){
+	//	if(!flag == true){
 		SystemPropertyUtility.setSystemProperty();
 		db = SystemPropertyUtility.getDb();
 		varColl = db.getCollection("Variables");
@@ -53,7 +76,7 @@ public class FakeMongoStaticCollection {
 		varColl.insert(new BasicDBObject("name", "Blackout_variable2").append("VID", 18).append("strategy","StrategyBlackout"));
 	
 		//fake modelVariables collection
-		DBCollection modeVarColl = db.getCollection("modelVariables");
+		modeVarColl = db.getCollection("modelVariables");
 		BasicDBList dbList = new BasicDBList();
 		dbList.add(new BasicDBObject("name", "variable4").append("coefficient", 0.015));
 		dbList.add(new BasicDBObject("name", "variable10").append("coefficient", 0.05));
@@ -90,13 +113,27 @@ public class FakeMongoStaticCollection {
 		dbList8.add(new BasicDBObject("name", "Blackout_variable2").append("coefficient", 0.015));
 		modeVarColl.insert(new BasicDBObject("modelId", 75).append("modelName", "Model_Name8").append("modelDescription", "Home Appliances2").append("constant", 5).append("month", 0).append("variable", dbList8));
 		
+		//fake regionalFactors collection
+		regionalAdjFactorsColl = db.getCollection("regionalAdjustmentFactors");
+		regionalAdjFactorsColl.insert(new BasicDBObject("state", "TN").append("modelName", "Model_Name").append("modelId", "35").append("factor", "0.1"));
+		
+		sourceFeedColl = db.getCollection("sourceFeed");
+		sourceFeedColl.insert(new BasicDBObject("testSB", "testSG").append("testInternalSearch", "testIS").append("testBROWSE", "testPR"));
+	
+		cpsOccasionsColl = db.getCollection("cpsOccasions");
+		cpsOccasionsColl.insert(new BasicDBObject("occasionId", "7").append("occasion", "testingWeb").append("priority", 6).append("duration", 8).append("daysInHistory", "30").append("tagExpiresIn", "30"));
+		
 		setVarColl(varColl);
-		setModelVarCollection(modeVarColl);
+		setModeVarColl(modeVarColl);
+		setRegionalAdjFactorsColl(regionalAdjFactorsColl);
+		setSourceFeedColl(sourceFeedColl);
+		setCpsOccasionsColl(cpsOccasionsColl);
+		
 		/*setMemberVarsColl(memVarColl);
 		setChangedMemberVarsColl(changedMemberVar);
 		*/
-		flag = true;
-		}
+	//	flag = true;
+//		}
 	}
 
 }
