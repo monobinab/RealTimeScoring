@@ -1179,6 +1179,20 @@ public class CPSFilerTest {
 		assertEquals(retEmailPackages.get(0), temp);
 		
 	}
+
+	
+	@Test
+	public void testIsOccasionTop5Percent(){
+		boolean isTop5 = cpsFiler.isOccasionTop5Percent("CECAS823600153010");
+		assertTrue(isTop5);		
+	}
+	
+	
+	@Test
+	public void testisNotOccasionTop5Percent(){
+		boolean isTop5 = cpsFiler.isOccasionTop5Percent("CECAS723600153010");
+		assertFalse(isTop5);		
+	}
 	
 	
 	

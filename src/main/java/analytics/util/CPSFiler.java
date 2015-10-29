@@ -351,7 +351,7 @@ public class CPSFiler {
 							//Check if the occasion has an mdtag
 							String mdtag = scoresInfo.getMdTag();
 							if(StringUtils.isNotBlank(mdtag)){
-								if(isTop5Percent(mdtag) && !isOccasionResponsysReady(mdtag)){
+								if(this.isOccasionTop5Percent(mdtag) && !isOccasionResponsysReady(mdtag)){
 									
 									continue;								
 								}	
@@ -371,29 +371,6 @@ public class CPSFiler {
 		return mdTagsList;	
 	}
 	
-	private List<String> filterResponsysNotReadyTop5PercentTags(String lyl_id_no, String l_id,List<String> tagsList) {
-		List<String> filteredTagsLst = new ArrayList<String>();
-		List<String> inactiveTop5TagsLst = new ArrayList<String>();
-		for(String mdtag : tagsList){
-			if(isTop5Percent(mdtag)){
-				if(!isOccasionResponsysReady(mdtag))
-				{
-					inactiveTop5TagsLst.add(mdtag);
-				}
-				else
-					filteredTagsLst.add(mdtag);
-			}
-			else
-				filteredTagsLst.add(mdtag);
-		}
-		//Delete the top5percent mdtags that responsys is not ready for, from mdTagsWithDates collection.
-		if(inactiveTop5TagsLst.size() > 0){
-			logger.info("PERSIST: Filtering top5% tags that responsys is not ready for :: MemberId : "+ lyl_id_no + " Tags: " + getLogMsg(inactiveTop5TagsLst));
-			
-		}
-		return filteredTagsLst;
-	}
-
 	protected boolean isOccasionTop5Percent(String mdtag) {
 		
 		if(StringUtils.isNotBlank(mdtag)){
@@ -464,23 +441,13 @@ public class CPSFiler {
 		return emailPackages;
 	}
 	
-	private boolean isOccasionResponsysReady(String mdtag) {
-		System.out.println(mdtag);
-		System.out.println(activeTags);
+	public boolean isOccasionResponsysReady(String mdtag) {
+		//System.out.println(mdtag);
+		//System.out.println(activeTags);
 		return activeTags.contains(mdtag.substring(0, 5));			
 	}
 
-	private boolean isTop5Percent(String mdtag) {
-		TagMetadata tagMetaData = tagsMetaDataDao.getDetails(mdtag);
-		if(tagMetaData != null){
-			//Check for the 6th char of the mdtag to be 8
-			if(tagMetaData.getMdTag().substring(5, 6).equals(MongoNameConstants.top5PercentTag))
-				return true;
-			else
-				return false;			
-		}
-		return false;		
-	}
+
 	
 	private String getLogMsg(List<String> listOfStrings) {
 		String logMsg = "  ";
