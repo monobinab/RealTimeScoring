@@ -335,97 +335,99 @@ public class CPSFilerTest {
 		
 	}
 	
-//	//Test Case 2 - Received two occasions - Duress & Replacement ; Duress is already in progress), 
-//	//Expected Result - queue replacement after 8 days of Duress's send date
-//	@Test
-//	public void testDecideSendDatesWhenOccasionInProgress() throws RealTimeScoringException, ParseException{
-//		SimpleDateFormat sdformat = new SimpleDateFormat("MM/dd/yyyy");
-//		emailPackages = new ArrayList<EmailPackage>();
-//		memberInfo = new MemberInfo("hiBSAglnyr3kI6kYrBXHmMy5WPE=","N","AZ","N","N","N");	
-//		
-//		tagMetadata = new TagMetadata("HADHS123600153010","Home Appliance","Sears Dishwasher","Duress","HADHS",91.0,"Y","", 1, 8,30);	
-//		emailPackage = new EmailPackage("7081103948483127",tagMetadata);
-//		emailPackages.add(emailPackage);
-//		
-//		tagMetadata = new TagMetadata("HAGAS2610072010","Home Appliance","Sears appliance","Replacement","HAGAS",81.0,"Y","",2, 8, 30);
-//		emailPackage = new EmailPackage("7081103948483127",tagMetadata);
-//		emailPackages.add(emailPackage);
-//		
-//		tagMetadata = new TagMetadata("HADHS123600153010","Home Appliance","Sears Dishwasher","Duress","HADHS",91.0,"Y","", 1, 8,30);	
-//		inProgressEmailPackage = new EmailPackage("7081103948483127",tagMetadata);
-//		inProgressEmailPackage.setSendDate(new DateTime().minusDays(3).toDate());//today - 3
-//	
-//		List<EmailPackage> retEmailPackages = cpsFiler.decideSendDates(emailPackages,inProgressEmailPackage);		
-//		Assert.assertNotNull(retEmailPackages);
-//		assertEquals(retEmailPackages.size(),1);			
-//		assertEquals(sdformat.format(retEmailPackages.get(0).getSendDate()),sdformat.format(new DateTime(inProgressEmailPackage.getSendDate()).plusDays(8).toDate()));			
-//		
-//	}
+	//Test Case 2 - Received two occasions - Duress & Replacement ; Duress is already in progress), 
+	//Expected Result - queue replacement after 8 days of Duress's send date
+	@Test
+	public void testDecideSendDatesWhenOccasionInProgress() throws RealTimeScoringException, ParseException{
+		SimpleDateFormat sdformat = new SimpleDateFormat("MM/dd/yyyy");
+		emailPackages = new ArrayList<EmailPackage>();
+		memberInfo = new MemberInfo("hiBSAglnyr3kI6kYrBXHmMy5WPE=","N","AZ","N","N","N");	
+		
+		tagMetadata = new TagMetadata("HADHS123600153010","Home Appliance","Sears Dishwasher","Duress","HADHS",91.0,"Y","", 1, 8,30);	
+		emailPackage = new EmailPackage("7081103948483127",tagMetadata);
+		emailPackages.add(emailPackage);
+		
+		tagMetadata = new TagMetadata("HAGAS2610072010","Home Appliance","Sears appliance","Replacement","HAGAS",81.0,"Y","",2, 8, 30);
+		emailPackage = new EmailPackage("7081103948483127",tagMetadata);
+		emailPackages.add(emailPackage);
+		
+		tagMetadata = new TagMetadata("HADHS123600153010","Home Appliance","Sears Dishwasher","Duress","HADHS",91.0,"Y","", 1, 8,30);	
+		inProgressEmailPackage = new EmailPackage("7081103948483127",tagMetadata);
+		inProgressEmailPackage.setSendDate(new DateTime().minusDays(3).toDate());//today - 3
+		inProgressEmailPackage.setSentDateTime(new DateTime().minusDays(3).toDate());
+	
+		List<EmailPackage> retEmailPackages = cpsFiler.decideSendDates(emailPackages,inProgressEmailPackage);		
+		Assert.assertNotNull(retEmailPackages);
+		assertEquals(retEmailPackages.size(),1);			
+		assertEquals(sdformat.format(retEmailPackages.get(0).getSendDate()),sdformat.format(new DateTime(inProgressEmailPackage.getSendDate()).plusDays(8).toDate()));			
+		
+	}
 	
 		//Test Case 3 - Received two occasions - Duress & Replacement & Browse ; Replacement is already in progress), 
 		//Expected Result - Replacement is interrupted as duress is of higher priority. Duress is set to be sent tomorrow
-//		@Test
-//		public void testDecideSendDatesWhenHigherPriorityComesIn() throws RealTimeScoringException, ParseException{
-//			SimpleDateFormat sdformat = new SimpleDateFormat("MM/dd/yyyy");
-//			emailPackages = new ArrayList<EmailPackage>();
-//			memberInfo = new MemberInfo("hiBSAglnyr3kI6kYrBXHmMy5WPE=","N","AZ","N","N","N");	
-//			
-//			tagMetadata = new TagMetadata("HADHS123600153010","Home Appliance","Sears Dishwasher","Duress","HADHS",91.0,"Y","", 1, 8,30);	
-//			emailPackage = new EmailPackage("7081103948483127",tagMetadata);
-//			emailPackages.add(emailPackage);
-//			
-//			tagMetadata = new TagMetadata("HAGAS2610072010","Home Appliance","Sears appliance","Replacement","HAGAS",81.0,"Y","",2, 8, 30);
-//			emailPackage = new EmailPackage("7081103948483127",tagMetadata);
-//			emailPackages.add(emailPackage);
-//			
-//			tagMetadata = new TagMetadata("HADHS723600153010","Home Appliance","Sears Dishwasher","Browse","HADHS",91.0,"Y","", 7, 8,30);	
-//			emailPackage = new EmailPackage("7081103948483127",tagMetadata);
-//			emailPackages.add(emailPackage);
-//			
-//			tagMetadata = new TagMetadata("HAGAS2610072010","Home Appliance","Sears appliance","Replacement","HAGAS",81.0,"Y","",2, 8, 30);
-//			inProgressEmailPackage = new EmailPackage("7081103948483127",tagMetadata);		
-//			inProgressEmailPackage.setSendDate(new DateTime().minusDays(3).toDate());//today - 3
-//		
-//			List<EmailPackage> retEmailPackages = cpsFiler.decideSendDates(emailPackages,inProgressEmailPackage);	
-//			
-//			Assert.assertNotNull(retEmailPackages);
-//			assertEquals(retEmailPackages.size(),2);			
-//			assertEquals(sdformat.format(retEmailPackages.get(0).getSendDate()),sdformat.format(new DateTime().plusDays(1).toDate()));	//check if send date is set to be today's date		
-//			assertEquals(sdformat.format(retEmailPackages.get(1).getSendDate()),sdformat.format(new DateTime().plusDays(9).toDate()));	
-//		}
-//		
+		@Test
+		public void testDecideSendDatesWhenHigherPriorityComesIn() throws RealTimeScoringException, ParseException{
+			SimpleDateFormat sdformat = new SimpleDateFormat("MM/dd/yyyy");
+			emailPackages = new ArrayList<EmailPackage>();
+			memberInfo = new MemberInfo("hiBSAglnyr3kI6kYrBXHmMy5WPE=","N","AZ","N","N","N");	
+			
+			tagMetadata = new TagMetadata("HADHS123600153010","Home Appliance","Sears Dishwasher","Duress","HADHS",91.0,"Y","", 1, 8,30);	
+			emailPackage = new EmailPackage("7081103948483127",tagMetadata);
+			emailPackages.add(emailPackage);
+			
+			tagMetadata = new TagMetadata("HAGAS2610072010","Home Appliance","Sears appliance","Replacement","HAGAS",81.0,"Y","",2, 8, 30);
+			emailPackage = new EmailPackage("7081103948483127",tagMetadata);
+			emailPackages.add(emailPackage);
+			
+			tagMetadata = new TagMetadata("HADHS723600153010","Home Appliance","Sears Dishwasher","Browse","HADHS",91.0,"Y","", 7, 8,30);	
+			emailPackage = new EmailPackage("7081103948483127",tagMetadata);
+			emailPackages.add(emailPackage);
+			
+			tagMetadata = new TagMetadata("HAGAS2610072010","Home Appliance","Sears appliance","Replacement","HAGAS",81.0,"Y","",2, 8, 30);
+			inProgressEmailPackage = new EmailPackage("7081103948483127",tagMetadata);		
+			inProgressEmailPackage.setSendDate(new DateTime().minusDays(3).toDate());//today - 3
+			inProgressEmailPackage.setSentDateTime(new DateTime().minusDays(3).toDate());//today - 3
+			
+			List<EmailPackage> retEmailPackages = cpsFiler.decideSendDates(emailPackages,inProgressEmailPackage);	
+			
+			Assert.assertNotNull(retEmailPackages);
+			assertEquals(retEmailPackages.size(),2);			
+			assertEquals(sdformat.format(retEmailPackages.get(0).getSendDate()),sdformat.format(new DateTime().plusDays(1).toDate()));	//check if send date is set to be today's date		
+			assertEquals(sdformat.format(retEmailPackages.get(1).getSendDate()),sdformat.format(new DateTime().plusDays(9).toDate()));	
+		}
+		
 		//Test Case 3 - Received 3 occasions - Duress & Replacement & Browse ; Replacement is already in progress), 
 		//Expected Result - Replacement is interrupted as duress is of higher priority. Duress is set to be sent tomorrow
-//		@Test
-//		public void testDecideSendDatesWhenHigherPriorityComesIn1() throws RealTimeScoringException, ParseException{
-//			SimpleDateFormat sdformat = new SimpleDateFormat("MM/dd/yyyy");
-//			emailPackages = new ArrayList<EmailPackage>();
-//			memberInfo = new MemberInfo("hiBSAglnyr3kI6kYrBXHmMy5WPE=","N","AZ","N","N","N");	
-//			
-//			tagMetadata = new TagMetadata("HADHS123600153010","Home Appliance","Sears Dishwasher","Duress","HADHS",91.0,"Y","", 1, 8,30);	
-//			emailPackage = new EmailPackage("7081103948483127",tagMetadata);
-//			emailPackages.add(emailPackage);
-//			
-//			tagMetadata = new TagMetadata("HAGAS2610072010","Home Appliance","Sears appliance","Replacement","HAGAS",81.0,"Y","",2, 8, 30);
-//			emailPackage = new EmailPackage("7081103948483127",tagMetadata);
-//			emailPackages.add(emailPackage);
-//			
-//			tagMetadata = new TagMetadata("HADHS723600153010","Home Appliance","Sears Dishwasher","Browse","HADHS",91.0,"Y","", 7, 8,30);	
-//			emailPackage = new EmailPackage("7081103948483127",tagMetadata);
-//			emailPackages.add(emailPackage);
-//			
-//			tagMetadata = new TagMetadata("HAGAS2610072010","Home Appliance","Sears appliance","Replacement","HAGAS",81.0,"Y","",2, 8, 30);
-//			inProgressEmailPackage = new EmailPackage("7081103948483127",tagMetadata);		
-//			inProgressEmailPackage.setSendDate(new DateTime().toDate());//today 
-//		
-//			List<EmailPackage> retEmailPackages = cpsFiler.decideSendDates(emailPackages,inProgressEmailPackage);	
-//			
-//			Assert.assertNotNull(retEmailPackages);
-//			assertEquals(retEmailPackages.size(),2);			
-//			assertEquals(sdformat.format(retEmailPackages.get(0).getSendDate()),sdformat.format(new DateTime().plusDays(1).toDate()));	//check if send date is set to be today's date		
-//			assertEquals(sdformat.format(retEmailPackages.get(1).getSendDate()),sdformat.format(new DateTime().plusDays(9).toDate()));	
-//		}
-//		
+		@Test
+		public void testDecideSendDatesWhenHigherPriorityComesIn1() throws RealTimeScoringException, ParseException{
+			SimpleDateFormat sdformat = new SimpleDateFormat("MM/dd/yyyy");
+			emailPackages = new ArrayList<EmailPackage>();
+			memberInfo = new MemberInfo("hiBSAglnyr3kI6kYrBXHmMy5WPE=","N","AZ","N","N","N");	
+			
+			tagMetadata = new TagMetadata("HADHS123600153010","Home Appliance","Sears Dishwasher","Duress","HADHS",91.0,"Y","", 1, 8,30);	
+			emailPackage = new EmailPackage("7081103948483127",tagMetadata);
+			emailPackages.add(emailPackage);
+			
+			tagMetadata = new TagMetadata("HAGAS2610072010","Home Appliance","Sears appliance","Replacement","HAGAS",81.0,"Y","",2, 8, 30);
+			emailPackage = new EmailPackage("7081103948483127",tagMetadata);
+			emailPackages.add(emailPackage);
+			
+			tagMetadata = new TagMetadata("HADHS723600153010","Home Appliance","Sears Dishwasher","Browse","HADHS",91.0,"Y","", 7, 8,30);	
+			emailPackage = new EmailPackage("7081103948483127",tagMetadata);
+			emailPackages.add(emailPackage);
+			
+			tagMetadata = new TagMetadata("HAGAS2610072010","Home Appliance","Sears appliance","Replacement","HAGAS",81.0,"Y","",2, 8, 30);
+			inProgressEmailPackage = new EmailPackage("7081103948483127",tagMetadata);		
+			inProgressEmailPackage.setSendDate(new DateTime().toDate());//today 
+			inProgressEmailPackage.setSentDateTime(new DateTime().minusDays(3).toDate());//today - 3
+			List<EmailPackage> retEmailPackages = cpsFiler.decideSendDates(emailPackages,inProgressEmailPackage);	
+			
+			Assert.assertNotNull(retEmailPackages);
+			assertEquals(retEmailPackages.size(),2);			
+			assertEquals(sdformat.format(retEmailPackages.get(0).getSendDate()),sdformat.format(new DateTime().plusDays(1).toDate()));	//check if send date is set to be today's date		
+			assertEquals(sdformat.format(retEmailPackages.get(1).getSendDate()),sdformat.format(new DateTime().plusDays(9).toDate()));	
+		}
+		
 		
 		//Test Case 4 - Received 2 occasions - Replacement & Browse ; Duress is already in progress; it didn't come in again today), 
 		//Expected Result - Duress is interrupted; Replacement is set to be sent tomorrow ; Browse is set to be sent after 8 days
@@ -446,7 +448,7 @@ public class CPSFilerTest {
 			tagMetadata = new TagMetadata("HADHS123600153010","Home Appliance","Sears Dishwasher","Duress","HADHS",91.0,"Y","", 1, 8,30);
 			inProgressEmailPackage = new EmailPackage("7081103948483127",tagMetadata);		
 			inProgressEmailPackage.setSendDate(new DateTime().minusDays(3).toDate());//today - 3
-		
+			inProgressEmailPackage.setSentDateTime(new DateTime().minusDays(3).toDate());//today - 3
 			List<EmailPackage> retEmailPackages = cpsFiler.decideSendDates(emailPackages,inProgressEmailPackage);	
 			
 			Assert.assertNotNull(retEmailPackages);			
@@ -469,82 +471,82 @@ public class CPSFilerTest {
 		 * 
 		 */
 		
-//		@Test
-//		public void testDecideSendDatesWhenInProgressIsActive() throws RealTimeScoringException, ParseException{
-//			SimpleDateFormat sdformat = new SimpleDateFormat("MM/dd/yyyy");
-//			List<EmailPackage> emailPackages1 = new ArrayList<EmailPackage>();
-//			tagMetadata = new TagMetadata("HMMTS7236000153010","Home-Big Tickets","Sears Mattress","Browse","HMMTS",81.0,"Y","",6, 8, 30);
-//			emailPackage = new EmailPackage("7081103948483127",tagMetadata);
-//			emailPackages1.add(emailPackage);	
-//			
-//			tagMetadata = new TagMetadata("SPFTS623600153010","Sporting Goods","Sears Fitness","Replace_by_age","SPFTS",91.0,"Y","", 7, 3,30);
-//			emailPackage = new EmailPackage("7081103948483127",tagMetadata);	
-//			emailPackages1.add(emailPackage);
-//			
-//		
-//			
-//			tagMetadata = new TagMetadata("SPFTS623600153010","Sporting Goods","Sears Fitness","Replace_by_age","SPFTS",91.0,"Y","", 7, 3,30);
-//			EmailPackage inProgressEmailPack = new EmailPackage("7081103948483127",tagMetadata);		
-//			inProgressEmailPack.setSendDate(new DateTime().minusDays(1).toDate());//today - 1
-//		
-//			List<EmailPackage> retEmailPackages = cpsFiler.decideSendDates(emailPackages1,inProgressEmailPack);	
-//			
-//			Assert.assertNotNull(retEmailPackages);			
-//			assertEquals(1,retEmailPackages.size());	
-//			assertEquals("HMMTS7236000153010",retEmailPackages.get(0).getMdTagMetaData().getMdTag());
-//			assertEquals(sdformat.format(retEmailPackages.get(0).getSendDate()),sdformat.format(new DateTime().plusDays(1).toDate()));//check if send date is set to be today's date	
-//						
-//		}
+		@Test
+		public void testDecideSendDatesWhenInProgressIsActive() throws RealTimeScoringException, ParseException{
+			SimpleDateFormat sdformat = new SimpleDateFormat("MM/dd/yyyy");
+			List<EmailPackage> emailPackages1 = new ArrayList<EmailPackage>();
+			tagMetadata = new TagMetadata("HMMTS7236000153010","Home-Big Tickets","Sears Mattress","Browse","HMMTS",81.0,"Y","",6, 8, 30);
+			emailPackage = new EmailPackage("7081103948483127",tagMetadata);
+			emailPackages1.add(emailPackage);	
+			
+			tagMetadata = new TagMetadata("SPFTS623600153010","Sporting Goods","Sears Fitness","Replace_by_age","SPFTS",91.0,"Y","", 7, 3,30);
+			emailPackage = new EmailPackage("7081103948483127",tagMetadata);	
+			emailPackages1.add(emailPackage);
+			
+		
+			
+			tagMetadata = new TagMetadata("SPFTS623600153010","Sporting Goods","Sears Fitness","Replace_by_age","SPFTS",91.0,"Y","", 7, 3,30);
+			EmailPackage inProgressEmailPack = new EmailPackage("7081103948483127",tagMetadata);		
+			inProgressEmailPack.setSendDate(new DateTime().minusDays(1).toDate());//today - 1
+			inProgressEmailPack.setSentDateTime(new DateTime().minusDays(1).toDate());//today - 1
+			List<EmailPackage> retEmailPackages = cpsFiler.decideSendDates(emailPackages1,inProgressEmailPack);	
+			
+			Assert.assertNotNull(retEmailPackages);			
+			assertEquals(1,retEmailPackages.size());	
+			assertEquals("HMMTS7236000153010",retEmailPackages.get(0).getMdTagMetaData().getMdTag());
+			assertEquals(sdformat.format(retEmailPackages.get(0).getSendDate()),sdformat.format(new DateTime().plusDays(1).toDate()));//check if send date is set to be today's date	
+						
+		}
 		
 		//Test Case 5 - Received three occasions - CK Replacement, DH Replacement, FT Browse ;  DH Replacement is already in progress), 
 		//Expected Result - DH Replacement continues, CK Replacement and DH Browse are queued
-//		@Test
-//		public void testDecideSendDatesWhenEqualPriorityComesIn() throws RealTimeScoringException, ParseException{
-//			SimpleDateFormat sdformat = new SimpleDateFormat("MM/dd/yyyy");
-//			emailPackages = new ArrayList<EmailPackage>();
-//			tagMetadata = new TagMetadata("HACKS2610072010","Home Appliance","Sears Cooktop","Replacement","HACKS",81.0,"Y","",2, 8, 30);
-//			emailPackage = new EmailPackage("7081103948483127",tagMetadata);
-//			emailPackages.add(emailPackage);			
-//			
-//			tagMetadata = new TagMetadata("HADHS2610072010","Home Appliance","Sears Dishwasher","Replacement","HADHS",81.0,"Y","",2, 8, 30);
-//			emailPackage = new EmailPackage("7081103948483127",tagMetadata);
-//			emailPackages.add(emailPackage);
-//			
-//			tagMetadata = new TagMetadata("SPFTS723600153010","Sporting Goods","Sears Fitness","Browse","SPFTS",91.0,"Y","", 7, 8,30);	
-//			emailPackage = new EmailPackage("7081103948483127",tagMetadata);
-//			emailPackages.add(emailPackage);
-//			
-//			tagMetadata = new TagMetadata("HADHS2610072010","Home Appliance","Sears Dishwasher","Replacement","HADHS",81.0,"Y","",2, 8, 30);
-//			inProgressEmailPackage = new EmailPackage("7081103948483127",tagMetadata);		
-//			inProgressEmailPackage.setSendDate(new DateTime().minusDays(3).toDate());//today - 3
-//		
-//			List<EmailPackage> retEmailPackages = cpsFiler.decideSendDates(emailPackages,inProgressEmailPackage);		
-//			
-//			Assert.assertNotNull(retEmailPackages);		
-//			assertEquals(retEmailPackages.size(),2);			
-//			assertEquals(sdformat.format(retEmailPackages.get(0).getSendDate()),sdformat.format(new DateTime(inProgressEmailPackage.getSendDate()).plusDays(8).toDate()));//check if send date is set to be today's date	
-//			assertEquals(sdformat.format(retEmailPackages.get(1).getSendDate()),sdformat.format(new DateTime(retEmailPackages.get(0).getSendDate()).plusDays(8).toDate()));	
-//			
-//		}
-//		
+		@Test
+		public void testDecideSendDatesWhenEqualPriorityComesIn() throws RealTimeScoringException, ParseException{
+			SimpleDateFormat sdformat = new SimpleDateFormat("MM/dd/yyyy");
+			emailPackages = new ArrayList<EmailPackage>();
+			tagMetadata = new TagMetadata("HACKS2610072010","Home Appliance","Sears Cooktop","Replacement","HACKS",81.0,"Y","",2, 8, 30);
+			emailPackage = new EmailPackage("7081103948483127",tagMetadata);
+			emailPackages.add(emailPackage);			
+			
+			tagMetadata = new TagMetadata("HADHS2610072010","Home Appliance","Sears Dishwasher","Replacement","HADHS",81.0,"Y","",2, 8, 30);
+			emailPackage = new EmailPackage("7081103948483127",tagMetadata);
+			emailPackages.add(emailPackage);
+			
+			tagMetadata = new TagMetadata("SPFTS723600153010","Sporting Goods","Sears Fitness","Browse","SPFTS",91.0,"Y","", 7, 8,30);	
+			emailPackage = new EmailPackage("7081103948483127",tagMetadata);
+			emailPackages.add(emailPackage);
+			
+			tagMetadata = new TagMetadata("HADHS2610072010","Home Appliance","Sears Dishwasher","Replacement","HADHS",81.0,"Y","",2, 8, 30);
+			inProgressEmailPackage = new EmailPackage("7081103948483127",tagMetadata);		
+			inProgressEmailPackage.setSendDate(new DateTime().minusDays(3).toDate());//today - 3
+			inProgressEmailPackage.setSentDateTime(new DateTime().minusDays(3).toDate());//today - 3
+			List<EmailPackage> retEmailPackages = cpsFiler.decideSendDates(emailPackages,inProgressEmailPackage);		
+			
+			Assert.assertNotNull(retEmailPackages);		
+			assertEquals(retEmailPackages.size(),2);			
+			assertEquals(sdformat.format(retEmailPackages.get(0).getSendDate()),sdformat.format(new DateTime(inProgressEmailPackage.getSendDate()).plusDays(8).toDate()));//check if send date is set to be today's date	
+			assertEquals(sdformat.format(retEmailPackages.get(1).getSendDate()),sdformat.format(new DateTime(retEmailPackages.get(0).getSendDate()).plusDays(8).toDate()));	
+			
+		}
+		
 		//Test Case 6 - Received one occasion - Duress  ; Duress is already in progress), 
 		//Expected Result - no need to queue again ; let the communication continue
-//		@Test
-//		public void testDecideSendDatesWhenNoOtherOccasionCameIn() throws RealTimeScoringException, ParseException{			
-//			emailPackages = new ArrayList<EmailPackage>();
-//						
-//			tagMetadata = new TagMetadata("HADHS123600153010","Home Appliance","Sears Dishwasher","Duress","HADHS",91.0,"Y","", 1, 8,30);	
-//			emailPackage = new EmailPackage("7081103948483127",tagMetadata);
-//			emailPackages.add(emailPackage);			
-//			
-//			tagMetadata = new TagMetadata("HADHS123600153010","Home Appliance","Sears Dishwasher","Duress","HADHS",91.0,"Y","", 1, 8,30);	
-//			inProgressEmailPackage = new EmailPackage("7081103948483127",tagMetadata);
-//			inProgressEmailPackage.setSendDate(new DateTime().minusDays(3).toDate());//today - 3
-//		
-//			List<EmailPackage> retEmailPackages = cpsFiler.decideSendDates(emailPackages,inProgressEmailPackage);	
-//			Assert.assertNotNull(retEmailPackages);				
-//			assertEquals(retEmailPackages.size(),0);			
-//		}
+		@Test
+		public void testDecideSendDatesWhenNoOtherOccasionCameIn() throws RealTimeScoringException, ParseException{			
+			emailPackages = new ArrayList<EmailPackage>();
+						
+			tagMetadata = new TagMetadata("HADHS123600153010","Home Appliance","Sears Dishwasher","Duress","HADHS",91.0,"Y","", 1, 8,30);	
+			emailPackage = new EmailPackage("7081103948483127",tagMetadata);
+			emailPackages.add(emailPackage);			
+			
+			tagMetadata = new TagMetadata("HADHS123600153010","Home Appliance","Sears Dishwasher","Duress","HADHS",91.0,"Y","", 1, 8,30);	
+			inProgressEmailPackage = new EmailPackage("7081103948483127",tagMetadata);
+			inProgressEmailPackage.setSendDate(new DateTime().minusDays(3).toDate());//today - 3
+			inProgressEmailPackage.setSentDateTime(new DateTime().minusDays(3).toDate());//today - 3
+			List<EmailPackage> retEmailPackages = cpsFiler.decideSendDates(emailPackages,inProgressEmailPackage);	
+			Assert.assertNotNull(retEmailPackages);				
+			assertEquals(retEmailPackages.size(),0);			
+		}
 			
 		
 		public void testArePackagesSame(){
@@ -1196,12 +1198,14 @@ public class CPSFilerTest {
 	
 	@Test
 	public void testIsOccasionResponsysReady(){
+		cpsFiler.setActiveTags(activeTags);
 		boolean isResponsysReady = cpsFiler.isOccasionResponsysReady("HARFS823600153010");
 		assertTrue(isResponsysReady);	
 	}
 	
 	@Test
 	public void testIsOccasionNotResponsysReady(){
+		cpsFiler.setActiveTags(activeTags);
 		boolean isResponsysReady = cpsFiler.isOccasionResponsysReady("CEGES823600153010");
 		assertFalse(isResponsysReady);	
 	}
