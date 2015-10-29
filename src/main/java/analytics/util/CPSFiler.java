@@ -442,8 +442,6 @@ public class CPSFiler {
 	}
 	
 	public boolean isOccasionResponsysReady(String mdtag) {
-		//System.out.println(mdtag);
-		//System.out.println(activeTags);
 		return activeTags.contains(mdtag.substring(0, 5));			
 	}
 

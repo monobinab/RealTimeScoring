@@ -1194,7 +1194,17 @@ public class CPSFilerTest {
 		assertFalse(isTop5);		
 	}
 	
+	@Test
+	public void testIsOccasionResponsysReady(){
+		boolean isResponsysReady = cpsFiler.isOccasionResponsysReady("HARFS823600153010");
+		assertTrue(isResponsysReady);	
+	}
 	
+	@Test
+	public void testIsOccasionNotResponsysReady(){
+		boolean isResponsysReady = cpsFiler.isOccasionResponsysReady("CEGES823600153010");
+		assertFalse(isResponsysReady);	
+	}
 	
 
 	
