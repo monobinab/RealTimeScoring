@@ -74,7 +74,7 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
     	for(String trait: l_idToValueCollectionMap.get(current_l_id)) {
     		
     		// populate buSubBuMap for BrowseTags
-    		if (trait != null) {
+    	/*	if (trait != null) {
     			String buSubBu = traitBuSubBuMap.get(trait);
     			if(buSubBu != null){
 					if (!buSubBuMap.containsKey(buSubBu))
@@ -84,7 +84,7 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
 						buSubBuMap.put(buSubBu,	count);
 					}
     			}
-			}
+			}*/
     			
     		
     		
