@@ -354,6 +354,7 @@ public class CPSFilerTest {
 		tagMetadata = new TagMetadata("HADHS123600153010","Home Appliance","Sears Dishwasher","Duress","HADHS",91.0,"Y","", 1, 8,30);	
 		inProgressEmailPackage = new EmailPackage("7081103948483127",tagMetadata);
 		inProgressEmailPackage.setSendDate(new DateTime().minusDays(3).toDate());//today - 3
+		inProgressEmailPackage.setSentDateTime(new DateTime().minusDays(3).toDate());
 	
 		List<EmailPackage> retEmailPackages = cpsFiler.decideSendDates(emailPackages,inProgressEmailPackage);		
 		Assert.assertNotNull(retEmailPackages);
@@ -385,7 +386,8 @@ public class CPSFilerTest {
 			tagMetadata = new TagMetadata("HAGAS2610072010","Home Appliance","Sears appliance","Replacement","HAGAS",81.0,"Y","",2, 8, 30);
 			inProgressEmailPackage = new EmailPackage("7081103948483127",tagMetadata);		
 			inProgressEmailPackage.setSendDate(new DateTime().minusDays(3).toDate());//today - 3
-		
+			inProgressEmailPackage.setSentDateTime(new DateTime().minusDays(3).toDate());//today - 3
+			
 			List<EmailPackage> retEmailPackages = cpsFiler.decideSendDates(emailPackages,inProgressEmailPackage);	
 			
 			Assert.assertNotNull(retEmailPackages);
@@ -417,7 +419,7 @@ public class CPSFilerTest {
 			tagMetadata = new TagMetadata("HAGAS2610072010","Home Appliance","Sears appliance","Replacement","HAGAS",81.0,"Y","",2, 8, 30);
 			inProgressEmailPackage = new EmailPackage("7081103948483127",tagMetadata);		
 			inProgressEmailPackage.setSendDate(new DateTime().toDate());//today 
-		
+			inProgressEmailPackage.setSentDateTime(new DateTime().minusDays(3).toDate());//today - 3
 			List<EmailPackage> retEmailPackages = cpsFiler.decideSendDates(emailPackages,inProgressEmailPackage);	
 			
 			Assert.assertNotNull(retEmailPackages);
@@ -446,7 +448,7 @@ public class CPSFilerTest {
 			tagMetadata = new TagMetadata("HADHS123600153010","Home Appliance","Sears Dishwasher","Duress","HADHS",91.0,"Y","", 1, 8,30);
 			inProgressEmailPackage = new EmailPackage("7081103948483127",tagMetadata);		
 			inProgressEmailPackage.setSendDate(new DateTime().minusDays(3).toDate());//today - 3
-		
+			inProgressEmailPackage.setSentDateTime(new DateTime().minusDays(3).toDate());//today - 3
 			List<EmailPackage> retEmailPackages = cpsFiler.decideSendDates(emailPackages,inProgressEmailPackage);	
 			
 			Assert.assertNotNull(retEmailPackages);			
@@ -486,7 +488,7 @@ public class CPSFilerTest {
 			tagMetadata = new TagMetadata("SPFTS623600153010","Sporting Goods","Sears Fitness","Replace_by_age","SPFTS",91.0,"Y","", 7, 3,30);
 			EmailPackage inProgressEmailPack = new EmailPackage("7081103948483127",tagMetadata);		
 			inProgressEmailPack.setSendDate(new DateTime().minusDays(1).toDate());//today - 1
-		
+			inProgressEmailPack.setSentDateTime(new DateTime().minusDays(1).toDate());//today - 1
 			List<EmailPackage> retEmailPackages = cpsFiler.decideSendDates(emailPackages1,inProgressEmailPack);	
 			
 			Assert.assertNotNull(retEmailPackages);			
@@ -517,7 +519,7 @@ public class CPSFilerTest {
 			tagMetadata = new TagMetadata("HADHS2610072010","Home Appliance","Sears Dishwasher","Replacement","HADHS",81.0,"Y","",2, 8, 30);
 			inProgressEmailPackage = new EmailPackage("7081103948483127",tagMetadata);		
 			inProgressEmailPackage.setSendDate(new DateTime().minusDays(3).toDate());//today - 3
-		
+			inProgressEmailPackage.setSentDateTime(new DateTime().minusDays(3).toDate());//today - 3
 			List<EmailPackage> retEmailPackages = cpsFiler.decideSendDates(emailPackages,inProgressEmailPackage);		
 			
 			Assert.assertNotNull(retEmailPackages);		
@@ -540,7 +542,7 @@ public class CPSFilerTest {
 			tagMetadata = new TagMetadata("HADHS123600153010","Home Appliance","Sears Dishwasher","Duress","HADHS",91.0,"Y","", 1, 8,30);	
 			inProgressEmailPackage = new EmailPackage("7081103948483127",tagMetadata);
 			inProgressEmailPackage.setSendDate(new DateTime().minusDays(3).toDate());//today - 3
-		
+			inProgressEmailPackage.setSentDateTime(new DateTime().minusDays(3).toDate());//today - 3
 			List<EmailPackage> retEmailPackages = cpsFiler.decideSendDates(emailPackages,inProgressEmailPackage);	
 			Assert.assertNotNull(retEmailPackages);				
 			assertEquals(retEmailPackages.size(),0);			
@@ -1179,8 +1181,34 @@ public class CPSFilerTest {
 		assertEquals(retEmailPackages.get(0), temp);
 		
 	}
+
+	
+	@Test
+	public void testIsOccasionTop5Percent(){
+		boolean isTop5 = cpsFiler.isOccasionTop5Percent("CECAS823600153010");
+		assertTrue(isTop5);		
+	}
 	
 	
+	@Test
+	public void testisNotOccasionTop5Percent(){
+		boolean isTop5 = cpsFiler.isOccasionTop5Percent("CECAS723600153010");
+		assertFalse(isTop5);		
+	}
+	
+	@Test
+	public void testIsOccasionResponsysReady(){
+		cpsFiler.setActiveTags(activeTags);
+		boolean isResponsysReady = cpsFiler.isOccasionResponsysReady("HARFS823600153010");
+		assertTrue(isResponsysReady);	
+	}
+	
+	@Test
+	public void testIsOccasionNotResponsysReady(){
+		cpsFiler.setActiveTags(activeTags);
+		boolean isResponsysReady = cpsFiler.isOccasionResponsysReady("CEGES823600153010");
+		assertFalse(isResponsysReady);	
+	}
 	
 
 	
