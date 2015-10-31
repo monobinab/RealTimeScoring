@@ -90,7 +90,7 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 				 */
 			//	String topology = jsonElement.getAsJsonObject().get("topology").getAsString();
 				
-				BigInteger loyaltyID =  new BigInteger(lyl_id_no.getAsString());
+				//BigInteger loyaltyID =  new BigInteger(lyl_id_no.getAsString());
 				//if (! (loyaltyID.compareTo(startLoyalty) != -1  && loyaltyID.compareTo(lastLoyalty) != 1) ){
 				
 				/*if (loyaltyID.compareTo(startLoyalty) == -1  || loyaltyID.compareTo(lastLoyalty) == 1) {
