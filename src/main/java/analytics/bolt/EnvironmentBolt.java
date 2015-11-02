@@ -1,6 +1,10 @@
 package analytics.bolt;
 
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import analytics.jmx.AppMetricsBean;
+import analytics.jmx.JMXConnectionManager;
 import analytics.util.MongoNameConstants;
 import backtype.storm.metric.api.MultiCountMetric;
 import backtype.storm.task.OutputCollector;
@@ -10,16 +14,25 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
 
 public class EnvironmentBolt extends BaseRichBolt {
-	protected MultiCountMetric countMetric;
-	/*private static final Logger LOGGER = LoggerFactory
-			.getLogger(EnvironmentBolt.class);*/
-	private String environment;
 	
-	public EnvironmentBolt() {
-	}
+	private static final long serialVersionUID = 1L;
+	protected MultiCountMetric countMetric;
+	/*private static final Logger LOGGER = LoggerFactory.getLogger(EnvironmentBolt.class);*/
+	private String environment;
+	protected AppMetricsBean appMetricsBean;
+	protected AtomicInteger atomicInteger;
+	
+	public EnvironmentBolt() {}
 
 	public EnvironmentBolt(String systemProperty) {
-		environment = systemProperty;
+	   environment = systemProperty;
+	   JMXConnectionManager jmxConnectionManager = JMXConnectionManager.getInstance();
+        if(jmxConnectionManager != null){
+        	if(appMetricsBean == null && atomicInteger == null){
+        		appMetricsBean = jmxConnectionManager.getAppMetricsBean();
+        		atomicInteger = jmxConnectionManager.getAtomicIntegerInstance();
+        	}
+        }
 	}
 	
 	public void redisCountIncr(String scope){
@@ -27,20 +40,18 @@ public class EnvironmentBolt extends BaseRichBolt {
 	}
 
 	@Override
-	public void prepare(Map stormConf, TopologyContext context,
+	public void prepare(@SuppressWarnings("rawtypes") Map stormConf, TopologyContext context,
 			OutputCollector collector) {
 		System.setProperty(MongoNameConstants.IS_PROD, environment);
 		
 		//initializing the metrics
 		countMetric = new MultiCountMetric();
 		context.registerMetric("custom_metrics", countMetric, 60);
-	
 	}
 
 	@Override
 	public void execute(Tuple input) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -48,6 +59,4 @@ public class EnvironmentBolt extends BaseRichBolt {
 		// TODO Auto-generated method stub
 
 	}
-
-
 }

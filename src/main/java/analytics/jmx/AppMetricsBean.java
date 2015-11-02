@@ -1,7 +1,10 @@
 package analytics.jmx;
 
-public class AppMetricsBean implements AppMetricsBeanIntf{
+import java.io.Serializable;
 
+public class AppMetricsBean implements AppMetricsBeanIntf, Serializable{
+
+	private static final long serialVersionUID = 1L;
 	private long browseTupCount;
 	private long intSearchTupCount;
 	private long cpsTupCount;
