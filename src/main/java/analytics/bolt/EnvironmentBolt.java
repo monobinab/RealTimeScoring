@@ -19,20 +19,21 @@ public class EnvironmentBolt extends BaseRichBolt {
 	protected MultiCountMetric countMetric;
 	/*private static final Logger LOGGER = LoggerFactory.getLogger(EnvironmentBolt.class);*/
 	private String environment;
-	protected AppMetricsBean appMetricsBean;
-	protected AtomicInteger atomicInteger;
+	//protected AppMetricsBean appMetricsBean;
+	//protected AtomicInteger atomicInteger;
 	
 	public EnvironmentBolt() {}
 
 	public EnvironmentBolt(String systemProperty) {
 	   environment = systemProperty;
+	   /**
 	   JMXConnectionManager jmxConnectionManager = JMXConnectionManager.getInstance();
         if(jmxConnectionManager != null){
         	if(appMetricsBean == null && atomicInteger == null){
         		appMetricsBean = jmxConnectionManager.getAppMetricsBean();
         		atomicInteger = jmxConnectionManager.getAtomicIntegerInstance();
         	}
-        }
+        }*/
 	}
 	
 	public void redisCountIncr(String scope){
