@@ -9,4 +9,9 @@
  <cache name="MODELPERCENTILECACHE" maxElementsInMemory="50" eternal="false"
  	overflowToDisk="false" timeToLiveSeconds="86400" memoryStoreEvictionPolicy="LFU">
  </cache>
+ 
+ <cache name="MODELVARIABLESCACHE" maxElementsInMemory="50" eternal="false"
+ 	overflowToDisk="false" timeToLiveSeconds="86400" memoryStoreEvictionPolicy="LFU">
+ </cache>
+ 
 </ehcache>

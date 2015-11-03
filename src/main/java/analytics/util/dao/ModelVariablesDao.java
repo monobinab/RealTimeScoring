@@ -9,9 +9,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.util.MongoNameConstants;
+import analytics.util.dao.caching.CacheBuilder;
+import analytics.util.dao.caching.CacheConstant;
+import analytics.util.dao.caching.CacheWrapper;
 import analytics.util.objects.Boost;
 import analytics.util.objects.Model;
 import analytics.util.objects.Variable;
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
@@ -21,16 +27,23 @@ import com.mongodb.DBObject;
 
 
 public class ModelVariablesDao extends AbstractDao{
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(ModelVariablesDao.class);
-    DBCollection modelVariablesCollection;
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(ModelVariablesDao.class);
+    
+	private DBCollection modelVariablesCollection;
+    
+	private Cache cache = null;
+    
     public ModelVariablesDao(){
     	super();
 		modelVariablesCollection = db.getCollection("modelVariables");
+		cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_MODELVARIABLESCACHE);
+    	CacheBuilder.getInstance().setCaches(cache);
     }
-    public List<String> getVariableList(){
+    
+	public List<String> getVariableList(){
     	List<String> modelVariablesList = new ArrayList<String>();
-    	DBCursor modelVariablesCursor = modelVariablesCollection.find();
+    	DBCursor modelVariablesCursor = this.getModelVariables();
 		for(DBObject modelDBO:modelVariablesCursor) {
 			BasicDBList variablesDBList = (BasicDBList) modelDBO.get(MongoNameConstants.MODELV_VARIABLE);
 			for(Object var:variablesDBList) {
@@ -39,13 +52,12 @@ public class ModelVariablesDao extends AbstractDao{
 				}
 			}
 		}
-    	return modelVariablesList;
-    }
+		return modelVariablesList;
+	}
     
 
-    public void populateModelVariables(Map<Integer, Map<Integer, Model>> modelsMap,
-    		Map<String, List<Integer>> variableModelsMap){
-		DBCursor models = modelVariablesCollection.find();
+    public void populateModelVariables(Map<Integer, Map<Integer, Model>> modelsMap, Map<String, List<Integer>> variableModelsMap){
+		DBCursor models = this.getModelVariables();
 		for (DBObject model : models) {
 			int modelId = Integer.valueOf(model.get(MongoNameConstants.MODEL_ID).toString());
 			String modelName = model.get(MongoNameConstants.MODEL_NAME).toString();
@@ -67,28 +79,37 @@ public class ModelVariablesDao extends AbstractDao{
 		}
     }
     
-    public List<String> getModelVariableList(int modelId){
-    	List<String> modelVariablesList = new ArrayList<String>();
-    	if (modelVariablesCollection != null) {
-			BasicDBObject query = new BasicDBObject();
-			query.put("modelId", modelId);
-			DBObject obj = modelVariablesCollection.findOne(query);
-			if (obj != null){
-				BasicDBList variablesDBList = (BasicDBList) obj.get(MongoNameConstants.MODELV_VARIABLE);
-				for(Object var:variablesDBList) {
-					if(!modelVariablesList.contains(var.toString())) {
-						modelVariablesList.add(((BasicDBObject) var).get(MongoNameConstants.MODELV_NAME).toString());
+    @SuppressWarnings("unchecked")
+	public List<String> getModelVariableList(int modelId){
+    	String cacheKey = CacheConstant.RTS_MODEL_VAR_WITH_MODELID_CACHE_KEY + modelId;
+		Element element = CacheWrapper.getInstance().isCacheKeyExist(cache, cacheKey);
+		if(element != null && element.getObjectKey().equals(cacheKey)){
+			return (List<String>) element.getObjectValue();
+		}else{
+	    	List<String> modelVariablesList = new ArrayList<String>();
+	    	if (modelVariablesCollection != null) {
+				BasicDBObject query = new BasicDBObject();
+				query.put("modelId", modelId);
+				DBObject obj = modelVariablesCollection.findOne(query);
+				if (obj != null){
+					BasicDBList variablesDBList = (BasicDBList) obj.get(MongoNameConstants.MODELV_VARIABLE);
+					for(Object var:variablesDBList) {
+						if(!modelVariablesList.contains(var.toString())) {
+							modelVariablesList.add(((BasicDBObject) var).get(MongoNameConstants.MODELV_NAME).toString());
+						}
 					}
+					//return (List<String>) obj.get("variable"); //see if this works?
+					if(modelVariablesList != null && modelVariablesList.size() > 0){
+						cache.put(new Element(cacheKey, (List<String>) modelVariablesList));
+					}
+					return modelVariablesList;
 				}
-				//return (List<String>) obj.get("variable"); //see if this works?
-				return modelVariablesList;
 			}
+			return null;
 		}
-		return null;
     }
        
-	private Map<String, Variable> populateVariableModelsMap(DBObject model,
-			int modelId, Map<String, List<Integer>> variableModelsMap) {
+	private Map<String, Variable> populateVariableModelsMap(DBObject model, int modelId, Map<String, List<Integer>> variableModelsMap) {
 		BasicDBList modelVariables = (BasicDBList) model.get(MongoNameConstants.VARIABLE);
 		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
 		for (Object modelVariable : modelVariables) {
@@ -119,5 +140,20 @@ public class ModelVariablesDao extends AbstractDao{
 			}
 		}
 		return variablesMap;
+	}
+	
+	
+	private DBCursor getModelVariables(){
+		String cacheKey = CacheConstant.RTS_MODEL_VAR_CACHE_KEY;
+		Element element = CacheWrapper.getInstance().isCacheKeyExist(cache, cacheKey);
+		if(element != null && element.getObjectKey().equals(cacheKey)){
+			return (DBCursor) element.getObjectValue();
+		}else{
+			DBCursor dbCursor = modelVariablesCollection.find();
+			if(dbCursor != null && dbCursor.count() > 0){
+				cache.put(new Element(cacheKey, (DBCursor) dbCursor));
+			}
+			return dbCursor;
+		}
 	}
 }

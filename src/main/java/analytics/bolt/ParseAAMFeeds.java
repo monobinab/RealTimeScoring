@@ -21,17 +21,13 @@ import backtype.storm.tuple.Tuple;
 
 public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 
-	static final Logger LOGGER = LoggerFactory
-			.getLogger(ParseAAMFeeds.class);
+	protected static final Logger LOGGER = LoggerFactory.getLogger(ParseAAMFeeds.class);
 	private static final long serialVersionUID = 1L;
 	protected OutputCollector outputCollector;
-
-    protected List<String> modelVariablesList;
     protected Map<String,Collection<String>> l_idToValueCollectionMap; // USED TO MAP BETWEEN l_id AND THE TRAITS OR PID OR SearchKeyword ASSOCIATED WITH THAT ID 
     
     protected String source;
     protected String sourceTopic;
-	protected ModelVariablesDao modelVariablesDao;
 			
     public ParseAAMFeeds() {
 	}
@@ -45,14 +41,9 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
     }
     
 	@Override
-	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
+	public void prepare(@SuppressWarnings("rawtypes") Map stormConf, TopologyContext context, OutputCollector collector) {
         this.outputCollector = collector;
         super.prepare(stormConf, context, collector);
-	    modelVariablesDao =  new ModelVariablesDao(); 
-        modelVariablesList = new ArrayList<String>();
-     
-		//POPULATE MODEL VARIABLES LIST
-        modelVariablesList = modelVariablesDao.getVariableList();
     }
 
 	@Override

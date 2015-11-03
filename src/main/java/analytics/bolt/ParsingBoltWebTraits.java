@@ -14,6 +14,7 @@ import org.apache.commons.lang.StringUtils;
 
 import analytics.util.JsonUtils;
 import analytics.util.dao.MemberTraitsDao;
+import analytics.util.dao.ModelVariablesDao;
 import analytics.util.dao.TraitVariablesDao;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -23,10 +24,12 @@ import com.google.gson.Gson;
 
 
 public class ParsingBoltWebTraits extends ParseAAMFeeds {
+
+	private static final long serialVersionUID = 1L;
 	private Map<String,List<String>> traitVariablesMap;
-    private Map<String,List<String>> variableTraitsMap;
     private MemberTraitsDao memberTraitsDao;
     private TraitVariablesDao traitVariablesDao;
+    private ModelVariablesDao modelVariablesDao;
     
     public ParsingBoltWebTraits(){
     	
@@ -43,11 +46,11 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
 
 		traitVariablesDao = new TraitVariablesDao();
 		memberTraitsDao = new MemberTraitsDao();
+		modelVariablesDao =  new ModelVariablesDao(); 
         LOGGER.info("PREPARING PARSING BOLT FOR WEB TRAITS");
 
         // POPULATE THE TRAIT TO VARIABLES MAP AND THE VARIABLE TO TRAITS MAP
-        traitVariablesMap = traitVariablesDao.getTraitVariableList();
-        variableTraitsMap = traitVariablesDao.getVariableTraitList();		
+        traitVariablesMap = traitVariablesDao.getTraitVariableList();	
     }
 
     
@@ -58,6 +61,7 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
     	LOGGER.debug("Processing list of traits");
     	Map<String, List<String>> dateTraitsMap = null; // MAP BETWEEN DATES AND SET OF TRAITS - HISTORICAL AND CURRENT TRAITS
 		List<String> variableList = new ArrayList<String>();
+		List<String> modelVariablesList = modelVariablesDao.getVariableList();
     	boolean firstTrait = true; //flag to indicate if the AMM trait found is the first for that member - if true then populate the memberTraitsMap
     	int traitCount = 0;
     	int variableCount = 0;
@@ -65,7 +69,7 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
     	//FOR EACH TRAIT FOUND FROM AAM DATA FIND THE VARIABLES THAT ARE IMPACTED
     	LOGGER.debug("Finding list of variables for each trait");
     	for(String trait: l_idToValueCollectionMap.get(current_l_id)) {
-    		if(traitVariablesMap.containsKey(trait) && JsonUtils.hasModelVariable(modelVariablesList,traitVariablesMap.get(trait))) {
+    		if(traitVariablesMap.containsKey(trait) && JsonUtils.hasModelVariable(modelVariablesList, traitVariablesMap.get(trait))) {
     			if(firstTrait) {
     				dateTraitsMap = memberTraitsDao.getDateTraits(current_l_id);
     				firstTrait = false;
