@@ -68,13 +68,12 @@ public class CPProcessingBolt extends EnvironmentBolt  {
 				List<EmailPackage> emailPackages = cpsFiler.prepareEmailPackages(rtsAPIResponse,lyl_id_no,l_id);
 				LOGGER.info("PERSIST:Tags to be queued to outbox for lyl_id_no " + lyl_id_no+ " : ["+getLogMsg(emailPackages) + "]");
 				
-				if(emailPackages!= null && emailPackages.size()>0)
-				{
-					cpsFiler.fileEmailPackages(emailPackages);
-					LOGGER.info("PERSIST: Queued Tags in CPS Outbox for memberId " + lyl_id_no+ " : "+getLogMsg(emailPackages));
-					redisCountIncr("queued_tags_count");
-					
-				}					
+				if(emailPackages!= null && emailPackages.size()>0){
+						List<EmailPackage> queuedEmailPackages = cpsFiler.fileEmailPackages(emailPackages);
+						LOGGER.info("PERSIST: Queued Tags in CPS Outbox for memberId " + lyl_id_no+ " : "+getLogMsg(queuedEmailPackages));
+						redisCountIncr("queued_tags_count");						
+										
+				}			
 			} catch (SQLException e){
 				LOGGER.error("PERSIST: SQLException Occured in CPProcessingBolt for memberId :: "+ lyl_id_no + " : "+ ExceptionUtils.getMessage(e) + "Rootcause-"+ ExceptionUtils.getRootCauseMessage(e) + "  SATCKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 				redisCountIncr("SQLException_count");	
@@ -97,10 +96,14 @@ public class CPProcessingBolt extends EnvironmentBolt  {
 
 	private String getLogMsg(List<EmailPackage> emailPackages) {
 		String logMsg = "  ";
-		for(EmailPackage emailPackage : emailPackages)
-		{
-			logMsg = logMsg.concat(emailPackage.getMdTagMetaData().getMdTag()).concat("  "); 
-		}
+		if(emailPackages!=null && emailPackages.size()>0){
+				for(EmailPackage emailPackage : emailPackages)
+				{
+					logMsg = logMsg.concat(emailPackage.getMdTagMetaData().getMdTag()).concat("  "); 
+				}				
+						
+		}	
+		
 		return logMsg;
 	}
 	

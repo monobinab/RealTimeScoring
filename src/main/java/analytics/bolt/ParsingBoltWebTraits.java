@@ -14,6 +14,7 @@ import org.apache.commons.lang.StringUtils;
 
 import analytics.util.JsonUtils;
 import analytics.util.dao.MemberTraitsDao;
+import analytics.util.dao.TraitBuSubBuDao;
 import analytics.util.dao.TraitVariablesDao;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -27,7 +28,8 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
     private Map<String,List<String>> variableTraitsMap;
     private MemberTraitsDao memberTraitsDao;
     private TraitVariablesDao traitVariablesDao;
-    
+    private TraitBuSubBuDao traitBuSubBuDao;
+    private Map<String, String> traitBuSubBuMap;
     public ParsingBoltWebTraits(){
     	
     }
@@ -47,14 +49,19 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
 
         // POPULATE THE TRAIT TO VARIABLES MAP AND THE VARIABLE TO TRAITS MAP
         traitVariablesMap = traitVariablesDao.getTraitVariableList();
-        variableTraitsMap = traitVariablesDao.getVariableTraitList();		
+        variableTraitsMap = traitVariablesDao.getVariableTraitList();
+        
+        //POPULATE THE TRAITBUSUBBUMAP
+        traitBuSubBuDao = new TraitBuSubBuDao();
+        traitBuSubBuMap = traitBuSubBuDao.getTraitBuSubBuMap();
+        
     }
 
     
 
 	//Generalize with parsing bolt aam atc - processPidList
 	//[2014-29-08]:{Trait1,Trait2}, [2014-28-08]:{Trait3,Trait2}
-    protected Map<String,String> processList(String current_l_id, Hashtable<String, Integer> tagsMap) {
+    protected Map<String,String> processList(String current_l_id, Hashtable<String, Integer> buSubBuMap) {
     	LOGGER.debug("Processing list of traits");
     	Map<String, List<String>> dateTraitsMap = null; // MAP BETWEEN DATES AND SET OF TRAITS - HISTORICAL AND CURRENT TRAITS
 		List<String> variableList = new ArrayList<String>();
@@ -65,6 +72,22 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
     	//FOR EACH TRAIT FOUND FROM AAM DATA FIND THE VARIABLES THAT ARE IMPACTED
     	LOGGER.debug("Finding list of variables for each trait");
     	for(String trait: l_idToValueCollectionMap.get(current_l_id)) {
+    		
+    		// populate buSubBuMap for BrowseTags
+    	/*	if (trait != null) {
+    			String buSubBu = traitBuSubBuMap.get(trait);
+    			if(buSubBu != null){
+					if (!buSubBuMap.containsKey(buSubBu))
+						buSubBuMap.put(buSubBu, 1);
+					else {
+						int count = (buSubBuMap.get(buSubBu)) + 1;
+						buSubBuMap.put(buSubBu,	count);
+					}
+    			}
+			}*/
+    			
+    		
+    		
     		if(traitVariablesMap.containsKey(trait) && JsonUtils.hasModelVariable(modelVariablesList,traitVariablesMap.get(trait))) {
     			if(firstTrait) {
     				dateTraitsMap = memberTraitsDao.getDateTraits(current_l_id);

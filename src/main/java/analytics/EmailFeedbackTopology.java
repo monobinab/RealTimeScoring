@@ -27,6 +27,7 @@ public class EmailFeedbackTopology {
 	
 	public static void main(String[] args) {
 		
+		String purchase_Topic="rts_cp_purchase_scores";
 		if (!SystemUtility.setEnvironment(args)) {
 			System.out
 					.println("Please pass the environment variable argument- 'PROD' or 'QA' or 'LOCAL'");
@@ -51,8 +52,8 @@ public class EmailFeedbackTopology {
 		builder.setBolt("strategyScoringBolt", new StrategyScoringBolt(env), 2).shuffleGrouping("emailFeedbackParsingBolt",  "score_stream");
 		
 		//Adding the purchase kafka bolt to read from strategy scoring bolt...
-		/*builder.setBolt("purchaseScoreKafka_bolt", new PurchaseScoreKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD), purchase_Topic), 2)
-		.shuffleGrouping("strategyScoringBolt","cp_purchase_scores_stream");*/
+		builder.setBolt("purchaseScoreKafka_bolt", new PurchaseScoreKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD), purchase_Topic), 2)
+		.shuffleGrouping("strategyScoringBolt","cp_purchase_scores_stream");
 		
 		if(env.equals("PROD")){
 			builder.setBolt("loggingBolt", new LoggingBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");

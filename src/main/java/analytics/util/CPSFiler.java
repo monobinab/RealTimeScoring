@@ -100,7 +100,7 @@ public class CPSFiler {
 						queuedPackages.add(0, inProgressPackage); 
 					}			
 					List<EmailPackage> currentPackages = queuedPackages;//in progress + queued			
-					compareAndDelete(lyl_id_no,emailPackagesToBeSent, currentPackages);
+					emailPackagesToBeSent = compareAndDelete(lyl_id_no,emailPackagesToBeSent, currentPackages);
 					
 					//Rule - top 5 % occasions are not queued
 					if(emailPackagesToBeSent != null && emailPackagesToBeSent.size() > 0){
@@ -216,14 +216,15 @@ public class CPSFiler {
 		}
 		
 		if(!inProgressActive){
-			/*// 1. queueStartingTomorrow if inProgress is sent today
-			// 2. queueStartingToday if inProgress is sent before today
-			
-			if(sdformat.parse(sdformat.format(inProgressPackage.getSendDate())).before(todaysDate))
-				return queueStartingToday(emailPackagesToBeSent);	
-			else if(sdformat.parse(sdformat.format(inProgressPackage.getSendDate())).equals(todaysDate))*/
+			// 1. queueStartingTomorrow if inProgress is not active anymore
 				return queueStartingTomorrow(emailPackagesToBeSent);
 		}
+		
+	    //If the remaining duration of inProgress is greater than the queue length, no need to queue anymore occasions
+		if(inProgressPackage.getMdTagMetaData().getSendDuration()- CalendarUtil.getDatesDiff(inProgressPackage.getSentDateTime(),new Date())>Constants.CPS_QUEUE_LENGTH){
+			return null;			
+		}
+		
 		
 		
 		EmailPackage previousOccasion = inProgressPackage;
@@ -300,17 +301,22 @@ public class CPSFiler {
 		return outboxDao.getQueuedEmailPackages(lyl_id_no, occasionsInfo);
 	}
 
-	protected void compareAndDelete(String lyl_id_no, List<EmailPackage> emailPackagesToBeSent, List<EmailPackage> currentPackages) throws SQLException {
+	protected List<EmailPackage> compareAndDelete(String lyl_id_no, List<EmailPackage> emailPackagesToBeSent, List<EmailPackage> currentPackages) throws SQLException {
 		//if exisitng queue and incoming is same - do nothing.		
 		if(emailPackagesToBeSent != null && currentPackages != null){
 			if(!arePackagesSame(emailPackagesToBeSent, currentPackages))	
 			{
 				if(currentPackages.size()>0)
 					outboxDao.deleteQueuedEmailPackages(lyl_id_no);	
+				return emailPackagesToBeSent;
+			}
+			else
+			{
+				return null;
 			}
 			
 		}
-		
+		return emailPackagesToBeSent;
 						
 	}
 
@@ -345,7 +351,7 @@ public class CPSFiler {
 							//Check if the occasion has an mdtag
 							String mdtag = scoresInfo.getMdTag();
 							if(StringUtils.isNotBlank(mdtag)){
-								if(isTop5Percent(mdtag) && !isOccasionResponsysReady(mdtag)){
+								if(this.isOccasionTop5Percent(mdtag) && !isOccasionResponsysReady(mdtag)){
 									
 									continue;								
 								}	
@@ -365,29 +371,6 @@ public class CPSFiler {
 		return mdTagsList;	
 	}
 	
-	private List<String> filterResponsysNotReadyTop5PercentTags(String lyl_id_no, String l_id,List<String> tagsList) {
-		List<String> filteredTagsLst = new ArrayList<String>();
-		List<String> inactiveTop5TagsLst = new ArrayList<String>();
-		for(String mdtag : tagsList){
-			if(isTop5Percent(mdtag)){
-				if(!isOccasionResponsysReady(mdtag))
-				{
-					inactiveTop5TagsLst.add(mdtag);
-				}
-				else
-					filteredTagsLst.add(mdtag);
-			}
-			else
-				filteredTagsLst.add(mdtag);
-		}
-		//Delete the top5percent mdtags that responsys is not ready for, from mdTagsWithDates collection.
-		if(inactiveTop5TagsLst.size() > 0){
-			logger.info("PERSIST: Filtering top5% tags that responsys is not ready for :: MemberId : "+ lyl_id_no + " Tags: " + getLogMsg(inactiveTop5TagsLst));
-			
-		}
-		return filteredTagsLst;
-	}
-
 	protected boolean isOccasionTop5Percent(String mdtag) {
 		
 		if(StringUtils.isNotBlank(mdtag)){
@@ -435,11 +418,16 @@ public class CPSFiler {
 		return emailPackages;
 	}
 	
-	public void fileEmailPackages(List<EmailPackage> emailPackages) throws SQLException {
+	public List<EmailPackage> fileEmailPackages(List<EmailPackage> emailPackages) throws SQLException {
 		//don't queue if sendDate is null
-		if(emailPackages != null && emailPackages.size() > 0){			
-			outboxDao.queueEmailPackages(filterNullDatePackages(emailPackages));
+		List<EmailPackage> queuedEmailPackages = null;
+		if(emailPackages != null && emailPackages.size() > 0)
+		{
+			queuedEmailPackages = outboxDao.queueEmailPackages(filterNullDatePackages(emailPackages));
 		}
+			
+		return queuedEmailPackages;
+		
 	}
 	
 	public List<EmailPackage> filterNullDatePackages(List<EmailPackage> emailPackages){
@@ -453,37 +441,29 @@ public class CPSFiler {
 		return emailPackages;
 	}
 	
-	private boolean isOccasionResponsysReady(String mdtag) {
-		System.out.println(mdtag);
-		System.out.println(activeTags);
+	public boolean isOccasionResponsysReady(String mdtag) {
 		return activeTags.contains(mdtag.substring(0, 5));			
 	}
 
-	private boolean isTop5Percent(String mdtag) {
-		TagMetadata tagMetaData = tagsMetaDataDao.getDetails(mdtag);
-		if(tagMetaData != null){
-			//Check for the 6th char of the mdtag to be 8
-			if(tagMetaData.getMdTag().substring(5, 6).equals(MongoNameConstants.top5PercentTag))
-				return true;
-			else
-				return false;			
-		}
-		return false;		
-	}
+
 	
 	private String getLogMsg(List<String> listOfStrings) {
 		String logMsg = "  ";
 		int i =0;
-		for(String str : listOfStrings)
-		{
-			if (i ==0)
-				logMsg = logMsg.concat(str);
-			else if ( i == listOfStrings.size()-1)
-				logMsg = logMsg.concat(str);
-			else
-				logMsg = logMsg.concat(", ").concat(str);
+		if(listOfStrings != null && listOfStrings.size() > 0){
+			for(String str : listOfStrings)
+			{
+				if (i ==0)
+					logMsg = logMsg.concat(str);
+				else if ( i == listOfStrings.size()-1)
+					logMsg = logMsg.concat(str);
+				else
+					logMsg = logMsg.concat(", ").concat(str);
+			}
+			
 		}
-		return logMsg;
+		return logMsg;	
+		
 	}
 	
 	/*public List<EmailPackage> decideSendDates(List<EmailPackage> emailPackages, EmailPackage inProgressPackage) throws SQLException, RealTimeScoringException {
