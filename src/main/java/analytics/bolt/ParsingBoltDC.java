@@ -5,7 +5,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import analytics.jmx.AppMetricsBean;
+import analytics.jmx.JMXConnectionManager;
 import analytics.util.DCParsingHandler;
 import analytics.util.JsonUtils;
 import analytics.util.SecurityUtils;
@@ -28,6 +31,8 @@ public class ParsingBoltDC extends EnvironmentBolt {
 	private OutputCollector outputCollector;
 	private DcAidVarStrengthDao dcAidVarStrengthDao;
 	private Map<String, Map<String, Integer>> dcAidVarStrengthMap;
+	private AppMetricsBean appMetricsBean;
+	private AtomicInteger atomicInteger;
 
 	 public ParsingBoltDC(String systemProperty){
 		 super(systemProperty);
@@ -40,6 +45,13 @@ public class ParsingBoltDC extends EnvironmentBolt {
 		dcAidVarStrengthMap = dcAidVarStrengthDao.getdcAidVarStrenghtMap();
 		//System.out.println(dcAidVarStrengthMap.size());
 		LOGGER.info("DC Bolt Preparing to Launch");
+		JMXConnectionManager jmxConnectionManager = JMXConnectionManager.getInstance();
+        if(jmxConnectionManager != null){
+        	if(appMetricsBean == null && atomicInteger == null){
+        		appMetricsBean = jmxConnectionManager.getAppMetricsBean();
+        		atomicInteger = jmxConnectionManager.getAtomicIntegerInstance();
+        	}
+        }
 	}
 
 	@Override
@@ -50,6 +62,9 @@ public class ParsingBoltDC extends EnvironmentBolt {
 	@Override
 	public void execute(Tuple input) {
 		redisCountIncr("incoming_tuples");
+		if(appMetricsBean != null && atomicInteger != null){
+        	appMetricsBean.setDcTupCount(atomicInteger.incrementAndGet());
+        }
 		String message = (String) input.getValueByField("str");
 		
 		//check the incoming string for <UpdateMemberPrompts or :UpdateMemberPrompts as it contains the member's response data

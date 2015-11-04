@@ -13,6 +13,7 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,7 +84,6 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	  
 	  	topologyName = (String) stormConf.get("metrics_topology");
 	  	scoringSingleton = ScoringSingleton.getInstance();
-	    	
 	  }
 	
 	@SuppressWarnings("unchecked")
@@ -174,24 +174,22 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			
 			//null check
 	      	for(ChangedMemberScore changedMemberScore : changedMemberScoresList){
-	      		List<Object> listToEmit = new ArrayList<Object>();
-				listToEmit.add(lId);
-				listToEmit.add(changedMemberScore.getScore());
-				listToEmit.add(changedMemberScore.getModelId().toString());
-				listToEmit.add(source);
-				listToEmit.add(messageID);
-				listToEmit.add(changedMemberScore.getMinDate());
-				listToEmit.add(changedMemberScore.getMaxDate());
-				this.outputCollector.emit("score_stream",listToEmit);
+	      		if(StringUtils.isEmpty(changedMemberScore.getSource())){
+	      			changedMemberScore.setSource(source);
+	      		}
+	      		changedMemberScore.setlId(lId);
+	      		changedMemberScore.setMessageID(messageID);
 			}
-	   			
+	      	List<Object> listToEmitMemberScoreList = new ArrayList<Object>();
+	      	listToEmitMemberScoreList.add(changedMemberScoresList);
+	      	this.outputCollector.emit("score_stream", listToEmitMemberScoreList);
+	      	
 			//persisting the loyalty id to redis for UnknownOccasionsTopology to pick up the loyalty id
 			if(respHost != null){
 					jedis = getJedisInterface().createJedis(respHost, respPort);
 					jedis.connect();
 					jedis.set("Unknown:"+lyl_id_no,"");
 					jedis.disconnect();
-				
 			}
 			
 			//Adding logic to set up a Stream that the KafkaBolt can listen to...
@@ -220,11 +218,10 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declareStream("score_stream",new Fields("l_id", "newScore", "model","source", "messageID", "minExpiry", "maxExpiry"));
+		declarer.declareStream("score_stream",new Fields("changedMemberScoresList"));
 		declarer.declareStream("kafka_stream", new Fields("message"));
 		declarer.declareStream("cp_purchase_scores_stream", new Fields("loyaltyId", "topology", "cpsScoreMessage"));
 	}
-
 }
 
 

@@ -9,6 +9,7 @@ import analytics.bolt.PurchaseScoreKafkaBolt;
 import analytics.bolt.RTSKafkaBolt;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.bolt.TellurideParsingBoltPOS;
+import analytics.jmx.JMXConnectionManager;
 import analytics.spout.WebsphereMQSpout;
 import analytics.util.AuthPropertiesReader;
 import analytics.util.Constants;
@@ -44,11 +45,11 @@ public class RealTimeScoringTellurideTopology {
 					.println("Please pass the environment variable argument- 'PROD' or 'QA' or 'LOCAL'");
 			System.exit(0);
 		}
-		String topologyId = "";
+
+		//String topologyId = "";
 		String purchase_Topic="rts_cp_purchase_scores";
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 		String kafkatopic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;
-
 		MQConnectionConfig mqConnection = new MQConnectionConfig();
 		WebsphereMQCredential mqCredential = mqConnection
 				.getWebsphereMQCredential(System.getProperty(MongoNameConstants.IS_PROD), "Telluride");
@@ -102,12 +103,11 @@ public class RealTimeScoringTellurideTopology {
 		/*topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System.getProperty(MongoNameConstants.IS_PROD), "10.2.8.175", 11211,
 				"10.2.8.149", 11211), 12).shuffleGrouping("parsingBolt");*/
        
-       topologyBuilder.setBolt("kafka_bolt", new RTSKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD),kafkatopic), 2)
-		.shuffleGrouping("strategyScoringBolt","kafka_stream");
+       topologyBuilder.setBolt("kafka_bolt", new RTSKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD),kafkatopic), 2).shuffleGrouping("strategyScoringBolt","kafka_stream");
 	
-        if(System.getProperty(MongoNameConstants.IS_PROD).equalsIgnoreCase("PROD")){
+       if(System.getProperty(MongoNameConstants.IS_PROD).equalsIgnoreCase("PROD")){
         	topologyBuilder.setBolt("loggingBolt", new LoggingBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
-        }
+       }
        
  		Config conf = new Config();
 		conf.put("metrics_topology", "Telluride");

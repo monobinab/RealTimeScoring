@@ -46,7 +46,6 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 	private DivLnBoostDao divLnBoostDao;
 	SywApiCalls sywApiCalls;
 	private Map<String, List<String>> divLnBoostVariblesMap;
-	Map<Integer, Map<Integer, Double>> percentileScores;
 	private BoostDao boostDao;
 	private MemberBoostsDao memberBoostsDao;
 	private MemberScoreDao memberScoreDao;
@@ -83,7 +82,6 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 		feeds.add("SYW_OWN");
 		feeds.add("SYW_WANT");
 		boostListMap = boostDao.getBoostsMap(feeds);// Feed prefix
-		percentileScores = modelPercentileDao.getModelPercentiles();
 	}
 
 	@Override
@@ -256,7 +254,7 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 			if (modelIdObj instanceof Integer) {
 				int modelId = (Integer)modelIdObj;
 				String modelIdStr = String.valueOf(modelId);
-				if(memberScores.get(modelIdStr) == null || percentileScores.get(modelId) == null){
+				if(memberScores.get(modelIdStr) == null || modelPercentileDao.getModelPercentiles().get(modelId) == null){
 					continue;
 				}
 				double memberScore = Double.valueOf(memberScores.get(modelIdStr));
@@ -265,7 +263,7 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 					LOGGER.error("New "+variableName+" boost value failed to get recorded in memberBoosts collection or allBoostValuesMap for user "+lId);
 					continue;
 				}
-				double percentileScore = percentileScores.get(modelId).get(percentile);
+				double percentileScore = modelPercentileDao.getModelPercentiles().get(modelId).get(percentile);
 				double val = 0.0;
 				
 				if ("SYW_LIKE".equals(feedType) || "SYW_WANT".equals(feedType)) {

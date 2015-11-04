@@ -5,13 +5,14 @@ package analytics.bolt;
 
 import analytics.util.dao.MemberScoreDao;
 import analytics.util.dao.ModelPercentileDao;
+import analytics.util.objects.ChangedMemberScore;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Tuple;
 
 import java.util.Date;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -29,7 +30,6 @@ public class LoggingBolt extends EnvironmentBolt {
 	private OutputCollector outputCollector;
 	private MemberScoreDao memberScoreDao;
 	private ModelPercentileDao modelPercentileDao;
-	private Map<Integer,TreeMap<Integer,Double>> modelScorePercentileMap;
 	
 	public LoggingBolt() {
 	}
@@ -45,53 +45,61 @@ public class LoggingBolt extends EnvironmentBolt {
 	 * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
 	 */
 	@Override
-	public void prepare(Map stormConf, TopologyContext context,
+	public void prepare(@SuppressWarnings("rawtypes") Map stormConf, TopologyContext context,
 			OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
    		this.outputCollector = collector;
 		memberScoreDao = new MemberScoreDao();
 		modelPercentileDao = new ModelPercentileDao();
-		modelScorePercentileMap = getModelScorePercentileMap();
 	}
-		/*
+	
+	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see backtype.storm.task.IBolt#execute(backtype.storm.tuple.Tuple)
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public void execute(Tuple input) {
 		redisCountIncr("incoming_tuples");
-		String l_id = input.getStringByField("l_id");
-		String modelId = input.getStringByField("model");
-		String oldScore = memberScoreDao.getMemberScores(l_id).get(modelId);
-		String source = input.getStringByField("source");
-		Double newScore = input.getDoubleByField("newScore");
-		String minExpiry = input.getStringByField("minExpiry");
-		String maxExpiry = input.getStringByField("maxExpiry");
+		List<ChangedMemberScore> changedMemberScores = (List<ChangedMemberScore>)input.getValueByField("changedMemberScoresList");
+		if(changedMemberScores != null && changedMemberScores.size() > 0){
+			Map<Integer,TreeMap<Integer,Double>> modelScorePercentileMap = modelPercentileDao.getModelScorePercentilesMap();
+			for(ChangedMemberScore changedMemberScore : changedMemberScores){
+				if(changedMemberScore != null){
+					String l_id = changedMemberScore.getlId();
+					String modelId = changedMemberScore.getModelId();
+					String oldScore = memberScoreDao.getMemberScores(l_id).get(modelId);
+					String source = changedMemberScore.getSource();
+					Double newScore = changedMemberScore.getScore();
+					String minExpiry = changedMemberScore.getMinDate();
+					String maxExpiry = changedMemberScore.getMaxDate();
 
-		Integer newPercentile = getPercentileForScore(newScore,Integer.parseInt(modelId));
-		Integer oldPercentile = (oldScore == null ? null : getPercentileForScore(new Double (oldScore),Integer.parseInt(modelId)));
+					Integer newPercentile = getPercentileForScore(modelScorePercentileMap, newScore,Integer.parseInt(modelId));
+					Integer oldPercentile = (oldScore == null ? null : getPercentileForScore(modelScorePercentileMap, new Double (oldScore),Integer.parseInt(modelId)));
 
-
-		String messageID = "";
-		if (input.contains("messageID")) {
-			messageID = input.getStringByField("messageID");
+					String messageID = "";
+					if (input.contains("messageID")) {
+						messageID = input.getStringByField("messageID");
+					}
+					LOGGER.info("TIME:" + messageID + "-Entering logging bolt-" + System.currentTimeMillis());
+					LOGGER.info("PERSIST: " + new Date() + ": Topology: Changes Scores : lid: " + l_id + ", modelId: "+modelId + ", oldScore: "+oldScore +
+							", newScore: "+newScore+", minExpiry: "+minExpiry+", maxExpiry: "+maxExpiry+", source: " + source+", "
+									+ "oldPercentile: " + oldPercentile+", newPercentile: " + newPercentile);
+					redisCountIncr("score_logged");
+					outputCollector.ack(input);	
+				}
+			}
 		}
-		LOGGER.info("TIME:" + messageID + "-Entering logging bolt-" + System.currentTimeMillis());
-		LOGGER.info("PERSIST: " + new Date() + ": Topology: Changes Scores : lid: " + l_id + ", modelId: "+modelId + ", oldScore: "+oldScore +
-				", newScore: "+newScore+", minExpiry: "+minExpiry+", maxExpiry: "+maxExpiry+", source: " + source+", "
-						+ "oldPercentile: " + oldPercentile+", newPercentile: " + newPercentile);
-		redisCountIncr("score_logged");
-		outputCollector.ack(input);	}
+	}
 
-	
+	/**
 	private HashMap<Integer,TreeMap<Integer,Double>> getModelScorePercentileMap(){
-		
 		HashMap<Integer,TreeMap<Integer,Double>> modelScorePercentileMap = modelPercentileDao.getModelScorePercentilesMap();
 		return modelScorePercentileMap;
-	}
+	}*/
 	
-	private int getPercentileForScore(double score, int modelId){
+	private int getPercentileForScore(Map<Integer,TreeMap<Integer,Double>> modelScorePercentileMap, double score, int modelId){
 		TreeMap<Integer,Double> percMap = modelScorePercentileMap.get(modelId);
 		int p = 0;
 		if (percMap != null && percMap.size() > 0) {
@@ -118,5 +126,4 @@ public class LoggingBolt extends EnvironmentBolt {
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 	}
-
 }
