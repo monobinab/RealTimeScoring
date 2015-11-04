@@ -37,8 +37,8 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 	TagVariableDao tagVariableDao;
 	MemberMDTags2Dao memberMDTags2Dao;
 	Map<Integer, String> modelTagsMap = new HashMap<Integer, String>();
-	private static BigInteger startLoyalty = new BigInteger("7081010000647509"); 
-	private static BigInteger lastLoyalty = new BigInteger("7081117556061439");
+	//private static BigInteger startLoyalty = new BigInteger("7081010000647509"); 
+	//private static BigInteger lastLoyalty = new BigInteger("7081216198457607");
 
 	public TagCreatorBolt(String env) {
 		super(env);
@@ -90,15 +90,15 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 				 */
 			//	String topology = jsonElement.getAsJsonObject().get("topology").getAsString();
 				
-				BigInteger loyaltyID =  new BigInteger(lyl_id_no.getAsString());
+				//BigInteger loyaltyID =  new BigInteger(lyl_id_no.getAsString());
 				//if (! (loyaltyID.compareTo(startLoyalty) != -1  && loyaltyID.compareTo(lastLoyalty) != 1) ){
 				
-				if (loyaltyID.compareTo(startLoyalty) == -1  || loyaltyID.compareTo(lastLoyalty) == 1) {
+				/*if (loyaltyID.compareTo(startLoyalty) == -1  || loyaltyID.compareTo(lastLoyalty) == 1) {
 					LOGGER.info("Not creating Tag as lid is out of the percentile range alloted");
 					redisCountIncr("OutOf_PO_CPS_PercSplit");	
 					outputCollector.ack(input);
 					return;
-				}
+				}*/
 				
 				String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no.getAsString());
 				

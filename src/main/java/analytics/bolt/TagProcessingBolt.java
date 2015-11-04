@@ -37,8 +37,8 @@ public class TagProcessingBolt extends EnvironmentBolt {
 	private HashMap<String, String> cpsOccasionPriorityMap;
 	private HashMap<String, String> cpsOccasionDurationMap;
 	
-	private static BigInteger startLoyalty = new BigInteger("7081010000647509"); 
-	private static BigInteger lastLoyalty = new BigInteger("7081117556061439");
+	//private static BigInteger startLoyalty = new BigInteger("7081010000647509"); 
+	//private static BigInteger lastLoyalty = new BigInteger("7081216198457607");
 	
 
 	public TagProcessingBolt(String systemProperty, String host, int port) {
@@ -89,13 +89,13 @@ public class TagProcessingBolt extends EnvironmentBolt {
 			}
 			
 			//Do not create/process tags out of range alloted to CPS...
-			BigInteger loyaltyID =  new BigInteger(lyl_id_no);
+			/*BigInteger loyaltyID =  new BigInteger(lyl_id_no);
 			if (loyaltyID.compareTo(startLoyalty) == -1  || loyaltyID.compareTo(lastLoyalty) == 1) {
 				LOGGER.info("Not creating Tag as lid is out of the percentile range alloted");
 				redisCountIncr("OutOf_PO_CPS_PercSplit");	
 				outputCollector.ack(input);
 				return;
-			}
+			}*/
 			
 			
 			String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no);

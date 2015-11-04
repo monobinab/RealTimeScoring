@@ -194,5 +194,9 @@ public class MongoNameConstants {
      public static final String DIV_LN = "d";
      public static final String BU_SUBBU = "bsb";
      
+   //traitLnBuSubBu collection
+     public static final String TRAIT_ID = "t";
+ 
+     
 }
 

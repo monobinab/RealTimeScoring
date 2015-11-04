@@ -113,6 +113,7 @@ public class CPSUtil {
 				memberMDTags2Dao.addMemberMDTags(l_id, presetItem.getMdTagList(), cpsOccasionDurationMap, cpsOccasionPriorityMap);
 				
 
+				SimpleDateFormat sdformat = new SimpleDateFormat("yyyy-MM-dd");
 				// TEST
 				// if(!testMap.containsKey(loyID))
 				// break;
@@ -142,6 +143,9 @@ public class CPSUtil {
 									}
 									changedMemberScoreObject.setModelId(Integer.toString(modelId));
 									changedMemberScoreObject.setScore(newScore );
+									changedMemberScoreObject.setEffDate(sdformat.format(new Date()));
+									changedMemberScoreObject.setMaxDate(sdformat.format(new Date()));
+									changedMemberScoreObject.setMinDate(sdformat.format(new Date()));
 									changedScores.put(modelId, changedMemberScoreObject);	
 									changedMemberScoresDao.upsertUpdateChangedScores(l_id, changedScores);
 								}
@@ -187,10 +191,9 @@ public class CPSUtil {
 										}
 										changedMemberScoreObject.setModelId(Integer.toString(modelId));
 										changedMemberScoreObject.setScore(newScore );
-										//scoreObj.setEffDate(DateUtil.formatDate(new Date(), "yyyy-MM-dd"));
-										//scoreObj.setMaxDate(DateUtil.formatDate(new Date(), "yyyy-MM-dd"));
-										//scoreObj.setMinDate(DateUtil.formatDate(new Date(), "yyyy-MM-dd"));
-										//Map<Integer,ChangedMemberScore> memberScores = new HashMap<Integer, ChangedMemberScore>();
+										changedMemberScoreObject.setEffDate(sdformat.format(new Date()));
+										changedMemberScoreObject.setMaxDate(sdformat.format(new Date()));
+										changedMemberScoreObject.setMinDate(sdformat.format(new Date()));
 										changedScores.put(modelId, changedMemberScoreObject);									
 										changedMemberScoresDao.upsertUpdateChangedScores(l_id, changedScores);
 									}
@@ -241,7 +244,7 @@ public class CPSUtil {
 						e.printStackTrace();
 					}
 
-					Thread.sleep(37000);
+					Thread.sleep(10000);
 
 					// VERIFY
 

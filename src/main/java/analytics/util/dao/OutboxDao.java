@@ -60,10 +60,9 @@ public class OutboxDao extends AbstractMySQLDao{
 	        return emlPackageList;
 	}
 
-	public void queueEmailPackages(List<EmailPackage> emailPackages) throws SQLException {
-		SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+	public List<EmailPackage> queueEmailPackages(List<EmailPackage> emailPackages) throws SQLException {
 		Integer queueLength =0;
+		List<EmailPackage> queuedEmailPackages=new ArrayList<EmailPackage>();
 		
 		for(EmailPackage emlPack: emailPackages) {
 			if(queueLength < Constants.CPS_QUEUE_LENGTH){
@@ -132,6 +131,8 @@ public class OutboxDao extends AbstractMySQLDao{
 				statement.executeUpdate();	
 				queueLength = queueLength+ emlPack.getMdTagMetaData().getSendDuration();
 				statement.close();
+				queuedEmailPackages.add(emlPack);
+				
 			}
 			else
 			{
@@ -140,7 +141,7 @@ public class OutboxDao extends AbstractMySQLDao{
 			
 		}
 		
-		
+		return queuedEmailPackages;
 	}
 
 /*	public void removeFromQueue(EmailPackage queuedEP) {
@@ -257,6 +258,7 @@ public class OutboxDao extends AbstractMySQLDao{
 		        	inProgressOccasion.setAddedDateTime( rs1.getTimestamp("added_datetime"));
 		        	inProgressOccasion.setSendDate(rs1.getDate("send_date"));
 		        	inProgressOccasion.setStatus( rs1.getInt("status")); 
+		        	inProgressOccasion.setSentDateTime(rs1.getTimestamp("recentSentDate"));
 	        	}	
 	        			        	
 	       }	
