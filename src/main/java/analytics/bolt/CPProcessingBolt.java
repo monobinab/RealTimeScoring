@@ -66,13 +66,17 @@ public class CPProcessingBolt extends EnvironmentBolt  {
 				//20 - level, rtsTOtec is the apikey for internal calls to RTS API from topologies
 				String rtsAPIResponse = rtsApiCaller.getRTSAPIResponse(lyl_id_no, "20", cps_api_key, "sears", Boolean.FALSE, "");
 				List<EmailPackage> emailPackages = cpsFiler.prepareEmailPackages(rtsAPIResponse,lyl_id_no,l_id);
-				LOGGER.info("PERSIST:Tags to be queued to outbox for lyl_id_no " + lyl_id_no+ " : ["+getLogMsg(emailPackages) + "]");
+				LOGGER.info("PERSIST: MemberId : " + lyl_id_no+ " | Tags to be queued : ["+getLogMsg(emailPackages) + "]");
 				
 				if(emailPackages!= null && emailPackages.size()>0){
-						List<EmailPackage> queuedEmailPackages = cpsFiler.fileEmailPackages(emailPackages);
-						LOGGER.info("PERSIST: Queued Tags in CPS Outbox for memberId " + lyl_id_no+ " : "+getLogMsg(queuedEmailPackages));
-						redisCountIncr("queued_tags_count");						
-										
+					List<EmailPackage> queuedEmailPackages = cpsFiler.fileEmailPackages(emailPackages);
+					if(queuedEmailPackages!= null && queuedEmailPackages.size()>0){
+						LOGGER.info("PERSIST: MemberId : " + lyl_id_no + " | CPS STATUS : QUEUED " + " | TAGS: "+  getLogMsg(queuedEmailPackages));
+						redisCountIncr("queued_tags_count");											
+					}else{
+						LOGGER.info("PERSIST: MemberId : " + lyl_id_no + " | CPS STATUS : NOT QUEUED ");						
+					}
+					
 				}			
 			} catch (SQLException e){
 				LOGGER.error("PERSIST: SQLException Occured in CPProcessingBolt for memberId :: "+ lyl_id_no + " : "+ ExceptionUtils.getMessage(e) + "Rootcause-"+ ExceptionUtils.getRootCauseMessage(e) + "  SATCKTRACE : "+ ExceptionUtils.getFullStackTrace(e));

@@ -1,7 +1,7 @@
 package analytics.bolt;
 
 
-import java.math.BigInteger;
+/*import java.math.BigInteger;*/
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,8 +37,8 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 	TagVariableDao tagVariableDao;
 	MemberMDTags2Dao memberMDTags2Dao;
 	Map<Integer, String> modelTagsMap = new HashMap<Integer, String>();
-	private static BigInteger startLoyalty = new BigInteger("7081010000647509"); 
-	private static BigInteger lastLoyalty = new BigInteger("7081216198457607");
+	/*private static BigInteger startLoyalty = new BigInteger("7081010000647509"); 
+	private static BigInteger lastLoyalty = new BigInteger("7081216198457607");*/
 
 	public TagCreatorBolt(String env) {
 		super(env);
@@ -81,16 +81,16 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 			
 			try{
 				JsonElement jsonElement = TupleParser.getParsedJson(input);
-				LOGGER.info("Input from TagCreatorBolt :" + jsonElement.toString());
+				LOGGER.info("Input to TagCreatorBolt :" + jsonElement.toString());
 				JsonElement lyl_id_no = jsonElement.getAsJsonObject().get("memberId");
 				
 				
 				/*
 				 * topologyName is not needed as of now, but is there in the json emitted and can be used whenever needed
 				 */
-			//	String topology = jsonElement.getAsJsonObject().get("topology").getAsString();
+		        //	String topology = jsonElement.getAsJsonObject().get("topology").getAsString();
 				
-				BigInteger loyaltyID =  new BigInteger(lyl_id_no.getAsString());
+	    		/*	BigInteger loyaltyID =  new BigInteger(lyl_id_no.getAsString());
 				//if (! (loyaltyID.compareTo(startLoyalty) != -1  && loyaltyID.compareTo(lastLoyalty) != 1) ){
 				
 				if (loyaltyID.compareTo(startLoyalty) == -1  || loyaltyID.compareTo(lastLoyalty) == 1) {
@@ -98,7 +98,7 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 					redisCountIncr("OutOf_PO_CPS_PercSplit");	
 					outputCollector.ack(input);
 					return;
-				}
+				}*/
 				
 				String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no.getAsString());
 				

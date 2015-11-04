@@ -61,9 +61,7 @@ public class CPSFiler {
 		
 		if(memberInfo!=null){
 			if(StringUtils.isNotBlank(memberInfo.getEid())&& memberInfo.getEid()!="0"){
-				List<TagMetadata> validOccasions = this.getValidOccasionsList(rtsAPIResponse);
-				
-				
+				List<TagMetadata> validOccasions = this.getValidOccasionsList(rtsAPIResponse);				
 				
 				if(validOccasions != null && validOccasions.size() > 0){
 					for(TagMetadata validOccasion : validOccasions){
@@ -84,10 +82,10 @@ public class CPSFiler {
 						
 					}
 				}else{
-				logger.info("PERSIST:There are no valid mdtags for this member: " + lyl_id_no);
+					logger.info("PERSIST: MemberId : " + lyl_id_no + " | CPS STATUS : NO TAGS | REASON : No md/rtsTags from API.");
 				}
 				
-				if(emailPackages != null ){
+				if(emailPackages != null  && emailPackages.size() > 0){
 					
 					//ignore sending an emailPackage if it has been sent in the history -( ex: duress > 0 & < 38)
 					List<EmailPackage> emailPackagesToBeSent = this.ignorePackagesSentInHistory(emailPackages);
@@ -115,13 +113,13 @@ public class CPSFiler {
 			}
 			else
 			{
-				logger.info("PERSIST: Occasions are not queued for member - " + lyl_id_no + " in CPS. Eid for member - " + lyl_id_no + " is either null, blank or 0.");
+				logger.info("PERSIST: MemberId : " + lyl_id_no + " | CPS STATUS : NOT QUEUED | REASON : Eid is null, blank or 0.");
 			}
 			
 		}
 		else
 		{
-			logger.info("PERSIST: Occasions are not queued for member - " + lyl_id_no + " in CPS. There is no memeberInfo found for member - " + lyl_id_no );
+			logger.info("PERSIST: MemberId : " + lyl_id_no + " | CPS STATUS : NOT QUEUED | REASON : memberInfo not found ." );
 		}
 		
 		
@@ -186,16 +184,12 @@ public class CPSFiler {
 		}
 		if(StringUtils.isNotBlank(memberId))
 		{
-			logger.info("PERSIST: Top5tags that were not queued for MemberId : "+ memberId + "because of higher priority tags in queue :: " + removedTop5tags);
+			logger.info("PERSIST: MemberId : "+ memberId + " | TAGS : " + removedTop5tags + " | CPS STATUS : NOT QUEUED | REASON : Higher priority tags in queue already." );
 		}
 		return emailPackagesToBeSent;
 	}
 	
 	protected List<EmailPackage> decideSendDates(	List<EmailPackage> emailPackagesToBeSent, EmailPackage inProgressPackage) throws ParseException {
-		
-		SimpleDateFormat sdformat = new SimpleDateFormat("yyyy-MM-dd");
-		String todaysDateStr = sdformat.format(new DateTime().toDate());
-		Date todaysDate = sdformat.parse(todaysDateStr);
 		
 		boolean inProgressActive = false;
 		
@@ -204,6 +198,7 @@ public class CPSFiler {
 			while(emailPackagesItr.hasNext()){
 				EmailPackage emailPackage = emailPackagesItr.next();
 				if(emailPackage.getMdTagMetaData().getMdTag().equals(inProgressPackage.getMdTagMetaData().getMdTag())){
+					logger.info("PERSIST: MemberId : "+ emailPackage.getMemberId() + " | TAG : " + emailPackage.getMdTagMetaData().getMdTag() + " | CPS STATUS : NOT QUEUED | REASON : This tag is inProgress already." );					
 					emailPackagesItr.remove();
 					inProgressActive = true;				
 				}
@@ -234,10 +229,7 @@ public class CPSFiler {
 			//       and send it tomorrow			//
 			if( emailPackage.getMdTagMetaData().getPriority() < previousOccasion.getMdTagMetaData().getPriority()){
 				
-				/*if(sdformat.parse(sdformat.format(previousOccasion.getSendDate())).before(todaysDate))
-					emailPackage.setSendDate(new DateTime().toDate());	
-				else if(sdformat.parse(sdformat.format(previousOccasion.getSendDate())).equals(todaysDate))*/
-					emailPackage.setSendDate(new DateTime().plusDays(1).toDate());
+				emailPackage.setSendDate(new DateTime().plusDays(1).toDate());
 			}			
 			//Rule - if incoming occasion is of same priority as the inProgress occasion - (check for same bu, sub bu ??) and queue the incoming occasion
 			//Rule - if incoming occasion is of lesser priority than the inProgress occasion - queue the incoming occasion
@@ -302,12 +294,12 @@ public class CPSFiler {
 	}
 
 	protected List<EmailPackage> compareAndDelete(String lyl_id_no, List<EmailPackage> emailPackagesToBeSent, List<EmailPackage> currentPackages) throws SQLException {
-		//if exisitng queue and incoming is same - do nothing.		
+		//if existing queue and incoming is same - do nothing.		
 		if(emailPackagesToBeSent != null && currentPackages != null){
 			if(!arePackagesSame(emailPackagesToBeSent, currentPackages))	
 			{
 				if(currentPackages.size()>0)
-					outboxDao.deleteQueuedEmailPackages(lyl_id_no);	
+					outboxDao.deleteQueuedEmailPackages(lyl_id_no);					
 				return emailPackagesToBeSent;
 			}
 			else
@@ -327,8 +319,7 @@ public class CPSFiler {
 			for(int i = 0; i<emailPackagesToBeSent.size();i++){
 				if(!emailPackagesToBeSent.get(i).getMdTagMetaData().getMdTag().equals(currentPackages.get(i).getMdTagMetaData().getMdTag()))
 					return false;
-			}
-			
+			}		
 			
 			return true;			
 	}
@@ -352,7 +343,7 @@ public class CPSFiler {
 							String mdtag = scoresInfo.getMdTag();
 							if(StringUtils.isNotBlank(mdtag)){
 								if(this.isOccasionTop5Percent(mdtag) && !isOccasionResponsysReady(mdtag)){
-									
+									logger.info("PERSIST: MemberId : "+ apiResponseMapper.getMemberId() + " | TAG : "+ mdtag +" | CPS STATUS : NOT QUEUED | REASON : Responsys not ready tag.");
 									continue;								
 								}	
 								TagMetadata tagMetaData = new TagMetadata();
@@ -397,8 +388,7 @@ public class CPSFiler {
 			EmailPackage emailPackage = emailPackagesItr.next();
 			if(emailPackage!= null){
 				
-				Date sentDate = outboxDao.getSentDate(emailPackage);
-				
+				Date sentDate = outboxDao.getSentDate(emailPackage);				
 				
 				//First Rule - Check that when the package was last sent and is it sent with-in sendDuration
 				if(sentDate != null){
@@ -408,6 +398,7 @@ public class CPSFiler {
 					    int daysToCheckInHistory = Integer.parseInt(occasionInfo.getDaysToCheckInHistory());
 						int dateDiffDays = CalendarUtil.getDatesDiff(todaysDate, sdformat.parse(sdformat.format(sentDate)));
 							if((dateDiffDays >sendDuration ) &&(dateDiffDays < daysToCheckInHistory+sendDuration)){
+								logger.info("PERSIST: MemberId : "+ emailPackage.getMemberId() + " | TAG : "+ emailPackage.getMdTagMetaData().getMdTag() +" | CPS STATUS : NOT QUEUED | REASON :  Tag is already sent on "+ sdformat.format(sentDate));
 								emailPackagesItr.remove();
 							}
 						}
@@ -435,7 +426,8 @@ public class CPSFiler {
         while(emailPackagesItr.hasNext()){
         	EmailPackage emailPackage = emailPackagesItr.next();
 	        if(emailPackage.getSendDate() == null){
-	        	emailPackagesItr.remove();
+	        	logger.info("PERSIST: MemberId : "+ emailPackage.getMemberId() + " | TAG : "+ emailPackage.getMdTagMetaData().getMdTag() +" | CPS STATUS : NOT QUEUED | REASON : SendDate = null");
+				emailPackagesItr.remove();
 			}
         }
 		return emailPackages;
@@ -446,26 +438,7 @@ public class CPSFiler {
 	}
 
 
-	
-	private String getLogMsg(List<String> listOfStrings) {
-		String logMsg = "  ";
-		int i =0;
-		if(listOfStrings != null && listOfStrings.size() > 0){
-			for(String str : listOfStrings)
-			{
-				if (i ==0)
-					logMsg = logMsg.concat(str);
-				else if ( i == listOfStrings.size()-1)
-					logMsg = logMsg.concat(str);
-				else
-					logMsg = logMsg.concat(", ").concat(str);
-			}
-			
-		}
-		return logMsg;	
-		
-	}
-	
+
 	/*public List<EmailPackage> decideSendDates(List<EmailPackage> emailPackages, EmailPackage inProgressPackage) throws SQLException, RealTimeScoringException {
 		/******************* LOGIC *********************************	
 			prepare the list of occasions(this will have occasion name, priority, sendDuration)
