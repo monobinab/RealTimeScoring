@@ -36,7 +36,7 @@ public class DCTopology {
 		TopologyBuilder builder = new TopologyBuilder();
 		BrokerHosts hosts = new ZkHosts("trprtelpacmapp1.vm.itg.corp.us.shldcorp.com:2181");
 		// use topology Id as part of the consumer ID to make it unique
-		SpoutConfig kafkaConfig = new SpoutConfig(hosts, "telprod_reqresp_log_output", "", "RTSConsumer_test_cache"+topologyId);
+		SpoutConfig kafkaConfig = new SpoutConfig(hosts, "telprod_reqresp_log_output", "", "RTSConsumer"+topologyId);
 		kafkaConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
 		
 		builder.setSpout("kafkaSpout", new KafkaSpout(kafkaConfig), 2);
