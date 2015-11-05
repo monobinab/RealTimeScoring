@@ -136,45 +136,41 @@ public class OutboxDao extends AbstractMySQLDao{
 			}
 			else
 			{
+				
+				//gather the tags that are not queued 
+				String ignoredTags = " ";
+				for (int i =emailPackages.indexOf(emlPack); i<emailPackages.size(); i++){
+					ignoredTags = ignoredTags+emailPackages.get(i).getMdTagMetaData().getMdTag() + "  ";					
+				}
+				LOGGER.info("PERSIST: MemberId : "+ emlPack.getMemberId() + " | CPS STATUS : NOT QUEUED | REASON: Queue Length reached threshold. | " + " NOT QUEUED TAGS : " + ignoredTags) ;
+				
 				break;
 			}
-			
-		}
+					}
 		
 		return queuedEmailPackages;
 	}
 
-/*	public void removeFromQueue(EmailPackage queuedEP) {
-		// TODO Auto-generated method stub
-		
-	}
-	public java.sql.Date getSentDate(EmailPackage emailPackage) {
-		// TODO Auto-generated method stub
-		return null;
-	}*/
-
-	/*public Integer getEmailPackageStatus(EmailPackage emailPackage,	Integer daysToCheck) {
-		// This method is expected to return 1 if the emailPackage was sent in the past "daysToCheck"
-		// It should return 0 if the emailPackage was not sent
-		java.util.Calendar cal = java.util.Calendar.getInstance();
-		
-		if(emailPackage.getStatus() == 1 
-				&& emailPackage.getSentDateTime() != null 
-				// TODO: Do you want to include the send date with daysToCheck? e.g. if days to check is 1 do you include yesterday or after [today - (daysToCheck+1)]?
-				&& emailPackage.getSentDateTime().after(new Date(cal.getTimeInMillis() - 24l * 60l * 60l * 1000l * (daysToCheck.longValue() + 1l)))) {
-			return 1;
-		} else {
-			return 0;
-		}
-	}*/
-
 	public void deleteQueuedEmailPackages(String lyl_id_no) throws SQLException {
-		StringBuilder query = new StringBuilder();
-		query.append("DELETE from rts_member.cp_outbox WHERE loy_id=? AND status=0;");
-    	PreparedStatement statement = connection.prepareStatement(query.toString());
+		List<String> deletedTags = new ArrayList<String>();
+		String query= "Select * from rts_member.cp_outbox WHERE loy_id=? AND status=0;";
+		PreparedStatement statement = connection.prepareStatement(query);
+		statement.setString(1, lyl_id_no);
+		ResultSet rs = statement.executeQuery();
+		while (rs.next()) {  
+			deletedTags.add(rs.getString("md_tag"));	        	
+	    }
+		statement.close();
+		
+		
+		query = "DELETE from rts_member.cp_outbox WHERE loy_id=? AND status=0;";
+		statement = connection.prepareStatement(query);
 		statement.setString(1, lyl_id_no);
 		statement.executeUpdate();
 		statement.close();
+		
+		if(deletedTags.size()>0)
+			LOGGER.info("PERSIST: MemberId : "+ lyl_id_no + " | CPS STATUS : DELETED | REASON : Deleted to requeue the current active tags. | DELETED TAGS : " + deletedTags ) ;
 	}
 
 	public Date getSentDate(String lyl_id_no, String occasionName) throws SQLException {
