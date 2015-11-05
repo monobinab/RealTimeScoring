@@ -113,51 +113,48 @@ public class ModelVariablesDao extends AbstractDao{
 				DBObject dbObj = dbCursor.next();
 				if(dbObj != null){
 					ModelVariable modelVariable = new ModelVariable();
-					try{
-						modelVariable.setModelId((Integer)dbObj.get("modelId"));
-						modelVariable.setModelName((String)dbObj.get("modelName"));
-						modelVariable.setModelDescription((String)dbObj.get("modelDescription"));
-						modelVariable.setConstant((Double)dbObj.get("constant"));
-						modelVariable.setMonth((Integer)dbObj.get("month"));
-					}catch(ClassCastException ex){
-						modelVariable.setModelId((Integer)dbObj.get("modelId"));
-						modelVariable.setModelName((String)dbObj.get("modelName"));
-						modelVariable.setModelDescription((String)dbObj.get("modelDescription"));
+					modelVariable.setModelId((Integer)dbObj.get("modelId"));
+					modelVariable.setModelName((String)dbObj.get("modelName"));
+					modelVariable.setModelDescription((String)dbObj.get("modelDescription"));
+					if(dbObj.get("constant") instanceof Integer){
 						int val = (Integer)dbObj.get("constant");
 						modelVariable.setConstant(val*1.0);
-						modelVariable.setMonth((Integer)dbObj.get("month"));
+					}else if(dbObj.get("constant") instanceof Double){
+						modelVariable.setConstant((Double)dbObj.get("constant"));
 					}
+					modelVariable.setMonth((Integer)dbObj.get("month"));
+					
 					BasicDBList variableList = (BasicDBList)dbObj.get("variable");
 					if(variableList != null && variableList.size() > 0){
 						List<Variable> dbVariables = new ArrayList<Variable>();
 						for(Iterator<Object> it = variableList.iterator(); it.hasNext();){
 							BasicDBObject dbo = (BasicDBObject) it.next();
 							Variable variable = new Variable();
-							try{
 								if(dbo != null && dbo.containsField("name")){
 									variable.setName((String)dbo.get("name"));
-									variable.setCoefficient((Double)dbo.get("coefficient"));
+									if(dbo.get("coefficient") instanceof Integer){
+										int val = (Integer)dbo.get("coefficient");
+										variable.setCoefficient(val*1.0);
+									}else if(dbo.get("coefficient") instanceof Double){
+										variable.setCoefficient((Double)dbo.get("coefficient"));
+									}
 									if(dbo.get("intercept") != null){
-										variable.setIntercept((Double)dbo.get("intercept"));
+										if(dbo.get("intercept") instanceof Integer){
+											int val = (Integer)dbo.get("intercept");
+											variable.setIntercept(val*1.0);
+										}else if(dbo.get("intercept") instanceof Double){
+											variable.setIntercept((Double)dbo.get("intercept"));
+										}
 									}
-									dbVariables.add(variable);
-									}
-								}catch(ClassCastException ex){
-								int val = (Integer)dbo.get("coefficient");
-								variable.setName((String)dbo.get("name"));
-								variable.setCoefficient(val*1.0);
-								if(dbo.get("intercept") != null){
-									variable.setCoefficient((Double)dbo.get("intercept"));
 								}
 								dbVariables.add(variable);
 							}
-						}
 						modelVariable.setVariable(dbVariables);
 						modelVariables.add(modelVariable);
+						}
 					}
 				}
 			}
-		}
 		if(modelVariables != null && modelVariables.size() > 0){
 			cache.put(new Element(cacheKey, (List<ModelVariable>) modelVariables));
 		}
