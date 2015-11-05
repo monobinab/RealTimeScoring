@@ -62,8 +62,8 @@ public class SywScoringBolt extends BaseRichBolt {
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
 		initMetrics(context);
-	//	System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
-		   HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
+		//System.setProperty(MongoNameConstants.IS_PROD, String.valueOf(stormConf.get(MongoNameConstants.IS_PROD)));
+		HostPortUtility.getInstance(stormConf.get("nimbus.host").toString());
 		outputCollector = collector;
 		variableDao = new VariableDao();
 		// populate the variableVidToNameMap
@@ -74,14 +74,6 @@ public class SywScoringBolt extends BaseRichBolt {
 		modelBoostDao = new ModelSywBoostDao();
 		sywBoostModelMap = modelBoostDao.getVarModelMap();
 		dcBoostModelMap = new DCDao().getDCModelMap();
-		
-		variableNameToVidMap = new HashMap<String, String>();
-		List<Variable> variables = variableDao.getVariables();
-		for(Variable variable:variables){
-			if (variable.getName() != null && variable.getVid()!= null) {
-				variableNameToVidMap.put(variable.getName(), variable.getVid());
-			}
-		}
 		
 		simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		// TODO: Dont hard code this
@@ -112,6 +104,12 @@ public class SywScoringBolt extends BaseRichBolt {
 			messageID = input.getStringByField("messageID");
 		}
 
+		Map<String,String> variableNameToVidMap = new HashMap<String, String>();
+		for(Variable variable: variableDao.getVariables()){
+			if (variable.getName() != null && variable.getVid()!= null) {
+				variableNameToVidMap.put(variable.getName(), variable.getVid());
+			}
+		}
 		// TODO: Reuse this as a function. AAM ATC uses a very similar piece of
 		// code
 		// 2) Create map of new changes from the input

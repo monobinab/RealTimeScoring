@@ -29,13 +29,12 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 	/**
 	 * Created by Rock Wasserman 6/19/2014
 	 */
+	private static final long serialVersionUID = 1L;
 	private DivLnVariableDao divLnVariableDao;
-	private VariableDao variableDao;
 	private MemberBoostsDao memberBoostsDao;
 	private DivLnBuSubBuDao divLnBuSubBuDao;
 	private HashMap<String, List<String>> divLnBoostVariblesMap;
 	private Map<String, String> divLnBuSubBuMap;
-	private Map<String, Variable> boostMap;
 	private PidMatchUtils pidMatchUtil;
 	private List<String> boostList;
 
@@ -51,27 +50,17 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 	 * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
 	 */
 	@Override
-	public void prepare(Map stormConf, TopologyContext context,
+	public void prepare(@SuppressWarnings("rawtypes") Map stormConf, TopologyContext context,
 			OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
 		pidMatchUtil = new PidMatchUtils();
 
 		divLnVariableDao = new DivLnVariableDao();
-		variableDao = new VariableDao();
 		memberBoostsDao = new MemberBoostsDao();
 
 		// populate divLnBoostvariablesMap & Boost list
 		divLnBoostVariblesMap = divLnVariableDao.getDivLnBoostVariable();
-
 		boostList = new ArrayList<String>();
-		List<Variable> variableList = variableDao.getVariables();
-		boostMap = new HashMap<String, Variable>();
-		for (Variable v : variableList) {
-			if (v.getName().contains(MongoNameConstants.BROWSE_BOOST_PREFIX)) {
-				boostMap.put(v.getName(), v);
-				boostList.add(v.getName());
-			}
-		}
 
 		divLnBuSubBuDao = new DivLnBuSubBuDao();
 		divLnBuSubBuMap = divLnBuSubBuDao.getDvLnBuSubBu();

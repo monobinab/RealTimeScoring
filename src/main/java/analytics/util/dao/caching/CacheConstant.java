@@ -5,6 +5,7 @@ public class CacheConstant {
 	//Cache Name
 	public static final String RTS_CACHE_MODELPERCENTILECACHE = "MODELPERCENTILECACHE";
 	public static final String RTS_CACHE_MODELVARIABLESCACHE = "MODELVARIABLESCACHE";
+	public static final String RTS_CACHE_VARIABLESCACHE = "VARIABLESCACHE";
 	
 	
 	//Model Percentiles Cache Key
@@ -14,7 +15,9 @@ public class CacheConstant {
 	
 	//Model Variables Cache Key
 	public static final String RTS_MODEL_VAR_CACHE_KEY = "14e15cae-16b2-448d-8330-330533af65e5";
-	public static final String RTS_MODEL_VAR_WITH_MODELID_CACHE_KEY = "b2dd36a9-9c48-4e50-9fc4-acd1658117a7"; //Not in used: TODO: Cleanup
+	
+	//Variables Cache Key
+	public static final String RTS_VARIABLE_CACHE_KEY = "7d862e18-8bca-451c-8e04-6921deeeeacd";
 	
 	
 }

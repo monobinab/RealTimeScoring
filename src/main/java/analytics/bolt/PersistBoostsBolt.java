@@ -18,38 +18,37 @@ import java.util.*;
 
 public class PersistBoostsBolt extends EnvironmentBolt {
 	
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(PersistBoostsBolt.class);
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private static final Logger LOGGER = LoggerFactory.getLogger(PersistBoostsBolt.class);
     private MemberBoostsDao memberBoostsDao;
     private VariableDao variableDao;
-    private Map<String, String> variablesStrategyMap;
 	 
 	 public PersistBoostsBolt(String systemProperty){
 		 super(systemProperty);
-		 }
+	}
+	 
 	@Override
-	public void prepare(Map stormConf, TopologyContext context,
-			OutputCollector collector) {
+	public void prepare(@SuppressWarnings("rawtypes") Map stormConf, TopologyContext context,OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
     	memberBoostsDao = new MemberBoostsDao();
 		variableDao = new VariableDao();
-		variablesStrategyMap = new HashMap<String, String>();
-		
-		//populate variablesStrategyMap
-		for(Variable v: variableDao.getVariables()) {
-			if(v.getName().substring(0, 5).equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
-				variablesStrategyMap.put(v.getName(), v.getStrategy());
-			}
-		}
 	}
 
 	@Override
 	public void execute(Tuple input) {
-
 		//countMetric.scope("incoming_record").incr();
 		redisCountIncr("incoming_record");
         Map<String, Map<String, List<String>>> memberBoostValuesMap = new HashMap<String, Map<String, List<String>>>();
-
+        Map<String, String> variablesStrategyMap = new HashMap<String, String>();
+        //populate variablesStrategyMap
+  		for(Variable v: variableDao.getVariables()) {
+  			if(v.getName().substring(0, 5).equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
+  				variablesStrategyMap.put(v.getName(), v.getStrategy());
+  			}
+  		}
         LOGGER.debug("Persisting boost + values in mongo");
 		//Get the encrypted loyalty id
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
