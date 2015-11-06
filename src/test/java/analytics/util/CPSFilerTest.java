@@ -355,6 +355,7 @@ public class CPSFilerTest {
 		inProgressEmailPackage = new EmailPackage("7081103948483127",tagMetadata);
 		inProgressEmailPackage.setSendDate(new DateTime().minusDays(3).toDate());//today - 3
 		inProgressEmailPackage.setSentDateTime(new DateTime().minusDays(3).toDate());
+		
 	
 		List<EmailPackage> retEmailPackages = cpsFiler.decideSendDates(emailPackages,inProgressEmailPackage);		
 		Assert.assertNotNull(retEmailPackages);
@@ -1209,6 +1210,8 @@ public class CPSFilerTest {
 		boolean isResponsysReady = cpsFiler.isOccasionResponsysReady("CEGES823600153010");
 		assertFalse(isResponsysReady);	
 	}
+	
+
 	
 
 	
