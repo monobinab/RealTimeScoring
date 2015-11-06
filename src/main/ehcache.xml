@@ -18,4 +18,8 @@
  	overflowToDisk="false" timeToLiveSeconds="86400" memoryStoreEvictionPolicy="LFU">
  </cache>
  
+ <cache name="CPSOCCASIONSCACHE" maxElementsInMemory="50" eternal="false"
+ 	overflowToDisk="false" timeToLiveSeconds="604800" memoryStoreEvictionPolicy="LFU">
+ </cache>
+ 
 </ehcache>

@@ -1,7 +1,6 @@
 package analytics.bolt;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,13 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import scala.actors.threadpool.Arrays;
-import analytics.util.MongoNameConstants;
 import analytics.util.SecurityUtils;
 import analytics.util.dao.CpsOccasionsDao;
 import analytics.util.dao.MemberMDTags2Dao;
-import analytics.util.dao.TagMetadataDao;
-import analytics.util.dao.TagResponsysActiveDao;
-import analytics.util.objects.TagMetadata;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -36,17 +31,14 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 			.getLogger(CPParsePersistBolt.class);
 	private OutputCollector outputCollector;
 	private MemberMDTags2Dao memberMDTags2Dao;
-
 	private CpsOccasionsDao cpsOccasion;
-	private HashMap<String, String> cpsOccasionPriorityMap;
-	private HashMap<String, String> cpsOccasionDurationMap;
 	
 	public CPParsePersistBolt(String env) {
 		super(env);		
 	}		
 
 	@Override
-	public void prepare(Map stormConf, TopologyContext context,
+	public void prepare(@SuppressWarnings("rawtypes") Map stormConf, TopologyContext context,
 			OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
 		this.outputCollector = collector;
@@ -54,8 +46,6 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 		memberMDTags2Dao = new MemberMDTags2Dao();
 
 		cpsOccasion = new CpsOccasionsDao();
-		cpsOccasionPriorityMap = cpsOccasion.getcpsOccasionPriority();
-		cpsOccasionDurationMap = cpsOccasion.getcpsOccasionDurations();
 	}
 
 	@Override
@@ -106,10 +96,10 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 			    	if(jsonElement.getAsJsonObject().has("tagIdentifier") && 
 			    		 jsonElement.getAsJsonObject().get("tagIdentifier").toString().contains("RTS")){
 			    		LOGGER.info("PERSIST: Input RTS Tags for Lid " + lyl_id_no + " : "+ tagsList.toString());
-			    		memberMDTags2Dao.addRtsMemberTags(l_id, tagsList,cpsOccasionDurationMap,cpsOccasionPriorityMap);			    		
+			    		memberMDTags2Dao.addRtsMemberTags(l_id, tagsList,cpsOccasion.getcpsOccasionDurations(),cpsOccasion.getcpsOccasionPriority());			    		
 			    	}else {
 			    		LOGGER.info("PERSIST: Input mdTags for Lid " + lyl_id_no + " : "+ tagsList.toString());
-			    		memberMDTags2Dao.addMemberMDTags(l_id, tagsList,cpsOccasionDurationMap,cpsOccasionPriorityMap);
+			    		memberMDTags2Dao.addMemberMDTags(l_id, tagsList,cpsOccasion.getcpsOccasionDurations(),cpsOccasion.getcpsOccasionPriority());
 			    	}
 			    }			
 			}
@@ -144,6 +134,7 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 		return jsonElement;
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<String> getTagsFromJsonString(String tagsString) {	
 		List<String> tagsLst = new ArrayList<String>();				
 		if(StringUtils.isNotEmpty(tagsString)){						

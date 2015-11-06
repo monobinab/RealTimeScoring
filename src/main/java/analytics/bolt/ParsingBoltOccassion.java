@@ -26,16 +26,15 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
 public class ParsingBoltOccassion extends EnvironmentBolt {
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(ParsingBoltOccassion.class);
+
+	private static final long serialVersionUID = 1L;
+	private static final Logger LOGGER = LoggerFactory.getLogger(ParsingBoltOccassion.class);
 	private OutputCollector outputCollector;
 	private MemberMDTagsDao memberTagDao;
 	Map<String, TagVariable> tagVariablesMap = new HashMap<String, TagVariable>();
 	Map<String, String> modelScoreMap = new HashMap<String, String>();
 	private MemberMDTags2Dao memberMDTags2Dao;
 	private CpsOccasionsDao cpsOccasion;
-	private HashMap<String, String> cpsOccasionPriorityMap;
-	private HashMap<String, String> cpsOccasionDurationMap;
 	
 
 	public ParsingBoltOccassion(String systemProperty, String host, int port) {
@@ -52,17 +51,16 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 	}
 
 	@Override
-	public void prepare(Map stormConf, TopologyContext context,
+	public void prepare(@SuppressWarnings("rawtypes") Map stormConf, TopologyContext context,
 			OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
 		this.outputCollector = collector;
 		memberTagDao = new MemberMDTagsDao();
 		memberMDTags2Dao = new MemberMDTags2Dao();
 		cpsOccasion = new CpsOccasionsDao();
-		cpsOccasionPriorityMap = cpsOccasion.getcpsOccasionPriority();
-		cpsOccasionDurationMap = cpsOccasion.getcpsOccasionDurations();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void execute(Tuple input) {
 		// System.out.println("IN PARSING BOLT: " + input);
@@ -123,7 +121,7 @@ public class ParsingBoltOccassion extends EnvironmentBolt {
 				memberTagDao.addMemberMDTags(l_id, tagsLst);
 				
 				//Write to the mdTags with dates collection as well...
-				memberMDTags2Dao.addMemberMDTags(l_id, tagsLst,cpsOccasionDurationMap,cpsOccasionPriorityMap);
+				memberMDTags2Dao.addMemberMDTags(l_id, tagsLst,cpsOccasion.getcpsOccasionDurations(),cpsOccasion.getcpsOccasionPriority());
 			}
 			else{
 				memberTagDao.deleteMemberMDTags(l_id);

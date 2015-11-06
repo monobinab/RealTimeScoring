@@ -49,12 +49,9 @@ public class CPSUtil {
 		int failureCount = 0;
 		String modPercentile = null;
 		MemberMDTags2Dao memberMDTags2Dao = new MemberMDTags2Dao();
-		CpsOccasionsDao cpsOccasion;
-		HashMap<String, String> cpsOccasionPriorityMap;
-		HashMap<String, String> cpsOccasionDurationMap;
-		cpsOccasion = new CpsOccasionsDao();
-		cpsOccasionPriorityMap = cpsOccasion.getcpsOccasionPriority();
-		cpsOccasionDurationMap = cpsOccasion.getcpsOccasionDurations();
+		CpsOccasionsDao cpsOccasion = new CpsOccasionsDao();
+		HashMap<String, String> cpsOccasionPriorityMap = cpsOccasion.getcpsOccasionPriority();
+		HashMap<String, String> cpsOccasionDurationMap = cpsOccasion.getcpsOccasionDurations();
 		ChangedMemberScoresDao changedMemberScoresDao = new ChangedMemberScoresDao();
 		TagVariableDao tagVariableDao = new TagVariableDao();
 		MemberScoreDao memberScoreDao = new MemberScoreDao();

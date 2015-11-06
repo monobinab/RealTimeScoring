@@ -1,6 +1,5 @@
 package analytics.bolt;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,7 +12,6 @@ import scala.actors.threadpool.Arrays;
 import analytics.util.SecurityUtils;
 import analytics.util.dao.CpsOccasionsDao;
 import analytics.util.dao.MemberMDTags2Dao;
-import analytics.util.dao.MemberMDTagsDao;
 import analytics.util.objects.TagVariable;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -24,18 +22,16 @@ import backtype.storm.tuple.Tuple;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
 
 public class TagProcessingBolt extends EnvironmentBolt {
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(TagProcessingBolt.class);
+
+	private static final long serialVersionUID = 1L;
+	private static final Logger LOGGER = LoggerFactory.getLogger(TagProcessingBolt.class);
 	private OutputCollector outputCollector;
 	Map<String, TagVariable> tagVariablesMap = new HashMap<String, TagVariable>();
 	Map<String, String> modelScoreMap = new HashMap<String, String>();
 	private MemberMDTags2Dao memberMDTags2Dao;
 	private CpsOccasionsDao cpsOccasion;
-	private HashMap<String, String> cpsOccasionPriorityMap;
-	private HashMap<String, String> cpsOccasionDurationMap;
 	
 	//private static BigInteger startLoyalty = new BigInteger("7081010000647509"); 
 	//private static BigInteger lastLoyalty = new BigInteger("7081216198457607");
@@ -51,17 +47,16 @@ public class TagProcessingBolt extends EnvironmentBolt {
 	}
 
 	@Override
-	public void prepare(Map stormConf, TopologyContext context,
+	public void prepare(@SuppressWarnings("rawtypes") Map stormConf, TopologyContext context,
 			OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
 		this.outputCollector = collector;
 
 		memberMDTags2Dao = new MemberMDTags2Dao();
 		cpsOccasion = new CpsOccasionsDao();
-		cpsOccasionPriorityMap = cpsOccasion.getcpsOccasionPriority();
-		cpsOccasionDurationMap = cpsOccasion.getcpsOccasionDurations();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void execute(Tuple input) {
 
@@ -117,7 +112,7 @@ public class TagProcessingBolt extends EnvironmentBolt {
 				tagsLst = Arrays.asList(tagsArray);
 				
 				//Write to the mdTags with dates collection as well...
-				memberMDTags2Dao.addRtsMemberTags(l_id, tagsLst,cpsOccasionDurationMap,cpsOccasionPriorityMap);
+				memberMDTags2Dao.addRtsMemberTags(l_id, tagsLst,cpsOccasion.getcpsOccasionDurations(),cpsOccasion.getcpsOccasionPriority());
 			}
 			else{
 				memberMDTags2Dao.deleteMemberMDTags(l_id);

@@ -19,11 +19,10 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Tuple;
 
-public abstract class ResponsysBolt  extends EnvironmentBolt{
+public abstract class ResponsysBolt extends EnvironmentBolt{
 
 	private static final long serialVersionUID = 1L;
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(ResponsysBolt.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ResponsysBolt.class);
 	
 	private OutputCollector outputCollector;
 	protected ResponsysUtil responsysUtil;
@@ -32,15 +31,13 @@ public abstract class ResponsysBolt  extends EnvironmentBolt{
 	private String topologyName;
 	protected Map<Integer, String> tagModelsMap;
 	private CpsOccasionsDao cpsOccasion;
-	private HashMap<String, String> cpsOccasionPriorityMap;
-	private HashMap<String, String> cpsOccasionDurationMap;
 	
 	public ResponsysBolt(String systemProperty) {
 		super(systemProperty);
 	}
 
 	@Override
-	public void prepare(Map stormConf, TopologyContext context,
+	public void prepare(@SuppressWarnings("rawtypes") Map stormConf, TopologyContext context,
 			OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
 		this.outputCollector = collector;
@@ -51,8 +48,6 @@ public abstract class ResponsysBolt  extends EnvironmentBolt{
 		tagMetadataDao = responsysUtil.getTagMetadataDao();
 		memberInfoDao = responsysUtil.getMemberInfoDao();
 		cpsOccasion = new CpsOccasionsDao();
-		cpsOccasionPriorityMap = cpsOccasion.getcpsOccasionPriority();
-		cpsOccasionDurationMap = cpsOccasion.getcpsOccasionDurations();
 	 }
 
 	@Override
@@ -96,7 +91,7 @@ public abstract class ResponsysBolt  extends EnvironmentBolt{
 
 			responsysUtil.getResponsysServiceResult(responsysObj);
 			
-			addRtsMemberTag(l_id, responsysObj.getTagMetadata().getMdTag(),cpsOccasionDurationMap, cpsOccasionPriorityMap);
+			addRtsMemberTag(l_id, responsysObj.getTagMetadata().getMdTag(),cpsOccasion.getcpsOccasionDurations(), cpsOccasion.getcpsOccasionPriority());
 			
 		    redisCountIncr("data_to_responsys");
 		

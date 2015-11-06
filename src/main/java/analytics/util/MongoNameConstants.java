@@ -187,6 +187,7 @@ public class MongoNameConstants {
      public static final String DURATION = "duration";
      public static final String TAGEXPIRESIN = "tagExpiresIn";
      public static final String OCCASIONID = "occasionId";
+     public static final String DAYSINHISTORY = "daysInHistory";
      
      
      

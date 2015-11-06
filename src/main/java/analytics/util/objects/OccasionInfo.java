@@ -2,13 +2,27 @@ package analytics.util.objects;
 
 public class OccasionInfo {
 
+	private String occasionId;
 	private String occasion;
 	private String priority;
 	private String duration;
 	private String daysToCheckInHistory;
 	private String intCustEvent;
 	private int custEventId;
+	private String tagExpiresIn;
 	
+	/**
+	 * @return the occasionId
+	 */
+	public String getOccasionId() {
+		return occasionId;
+	}
+	/**
+	 * @param occasionId the occasionId to set
+	 */
+	public void setOccasionId(String occasionId) {
+		this.occasionId = occasionId;
+	}
 	/**
 	 * @return the occasion
 	 */
@@ -76,26 +90,16 @@ public class OccasionInfo {
 	public void setDaysToCheckInHistory(String daysToCheckInHistory) {
 		this.daysToCheckInHistory = daysToCheckInHistory;
 	}
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
+	/**
+	 * @return the tagExpiresIn
 	 */
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("OccasionInfo [occasion=");
-		builder.append(occasion);
-		builder.append(", priority=");
-		builder.append(priority);
-		builder.append(", duration=");
-		builder.append(duration);
-		builder.append(", daysToCheckInHistory=");
-		builder.append(daysToCheckInHistory);
-		builder.append(", intCustEvent=");
-		builder.append(intCustEvent);
-		builder.append(", custEventId=");
-		builder.append(custEventId);
-		builder.append("]");
-		return builder.toString();
+	public String getTagExpiresIn() {
+		return tagExpiresIn;
 	}
-
+	/**
+	 * @param tagExpiresIn the tagExpiresIn to set
+	 */
+	public void setTagExpiresIn(String tagExpiresIn) {
+		this.tagExpiresIn = tagExpiresIn;
+	}
 }

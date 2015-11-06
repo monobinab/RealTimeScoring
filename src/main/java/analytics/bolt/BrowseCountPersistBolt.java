@@ -22,7 +22,6 @@ import analytics.util.SecurityUtils;
 import analytics.util.dao.CpsOccasionsDao;
 import analytics.util.dao.MemberBrowseDao;
 import analytics.util.dao.SourceFeedDao;
-import analytics.util.objects.DateSpecificMemberBrowse;
 import analytics.util.objects.MemberBrowse;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -32,8 +31,7 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 	
 	private static final int THRESHOLD = 4;
 	private static final int NUMBER_OF_DAYS = 1;
-	static final Logger LOGGER = LoggerFactory
-			.getLogger(BrowseCountPersistBolt.class);
+	static final Logger LOGGER = LoggerFactory.getLogger(BrowseCountPersistBolt.class);
 	private static final long serialVersionUID = 1L;
 	protected OutputCollector outputCollector;
 	Map<String, String> sourceMap = new HashMap<String, String>();
@@ -44,7 +42,6 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 	SimpleDateFormat dateFormat;
 	private KafkaUtil kafkaUtil;
 	private String browseKafkaTopic;
-	private Map<String, String> occasionIdMap;
 	private CpsOccasionsDao cpsOccasionsDao;		
 	private String web;
 	private SourceFeedDao sourceFeedDao;
@@ -59,8 +56,9 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 		this.source = source;
 		this.browseKafkaTopic = browseKafkaTopic;
 	}
+	
 	@Override
-	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
+	public void prepare(@SuppressWarnings("rawtypes") Map stormConf, TopologyContext context, OutputCollector collector) {
         this.outputCollector = collector;
         super.prepare(stormConf, context, collector);
         kafkaUtil= new KafkaUtil(System.getProperty(MongoNameConstants.IS_PROD));
@@ -68,8 +66,6 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
         dateFormat = new SimpleDateFormat("yyyy-MM-dd");
      
         cpsOccasionsDao = new CpsOccasionsDao();
-        occasionIdMap = cpsOccasionsDao.getcpsOccasionId();
-        
         sourceFeedDao = new SourceFeedDao();
         sourceMap = sourceFeedDao.getSourceFeedMap();
  	}
@@ -258,7 +254,7 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 				int PC = existingBuSubBuCountsMap.get(buSubBu);
 				int IC = incomingBuSubBuMap.get(buSubBu);
 				if(PC < THRESHOLD && (PC + IC) >= THRESHOLD ){
-					buSubBuList.add(buSubBu+occasionIdMap.get(web));
+					buSubBuList.add(buSubBu+cpsOccasionsDao.getcpsOccasionId().get(web));
 				}
 			}
 		}
@@ -266,7 +262,7 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 		else{
 			for(String buSubBu : incomingBuSubBuMap.keySet()){
 				if(incomingBuSubBuMap.get(buSubBu) >= THRESHOLD ){
-					buSubBuList.add(buSubBu+occasionIdMap.get(web));
+					buSubBuList.add(buSubBu+cpsOccasionsDao.getcpsOccasionId().get(web));
 				}
 			}
 		}
