@@ -37,4 +37,33 @@ public class MemberInfoDao extends AbstractDao {
 		return info;
 	}
 
+	public void addMemberInfo(String l_id) {
+		DBObject dbObj = new BasicDBObject();
+		dbObj.put("l_id",l_id);
+		dbObj.put("eid", "1234567891");
+		dbObj.put("eml_opt_in", "N");
+		dbObj.put("srs_opt_in", "Y");
+		dbObj.put("kmt_opt_in", "Y");
+		dbObj.put("syw_opt_in", "N");
+		dbObj.put("st_cd", "NC");
+		dbObj.put("srs", "0001375");
+		dbObj.put("eml_opt_in", "Y");
+		dbObj.put("kmt", "7208");
+		memberInfoCollection.insert(dbObj);
+	}
+	
+	public long getMemberInfoCount(String l_id) {
+		BasicDBObject query = new BasicDBObject();
+		query.put(MongoNameConstants.L_ID, l_id);
+		return memberInfoCollection.count(query);
+		
+	}
+
+	public void deleteMemberInfo(String l_id) {
+		BasicDBObject query = new BasicDBObject();
+		query.put(MongoNameConstants.L_ID, l_id);
+		memberInfoCollection.remove(query);
+		
+	}
+
 }

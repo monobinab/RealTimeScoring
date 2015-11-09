@@ -85,7 +85,7 @@ public class CPSFiler {
 					logger.info("PERSIST: MemberId : " + lyl_id_no + " | CPS STATUS : NO TAGS | REASON : No md/rtsTags from API.");
 				}
 				
-				if(emailPackages != null  && emailPackages.size() > 0){
+				if(emailPackages != null ){
 					
 					//ignore sending an emailPackage if it has been sent in the history -( ex: duress > 0 & < 38)
 					List<EmailPackage> emailPackagesToBeSent = this.ignorePackagesSentInHistory(emailPackages);
@@ -216,7 +216,7 @@ public class CPSFiler {
 		}
 		
 	    //If the remaining duration of inProgress is greater than the queue length, no need to queue anymore occasions
-		if(inProgressPackage.getMdTagMetaData().getSendDuration()- CalendarUtil.getDatesDiff(inProgressPackage.getSentDateTime(),new Date())>Constants.CPS_QUEUE_LENGTH){
+		if(inProgressPackage.getMdTagMetaData().getSendDuration()- CalendarUtil.getDatesDiff(new Date(),inProgressPackage.getSentDateTime())>Constants.CPS_QUEUE_LENGTH){
 			return null;			
 		}
 		
@@ -435,137 +435,6 @@ public class CPSFiler {
 	
 	public boolean isOccasionResponsysReady(String mdtag) {
 		return activeTags.contains(mdtag.substring(0, 5));			
-	}
-
-
-
-	/*public List<EmailPackage> decideSendDates(List<EmailPackage> emailPackages, EmailPackage inProgressPackage) throws SQLException, RealTimeScoringException {
-		/******************* LOGIC *********************************	
-			prepare the list of occasions(this will have occasion name, priority, sendDuration)
-			loop through the email packages
-			{
-				incomingPkgPriority = get priority of the incoming occasion
-				find if there are occasions of higher priority sent in the last send duration days.
-				for (int i =0; i< incomingPkgPriority ; i++)
-				{
-					get sentDate of occasionList.get(i)
-					if sentDate not null
-						if (today-sentDate < sendDuration )
-							set send date of emailPackage = sentDate + sendDuration
-					else
-						set send date = today
-			}
-		}
-		**************************************************************//*
-		EmailPackage previousEmlPackage = null;
-		for(EmailPackage emailPackage : emailPackages){	
-			if(previousEmlPackage == null)
-			{
-				int incomingPkgPriority = emailPackage.getMdTagMetaData().getPriority();
-				//find if there are occasions of higher or equal priority sent in the last send duration days.
-				for(int i=0; i<=incomingPkgPriority; i++)
-				{
-					OccasionInfo occasionInfo = occasionDao.getOccasionInfo(String.valueOf(incomingPkgPriority));
-					int sendDuration = Integer.parseInt(occasionInfo.getDuration());
-					Date sentDate = outboxDao.getSentDate(emailPackage.getMemberId(), occasionInfo.getOccasion());
-					if(sentDate != null) //this means an occasion of higher priority is sent in the past
-					{
-						//check if the sentdate is within the limit of the duration of 
-						//the occasion to determine if the communication is still in progress. 
-						//If it is in progress - set the send date of incoming occasion
-						// to the next date after the communication schedule is completed
-						// otherwise set it to today's date
-						int daysSentSoFar = CalendarUtil.getDatesDiff(CalendarUtil.getTodaysDate(), sentDate);
-						if(daysSentSoFar < sendDuration )
-							emailPackage.setSendDate(CalendarUtil.getNewDate(sentDate, sendDuration));					
-					}
-					else
-					{
-						if(previousEmlPackage == null)
-							emailPackage.setSendDate(CalendarUtil.getTodaysDate());						
-						else					
-							emailPackage.setSendDate(CalendarUtil.getNewDate(previousEmlPackage.getSendDate(), previousEmlPackage.getMdTagMetaData().getSendDuration()));							
-					}
-					previousEmlPackage = emailPackage;
-					break; // terminate loop as there will be only one occasion being sent at any point.
-					
-				}
-			}
-			else
-			{
-				emailPackage.setSendDate(CalendarUtil.getNewDate(previousEmlPackage.getSendDate(), previousEmlPackage.getMdTagMetaData().getSendDuration()));
-				previousEmlPackage = emailPackage;
-			}
-		}
-		return emailPackages;
-	} 
-*/
-	
-	/*	protected List<EmailPackage> decideSendDates(	List<EmailPackage> emailPackagesToBeSent, EmailPackage inProgressPackage) {
-	List<EmailPackage> filteredPackageswithSendDates;
-	if(emailPackagesToBeSent != null){
-		EmailPackage previousOccasion = inProgressPackage;
-		
-		//Rule - If the incoming oocasionList doesn't contain the inProgressPackage - interrupt the in progress occasion.
-		if(inProgressPackage != null){
-			if(isInProgressOccasionActive(emailPackagesToBeSent,inProgressPackage)){
-				for(EmailPackage emailPackage : emailPackagesToBeSent){
-					if(previousOccasion == null){
-						emailPackage.setSendDate(CalendarUtil.getTodaysDate());						
-					}
-					else{
-						
-						//Rule - if incoming occasion is of higher priority - interrupt the in progress occasion
-						if( emailPackage.getMdTagMetaData().getPriority() < previousOccasion.getMdTagMetaData().getPriority()){
-							emailPackage.setSendDate(CalendarUtil.getTodaysDate());								
-						}
-						
-						//Rule - if incoming occasion is already in Progress - don't queue it again
-						else if(emailPackage.getMdTagMetaData().getMdTag().equals(inProgressPackage.getMdTagMetaData().getMdTag())){
-							emailPackage.setSendDate(inProgressPackage.getSendDate());
-							emailPackage.setSentDateTime(inProgressPackage.getSentDateTime());
-							emailPackage.setStatus(Constants.SENT);
-						}
-						//Rule - if incoming occasion is of same priority as the inProgress occasion - (check for same bu, sub bu ??) and queue the incoming occasion
-						//Rule - if incoming occasion is of lesser priority than the inProgress occasion - queue the incoming occasion
-						else if(( emailPackage.getMdTagMetaData().getPriority() == previousOccasion.getMdTagMetaData().getPriority() 
-								//&& emailPackage.getMdTagMetaData().getFirst5CharMdTag().equals(previousOccasion.getMdTagMetaData().getFirst5CharMdTag())
-								) || (emailPackage.getMdTagMetaData().getPriority() > previousOccasion.getMdTagMetaData().getPriority())) {
-							emailPackage.setSendDate(CalendarUtil.getNewDate(previousOccasion.getSendDate(), previousOccasion.getMdTagMetaData().getSendDuration()));							
-						}
-						
-							
-					}
-					
-					previousOccasion = emailPackage;						
-					
-				}					
-			}	
-			else{ //interrupt the in progress occasion as it is not active today.
-				emailPackagesToBeSent =queueStartingToday(emailPackagesToBeSent);
-				
-			}
-		}
-		else{
-			emailPackagesToBeSent = queueStartingToday(emailPackagesToBeSent);
-			
-		}
-							
-	}
-	
-	filteredPackageswithSendDates = filterSentPackages(emailPackagesToBeSent);
-	return filteredPackageswithSendDates;
-}*/
-	
-	/* checking for top 5% when validating the incoming occasions 
-	 * 		check if the first occasion in the JSONArray is "Top 5% of MSM" mdTag  && if it is an active tag
-								//if it is, we don't need to iterate further
-								if(this.isOccasionTop5Percent(scoresInfo)){
-									mdTagsList.add(tagMetaData);
-									return mdTagsList;														
-								}else if(!this.isOccasionTop5Percent(scoresInfo)){ //TODO: To check that we have to read %5 also
-									mdTagsList.add(tagMetaData);
-								}*/		
-	 
+	}	 
 	
 }

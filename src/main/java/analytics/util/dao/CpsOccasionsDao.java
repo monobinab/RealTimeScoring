@@ -75,6 +75,21 @@ public class CpsOccasionsDao extends AbstractDao {
         }
     	return cpsOccasionDurationsMap;
     }
+    
+    public HashMap<String, String> getcpsOccasionsById(){
+    	HashMap<String, String> cpsOccasionsMap = new HashMap<String, String>();
+	
+		DBCursor cpsOccasionsCursor = cpsOccasionsCollection.find();
+    	for(DBObject cpsOccasionsDBObject: cpsOccasionsCursor) {
+    		
+    		String occasionId = cpsOccasionsDBObject.get(MongoNameConstants.OCCASIONID).toString();
+    		String occasion =  cpsOccasionsDBObject.get(MongoNameConstants.OCCASION).toString();
+    		
+    		cpsOccasionsMap.put(occasionId,occasion);
+    		
+        }
+    	return cpsOccasionsMap;
+    }
      
 
 }

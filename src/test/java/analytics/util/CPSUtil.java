@@ -27,6 +27,7 @@ import analytics.util.KafkaUtil;
 import analytics.util.dao.CPOutBoxDAO;
 import analytics.util.dao.ChangedMemberScoresDao;
 import analytics.util.dao.CpsOccasionsDao;
+import analytics.util.dao.MemberInfoDao;
 import analytics.util.dao.MemberMDTags2Dao;
 import analytics.util.dao.MemberScoreDao;
 import analytics.util.dao.ModelPercentileDao;
@@ -34,6 +35,7 @@ import analytics.util.dao.TagMetadataDao;
 import analytics.util.dao.TagVariableDao;
 import analytics.util.objects.ChangedMemberScore;
 import analytics.util.objects.EmailPackage;
+import analytics.util.objects.MemberInfo;
 import analytics.util.objects.ModelScore;
 import analytics.util.objects.TagMetadata;
 
@@ -52,12 +54,16 @@ public class CPSUtil {
 		CpsOccasionsDao cpsOccasion;
 		HashMap<String, String> cpsOccasionPriorityMap;
 		HashMap<String, String> cpsOccasionDurationMap;
+		HashMap<String, String> cpsOccasionsByIdMap;
 		cpsOccasion = new CpsOccasionsDao();
 		cpsOccasionPriorityMap = cpsOccasion.getcpsOccasionPriority();
 		cpsOccasionDurationMap = cpsOccasion.getcpsOccasionDurations();
+		cpsOccasionsByIdMap = cpsOccasion.getcpsOccasionsById();
 		ChangedMemberScoresDao changedMemberScoresDao = new ChangedMemberScoresDao();
 		TagVariableDao tagVariableDao = new TagVariableDao();
 		MemberScoreDao memberScoreDao = new MemberScoreDao();
+		TagMetadataDao tagMetadataDao = new TagMetadataDao();
+		MemberInfoDao memberInfoDao = new MemberInfoDao();
 		ModelPercentileDao modelPercentileDao = new ModelPercentileDao();
 		
 		Map<String, List<CPOutBoxItem>> presetMap = loadFile(presetFile, "PRESET");
@@ -77,26 +83,47 @@ public class CPSUtil {
 				// PRESET
 				String loyID = presetList.get(0).getLoy_id();
 				String l_id = SecurityUtils.hashLoyaltyId(loyID);
+				
+				Long membRecCount  = memberInfoDao.getMemberInfoCount(l_id);
+				if(membRecCount == 0){
+					//add memberInfo
+					memberInfoDao.addMemberInfo(l_id);					 
+				}
+				else if(membRecCount > 1){
+					memberInfoDao.deleteMemberInfo(l_id);
+					memberInfoDao.addMemberInfo(l_id);	
+				}
+				changedMemberScoresDao.deleteChangedMemberScore(l_id);
+				//delete the documents if more than 1 document exist for this lid.
+				//get defaultMember scores and add to this member scores.
+				Long membScoreRecCount = memberScoreDao.getMemberInfoCount(l_id);
+				if(membScoreRecCount >1)
+					memberScoreDao.deleteMemberScore(l_id);
+				Map<String,Double> defaultMemberScores = memberScoreDao.getMemberScores2("defaultMember");
+				memberScoreDao.upsertUpdateMemberScores(l_id, defaultMemberScores);
+				//}
 				CPOutBoxItem presetItem = presetList.get(0);
 
 				printWriter.println("PRESET OutBox Entries for LOYALTY ID: "+ loyID);
 
 				for (CPOutBoxItem cpItem : presetList) {
 					
-					TagMetadata tagMetadata = new TagMetadataDao().getDetails(cpItem.getMd_tag());
-					//ToDO - if metadata is not found intagMetadata collection populate the 
-					//       tagMetadata object by getting the metadata from Teradata
+					TagMetadata tagMetadata = tagMetadataDao.getDetails(cpItem.getMd_tag());
+					
 					if(tagMetadata==null){
-						System.out.println("metadata is not found for tag: "+cpItem.getMd_tag() );
-						// ToDO - populate the tagMetadata object by getting the metadata from Teradata
+						tagMetadata = new TagMetadata();
+						tagMetadata.setMdTag(cpItem.getMd_tag());
+						tagMetadata.setPurchaseOccassion(cpsOccasionsByIdMap.get(cpItem.getMd_tag().substring(5,6)));		
+						tagMetadata.setBusinessUnit("testBu");
+						tagMetadata.setSubBusinessUnit("testSubBu");
+						tagMetadataDao.addTagMetaData(tagMetadata);						
 					}
-					if(StringUtils.isBlank(cpItem.getBu()))
-						cpItem.setBu(tagMetadata.getBusinessUnit());
-					if(StringUtils.isBlank(cpItem.getSub_bu()))
-						cpItem.setSub_bu(tagMetadata.getSubBusinessUnit());
-					if(StringUtils.isBlank(cpItem.getOccasion_name()))
-						cpItem.setOccasion_name(tagMetadata.getPurchaseOccasion());
-								new CPOutBoxDAO().insertRow(cpItem);
+					
+					cpItem.setBu(tagMetadata.getBusinessUnit());
+					cpItem.setSub_bu(tagMetadata.getSubBusinessUnit());
+					cpItem.setOccasion_name(tagMetadata.getPurchaseOccasion());
+								
+					new CPOutBoxDAO().insertRow(cpItem);
 
 					printWriter.println("tag:" + cpItem.getMd_tag()
 							+ "  Send Date:" + cpItem.getSend_date()
@@ -122,9 +149,8 @@ public class CPSUtil {
 					List<CPOutBoxItem> testList = testMap.get(loyID);
 					CPOutBoxItem testItem = testList.get(0);
 				
-					//ScoringUtils scoringUtils = new ScoringUtils();
-					
 					for (CPOutBoxItem cptestItem : testList) {
+						
 						//update the score of the model pertaining to the purchase to 0
 						// in changedMemberScore/memberScore to 0 if testList has a purchase tag 
 						
@@ -150,7 +176,8 @@ public class CPSUtil {
 									changedMemberScoresDao.upsertUpdateChangedScores(l_id, changedScores);
 								}
 								else{
-									Map<String, Double> memScores = memberScoreDao.getMemberScores(l_id, modelId);
+									Map<String, Double> memScores = memberScoreDao.getMemberScores2(l_id);
+									//Map<String, Double> memScores = memberScoreDao.getMemberScores(l_id, modelId);
 									if(memScores!=null && memScores.size()>0){
 										memScores.put(Integer.toString(modelId), newScore);
 										memberScoreDao.upsertUpdateMemberScores(l_id, memScores);	
@@ -200,7 +227,8 @@ public class CPSUtil {
 									else{
 										//check if there is an entry for this member in memberScores
 										//if so update it								
-										Map<String, Double> memScores = memberScoreDao.getMemberScores(l_id, modelId);
+										//Map<String, Double> memScores = memberScoreDao.getMemberScores(l_id, modelId);
+										Map<String, Double> memScores = memberScoreDao.getMemberScores2(l_id);
 										if(memScores!=null && memScores.size()>0){
 										//	Map<String, String> memberScores = new HashMap<String, String>();
 											memScores.put(Integer.toString(modelId),newScore);
@@ -219,7 +247,17 @@ public class CPSUtil {
 							
 							continue;
 						}
-
+						TagMetadata tagMetadata = tagMetadataDao.getDetails(cptestItem.getMd_tag());
+						
+						if(tagMetadata==null){
+							tagMetadata = new TagMetadata();
+							tagMetadata.setMdTag(cptestItem.getMd_tag());
+							tagMetadata.setPurchaseOccassion(cpsOccasionsByIdMap.get(cptestItem.getMd_tag().substring(5, 6)));		
+							tagMetadata.setBusinessUnit("testBu");
+							tagMetadata.setSubBusinessUnit("testSubBu");
+							tagMetadataDao.addTagMetaData(tagMetadata);						
+						}
+						
 						testItem.getMdTagList().add(cptestItem.getMd_tag());
 					}
 					
@@ -244,7 +282,7 @@ public class CPSUtil {
 						e.printStackTrace();
 					}
 
-					Thread.sleep(10000);
+					Thread.sleep(5000);
 
 					// VERIFY
 

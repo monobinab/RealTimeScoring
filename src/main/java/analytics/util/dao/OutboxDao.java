@@ -40,7 +40,6 @@ public class OutboxDao extends AbstractMySQLDao{
 			ResultSet rs = statement.executeQuery();
 	        
 	        while (rs.next()) {
-	             //System.out.println("loyalty id: " + rs.getString("loy_id"));
 	             TagMetadata tagMetadata = new TagMetadata(rs.getString("md_tag"),rs.getString("bu"),rs.getString("sub_bu"),rs.getString("occasion_name"));
 	             for(OccasionInfo occasion :occasionsInfo){
 	            	 if(rs.getString("occasion_name").equalsIgnoreCase(occasion.getOccasion()))
@@ -257,9 +256,7 @@ public class OutboxDao extends AbstractMySQLDao{
 		        	inProgressOccasion.setSentDateTime(rs1.getTimestamp("recentSentDate"));
 	        	}	
 	        			        	
-	       }	
-		
-		//}
+	       }
 		
 		 statement.close();
 		return inProgressOccasion;

@@ -36,68 +36,53 @@ public class ConsideredPurchaseTopology {
 			System.exit(0);
 		}
 		
-		//String kafkaTopic1="rts_cp_membertags";
-		//String zkroot1="rts_cp_membertags_zk1";		
-		//String kafkaTopic2="stormtopic";
-		//String zkroot2="rts_stormtopic_zkroot";
-		//String kafkaTopic2="rts_cp_membertags_qa";
-		//String kafkaTopic2="cps_rtstags_qa";
+		String mdTagsKafkaTopic="rts_cp_membertags_qa";
+		String zkroot_mdtags="rts_cp_membertags_qa_zkroot";
+		String cpsPurchaseScoresTopic="rts_cp_purchase_scores_qa";
+		String zkroot_cp_purchase = "purchase_scores_qa_zkroot";
+		String browseKafkaTopic = "rts_browse_qa";
+		String zkroot_browse="browseTopic_qa_zkroot";
 		
-		String kafkaTopic2="cps_rtstags_qa";
-		String zkroot2="cps_rtstags_qa_zkroot";
+		/*String mdTagsKafkaTopic="cps_rtstags_qa";
+		String zkroot_mdtags="cps_rtstags_qa_zkroot";
 		String cpsPurchaseScoresTopic="rts_cp_purchase_scores";
-		String zkroot_cp_purchase = "rts_cp_purchase_zkroot";
+		String zkroot_cp_purchase = "rts_cp_purchase_zkroot";		
+		//Browse related changes...
+		String browseKafkaTopic = TopicConstants.BROWSE_KAFKA_TOPIC;
+		String zkroot_browse="browseTopic";*/
+		
 		String group_id = "cps_groupid";
 		String env = System.getProperty(MongoNameConstants.IS_PROD);
 		TopologyBuilder topologyBuilder = new TopologyBuilder();	
-		
-		//Browse related changes...
-		String kafkaTopic = TopicConstants.BROWSE_KAFKA_TOPIC;
-		String zkroot="browseTopic";
 				
 		try {
-			//SpoutConfig spoutConfig1 = null;
+			SpoutConfig spoutConfig1 = null;
 			SpoutConfig spoutConfig2 = null;
-			SpoutConfig spoutConfig3 = null;
-			//spoutConfig1 = new KafkaUtil(env).getSpoutConfig(kafkaTopic1,zkroot1,group_id);
-			spoutConfig2 = new KafkaUtil(env).getSpoutConfig(kafkaTopic2,zkroot2,group_id);
-			spoutConfig3 = new KafkaUtil(env).getSpoutConfig(cpsPurchaseScoresTopic,zkroot_cp_purchase,group_id);	
+			spoutConfig1 = new KafkaUtil(env).getSpoutConfig(mdTagsKafkaTopic,zkroot_mdtags,group_id);
+			spoutConfig2 = new KafkaUtil(env).getSpoutConfig(cpsPurchaseScoresTopic,zkroot_cp_purchase,group_id);	
 			
-			//topologyBuilder.setSpout("CPKafkaSpout1", new RTSKafkaSpout(spoutConfig1), 1);
-			topologyBuilder.setSpout("CPKafkaSpout2", new RTSKafkaSpout(spoutConfig2), 1);
-			//spoutConfig2 = new KafkaUtil(env).getSpoutConfig(cpsPurchaseScoresTopic,zkroot_cp_purchase);
-			//topologyBuilder.setSpout("CPPurchaseFeedbackSpout", new RTSKafkaSpout(spoutConfig3), 1);
-			topologyBuilder.setSpout("CPPurchaseSpout", new RTSKafkaSpout(spoutConfig3), 1);
-			//LOGGER.info("CPS Topology listening to kafka topics : " + kafkaTopic1 + ", "+kafkaTopic2 +" , "+ cpsPurchaseScoresTopic);
+		
+			topologyBuilder.setSpout("MDTagsSpout", new RTSKafkaSpout(spoutConfig1), 1);
+			topologyBuilder.setSpout("CPPurchaseSpout", new RTSKafkaSpout(spoutConfig2), 1);
 			
-			//Browse relate CHnages
+			//Browse related changes
 			topologyBuilder.setSpout(
 					"BrowseKafkaSpout",
-					new RTSKafkaSpout(new KafkaUtil(env).getSpoutConfig(kafkaTopic,zkroot,group_id)), 1);
+					new RTSKafkaSpout(new KafkaUtil(env).getSpoutConfig(browseKafkaTopic,zkroot_browse,group_id)), 1);			
 			
+			LOGGER.info("CPS Topology listening to kafka topics : " + mdTagsKafkaTopic + ", "+ cpsPurchaseScoresTopic);
 			
-			LOGGER.info("CPS Topology listening to kafka topics : " + kafkaTopic2 + ", "+ cpsPurchaseScoresTopic);
 		} catch (ConfigurationException e) {
 			LOGGER.error(e.getClass() + ": " + e.getMessage() +" STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 			System.exit(0);	
 		}
-		//topologyBuilder.setBolt("CPParsePersistBolt", new CPParsePersistBolt(env), 15).shuffleGrouping("CPKafkaSpout2");	
-		//topologyBuilder.setBolt("CPPurchaseBolt", new PurchaseBolt(env), 15).shuffleGrouping("CPPurchaseSpout");
-		//topologyBuilder.setBolt("CPProcessingBolt", new CPProcessingBolt(env),15).shuffleGrouping("CPTagCreatorBolt").shuffleGrouping("CPParsePersistBolt");
-		
 		topologyBuilder.setBolt("CPTagCreatorBolt", new TagCreatorBolt(env), 1).shuffleGrouping("CPPurchaseSpout");	
-		topologyBuilder.setBolt("CPParsePersistBolt", new CPParsePersistBolt(env), 15).shuffleGrouping("CPKafkaSpout2").shuffleGrouping("CPTagCreatorBolt", "rtsTags_stream" );	
-		//topologyBuilder.setBolt("CPParsePersistBolt", new CPParsePersistBolt(env), 15).shuffleGrouping("CPKafkaSpout1").shuffleGrouping("CPKafkaSpout2").shuffleGrouping("CPTagCreatorBolt", "rtsTags_stream" );	
-		
-			
+		topologyBuilder.setBolt("CPParsePersistBolt", new CPParsePersistBolt(env), 15).shuffleGrouping("MDTagsSpout").shuffleGrouping("CPTagCreatorBolt", "rtsTags_stream" );	
+					
 		//Browse Related Changes
 		topologyBuilder.setBolt("tagProcessingBolt", new TagProcessingBolt(env),10).localOrShuffleGrouping("BrowseKafkaSpout");
 		topologyBuilder.setBolt("CPProcessingBolt", new CPProcessingBolt(env),15).shuffleGrouping("CPParsePersistBolt").shuffleGrouping("tagProcessingBolt")
 		.shuffleGrouping("CPTagCreatorBolt", "blackedout_stream" );
-		
-		/*topologyBuilder.setBolt("CPProcessingBolt", new CPProcessingBolt(env),15).shuffleGrouping("CPParsePersistBolt")
-		.shuffleGrouping("CPTagCreatorBolt", "blackedout_stream" );*/
-		
 		
 		Config conf = new Config();
 		conf.put("metrics_topology", "CPS");

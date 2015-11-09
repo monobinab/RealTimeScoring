@@ -50,7 +50,7 @@ public class MemberScoreDao extends AbstractDao {
 				
 	}
     
-    public Map<String,Double> getMemberScores(String l_id, Integer modelId){
+    public Map<String,Double> getMemberScores2(String l_id){
     	Map<String,Double> memberScores = new HashMap<String, Double>();
 		BasicDBObject query = new BasicDBObject();
 		query.put(MongoNameConstants.L_ID, l_id);
@@ -66,6 +66,22 @@ public class MemberScoreDao extends AbstractDao {
 					memberScores.put(key, Double.parseDouble(dbObj.get(key).toString()) );
 				}
 			}
+		}else{
+			query.put(MongoNameConstants.L_ID, "defaultMember");
+			dbObj = memberScoreCollection.findOne(query);
+
+			if (dbObj != null && dbObj.keySet() != null) {
+				for (String key : dbObj.keySet()) {
+					// skip expired changes
+					if (MongoNameConstants.L_ID.equals(key) || MongoNameConstants.ID.equals(key) || MongoNameConstants.TIMESTAMP.equals(key)) {
+						continue;
+					}
+					else{
+						memberScores.put(key, Double.parseDouble(dbObj.get(key).toString()) );
+					}
+				}
+			}			
+			
 		}
 		return memberScores;
 				
@@ -80,6 +96,19 @@ public class MemberScoreDao extends AbstractDao {
 		memberScoreCollection.update(new BasicDBObject(MongoNameConstants.L_ID,
 				lId), new BasicDBObject("$set", dbObj), true,
 				false);
+		
+	}
+
+	public Long getMemberInfoCount(String l_id) {
+		BasicDBObject query = new BasicDBObject();
+		query.put(MongoNameConstants.L_ID, l_id);
+		return memberScoreCollection.count(query);
+	}
+
+	public void deleteMemberScore(String l_id) {
+		BasicDBObject query = new BasicDBObject();
+		query.put(MongoNameConstants.L_ID, l_id);
+		memberScoreCollection.remove(query);
 		
 	}
 }
