@@ -69,33 +69,6 @@ public class CpsOccasionsDao extends AbstractDao {
     	return cpsOccasionDurationsMap;
     }
     
-    /**
-    @SuppressWarnings("unchecked")
-	private List<OccasionInfo> getCPSOccasionInfo(){
-    	String cacheKey = CacheConstant.RTS_CPSOCCASIONS_CACHE_KEY;
-		Element element = CacheWrapper.getInstance().isCacheKeyExist(cache, cacheKey);
-		if(element != null && element.getObjectKey().equals(cacheKey)){
-			return (List<OccasionInfo>) element.getObjectValue();
-		}else{
-    	List<OccasionInfo> occasionInfos = new ArrayList<OccasionInfo>();
-    	DBCursor cpsOccasionsCursor = cpsOccasionsCollection.find();
-    	for(DBObject cpsOccasionsDBObject: cpsOccasionsCursor) {
-    		OccasionInfo occasionInfo = new OccasionInfo();
-    		occasionInfo.setOccasionId(cpsOccasionsDBObject.get(MongoNameConstants.OCCASIONID).toString());
-    		occasionInfo.setOccasion(cpsOccasionsDBObject.get(MongoNameConstants.OCCASION).toString());
-    		occasionInfo.setPriority(cpsOccasionsDBObject.get(MongoNameConstants.PRIORITY).toString());
-    		occasionInfo.setDuration(cpsOccasionsDBObject.get(MongoNameConstants.DURATION).toString());
-    		occasionInfo.setDaysToCheckInHistory(cpsOccasionsDBObject.get(MongoNameConstants.DAYSINHISTORY).toString());
-    		occasionInfo.setTagExpiresIn(cpsOccasionsDBObject.get(MongoNameConstants.TAGEXPIRESIN).toString());
-    		occasionInfos.add(occasionInfo);
-    	}
-    	if(occasionInfos != null && occasionInfos.size() > 0){
-			cache.put(new Element(cacheKey, (List<OccasionInfo>) occasionInfos));
-		}
-    	return occasionInfos;
-		}
-    }*/
-    
     @SuppressWarnings("unchecked")
 	private List<OccasionInfo> getCPSOccasionInfo(){
     	String cacheKey = CacheConstant.RTS_CPSOCCASIONS_CACHE_KEY;

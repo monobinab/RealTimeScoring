@@ -1,7 +1,10 @@
 package analytics.util.objects;
 
-public class OccasionInfo {
+import java.io.Serializable;
 
+public class OccasionInfo implements Serializable{
+
+	private static final long serialVersionUID = 1L;
 	private String occasionId;
 	private String occasion;
 	private String priority;

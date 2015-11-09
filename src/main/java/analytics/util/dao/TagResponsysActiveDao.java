@@ -1,27 +1,28 @@
 package analytics.util.dao;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.util.Constants;
-import analytics.util.MongoNameConstants;
-import analytics.util.objects.TagMetadata;
+import analytics.util.dao.caching.CacheBuilder;
+import analytics.util.dao.caching.CacheConstant;
+import analytics.util.dao.caching.CacheWrapper;
+import analytics.util.objects.TagsResponsesActive;
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 
-import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
 public class TagResponsysActiveDao extends AbstractDao {
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(MemberTraitsDao.class);
-	DBCollection tagResponsysActiveCollection;
+	private static final Logger LOGGER = LoggerFactory.getLogger(TagResponsysActiveDao.class);
+	private DBCollection tagResponsysActiveCollection;
+	private Cache cache = null;
 
 	/**
 	 * t,b,s,po
@@ -29,37 +30,60 @@ public class TagResponsysActiveDao extends AbstractDao {
 	public TagResponsysActiveDao() {
 		super();
 		tagResponsysActiveCollection = db.getCollection("tagsResponsysActive");
+		cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_TAGSRESPONSESACTIVECACHE);
+    	CacheBuilder.getInstance().setCaches(cache);
 		LOGGER.info("colelction in tagMetadataDao: " + tagResponsysActiveCollection.getFullName());
 	}
 
 	public HashSet<String> getResponsysActiveTagsList(){
-
-		DBCursor dbCursor = tagResponsysActiveCollection.find();
-		DBObject record = null;
 		HashSet<String> activeTagsList = new HashSet<String>();
-		
-		while (dbCursor.hasNext()) {
-			record = dbCursor.next();
-			if(record!=null){
-				activeTagsList.add((String)record.get(MongoNameConstants.ACTIVE_BUSINESS_UNIT));
+		List<TagsResponsesActive> tagsResponsesActives = this.getTagsResponsesActive();
+		if(tagsResponsesActives != null && tagsResponsesActives.size() > 0){
+			for(TagsResponsesActive tagsResponsesActive : tagsResponsesActives){
+				activeTagsList.add(tagsResponsesActive.getBu());
 			}
 		}
 		return activeTagsList;
 	}
 	
 	public List<String> getActiveResponsysTagsList(){
-		DBCursor dbCursor = tagResponsysActiveCollection.find();
-		DBObject dbObj = null;
 		List<String> activeTags = new ArrayList<String>();
-		while(dbCursor.hasNext()){
-			dbObj = dbCursor.next();
-			if(dbObj != null){
-			if(dbObj.get("OCC").toString().equalsIgnoreCase("Unknown")){
-				activeTags.add((String) dbObj.get("BU"));
+		List<TagsResponsesActive> tagsResponsesActives = this.getTagsResponsesActive();
+		if(tagsResponsesActives != null && tagsResponsesActives.size() > 0){
+			for(TagsResponsesActive tagsResponsesActive : tagsResponsesActives){
+				if(tagsResponsesActive.getOcc().equalsIgnoreCase("Unknown")){
+				activeTags.add(tagsResponsesActive.getBu());
 				}
 			}
 		}
-			return activeTags;
+		return activeTags;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private List<TagsResponsesActive> getTagsResponsesActive(){
+		String cacheKey = CacheConstant.RTS_TAGSRESPONSESACTIVE_CACHE_KEY;
+		Element element = CacheWrapper.getInstance().isCacheKeyExist(cache, cacheKey);
+		if(element != null && element.getObjectKey().equals(cacheKey)){
+			return (List<TagsResponsesActive>) element.getObjectValue();
+		}else{
+		 List<TagsResponsesActive> tagsResponsesActives = new ArrayList<TagsResponsesActive>();
+		 DBCursor dbCursor = tagResponsysActiveCollection.find();
+		 if(dbCursor != null && dbCursor.count() > 0){
+			 while(dbCursor.hasNext()){
+				DBObject dbObj = dbCursor.next();
+				if(dbObj != null){
+					TagsResponsesActive tagsResponsesActive = new TagsResponsesActive();
+					tagsResponsesActive.setBu((String) dbObj.get("BU"));
+					tagsResponsesActive.setOcc((String) dbObj.get("OCC"));
+					tagsResponsesActives.add(tagsResponsesActive);
+				}
+			 }
+		 }
+		 if(tagsResponsesActives != null && tagsResponsesActives.size() > 0){
+				cache.put(new Element(cacheKey, (List<TagsResponsesActive>) tagsResponsesActives));
+		 }
+		 return tagsResponsesActives;
+		}
 	}
 }
 

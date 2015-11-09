@@ -7,6 +7,8 @@ public class CacheConstant {
 	public static final String RTS_CACHE_MODELVARIABLESCACHE = "MODELVARIABLESCACHE";
 	public static final String RTS_CACHE_VARIABLESCACHE = "VARIABLESCACHE";
 	public static final String RTS_CACHE_CPSOCCASIONSCACHE = "CPSOCCASIONSCACHE";
+	public static final String RTS_CACHE_TAGVARIABLE = "TAGVARIABLECACHE";
+	public static final String RTS_CACHE_TAGSRESPONSESACTIVECACHE = "TAGSRESPONSESACTIVECACHE";
 	
 	
 	//Model Percentiles Cache Key
@@ -22,6 +24,12 @@ public class CacheConstant {
 	
 	//CPS Occasions Cache Key
 	public static final String RTS_CPSOCCASIONS_CACHE_KEY = "4840e702-414f-465f-9fd6-d29c88b76fe6";
+	
+	//Tag Variable Cache Key
+	public static final String RTS_TAGVARIABLE_CACHE_KEY = "b006d51e-4117-4e2a-aebb-2e4f0e45b075";
+	
+	//Tag Variable Cache Key
+	public static final String RTS_TAGSRESPONSESACTIVE_CACHE_KEY = "1f8a92c3-78ae-4045-a3bc-bcbed3f2f833";
 	
 	
 }

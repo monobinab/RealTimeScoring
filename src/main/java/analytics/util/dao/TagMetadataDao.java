@@ -78,7 +78,6 @@ public class TagMetadataDao extends AbstractDao {
 		return tagMetaDataList;
 	}
 	public TagMetadata getBuSubBu(String tag){
-		
       	//char[] charArr = tag.toCharArray();
 		//Pattern namesRegex = Pattern.compile("^"+charArr[0]+charArr[1]+charArr[2]+charArr[3]+charArr[4]+".*");
       	Pattern namesRegex = Pattern.compile("^"+tag.substring(0, 5)+".*");

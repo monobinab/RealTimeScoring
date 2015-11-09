@@ -22,4 +22,12 @@
  	overflowToDisk="false" timeToLiveSeconds="604800" memoryStoreEvictionPolicy="LFU">
  </cache>
  
+ <cache name="TAGVARIABLECACHE" maxElementsInMemory="50" eternal="false"
+ 	overflowToDisk="false" timeToLiveSeconds="604800" memoryStoreEvictionPolicy="LFU">
+ </cache>
+ 
+ <cache name="TAGSRESPONSESACTIVECACHE" maxElementsInMemory="50" eternal="false"
+ 	overflowToDisk="false" timeToLiveSeconds="604800" memoryStoreEvictionPolicy="LFU">
+ </cache>
+ 
 </ehcache>
