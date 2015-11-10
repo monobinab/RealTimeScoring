@@ -31,10 +31,8 @@ import analytics.util.dao.MongoDBConnectionWrapper;
 import analytics.util.dao.RegionalFactorDao;
 import analytics.util.dao.VariableDao;
 import analytics.util.objects.Boost;
-import analytics.util.objects.BrowseTag;
 import analytics.util.objects.Change;
 import analytics.util.objects.ChangedMemberScore;
-import analytics.util.objects.DateSpecificMemberBrowse;
 import analytics.util.objects.MemberInfo;
 import analytics.util.objects.MemberRTSChanges;
 import analytics.util.objects.Model;
@@ -47,9 +45,6 @@ public class ScoringSingleton {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ScoringSingleton.class);
 	private Map<String, List<Integer>> variableModelsMap;
 	private Map<Integer, Map<Integer, Model>> modelsMap;
-	private Map<String, String> variableVidToNameMap;
-	private Map<String, String> variableNameToVidMap;
-	private Map<String, String> variableNameToStrategyMap;
 	private Map<String, Double> regionalFactorsMap;
 	private MemberVariablesDao memberVariablesDao;
 	private ChangedMemberScoresDao changedMemberScoresDao;
@@ -104,20 +99,7 @@ public class ScoringSingleton {
 			changedVariablesDao = new ChangedMemberVariablesDao();
 			memberVariablesDao = new MemberVariablesDao();
 			changedMemberScoresDao = new ChangedMemberScoresDao();
-		
-			// populate the variableVidToNameMap
-			variableNameToStrategyMap = new HashMap<String, String>();
-			variableVidToNameMap = new HashMap<String, String>();
-			variableNameToVidMap = new HashMap<String, String>();
-			List<Variable> variables = variableDao.getVariables();
-			for (Variable variable : variables) {
-				if (variable.getName() != null && variable.getVid() != null) {
-					variableVidToNameMap.put(variable.getVid(), variable.getName());
-					variableNameToVidMap.put(variable.getName(), variable.getVid());
-					variableNameToStrategyMap.put(variable.getName(), variable.getStrategy());
-				}
-			}
-
+			
 			LOGGER.debug("Populate variable models map");
 			// populate the variableModelsMap
 			variableModelsMap = new HashMap<String, List<Integer>>();
@@ -201,10 +183,21 @@ public class ScoringSingleton {
 	public MemberRTSChanges calcRTSChanges(String lId, Map<String, String> newChangesVarValueMap, Set<Integer> modelIdsList, String source){
 			
 		MemberRTSChanges memberRTSChanges = null;
-		try{
-						
+		Map<String, String> variableNameToStrategyMap = new HashMap<String, String>();
+		Map<String, String> variableNameToVidMap = new HashMap<String, String>();
+		Map<String, String> variableVidToNameMap = new HashMap<String, String>();
+		List<Variable> variables = variableDao.getVariables();
+		for (Variable variable : variables) {
+			if (variable.getName() != null && variable.getVid() != null) {
+				variableNameToVidMap.put(variable.getName(), variable.getVid());
+				variableNameToStrategyMap.put(variable.getName(), variable.getStrategy());
+				variableVidToNameMap.put(variable.getVid(), variable.getName());
+			}
+		}
+		
+		try{		
 			//Find all models affected by the new incoming changes if newChangesVarValueMap is null
-			if(  newChangesVarValueMap !=  null && !newChangesVarValueMap.isEmpty() ){
+			if(newChangesVarValueMap !=  null && !newChangesVarValueMap.isEmpty()){
 				Iterator<String> itr = newChangesVarValueMap.keySet().iterator();
 				while(itr.hasNext()){
 					String var = itr.next();
@@ -221,20 +214,20 @@ public class ScoringSingleton {
 			if(modelIdsList != null && !modelIdsList.isEmpty()){ 
 			
 				//Create a map of variable values for member, fetched from memberVariables collection
-				Map<String, Object> memberVariablesMap = this.createMemberVariableValueMap(lId, modelIdsList);
+				Map<String, Object> memberVariablesMap = this.createMemberVariableValueMap(lId, modelIdsList, variableNameToVidMap);
 			
 				//checking only for null map as, with empty memberVaraiblesMap also, scoring should happen with new changes for that member
 				if(memberVariablesMap != null){
 					
 					//create a map of non-expired variables and value fetched from changedMembervariables collection
-					Map<String, Change> changedMemberVariables = this.createChangedMemberVariablesMap(lId);
+					Map<String, Change> changedMemberVariables = this.createChangedMemberVariablesMap(lId, variableVidToNameMap);
 				
 					//For each variable in new changes, execute strategy and store in allChanges
 					//empty check for newChangesVarValueMap is NOT NEEDED here as empty map will come only from topology
 					//and if it is empty, modelList will be empty and the control won't be here
 					Map<String, Change> allChanges = null;
 					if( newChangesVarValueMap !=  null ){
-						allChanges = this.executeStrategy(changedMemberVariables, newChangesVarValueMap, memberVariablesMap);
+						allChanges = this.executeStrategy(changedMemberVariables, newChangesVarValueMap, memberVariablesMap, variableNameToStrategyMap, variableNameToVidMap);
 					}//if this method is called from outside of the topology, newChangesVarValueMap will be null and 
 					  //thereby allChanges should be set with changedMemberVariables for scoring
 					else{
@@ -255,7 +248,7 @@ public class ScoringSingleton {
 								if(!isBlackOutModel(allChanges, modelId)){
 								
 									//recalculate score for each model
-									rtsScore = this.calcScore(memberVariablesMap, allChanges, modelId);
+									rtsScore = this.calcScore(memberVariablesMap, allChanges, modelId, variableNameToVidMap);
 									
 									LOGGER.debug("new score before boost var: " + rtsScore);
 									
@@ -318,9 +311,8 @@ public class ScoringSingleton {
 			return memberRTSChanges;
 	}
 
-	public Map<String, Object> createMemberVariableValueMap(String loyaltyId, Set<Integer> modelIdList)  {
+	public Map<String, Object> createMemberVariableValueMap(String loyaltyId, Set<Integer> modelIdList, Map<String, String> variableNameToVidMap)  {
 		Set<String> filteredVariables = new HashSet<String>();
-		
 		for (Integer modelId : modelIdList) {
 			Map<String, Variable> variables = getModelVariables(modelId);
 				if(variables == null){
@@ -355,7 +347,7 @@ public class ScoringSingleton {
 		return modelIdList;
 	}
 
-	public Map<String, Change> createChangedMemberVariablesMap(String lId) {
+	public Map<String, Change> createChangedMemberVariablesMap(String lId, Map<String, String> variableVidToNameMap) {
 		// This map is VID->Change
 		Map<String, Change> changedMbrVariables = changedVariablesDao.getChangedMemberVariables(lId);
 
@@ -397,8 +389,11 @@ public class ScoringSingleton {
 	 *            L_id -> Variables
 	 * @return
 	 */
-	public Map<String, Change> executeStrategy(Map<String, Change> allChanges, Map<String, String> newChangesVarValueMap, Map<String, Object> memberVariablesMap) {
-		
+	public Map<String, Change> executeStrategy(Map<String, Change> allChanges, 
+			Map<String, String> newChangesVarValueMap, 
+			Map<String, Object> memberVariablesMap, 
+			Map<String, String> variableNameToStrategyMap, 
+			Map<String, String> variableNameToVidMap) {
 			for (String variableName : newChangesVarValueMap.keySet()) {
 				variableName = variableName.toUpperCase();
 				if (variableModelsMap.containsKey(variableName)) {
@@ -506,10 +501,10 @@ public class ScoringSingleton {
 																																					
 	}
 	
-	public double calcScore(Map<String, Object> mbrVarMap, Map<String, Change> allChanges, Integer modelId) throws RealTimeScoringException {
+	public double calcScore(Map<String, Object> mbrVarMap, Map<String, Change> allChanges, Integer modelId, Map<String, String> variableNameToVidMap) throws RealTimeScoringException {
 				
 		// recalculate score for model
-		double baseScore = calcBaseScore(mbrVarMap, allChanges, modelId);
+		double baseScore = calcBaseScore(mbrVarMap, allChanges, modelId, variableNameToVidMap);
 		double newScore;
 
 		if (baseScore <= -100) {
@@ -522,12 +517,11 @@ public class ScoringSingleton {
 		return newScore;
 	}
 	
-	public double calcBaseScore(Map<String, Object> mbrVarMap, Map<String, Change> allChanges, Integer modelId) throws RealTimeScoringException {
+	public double calcBaseScore(Map<String, Object> mbrVarMap, Map<String, Change> allChanges, Integer modelId, Map<String, String> variableNameToVidMap) throws RealTimeScoringException {
 
 		if (allChanges == null || allChanges.isEmpty()) {
 			throw new RealTimeScoringException("changed member variables is null");
 		}
-		
 		Model model = getModel(modelId);
 		if(model == null)
 			throw new RealTimeScoringException("Model is null for " +  modelId);
@@ -659,6 +653,13 @@ public class ScoringSingleton {
 	}
 
 	public void updateChangedMemberVariables(String lId, Map<String, Change> allChanges) {
+		Map<String, String> variableNameToVidMap = new HashMap<String, String>();
+		List<Variable> variablesList = variableDao.getVariables();
+		for (Variable variable : variablesList) {
+			if (variable.getName() != null && variable.getVid() != null) {
+				variableNameToVidMap.put(variable.getName(), variable.getVid());
+			}
+		}
 		if (allChanges != null && !allChanges.isEmpty()) {
 			// upsert document
 			changedVariablesDao.upsertUpdateChangedVariables(lId, allChanges, variableNameToVidMap);
