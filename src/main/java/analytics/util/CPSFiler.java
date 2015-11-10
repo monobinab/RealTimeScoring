@@ -215,14 +215,7 @@ public class CPSFiler {
 				return queueStartingTomorrow(emailPackagesToBeSent);
 		}
 		
-	    //If the remaining duration of inProgress is greater than the queue length, no need to queue anymore occasions
-		if(inProgressPackage.getMdTagMetaData().getSendDuration()- CalendarUtil.getDatesDiff(new Date(),inProgressPackage.getSentDateTime())>Constants.CPS_QUEUE_LENGTH){
-			return null;			
-		}
-		
-		
-		
-		EmailPackage previousOccasion = inProgressPackage;
+	   	EmailPackage previousOccasion = inProgressPackage;
 		for(EmailPackage emailPackage : emailPackagesToBeSent){			
 				
 			//Rule - if incoming occasion is of higher priority - interrupt the in progress occasion
@@ -236,6 +229,11 @@ public class CPSFiler {
 			else if(( emailPackage.getMdTagMetaData().getPriority() == previousOccasion.getMdTagMetaData().getPriority() 
 					//&& emailPackage.getMdTagMetaData().getFirst5CharMdTag().equals(previousOccasion.getMdTagMetaData().getFirst5CharMdTag())
 					) || (emailPackage.getMdTagMetaData().getPriority() > previousOccasion.getMdTagMetaData().getPriority())) {
+				
+				//If the remaining duration of inProgress is greater than the queue length, no need to queue anymore occasions
+				if(inProgressPackage.getMdTagMetaData().getSendDuration()- CalendarUtil.getDatesDiff(new Date(),inProgressPackage.getSentDateTime())>Constants.CPS_QUEUE_LENGTH){
+					return null;			
+				}
 				emailPackage.setSendDate(CalendarUtil.getNewDate(previousOccasion.getSendDate(), previousOccasion.getMdTagMetaData().getSendDuration()));							
 			}			
 			previousOccasion = emailPackage;						
