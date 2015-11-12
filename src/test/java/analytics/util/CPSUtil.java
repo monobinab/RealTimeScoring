@@ -247,17 +247,18 @@ public class CPSUtil {
 							
 							continue;
 						}
-						TagMetadata tagMetadata = tagMetadataDao.getDetails(cptestItem.getMd_tag());
-						
-						if(tagMetadata==null){
-							tagMetadata = new TagMetadata();
-							tagMetadata.setMdTag(cptestItem.getMd_tag());
-							tagMetadata.setPurchaseOccassion(cpsOccasionsByIdMap.get(cptestItem.getMd_tag().substring(5, 6)));		
-							tagMetadata.setBusinessUnit("testBu");
-							tagMetadata.setSubBusinessUnit("testSubBu");
-							tagMetadataDao.addTagMetaData(tagMetadata);						
+						if(StringUtils.isNotBlank(cptestItem.getMd_tag())){
+							TagMetadata tagMetadata = tagMetadataDao.getDetails(cptestItem.getMd_tag());
+							
+							if(tagMetadata==null){
+								tagMetadata = new TagMetadata();
+								tagMetadata.setMdTag(cptestItem.getMd_tag());
+								tagMetadata.setPurchaseOccassion(cpsOccasionsByIdMap.get(cptestItem.getMd_tag().substring(5, 6)));		
+								tagMetadata.setBusinessUnit("testBu");
+								tagMetadata.setSubBusinessUnit("testSubBu");
+								tagMetadataDao.addTagMetaData(tagMetadata);						
+							}
 						}
-						
 						testItem.getMdTagList().add(cptestItem.getMd_tag());
 					}
 					
@@ -459,7 +460,11 @@ public class CPSUtil {
 			// JSON object
 			if ("TEST".equalsIgnoreCase(testPhase)) {
 				cpBoxItem.setLoy_id(variables[0]);
-				cpBoxItem.setMd_tag(variables[1]);
+				if(variables.length>1){
+					cpBoxItem.setMd_tag(variables[1]);
+				}else{
+					cpBoxItem.setMd_tag(StringUtils.EMPTY);
+				}
 			} else {
 				cpBoxItem.setLoy_id(variables[0]);
 				cpBoxItem.setMd_tag(variables[1]);
