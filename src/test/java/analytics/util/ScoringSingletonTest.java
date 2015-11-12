@@ -89,8 +89,7 @@ public class ScoringSingletonTest {
 	@Test
 	public void getModelIdListNullNewChangesVarValueMapTest1() {
 		Map<String, String> newChangesVarValueMap = null;
-		Set<Integer> modelList = scoringSingletonObj
-				.getModelIdList(newChangesVarValueMap);
+		Set<Integer> modelList = scoringSingletonObj.getModelIdList(newChangesVarValueMap, null, null);
 		assertTrue("expecting empty modelIdList as newChangesVarValueMap is null", modelList.isEmpty());
 	}
 
@@ -103,14 +102,8 @@ public class ScoringSingletonTest {
 		modelLists.add(48);
 		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
 		variableModelsMapContents.put("S_DSL_APP_INT_ACC_FTWR_TRS", modelLists);
-		Field variableModelsMap = ScoringSingleton.class
-				.getDeclaredField("variableModelsMap");
-		variableModelsMap.setAccessible(true);
-		variableModelsMap.set(scoringSingletonObj, variableModelsMapContents);
-		Set<Integer> modelList = scoringSingletonObj
-				.getModelIdList(newChangesVarValueMap);
+		Set<Integer> modelList = scoringSingletonObj.getModelIdList(newChangesVarValueMap, variableModelsMapContents, null);
 		assertTrue("expecting empty modelIdList as none of the variables in newChangesVarValueMap is not in variableModelsMap", modelList.isEmpty());
-		variableModelsMap.setAccessible(false);
 	}
 
 	/*if variableModelsMap does not contain any one of the variables from newChangesVarValueMap --
@@ -132,11 +125,6 @@ public class ScoringSingletonTest {
 		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
 		variableModelsMapContents.put("S_DSL_APP_INT_ACC_FTWR_TRS", modelLists);
 		variableModelsMapContents.put("S_DSL_APP_INT_ACC_FTWR", modelLists2);
-
-		Field variableModelsMap = ScoringSingleton.class.getDeclaredField("variableModelsMap");
-		variableModelsMap.setAccessible(true);
-		variableModelsMap.set(scoringSingletonObj, variableModelsMapContents);
-		
 		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
 		variablesMap.put("S_DSL_APP_INT_ACC_FTWR_TRS", new Variable("S_DSL_APP_INT_ACC_FTWR_TRS",0.002));
 		Map<String, Variable> variablesMap2 = new HashMap<String, Variable>();
@@ -150,19 +138,13 @@ public class ScoringSingletonTest {
 		modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContent.put(35, monthModelMap);
 		modelsMapContent.put(48, monthModelMap2);
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
-		
 		
 		// Actual modelIds from ScoringSingleton
-		Set<Integer> actualModelLists = scoringSingletonObj
-				.getModelIdList(newChangesVarValueMap);
+		Set<Integer> actualModelLists = scoringSingletonObj.getModelIdList(newChangesVarValueMap, variableModelsMapContents, modelsMapContent);
 		// Expected modelIds
 		Set<Integer> expectedModelLists = new HashSet<Integer>();
 		expectedModelLists.add(48);
 		Assert.assertEquals(expectedModelLists, actualModelLists);
-		variableModelsMap.setAccessible(false);
 	}
 		
 	/* This test is for a positive case, and return modelIdLists for newChangesVarValueMap
@@ -179,11 +161,6 @@ public class ScoringSingletonTest {
 		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
 		variableModelsMapContents.put("S_DSL_APP_INT_ACC_FTWR_TRS", modelLists);
 		variableModelsMapContents.put("S_DSL_APP_INT_ACC_FTWR_ALL", modelLists2);
-
-		Field variableModelsMap = ScoringSingleton.class.getDeclaredField("variableModelsMap");
-		variableModelsMap.setAccessible(true);
-		variableModelsMap.set(scoringSingletonObj, variableModelsMapContents);
-		
 		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
 		variablesMap.put("S_DSL_APP_INT_ACC_FTWR_TRS", new Variable("S_DSL_APP_INT_ACC_FTWR_TRS",0.002));
 		Map<String, Variable> variablesMap2 = new HashMap<String, Variable>();
@@ -197,25 +174,18 @@ public class ScoringSingletonTest {
 		modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContent.put(30, monthModelMap);
 		modelsMapContent.put(48, monthModelMap2);
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
 		
 		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
 		newChangesVarValueMap.put("S_DSL_APP_INT_ACC_FTWR_TRS", "0.001");
 		newChangesVarValueMap.put("S_DSL_APP_INT_ACC_FTWR_ALL", "1");
 
 		// Actual modelIds from ScoringSingleton
-		Set<Integer> actualModelList = scoringSingletonObj
-				.getModelIdList(newChangesVarValueMap);
+		Set<Integer> actualModelList = scoringSingletonObj.getModelIdList(newChangesVarValueMap, variableModelsMapContents, modelsMapContent);
 		// Expected modelIds
 		Set<Integer> expectedModelLists = new HashSet<Integer>();
 		expectedModelLists.add(48);
 		expectedModelLists.add(30);
 		Assert.assertEquals(expectedModelLists, actualModelList);
-		variableModelsMap.setAccessible(false);
-		modelsMap.setAccessible(false);
-		
 	}
 	
 	/*to test the filtration of the invalid month model
@@ -228,13 +198,8 @@ public class ScoringSingletonTest {
 
 		List<Integer> modelLists = new ArrayList<Integer>();
 		modelLists.add(48);
-		
 		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
 		variableModelsMapContents.put("S_DSL_APP_INT_ACC_FTWR_TRS", modelLists);
-		Field variableModelsMap = ScoringSingleton.class.getDeclaredField("variableModelsMap");
-		variableModelsMap.setAccessible(true);
-		variableModelsMap.set(scoringSingletonObj, variableModelsMapContents);
-		
 		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
 		variablesMap.put("S_DSL_APP_INT_ACC_FTWR_TRS", new Variable("S_DSL_APP_INT_ACC_FTWR_TRS",0.002));
 		Map<Integer, Model> monthModelMap2 = new HashMap<Integer, Model>();
@@ -242,20 +207,12 @@ public class ScoringSingletonTest {
 		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContent.put(48, monthModelMap2);
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
-		
 		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
 		newChangesVarValueMap.put("S_DSL_APP_INT_ACC_FTWR_TRS", "0.001");
 
 		// Actual modelIds from ScoringSingleton
-		Set<Integer> actualModelList = scoringSingletonObj
-				.getModelIdList(newChangesVarValueMap);
-		
+		Set<Integer> actualModelList = scoringSingletonObj.getModelIdList(newChangesVarValueMap, variableModelsMapContents, modelsMapContent);
 		Assert.assertTrue( actualModelList.isEmpty());
-		variableModelsMap.setAccessible(false);
-		modelsMap.setAccessible(false);
 	}
 
 	// This test is to check whether createMemberVariableValueMap() returns null if loyaltyid is null
@@ -269,11 +226,6 @@ public class ScoringSingletonTest {
 		modelLists.add(35);
 		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
 		variableModelsMapContents.put("S_HOME_6M_IND2", modelLists);
-
-		Field variableModelsMap = ScoringSingleton.class.getDeclaredField("variableModelsMap");
-		variableModelsMap.setAccessible(true);
-		variableModelsMap.set(scoringSingletonObj, variableModelsMapContents);
-		
 		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
 		variablesMap.put("S_HOME_6M_IND2", new Variable("S_HOME_6M_IND2",0.002));
 		Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
@@ -281,19 +233,10 @@ public class ScoringSingletonTest {
 		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContent.put(35, monthModelMap);
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
-		
 		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
 		variableNameToVidMapContents.put("S_HOME_6M_IND2", "2269");
-		/**
-		Field variableNameToVidMap = ScoringSingleton.class.getDeclaredField("variableNameToVidMap");
-		variableNameToVidMap.setAccessible(true);
-		variableNameToVidMap.set(scoringSingletonObj, variableNameToVidMapContents);
-		*/	
-		Set<Integer> modelIdList2 = scoringSingletonObj.getModelIdList(newChangesVarValueMap2);
-		Map<String, Object> map = scoringSingletonObj.createMemberVariableValueMap("", modelIdList2, variableNameToVidMapContents);
+		Set<Integer> modelIdList2 = scoringSingletonObj.getModelIdList(newChangesVarValueMap2, variableModelsMapContents, modelsMapContent);
+		Map<String, Object> map = scoringSingletonObj.createMemberVariableValueMap("", modelIdList2, variableNameToVidMapContents, modelsMapContent);
 		assertEquals("memberVariablesMap null as lid is null", map, null);
 	}
 
@@ -307,14 +250,11 @@ public class ScoringSingletonTest {
 		String lId = "SearsTesting";
 		//fake memberVariables collection
 		DBCollection memberVariables = db.getCollection("memberVariables");
-		memberVariables.insert(new BasicDBObject("l_id", lId)
-				.append("2269", 1).append("2270", 0.10455));
+		memberVariables.insert(new BasicDBObject("l_id", lId).append("2269", 1).append("2270", 0.10455));
 		
 		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
-		variablesMap.put("S_DSL_APP_INT_ACC", new Variable("S_DSL_APP_INT_ACC",
-				0.002));
-		variablesMap.put("S_DSL_APP_INT_ACC2", new Variable(
-				"S_DSL_APP_INT_ACC2", 0.0915));
+		variablesMap.put("S_DSL_APP_INT_ACC", new Variable("S_DSL_APP_INT_ACC",0.002));
+		variablesMap.put("S_DSL_APP_INT_ACC2", new Variable("S_DSL_APP_INT_ACC2", 0.0915));
 		Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
 		monthModelMap.put(0, new Model(35, "Model_Name", 0, 5, variablesMap));
 		Map<Integer, Model> monthModelMap2 = new HashMap<Integer, Model>();
@@ -322,35 +262,19 @@ public class ScoringSingletonTest {
 		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContent.put(35, monthModelMap);
 		modelsMapContent.put(48, monthModelMap2);
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
-		
 		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
 		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC", "2269");
 		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC2", "2270");
-		/**
-		Field variableNameToVidMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToVidMap");
-		variableNameToVidMap.setAccessible(true);
-		variableNameToVidMap.set(scoringSingletonObj,
-				variableNameToVidMapContents);
-		*/
-		
 		Set<Integer> modelIdsList = new HashSet<Integer>();
 		modelIdsList.add(35);
 		modelIdsList.add(48);
 		
-		Map<String, Object> actualMemberVariablesMap = scoringSingletonObj.createMemberVariableValueMap(lId, modelIdsList, variableNameToVidMapContents);
+		Map<String, Object> actualMemberVariablesMap = scoringSingletonObj.createMemberVariableValueMap(lId, modelIdsList, variableNameToVidMapContents, modelsMapContent);
 		Set<String> expMemVarValue = new HashSet<String>();
 		expMemVarValue.add("2270");
 		expMemVarValue.add("2269");
-
 		Assert.assertEquals(expMemVarValue, actualMemberVariablesMap.keySet());
-		
 		memberVariables.remove(new BasicDBObject("l_id", lId));
-		modelsMap.setAccessible(false);
-		//variableNameToVidMap.setAccessible(false);
 	}
 	
 	/*to test the filteredVariables to fetch from memberVariables collection
@@ -365,17 +289,13 @@ public class ScoringSingletonTest {
 		String lId = "SearsTesting2";
 		//fake memberVariables collection
 		DBCollection memberVariables = db.getCollection("memberVariables");
-		memberVariables.insert(new BasicDBObject("l_id", lId)
-				.append("2269", 1).append("2270", 0.10455));
+		memberVariables.insert(new BasicDBObject("l_id", lId).append("2269", 1).append("2270", 0.10455));
 		
 		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
-		variablesMap.put("S_DSL_APP_INT_ACC", new Variable("S_DSL_APP_INT_ACC",
-				0.002));
-		variablesMap.put("S_DSL_APP_INT_ACC2", new Variable(
-				"S_DSL_APP_INT_ACC2", 0.0915));
+		variablesMap.put("S_DSL_APP_INT_ACC", new Variable("S_DSL_APP_INT_ACC",0.002));
+		variablesMap.put("S_DSL_APP_INT_ACC2", new Variable("S_DSL_APP_INT_ACC2", 0.0915));
 		Map<String, Variable> variablesMap2 = new HashMap<String, Variable>();
-		variablesMap2.put("S_DSL_APP_INT_ACC3", new Variable("S_DSL_APP_INT_ACC3",
-				0.002));
+		variablesMap2.put("S_DSL_APP_INT_ACC3", new Variable("S_DSL_APP_INT_ACC3",0.002));
 		Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
 		monthModelMap.put(0, new Model(35, "Model_Name", 0, 5, variablesMap));
 		Map<Integer, Model> monthModelMap2 = new HashMap<Integer, Model>();
@@ -388,32 +308,17 @@ public class ScoringSingletonTest {
 		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC", "2269");
 		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC2", "2270");
 		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC3", "2271");
-
 		
 		Set<Integer> modelIdsList = new HashSet<Integer>();
 		modelIdsList.add(35);
 		modelIdsList.add(48);
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
-		
-		/**
-		Field variableNameToVidMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToVidMap");
-		variableNameToVidMap.setAccessible(true);
-		variableNameToVidMap.set(scoringSingletonObj,
-				variableNameToVidMapContents);*/
-		
-		Map<String, Object> actualMemberVariables = scoringSingletonObj.createMemberVariableValueMap(lId, modelIdsList, variableNameToVidMapContents);
+		Map<String, Object> actualMemberVariables = scoringSingletonObj.createMemberVariableValueMap(lId, modelIdsList, variableNameToVidMapContents, modelsMapContent);
 		Set<String> expectedMemVarValue = new HashSet<String>();
 		expectedMemVarValue.add("2270");
 		expectedMemVarValue.add("2269");
 
 		Assert.assertEquals("Expecting 2269 and 2270 only as 2271 not in memberVar collection", expectedMemVarValue, actualMemberVariables.keySet());
-		
 		memberVariables.remove(new BasicDBObject("l_id", lId));
-		modelsMap.setAccessible(false);
-		//variableNameToVidMap.setAccessible(false);
 	}
 	
 	/*model 48 is month model but does not correspond to current month, so the associated variables will not be fetched from memberVariables collection
@@ -427,8 +332,7 @@ public class ScoringSingletonTest {
 		String lId = "SearsTesting3";
 		//fake memberVariables collection
 		DBCollection memberVariables = db.getCollection("memberVariables");
-		memberVariables.insert(new BasicDBObject("l_id", lId)
-				.append("2269", 1).append("2270", 0.10455));
+		memberVariables.insert(new BasicDBObject("l_id", lId).append("2269", 1).append("2270", 0.10455));
 		
 		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
 		variablesMap.put("S_DSL_APP_INT_ACC", new Variable("S_DSL_APP_INT_ACC",	0.002));
@@ -445,30 +349,17 @@ public class ScoringSingletonTest {
 		modelsMapContent.put(48, monthModelMap2);
 		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
 		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC", "2269");
-		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC2", "2270");
-	
+		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC2", "2270");	
 		Set<Integer> modelIdsList = new HashSet<Integer>();
 		modelIdsList.add(35);
 		modelIdsList.add(48);
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
-		/**
-		Field variableNameToVidMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToVidMap");
-		variableNameToVidMap.setAccessible(true);
-		variableNameToVidMap.set(scoringSingletonObj,
-				variableNameToVidMapContents);*/
-		
-		Map<String, Object> actualMemberVariablesMap = scoringSingletonObj.createMemberVariableValueMap(lId, modelIdsList, variableNameToVidMapContents);
+		Map<String, Object> actualMemberVariablesMap = scoringSingletonObj.createMemberVariableValueMap(lId, modelIdsList, variableNameToVidMapContents, modelsMapContent);
 		Set<String> expectedMemVarValueMap = new HashSet<String>();
 		expectedMemVarValueMap.add("2269");
 		
 		Assert.assertEquals("Expecting var associated with model 35 only as 48 is NOT current month model", expectedMemVarValueMap, actualMemberVariablesMap.keySet());
 		
 		memberVariables.remove(new BasicDBObject("l_id", lId));
-		modelsMap.setAccessible(false);
-		//variableNameToVidMap.setAccessible(false);
 	}
 
 	/*if variable collection does not have a variable so that there is no VID in record, it will be skipped in the creation of memberVariableValueMap*/ 
@@ -480,44 +371,29 @@ public class ScoringSingletonTest {
 		
 		String lId = "SearsTesting4";
 		DBCollection memberVariables = db.getCollection("memberVariables");
-		memberVariables.insert(new BasicDBObject("l_id", lId)
-				.append("2269", 1).append("2268", 0.10455));
+		memberVariables.insert(new BasicDBObject("l_id", lId).append("2269", 1).append("2268", 0.10455));
 
 		//variablesMap, modelsMap are populated from modelVaraibles collection
 		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
-		variablesMap.put("S_DSL_APP_INT_ACC", new Variable("S_DSL_APP_INT_ACC",
-				0.002));
-		variablesMap
-				.put("S_HOME_6M_IND", new Variable("S_HOME_6M_IND", 0.0015));
+		variablesMap.put("S_DSL_APP_INT_ACC", new Variable("S_DSL_APP_INT_ACC",0.002));
+		variablesMap.put("S_HOME_6M_IND", new Variable("S_HOME_6M_IND", 0.0015));
 
 		Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
 		monthModelMap.put(0, new Model(35, "Model_Name", 0, 5, variablesMap));
 		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContent.put(35, monthModelMap);
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
 
 		//variableNameToVidMap is populated from variables collection
 		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
 		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC", "2269");
-		/**
-		Field variableNameToVidMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToVidMap");
-		variableNameToVidMap.setAccessible(true);
-		variableNameToVidMap.set(scoringSingletonObj,
-				variableNameToVidMapContents);*/
-		
 		Set<Integer> modelIdsList = new HashSet<Integer>();
 		modelIdsList.add(35);
-		Map<String, Object> actualMemberVariablesMap = scoringSingletonObj.createMemberVariableValueMap(lId, modelIdsList, variableNameToVidMapContents);
+		Map<String, Object> actualMemberVariablesMap = scoringSingletonObj.createMemberVariableValueMap(lId, modelIdsList, variableNameToVidMapContents, modelsMapContent);
 		Set<String> expectedMemVarValueMap = new HashSet<String>();
 		expectedMemVarValueMap.add("2269");
 
 		Assert.assertEquals("Expecting var S_DSL_APP_INT_ACC only as there is no VID for S_HOME_6M_IND", expectedMemVarValueMap, actualMemberVariablesMap.keySet());
 		memberVariables.remove(new BasicDBObject("l_id", lId));
-		modelsMap.setAccessible(false);
-		//variableNameToVidMap.setAccessible(false);
 	}
 
 	
@@ -529,43 +405,29 @@ public class ScoringSingletonTest {
 		
 		String lId = "SearsTesting44";
 		DBCollection memberVariables = db.getCollection("memberVariables");
-		memberVariables.insert(new BasicDBObject("l_id", lId)
-				.append("1000", 1).append("1001", 0.10455));
+		memberVariables.insert(new BasicDBObject("l_id", lId).append("1000", 1).append("1001", 0.10455));
 
 		//variablesMap, modelsMap are populated from modelVaraibles collection
 		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
-		variablesMap.put("S_DSL_APP_INT_ACC", new Variable("S_DSL_APP_INT_ACC",
-				0.002));
-		variablesMap
-				.put("S_HOME_6M_IND_ALL", new Variable("S_HOME_6M_IND_ALL", 0.0015));
+		variablesMap.put("S_DSL_APP_INT_ACC", new Variable("S_DSL_APP_INT_ACC",0.002));
+		variablesMap.put("S_HOME_6M_IND_ALL", new Variable("S_HOME_6M_IND_ALL", 0.0015));
 
 		Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
 		monthModelMap.put(0, new Model(35, "Model_Name", 0, 5, variablesMap));
 		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContent.put(35, monthModelMap);
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
 
 		//variableNameToVidMap is populated from variables collection
 		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
 		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC", "2269");
-		/**
-		Field variableNameToVidMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToVidMap");
-		variableNameToVidMap.setAccessible(true);
-		variableNameToVidMap.set(scoringSingletonObj,
-				variableNameToVidMapContents);*/
 		
 		Set<Integer> modelIdsList = new HashSet<Integer>();
 		modelIdsList.add(35);
-		Map<String, Object> actualMemberVariablesMap = scoringSingletonObj.createMemberVariableValueMap(lId, modelIdsList, variableNameToVidMapContents);
+		Map<String, Object> actualMemberVariablesMap = scoringSingletonObj.createMemberVariableValueMap(lId, modelIdsList, variableNameToVidMapContents, modelsMapContent);
 		Set<String> expectedMemVarValueMap = new HashSet<String>();
 		
 		Assert.assertEquals("Expecting empty memberVarValueMap as this member does not have any of the filtered variables", expectedMemVarValueMap, actualMemberVariablesMap.keySet());
 		memberVariables.remove(new BasicDBObject("l_id", lId));
-		modelsMap.setAccessible(false);
-		//variableNameToVidMap.setAccessible(false);
 	}
 
 	/* This test is to check whether changedMemberVariablesMap is getting populated
@@ -592,13 +454,6 @@ public class ScoringSingletonTest {
 
 		Map<String, String> varIdToNameMapContents = new HashMap<String, String>();
 		varIdToNameMapContents.put("2270", "MY_VAR_NAME");
-		
-		/**
-		Field varIdToNameMap = ScoringSingleton.class
-				.getDeclaredField("variableVidToNameMap");
-		varIdToNameMap.setAccessible(true);
-		varIdToNameMap.set(scoringSingletonObj, varIdToNameMapContents);*/
-
 		Map<String, Change> changedVars = scoringSingletonObj.createChangedMemberVariablesMap(l_id, varIdToNameMapContents);
 		Assert.assertTrue(changedVars.containsKey("MY_VAR_NAME"));
 		Change actual = changedVars.get("MY_VAR_NAME");
@@ -610,7 +465,6 @@ public class ScoringSingletonTest {
 		Assert.assertEquals(expected.getChangeVariable(),
 				actual.getChangeVariable());
 		changedMemberVar.remove(new BasicDBObject("l_id",l_id));
-		//varIdToNameMap.setAccessible(false);
 	}
 
 	/* if member has all variables expired, they wont be populated in the map*/
@@ -636,16 +490,9 @@ public class ScoringSingletonTest {
 
 		Map<String, String> varIdToNameMapContents = new HashMap<String, String>();
 		varIdToNameMapContents.put("2270", "MY_VAR_NAME");
-		/**
-		Field varIdToNameMap = ScoringSingleton.class
-				.getDeclaredField("variableVidToNameMap");
-		varIdToNameMap.setAccessible(true);
-		varIdToNameMap.set(scoringSingletonObj, varIdToNameMapContents);*/
-
 		Map<String, Change> changedVars = scoringSingletonObj.createChangedMemberVariablesMap(l_id, varIdToNameMapContents);
 		Assert.assertEquals("Expecting an empty map as variables are expired", new HashMap<String, Change>(), changedVars);
 		changedMemberVar.remove(new BasicDBObject("l_id",l_id));
-		//varIdToNameMap.setAccessible(false);
 	}
 	
 	/*if the member does not have any record in changedMemVar collection, changedMemVarMap will be empty*/
@@ -656,15 +503,8 @@ public class ScoringSingletonTest {
 		String l_id = "6RpGnW1XhFFBoJV+T9cT9ok2";
 		Map<String, String> varIdToNameMapContents = new HashMap<String, String>();
 		varIdToNameMapContents.put("2270", "MY_VAR_NAME");
-		/**
-		Field varIdToNameMap = ScoringSingleton.class
-				.getDeclaredField("variableVidToNameMap");
-		varIdToNameMap.setAccessible(true);
-		varIdToNameMap.set(scoringSingletonObj, varIdToNameMapContents);*/
-
 		Map<String, Change> changedVars = scoringSingletonObj.createChangedMemberVariablesMap(l_id, varIdToNameMapContents);
 		Assert.assertEquals("Expecting an empty map as there is no record in changedMemVar collection for this member", new HashMap<String, Change>(), changedVars);
-		//varIdToNameMap.setAccessible(false);
 	}
 	
 	//testing the boosting method with null allChanges
@@ -672,7 +512,8 @@ public class ScoringSingletonTest {
 	public void getBoostScoreNullAllChangesTest() throws ParseException,
 			SecurityException, NoSuchFieldException, IllegalArgumentException,
 			IllegalAccessException {
-		double boost = scoringSingletonObj.getBoostScore(null, 35);
+		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
+		double boost = scoringSingletonObj.getBoostScore(null, 35, modelsMapContent);
 		int compare = (new Double(0.0)).compareTo(new Double(boost));
 		Assert.assertEquals(compare, 0);
 	}
@@ -684,8 +525,7 @@ public class ScoringSingletonTest {
 
 		HashMap<String, Change> allChanges = new HashMap<String, Change>();
 		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
-		variablesMap.put("BOOST_S_DSL_APP_INT_ACC", new Variable("BOOST_S_DSL_APP_INT_ACC",
-				0.0015));
+		variablesMap.put("BOOST_S_DSL_APP_INT_ACC", new Variable("BOOST_S_DSL_APP_INT_ACC",0.0015));
 		Map<Integer, Model> monthModelMap= new HashMap<Integer, Model>();
 		monthModelMap.put(
 				Calendar.getInstance().get(Calendar.MONTH) + 1,
@@ -693,14 +533,9 @@ public class ScoringSingletonTest {
 						Calendar.MONTH) + 1, 5, variablesMap));
 		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContent.put(27, monthModelMap);
-
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
-		double boost = scoringSingletonObj.getBoostScore(allChanges, 27);
+		double boost = scoringSingletonObj.getBoostScore(allChanges, 27, modelsMapContent);
 		int comapreVal = new Double(0.0).compareTo(new Double(boost));
 		Assert.assertEquals("Expecting boost value of 0", comapreVal, 0);
-		modelsMap.setAccessible(false);
 	}
 
 	/*if the model does not have variables for this specific month -- null varMap*/
@@ -725,14 +560,9 @@ public class ScoringSingletonTest {
 
 		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContent.put(27, monthModelMap);
-
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
-		double boost = scoringSingletonObj.getBoostScore(allChanges, 27);
+		double boost = scoringSingletonObj.getBoostScore(allChanges, 27, modelsMapContent);
 		int comapreVal = new Double(0.0).compareTo(new Double(boost));
 		Assert.assertEquals("Expecting a boost of 0 as there are no vars for this model", comapreVal, 0);
-		modelsMap.setAccessible(false);
 	}
 	
 	/*if the model does not have variables for this specific month -- with empty varMap */
@@ -758,14 +588,9 @@ public class ScoringSingletonTest {
 
 		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContent.put(27, monthModelMap);
-
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
-		double boost = scoringSingletonObj.getBoostScore(allChanges, 27);
+		double boost = scoringSingletonObj.getBoostScore(allChanges, 27, modelsMapContent);
 		int comapreVal = new Double(0.0).compareTo(new Double(boost));
 		Assert.assertEquals("Expecting a boost of 0 as there are no vars for this model", comapreVal, 0);
-		modelsMap.setAccessible(false);
 	}
 	
 	// This tests the boosts returned for current month model
@@ -793,14 +618,9 @@ public class ScoringSingletonTest {
 
 		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContent.put(27, monthModelMap);
-
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
-		double boost = scoringSingletonObj.getBoostScore(allChanges, 27);
+		double boost = scoringSingletonObj.getBoostScore(allChanges, 27, modelsMapContent);
 		int comapreVal = new Double(2.024).compareTo(new Double(boost));
 		Assert.assertEquals(comapreVal, 0);
-		modelsMap.setAccessible(false);
 	}
 
  /* This test case is for testing the boost returned for non month modelId*/
@@ -832,14 +652,9 @@ public class ScoringSingletonTest {
 				variablesMap));
 		Map<Integer, Map<Integer, Model>> modelsMapContentBoost = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContentBoost.put(35, monthModelMap);
-
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContentBoost);
-		double boost = scoringSingletonObj.getBoostScore(allChanges, 35);
+		double boost = scoringSingletonObj.getBoostScore(allChanges, 35, modelsMapContentBoost);
 		int comapreVal = new Double(0.138).compareTo(new Double(boost));
 		Assert.assertEquals(comapreVal, 0);
-		modelsMap.setAccessible(false);
 	}
 	
 	/*to test for boost variable which is NOT an BOOST instance, i.e. does not have an intercept and is just a Variable*/
@@ -871,14 +686,9 @@ public class ScoringSingletonTest {
 				variablesMap));
 		Map<Integer, Map<Integer, Model>> modelsMapContentBoost = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContentBoost.put(35, monthModelMap);
-
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContentBoost);
-		double boost = scoringSingletonObj.getBoostScore(allChanges, 35);
+		double boost = scoringSingletonObj.getBoostScore(allChanges, 35, modelsMapContentBoost);
 		int comapreVal = new Double(0.124).compareTo(new Double(boost));
 		Assert.assertEquals(comapreVal, 0);
-		modelsMap.setAccessible(false);
 	}
 	
 	// test for a non boost variable
@@ -890,8 +700,6 @@ public class ScoringSingletonTest {
 		Change change = new Change("2270", 12,
 				simpleDateFormat.parse("2999-10-21"),
 				simpleDateFormat.parse("2014-10-01"));
-		
-
 		HashMap<String, Change> allChanges = new HashMap<String, Change>();
 		allChanges.put("S_DSL_APP_INT_ACC", change);
 		
@@ -903,13 +711,8 @@ public class ScoringSingletonTest {
 				variablesMap));
 		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContent.put(27, monthModelMap);
-
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
-		double boost = scoringSingletonObj.getBoostScore(allChanges, 27);
+		double boost = scoringSingletonObj.getBoostScore(allChanges, 27, modelsMapContent);
 		Assert.assertEquals("Expecting a boost of 0 as vars in allChanges are not BOOST variables", new Double(0.0), new Double(boost));
-		modelsMap.setAccessible(false);
 	}
 	
 	// to test a seasonal  model which does not belong to current month (Invalid month model)
@@ -921,26 +724,16 @@ public class ScoringSingletonTest {
 			Change change = new Change("2270", 12,
 					simpleDateFormat.parse("2999-10-21"),
 					simpleDateFormat.parse("2014-10-01"));
-			
-
 			HashMap<String, Change> allChanges = new HashMap<String, Change>();
 			allChanges.put("BOOST_S_DSL_APP_INT_ACC", change);
-			
 			Map<String, Variable> variablesMap = new HashMap<String, Variable>();
-			variablesMap.put("BOOST_S_DSL_APP_INT_ACC", new Boost(
-					"BOOST_S_DSL_APP_INT_ACC", 0.002, 0.1));
+			variablesMap.put("BOOST_S_DSL_APP_INT_ACC", new Boost("BOOST_S_DSL_APP_INT_ACC", 0.002, 0.1));
 			Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
-			monthModelMap.put(Calendar.getInstance().get(Calendar.MONTH) , new Model(27, "Model_Name2", Calendar.getInstance().get(Calendar.MONTH) , 5,
-					variablesMap));
+			monthModelMap.put(Calendar.getInstance().get(Calendar.MONTH) , new Model(27, "Model_Name2", Calendar.getInstance().get(Calendar.MONTH) , 5, variablesMap));
 			Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
 			modelsMapContent.put(27, monthModelMap);
-
-			Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-			modelsMap.setAccessible(true);
-			modelsMap.set(scoringSingletonObj, modelsMapContent);
-			double boost = scoringSingletonObj.getBoostScore(allChanges, 27);
+			double boost = scoringSingletonObj.getBoostScore(allChanges, 27, modelsMapContent);
 			Assert.assertEquals("Expecting a boost of 0 as the model doest not belong to current month", new Double(0.0), new Double(boost));
-			modelsMap.setAccessible(false);
 		}
 
 
@@ -967,14 +760,9 @@ public class ScoringSingletonTest {
 						Calendar.MONTH) + 1, 5, variablesMap));
 		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContent.put(27, monthModelMap);
-
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
-		double boost = scoringSingletonObj.getBoostScore(allChanges, 35);
+		double boost = scoringSingletonObj.getBoostScore(allChanges, 35, modelsMapContent);
 		int compareVal = new Double(0.0).compareTo(new Double(boost));
 		Assert.assertEquals("Expecting boost value of 0 as the model of interest is not in our modelVar collectio", compareVal, 0);
-		modelsMap.setAccessible(false);
 	}
 	
 	/*
@@ -1011,14 +799,9 @@ public class ScoringSingletonTest {
 
 		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContent.put(27, monthModelMap);
-
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
-		double boost = scoringSingletonObj.getBoostScore(allChanges, 27);
+		double boost = scoringSingletonObj.getBoostScore(allChanges, 27, modelsMapContent);
 		int comapreVal = new Double(2.024).compareTo(new Double(boost));
 		Assert.assertEquals(comapreVal, 0);
-		modelsMap.setAccessible(false);
 	}
 
 	//this test expects TRUE to be returned as allChanges for this member has blackout variable associated with model of interest
@@ -1034,32 +817,14 @@ public class ScoringSingletonTest {
 
 		HashMap<String, Change> allChanges = new HashMap<String, Change>();
 		allChanges.put("BLACKOUT_HA_COOK", change);
-
 		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
-		variablesMap.put("BLACKOUT_HA_COOK", new Boost(
-				"BLACKOUT_HA_COOK", 0.002, 0.1));
+		variablesMap.put("BLACKOUT_HA_COOK", new Boost("BLACKOUT_HA_COOK", 0.002, 0.1));
 		Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
-
-		monthModelMap.put(0, new Model(35, "Model_Name", 0, 5,
-				variablesMap));
+		monthModelMap.put(0, new Model(35, "Model_Name", 0, 5,variablesMap));
 		Map<Integer, Map<Integer, Model>> modelsMapContentBlackout = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContentBlackout.put(35, monthModelMap);
-		
-		List<Integer> modelLists = new ArrayList<Integer>();
-		modelLists.add(35);
-		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
-		variableModelsMapContents.put("BLACKOUT_HA_COOK", modelLists);
-	
-		Field variableModelsMap = ScoringSingleton.class.getDeclaredField("variableModelsMap");
-		variableModelsMap.setAccessible(true);
-		variableModelsMap.set(scoringSingletonObj, variableModelsMapContents);
-
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContentBlackout);
-		Boolean value = scoringSingletonObj.isBlackOutModel(allChanges, 35);
+		Boolean value = scoringSingletonObj.isBlackOutModel(allChanges, 35, modelsMapContentBlackout);
 		Assert.assertEquals(Boolean.TRUE, value);
-		modelsMap.setAccessible(false);
 	}
 
 	//this test expects FALSE to be returned as the allChanges does not contain any blackout variable that is associated with the model
@@ -1083,13 +848,8 @@ public class ScoringSingletonTest {
 		monthModelMap.put(0, new Model(35, "Model_Name", 0, 5, variablesMap));
 		Map<Integer, Map<Integer, Model>> modelsMapContentBoost = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContentBoost.put(35, monthModelMap);
-
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContentBoost);
-		Boolean value = scoringSingletonObj.isBlackOutModel(allChanges, 35);
+		Boolean value = scoringSingletonObj.isBlackOutModel(allChanges, 35, modelsMapContentBoost);
 		Assert.assertEquals(Boolean.FALSE, value);
-		modelsMap.setAccessible(false);
 	}
 
 	/*if the blackout variable is not in modelVariables collection for the model of interest*/
@@ -1107,21 +867,14 @@ public class ScoringSingletonTest {
 		allChanges.put("BLACKOUT_HA_COOK", change);
 
 		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
-		variablesMap.put("HA_COOK", new Boost(
-				"HA_COOK", 0.002, 0.1));
+		variablesMap.put("HA_COOK", new Boost("HA_COOK", 0.002, 0.1));
 		Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
 
-		monthModelMap.put(0, new Model(35, "Model_Name", 0, 5,
-				variablesMap));
+		monthModelMap.put(0, new Model(35, "Model_Name", 0, 5,variablesMap));
 		Map<Integer, Map<Integer, Model>> modelsMapContentBoost = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContentBoost.put(35, monthModelMap);
-
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContentBoost);
-		Boolean value = scoringSingletonObj.isBlackOutModel(allChanges, 35);
+		Boolean value = scoringSingletonObj.isBlackOutModel(allChanges, 35, modelsMapContentBoost);
 		Assert.assertEquals(Boolean.FALSE, value);
-		modelsMap.setAccessible(false);
 	}
 	
 	/*
@@ -1144,21 +897,14 @@ public class ScoringSingletonTest {
 		allChanges.put(null, change);
 
 		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
-		variablesMap.put("HA_COOK", new Boost(
-				"HA_COOK", 0.002, 0.1));
+		variablesMap.put("HA_COOK", new Boost("HA_COOK", 0.002, 0.1));
 		Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
 
-		monthModelMap.put(0, new Model(35, "Model_Name", 0, 5,
-				variablesMap));
+		monthModelMap.put(0, new Model(35, "Model_Name", 0, 5,variablesMap));
 		Map<Integer, Map<Integer, Model>> modelsMapContentBoost = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContentBoost.put(35, monthModelMap);
-
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContentBoost);
-		Boolean value = scoringSingletonObj.isBlackOutModel(allChanges, 35);
+		Boolean value = scoringSingletonObj.isBlackOutModel(allChanges, 35, modelsMapContentBoost);
 		Assert.assertEquals(Boolean.FALSE, value);
-		modelsMap.setAccessible(false);
 	}
 	//calc rtsScore positive case test
 	@Test
@@ -1194,21 +940,10 @@ public class ScoringSingletonTest {
 		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC", "2269");
 		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC2", "2270");
 		variableNameToVidMapContents.put("S_HOME_6M_IND_ALL", "2271");
-
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
-		/**
-		Field varNameToVidMapContents = ScoringSingleton.class
-				.getDeclaredField("variableNameToVidMap");
-		varNameToVidMapContents.setAccessible(true);
-		varNameToVidMapContents.set(scoringSingletonObj,
-				variableNameToVidMapContents);*/
 		
-		double newScore = scoringSingletonObj.calcScore(memVariables, allChanges, 35, variableNameToVidMapContents);
+		double newScore = scoringSingletonObj.calcScore(memVariables, allChanges, 35, variableNameToVidMapContents, modelsMapContent);
 		int comapreVal = new Double(0.9935028049029226).compareTo(new Double(newScore));
 		Assert.assertEquals(comapreVal, 0);
-		modelsMap.setAccessible(false);
 	}
 	
 	
@@ -1238,21 +973,9 @@ public class ScoringSingletonTest {
 
 		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
 		variableNameToVidMapContents.put("S_HOME_6M_IND_ALL", "2271");
-
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
-		/**
-		Field varNameToVidMapContents = ScoringSingleton.class
-				.getDeclaredField("variableNameToVidMap");
-		varNameToVidMapContents.setAccessible(true);
-		varNameToVidMapContents.set(scoringSingletonObj,
-				variableNameToVidMapContents);*/
-		
-		double newScore = scoringSingletonObj.calcScore(memVariables, allChanges, 35, variableNameToVidMapContents);
+		double newScore = scoringSingletonObj.calcScore(memVariables, allChanges, 35, variableNameToVidMapContents, modelsMapContent);
 		int comapreVal = new Double(1.0).compareTo(new Double(newScore));
 		Assert.assertEquals("Expecting a newScore of 1.0 as baseScore >= 35", comapreVal, 0);
-		modelsMap.setAccessible(false);
 	}
 
 	//test to check the rtsScore if baseScore<-100
@@ -1272,8 +995,7 @@ public class ScoringSingletonTest {
 		allChanges.put("S_HOME_6M_IND_ALL", change);
 
 		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
-		variablesMap.put("S_HOME_6M_IND_ALL", new Variable("S_HOME_6M_IND_ALL",
-				1));
+		variablesMap.put("S_HOME_6M_IND_ALL", new Variable("S_HOME_6M_IND_ALL", 1));
 		Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
 		monthModelMap.put(0, new Model(35, "Model_Name", 0, -105, variablesMap));
 		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
@@ -1281,21 +1003,9 @@ public class ScoringSingletonTest {
 
 		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
 		variableNameToVidMapContents.put("S_HOME_6M_IND_ALL", "2271");
-
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
-		/**
-		Field varNameToVidMapContents = ScoringSingleton.class
-				.getDeclaredField("variableNameToVidMap");
-		varNameToVidMapContents.setAccessible(true);
-		varNameToVidMapContents.set(scoringSingletonObj,
-				variableNameToVidMapContents);*/
-		
-		double newScore = scoringSingletonObj.calcScore(memVariables, allChanges, 35, variableNameToVidMapContents);
+		double newScore = scoringSingletonObj.calcScore(memVariables, allChanges, 35, variableNameToVidMapContents, modelsMapContent);
 		int comapreVal = new Double(0.0).compareTo(new Double(newScore));
 		Assert.assertEquals("Expecting a newScore of 0.0 as baseScore is <= -100", comapreVal, 0);
-		modelsMap.setAccessible(false);
 	}
 	
 	/* If memberVariables is empty, was expected to throw RealTimeScoringException, now changed with the fact that scoring can be done with allChanges values
@@ -1324,22 +1034,9 @@ public class ScoringSingletonTest {
 
 		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
 		variableNameToVidMapContents.put("S_HOME_6M_IND_ALL", "2271");
-
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
-		/**
-		Field varNameToVidMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToVidMap");
-		varNameToVidMap.setAccessible(true);
-		varNameToVidMap.set(scoringSingletonObj,
-				variableNameToVidMapContents);*/
-		
-		double newScore = scoringSingletonObj.calcScore(new HashMap<String, Object>(), allChanges, 35, variableNameToVidMapContents);
+		double newScore = scoringSingletonObj.calcScore(new HashMap<String, Object>(), allChanges, 35, variableNameToVidMapContents, modelsMapContent);
 		int comapreVal = new Double(0.9934277167211376).compareTo(new Double(newScore));
 		Assert.assertEquals(comapreVal, 0);
-		modelsMap.setAccessible(false);
-		//varNameToVidMap.setAccessible(false);
 	}
 
 	/* If allChanges is null, expected to throw RealTimeScoringException
@@ -1360,20 +1057,7 @@ public class ScoringSingletonTest {
 
 		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
 		variableNameToVidMapContents.put("S_HOME_6M_IND_ALL", "2271");
-		
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
-		/**
-		Field varNameToVidMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToVidMap");
-		varNameToVidMap.setAccessible(true);
-		varNameToVidMap.set(scoringSingletonObj,
-				variableNameToVidMapContents);*/
-		
-		scoringSingletonObj.calcBaseScore(memVariables, null, 35, variableNameToVidMapContents);
-		modelsMap.setAccessible(false);
-		//varNameToVidMap.setAccessible(false);
+		scoringSingletonObj.calcBaseScore(memVariables, null, 35, variableNameToVidMapContents, modelsMapContent);
 		
 	}
 	
@@ -1384,8 +1068,7 @@ public class ScoringSingletonTest {
 		Map<String, Object> memVariables = new HashMap<String, Object>();
 		memVariables.put("2271", 1);
 		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
-		variablesMap.put("S_HOME_6M_IND_ALL", new Variable("S_HOME_6M_IND_ALL",
-				0.0915));
+		variablesMap.put("S_HOME_6M_IND_ALL", new Variable("S_HOME_6M_IND_ALL",0.0915));
 		Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
 		monthModelMap.put(0, new Model(35, "Model_Name", 0, 5, variablesMap));
 		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
@@ -1393,20 +1076,7 @@ public class ScoringSingletonTest {
 
 		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
 		variableNameToVidMapContents.put("S_HOME_6M_IND_ALL", "2271");
-
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
-		/**
-		Field varNameToVidMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToVidMap");
-		varNameToVidMap.setAccessible(true);
-		varNameToVidMap.set(scoringSingletonObj,
-				variableNameToVidMapContents);*/
-		scoringSingletonObj.calcBaseScore(memVariables, new HashMap<String, Change>(), 35, variableNameToVidMapContents);
-		modelsMap.setAccessible(false);
-		//varNameToVidMap.setAccessible(false);
-		
+		scoringSingletonObj.calcBaseScore(memVariables, new HashMap<String, Change>(), 35, variableNameToVidMapContents, modelsMapContent);
 	}
 
 	// tests the baseScore for non-month model
@@ -1443,22 +1113,9 @@ public class ScoringSingletonTest {
 		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC", "2269");
 		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC2", "2270");
 		variableNameToVidMapContents.put("S_HOME_6M_IND_ALL", "2271");
-
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
-		/**
-		Field varNameToVidMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToVidMap");
-		varNameToVidMap.setAccessible(true);
-		varNameToVidMap.set(scoringSingletonObj,
-				variableNameToVidMapContents);*/
-		
-		double baseScore = scoringSingletonObj.calcBaseScore(memVariables, allChanges, 35, variableNameToVidMapContents);
+		double baseScore = scoringSingletonObj.calcBaseScore(memVariables, allChanges, 35, variableNameToVidMapContents, modelsMapContent);
 		int comapreVal = new Double(5.0298663249999995).compareTo(new Double(baseScore));
 		Assert.assertEquals(comapreVal, 0);
-		modelsMap.setAccessible(false);
-		//varNameToVidMap.setAccessible(false);
 	}
 
 	// tests the baseScore for current month model
@@ -1495,22 +1152,10 @@ public class ScoringSingletonTest {
 		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC", "2269");
 		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC2", "2270");
 		variableNameToVidMapContents.put("S_HOME_6M_IND_ALL", "2271");
-
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
-		/**
-		Field varNameToVidMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToVidMap");
-		varNameToVidMap.setAccessible(true);
-		varNameToVidMap.set(scoringSingletonObj,
-				variableNameToVidMapContents);*/
 		
-		double baseScore = scoringSingletonObj.calcBaseScore(memVariables, allChanges, 35, variableNameToVidMapContents);
+		double baseScore = scoringSingletonObj.calcBaseScore(memVariables, allChanges, 35, variableNameToVidMapContents, modelsMapContent);
 		int comapreVal = new Double(3.029866325).compareTo(new Double(baseScore));
 		Assert.assertEquals(0, comapreVal);
-		modelsMap.setAccessible(false);
-		//varNameToVidMap.setAccessible(false);
 	}
 	
 	/*to test a seasonal model which does not belong to current month (invalid month model), method throws exception, 
@@ -1549,19 +1194,8 @@ public class ScoringSingletonTest {
 		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC", "2269");
 		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC2", "2270");
 		variableNameToVidMapContents.put("S_HOME_6M_IND_ALL", "2271");
-
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
-		/**
-		Field varNameToVidMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToVidMap");
-		varNameToVidMap.setAccessible(true);
-		varNameToVidMap.set(scoringSingletonObj,
-				variableNameToVidMapContents);*/
-		scoringSingletonObj.calcBaseScore(memVariables,	allChanges, 35, variableNameToVidMapContents);
-		modelsMap.setAccessible(false);
-		//varNameToVidMap.setAccessible(false);
+		
+		scoringSingletonObj.calcBaseScore(memVariables,	allChanges, 35, variableNameToVidMapContents, modelsMapContent);
 	}
 	
 	@Test(expected = RealTimeScoringException.class)
@@ -1585,13 +1219,8 @@ public class ScoringSingletonTest {
 		monthModelMap.put(Calendar.getInstance().get(Calendar.MONTH)+1 , new Model(35, "Model_Name", Calendar.getInstance().get(Calendar.MONTH)+1 , 3, null));
 		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContent.put(35, monthModelMap);
-
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
 		
-		scoringSingletonObj.calcBaseScore(memVariables,	allChanges, 35, null);
-		modelsMap.setAccessible(false);
+		scoringSingletonObj.calcBaseScore(memVariables,	allChanges, 35, null, modelsMapContent);
 	}
 	
 	@Test(expected = RealTimeScoringException.class)
@@ -1614,14 +1243,8 @@ public class ScoringSingletonTest {
 		Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
 		monthModelMap.put(Calendar.getInstance().get(Calendar.MONTH)+1 , new Model(35, "Model_Name", Calendar.getInstance().get(Calendar.MONTH)+1 , 3, new HashMap<String, Variable>()));
 		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
-		modelsMapContent.put(35, monthModelMap);
-
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
-		
-		scoringSingletonObj.calcBaseScore(memVariables,	allChanges, 35, null);
-		modelsMap.setAccessible(false);
+		modelsMapContent.put(35, monthModelMap);		
+		scoringSingletonObj.calcBaseScore(memVariables,	allChanges, 35, null, modelsMapContent);
 	}
 	
 	/* tests the baseScore for null variable name or null VID
@@ -1662,19 +1285,7 @@ public class ScoringSingletonTest {
 		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC2", "2270");
 		variableNameToVidMapContents.put("S_HOME_6M_IND_ALL", "2271");
 
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
-		/**
-		Field varNameToVidMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToVidMap");
-		varNameToVidMap.setAccessible(true);
-		varNameToVidMap.set(scoringSingletonObj,
-				variableNameToVidMapContents);*/
-		
-		scoringSingletonObj.calcBaseScore(memVariables,	allChanges, 35, variableNameToVidMapContents);
-		modelsMap.setAccessible(false);
-		//varNameToVidMap.setAccessible(false);
+		scoringSingletonObj.calcBaseScore(memVariables,	allChanges, 35, variableNameToVidMapContents, modelsMapContent);
 	}
 	
 	//to test for a BOOST variable, the method skips the boost variable and scores with only MSM variables
@@ -1711,20 +1322,9 @@ public class ScoringSingletonTest {
 		variableNameToVidMapContents.put("BOOST_S_DSL_APP_INT_ACC", "2270");
 		variableNameToVidMapContents.put("S_HOME_6M_IND_ALL", "2271");
 
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
-		/**
-		Field varNameToVidMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToVidMap");
-		varNameToVidMap.setAccessible(true);
-		varNameToVidMap.set(scoringSingletonObj,
-				variableNameToVidMapContents);*/
-		double baseScore = scoringSingletonObj.calcBaseScore(memVariables, allChanges, 35, variableNameToVidMapContents);
+		double baseScore = scoringSingletonObj.calcBaseScore(memVariables, allChanges, 35, variableNameToVidMapContents, modelsMapContent);
 		int comapreVal = new Double(5.0203).compareTo(new Double(baseScore));
 		Assert.assertEquals(comapreVal, 0);
-		modelsMap.setAccessible(false);
-		//varNameToVidMap.setAccessible(false);
 	}
 	
 	//to test for a variable (S_DSL_APP_INT_ACC2) with no VID (i.e. variables collection does not contain it but is there in modelVaraibles collection)
@@ -1747,10 +1347,8 @@ public class ScoringSingletonTest {
 		allChanges.put("S_HOME_6M_IND_ALL", change);
 
 		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
-		variablesMap.put("S_DSL_APP_INT_ACC", new Variable("S_DSL_APP_INT_ACC",
-				0.002));
-		variablesMap.put("S_HOME_6M_IND_ALL", new Variable("S_HOME_6M_IND_ALL",
-				0.0915));
+		variablesMap.put("S_DSL_APP_INT_ACC", new Variable("S_DSL_APP_INT_ACC",0.002));
+		variablesMap.put("S_HOME_6M_IND_ALL", new Variable("S_HOME_6M_IND_ALL",0.0915));
 		variablesMap.put("S_DSL_APP_INT_ACC2", new Variable("S_DSL_APP_INT_ACC2", 0.0915));
 		Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
 		monthModelMap.put(0, new Model(35, "Model_Name", 0, 5, variablesMap));
@@ -1760,20 +1358,7 @@ public class ScoringSingletonTest {
 		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
 		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC", "2269");
 		variableNameToVidMapContents.put("S_HOME_6M_IND_ALL", "2271");
-
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
-		/**
-		Field varNameToVidMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToVidMap");
-		varNameToVidMap.setAccessible(true);
-		varNameToVidMap.set(scoringSingletonObj,
-				variableNameToVidMapContents);*/
-		
-		scoringSingletonObj.calcBaseScore(memVariables, allChanges, 35, variableNameToVidMapContents);
-		modelsMap.setAccessible(false);
-		//varNameToVidMap.setAccessible(false);
+		scoringSingletonObj.calcBaseScore(memVariables, allChanges, 35, variableNameToVidMapContents, modelsMapContent);
 	}
 	
 	/*test to check the baseSScore with a variable NOT in memberVars as well as in changedMemVar
@@ -1808,23 +1393,10 @@ public class ScoringSingletonTest {
 		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
 		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC", "2269");
 		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC2", "2270");
-		variableNameToVidMapContents.put("S_HOME_6M_IND_ALL", "2271");
-
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
-		/**
-		Field varNameToVidMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToVidMap");
-		varNameToVidMap.setAccessible(true);
-		varNameToVidMap.set(scoringSingletonObj,
-				variableNameToVidMapContents);*/
-		
-		double baseScore = scoringSingletonObj.calcBaseScore(memVariables, allChanges, 35, variableNameToVidMapContents);
+		variableNameToVidMapContents.put("S_HOME_6M_IND_ALL", "2271");		
+		double baseScore = scoringSingletonObj.calcBaseScore(memVariables, allChanges, 35, variableNameToVidMapContents, modelsMapContent);
 		int comapreVal = new Double(5.0203).compareTo(new Double(baseScore));
 		Assert.assertEquals(comapreVal, 0);
-		modelsMap.setAccessible(false);
-		//varNameToVidMap.setAccessible(false);
 	}
 	
 	/*test to check the baseSScore with a variable value (in memberVar or in allChanges) NOT an Integer nor a Double
@@ -1846,10 +1418,8 @@ public class ScoringSingletonTest {
 		allChanges.put("S_HOME_6M_IND_ALL", change);
 
 		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
-		variablesMap.put("S_DSL_APP_INT_ACC", new Variable("S_DSL_APP_INT_ACC",
-				0.002));
-		variablesMap.put("S_HOME_6M_IND_ALL", new Variable("S_HOME_6M_IND_ALL",
-				0.0915));
+		variablesMap.put("S_DSL_APP_INT_ACC", new Variable("S_DSL_APP_INT_ACC", 0.002));
+		variablesMap.put("S_HOME_6M_IND_ALL", new Variable("S_HOME_6M_IND_ALL", 0.0915));
 		Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
 		monthModelMap.put(0, new Model(35, "Model_Name", 0, 5, variablesMap));
 		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
@@ -1858,22 +1428,10 @@ public class ScoringSingletonTest {
 		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
 		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC", "2269");
 		variableNameToVidMapContents.put("S_HOME_6M_IND_ALL", "2271");
-
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
-		/**
-		Field varNameToVidMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToVidMap");
-		varNameToVidMap.setAccessible(true);
-		varNameToVidMap.set(scoringSingletonObj,
-				variableNameToVidMapContents);*/
 		
-		double baseScore = scoringSingletonObj.calcBaseScore(memVariables, allChanges, 35, variableNameToVidMapContents);
+		double baseScore = scoringSingletonObj.calcBaseScore(memVariables, allChanges, 35, variableNameToVidMapContents, modelsMapContent);
 		int comapreVal = new Double(5.0183).compareTo(new Double(baseScore));
 		Assert.assertEquals(comapreVal, 0);
-		modelsMap.setAccessible(false);
-		//varNameToVidMap.setAccessible(false);
 	}
 	
 	//min max Expiry set by the expiration dates of the variables
@@ -1895,21 +1453,14 @@ public class ScoringSingletonTest {
 		monthModelMap.put(0, new Model(35, "Model_Name", 0, 5, variablesMap));
 		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContent.put(35, monthModelMap);
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
 		
 		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
 		List<Integer> modelLists = new ArrayList<Integer>();
 		modelLists.add(35);
 		variableModelsMapContents.put("S_HOME_6M_IND_ALL", modelLists);
 		variableModelsMapContents.put("S_HOME_6M_IND_ALL2", modelLists);
-		Field varaibleModelsMap = ScoringSingleton.class
-				.getDeclaredField("variableModelsMap");
-		varaibleModelsMap.setAccessible(true);
-		varaibleModelsMap.set(scoringSingletonObj,variableModelsMapContents);
 		
-		Map<String, Date> minMaxMap = scoringSingletonObj.getMinMaxExpiry(35, allChanges);
+		Map<String, Date> minMaxMap = scoringSingletonObj.getMinMaxExpiry(35, allChanges, variableModelsMapContents, modelsMapContent);
 		
 		Assert.assertEquals(simpleDateFormat.parse("2888-10-21"), minMaxMap.get("minExpiry"));
 		Assert.assertEquals(simpleDateFormat.parse("2999-10-21"), minMaxMap.get("maxExpiry"));
@@ -1930,20 +1481,14 @@ public class ScoringSingletonTest {
 		allChanges.put("S_HOME_6M_IND_ALL3", change3);
 				
 		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
-		variablesMap.put("S_HOME_6M_IND_ALL", new Variable("S_DSL_APP_INT_ACC",
-				0.002));
-		variablesMap.put("S_HOME_6M_IND_ALL2", new Variable("S_DSL_APP_INT_ACC2",
-				0.002));
-		variablesMap.put("S_HOME_6M_IND_ALL3", new Variable("S_DSL_APP_INT_ACC3",
-				0.002));
+		variablesMap.put("S_HOME_6M_IND_ALL", new Variable("S_DSL_APP_INT_ACC",0.002));
+		variablesMap.put("S_HOME_6M_IND_ALL2", new Variable("S_DSL_APP_INT_ACC2",0.002));
+		variablesMap.put("S_HOME_6M_IND_ALL3", new Variable("S_DSL_APP_INT_ACC3",0.002));
 
 		Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
 		monthModelMap.put(0, new Model(35, "Model_Name", 0, 5, variablesMap));
 		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContent.put(35, monthModelMap);
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
 		
 		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
 		List<Integer> modelLists = new ArrayList<Integer>();
@@ -1951,12 +1496,8 @@ public class ScoringSingletonTest {
 		variableModelsMapContents.put("S_HOME_6M_IND_ALL", modelLists);
 		variableModelsMapContents.put("S_HOME_6M_IND_ALL2", modelLists);
 		variableModelsMapContents.put("S_HOME_6M_IND_ALL3", modelLists);
-		Field varaibleModelsMap = ScoringSingleton.class
-				.getDeclaredField("variableModelsMap");
-		varaibleModelsMap.setAccessible(true);
-		varaibleModelsMap.set(scoringSingletonObj,variableModelsMapContents);
 		
-		Map<String, Date> minMaxMap = scoringSingletonObj.getMinMaxExpiry(35, allChanges);
+		Map<String, Date> minMaxMap = scoringSingletonObj.getMinMaxExpiry(35, allChanges, variableModelsMapContents, modelsMapContent);
 		
 		Assert.assertEquals(simpleDateFormat.parse("2777-10-21"), minMaxMap.get("minExpiry"));
 		Assert.assertEquals(simpleDateFormat.parse("2999-10-21"), minMaxMap.get("maxExpiry"));
@@ -1984,21 +1525,14 @@ public class ScoringSingletonTest {
 		monthModelMap.put(0, new Model(35, "Model_Name", 0, 5, variablesMap));
 		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContent.put(35, monthModelMap);
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
 		
 		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
 		List<Integer> modelLists = new ArrayList<Integer>();
 		modelLists.add(35);
 		variableModelsMapContents.put("S_HOME_6M_IND_ALL2", modelLists);
 		variableModelsMapContents.put("S_HOME_6M_IND_ALL3", modelLists);
-		Field varaibleModelsMap = ScoringSingleton.class
-				.getDeclaredField("variableModelsMap");
-		varaibleModelsMap.setAccessible(true);
-		varaibleModelsMap.set(scoringSingletonObj,variableModelsMapContents);
 		
-		Map<String, Date> minMaxMap = scoringSingletonObj.getMinMaxExpiry(35, allChanges);
+		Map<String, Date> minMaxMap = scoringSingletonObj.getMinMaxExpiry(35, allChanges, variableModelsMapContents, modelsMapContent);
 		
 		Assert.assertEquals(simpleDateFormat.parse("2888-10-21"), minMaxMap.get("minExpiry"));
 		Assert.assertEquals(simpleDateFormat.parse("2999-10-21"), minMaxMap.get("maxExpiry"));
@@ -2024,20 +1558,13 @@ public class ScoringSingletonTest {
 		monthModelMap.put(Calendar.getInstance().get(Calendar.MONTH)+1, new Model(35, "Model_Name", Calendar.getInstance().get(Calendar.MONTH) + 1, 5, variablesMap));
 		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContent.put(35, monthModelMap);
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
 		
 		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
 		List<Integer> modelLists = new ArrayList<Integer>();
 		modelLists.add(35);
 		variableModelsMapContents.put("S_HOME_6M_IND_ALL2", modelLists);
-		Field varaibleModelsMap = ScoringSingleton.class
-				.getDeclaredField("variableModelsMap");
-		varaibleModelsMap.setAccessible(true);
-		varaibleModelsMap.set(scoringSingletonObj,variableModelsMapContents);
 		
-		Map<String, Date> minMaxMap = scoringSingletonObj.getMinMaxExpiry(35, allChanges);
+		Map<String, Date> minMaxMap = scoringSingletonObj.getMinMaxExpiry(35, allChanges, variableModelsMapContents, modelsMapContent);
 		
 		Assert.assertEquals(null, minMaxMap.get("minExpiry"));
 		Assert.assertEquals(null, minMaxMap.get("maxExpiry"));
@@ -2062,20 +1589,12 @@ public class ScoringSingletonTest {
 		monthModelMap.put(Calendar.getInstance().get(Calendar.MONTH)+1, new Model(35, "Model_Name", Calendar.getInstance().get(Calendar.MONTH)+1, 5, variablesMap));
 		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContent.put(35, monthModelMap);
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
-		
 		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
 		List<Integer> modelLists = new ArrayList<Integer>();
 		modelLists.add(48);
 		variableModelsMapContents.put("S_HOME_6M_IND_ALL", modelLists);
-		Field varaibleModelsMap = ScoringSingleton.class
-				.getDeclaredField("variableModelsMap");
-		varaibleModelsMap.setAccessible(true);
-		varaibleModelsMap.set(scoringSingletonObj,variableModelsMapContents);
 		
-		Map<String, Date> minMaxMap = scoringSingletonObj.getMinMaxExpiry(35, allChanges);
+		Map<String, Date> minMaxMap = scoringSingletonObj.getMinMaxExpiry(35, allChanges, variableModelsMapContents, modelsMapContent);
 		
 		Assert.assertEquals(null, minMaxMap.get("minExpiry"));
 		Assert.assertEquals(null, minMaxMap.get("maxExpiry"));
@@ -2100,20 +1619,12 @@ public class ScoringSingletonTest {
 		monthModelMap.put(0, new Model(35, "Model_Name", 0, 5, variablesMap));
 		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContent.put(35, monthModelMap);
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
-		
 		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
 		List<Integer> modelLists = new ArrayList<Integer>();
 		modelLists.add(35);
 		variableModelsMapContents.put("S_HOME_6M_IND_ALL", modelLists);
-		Field varaibleModelsMap = ScoringSingleton.class
-				.getDeclaredField("variableModelsMap");
-		varaibleModelsMap.setAccessible(true);
-		varaibleModelsMap.set(scoringSingletonObj,variableModelsMapContents);
 		
-		Map<String, Date> minMaxMap = scoringSingletonObj.getMinMaxExpiry(27, allChanges);
+		Map<String, Date> minMaxMap = scoringSingletonObj.getMinMaxExpiry(27, allChanges, variableModelsMapContents, modelsMapContent);
 		
 		Assert.assertEquals(null, minMaxMap.get("minExpiry"));
 		Assert.assertEquals(null, minMaxMap.get("maxExpiry"));
@@ -2141,20 +1652,13 @@ public class ScoringSingletonTest {
 		monthModelMap.put(Calendar.getInstance().get(Calendar.MONTH)+1, new Model(35, "Model_Name", Calendar.getInstance().get(Calendar.MONTH)+1, 5, variablesMap));
 		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContent.put(35, monthModelMap);
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
 		
 		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
 		List<Integer> modelLists = new ArrayList<Integer>();
 		modelLists.add(35);
 		variableModelsMapContents.put("S_HOME_6M_IND_ALL", modelLists);
-		Field varaibleModelsMap = ScoringSingleton.class
-				.getDeclaredField("variableModelsMap");
-		varaibleModelsMap.setAccessible(true);
-		varaibleModelsMap.set(scoringSingletonObj,variableModelsMapContents);
 		
-		Map<String, Date> minMaxMap = scoringSingletonObj.getMinMaxExpiry(35, allChanges);
+		Map<String, Date> minMaxMap = scoringSingletonObj.getMinMaxExpiry(35, allChanges, variableModelsMapContents, modelsMapContent);
 		
 		Assert.assertEquals(simpleDateFormat.format(lastDayOfMonth), simpleDateFormat.format(minMaxMap.get("minExpiry")));
 		Assert.assertEquals(simpleDateFormat.format(lastDayOfMonth), simpleDateFormat.format(minMaxMap.get("maxExpiry")));
@@ -2184,21 +1688,14 @@ public class ScoringSingletonTest {
 		monthModelMap.put(Calendar.getInstance().get(Calendar.MONTH) + 1, new Model(35, "Model_Name", Calendar.getInstance().get(Calendar.MONTH) + 1, 5, variablesMap));
 		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContent.put(35, monthModelMap);
-		Field modelsMap = ScoringSingleton.class.getDeclaredField("modelsMap");
-		modelsMap.setAccessible(true);
-		modelsMap.set(scoringSingletonObj, modelsMapContent);
 		
 		Map<String, List<Integer>> variableModelsMapContents = new HashMap<String, List<Integer>>();
 		List<Integer> modelLists = new ArrayList<Integer>();
 		modelLists.add(35);
 		variableModelsMapContents.put("S_HOME_6M_IND_ALL2", modelLists);
 		variableModelsMapContents.put("S_HOME_6M_IND_ALL3", modelLists);
-		Field varaibleModelsMap = ScoringSingleton.class
-				.getDeclaredField("variableModelsMap");
-		varaibleModelsMap.setAccessible(true);
-		varaibleModelsMap.set(scoringSingletonObj,variableModelsMapContents);
 		
-		Map<String, Date> minMaxMap = scoringSingletonObj.getMinMaxExpiry(35, allChanges);
+		Map<String, Date> minMaxMap = scoringSingletonObj.getMinMaxExpiry(35, allChanges, variableModelsMapContents, modelsMapContent);
 		
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DATE));
@@ -2228,27 +1725,12 @@ public class ScoringSingletonTest {
 		List<Integer> modelLists = new ArrayList<Integer>();
 		modelLists.add(55);
 		variableModelsMapContents.put("VARIABLE14", modelLists);
-		Field varaibleModelsMap = ScoringSingleton.class
-				.getDeclaredField("variableModelsMap");
-		varaibleModelsMap.setAccessible(true);
-		varaibleModelsMap.set(scoringSingletonObj,variableModelsMapContents);
 		
 		Map<String, String> variableNameToStrategyMapContents = new HashMap<String, String>();
 		variableNameToStrategyMapContents.put("VARIABLE14", "StrategyDCStrengthSum");
-		/**
-		Field variableNameToStrategyMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToStrategyMap");
-		variableNameToStrategyMap.setAccessible(true);
-		variableNameToStrategyMap.set(scoringSingletonObj,variableNameToStrategyMapContents);
-		*/
 		
 		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
 		variableNameToVidMapContents.put("VARIABLE14", "14");
-		/**
-		Field variableNameToVidMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToVidMap");
-		variableNameToVidMap.setAccessible(true);
-		variableNameToVidMap.set(scoringSingletonObj,variableNameToVidMapContents);*/
 		
 		Map<String, Object> memVariables = new HashMap<String, Object>();
 		memVariables.put("13", 1);
@@ -2260,12 +1742,9 @@ public class ScoringSingletonTest {
 		Map<String, Change> allChanges = new HashMap<String, Change>();
 		allChanges.put("VARIABLE14", change);
 		
-		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(allChanges, newChangesVarValueMap, memVariables, variableNameToStrategyMapContents, variableNameToVidMapContents);
+		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(allChanges, newChangesVarValueMap, memVariables, variableNameToStrategyMapContents, variableNameToVidMapContents, variableModelsMapContents, null);
 		Assert.assertEquals(2003.0, allChangesMap.get("VARIABLE14").getValue());
 		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(30).toDateMidnight().toDate()),allChangesMap.get("VARIABLE14").getExpirationDateAsString());
-		//variableNameToStrategyMap.setAccessible(false);
-		//variableNameToVidMap.setAccessible(false);
-		varaibleModelsMap.setAccessible(false);
 	}
 	
 	
@@ -2277,26 +1756,12 @@ public class ScoringSingletonTest {
 		List<Integer> modelLists = new ArrayList<Integer>();
 		modelLists.add(55);
 		variableModelsMapContents.put("VARIABLE13", modelLists);
-		Field varaibleModelsMap = ScoringSingleton.class
-				.getDeclaredField("variableModelsMap");
-		varaibleModelsMap.setAccessible(true);
-		varaibleModelsMap.set(scoringSingletonObj,variableModelsMapContents);
 		
 		Map<String, String> variableNameToStrategyMapContents = new HashMap<String, String>();
 		variableNameToStrategyMapContents.put("VARIABLE13", "StrategyCountTraitDates");
-		/**
-		Field variableNameToStrategyMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToStrategyMap");
-		variableNameToStrategyMap.setAccessible(true);
-		variableNameToStrategyMap.set(scoringSingletonObj,variableNameToStrategyMapContents);*/
 		
 		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
 		variableNameToVidMapContents.put("VARIABLE13", "13");
-		/**
-		Field variableNameToVidMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToVidMap");
-		variableNameToVidMap.setAccessible(true);
-		variableNameToVidMap.set(scoringSingletonObj,variableNameToVidMapContents);*/
 		
 		Map<String, Object> memVariables = new HashMap<String, Object>();
 		memVariables.put("13", 1);
@@ -2308,12 +1773,9 @@ public class ScoringSingletonTest {
 		Map<String, Change> allChanges = new HashMap<String, Change>();
 		allChanges.put("VARIABLE13", change);
 		
-		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(allChanges, newChangesVarValueMap, memVariables, variableNameToStrategyMapContents, variableNameToVidMapContents);
+		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(allChanges, newChangesVarValueMap, memVariables, variableNameToStrategyMapContents, variableNameToVidMapContents, variableModelsMapContents, null);
 		Assert.assertEquals(1, allChangesMap.get("VARIABLE13").getValue());
 		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(1).toDateMidnight().toDate()),allChangesMap.get("VARIABLE13").getExpirationDateAsString());
-		//variableNameToStrategyMap.setAccessible(false);
-		//variableNameToVidMap.setAccessible(false);
-		varaibleModelsMap.setAccessible(false);
 	}
 	
 	@Test
@@ -2327,26 +1789,12 @@ public class ScoringSingletonTest {
 		List<Integer> modelLists = new ArrayList<Integer>();
 		modelLists.add(48);
 		variableModelsMapContents.put("VARIABLE10", modelLists);
-		Field varaibleModelsMap = ScoringSingleton.class
-				.getDeclaredField("variableModelsMap");
-		varaibleModelsMap.setAccessible(true);
-		varaibleModelsMap.set(scoringSingletonObj,variableModelsMapContents);
 		
 		Map<String, String> variableNameToStrategyMapContents = new HashMap<String, String>();
 		variableNameToStrategyMapContents.put("VARIABLE10", "StrategySumSales");
-		/**
-		Field variableNameToStrategyMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToStrategyMap");
-		variableNameToStrategyMap.setAccessible(true);
-		variableNameToStrategyMap.set(scoringSingletonObj,variableNameToStrategyMapContents);*/
 		
 		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
 		variableNameToVidMapContents.put("VARIABLE10", "10");
-		/**
-		Field variableNameToVidMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToVidMap");
-		variableNameToVidMap.setAccessible(true);
-		variableNameToVidMap.set(scoringSingletonObj,variableNameToVidMapContents);*/
 		
 		Map<String, Object> memVariables = new HashMap<String, Object>();
 		memVariables.put("10", 1);
@@ -2358,12 +1806,9 @@ public class ScoringSingletonTest {
 		Map<String, Change> allChanges = new HashMap<String, Change>();
 		allChanges.put("VARIABLE10", change);
 		
-		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(allChanges, newChangesVarValueMap, memVariables, variableNameToStrategyMapContents, variableNameToVidMapContents);
+		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(allChanges, newChangesVarValueMap, memVariables, variableNameToStrategyMapContents, variableNameToVidMapContents, variableModelsMapContents, null);
 		Assert.assertEquals(0.001, allChangesMap.get("VARIABLE10").getValue());
 		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()),allChangesMap.get("VARIABLE10").getExpirationDateAsString());
-		//variableNameToStrategyMap.setAccessible(false);
-		//variableNameToVidMap.setAccessible(false);
-		varaibleModelsMap.setAccessible(false);
 	}
 	
 	/*if changedMemberVars is null or empty, previous value for allChanges will be set with value from memberVarMap*/
@@ -2378,38 +1823,18 @@ public class ScoringSingletonTest {
 		List<Integer> modelLists = new ArrayList<Integer>();
 		modelLists.add(48);
 		variableModelsMapContents.put("VARIABLE10", modelLists);
-		Field varaibleModelsMap = ScoringSingleton.class
-				.getDeclaredField("variableModelsMap");
-		varaibleModelsMap.setAccessible(true);
-		varaibleModelsMap.set(scoringSingletonObj,variableModelsMapContents);
-		
 		Map<String, String> variableNameToStrategyMapContents = new HashMap<String, String>();
 		variableNameToStrategyMapContents.put("VARIABLE10", "StrategySumSales");
-		/**
-		Field variableNameToStrategyMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToStrategyMap");
-		variableNameToStrategyMap.setAccessible(true);
-		variableNameToStrategyMap.set(scoringSingletonObj,variableNameToStrategyMapContents);*/
-		
 		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
 		variableNameToVidMapContents.put("VARIABLE10", "10");
-		/**
-		Field variableNameToVidMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToVidMap");
-		variableNameToVidMap.setAccessible(true);
-		variableNameToVidMap.set(scoringSingletonObj,variableNameToVidMapContents);*/
-		
 		Map<String, Object> memVariables = new HashMap<String, Object>();
 		memVariables.put("10", 1);
 		
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	
-		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(new HashMap<String, Change>(), newChangesVarValueMap, memVariables, variableNameToStrategyMapContents, variableNameToVidMapContents);
+		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(new HashMap<String, Change>(), newChangesVarValueMap, memVariables, variableNameToStrategyMapContents, variableNameToVidMapContents, variableModelsMapContents, null);
 		Assert.assertEquals(0.001, allChangesMap.get("VARIABLE10").getValue());
 		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()),allChangesMap.get("VARIABLE10").getExpirationDateAsString());
-		//variableNameToStrategyMap.setAccessible(false);
-		//variableNameToVidMap.setAccessible(false);
-		varaibleModelsMap.setAccessible(false);
 	}
 	
 	@Test
@@ -2423,26 +1848,12 @@ public class ScoringSingletonTest {
 		List<Integer> modelLists = new ArrayList<Integer>();
 		modelLists.add(48);
 		variableModelsMapContents.put("VARIABLE10", modelLists);
-		Field varaibleModelsMap = ScoringSingleton.class
-				.getDeclaredField("variableModelsMap");
-		varaibleModelsMap.setAccessible(true);
-		varaibleModelsMap.set(scoringSingletonObj,variableModelsMapContents);
 		
 		Map<String, String> variableNameToStrategyMapContents = new HashMap<String, String>();
 		variableNameToStrategyMapContents.put("VARIABLE10", "StrategySumSales");
-		/**
-		Field variableNameToStrategyMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToStrategyMap");
-		variableNameToStrategyMap.setAccessible(true);
-		variableNameToStrategyMap.set(scoringSingletonObj,variableNameToStrategyMapContents);*/
 		
 		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
 		variableNameToVidMapContents.put("VARIABLE10", "10");
-		/**
-		Field variableNameToVidMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToVidMap");
-		variableNameToVidMap.setAccessible(true);
-		variableNameToVidMap.set(scoringSingletonObj,variableNameToVidMapContents);*/
 		
 		Map<String, Object> memVariables = new HashMap<String, Object>();
 		memVariables.put("10", 1);
@@ -2454,12 +1865,9 @@ public class ScoringSingletonTest {
 		Map<String, Change> allChanges = new HashMap<String, Change>();
 		allChanges.put("VARIABLE10", change);
 		
-		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(allChanges, newChangesVarValueMap, memVariables, variableNameToStrategyMapContents, variableNameToVidMapContents);
+		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(allChanges, newChangesVarValueMap, memVariables, variableNameToStrategyMapContents, variableNameToVidMapContents, variableModelsMapContents, null);
 		Assert.assertEquals(0.001, allChangesMap.get("VARIABLE10").getValue());
 		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()),allChangesMap.get("VARIABLE10").getExpirationDateAsString());
-		//variableNameToStrategyMap.setAccessible(false);
-		//variableNameToVidMap.setAccessible(false);
-		varaibleModelsMap.setAccessible(false);
 	}
 	
 	@Test
@@ -2473,26 +1881,12 @@ public class ScoringSingletonTest {
 		List<Integer> modelLists = new ArrayList<Integer>();
 		modelLists.add(48);
 		variableModelsMapContents.put("VARIABLE1", modelLists);
-		Field varaibleModelsMap = ScoringSingleton.class
-				.getDeclaredField("variableModelsMap");
-		varaibleModelsMap.setAccessible(true);
-		varaibleModelsMap.set(scoringSingletonObj,variableModelsMapContents);
 		
 		Map<String, String> variableNameToStrategyMapContents = new HashMap<String, String>();
 		variableNameToStrategyMapContents.put("VARIABLE1","StrategyCountTransactions");
-		/**
-		Field variableNameToStrategyMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToStrategyMap");
-		variableNameToStrategyMap.setAccessible(true);
-		variableNameToStrategyMap.set(scoringSingletonObj,variableNameToStrategyMapContents);*/
 		
 		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
 		variableNameToVidMapContents.put("VARIABLE1", "1");
-		/**
-		Field variableNameToVidMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToVidMap");
-		variableNameToVidMap.setAccessible(true);
-		variableNameToVidMap.set(scoringSingletonObj,variableNameToVidMapContents);*/
 		
 		Map<String, Object> memVariables = new HashMap<String, Object>();
 		memVariables.put("2269", 1);
@@ -2504,12 +1898,9 @@ public class ScoringSingletonTest {
 		Map<String, Change> allChanges = new HashMap<String, Change>();
 		allChanges.put("VARIABLE1", change);
 		
-		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(allChanges, newChangesVarValueMap, memVariables, variableNameToStrategyMapContents, variableNameToVidMapContents);
+		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(allChanges, newChangesVarValueMap, memVariables, variableNameToStrategyMapContents, variableNameToVidMapContents, variableModelsMapContents, null);
 		Assert.assertEquals(4, allChangesMap.get("VARIABLE1").getValue());
 		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()),allChangesMap.get("VARIABLE1").getExpirationDateAsString());
-		//variableNameToStrategyMap.setAccessible(false);
-		//variableNameToVidMap.setAccessible(false);
-		varaibleModelsMap.setAccessible(false);
 	}
 
 	
@@ -2525,26 +1916,12 @@ public class ScoringSingletonTest {
 		List<Integer> modelLists = new ArrayList<Integer>();
 		modelLists.add(35);
 		variableModelsMapContents.put("VARIABLE4", modelLists);
-		Field varaibleModelsMap = ScoringSingleton.class
-				.getDeclaredField("variableModelsMap");
-		varaibleModelsMap.setAccessible(true);
-		varaibleModelsMap.set(scoringSingletonObj,variableModelsMapContents);
 		
 		Map<String, String> variableNameToStrategyMapContents = new HashMap<String, String>();
 		variableNameToStrategyMapContents.put("VARIABLE4", "StrategyDaysSinceLast");
-		/**
-		Field variableNameToStrategyMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToStrategyMap");
-		variableNameToStrategyMap.setAccessible(true);
-		variableNameToStrategyMap.set(scoringSingletonObj,variableNameToStrategyMapContents);*/
 		
 		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
 		variableNameToVidMapContents.put("VARIABLE4", "2284");
-		/**
-		Field variableNameToVidMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToVidMap");
-		variableNameToVidMap.setAccessible(true);
-		variableNameToVidMap.set(scoringSingletonObj,variableNameToVidMapContents);*/
 		
 		Map<String, Object> memVariables = new HashMap<String, Object>();
 		memVariables.put("4", 1);
@@ -2556,12 +1933,9 @@ public class ScoringSingletonTest {
 		Map<String, Change> allChanges = new HashMap<String, Change>();
 		allChanges.put("variable4", change);
 		
-		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(allChanges, newChangesVarValueMap, memVariables, variableNameToStrategyMapContents, variableNameToVidMapContents);
+		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(allChanges, newChangesVarValueMap, memVariables, variableNameToStrategyMapContents, variableNameToVidMapContents, variableModelsMapContents, null);
 		Assert.assertEquals(1, allChangesMap.get("VARIABLE4").getValue());
 		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()),allChangesMap.get("VARIABLE4").getExpirationDateAsString());
-		//variableNameToStrategyMap.setAccessible(false);
-		//variableNameToVidMap.setAccessible(false);
-		varaibleModelsMap.setAccessible(false);
 			
 	}
 	
@@ -2577,26 +1951,12 @@ public class ScoringSingletonTest {
 		List<Integer> modelLists = new ArrayList<Integer>();
 		modelLists.add(35);
 		variableModelsMapContents.put("VARIABLE5", modelLists);
-		Field varaibleModelsMap = ScoringSingleton.class
-				.getDeclaredField("variableModelsMap");
-		varaibleModelsMap.setAccessible(true);
-		varaibleModelsMap.set(scoringSingletonObj,variableModelsMapContents);
 		
 		Map<String, String> variableNameToStrategyMapContents = new HashMap<String, String>();
 		variableNameToStrategyMapContents.put("VARIABLE5", "StrategyTurnOnFlag");
-		/**
-		Field variableNameToStrategyMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToStrategyMap");
-		variableNameToStrategyMap.setAccessible(true);
-		variableNameToStrategyMap.set(scoringSingletonObj,variableNameToStrategyMapContents);*/
 		
 		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
 		variableNameToVidMapContents.put("VARIABLE5", "5");
-		/**
-		Field variableNameToVidMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToVidMap");
-		variableNameToVidMap.setAccessible(true);
-		variableNameToVidMap.set(scoringSingletonObj,variableNameToVidMapContents);*/
 		
 		Map<String, Object> memVariables = new HashMap<String, Object>();
 		memVariables.put("5", 1);
@@ -2608,13 +1968,9 @@ public class ScoringSingletonTest {
 		Map<String, Change> allChanges = new HashMap<String, Change>();
 		allChanges.put("VARIABLE5", change);
 		
-		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(allChanges, newChangesVarValueMap, memVariables, variableNameToStrategyMapContents, variableNameToVidMapContents);
+		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(allChanges, newChangesVarValueMap, memVariables, variableNameToStrategyMapContents, variableNameToVidMapContents, variableModelsMapContents, null);
 		Assert.assertEquals(1, allChangesMap.get("VARIABLE5").getValue());
 		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()),allChangesMap.get("VARIABLE5").getExpirationDateAsString());
-		//variableNameToStrategyMap.setAccessible(false);
-		//variableNameToVidMap.setAccessible(false);
-		varaibleModelsMap.setAccessible(false);
-			
 	}
 
 	@Test
@@ -2629,26 +1985,12 @@ public class ScoringSingletonTest {
 		List<Integer> modelLists = new ArrayList<Integer>();
 		modelLists.add(35);
 		variableModelsMapContents.put("VARIABLE6", modelLists);
-		Field varaibleModelsMap = ScoringSingleton.class
-				.getDeclaredField("variableModelsMap");
-		varaibleModelsMap.setAccessible(true);
-		varaibleModelsMap.set(scoringSingletonObj,variableModelsMapContents);
 		
 		Map<String, String> variableNameToStrategyMapContents = new HashMap<String, String>();
 		variableNameToStrategyMapContents.put("VARIABLE6", "StrategyTurnOffFlag");
-		/**
-		Field variableNameToStrategyMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToStrategyMap");
-		variableNameToStrategyMap.setAccessible(true);
-		variableNameToStrategyMap.set(scoringSingletonObj,variableNameToStrategyMapContents);*/
 		
 		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
 		variableNameToVidMapContents.put("VARIABLE6", "6");
-		/**
-		Field variableNameToVidMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToVidMap");
-		variableNameToVidMap.setAccessible(true);
-		variableNameToVidMap.set(scoringSingletonObj,variableNameToVidMapContents);*/
 		
 		Map<String, Object> memVariables = new HashMap<String, Object>();
 		memVariables.put("6", 1);
@@ -2660,13 +2002,9 @@ public class ScoringSingletonTest {
 		Map<String, Change> allChanges = new HashMap<String, Change>();
 		allChanges.put("VARIABLE6", change);
 		
-		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(allChanges, newChangesVarValueMap, memVariables, variableNameToStrategyMapContents, variableNameToVidMapContents);
+		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(allChanges, newChangesVarValueMap, memVariables, variableNameToStrategyMapContents, variableNameToVidMapContents, variableModelsMapContents, null);
 		Assert.assertEquals(0, allChangesMap.get("VARIABLE6").getValue());
 		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate()),allChangesMap.get("VARIABLE6").getExpirationDateAsString());
-		//variableNameToStrategyMap.setAccessible(false);
-		//variableNameToVidMap.setAccessible(false);
-		varaibleModelsMap.setAccessible(false);
-			
 	}
 
 	//ignored as there is no scoring for purchase occasions  
@@ -2683,26 +2021,12 @@ public class ScoringSingletonTest {
 		List<Integer> modelLists = new ArrayList<Integer>();
 		modelLists.add(35);
 		variableModelsMapContents.put("S_DSL_APP_INT_ACC_FTWR_TRS2", modelLists);
-		Field varaibleModelsMap = ScoringSingleton.class
-				.getDeclaredField("variableModelsMap");
-		varaibleModelsMap.setAccessible(true);
-		varaibleModelsMap.set(scoringSingletonObj,variableModelsMapContents);
 		
 		Map<String, String> variableNameToStrategyMapContents = new HashMap<String, String>();
 		variableNameToStrategyMapContents.put("S_DSL_APP_INT_ACC_FTWR_TRS2", "StrategyPurchaseOccasions");
-		/**
-		Field variableNameToStrategyMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToStrategyMap");
-		variableNameToStrategyMap.setAccessible(true);
-		variableNameToStrategyMap.set(scoringSingletonObj,variableNameToStrategyMapContents);*/
 		
 		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
 		variableNameToVidMapContents.put("S_DSL_APP_INT_ACC_FTWR_TRS2", "2283");
-		/**
-		Field variableNameToVidMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToVidMap");
-		variableNameToVidMap.setAccessible(true);
-		variableNameToVidMap.set(scoringSingletonObj,variableNameToVidMapContents);*/
 		
 		Map<String, Object> memVariables = new HashMap<String, Object>();
 		memVariables.put("2283", 1);
@@ -2714,13 +2038,9 @@ public class ScoringSingletonTest {
 		Map<String, Change> allChanges = new HashMap<String, Change>();
 		allChanges.put("S_DSL_APP_INT_ACC_FTWR_TRS2", change);
 		
-		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(allChanges, newChangesVarValueMap, memVariables, variableNameToStrategyMapContents, variableNameToVidMapContents);
+		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(allChanges, newChangesVarValueMap, memVariables, variableNameToStrategyMapContents, variableNameToVidMapContents, variableModelsMapContents, null);
 		Assert.assertEquals("0.001", allChangesMap.get("S_DSL_APP_INT_ACC_FTWR_TRS2").getValue());
 		Assert.assertEquals(simpleDateFormat.format(new LocalDate(new Date()).plusDays(365).toDateMidnight().toDate()),allChangesMap.get("S_DSL_APP_INT_ACC_FTWR_TRS2").getExpirationDateAsString());
-		//variableNameToStrategyMap.setAccessible(false);
-		//variableNameToVidMap.setAccessible(false);
-		varaibleModelsMap.setAccessible(false);
-			
 	}
 	
 	/*to test if all newChangesVar from incoming feed are not in varaibleModelsMap, allChanges map will be only unexpired member variables from changedMemVar collection
@@ -2736,26 +2056,11 @@ public class ScoringSingletonTest {
 		List<Integer> modelLists = new ArrayList<Integer>();
 		modelLists.add(48);
 		variableModelsMapContents.put("VARIABLE1", modelLists);
-		Field varaibleModelsMap = ScoringSingleton.class
-				.getDeclaredField("variableModelsMap");
-		varaibleModelsMap.setAccessible(true);
-		varaibleModelsMap.set(scoringSingletonObj,variableModelsMapContents);
 		
 		Map<String, String> variableNameToStrategyMapContents = new HashMap<String, String>();
 		variableNameToStrategyMapContents.put("VARIABLE1", "StrategyCountTransactions");
-		/**
-		Field variableNameToStrategyMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToStrategyMap");
-		variableNameToStrategyMap.setAccessible(true);
-		variableNameToStrategyMap.set(scoringSingletonObj,variableNameToStrategyMapContents);*/
-		
 		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
 		variableNameToVidMapContents.put("VARIABLE1", "1");
-		/**
-		Field variableNameToVidMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToVidMap");
-		variableNameToVidMap.setAccessible(true);
-		variableNameToVidMap.set(scoringSingletonObj,variableNameToVidMapContents);*/
 		
 		Map<String, Object> memVariables = new HashMap<String, Object>();
 		memVariables.put("1", 1);
@@ -2767,12 +2072,9 @@ public class ScoringSingletonTest {
 		Map<String, Change> allChanges = new HashMap<String, Change>();
 		allChanges.put("VARIABLE1", change);
 		
-		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(allChanges, newChangesVarValueMap, memVariables, variableNameToStrategyMapContents, variableNameToVidMapContents);
+		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(allChanges, newChangesVarValueMap, memVariables, variableNameToStrategyMapContents, variableNameToVidMapContents, variableModelsMapContents, null);
 		Assert.assertEquals(3, allChangesMap.get("VARIABLE1").getValue());
 		Assert.assertEquals("2999-10-21", allChangesMap.get("VARIABLE1").getExpirationDateAsString());
-		//variableNameToStrategyMap.setAccessible(false);
-		//variableNameToVidMap.setAccessible(false);
-		varaibleModelsMap.setAccessible(false);
 	}
 	
 	@Test
@@ -2786,26 +2088,12 @@ public class ScoringSingletonTest {
 		List<Integer> modelLists = new ArrayList<Integer>();
 		modelLists.add(48);
 		variableModelsMapContents.put("VARIABLE12", modelLists);
-		Field varaibleModelsMap = ScoringSingleton.class
-				.getDeclaredField("variableModelsMap");
-		varaibleModelsMap.setAccessible(true);
-		varaibleModelsMap.set(scoringSingletonObj,variableModelsMapContents);
 		
 		Map<String, String> variableNameToStrategyMapContents = new HashMap<String, String>();
 		variableNameToStrategyMapContents.put("VARIABLE12", "NONE");
-		/**
-		Field variableNameToStrategyMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToStrategyMap");
-		variableNameToStrategyMap.setAccessible(true);
-		variableNameToStrategyMap.set(scoringSingletonObj,variableNameToStrategyMapContents);*/
 		
 		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
 		variableNameToVidMapContents.put("VARIABLE12", "12");
-		/**
-		Field variableNameToVidMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToVidMap");
-		variableNameToVidMap.setAccessible(true);
-		variableNameToVidMap.set(scoringSingletonObj,variableNameToVidMapContents);*/
 		
 		Map<String, Object> memVariables = new HashMap<String, Object>();
 		memVariables.put("12", 1);
@@ -2817,12 +2105,9 @@ public class ScoringSingletonTest {
 		Map<String, Change> allChanges = new HashMap<String, Change>();
 		allChanges.put("VARIABLE12", change);
 		
-		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(allChanges, newChangesVarValueMap, memVariables, variableNameToStrategyMapContents, variableNameToVidMapContents);
+		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(allChanges, newChangesVarValueMap, memVariables, variableNameToStrategyMapContents, variableNameToVidMapContents, variableModelsMapContents, null);
 		Assert.assertEquals(3, allChangesMap.get("VARIABLE12").getValue());
 		Assert.assertEquals("2999-10-21", allChangesMap.get("VARIABLE12").getExpirationDateAsString());
-		//variableNameToStrategyMap.setAccessible(false);
-		//variableNameToVidMap.setAccessible(false);
-		varaibleModelsMap.setAccessible(false);
 	}
 
 	/*If we pass unknown strategy to StrategyMapper class' getStrategy method, Strategy returned will be null
@@ -2841,26 +2126,12 @@ public class ScoringSingletonTest {
 		List<Integer> modelLists = new ArrayList<Integer>();
 		modelLists.add(48);
 		variableModelsMapContents.put("VARIABLE12", modelLists);
-		Field varaibleModelsMap = ScoringSingleton.class
-				.getDeclaredField("variableModelsMap");
-		varaibleModelsMap.setAccessible(true);
-		varaibleModelsMap.set(scoringSingletonObj,variableModelsMapContents);
 		
 		Map<String, String> variableNameToStrategyMapContents = new HashMap<String, String>();
 		variableNameToStrategyMapContents.put("VARIABLE12", "TESTING");
-		/**
-		Field variableNameToStrategyMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToStrategyMap");
-		variableNameToStrategyMap.setAccessible(true);
-		variableNameToStrategyMap.set(scoringSingletonObj,variableNameToStrategyMapContents);*/
 		
 		Map<String, String> variableNameToVidMapContents = new HashMap<String, String>();
 		variableNameToVidMapContents.put("VARIABLE12", "12");
-		/**
-		Field variableNameToVidMap = ScoringSingleton.class
-				.getDeclaredField("variableNameToVidMap");
-		variableNameToVidMap.setAccessible(true);
-		variableNameToVidMap.set(scoringSingletonObj,variableNameToVidMapContents);*/
 		
 		Map<String, Object> memVariables = new HashMap<String, Object>();
 		memVariables.put("12", 1);
@@ -2872,12 +2143,9 @@ public class ScoringSingletonTest {
 		Map<String, Change> allChanges = new HashMap<String, Change>();
 		allChanges.put("VARIABLE12", change);
 		
-		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(allChanges, newChangesVarValueMap, memVariables, variableNameToStrategyMapContents, variableNameToVidMapContents);
+		Map<String, Change> allChangesMap = scoringSingletonObj.executeStrategy(allChanges, newChangesVarValueMap, memVariables, variableNameToStrategyMapContents, variableNameToVidMapContents, variableModelsMapContents, null);
 		Assert.assertEquals(3, allChangesMap.get("VARIABLE12").getValue());
 		Assert.assertEquals("2999-10-21", allChangesMap.get("VARIABLE12").getExpirationDateAsString());
-		//variableNameToStrategyMap.setAccessible(false);
-		//variableNameToVidMap.setAccessible(false);
-		varaibleModelsMap.setAccessible(false);
 	}
 	
 	//This is a positive test case to update changedMemberScore collection
@@ -3161,79 +2429,45 @@ public class ScoringSingletonTest {
 	}
 	@Test
 	public void calcRegionalFactorPositiveCaseTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
-
-		//preparing regionalFactorsMap
 		Map<String, Double> regionalFactorsMapContents = new HashMap<String, Double>();
 		regionalFactorsMapContents.put("35"+"-"+"TN", 0.2);
-		Field regionalFactorsMap = ScoringSingleton.class
-				.getDeclaredField("regionalFactorsMap");
-		regionalFactorsMap.setAccessible(true);
-		regionalFactorsMap.set(scoringSingletonObj, regionalFactorsMapContents);
-		Double factor = scoringSingletonObj.calcRegionalFactor(35, "TN");
+		Double factor = scoringSingletonObj.calcRegionalFactor(35, "TN", regionalFactorsMapContents);
 		Assert.assertEquals(0.2, factor);
-		regionalFactorsMap.setAccessible(false);
 	}
 
 	@Test
 	public void calcRegionalFactorWithEmptyRegionalFactorTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
-
-		//preparing regionalFactorsMap
 		Map<String, Double> regionalFactorsMapContents = new HashMap<String, Double>();
-		Field regionalFactorsMap = ScoringSingleton.class
-				.getDeclaredField("regionalFactorsMap");
-		regionalFactorsMap.setAccessible(true);
-		regionalFactorsMap.set(scoringSingletonObj, regionalFactorsMapContents);
-		Double factor = scoringSingletonObj.calcRegionalFactor( 35, "TN");
+		Double factor = scoringSingletonObj.calcRegionalFactor( 35, "TN", regionalFactorsMapContents);
 		Assert.assertEquals(1.0, factor);
-		regionalFactorsMap.setAccessible(false);
 	}
 
 	@Test
 	public void calcRegionalWithNoRequiredModelIdTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
-
-		//preparing regionalFactorsMap
 		Map<String, Double> regionalFactorsMapContents = new HashMap<String, Double>();
 		regionalFactorsMapContents.put("35"+"-"+"TN", 0.2);
-		Field regionalFactorsMap = ScoringSingleton.class
-				.getDeclaredField("regionalFactorsMap");
-		regionalFactorsMap.setAccessible(true);
-		regionalFactorsMap.set(scoringSingletonObj, regionalFactorsMapContents);
-		Double factor = scoringSingletonObj.calcRegionalFactor( 46, "TN");
+		Double factor = scoringSingletonObj.calcRegionalFactor( 46, "TN", regionalFactorsMapContents);
 		Assert.assertEquals(1.0, factor);
-		regionalFactorsMap.setAccessible(false);
 	}
 
 	@Test
 	public void calcRegionalWithNoRequiredStateTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
-
-		//preparing regionalFactorsMap
 		Map<String, Double> regionalFactorsMapContents = new HashMap<String, Double>();
 		regionalFactorsMapContents.put("35"+"-"+"IL", 0.2);
-		Field regionalFactorsMap = ScoringSingleton.class
-				.getDeclaredField("regionalFactorsMap");
-		regionalFactorsMap.setAccessible(true);
-		regionalFactorsMap.set(scoringSingletonObj, regionalFactorsMapContents);
-		Double factor = scoringSingletonObj.calcRegionalFactor( 35, "TN");
+		Double factor = scoringSingletonObj.calcRegionalFactor( 35, "TN", regionalFactorsMapContents);
 		Assert.assertEquals(1.0, factor);
-		regionalFactorsMap.setAccessible(false);
 	}
 
 	@Test
 	public void calcRegionalWithNoStateForMemberTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
-		Double factor = scoringSingletonObj.calcRegionalFactor(35, null);
+		Double factor = scoringSingletonObj.calcRegionalFactor(35, null, null);
 		Assert.assertEquals(1.0, factor);
 	}
 	
 	@Test
 	public void calcRegionalWithRegionalFactorMapTest() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
-		
-		Field regionalFactorsMap = ScoringSingleton.class
-				.getDeclaredField("regionalFactorsMap");
-		regionalFactorsMap.setAccessible(true);
-		regionalFactorsMap.set(scoringSingletonObj, null);
-		Double factor = scoringSingletonObj.calcRegionalFactor( 35, "TN");
+		Double factor = scoringSingletonObj.calcRegionalFactor( 35, "TN", null);
 		Assert.assertEquals(1.0, factor);
-		regionalFactorsMap.setAccessible(false);
 	}
 	
 	//a positive case
