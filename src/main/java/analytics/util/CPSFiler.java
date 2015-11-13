@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.exception.RealTimeScoringException;
+import analytics.util.CalendarUtil;
 import analytics.util.dao.MemberInfoDao;
 import analytics.util.dao.OccasionDao;
 import analytics.util.dao.OccationCustomeEventDao;
@@ -234,7 +235,8 @@ public class CPSFiler {
 				if(inProgressPackage.getMdTagMetaData().getSendDuration()- CalendarUtil.getDatesDiff(new Date(),inProgressPackage.getSentDateTime())>Constants.CPS_QUEUE_LENGTH){
 					return null;			
 				}
-				emailPackage.setSendDate(CalendarUtil.getNewDate(previousOccasion.getSendDate(), previousOccasion.getMdTagMetaData().getSendDuration()));							
+				emailPackage.setSendDate(CalendarUtil.getNewDate((previousOccasion.getSentDateTime()!=null)?previousOccasion.getSentDateTime():previousOccasion.getSendDate(), previousOccasion.getMdTagMetaData().getSendDuration()));
+				//emailPackage.setSendDate(CalendarUtil.getNewDate(previousOccasion.getSendDate(), previousOccasion.getMdTagMetaData().getSendDuration()));							
 			}			
 			previousOccasion = emailPackage;						
 			
