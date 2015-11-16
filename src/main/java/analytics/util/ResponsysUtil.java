@@ -1040,8 +1040,11 @@ public class ResponsysUtil {
 
 	public TagMetadata getTagMetadata(TagMetadata tagMetadata,String divLine)
 			throws JSONException {
-
-		tagMetadata = divLineBuSubDao.getBuSubBu(tagMetadata,divLine);
+		
+		//Commenting this code just for the holiday season to suppress emails..
+		//tagMetadata = divLineBuSubDao.getBuSubBu(tagMetadata,divLine);
+		
+		tagMetadata = divLineBuSubDao.getBuSubBuHolidaySeason(tagMetadata,divLine);
 
 		return tagMetadata;
 	}
