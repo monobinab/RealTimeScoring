@@ -34,6 +34,7 @@ public class CacheStatistics{
 				.append("Cache Remove Count : " + cache.getStatistics().cacheRemoveCount()).append("\n")
 				.append("Cache Heap Size : " + cache.getStatistics().getLocalHeapSize()).append("\n");
 				LOGGER.info(cacheStatsBuilder.toString());
+				//System.out.println(cacheStatsBuilder.toString());
 			}
 		}
 	}

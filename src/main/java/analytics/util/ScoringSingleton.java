@@ -30,6 +30,7 @@ import analytics.util.dao.ModelVariablesDao;
 import analytics.util.dao.MongoDBConnectionWrapper;
 import analytics.util.dao.RegionalFactorDao;
 import analytics.util.dao.VariableDao;
+//import analytics.util.dao.caching.CacheStatistics;
 import analytics.util.objects.Boost;
 import analytics.util.objects.Change;
 import analytics.util.objects.ChangedMemberScore;
@@ -159,7 +160,7 @@ public class ScoringSingleton {
 
 	
 	public MemberRTSChanges calcRTSChanges(String lId, Map<String, String> newChangesVarValueMap, Set<Integer> modelIdsList, String source){
-			
+		//CacheStatistics.getInstance().printCacheStatistics();
 		MemberRTSChanges memberRTSChanges = null;
 		Map<String, String> variableNameToStrategyMap = new HashMap<String, String>();
 		Map<String, String> variableNameToVidMap = new HashMap<String, String>();
