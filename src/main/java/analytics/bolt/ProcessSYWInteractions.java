@@ -45,7 +45,6 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 	private PidDivLnDao pidDivLnDao;
 	private DivLnBoostDao divLnBoostDao;
 	SywApiCalls sywApiCalls;
-	private Map<String, List<String>> divLnBoostVariblesMap;
 	private BoostDao boostDao;
 	private MemberBoostsDao memberBoostsDao;
 	private MemberScoreDao memberScoreDao;
@@ -60,7 +59,7 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 		 }
 
 	 @Override
-	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
+	public void prepare(@SuppressWarnings("rawtypes") Map stormConf, TopologyContext context, OutputCollector collector) {
 		 super.prepare(stormConf, context, collector);
 	     this.outputCollector = collector;
 		sywApiCalls = new SywApiCalls();
@@ -75,7 +74,6 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 		modelBoostDao = new ModelSywBoostDao();
 		entityTypes = new ArrayList<String>();
 		entityTypes.add("Product");
-		divLnBoostVariblesMap = divLnBoostDao.getDivLnBoost();
 		sywBoostModelMap = modelBoostDao.getVarModelMap();
 		List<String> feeds = new ArrayList<String>();
 		feeds.add("SYW_LIKE");
@@ -134,6 +132,8 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 			outputCollector.ack(input);  
 			return;
 		}
+		
+		Map<String, List<String>> divLnBoostVariblesMap = divLnBoostDao.getDivLnBoost();
 		// Variable map stores the vars to send to Strategy Bolt
 		Map<String, String> variableValueMap = new HashMap<String, String>();
 		Map<String, List<String>> boostValuesMap = new HashMap<String, List<String>>();

@@ -31,15 +31,13 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
-	/**
-	 * Created by Rock Wasserman 6/24/2014
-	 */
-
+	
+	private static final long serialVersionUID = 1L;
     private Map<String, List<String>> divLnVariablesMap;
 	private DivLnVariableDao divLnVariableDao;
 	private PidDivLnDao pidDivLnDao;
 	private DivLnBuSubBuDao divLnBuSubBuDao;
-	private Map<String, String> divLnBuSubBuMap;
+	
     /*
          * (non-Javadoc)
          *
@@ -52,7 +50,7 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
 	}
 	
 	@Override
-	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
+	public void prepare(@SuppressWarnings("rawtypes") Map stormConf, TopologyContext context, OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
 		divLnVariableDao = new DivLnVariableDao();
 		pidDivLnDao = new PidDivLnDao();
@@ -62,7 +60,6 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
         divLnVariablesMap = divLnVariableDao.getDivLnVariable();
         
         divLnBuSubBuDao = new DivLnBuSubBuDao();
-		divLnBuSubBuMap = divLnBuSubBuDao.getDvLnBuSubBu();
         
     }
 
@@ -204,6 +201,7 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
     	}
     	
     	Map<String,String> variableValueMap = new HashMap<String,String>();
+    	Map<String, String> divLnBuSubBuMap = divLnBuSubBuDao.getDvLnBuSubBu();
     	
     	for(String pid: pidSet) {
     		DivLn divLnObj = pidDivLnDao.getDivLnFromPid(pid);

@@ -1,29 +1,26 @@
 package analytics.util.dao;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.regex.Pattern;
-
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import scala.util.matching.Regex;
-import analytics.util.Constants;
 import analytics.util.MongoNameConstants;
+import analytics.util.dao.caching.CacheBuilder;
+import analytics.util.dao.caching.CacheConstant;
+import analytics.util.dao.caching.CacheWrapper;
 import analytics.util.objects.TagMetadata;
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 
-import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
 public class DivLineBuSubDao extends AbstractDao {
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(MemberTraitsDao.class);
-	DBCollection divLineBuSubCollection;
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(DivLineBuSubDao.class);
+	private DBCollection divLineBuSubCollection;
+	private Cache cache = null;
 
 	/**
 	 * t,b,s,po
@@ -32,11 +29,17 @@ public class DivLineBuSubDao extends AbstractDao {
 		super();
 		divLineBuSubCollection = db.getCollection("divLnBuName");
 		LOGGER.info("collection in tagMetadataDao: " + divLineBuSubCollection.getFullName());
+		cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_DIV_LN_BUNAMECACHE);
+    	CacheBuilder.getInstance().setCaches(cache);
 	}
 
 
 	public TagMetadata getBuSubBu(TagMetadata tagMetadata,String divLine){
-		
+		String cacheKey = CacheConstant.RTS_DIV_LN_BU_NAME_CACHE_KEY;
+		Element element = CacheWrapper.getInstance().isCacheKeyExist(cache, cacheKey);
+		if(element != null && element.getObjectKey().equals(cacheKey)){
+			return (TagMetadata) element.getObjectValue();
+		}else{
 		BasicDBObject query = new BasicDBObject();
 		query.put(MongoNameConstants.DLBS_DIV, divLine);
 		
@@ -51,6 +54,10 @@ public class DivLineBuSubDao extends AbstractDao {
 			tagMetadata.setBusinessUnit(tagMetadata.getBusinessUnit()!=null ? tagMetadata.getBusinessUnit()+",null" : "null");
 			tagMetadata.setSubBusinessUnit(tagMetadata.getSubBusinessUnit() != null ? tagMetadata.getSubBusinessUnit()+",null" : "null");
 		}*/
+		if(tagMetadata != null){
+			cache.put(new Element(cacheKey, (TagMetadata) tagMetadata));
+		}
 		return tagMetadata;
+		}
 	}
 }

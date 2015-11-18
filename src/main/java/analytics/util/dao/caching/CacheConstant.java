@@ -10,6 +10,10 @@ public class CacheConstant {
 	public static final String RTS_CACHE_TAGVARIABLE = "TAGVARIABLECACHE";
 	public static final String RTS_CACHE_TAGSRESPONSESACTIVECACHE = "TAGSRESPONSESACTIVECACHE";
 	public static final String RTS_CACHE_REGIONALFACTORCACHE = "REGIONALFACTORCACHE";
+	public static final String RTS_CACHE_DIV_CAT_VARIABLECACHE = "DIVCATVARIABLECACHE";
+	public static final String RTS_CACHE_DIV_LN_BOOSTCACHE = "DIVLNBOOSTCACHE";
+	public static final String RTS_CACHE_DIV_LN_BUNAMECACHE = "DIVLNBUNAMECACHE";
+	public static final String RTS_CACHE_DIV_LN_BU_SUBBU_CACHE = "DIVLNBUSUBBUCACHE";
 	
 	
 	//Model Percentiles Cache Key
@@ -34,6 +38,18 @@ public class CacheConstant {
 	
 	//Tag Variable Cache Key
 	public static final String RTS_REGIONALFACTOR_CACHE_KEY = "ed637e2a-85df-49e2-af9c-0a51d26beade";
+	
+	//Div Cat Variable Cache Key
+	public static final String RTS_DIVCATVARIABLE_CACHE_KEY = "36d934cf-f490-43e6-8612-e6d9898c3c99";
+	
+	//Div Ln Boost Cache Key
+	public static final String RTS_DIV_LN_BOOST_CACHE_KEY = "22035605-e283-45a2-80a2-eed62e30f670";
+	
+	//Div Ln Bu Name Cache Key
+	public static final String RTS_DIV_LN_BU_NAME_CACHE_KEY = "cb62cf35-a02c-44c2-93c5-813f5c0d6dc1";
+	
+	//Div Ln Bu Sub Bu Cache Key
+	public static final String RTS_DIV_LN_BU_SUBBU_CACHE_KEY = "2ffb7fa6-378d-42f6-b58d-8291281beecd";
 	
 	
 }

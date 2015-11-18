@@ -42,7 +42,6 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
     private DivCatVariableDao divCatVariableDao;
     private DivCatKsnDao divCatKsnDao;
     private Map<String, List<String>> divLnVariablesMap;
-    private Map<String, List<String>> divCatVariablesMap;
     private String host;
     private int port;
 
@@ -85,10 +84,6 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
 
         // populate divLnVariablesMap
         divLnVariablesMap = divLnVariableDao.getDivLnVariable();
-
-        LOGGER.trace("Populate div cat variables map");
-        //populate divCatVariablesMap
-        divCatVariablesMap = divCatVariableDao.getDivCatVariable();
     }
 
     /*
@@ -197,7 +192,7 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
 
     private void listLineItemsAndEmit(Tuple input, String lyl_id_no, ProcessTransaction processTransaction, String messageID, String l_id) {
         Collection<TransactionLineItem> lineItemList = new ArrayList<TransactionLineItem>();
-       
+        Map<String, List<String>> divCatVariablesMap = divCatVariableDao.getDivCatVariable();
         List<LineItem> lineItems = processTransaction.getLineItemList();
         if (LOGGER.isTraceEnabled()) {
             String lineItems_toString = null;
