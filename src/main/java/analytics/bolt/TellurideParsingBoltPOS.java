@@ -30,8 +30,7 @@ import java.util.*;
 
 public class TellurideParsingBoltPOS extends EnvironmentBolt {
 
-    private static final Logger LOGGER = LoggerFactory
-            .getLogger(TellurideParsingBoltPOS.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TellurideParsingBoltPOS.class);
     /**
      * Created by Devarshi Das 8/27/2014
      */
@@ -41,7 +40,6 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
     private DivLnItmDao divLnItmDao;
     private DivCatVariableDao divCatVariableDao;
     private DivCatKsnDao divCatKsnDao;
-    private Map<String, List<String>> divLnVariablesMap;
     private String host;
     private int port;
 
@@ -69,7 +67,7 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
      * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
      */
     @Override
-    public void prepare(Map stormConf, TopologyContext context,
+    public void prepare(@SuppressWarnings("rawtypes") Map stormConf, TopologyContext context,
                         OutputCollector collector) {
         super.prepare(stormConf, context, collector);
         this.outputCollector = collector;
@@ -81,9 +79,6 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
         divCatKsnDao = new DivCatKsnDao();
         divLnVariableDao = new DivLnVariableDao();
         divCatVariableDao = new DivCatVariableDao();
-
-        // populate divLnVariablesMap
-        divLnVariablesMap = divLnVariableDao.getDivLnVariable();
     }
 
     /*
@@ -194,6 +189,7 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
         Collection<TransactionLineItem> lineItemList = new ArrayList<TransactionLineItem>();
         Map<String, List<String>> divCatVariablesMap = divCatVariableDao.getDivCatVariable();
         List<LineItem> lineItems = processTransaction.getLineItemList();
+        Map<String, List<String>> divLnVariablesMap = divLnVariableDao.getDivLnVariable();
         if (LOGGER.isTraceEnabled()) {
             String lineItems_toString = null;
             if (lineItems != null)
@@ -443,8 +439,8 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
         return div + category;
     }
 
-    private final static String convertStreamToString(final Message jmsMsg)
-            throws Exception {
+    @SuppressWarnings("unused")
+	private final static String convertStreamToString(final Message jmsMsg)throws Exception {
         String stringMessage = "";
         BytesMessage bMsg = (BytesMessage) jmsMsg;
         byte[] buffer = new byte[40620];

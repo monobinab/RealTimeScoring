@@ -30,8 +30,7 @@ import java.util.*;
 
 public class TellurideParsingBoltPOS_Old extends EnvironmentBolt {
 
-    private static final Logger LOGGER = LoggerFactory
-            .getLogger(TellurideParsingBoltPOS_Old.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TellurideParsingBoltPOS_Old.class);
     /**
      * Created by Devarshi Das 8/27/2014
      */
@@ -41,7 +40,6 @@ public class TellurideParsingBoltPOS_Old extends EnvironmentBolt {
     private DivLnItmDao divLnItmDao;
     private DivCatVariableDao divCatVariableDao;
     private DivCatKsnDao divCatKsnDao;
-    private Map<String, List<String>> divLnVariablesMap;
     private Map<String, List<String>> divCatVariablesMap;
     private String host;
     private int port;
@@ -69,8 +67,7 @@ public class TellurideParsingBoltPOS_Old extends EnvironmentBolt {
      * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
      */
     @Override
-    public void prepare(Map stormConf, TopologyContext context,
-                        OutputCollector collector) {
+    public void prepare(@SuppressWarnings("rawtypes") Map stormConf, TopologyContext context, OutputCollector collector) {
         super.prepare(stormConf, context, collector);
         this.outputCollector = collector;
         LOGGER.info("Preparing telluride parsing bolt");
@@ -81,9 +78,6 @@ public class TellurideParsingBoltPOS_Old extends EnvironmentBolt {
         divCatKsnDao = new DivCatKsnDao();
         divLnVariableDao = new DivLnVariableDao();
         divCatVariableDao = new DivCatVariableDao();
-
-        // populate divLnVariablesMap
-        divLnVariablesMap = divLnVariableDao.getDivLnVariable();
 
         LOGGER.trace("Populate div cat variables map");
         //populate divCatVariablesMap
@@ -169,6 +163,7 @@ public class TellurideParsingBoltPOS_Old extends EnvironmentBolt {
     private void listLineItemsAndEmit(Tuple input, String lyl_id_no, ProcessTransaction processTransaction, String messageID, String l_id) {
         Collection<TransactionLineItem> lineItemList = new ArrayList<TransactionLineItem>();
         //logger.info("nposTransaction XML is" + transactionXmlAsString.toString());
+        Map<String, List<String>> divLnVariablesMap = divLnVariableDao.getDivLnVariable();
 
         List<LineItem> lineItems = processTransaction.getLineItemList();
         if (LOGGER.isTraceEnabled()) {

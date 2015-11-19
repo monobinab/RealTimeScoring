@@ -15,6 +15,7 @@ import com.google.gson.Gson;
 
 import analytics.util.MongoNameConstants;
 import analytics.util.PidMatchUtils;
+import analytics.util.dao.DivLnBoostDao;
 import analytics.util.dao.DivLnBuSubBuDao;
 import analytics.util.dao.DivLnVariableDao;
 import analytics.util.dao.MemberBoostsDao;
@@ -30,10 +31,9 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 	 * Created by Rock Wasserman 6/19/2014
 	 */
 	private static final long serialVersionUID = 1L;
-	private DivLnVariableDao divLnVariableDao;
 	private MemberBoostsDao memberBoostsDao;
 	private DivLnBuSubBuDao divLnBuSubBuDao;
-	private HashMap<String, List<String>> divLnBoostVariblesMap;
+	private DivLnBoostDao divLnBoostDao;
 	private PidMatchUtils pidMatchUtil;
 	private List<String> boostList;
 
@@ -53,12 +53,8 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 			OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
 		pidMatchUtil = new PidMatchUtils();
-
-		divLnVariableDao = new DivLnVariableDao();
 		memberBoostsDao = new MemberBoostsDao();
-
-		// populate divLnBoostvariablesMap & Boost list
-		divLnBoostVariblesMap = divLnVariableDao.getDivLnBoostVariable();
+		divLnBoostDao = new DivLnBoostDao();
 		boostList = new ArrayList<String>();
 		divLnBuSubBuDao = new DivLnBuSubBuDao();
 	}
@@ -68,6 +64,7 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 		Map<String, String> variableValueMap = new HashMap<String, String>();
 		Map<String, List<String>> boostValuesMap = new HashMap<String, List<String>>();
 		Map<String, String> divLnBuSubBuMap = divLnBuSubBuDao.getDvLnBuSubBu();
+		HashMap<String, List<String>> divLnBoostVariblesMap = divLnBoostDao.getDivLnBoost();
 		Collection<String> pidsCollection = l_idToValueCollectionMap
 				.get(current_l_id);
 

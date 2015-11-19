@@ -56,4 +56,25 @@ public class DivLnBoostDao extends AbstractDao{
     	return divLnBoostMap;
 		}
     }
+    
+    /** Duplicate Method
+    public HashMap<String, List<String>> getDivLnBoostVariable(){
+    	HashMap<String, List<String>> divLnBoostVariablesMap = new HashMap<String, List<String>>();
+    	DBCursor divLnVarCursor = divLnBoostCollection.find();
+    	for(DBObject divLnDBObject: divLnVarCursor) {
+            if (divLnBoostVariablesMap.get(divLnDBObject.get(MongoNameConstants.DLV_DIV)) == null)
+            {
+                List<String> varColl = new ArrayList<String>();
+                varColl.add(divLnDBObject.get(MongoNameConstants.DLB_BOOST).toString());
+                divLnBoostVariablesMap.put(divLnDBObject.get(MongoNameConstants.DLV_DIV).toString(), varColl);
+            }
+            else
+            {
+                List<String> varColl = divLnBoostVariablesMap.get(divLnDBObject.get(MongoNameConstants.DLV_DIV).toString());
+                varColl.add(divLnDBObject.get(MongoNameConstants.DLB_BOOST).toString().toUpperCase());
+                divLnBoostVariablesMap.put(divLnDBObject.get(MongoNameConstants.DLV_DIV).toString(), varColl);
+            }
+        }
+    	return divLnBoostVariablesMap;
+    }*/
 }

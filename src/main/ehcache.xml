@@ -53,6 +53,10 @@
  <cache name="DIVLNBUSUBBUCACHE" maxElementsInMemory="50" eternal="false"
  	overflowToDisk="false" timeToLiveSeconds="604800" memoryStoreEvictionPolicy="LFU">
  </cache>
+ 
+ <cache name="DIVLNVARIABLECACHE" maxElementsInMemory="50" eternal="false"
+ 	overflowToDisk="false" timeToLiveSeconds="604800" memoryStoreEvictionPolicy="LFU">
+ </cache>
  <!-- Weekly Refresh Caches -->
  
 </ehcache>

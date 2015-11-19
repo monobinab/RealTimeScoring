@@ -42,7 +42,6 @@ public class ParsingBoltPOS extends BaseRichBolt {
     private OutputCollector outputCollector;
     private DivLnVariableDao divLnVariableDao;
     private DivLnItmDao divLnItmDao;
-    private Map<String, List<String>> divLnVariablesMap;
 
     public void setOutputCollector(OutputCollector outputCollector) {
         this.outputCollector = outputCollector;
@@ -71,7 +70,6 @@ public class ParsingBoltPOS extends BaseRichBolt {
         // populate divLnVariablesMap
         divLnVariableDao = new DivLnVariableDao(); 
         divLnItmDao = new DivLnItmDao();
-        divLnVariablesMap = divLnVariableDao.getDivLnVariable();
     }
 
 
@@ -85,6 +83,7 @@ public class ParsingBoltPOS extends BaseRichBolt {
 
 		String lyl_id_no = null;
 		JMSMessage document = (JMSMessage) input.getValueByField("npos");
+		Map<String, List<String>> divLnVariablesMap = divLnVariableDao.getDivLnVariable();
 			
 		// 1) FETCH SEGMENT "B1"
 		// 2) TEST IF TRANSACTION TYPE CODE IS = 1 (RETURN IF FALSE)

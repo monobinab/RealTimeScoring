@@ -33,7 +33,6 @@ import com.google.gson.JsonParser;
 public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
 	
 	private static final long serialVersionUID = 1L;
-    private Map<String, List<String>> divLnVariablesMap;
 	private DivLnVariableDao divLnVariableDao;
 	private PidDivLnDao pidDivLnDao;
 	private DivLnBuSubBuDao divLnBuSubBuDao;
@@ -55,12 +54,7 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
 		divLnVariableDao = new DivLnVariableDao();
 		pidDivLnDao = new PidDivLnDao();
 		sourceTopic = "InternalSearch";
-
-        // populate divLnVariablesMap
-        divLnVariablesMap = divLnVariableDao.getDivLnVariable();
-        
         divLnBuSubBuDao = new DivLnBuSubBuDao();
-        
     }
 
 
@@ -78,7 +72,6 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
 
 
     private boolean isJSONValid(String test) {
-    	 
         try {
             JSONObject jsonObj = new JSONObject(test);
             jsonObj = null;
@@ -109,7 +102,7 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
     	String queryResultsDoc = new String();
     	Set<String> pidSet = new HashSet<String>();
     	Collection<String> searchStringsCollection = l_idToValueCollectionMap.get(current_l_id);
-    	
+    	Map<String, List<String>> divLnVariablesMap = divLnVariableDao.getDivLnVariable();
     	if(searchStringsCollection==null || searchStringsCollection.isEmpty()|| (searchStringsCollection.toArray())[0].toString().trim().equalsIgnoreCase(""))
     		return null;
     	

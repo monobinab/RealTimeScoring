@@ -14,6 +14,7 @@ public class CacheConstant {
 	public static final String RTS_CACHE_DIV_LN_BOOSTCACHE = "DIVLNBOOSTCACHE";
 	public static final String RTS_CACHE_DIV_LN_BUNAMECACHE = "DIVLNBUNAMECACHE";
 	public static final String RTS_CACHE_DIV_LN_BU_SUBBU_CACHE = "DIVLNBUSUBBUCACHE";
+	public static final String RTS_CACHE_DIV_LN_VARIABLE_CACHE = "DIVLNVARIABLECACHE";
 	
 	
 	//Model Percentiles Cache Key
@@ -50,6 +51,9 @@ public class CacheConstant {
 	
 	//Div Ln Bu Sub Bu Cache Key
 	public static final String RTS_DIV_LN_BU_SUBBU_CACHE_KEY = "2ffb7fa6-378d-42f6-b58d-8291281beecd";
+	
+	//Div Ln Variable Cache Key
+	public static final String RTS_DIV_LN_VARIABLE_CACHE_KEY = "b8ff018b-2b6e-4225-ac93-13da0b85376c";
 	
 	
 }
