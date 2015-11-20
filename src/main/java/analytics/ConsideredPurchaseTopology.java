@@ -80,11 +80,11 @@ public class ConsideredPurchaseTopology {
 			System.exit(0);	
 		}
 		topologyBuilder.setBolt("CPTagCreatorBolt", new TagCreatorBolt(env), 1).shuffleGrouping("CPPurchaseSpout");	
-		topologyBuilder.setBolt("CPParsePersistBolt", new CPParsePersistBolt(env), 15).shuffleGrouping("MDTagsSpout").shuffleGrouping("CPTagCreatorBolt", "rtsTags_stream" );	
+		topologyBuilder.setBolt("CPParsePersistBolt", new CPParsePersistBolt(env), 5).shuffleGrouping("MDTagsSpout").shuffleGrouping("CPTagCreatorBolt", "rtsTags_stream" );	
 					
 		//Browse Related Changes
-		topologyBuilder.setBolt("tagProcessingBolt", new TagProcessingBolt(env),10).localOrShuffleGrouping("BrowseKafkaSpout");
-		topologyBuilder.setBolt("CPProcessingBolt", new CPProcessingBolt(env),15).shuffleGrouping("CPParsePersistBolt").shuffleGrouping("tagProcessingBolt")
+		topologyBuilder.setBolt("tagProcessingBolt", new TagProcessingBolt(env),5).localOrShuffleGrouping("BrowseKafkaSpout");
+		topologyBuilder.setBolt("CPProcessingBolt", new CPProcessingBolt(env),10).shuffleGrouping("CPParsePersistBolt").shuffleGrouping("tagProcessingBolt")
 		.shuffleGrouping("CPTagCreatorBolt", "blackedout_stream" );
 		
 		Config conf = new Config();
