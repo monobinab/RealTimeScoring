@@ -30,9 +30,9 @@ public class TagVariableDao extends AbstractDao {
 	public TagVariableDao() {
 		super();
 		tagVariablesCollection = db.getCollection("tagVariable");
-		cache = CacheManager.getInstance().getCache(CacheConstant.RTS_CACHE_REGIONALFACTORCACHE);
+		cache = CacheManager.getInstance().getCache(CacheConstant.RTS_CACHE_TAGVARIABLECACHE);
     	if(null == cache){
-			cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_REGIONALFACTORCACHE);
+			cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_TAGVARIABLECACHE);
 	    	CacheBuilder.getInstance().setCaches(cache);
     	}
 	}
