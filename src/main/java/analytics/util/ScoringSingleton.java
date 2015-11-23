@@ -161,7 +161,6 @@ public class ScoringSingleton {
 
 	
 	public MemberRTSChanges calcRTSChanges(String lId, Map<String, String> newChangesVarValueMap, Set<Integer> modelIdsList, String source){
-		CacheStatistics.getInstance().printCacheStatistics();
 		MemberRTSChanges memberRTSChanges = null;
 		Map<String, String> variableNameToStrategyMap = new HashMap<String, String>();
 		Map<String, String> variableNameToVidMap = new HashMap<String, String>();
