@@ -23,8 +23,11 @@ public class DcAidVarStrengthDao extends AbstractDao{
 	public DcAidVarStrengthDao() {
 		super();
 		dcAidVarStrength = db.getCollection("dcAidVariableStrength"); // MongoNameConstants.PID_DIV_LN_COLLECTION
-		cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_DIV_AID_VAR_STRENGTH_CACHE);
-    	CacheBuilder.getInstance().setCaches(cache);
+		cache = CacheManager.getInstance().getCache(CacheConstant.RTS_CACHE_DIV_AID_VAR_STRENGTH_CACHE);
+    	if(null == cache){
+			cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_DIV_AID_VAR_STRENGTH_CACHE);
+	    	CacheBuilder.getInstance().setCaches(cache);
+    	}
 	}
 	
 	@SuppressWarnings("unchecked")

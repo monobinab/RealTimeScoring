@@ -27,8 +27,11 @@ public class VariableDao extends AbstractDao{
     public VariableDao(){
     	super();
 		variablesCollection = db.getCollection("Variables");
-		cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_VARIABLESCACHE);
-    	CacheBuilder.getInstance().setCaches(cache);
+		cache = CacheManager.getInstance().getCache(CacheConstant.RTS_CACHE_VARIABLESCACHE);
+    	if(null == cache){
+			cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_VARIABLESCACHE);
+	    	CacheBuilder.getInstance().setCaches(cache);
+    	}
     }
 	
     @SuppressWarnings("unchecked")

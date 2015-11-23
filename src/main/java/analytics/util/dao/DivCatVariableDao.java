@@ -23,8 +23,11 @@ public class DivCatVariableDao extends AbstractDao{
     public DivCatVariableDao(){
     	super();
 		divCatVariableCollection = db.getCollection("divCatVariable");
-		cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_DIV_CAT_VARIABLECACHE);
-    	CacheBuilder.getInstance().setCaches(cache);
+		cache = CacheManager.getInstance().getCache(CacheConstant.RTS_CACHE_DIV_CAT_VARIABLECACHE);
+    	if(null == cache){
+    		cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_DIV_CAT_VARIABLECACHE);
+    		CacheBuilder.getInstance().setCaches(cache);
+    	}
     }
     
     @SuppressWarnings("unchecked")

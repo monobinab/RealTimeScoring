@@ -23,8 +23,11 @@ public class DivLnBuSubBuDao extends AbstractDao{
     public DivLnBuSubBuDao(){
     	super();
     	divLnBuSubBuCollection = db.getCollection("divLnBuSubBu");
-    	cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_DIV_LN_BU_SUBBU_CACHE);
-    	CacheBuilder.getInstance().setCaches(cache);
+    	cache = CacheManager.getInstance().getCache(CacheConstant.RTS_CACHE_DIV_LN_BU_SUBBU_CACHE);
+    	if(null == cache){
+    		cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_DIV_LN_BU_SUBBU_CACHE);
+    		CacheBuilder.getInstance().setCaches(cache);
+    	}
     }
     
     @SuppressWarnings("unchecked")

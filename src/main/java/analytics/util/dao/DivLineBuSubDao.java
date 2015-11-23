@@ -29,8 +29,11 @@ public class DivLineBuSubDao extends AbstractDao {
 		super();
 		divLineBuSubCollection = db.getCollection("divLnBuName");
 		LOGGER.info("collection in tagMetadataDao: " + divLineBuSubCollection.getFullName());
-		cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_DIV_LN_BUNAMECACHE);
-    	CacheBuilder.getInstance().setCaches(cache);
+		cache = CacheManager.getInstance().getCache(CacheConstant.RTS_CACHE_DIV_LN_BUNAMECACHE);
+    	if(null == cache){
+    		cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_DIV_LN_BUNAMECACHE);
+    		CacheBuilder.getInstance().setCaches(cache);
+    	}
 	}
 
 

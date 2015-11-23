@@ -23,8 +23,11 @@ public class ModelSywBoostDao extends AbstractDao {
     public ModelSywBoostDao(){
     	super();
     	modelBoostCollection = db.getCollection("modelSywBoosts");
-    	cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_MODEL_SYW_BOOST_CACHE);
-    	CacheBuilder.getInstance().setCaches(cache);
+    	cache = CacheManager.getInstance().getCache(CacheConstant.RTS_CACHE_MODEL_SYW_BOOST_CACHE);
+    	if(null == cache){
+    		cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_MODEL_SYW_BOOST_CACHE);
+    		CacheBuilder.getInstance().setCaches(cache);
+    	}
     }
     
     @SuppressWarnings("unchecked")

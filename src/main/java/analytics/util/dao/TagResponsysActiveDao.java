@@ -30,9 +30,12 @@ public class TagResponsysActiveDao extends AbstractDao {
 	public TagResponsysActiveDao() {
 		super();
 		tagResponsysActiveCollection = db.getCollection("tagsResponsysActive");
-		cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_TAGSRESPONSESACTIVECACHE);
-    	CacheBuilder.getInstance().setCaches(cache);
 		LOGGER.info("colelction in tagMetadataDao: " + tagResponsysActiveCollection.getFullName());
+		cache = CacheManager.getInstance().getCache(CacheConstant.RTS_CACHE_TAGSRESPONSESACTIVECACHE);
+    	if(null == cache){
+			cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_TAGSRESPONSESACTIVECACHE);
+	    	CacheBuilder.getInstance().setCaches(cache);
+    	}
 	}
 
 	public HashSet<String> getResponsysActiveTagsList(){

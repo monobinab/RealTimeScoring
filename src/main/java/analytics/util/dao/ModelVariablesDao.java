@@ -33,8 +33,11 @@ public class ModelVariablesDao extends AbstractDao{
     public ModelVariablesDao(){
     	super();
 		modelVariablesCollection = db.getCollection("modelVariables");
-		cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_MODELVARIABLESCACHE);
-    	CacheBuilder.getInstance().setCaches(cache);
+		cache = CacheManager.getInstance().getCache(CacheConstant.RTS_CACHE_MODELVARIABLESCACHE);
+    	if(null == cache){
+    		cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_MODELVARIABLESCACHE);
+    		CacheBuilder.getInstance().setCaches(cache);
+    	}
     }
     
 	public List<String> getVariableList(){

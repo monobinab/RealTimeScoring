@@ -26,8 +26,11 @@ public class RegionalFactorDao extends AbstractDao {
 	public RegionalFactorDao() {
 		super();
 		regionalFactorColl = db.getCollection("regionalAdjustmentFactors"); 
-		cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_REGIONALFACTORCACHE);
-    	CacheBuilder.getInstance().setCaches(cache);
+		cache = CacheManager.getInstance().getCache(CacheConstant.RTS_CACHE_REGIONALFACTORCACHE);
+    	if(null == cache){
+    		cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_REGIONALFACTORCACHE);
+    		CacheBuilder.getInstance().setCaches(cache);
+    	}
 	}
 
 	@SuppressWarnings("unchecked")

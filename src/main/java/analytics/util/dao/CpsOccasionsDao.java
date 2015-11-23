@@ -32,8 +32,11 @@ public class CpsOccasionsDao extends AbstractDao {
     public CpsOccasionsDao(){
     	super();
     	cpsOccasionsCollection = db.getCollection("cpsOccasions");
-    	cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_CPSOCCASIONSCACHE);
-    	CacheBuilder.getInstance().setCaches(cache);
+    	cache = CacheManager.getInstance().getCache(CacheConstant.RTS_CACHE_CPSOCCASIONSCACHE);
+    	if(null == cache){
+    		cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_CPSOCCASIONSCACHE);
+    		CacheBuilder.getInstance().setCaches(cache);
+    	}
     }
     
     public HashMap<String, String> getcpsOccasionDurations(){

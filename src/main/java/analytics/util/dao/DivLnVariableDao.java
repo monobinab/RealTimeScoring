@@ -23,8 +23,11 @@ public class DivLnVariableDao extends AbstractDao{
     public DivLnVariableDao(){
     	super();
 		divLnVariableCollection = db.getCollection("divLnVariable");
-		cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_DIV_LN_VARIABLE_CACHE);
-    	CacheBuilder.getInstance().setCaches(cache);
+		cache = CacheManager.getInstance().getCache(CacheConstant.RTS_CACHE_DIV_LN_VARIABLE_CACHE);
+    	if(null == cache){
+    		cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_DIV_LN_VARIABLE_CACHE);
+    		CacheBuilder.getInstance().setCaches(cache);
+    	}
     }
     @SuppressWarnings("unchecked")
 	public HashMap<String, List<String>> getDivLnVariable(){

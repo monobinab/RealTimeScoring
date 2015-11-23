@@ -23,8 +23,11 @@ public class DivLnBoostDao extends AbstractDao{
     public DivLnBoostDao(){
     	super();
 		divLnBoostCollection = db.getCollection("divLnBoost");
-		cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_DIV_LN_BOOSTCACHE);
-    	CacheBuilder.getInstance().setCaches(cache);
+		cache = CacheManager.getInstance().getCache(CacheConstant.RTS_CACHE_DIV_LN_BOOSTCACHE);
+    	if(null == cache){
+    		cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_DIV_LN_BOOSTCACHE);
+    		CacheBuilder.getInstance().setCaches(cache);
+    	}
     }
     
     @SuppressWarnings("unchecked")

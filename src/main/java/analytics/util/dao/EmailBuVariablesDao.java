@@ -29,9 +29,12 @@ public class EmailBuVariablesDao extends AbstractDao {
     
     public EmailBuVariablesDao(){
     	super();
-    	emailBUVariableCollection = db.getCollection("emailBUVariable");	
-    	cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_EMAIL_BU_VARIABLE_CACHE);
-    	CacheBuilder.getInstance().setCaches(cache);
+    	emailBUVariableCollection = db.getCollection("emailBUVariable");
+    	cache = CacheManager.getInstance().getCache(CacheConstant.RTS_CACHE_EMAIL_BU_VARIABLE_CACHE);
+    	if(null == cache){
+    		cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_EMAIL_BU_VARIABLE_CACHE);
+    		CacheBuilder.getInstance().setCaches(cache);
+    	}
     }
     
     

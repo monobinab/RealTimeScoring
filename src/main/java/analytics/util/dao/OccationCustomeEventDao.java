@@ -25,8 +25,11 @@ public class OccationCustomeEventDao extends AbstractDao {
 	public OccationCustomeEventDao() {
 		super();
 		occCustEventCollection = db.getCollection("occ_cust_event");
-		cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_OCC_CUST_EVENT_CACHE);
-    	CacheBuilder.getInstance().setCaches(cache);
+		cache = CacheManager.getInstance().getCache(CacheConstant.RTS_CACHE_OCC_CUST_EVENT_CACHE);
+    	if(null == cache){
+    		cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_OCC_CUST_EVENT_CACHE);
+    		CacheBuilder.getInstance().setCaches(cache);
+    	}
 	}
 
 	public String getCustomeEventName(String occasion) {

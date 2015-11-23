@@ -27,8 +27,11 @@ public class EventsVibesActiveDao extends AbstractDao {
 		super();
 		eventsVibesActiveCollection = db.getCollection("eventsVibesActive");
 		LOGGER.info("collection in EventsVibesActiveDao: " + eventsVibesActiveCollection.getFullName());
-		cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_EVENTS_VIBES_ACTIVE_CACHE);
-    	CacheBuilder.getInstance().setCaches(cache);
+		cache = CacheManager.getInstance().getCache(CacheConstant.RTS_CACHE_EVENTS_VIBES_ACTIVE_CACHE);
+    	if(null == cache){
+    		cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_EVENTS_VIBES_ACTIVE_CACHE);
+    		CacheBuilder.getInstance().setCaches(cache);
+    	}
 	}
 
 	@SuppressWarnings("unchecked")
