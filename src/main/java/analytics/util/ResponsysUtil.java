@@ -80,7 +80,6 @@ public class ResponsysUtil {
 	private static final String validUnownTags = "Top 5% of MSM,Unknown";
 	
 	private EventsVibesActiveDao eventsVibesActiveDao;
-	HashMap<String, HashMap<String, String>> eventVibesActiveMap = new HashMap<String, HashMap<String, String>>();
 	
 	private MemberMDTags2Dao memberMDTags2Dao;
 	private MemberMDTagsDao memberMDTagsDao;
@@ -103,7 +102,6 @@ public class ResponsysUtil {
 		tagResponsysActiveDao =  new TagResponsysActiveDao();
 		tagVariableDao = new TagVariableDao();
 		eventsVibesActiveDao = new EventsVibesActiveDao();
-		eventVibesActiveMap = eventsVibesActiveDao.getVibesActiveEventsList();
 		memberInfoDao = new MemberInfoDao();
 		tagVariableDao = new TagVariableDao();
 		//tagResponsysActiveDao =  new TagResponsysActiveDao();
@@ -1006,7 +1004,7 @@ public class ResponsysUtil {
 	 * @return true or false based on whether Vibes is ready to accept the Bu/SubBu
 	 */
 	public boolean isVibesActiveWithEvent(String occasion, String bussUnit, StringBuilder custVibesEvent){
-		
+		HashMap<String, HashMap<String, String>> eventVibesActiveMap = eventsVibesActiveDao.getVibesActiveEventsList();
 		if(eventVibesActiveMap.get(occasion)!= null){
 			if(eventVibesActiveMap.get(occasion).get(bussUnit)!=null)
 				custVibesEvent.append(eventVibesActiveMap.get(occasion).get(bussUnit));

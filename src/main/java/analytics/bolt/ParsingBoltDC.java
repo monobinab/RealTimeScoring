@@ -30,7 +30,6 @@ public class ParsingBoltDC extends EnvironmentBolt {
 	private static final long serialVersionUID = 1L;
 	private OutputCollector outputCollector;
 	private DcAidVarStrengthDao dcAidVarStrengthDao;
-	private Map<String, Map<String, Integer>> dcAidVarStrengthMap;
 	private AppMetricsBean appMetricsBean;
 	private AtomicInteger atomicInteger;
 
@@ -38,12 +37,10 @@ public class ParsingBoltDC extends EnvironmentBolt {
 		 super(systemProperty);
 	 }
 	@Override
-	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
+	public void prepare(@SuppressWarnings("rawtypes") Map stormConf, TopologyContext context, OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
 		this.outputCollector = collector;
 		dcAidVarStrengthDao = new DcAidVarStrengthDao();
-		dcAidVarStrengthMap = dcAidVarStrengthDao.getdcAidVarStrenghtMap();
-		//System.out.println(dcAidVarStrengthMap.size());
 		LOGGER.info("DC Bolt Preparing to Launch");
 		JMXConnectionManager jmxConnectionManager = JMXConnectionManager.getInstance();
         if(jmxConnectionManager != null){
@@ -109,6 +106,7 @@ public class ParsingBoltDC extends EnvironmentBolt {
 		String l_id = SecurityUtils.hashLoyaltyId(loyalty_id);
 		Double strength_sum = 0.0;
 		Map<String, String> variableValueMap = new HashMap<String, String>();
+		Map<String, Map<String, Integer>> dcAidVarStrengthMap = dcAidVarStrengthDao.getdcAidVarStrenghtMap();
 		List<String> answerChoiceIds = parsedDC.getAnswerChoiceIds();
 		if(answerChoiceIds != null && !answerChoiceIds.isEmpty()){
 		Iterator<String> answerChoiceIdsIterator =  answerChoiceIds.iterator();

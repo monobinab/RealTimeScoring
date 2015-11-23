@@ -30,6 +30,7 @@ import analytics.util.dao.ModelVariablesDao;
 import analytics.util.dao.MongoDBConnectionWrapper;
 import analytics.util.dao.RegionalFactorDao;
 import analytics.util.dao.VariableDao;
+import analytics.util.dao.caching.CacheStatistics;
 //import analytics.util.dao.caching.CacheStatistics;
 import analytics.util.objects.Boost;
 import analytics.util.objects.Change;
@@ -82,6 +83,7 @@ public class ScoringSingleton {
 
 
 	public void initDAO(DB db1, DB db2){
+		CacheStatistics.getInstance().printCacheStatistics();
 		if(!isExecuted){
 			isExecuted = Boolean.TRUE;
 			if(db1 != null && db2 != null){

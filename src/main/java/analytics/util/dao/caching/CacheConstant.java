@@ -16,6 +16,10 @@ public class CacheConstant {
 	public static final String RTS_CACHE_DIV_LN_BU_SUBBU_CACHE = "DIVLNBUSUBBUCACHE";
 	public static final String RTS_CACHE_DIV_LN_VARIABLE_CACHE = "DIVLNVARIABLECACHE";
 	public static final String RTS_CACHE_SOURCEFEED_CACHE = "SOURCEFEEDCACHE";
+	public static final String RTS_CACHE_DIV_AID_VAR_STRENGTH_CACHE = "DIVAIDVARSTRENGTHCACHE";
+	public static final String RTS_CACHE_EMAIL_BU_VARIABLE_CACHE = "EMAILBUVARIABLECACHE";
+	public static final String RTS_CACHE_EVENTS_VIBES_ACTIVE_CACHE = "EVENTSVIBESACTIVECACHE";
+	public static final String RTS_CACHE_OCC_CUST_EVENT_CACHE = "OCCCUSTEVENTCACHE";
 	
 	
 	//Model Percentiles Cache Key
@@ -59,5 +63,16 @@ public class CacheConstant {
 	//Source Feed Cache Key
 	public static final String RTS_SOURCE_FEED_CACHE_KEY = "39a631e3-45e5-4768-bf18-c16edb8a6c20";
 	
+	//Div Aid Variable Strength Cache Key
+	public static final String RTS_DIV_AID_VAR_STRENGTH_CACHE_KEY = "ebc8229e-4807-4668-8a6b-884dbb3d8bcb";
+	
+	//Div Aid Variable Strength Cache Key
+	public static final String RTS_EMAIL_BU_VARIABLE_CACHE_KEY = "7db11d80-b786-4355-8202-b0c4f7a91f41";
+	
+	//Events Vibes Active Cache Key
+	public static final String RTS_EVENTS_VIBES_ACTIVE_CACHE_KEY = "fcd35679-3cc9-4836-9200-8b87684265be";
+	
+	//OCC Cust Event Cache Key
+	public static final String RTS_OCC_CUST_EVENT_CACHE_KEY = "78a35afc-6e88-4a05-8fa4-98c7fbdbefdd";
 	
 }

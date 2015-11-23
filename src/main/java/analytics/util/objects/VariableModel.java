@@ -3,12 +3,15 @@
  */
 package analytics.util.objects;
 
+import java.io.Serializable;
+
 /**
  * @author spannal
  *
  */
-public class VariableModel {
+public class VariableModel implements Serializable{
 	
+	private static final long serialVersionUID = 1L;
 	String variable;
 	int modelId;
 	String score;

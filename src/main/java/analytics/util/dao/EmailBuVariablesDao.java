@@ -9,31 +9,40 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import analytics.util.MongoNameConstants;
+import analytics.util.dao.caching.CacheBuilder;
+import analytics.util.dao.caching.CacheConstant;
+import analytics.util.dao.caching.CacheWrapper;
 import analytics.util.objects.VariableModel;
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 
-import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
 public class EmailBuVariablesDao extends AbstractDao {
 
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(EmailBuVariablesDao.class);
-    DBCollection emailBUVariableCollection;
-   // DBCollection divLnBoostCollection;
+    private DBCollection emailBUVariableCollection;
+    private Cache cache = null;
+    
     public EmailBuVariablesDao(){
     	super();
-    	emailBUVariableCollection = db.getCollection("emailBUVariable");		
+    	emailBUVariableCollection = db.getCollection("emailBUVariable");	
+    	cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_EMAIL_BU_VARIABLE_CACHE);
+    	CacheBuilder.getInstance().setCaches(cache);
     }
     
-    public HashMap<String, List<VariableModel>> getEmailBUVariables(){
+    
+    @SuppressWarnings("unchecked")
+	public HashMap<String, List<VariableModel>> getEmailBUVariables(){
+    	String cacheKey = CacheConstant.RTS_EMAIL_BU_VARIABLE_CACHE_KEY;
+		Element element = CacheWrapper.getInstance().isCacheKeyExist(cache, cacheKey);
+		if(element != null && element.getObjectKey().equals(cacheKey)){
+			return (HashMap<String, List<VariableModel>>) element.getObjectValue();
+		}else{
     	HashMap<String, List<VariableModel>> emailBUVariablesMap = new HashMap<String, List<VariableModel>>();
-	
 		DBCursor emailBUVarCursor = emailBUVariableCollection.find();
     	for(DBObject emailBUDBObject: emailBUVarCursor) {
     		
@@ -64,7 +73,11 @@ public class EmailBuVariablesDao extends AbstractDao {
             }    		
     		
         }
+    	if(emailBUVariablesMap != null && emailBUVariablesMap.size() > 0){
+			cache.put(new Element(cacheKey, (HashMap<String, List<VariableModel>>) emailBUVariablesMap));
+		}
     	return emailBUVariablesMap;
+		}
     }
 
 

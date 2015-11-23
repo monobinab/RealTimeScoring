@@ -21,15 +21,13 @@ public class ResponseBolt extends EnvironmentBolt{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(ResponseBolt.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ResponseBolt.class);
 	private OutputCollector outputCollector;
 	private String host;
 	private int port;
 	//private JedisPool jedisPool;
 	private ResponsysUtil responsysUtil;
 	private EventsVibesActiveDao eventsVibesActiveDao;
-	HashMap<String, HashMap<String, String>> eventVibesActiveMap = new HashMap<String, HashMap<String, String>>();
 	private String topologyName;
 	
 	public ResponseBolt(String systemProperty, String host, int port) {
@@ -39,13 +37,12 @@ public class ResponseBolt extends EnvironmentBolt{
 	}
 
 	@Override
-	public void prepare(Map stormConf, TopologyContext context,
+	public void prepare(@SuppressWarnings("rawtypes") Map stormConf, TopologyContext context,
 			OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
 		responsysUtil = new ResponsysUtil();
 		this.outputCollector = collector;
 		eventsVibesActiveDao = new EventsVibesActiveDao();
-		eventVibesActiveMap = eventsVibesActiveDao.getVibesActiveEventsList();
 		topologyName = (String) stormConf.get("metrics_topology");
 		
 		//JedisPoolConfig poolConfig = new JedisPoolConfig();
@@ -53,7 +50,6 @@ public class ResponseBolt extends EnvironmentBolt{
         //jedisPool = new JedisPool(poolConfig,host, port, 100);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void execute(Tuple input) {
 		Long startTime = System.currentTimeMillis();
@@ -151,7 +147,7 @@ public class ResponseBolt extends EnvironmentBolt{
 	}
 
 	private boolean isVibesActiveWithEvent(String occasion, String bussUnit, StringBuilder custVibesEvent){
-		
+		HashMap<String, HashMap<String, String>> eventVibesActiveMap = eventsVibesActiveDao.getVibesActiveEventsList();
 		if(eventVibesActiveMap.get(occasion)!= null){
 			if(eventVibesActiveMap.get(occasion).get(bussUnit)!=null)
 				custVibesEvent.append(eventVibesActiveMap.get(occasion).get(bussUnit));
@@ -171,5 +167,4 @@ public class ResponseBolt extends EnvironmentBolt{
 		// TODO Auto-generated method stub
 		
 	}
-	
 }

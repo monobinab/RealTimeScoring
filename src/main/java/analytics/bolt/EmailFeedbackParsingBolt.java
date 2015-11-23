@@ -30,10 +30,8 @@ public class EmailFeedbackParsingBolt extends EnvironmentBolt {
 	//private Map<String, List<String>> emailBlackoutVariablesMap;
 	//private EmailBuSubBuBlackoutVariablesDao emailBuSubBuBlackoutVariablesDao;
 	private String topologyName;
-	
 	//Sree Changes for Email Feedback = Y
 	private EmailBuVariablesDao emailBuVariablesDao;
-	private Map<String, List<VariableModel>> emailBUVariablesMap;
 	private ModelPercentileDao modelPercentileDao;
 	
 	public EmailFeedbackParsingBolt(String env) {		
@@ -41,14 +39,12 @@ public class EmailFeedbackParsingBolt extends EnvironmentBolt {
 	}	
 	
 	@Override
-	public void prepare(Map stormConf, TopologyContext context,OutputCollector collector) {
+	public void prepare(@SuppressWarnings("rawtypes") Map stormConf, TopologyContext context,OutputCollector collector) {
 		super.prepare(stormConf, context, collector);		
 		this.outputCollector = collector;	
 		//emailBuSubBuBlackoutVariablesDao = new EmailBuSubBuBlackoutVariablesDao();
 		topologyName = (String) stormConf.get("metrics_topology");
-		
 		emailBuVariablesDao = new EmailBuVariablesDao();
-		emailBUVariablesMap = emailBuVariablesDao.getEmailBUVariables();
 		modelPercentileDao = new ModelPercentileDao();
 	}
 	
@@ -73,6 +69,7 @@ public class EmailFeedbackParsingBolt extends EnvironmentBolt {
 			String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no);
 			
 			Map<String, String> variableValueMap = new HashMap<String, String>();
+			Map<String, List<VariableModel>> emailBUVariablesMap = emailBuVariablesDao.getEmailBUVariables();
 			
 			if(emailFeedback.equals("NO")){//blackout 
 				/*emailBlackoutVariablesMap = emailBuSubBuBlackoutVariablesDao.getEmailBlackoutVariables(bu,format);
