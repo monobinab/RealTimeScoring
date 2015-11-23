@@ -51,8 +51,7 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 	private ChangedMemberScoresDao changedMemberScoresDao;
 	private ModelPercentileDao modelPercentileDao;
 	private ModelSywBoostDao modelBoostDao;
-	Map<String, List<String>> boostListMap;
-	private Map<String, Integer> sywBoostModelMap;
+	private Map<String, List<String>> boostListMap;
 	
 	 public ProcessSYWInteractions(String systemProperty){
 		 super(systemProperty);
@@ -74,7 +73,6 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 		modelBoostDao = new ModelSywBoostDao();
 		entityTypes = new ArrayList<String>();
 		entityTypes.add("Product");
-		sywBoostModelMap = modelBoostDao.getVarModelMap();
 		List<String> feeds = new ArrayList<String>();
 		feeds.add("SYW_LIKE");
 		feeds.add("SYW_OWN");
@@ -248,6 +246,7 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 		Map<String, String> memberScores = memberScoreDao.getMemberScores(lId);
 		Map<String, ChangedMemberScore> changedMemberScores = changedMemberScoresDao.getChangedMemberScores(lId);
 		Map<String, String> varValToScore = new HashMap<String, String>();
+		Map<String, Integer> sywBoostModelMap = modelBoostDao.getVarModelMap();
 		for(String variableName : variableValueMap.keySet()){
 			
 			Object modelIdObj= sywBoostModelMap.get(variableName);

@@ -20,6 +20,7 @@ public class CacheConstant {
 	public static final String RTS_CACHE_EMAIL_BU_VARIABLE_CACHE = "EMAILBUVARIABLECACHE";
 	public static final String RTS_CACHE_EVENTS_VIBES_ACTIVE_CACHE = "EVENTSVIBESACTIVECACHE";
 	public static final String RTS_CACHE_OCC_CUST_EVENT_CACHE = "OCCCUSTEVENTCACHE";
+	public static final String RTS_CACHE_MODEL_SYW_BOOST_CACHE = "MODELSYWBOOSTCACHE";
 	
 	
 	//Model Percentiles Cache Key
@@ -74,5 +75,8 @@ public class CacheConstant {
 	
 	//OCC Cust Event Cache Key
 	public static final String RTS_OCC_CUST_EVENT_CACHE_KEY = "78a35afc-6e88-4a05-8fa4-98c7fbdbefdd";
+	
+	//Model Syw Boost Cache Key
+	public static final String RTS_MODEL_SYW_BOOST_CACHE_KEY = "eccdb891-221c-4de4-8295-4311d92449d0";
 	
 }

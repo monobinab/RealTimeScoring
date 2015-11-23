@@ -26,6 +26,7 @@ public class CacheStatistics{
 			for(Cache cache : caches){
 				StringBuilder cacheStatsBuilder = new StringBuilder();
 				cacheStatsBuilder.append(new Date()).append("\n")
+				.append("Cache Name : " + cache.getName()).append("\n")
 				.append("Cache Size : " + cache.getStatistics().getSize()).append("\n")
 				.append("Cache Hit Count : " + cache.getStatistics().cacheHitCount()).append("\n")
 				.append("Cache Miss Count : " + cache.getStatistics().cacheMissCount()).append("\n")

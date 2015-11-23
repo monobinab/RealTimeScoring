@@ -41,7 +41,6 @@ public class SywScoringBolt extends BaseRichBolt {
 	private ModelSywBoostDao modelBoostDao;
 	private ModelPercentileDao modelPercentileDao;
 
-	private Map sywBoostModelMap;
 	private Map dcBoostModelMap;
 	//TODO: Change this after refactoring
 	private Map boostModelMap;
@@ -72,7 +71,6 @@ public class SywScoringBolt extends BaseRichBolt {
 		changedMemberScoresDao = new ChangedMemberScoresDao();
 		changedMemberVariablesDao = new ChangedMemberVariablesDao();
 		modelBoostDao = new ModelSywBoostDao();
-		sywBoostModelMap = modelBoostDao.getVarModelMap();
 		dcBoostModelMap = new DCDao().getDCModelMap();
 		
 		simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -92,6 +90,7 @@ public class SywScoringBolt extends BaseRichBolt {
 		countMetric.scope("incoming_record").incr();
 		String lId = input.getStringByField("l_id");
 		String source = input.getStringByField("source");
+		Map sywBoostModelMap =  modelBoostDao.getVarModelMap();
 		
 		if(source == "DC"){
 			boostModelMap = dcBoostModelMap;
