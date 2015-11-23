@@ -10,36 +10,36 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
-import analytics.exception.RealTimeScoringException;
+import analytics.util.dao.caching.CacheBuilder;
+import analytics.util.dao.caching.CacheConstant;
+import analytics.util.dao.caching.CacheWrapper;
 import analytics.util.objects.OccasionInfo;
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 
 public class OccasionDao extends AbstractDao{
 	
 	private DBCollection occasionInfoCollection;
-	private List<OccasionInfo> occasionInfos = new ArrayList<OccasionInfo>();
-	private static OccasionDao occasionDao;
+	private Cache cache = null;
 	
 	public OccasionDao() {
 		super();
-		try {
-			occasionInfos = this.getOccasionsInfo();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		cache = CacheManager.getInstance().getCache(CacheConstant.RTS_CACHE_OCCASIONS_INFO_CACHE);
+    	if(null == cache){
+    		cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_OCCASIONS_INFO_CACHE);
+    		CacheBuilder.getInstance().setCaches(cache);
+    	}
 	}
 	
-	public static OccasionDao getInstance(){
-        if(occasionDao == null){
-        	occasionDao = new OccasionDao();
-        }
-        return occasionDao;
-    }
-	
-	public List<OccasionInfo> getOccasionsInfo() throws Exception{
-	//	List<OccasionInfo> occasionInfos = new ArrayList<OccasionInfo>();
-		  if(occasionInfos!= null && occasionInfos.size()>0){
-			  return occasionInfos;
-		  }
+	@SuppressWarnings("unchecked")
+	public List<OccasionInfo> getOccasionsInfo(){
+		String cacheKey = CacheConstant.RTS_OCCASIONS_INFO_CACHE_KEY;
+		Element element = CacheWrapper.getInstance().isCacheKeyExist(cache, cacheKey);
+		if(element != null && element.getObjectKey().equals(cacheKey)){
+			return (List<OccasionInfo>) element.getObjectValue();
+		}else{
+		List<OccasionInfo> occasionInfos = new ArrayList<OccasionInfo>();
 		occasionInfoCollection = db.getCollection("cpsOccasions");
 		if(occasionInfoCollection != null){
 			DBCursor cursor = occasionInfoCollection.find();
@@ -81,11 +81,15 @@ public class OccasionDao extends AbstractDao{
 				}
 			}
 		}
-		//System.out.println("OccasionInfos size = " + occasionInfos.size()); 
+		if(occasionInfos != null && occasionInfos.size() > 0){
+			cache.put(new Element(cacheKey, (List<OccasionInfo>) occasionInfos));
+		}
 		return occasionInfos;
+		}
 	}
 	
 	public OccasionInfo getOccasionInfo(String occ){
+		List<OccasionInfo> occasionInfos = this.getOccasionsInfo();
 		if(occasionInfos != null && occasionInfos.size() > 0){
 			for(OccasionInfo occasionInfo : occasionInfos){
 				if(occasionInfo != null && occasionInfo.getOccasion().equalsIgnoreCase(occ)){
@@ -97,6 +101,7 @@ public class OccasionDao extends AbstractDao{
 	}
 	
 	public OccasionInfo getOccasionInfoFromPriority(String priority){
+		List<OccasionInfo> occasionInfos = this.getOccasionsInfo();
 		if(occasionInfos != null && occasionInfos.size() > 0){
 			for(OccasionInfo occasionInfo : occasionInfos){
 				if(occasionInfo != null && occasionInfo.getPriority().equalsIgnoreCase(priority)){

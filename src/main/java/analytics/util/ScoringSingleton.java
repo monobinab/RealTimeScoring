@@ -83,7 +83,6 @@ public class ScoringSingleton {
 
 
 	public void initDAO(DB db1, DB db2){
-		CacheStatistics.getInstance().printCacheStatistics();
 		if(!isExecuted){
 			isExecuted = Boolean.TRUE;
 			if(db1 != null && db2 != null){
@@ -162,7 +161,7 @@ public class ScoringSingleton {
 
 	
 	public MemberRTSChanges calcRTSChanges(String lId, Map<String, String> newChangesVarValueMap, Set<Integer> modelIdsList, String source){
-		//CacheStatistics.getInstance().printCacheStatistics();
+		CacheStatistics.getInstance().printCacheStatistics();
 		MemberRTSChanges memberRTSChanges = null;
 		Map<String, String> variableNameToStrategyMap = new HashMap<String, String>();
 		Map<String, String> variableNameToVidMap = new HashMap<String, String>();

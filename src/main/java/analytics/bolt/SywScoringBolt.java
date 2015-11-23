@@ -90,7 +90,7 @@ public class SywScoringBolt extends BaseRichBolt {
 		countMetric.scope("incoming_record").incr();
 		String lId = input.getStringByField("l_id");
 		String source = input.getStringByField("source");
-		Map sywBoostModelMap =  modelBoostDao.getVarModelMap();
+		Map<String, Integer> sywBoostModelMap =  modelBoostDao.getVarModelMap();
 		
 		if(source == "DC"){
 			boostModelMap = dcBoostModelMap;

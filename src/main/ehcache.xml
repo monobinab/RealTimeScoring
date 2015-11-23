@@ -81,6 +81,10 @@
  <cache name="MODELSYWBOOSTCACHE" maxElementsInMemory="50" eternal="false"
  	overflowToDisk="false" timeToLiveSeconds="604800" memoryStoreEvictionPolicy="LFU">
  </cache>
+ 
+ <cache name="OCCASIONSINFOCACHE" maxElementsInMemory="50" eternal="false"
+ 	overflowToDisk="false" timeToLiveSeconds="604800" memoryStoreEvictionPolicy="LFU">
+ </cache>
  <!-- Weekly Refresh Caches -->
  
 </ehcache>

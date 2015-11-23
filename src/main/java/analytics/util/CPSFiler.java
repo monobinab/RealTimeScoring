@@ -44,7 +44,7 @@ public class CPSFiler {
 		outboxDao = new OutboxDao();
 		memberInfoDao = new MemberInfoDao();
 		tagsMetaDataDao = new TagMetadataDao();
-		occasionDao = OccasionDao.getInstance();
+		occasionDao = new OccasionDao();
 		tagResponsysActiveDao = new TagResponsysActiveDao();
 		activeTags= tagResponsysActiveDao.getActiveResponsysTagsList();
 		
