@@ -19,6 +19,7 @@ import analytics.util.MongoNameConstants;
 import analytics.util.SystemUtility;
 import analytics.util.TopicConstants;
 import analytics.util.WebsphereMQCredential;
+import analytics.util.dao.caching.CacheRefreshScheduler;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
@@ -39,6 +40,7 @@ public class RealTimeScoringTellurideTopology {
 	
 	public static void main(String[] args) throws ConfigurationException {
 		LOGGER.info("Starting telluride real time scoring topology");
+		System.setProperty("TEST_PROPERTY", "ANURAG");
 		// Configure logger
 		if (!SystemUtility.setEnvironment(args)) {
 			System.out
@@ -51,6 +53,7 @@ public class RealTimeScoringTellurideTopology {
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 		String kafkatopic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;
 		MQConnectionConfig mqConnection = new MQConnectionConfig();
+		//CacheRefreshScheduler.getInstance().startScheduler();
 		WebsphereMQCredential mqCredential = mqConnection
 				.getWebsphereMQCredential(System.getProperty(MongoNameConstants.IS_PROD), "Telluride");
 		if(mqCredential==null){

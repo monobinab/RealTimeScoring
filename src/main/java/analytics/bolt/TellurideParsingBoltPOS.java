@@ -1,6 +1,7 @@
 package analytics.bolt;
 
 import analytics.util.JsonUtils;
+import analytics.util.MongoNameConstants;
 import analytics.util.SecurityUtils;
 import analytics.util.XMLParser;
 import analytics.util.dao.DivCatKsnDao;
@@ -52,6 +53,7 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
         super(systemProperty);
         this.host = host;
         this.port = port;
+        System.out.println(System.getProperty("TEST_PROPERTY"));
         
     }
 
