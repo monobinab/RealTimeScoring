@@ -53,8 +53,6 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
         super(systemProperty);
         this.host = host;
         this.port = port;
-        System.out.println(System.getProperty("TEST_PROPERTY"));
-        
     }
 
     public void setOutputCollector(OutputCollector outputCollector) {
@@ -95,6 +93,7 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
             LOGGER.debug("The time it enters inside Telluride parsing bolt execute method" + System.currentTimeMillis() + " and the message ID is ..." + input.getMessageId());
           }
         LOGGER.info("PERSIST: incoming tuples in parsingbolt TELLURIDE");
+        System.out.println(System.getProperty("TEST_PROPERTY"));
         redisCountIncr("incoming_tuples");
         /**
         if(appMetricsBean != null && atomicInteger != null){
