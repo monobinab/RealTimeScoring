@@ -34,7 +34,6 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 	static final Logger LOGGER = LoggerFactory.getLogger(BrowseCountPersistBolt.class);
 	private static final long serialVersionUID = 1L;
 	protected OutputCollector outputCollector;
-	Map<String, String> sourceMap = new HashMap<String, String>();
 	private String source;
 	
 	MemberBrowseDao memberBrowseDao;
@@ -67,7 +66,6 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
      
         cpsOccasionsDao = new CpsOccasionsDao();
         sourceFeedDao = new SourceFeedDao();
-        sourceMap = sourceFeedDao.getSourceFeedMap();
  	}
 	
 	@Override
@@ -83,7 +81,7 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 
 	public List<String> updateMemberBrowseAndKafkaList(String loyalty_id, String l_id, Map<String, Integer> incomingBuSubBuMap) {
 	
-		
+		Map<String, String> sourceMap = sourceFeedDao.getSourceFeedMap();
 		String todayDate = dateFormat.format(new Date());
 		LocalDate  date = new LocalDate(new Date());
 		LOGGER.info("PERSIST: Incoming buSubBu for " + l_id + " from " + sourceMap.get(source) +": " + incomingBuSubBuMap);	
@@ -95,9 +93,9 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 		//no record in memberBrowse for this member, insert the member and publish to kafka
 		if(memberBrowse == null ){
 			LOGGER.info("PERSIST: Record getting inserted for " + l_id + " from " + sourceMap.get(source));
-		//	validateAndEmitToKafka(loyalty_id, l_id, incomingBuSubBuMap, buSubBuCountsMap);
+		//	validateAndEmitToKafka(loyalty_id, l_id, incomingBuSubBuMap, buSubBuCountsMap, sourceMap);
 			buSubBuListToKafka = getBuSubBuList(loyalty_id, l_id, incomingBuSubBuMap, buSubBuCountsMap);
-			insertMemberBrowseToday(l_id, incomingBuSubBuMap, todayDate);
+			insertMemberBrowseToday(l_id, incomingBuSubBuMap, todayDate, sourceMap);
 		}
 		
 		/*If the member has records, iterate through the required number of dates and 
@@ -140,27 +138,27 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 				//System.out.println("PC " + key +": " + buSubBuCountsMap.get(key));
 				LOGGER.info("PERSIST: PC for " + l_id + "-- "+ key +": " + buSubBuCountsMap.get(key));
 			}
-			//validateAndEmitToKafka(loyalty_id, l_id, incomingBuSubBuMap, buSubBuCountsMap);
+			//validateAndEmitToKafka(loyalty_id, l_id, incomingBuSubBuMap, buSubBuCountsMap, sourceMap);
 			buSubBuListToKafka = getBuSubBuList(loyalty_id, l_id, incomingBuSubBuMap, buSubBuCountsMap);
 			/*
 			 * If the member has document for today, update the counts with incoming buSubBu counts
 			 */
 			if(dateSpeBuSubBuMap.containsKey(todayDate)){
-				updateMemberBrowseToday(l_id, incomingBuSubBuMap, memberBrowse, todayDate);
+				updateMemberBrowseToday(l_id, incomingBuSubBuMap, memberBrowse, todayDate, sourceMap);
 				LOGGER.info("PERSIST: Today's record getting updated for " + l_id + " from " + sourceMap.get(source));
 			}
 			/*
 			 * If the member does not have document for today, insert a new document for today
 			 */
 			else{
-				insertMemberBrowseToday(l_id, incomingBuSubBuMap, todayDate);
+				insertMemberBrowseToday(l_id, incomingBuSubBuMap, todayDate, sourceMap);
 				LOGGER.info("PERSIST: Today's record getting inserted for " + l_id + " from " + sourceMap.get(source));
 			}
 		}
 			return buSubBuListToKafka;
 	}
 
-	private void updateMemberBrowseToday(String l_id, Map<String, Integer> incomingBuSubBuMap, MemberBrowse memberBrowse, String todayDate) {
+	private void updateMemberBrowseToday(String l_id, Map<String, Integer> incomingBuSubBuMap, MemberBrowse memberBrowse, String todayDate, Map<String, String> sourceMap) {
 	
 		Map<String, Map<String, Map<String, Integer>>> dateSpeBuSubBuMap = memberBrowse.getDateSpecificBuSubBu();
 		
@@ -199,7 +197,7 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 	
 	
 	
-	public void insertMemberBrowseToday(String l_id, Map<String, Integer> incomingBuSubBuMap, String todayDate){
+	public void insertMemberBrowseToday(String l_id, Map<String, Integer> incomingBuSubBuMap, String todayDate, Map<String, String> sourceMap){
 		MemberBrowse memberBrowse = new MemberBrowse();
 		memberBrowse.setL_id(l_id);
 		Map<String, Map<String, Map<String, Integer>>> dateSpeBuSubBuMap = new HashMap<String, Map<String,Map<String,Integer>>>();
@@ -214,9 +212,7 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 		 memberBrowseDao.updateMemberBrowse(memberBrowse, todayDate);
 	}
 	
-	public void validateAndEmitToKafka(String loyalty_id, String l_id, Map<String, Integer> incomingBuSubBuMap, Map<String, Integer> buSubBuCountsMap){
-
-		
+	public void validateAndEmitToKafka(String loyalty_id, String l_id, Map<String, Integer> incomingBuSubBuMap, Map<String, Integer> buSubBuCountsMap, Map<String, String> sourceMap){
 		List<String> buSubBuList = getBuSubBuList(loyalty_id, l_id, incomingBuSubBuMap, buSubBuCountsMap); 
 			
 		//publish to kafka
@@ -272,26 +268,24 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 	
 	public void publishToKafka(List<String> buSubBuListToKafka, String loyalty_id, String l_id){
 		//publish to kafka
-				if(buSubBuListToKafka != null && !buSubBuListToKafka.isEmpty()){
-					Map<String, Object> mapToBeSend = new HashMap<String, Object>();
-					mapToBeSend.put("memberId", loyalty_id);
-					mapToBeSend.put("topology", source);
-					//mapToBeSend.put("occasionId", occasionIdMap.get(web)); 
-					mapToBeSend.put("buSubBu", buSubBuListToKafka);
-					String jsonToBeSend = new Gson().toJson(mapToBeSend );
-					try {
-						kafkaUtil.sendKafkaMSGs(jsonToBeSend.toString(), browseKafkaTopic);
-					//	System.out.println("to kafka " + buSubBuListToKafka + ", " + source);
-						LOGGER.info( l_id + " --" + loyalty_id + " published to kafka for " + sourceMap.get(source) + ": " + buSubBuListToKafka);
-						redisCountIncr("browse_to_kafka");
-					} catch (ConfigurationException e) {
-						LOGGER.error("Exception in kakfa " + ExceptionUtils.getFullStackTrace(e));
-					}
-				}
-				
-				else{
-					redisCountIncr("browse_not_to_kafka");
-				}
+		if(buSubBuListToKafka != null && !buSubBuListToKafka.isEmpty()){
+			Map<String, Object> mapToBeSend = new HashMap<String, Object>();
+			mapToBeSend.put("memberId", loyalty_id);
+			mapToBeSend.put("topology", source);
+			//mapToBeSend.put("occasionId", occasionIdMap.get(web)); 
+			mapToBeSend.put("buSubBu", buSubBuListToKafka);
+			String jsonToBeSend = new Gson().toJson(mapToBeSend );
+			try {
+				kafkaUtil.sendKafkaMSGs(jsonToBeSend.toString(), browseKafkaTopic);
+			//	System.out.println("to kafka " + buSubBuListToKafka + ", " + source);
+				LOGGER.info( l_id + " --" + loyalty_id + " published to kafka for : " + buSubBuListToKafka);
+				redisCountIncr("browse_to_kafka");
+			} catch (ConfigurationException e) {
+				LOGGER.error("Exception in kakfa " + ExceptionUtils.getFullStackTrace(e));
+			}
+		}
+		else{
+			redisCountIncr("browse_not_to_kafka");
+		}
 	}
-
 }
