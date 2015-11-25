@@ -19,6 +19,7 @@ import analytics.util.MongoNameConstants;
 import analytics.util.SystemUtility;
 import analytics.util.TopicConstants;
 import analytics.util.WebsphereMQCredential;
+import analytics.util.dao.caching.CacheRefreshScheduler;
 //import analytics.util.dao.caching.CacheRefreshScheduler;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
@@ -52,7 +53,7 @@ public class RealTimeScoringTellurideTopology {
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 		String kafkatopic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;
 		MQConnectionConfig mqConnection = new MQConnectionConfig();
-		//CacheRefreshScheduler.getInstance().startScheduler();
+		CacheRefreshScheduler.getInstance().startScheduler();
 		WebsphereMQCredential mqCredential = mqConnection
 				.getWebsphereMQCredential(System.getProperty(MongoNameConstants.IS_PROD), "Telluride");
 		if(mqCredential==null){
