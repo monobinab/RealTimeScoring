@@ -122,8 +122,7 @@ public class MemberBrowseDao extends AbstractDao{
       	
       	 if(dbo != null){
       		 memberBrowse7day = new MemberBrowse();
-      		 dbo.removeField("_id");
-          	 dbo.removeField("l_id");
+         	 dbo.removeField("l_id");
           	 Map<String, Map<String, Map<String, Integer>> > dateSpecBuSubBuMap = new HashMap<String, Map<String, Map<String, Integer>>>();
       		 for(String date :  dbo.keySet()){
       			 
