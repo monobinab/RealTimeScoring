@@ -1,4 +1,4 @@
-package analytics.bolt;
+/*package analytics.bolt;
 
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
@@ -50,10 +50,10 @@ public class StrategyScoringBoltTest {
 		db = SystemPropertyUtility.getDb();
 	}
 	
-	/*
+	
 	 * If there is no incoming variables from the parsing bolt, i.e. newChangesVarValueMap is empty
 	 * strategyBolt will ack the input, thereby output collector will be empty
-	 */
+	 
 	@Test
 	public void strategyScoringBoltWithEmptyNewChangesVarValueMapTest() throws ParseException {
 			
@@ -72,11 +72,11 @@ public class StrategyScoringBoltTest {
 		Assert.assertEquals(new HashMap<String, List<Object>>(), outputCollector.getTuple());
 	}
 	
-	/*
+	
 	 * If all incoming variables are not of RTS interest (with NONE strategy), there won't be any models to be scored
 	 * so, null object will be returned from SS and the input will be acked by the strategybolt
 	 * output collector will be empty
-	 */
+	 
 	@Test
 	public void strategyScoringBoltWithAllIncomingVarsOfNONEStrategyTest() throws ParseException {
 		
@@ -210,9 +210,9 @@ public class StrategyScoringBoltTest {
 		memVarColl.remove(new BasicDBObject("l_id", l_id));
 	}
 	
-	/*
+	
 	 * If the member does not exist in memberVariables collection, RTS will not score that member
-	 */
+	 
 	@Test
 	public void strategyScoringBoltWithNoMemberVarsFoundTest() throws ParseException {
 		
@@ -249,9 +249,9 @@ public class StrategyScoringBoltTest {
 		Assert.assertEquals(new HashMap<String, List<Object>>(), outputCollector.getTuple());
 	}
 	
-	/*
+	
 	 * If the member exists but with no vars of interest, he will be scored by RTS, if he has non-expired vars of interest (in changedMemVars collection)
-	 */
+	 
 	@SuppressWarnings("unchecked")
 	@Test
 	public void strategyScoringBoltMemberFoundWithNoVarsOfInterestTest() throws ParseException {
@@ -342,10 +342,10 @@ public class StrategyScoringBoltTest {
 		memVarColl.remove(new BasicDBObject("l_id", l_id));
 	}
 	
-	/*
+	
 	 * If the incoming variable is a blackout variable, the model associated will be blacked out with a score of 0.0
 	 * expiration will be set for 30 days based on blackout strategy
-	 */
+	 
 	@SuppressWarnings("unchecked")
 	@Test
 	public void strategyScoringBoltWithBlackoutIncomingVarTest() throws ParseException {
@@ -437,12 +437,12 @@ public class StrategyScoringBoltTest {
 		memVarColl.remove(new BasicDBObject("l_id", l_id));
 	}
 		
-	/*
+	
 	 * If the incoming variable is not a blackout variable, but the model affected by the inc var has a blackout var
 	 * which is unexpired for this member based on previous activity
 	 * then the model will be blacked out with a score of 0.0 and expiration will be set for 30 days based on blackout strategy
 	 * here model 75 has VID 17 associated with it, so will be blacked out, but model 70 which has only S_SRS_VAR association, will be scored with value
-	 */
+	 
 	@SuppressWarnings("unchecked")
 	@Test
 	public void strategyScoringBoltWithNoIncomingBlackoutWithUnexpiredBlackoutChangedMemVarTest() throws ParseException {
@@ -547,12 +547,12 @@ public class StrategyScoringBoltTest {
 		memVarColl.remove(new BasicDBObject("l_id", l_id));
 	}
 		
-	/*
+	
 	 * If a member has an non-expired change var based on previous activity, which is removed from RTS system (i.e. from variables and modelVariables collection)
 	 * it won't be populated in changedMemVars at all
 	 * hence, it will be skipped in scoring, expiration dates etc. Here, VID 19 is not in our collections, so only the incoming S_SRS_VAR will be used
 	 * Got NPE in PRODUCTION and the null check was included
-	 */
+	 
 	@SuppressWarnings("unchecked")
 	@Test
 	public void strategyScoringBoltWithUnexpChangedMemVarNotInRTSTest() throws ParseException {
@@ -643,4 +643,4 @@ public class StrategyScoringBoltTest {
 		memVarColl.remove(new BasicDBObject("l_id", l_id));
 	}
 	
-}
+}*/
