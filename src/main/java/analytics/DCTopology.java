@@ -35,6 +35,8 @@ public class DCTopology {
 			System.exit(0);
 		}
 		TopologyBuilder builder = new TopologyBuilder();
+		CacheRefreshScheduler.getInstance().startScheduler();
+		
 		BrokerHosts hosts = new ZkHosts("trprtelpacmapp1.vm.itg.corp.us.shldcorp.com:2181");
 		// use topology Id as part of the consumer ID to make it unique
 		SpoutConfig kafkaConfig = new SpoutConfig(hosts, "telprod_reqresp_log_output", "", "RTSConsumer"+topologyId);
@@ -88,6 +90,5 @@ public class DCTopology {
 			}
 			cluster.shutdown();
 		}
-		 CacheRefreshScheduler.getInstance().startScheduler();
 	}
 }

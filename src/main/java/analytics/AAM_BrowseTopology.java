@@ -35,7 +35,7 @@ public class AAM_BrowseTopology {
 			System.exit(0);
 		} 
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
-
+		CacheRefreshScheduler.getInstance().startScheduler();
 		String topic = TopicConstants.AAM_BROWSE_PRODUCTS;
 		String kafkatopic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;
 		String browseKafkaTopic = TopicConstants.BROWSE_KAFKA_TOPIC;
@@ -93,6 +93,5 @@ public class AAM_BrowseTopology {
 			}
 			cluster.shutdown();
 		}
-		 CacheRefreshScheduler.getInstance().startScheduler();
 	}
 }

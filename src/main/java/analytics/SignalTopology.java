@@ -30,7 +30,7 @@ public class SignalTopology {
 			System.exit(0);
 		} 
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
-
+		CacheRefreshScheduler.getInstance().startScheduler();
 		topologyBuilder.setSpout("signalSpout", new SignalSpout(), 1);
 		topologyBuilder.setBolt("parsingSignalBolt", new ParsingSignalBolt(System.getProperty(MongoNameConstants.IS_PROD), AuthPropertiesReader.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
 				.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 3).shuffleGrouping("signalSpout");
@@ -64,6 +64,5 @@ public class SignalTopology {
 			}
 			cluster.shutdown();
 		}
-		 CacheRefreshScheduler.getInstance().startScheduler();
 	}
 }

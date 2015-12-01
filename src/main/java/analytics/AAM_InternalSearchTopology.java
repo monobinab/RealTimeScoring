@@ -41,6 +41,7 @@ public static void main(String[] args) {
 		String source = TopicConstants.AAM_CDF_INTERNALSEARCH;
 		String browseKafkaTopic = TopicConstants.BROWSE_KAFKA_TOPIC;
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
+		CacheRefreshScheduler.getInstance().startScheduler();
 		
 		//Sree. Spout that wakes up every 5 mins and process the Traits
 		topologyBuilder.setSpout("internalSearchSpout", new WebHDFSSpout(servers[1], TopicConstants.PORT, Constants.AAM_INTERNAL_SEARCH_PATH, "aamInternalSearch"), 1);
@@ -89,7 +90,6 @@ public static void main(String[] args) {
 			cluster.shutdown();
 
 			}
-		 CacheRefreshScheduler.getInstance().startScheduler();
 		}
 	}
 

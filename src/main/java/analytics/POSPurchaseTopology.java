@@ -32,7 +32,7 @@ public class POSPurchaseTopology {
 			System.exit(0);
 		} 
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
-
+		CacheRefreshScheduler.getInstance().startScheduler();
 		topologyBuilder.setSpout("posPurchaseSpout", new ResponsysSpout(
 				System.getProperty(MongoNameConstants.IS_PROD), AuthPropertiesReader.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
 						.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 1);
@@ -68,7 +68,6 @@ public class POSPurchaseTopology {
 					LOGGER.error(e.getClass() + ": " +  e.getMessage(), e);
 				}
 				cluster.shutdown();
-			}
-		CacheRefreshScheduler.getInstance().startScheduler();
+		}
 	}
 }

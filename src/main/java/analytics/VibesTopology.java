@@ -30,6 +30,7 @@ public class VibesTopology{
 		} else {
 		
 		TopologyBuilder builder = new TopologyBuilder();
+		CacheRefreshScheduler.getInstance().startScheduler();
 		//String[] servers = RedisConnection.getServers(System.getProperty(MongoNameConstants.IS_PROD));
 		
 		//Spout that wakes up every 5 mins and process the Vibes Text Messages
@@ -61,7 +62,6 @@ public class VibesTopology{
 				cluster.shutdown();
 			}
 		}
-		 CacheRefreshScheduler.getInstance().startScheduler();
 	}
 }
 	

@@ -36,6 +36,7 @@ public class SYWEventsTopology {
 			System.exit(0);
 		} 
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
+		CacheRefreshScheduler.getInstance().startScheduler();
 		String topic = TopicConstants.SYW;
 		String kafkatopic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;
 		topologyBuilder.setSpout("sywEventsSpout1", new SYWRedisSpout(
@@ -104,6 +105,5 @@ public class SYWEventsTopology {
 			Thread.sleep(10000000);
 			cluster.shutdown();
 		}
-	  CacheRefreshScheduler.getInstance().startScheduler();
 	}
 }
