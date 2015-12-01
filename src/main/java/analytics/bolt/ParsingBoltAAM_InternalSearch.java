@@ -18,6 +18,7 @@ import org.codehaus.jettison.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import analytics.util.SingletonJsonParser;
 import analytics.util.dao.DivLnBuSubBuDao;
 import analytics.util.dao.DivLnVariableDao;
 import analytics.util.dao.PidDivLnDao;
@@ -25,6 +26,7 @@ import analytics.util.objects.DivLn;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -70,8 +72,7 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
 		}
 	}
 
-
-    private boolean isJSONValid(String test) {
+   /*private boolean isJSONValid(String test) {
         try {
             JSONObject jsonObj = new JSONObject(test);
             jsonObj = null;
@@ -85,6 +86,18 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
                 //System.out.println(test);
                 return false;
             }
+        }
+    }*/
+    
+    public static boolean isJSONValid(String str) {
+        try {
+        	Gson gson = SingletonJsonParser.getInstance().getGsonInstance();
+            gson.fromJson(str, Object.class);
+            return true;
+        } catch(com.google.gson.JsonSyntaxException ex) { 
+        	LOGGER.info("String too big: " + str);
+        	LOGGER.info(ex.getMessage());
+            return false;
         }
     }
         	

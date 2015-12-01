@@ -41,9 +41,10 @@ public class POSPurchaseBolt  extends ResponsysBolt{
 			for(int i=0; i <divLineArr.length ; i++){
 				//tagMetadata.setDivLine(tagMetadata.getDivLine()!=null ? tagMetadata.getDivLine()+"," +divLineArr[i]: divLineArr[i]);
 				responsysUtil.getTagMetadata(tagMetadata,divLineArr[i]);
-				if (tagMetadata.getDivLine() == null || tagMetadata.getDivLine().equals("")||tagMetadata.getDivLine().isEmpty())
-					return "P";
+				
 			}
+			if (tagMetadata.getDivLine() == null || tagMetadata.getDivLine().equals("")||tagMetadata.getDivLine().isEmpty())
+				return "P";
 			
 			setResponsysObj(lyl_id_no, responsysObj, l_id, memberInfo, o, tagMetadata, value, custEventNm, topologyName);
 	    }catch(Exception e){

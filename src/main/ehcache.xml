@@ -46,10 +46,6 @@
  	overflowToDisk="false" timeToLiveSeconds="604800" memoryStoreEvictionPolicy="LFU">
  </cache>
  
- <cache name="DIVLNBUNAMECACHE" maxElementsInMemory="50" eternal="false"
- 	overflowToDisk="false" timeToLiveSeconds="604800" memoryStoreEvictionPolicy="LFU">
- </cache>
- 
  <cache name="DIVLNBUSUBBUCACHE" maxElementsInMemory="50" eternal="false"
  	overflowToDisk="false" timeToLiveSeconds="604800" memoryStoreEvictionPolicy="LFU">
  </cache>

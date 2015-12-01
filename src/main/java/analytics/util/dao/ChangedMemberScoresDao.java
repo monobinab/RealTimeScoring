@@ -29,7 +29,7 @@ public class ChangedMemberScoresDao extends AbstractDao{
     }
     
     public void deleteChangedMemberScore(String lId){
-    	changedMemberScoresCollection.findAndRemove(new BasicDBObject("l_id",lId));
+    	changedMemberScoresCollection.remove(new BasicDBObject("l_id",lId));
     }
     
 	public void upsertUpdateChangedScores(String lId, Map<Integer, ChangedMemberScore> updatedScores) {

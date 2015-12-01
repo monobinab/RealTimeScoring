@@ -4,13 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.util.MongoNameConstants;
-import analytics.util.dao.caching.CacheBuilder;
-import analytics.util.dao.caching.CacheConstant;
-import analytics.util.dao.caching.CacheWrapper;
 import analytics.util.objects.TagMetadata;
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
@@ -20,8 +14,11 @@ public class DivLineBuSubDao extends AbstractDao {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(DivLineBuSubDao.class);
 	private DBCollection divLineBuSubCollection;
-	private Cache cache = null;
-
+	private final String filterHolidayBUSUbBU = "Electronics|Sears Camera|Electronics|Sears Television|Lawn & Garden|"
+			+ "Sears Mower|Lawn & Garden|Sears small items|Lawn & Garden|Sears Trimmers|outdoor Living|Sears Grill|"
+			+ "outdoor Living|Sears Patio Furniture|Sporting Goods|Sears Gameroom|Tools|Sears Hand tools|Tools|"
+			+ "Sears Power Tools|Tools|Sears Tool Storage";
+	
 	/**
 	 * t,b,s,po
 	 */
@@ -29,20 +26,10 @@ public class DivLineBuSubDao extends AbstractDao {
 		super();
 		divLineBuSubCollection = db.getCollection("divLnBuName");
 		LOGGER.info("collection in tagMetadataDao: " + divLineBuSubCollection.getFullName());
-		cache = CacheManager.getInstance().getCache(CacheConstant.RTS_CACHE_DIV_LN_BUNAMECACHE);
-    	if(null == cache){
-    		cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_DIV_LN_BUNAMECACHE);
-    		CacheBuilder.getInstance().setCaches(cache);
-    	}
 	}
 
-
+/**
 	public TagMetadata getBuSubBu(TagMetadata tagMetadata,String divLine){
-		String cacheKey = CacheConstant.RTS_DIV_LN_BU_NAME_CACHE_KEY;
-		Element element = CacheWrapper.getInstance().isCacheKeyExist(cache, cacheKey);
-		if(element != null && element.getObjectKey().equals(cacheKey)){
-			return (TagMetadata) element.getObjectValue();
-		}else{
 		BasicDBObject query = new BasicDBObject();
 		query.put(MongoNameConstants.DLBS_DIV, divLine);
 		
@@ -53,14 +40,33 @@ public class DivLineBuSubDao extends AbstractDao {
 			tagMetadata.setBusinessUnit(tagMetadata.getBusinessUnit()!=null ? tagMetadata.getBusinessUnit()+","+(String)dbObj.get(MongoNameConstants.DLBS_BU) : (String)dbObj.get(MongoNameConstants.DLBS_BU));
 			tagMetadata.setSubBusinessUnit(tagMetadata.getSubBusinessUnit() != null ? tagMetadata.getSubBusinessUnit()+","+(String)dbObj.get(MongoNameConstants.DLBS_SUB) : (String)dbObj.get(MongoNameConstants.DLBS_SUB));
 	
+		}else{
+			tagMetadata.setBusinessUnit(tagMetadata.getBusinessUnit()!=null ? tagMetadata.getBusinessUnit()+",null" : "null");
+			tagMetadata.setSubBusinessUnit(tagMetadata.getSubBusinessUnit() != null ? tagMetadata.getSubBusinessUnit()+",null" : "null");
+		}
+		return tagMetadata;
+	}*/
+	
+	//Temporary fix to supress certain BU, SubBUs for sending emails... Holiday Season only...
+	public TagMetadata getBuSubBuHolidaySeason(TagMetadata tagMetadata, String divLine){
+		BasicDBObject query = new BasicDBObject();
+		query.put(MongoNameConstants.DLBS_DIV, divLine);
+		
+		DBObject dbObj = divLineBuSubCollection.findOne(query);
+		
+		if(dbObj != null){
+			String buSubBu = (String)dbObj.get(MongoNameConstants.DLBS_BU)+"|"+(String)dbObj.get(MongoNameConstants.DLBS_SUB);
+			if(filterHolidayBUSUbBU.toLowerCase().contains(buSubBu.toLowerCase()))
+				return tagMetadata;
+				
+			tagMetadata.setDivLine(tagMetadata.getDivLine()!=null ? tagMetadata.getDivLine()+"," +divLine: divLine);
+			tagMetadata.setBusinessUnit(tagMetadata.getBusinessUnit()!=null ? tagMetadata.getBusinessUnit()+","+(String)dbObj.get(MongoNameConstants.DLBS_BU) : (String)dbObj.get(MongoNameConstants.DLBS_BU));
+			tagMetadata.setSubBusinessUnit(tagMetadata.getSubBusinessUnit() != null ? tagMetadata.getSubBusinessUnit()+","+(String)dbObj.get(MongoNameConstants.DLBS_SUB) : (String)dbObj.get(MongoNameConstants.DLBS_SUB));
+	
 		}/*else{
 			tagMetadata.setBusinessUnit(tagMetadata.getBusinessUnit()!=null ? tagMetadata.getBusinessUnit()+",null" : "null");
 			tagMetadata.setSubBusinessUnit(tagMetadata.getSubBusinessUnit() != null ? tagMetadata.getSubBusinessUnit()+",null" : "null");
 		}*/
-		if(tagMetadata != null){
-			cache.put(new Element(cacheKey, (TagMetadata) tagMetadata));
-		}
 		return tagMetadata;
-		}
 	}
 }

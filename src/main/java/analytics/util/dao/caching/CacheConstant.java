@@ -12,7 +12,6 @@ public class CacheConstant {
 	public static final String RTS_CACHE_REGIONALFACTORCACHE = "REGIONALFACTORCACHE";
 	public static final String RTS_CACHE_DIV_CAT_VARIABLECACHE = "DIVCATVARIABLECACHE";
 	public static final String RTS_CACHE_DIV_LN_BOOSTCACHE = "DIVLNBOOSTCACHE";
-	public static final String RTS_CACHE_DIV_LN_BUNAMECACHE = "DIVLNBUNAMECACHE";
 	public static final String RTS_CACHE_DIV_LN_BU_SUBBU_CACHE = "DIVLNBUSUBBUCACHE";
 	public static final String RTS_CACHE_DIV_LN_VARIABLE_CACHE = "DIVLNVARIABLECACHE";
 	public static final String RTS_CACHE_SOURCEFEED_CACHE = "SOURCEFEEDCACHE";
@@ -52,9 +51,6 @@ public class CacheConstant {
 	
 	//Div Ln Boost Cache Key
 	public static final String RTS_DIV_LN_BOOST_CACHE_KEY = "22035605-e283-45a2-80a2-eed62e30f670";
-	
-	//Div Ln Bu Name Cache Key
-	public static final String RTS_DIV_LN_BU_NAME_CACHE_KEY = "cb62cf35-a02c-44c2-93c5-813f5c0d6dc1";
 	
 	//Div Ln Bu Sub Bu Cache Key
 	public static final String RTS_DIV_LN_BU_SUBBU_CACHE_KEY = "2ffb7fa6-378d-42f6-b58d-8291281beecd";

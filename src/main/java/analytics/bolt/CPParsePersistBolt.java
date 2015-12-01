@@ -104,7 +104,6 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 			    }			
 			}
 			if(tagsList != null && tagsList.size()==0){
-				LOGGER.info("PERSIST: Input Empty Tags for Lid " + lyl_id_no + " : "+ tagsList.toString());
 				memberMDTags2Dao.deleteMemberMDTags(l_id);
 				LOGGER.info("PERSIST: OCCASION DELETE: " + l_id);
 			}
@@ -112,7 +111,6 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 			List<Object> listToEmit = new ArrayList<Object>();
 			listToEmit = new ArrayList<Object>();
 			listToEmit.add(lyl_id_no.getAsString());
-			//listToEmit.add(l_id);				
 			this.outputCollector.emit(listToEmit);			
 			
 			redisCountIncr("output_count");	
@@ -120,11 +118,9 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 				
 		} catch (Exception e) {			
 			LOGGER.error("PERSIST: CPParsePersistBolt: exception in parsing for memberId :: "+ input.getString(0) + " : " + ExceptionUtils.getMessage(e) + "Rootcause-"+ ExceptionUtils.getRootCauseMessage(e) +"  STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
-			redisCountIncr("exception_count");	
-			//outputCollector.fail(input);
+			redisCountIncr("exception_count");				
 		
 		} 
-		// LOGGER.info("TIME:" + messageID + "-Exiting ParsingboltOccasion-" +
 		outputCollector.ack(input);
 	}
 

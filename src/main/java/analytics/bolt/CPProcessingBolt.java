@@ -1,20 +1,20 @@
 package analytics.bolt;
 
 
-import java.math.BigInteger;
+//import java.math.BigInteger;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.configuration.PropertiesConfiguration;
+//import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import scala.math.BigInt;
-import analytics.exception.RealTimeScoringException;
+//import scala.math.BigInt;
+//import analytics.exception.RealTimeScoringException;
 import analytics.util.CPSFiler;
-import analytics.util.MongoNameConstants;
+//import analytics.util.MongoNameConstants;
 import analytics.util.RTSAPICaller;
 import analytics.util.SecurityUtils;
 import analytics.util.dao.ClientApiKeysDAO;
@@ -74,20 +74,19 @@ public class CPProcessingBolt extends EnvironmentBolt  {
 						LOGGER.info("PERSIST: MemberId : " + lyl_id_no + " | CPS STATUS : QUEUED " + " | TAGS: "+  getLogMsg(queuedEmailPackages));
 						redisCountIncr("queued_tags_count");											
 					}else{
-						LOGGER.info("PERSIST: MemberId : " + lyl_id_no + " | CPS STATUS : NOT QUEUED ");						
+						LOGGER.info("PERSIST: MemberId : " + lyl_id_no + " | CPS STATUS : NOT QUEUED****");	
+						redisCountIncr("not_queued_tags_count");
 					}
 					
 				}			
 			} catch (SQLException e){
 				LOGGER.error("PERSIST: SQLException Occured in CPProcessingBolt for memberId :: "+ lyl_id_no + " : "+ ExceptionUtils.getMessage(e) + "Rootcause-"+ ExceptionUtils.getRootCauseMessage(e) + "  SATCKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 				redisCountIncr("SQLException_count");	
-				e.printStackTrace();
-				//outputCollector.fail(input);					
+				e.printStackTrace();									
 			} catch (Exception e){
 				LOGGER.error("PERSIST: Exception Occured in CPProcessingBolt for memberId:: " + lyl_id_no + " : "+  ExceptionUtils.getMessage(e) + "Rootcause-"+ ExceptionUtils.getRootCauseMessage(e) + "  STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 				redisCountIncr("exception_count");
 				e.printStackTrace();
-				//outputCollector.fail(input);	
 			}
 				
 		} else {

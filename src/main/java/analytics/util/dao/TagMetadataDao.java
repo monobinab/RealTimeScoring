@@ -97,4 +97,14 @@ public class TagMetadataDao extends AbstractDao {
 		}
 		return metaDataObj;
 	}
+	
+	public void addTagMetaData(TagMetadata metaDataObj){
+		BasicDBObject newObj = new BasicDBObject();
+		newObj.append("SUB", metaDataObj.getSubBusinessUnit());
+		newObj.append("BU_", metaDataObj.getBusinessUnit());
+		newObj.append("SEG", metaDataObj.getMdTag());
+		newObj.append("OCC", metaDataObj.getPurchaseOccasion());
+		tagMetadataCollection.insert(newObj);
+		
+	}
 }

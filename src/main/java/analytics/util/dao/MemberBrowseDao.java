@@ -108,6 +108,38 @@ public class MemberBrowseDao extends AbstractDao{
       	 return entireMemberBrowse;
       }
     
+    @SuppressWarnings("unchecked")
+  	public MemberBrowse getMemberBrowse7dayHistory(String lId){
+      	BasicDBObject filter7daysDBO = new BasicDBObject("l_id",1).append("_id", 0);
+    	for(int i=0;i<7;i++) {
+    		filter7daysDBO.append(dateFormat.format(new Date().getTime() + (-i * 24 * 60 * 60 * 1000)),1);
+    		
+    	}
+    	
+      	MemberBrowse memberBrowse7day = null;
+      	DBObject dbo = memberBrowseCollection.findOne(new BasicDBObject("l_id", lId),filter7daysDBO);
+      	
+      	
+      	 if(dbo != null){
+      		 memberBrowse7day = new MemberBrowse();
+         	 dbo.removeField("l_id");
+          	 Map<String, Map<String, Map<String, Integer>> > dateSpecBuSubBuMap = new HashMap<String, Map<String, Map<String, Integer>>>();
+      		 for(String date :  dbo.keySet()){
+      			 
+      			 BasicDBObject dateSpedbObj = (BasicDBObject) dbo.get(date);
+  		    		
+		  		 Map<String, Map<String, Integer>> browseTagfeedCountsMap = new HashMap<String, Map<String,Integer>>();
+	   	    	 for(String browseTag : dateSpedbObj.keySet()){
+		    		 Map<String, Integer> feedCountsMap =  (Map<String, Integer>) dateSpedbObj.get(browseTag);
+		    		 browseTagfeedCountsMap.put(browseTag, feedCountsMap);
+	   	         }
+	   	    	dateSpecBuSubBuMap.put(date, browseTagfeedCountsMap);
+      		 }
+      		memberBrowse7day.setDateSpecificBuSubBu(dateSpecBuSubBuMap);
+      	 }
+      	 return memberBrowse7day;
+      }
+    
 	/*public void updateMemberBrowse(String l_id,  DateSpecificMemberBrowse memberBrowse){
 		BasicDBObject updateRec = new BasicDBObject();
 		BasicDBObject browseTagDbObj = new BasicDBObject();

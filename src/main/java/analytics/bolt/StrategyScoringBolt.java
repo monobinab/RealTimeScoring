@@ -185,12 +185,12 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	      	this.outputCollector.emit("score_stream", listToEmitMemberScoreList);
 	      	
 			//persisting the loyalty id to redis for UnknownOccasionsTopology to pick up the loyalty id
-			if(respHost != null){
+		/*	if(respHost != null){
 					jedis = getJedisInterface().createJedis(respHost, respPort);
 					jedis.connect();
 					jedis.set("Unknown:"+lyl_id_no,"");
 					jedis.disconnect();
-			}
+			}*/
 			
 			//Adding logic to set up a Stream that the KafkaBolt can listen to...
 			List<Object> listToEmit = new ArrayList<Object>();
