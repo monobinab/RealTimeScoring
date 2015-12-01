@@ -17,6 +17,7 @@ import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
 import analytics.util.SystemUtility;
 import analytics.util.TopicConstants;
+import analytics.util.dao.caching.CacheRefreshScheduler;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
@@ -115,7 +116,6 @@ public class ConsideredPurchaseTopology {
 			}
 			cluster.shutdown();
 		}
-	
+		 CacheRefreshScheduler.getInstance().startScheduler();
 	}
-
 }

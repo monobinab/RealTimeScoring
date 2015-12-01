@@ -9,6 +9,7 @@ import analytics.util.Constants;
 import analytics.util.MongoNameConstants;
 import analytics.util.RedisConnection;
 import analytics.util.TopicConstants;
+import analytics.util.dao.caching.CacheRefreshScheduler;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
@@ -56,7 +57,7 @@ public class TraitsTopology{
 			//Thread.sleep(1000000);
 			cluster.shutdown();
 		}
-
+		 CacheRefreshScheduler.getInstance().startScheduler();
 	}
 }
 	
