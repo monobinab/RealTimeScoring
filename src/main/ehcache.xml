@@ -8,19 +8,19 @@
  
  <!-- Daily Refresh Caches -->
  <cache name="MODELPERCENTILECACHE" maxElementsInMemory="50" eternal="false"
- 	overflowToDisk="false" timeToLiveSeconds="86400" memoryStoreEvictionPolicy="LFU">
+ 	overflowToDisk="false" timeToLiveSeconds="0" memoryStoreEvictionPolicy="LFU">
  </cache>
  
  <cache name="MODELVARIABLESCACHE" maxElementsInMemory="50" eternal="false"
- 	overflowToDisk="false" timeToLiveSeconds="86400" memoryStoreEvictionPolicy="LFU">
+ 	overflowToDisk="false" timeToLiveSeconds="0" memoryStoreEvictionPolicy="LFU">
  </cache>
  
  <cache name="VARIABLESCACHE" maxElementsInMemory="50" eternal="false"
- 	overflowToDisk="false" timeToLiveSeconds="86400" memoryStoreEvictionPolicy="LFU">
+ 	overflowToDisk="false" timeToLiveSeconds="0" memoryStoreEvictionPolicy="LFU">
  </cache>
  
  <cache name="REGIONALFACTORCACHE" maxElementsInMemory="50" eternal="false"
- 	overflowToDisk="false" timeToLiveSeconds="86400" memoryStoreEvictionPolicy="LFU">
+ 	overflowToDisk="false" timeToLiveSeconds="0" memoryStoreEvictionPolicy="LFU">
  </cache>
  <!-- Daily Refresh Caches -->
   

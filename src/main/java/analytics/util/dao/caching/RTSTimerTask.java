@@ -27,12 +27,12 @@ public class RTSTimerTask extends TimerTask {
     @Override
     public void run() {
     	Date currentDate = new Date(System.currentTimeMillis());
-    	//LOGGER.info("Daily Cache Refresh Job Started at : " + sdf.format(currentDate));
-    	System.out.println("Daily Cache Refresh Job Started at : " + sdf.format(currentDate));
+    	LOGGER.info("Daily Cache Refresh Job Started at : " + sdf.format(currentDate));
         List<Cache> caches = this.getDailyActiveCaches();
         if(caches != null && caches.size() > 0){
         	for(Cache cache : caches){         
     			cache.removeAll();
+    			LOGGER.info("Cache : " + cache.getName() + " refreshed successfully !!");
         	}
         }
    }

@@ -247,13 +247,15 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 		Map<String, ChangedMemberScore> changedMemberScores = changedMemberScoresDao.getChangedMemberScores(lId);
 		Map<String, String> varValToScore = new HashMap<String, String>();
 		Map<String, Integer> sywBoostModelMap = modelBoostDao.getVarModelMap();
+		Map<Integer, Map<Integer, Double>> modelPercentileMap = modelPercentileDao.getModelPercentiles();
+				
 		for(String variableName : variableValueMap.keySet()){
 			
 			Object modelIdObj= sywBoostModelMap.get(variableName);
 			if (modelIdObj instanceof Integer) {
 				int modelId = (Integer)modelIdObj;
 				String modelIdStr = String.valueOf(modelId);
-				if(memberScores.get(modelIdStr) == null || modelPercentileDao.getModelPercentiles().get(modelId) == null){
+				if(memberScores.get(modelIdStr) == null || modelPercentileMap.get(modelId) == null){
 					continue;
 				}
 				double memberScore = Double.valueOf(memberScores.get(modelIdStr));
@@ -262,7 +264,7 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 					LOGGER.error("New "+variableName+" boost value failed to get recorded in memberBoosts collection or allBoostValuesMap for user "+lId);
 					continue;
 				}
-				double percentileScore = modelPercentileDao.getModelPercentiles().get(modelId).get(percentile);
+				double percentileScore = modelPercentileMap.get(modelId).get(percentile);
 				double val = 0.0;
 				
 				if ("SYW_LIKE".equals(feedType) || "SYW_WANT".equals(feedType)) {

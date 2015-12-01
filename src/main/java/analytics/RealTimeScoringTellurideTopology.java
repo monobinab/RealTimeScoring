@@ -53,7 +53,7 @@ public class RealTimeScoringTellurideTopology {
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 		String kafkatopic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;
 		MQConnectionConfig mqConnection = new MQConnectionConfig();
-		CacheRefreshScheduler.getInstance().startScheduler();
+		//CacheRefreshScheduler.getInstance().startScheduler();
 		WebsphereMQCredential mqCredential = mqConnection
 				.getWebsphereMQCredential(System.getProperty(MongoNameConstants.IS_PROD), "Telluride");
 		if(mqCredential==null){
