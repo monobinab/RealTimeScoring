@@ -20,10 +20,10 @@ public class CacheRefreshJob implements Job{
 	public void execute(JobExecutionContext arg0) throws JobExecutionException {
 		List<Cache> caches = this.getDailyActiveCaches();
         if(caches != null && caches.size() > 0){
-        	for(Cache cache : caches){         
+        	for(Cache cache : caches){
+        		CacheStatistics.getInstance().showCacheStatistics(cache);
     			cache.removeAll();
     			LOGGER.info("Cache : " + cache.getName() + " refreshed successfully !!");
-    			System.out.println("Cache : " + cache.getName() + " refreshed successfully !!");
         	}
         }
 	}

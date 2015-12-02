@@ -17,7 +17,7 @@ public class RTSQuartzScheduler {
 		if(job != null){
 			Trigger trigger = TriggerBuilder.newTrigger().
 					withIdentity("cachRefreshTrigger", "group1").
-					withSchedule(CronScheduleBuilder.cronSchedule("0/5 * * * * ?")).build();
+					withSchedule(CronScheduleBuilder.cronSchedule("0/60 * * * * ?")).build();
 			/**
 			Trigger trigger = TriggerBuilder.newTrigger().
 					withIdentity("cachRefreshTrigger", "group1").

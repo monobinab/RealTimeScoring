@@ -1,10 +1,6 @@
 package analytics.bolt;
 
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import analytics.jmx.AppMetricsBean;
-import analytics.jmx.JMXConnectionManager;
 import analytics.util.MongoNameConstants;
 import analytics.util.dao.caching.CacheRefreshScheduler;
 import backtype.storm.metric.api.MultiCountMetric;
@@ -27,15 +23,6 @@ public class EnvironmentBolt extends BaseRichBolt {
 
 	public EnvironmentBolt(String systemProperty) {
 	   environment = systemProperty;
-	   //CacheRefreshScheduler.getInstance().startScheduler();
-	   /**
-	   JMXConnectionManager jmxConnectionManager = JMXConnectionManager.getInstance();
-        if(jmxConnectionManager != null){
-        	if(appMetricsBean == null && atomicInteger == null){
-        		appMetricsBean = jmxConnectionManager.getAppMetricsBean();
-        		atomicInteger = jmxConnectionManager.getAtomicIntegerInstance();
-        	}
-        }*/
 	}
 	
 	public void redisCountIncr(String scope){
