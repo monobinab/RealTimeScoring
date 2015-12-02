@@ -378,6 +378,13 @@
 			<version>1.7</version>
 		</dependency>
 		<!--  ehcache.xml -->
+		<!-- Quartz Scheduler -->
+		<dependency>
+			<groupId>org.quartz-scheduler</groupId>
+			<artifactId>quartz</artifactId>
+			<version>2.1.5</version>
+		</dependency>
+		<!-- Quartz Scheduler -->
     </dependencies>
 	<build>
 		<resources>
