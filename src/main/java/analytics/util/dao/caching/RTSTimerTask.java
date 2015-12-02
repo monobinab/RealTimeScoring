@@ -49,8 +49,8 @@ public class RTSTimerTask extends TimerTask {
     public void startTask(){
     	RTSTimerTask task = new RTSTimerTask();
         Timer timer = new Timer();  
-        //timer.schedule(task, getTomorrowMorning2AM(), ONCE_PER_DAY);// Once Per Day - 1000*60*60*24 (24 hrs)
-        timer.schedule (task,0,1000*60*1);
+        timer.schedule(task, getTomorrowMorning2AM(), ONCE_PER_DAY);// Once Per Day - 1000*60*60*24 (24 hrs)
+        //timer.schedule (task,0,1000*60*1);
     }
     
     private List<Cache> getDailyActiveCaches(){
