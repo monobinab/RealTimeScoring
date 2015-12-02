@@ -27,7 +27,7 @@ public class EnvironmentBolt extends BaseRichBolt {
 
 	public EnvironmentBolt(String systemProperty) {
 	   environment = systemProperty;
-	   CacheRefreshScheduler.getInstance().startScheduler();
+	   //CacheRefreshScheduler.getInstance().startScheduler();
 	   /**
 	   JMXConnectionManager jmxConnectionManager = JMXConnectionManager.getInstance();
         if(jmxConnectionManager != null){
@@ -50,6 +50,7 @@ public class EnvironmentBolt extends BaseRichBolt {
 		//initializing the metrics
 		countMetric = new MultiCountMetric();
 		context.registerMetric("custom_metrics", countMetric, 60);
+		CacheRefreshScheduler.getInstance().startScheduler();
 	}
 
 	@Override

@@ -19,7 +19,7 @@ public class CacheRefreshScheduler {
 	
 	public void startScheduler(){
 		if(isScheduled != Boolean.TRUE){
-			//LOGGER.info("QUARTZ Cache Refresh Scheduler Started Sucessfully !!");
+			LOGGER.info("QUARTZ Cache Refresh Scheduler Started Sucessfully !!");
 			System.out.println("QUARTZ Cache Refresh Scheduler Started Sucessfully !!");
 			isScheduled = Boolean.TRUE;
 			RTSQuartzScheduler rtsQuartzScheduler = new RTSQuartzScheduler();
