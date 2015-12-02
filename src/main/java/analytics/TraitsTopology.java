@@ -28,7 +28,6 @@ public class TraitsTopology{
 		}
 		
 		TopologyBuilder builder = new TopologyBuilder();
-		CacheRefreshScheduler.getInstance().startScheduler();
 		String[] servers = RedisConnection.getServers("LOCAL");
 		
 		//Spout that wakes up every 5 mins and process the Traits

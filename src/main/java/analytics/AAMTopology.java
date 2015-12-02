@@ -36,7 +36,6 @@ public class AAMTopology {
 			System.exit(0);
 		}
 			TopologyBuilder builder = new TopologyBuilder();
-			CacheRefreshScheduler.getInstance().startScheduler();
 			
 			String source = TopicConstants.AAM_CDF_TRAITS;
 

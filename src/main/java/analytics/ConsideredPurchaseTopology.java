@@ -58,7 +58,6 @@ public class ConsideredPurchaseTopology {
 		String group_id = "cps_groupid";
 		String env = System.getProperty(MongoNameConstants.IS_PROD);
 		TopologyBuilder topologyBuilder = new TopologyBuilder();	
-		CacheRefreshScheduler.getInstance().startScheduler();
 		
 		try {
 			SpoutConfig spoutConfig1 = null;

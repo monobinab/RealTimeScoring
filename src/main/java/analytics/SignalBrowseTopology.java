@@ -35,7 +35,6 @@ public class SignalBrowseTopology{
 		} else {
 		
 		TopologyBuilder builder = new TopologyBuilder();
-		CacheRefreshScheduler.getInstance().startScheduler();
 		String source = TopicConstants.SIGNAL_BROWSE_FEED;
 		String kafkatopic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;
 		String browseKafkaTopic = TopicConstants.BROWSE_KAFKA_TOPIC;

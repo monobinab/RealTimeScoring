@@ -51,7 +51,6 @@ public class RealTimeScoringTellurideTopology {
 		//String topologyId = "";
 		String purchase_Topic="rts_cp_purchase_scores";
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
-		CacheRefreshScheduler.getInstance().startScheduler();
 		String kafkatopic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;
 		MQConnectionConfig mqConnection = new MQConnectionConfig();
 		WebsphereMQCredential mqCredential = mqConnection

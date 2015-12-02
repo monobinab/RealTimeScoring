@@ -38,7 +38,6 @@ public class EmailFeedbackTopology {
 		String zkroot="emailTopic";
 		String env = System.getProperty(MongoNameConstants.IS_PROD);
 		TopologyBuilder builder = new TopologyBuilder();
-		CacheRefreshScheduler.getInstance().startScheduler();
 		
 		//prepare the kafka spout configuration			
 		try {
