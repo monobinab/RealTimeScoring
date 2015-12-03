@@ -48,6 +48,7 @@ public class POSPurchaseTopology {
 					|| System.getProperty(MongoNameConstants.IS_PROD)
 							.equalsIgnoreCase("QA")) {
 				try {
+					conf.setNumWorkers(48);
 	               StormSubmitter.submitTopology(args[0], conf,
 							topologyBuilder.createTopology());
 				} catch (AlreadyAliveException e) {
