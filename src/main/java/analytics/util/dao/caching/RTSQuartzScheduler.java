@@ -22,7 +22,7 @@ public class RTSQuartzScheduler {
 			
 			Trigger trigger = TriggerBuilder.newTrigger().
 					withIdentity("cachRefreshTrigger", "group1").
-					withSchedule(CronScheduleBuilder.cronSchedule("0 0 14 * * ?")).build();
+					withSchedule(CronScheduleBuilder.cronSchedule("0 0 02 * * ?")).build();
 			//schedule it
 	    	Scheduler scheduler = new StdSchedulerFactory().getScheduler();
 	    	scheduler.start();
