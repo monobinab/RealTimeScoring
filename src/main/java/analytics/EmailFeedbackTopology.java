@@ -38,6 +38,15 @@ public class EmailFeedbackTopology {
 		String env = System.getProperty(MongoNameConstants.IS_PROD);
 		TopologyBuilder builder = new TopologyBuilder();
 		
+		//browseKafkaTopic for PROD
+		//String browseKafkaTopic = "rts_browse";
+		
+		//for testing
+		String browseKafkaTopic = "test2";
+		
+		//listening topic for testing
+		/*String kafkaTopic = "test2";*/
+		
 		//prepare the kafka spout configuration			
 		try {
 			builder.setSpout("RTSKafkaSpout", new RTSKafkaSpout(new KafkaUtil(System.getProperty(MongoNameConstants.IS_PROD)).getSpoutConfig(				
@@ -48,7 +57,8 @@ public class EmailFeedbackTopology {
 				System.exit(0);
 		}
 			
-		builder.setBolt("emailFeedbackParsingBolt", new EmailFeedbackParsingBolt(env),2).localOrShuffleGrouping("RTSKafkaSpout");
+		//builder.setBolt("emailFeedbackParsingBolt", new EmailFeedbackParsingBolt(env),2).localOrShuffleGrouping("RTSKafkaSpout");
+		builder.setBolt("emailFeedbackParsingBolt", new EmailFeedbackParsingBolt(env, "Browse", browseKafkaTopic),2).localOrShuffleGrouping("RTSKafkaSpout");
 		builder.setBolt("strategyScoringBolt", new StrategyScoringBolt(env), 2).shuffleGrouping("emailFeedbackParsingBolt",  "score_stream");
 		
 		//Adding the purchase kafka bolt to read from strategy scoring bolt...
