@@ -34,8 +34,8 @@ public class Kafka612TesterOLD {
 	 	   Producer<String, String> producer = new Producer<String, String>(config);
            //String msg = "New Test message to Kafka at "+System.currentTimeMillis(); 
 	 	   //String msg="{\"lyl_id_no\":\"7081327008588950\",\"tags\":[\"HMMTS823600153010\",\"HAVCS823600153010\",\"HALAS823600153010\",\"HARFS723600123010\", \"HAGAS118400116010\"]}";
-	 	   String msg="{\"lyl_id_no\":\"7081073754330425\",\"BU\":\"HA\",\"format\":\"S\",\"emailFeedbackResponse\":\"YES\"}";
-           KeyedMessage<String, String> data = new KeyedMessage<String, String>("rts_emailnofeedback", "rts_grp", msg);
+	 	   String msg="{\"lyl_id_no\":\"7081187618793758\",\"BU\":\"HR\",\"format\":\"S\",\"emailFeedbackResponse\":\"EXPLICIT\"}";
+           KeyedMessage<String, String> data = new KeyedMessage<String, String>("test2", "rts_group", msg);
 	       producer.send(data);
            producer.close();       
 	        
