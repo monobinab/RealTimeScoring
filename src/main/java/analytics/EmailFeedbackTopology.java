@@ -39,10 +39,10 @@ public class EmailFeedbackTopology {
 		TopologyBuilder builder = new TopologyBuilder();
 		
 		//browseKafkaTopic for PROD
-		//String browseKafkaTopic = "rts_browse";
+		String browseKafkaTopic = "rts_browse";
 		
 		//for testing
-		String browseKafkaTopic = "test2";
+		//String browseKafkaTopic = "test2";
 		
 		//listening topic for testing
 		/*String kafkaTopic = "test2";*/

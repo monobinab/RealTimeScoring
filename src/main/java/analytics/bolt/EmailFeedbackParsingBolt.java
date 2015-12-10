@@ -152,7 +152,7 @@ public class EmailFeedbackParsingBolt extends EnvironmentBolt {
 						
 							//For BrowseTag creation
 							if(boostBrowseBuSubBuMap.get(tagModelIdMap.get(var.getModelId())).getBuSubBu() != null)
-								buSubBuListtoKafka.add(tagModelIdMap.get(var.getModelId())+occasionIdMap.get(web));
+								buSubBuListtoKafka.add(boostBrowseBuSubBuMap.get(tagModelIdMap.get(var.getModelId())).getBuSubBu()+occasionIdMap.get(web));
 							
 						}
 					}
@@ -181,13 +181,12 @@ public class EmailFeedbackParsingBolt extends EnvironmentBolt {
 			}
 			
 			//publishing to kafka for browseTag creation
-			//TODO: uncomment this when in PROD
 			if(buSubBuListtoKafka != null && !buSubBuListtoKafka.isEmpty()){
-				/*browseUtils.publishToKafka(buSubBuListtoKafka, lyl_id_no, l_id, topologyName, browseKafkaTopic);
-				redisCountIncr("explicit_to_kafka");*/
+				browseUtils.publishToKafka(buSubBuListtoKafka, lyl_id_no, l_id, topologyName, browseKafkaTopic);
+				redisCountIncr("explicit_to_kafka");
 			}
 			else{
-				//redisCountIncr("explicit_not_to_kafka");
+				redisCountIncr("explicit_not_to_kafka");
 			}
 		}
 	}
