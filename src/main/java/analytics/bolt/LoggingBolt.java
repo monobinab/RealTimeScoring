@@ -61,12 +61,15 @@ public class LoggingBolt extends EnvironmentBolt {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void execute(Tuple input) {
+		
 		redisCountIncr("incoming_tuples");
 		List<ChangedMemberScore> changedMemberScores = (List<ChangedMemberScore>)input.getValueByField("changedMemberScoresList");
 		if(changedMemberScores != null && changedMemberScores.size() > 0){
 			Map<Integer,TreeMap<Integer,Double>> modelScorePercentileMap = modelPercentileDao.getModelScorePercentilesMap();
 			for(ChangedMemberScore changedMemberScore : changedMemberScores){
+				
 				if(changedMemberScore != null){
+					try{
 					String l_id = changedMemberScore.getlId();
 					String modelId = changedMemberScore.getModelId();
 					String oldScore = memberScoreDao.getMemberScores(l_id).get(modelId);
@@ -88,7 +91,13 @@ public class LoggingBolt extends EnvironmentBolt {
 									+ "oldPercentile: " + oldPercentile+", newPercentile: " + newPercentile);
 					redisCountIncr("score_logged");
 					outputCollector.ack(input);	
+					}
+					catch(Exception e){
+						LOGGER.error("Exception in Logging bolt for " + changedMemberScore.getlId() + " model " + changedMemberScore.getModelId());
+					}
 				}
+				
+			
 			}
 		}
 	}
