@@ -243,12 +243,12 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 	}
 
 	public Map<String, String> formMapForScoringBolt(String feedType, String lId, Map<String, Map<String, List<String>>> allBoostValuesMap, Map<String, String> variableValueMap) {
+		Map<String, String> varValToScore = new HashMap<String, String>();
+		try{
 		Map<String, String> memberScores = memberScoreDao.getMemberScores(lId);
 		Map<String, ChangedMemberScore> changedMemberScores = changedMemberScoresDao.getChangedMemberScores(lId);
-		Map<String, String> varValToScore = new HashMap<String, String>();
 		Map<String, Integer> sywBoostModelMap = modelBoostDao.getVarModelMap();
 		Map<Integer, Map<Integer, Double>> modelPercentileMap = modelPercentileDao.getModelPercentiles();
-				
 		for(String variableName : variableValueMap.keySet()){
 			
 			Object modelIdObj= sywBoostModelMap.get(variableName);
@@ -296,6 +296,11 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 					redisCountIncr("type_own");
 				}
 			}
+		}
+		
+		}
+		catch(Exception e){
+			LOGGER.error("Exception in ProcessSYWInteractions for " + lId );
 		}
 		return varValToScore;
 	}

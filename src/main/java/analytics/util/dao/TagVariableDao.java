@@ -167,4 +167,18 @@ public class TagVariableDao extends AbstractDao {
 		return tagVariables;
 		}
 	}
+	
+	public Map<Integer, String> getTagFromModelId(){
+		Map<Integer, String> tagVariablesMap = new HashMap<Integer, String>();
+		DBCursor tagVariables = tagVariablesCollection.find();
+		while(tagVariables.hasNext()){
+			DBObject tagVariableObject = tagVariables.next();
+			if(tagVariableObject!=null)
+			{
+				tagVariablesMap.put(Integer.valueOf(tagVariableObject.get(MongoNameConstants.TAG_VAR_MODEL).toString()), 
+						tagVariableObject.get(MongoNameConstants.TAG_VAR_MDTAG).toString());
+			}
+		}
+		return tagVariablesMap;
+	}
 }

@@ -4,15 +4,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.bolt.POSPurchaseBolt;
-import analytics.bolt.UnknownResponsysBolt;
-import analytics.bolt.ResponsysBolt;
 import analytics.spout.ResponsysSpout;
 import analytics.util.AuthPropertiesReader;
 import analytics.util.Constants;
 import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
 import analytics.util.SystemUtility;
-import analytics.util.dao.caching.CacheRefreshScheduler;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
@@ -32,6 +29,7 @@ public class POSPurchaseTopology {
 			System.exit(0);
 		} 
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
+
 		topologyBuilder.setSpout("posPurchaseSpout", new ResponsysSpout(
 				System.getProperty(MongoNameConstants.IS_PROD), AuthPropertiesReader.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
 						.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 1);
@@ -48,6 +46,7 @@ public class POSPurchaseTopology {
 					|| System.getProperty(MongoNameConstants.IS_PROD)
 							.equalsIgnoreCase("QA")) {
 				try {
+					conf.setNumWorkers(6);
 	               StormSubmitter.submitTopology(args[0], conf,
 							topologyBuilder.createTopology());
 				} catch (AlreadyAliveException e) {
@@ -67,6 +66,6 @@ public class POSPurchaseTopology {
 					LOGGER.error(e.getClass() + ": " +  e.getMessage(), e);
 				}
 				cluster.shutdown();
-		}
+			}
 	}
 }

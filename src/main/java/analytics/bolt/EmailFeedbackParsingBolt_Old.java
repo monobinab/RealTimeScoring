@@ -2,23 +2,16 @@ package analytics.bolt;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.util.BrowseUtils;
 import analytics.util.JsonUtils;
 import analytics.util.SecurityUtils;
-import analytics.util.dao.BoostBrowseBuSubBuDao;
-import analytics.util.dao.CpsOccasionsDao;
 import analytics.util.dao.EmailBuVariablesDao;
 import analytics.util.dao.ModelPercentileDao;
-import analytics.util.dao.TagVariableDao;
-import analytics.util.objects.BoostBrowseBuSubBu;
 import analytics.util.objects.VariableModel;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -29,67 +22,46 @@ import backtype.storm.tuple.Tuple;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
-public class EmailFeedbackParsingBolt extends EnvironmentBolt {
+public class EmailFeedbackParsingBolt_Old extends EnvironmentBolt {
 	
-	private static final String BOOST_VALUE = "4";
 	private static final long serialVersionUID = 1L;
-	private static final Logger LOGGER = LoggerFactory.getLogger(EmailFeedbackParsingBolt.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(EmailFeedbackParsingBolt_Old.class);
 	private OutputCollector outputCollector;
+	//private Map<String, List<String>> emailBlackoutVariablesMap;
+	//private EmailBuSubBuBlackoutVariablesDao emailBuSubBuBlackoutVariablesDao;
 	private String topologyName;
 	
 	//Sree Changes for Email Feedback = Y
 	private EmailBuVariablesDao emailBuVariablesDao;
+	private Map<String, List<VariableModel>> emailBUVariablesMap;
 	private ModelPercentileDao modelPercentileDao;
 	
-	/*
-	 * for browse tag creation
-	*/
-	private TagVariableDao tagVariableDao;
-	private Map<Integer, String> tagModelIdMap;
-	private BoostBrowseBuSubBuDao boostBrowseBuSubBuDao;
-	private Map<String, BoostBrowseBuSubBu> boostBrowseBuSubBuMap;
-	private BrowseUtils browseUtils;
-	private String systemProperty;
-	private String browseKafkaTopic;
-	private String web;
-	private Map<String, String> occasionIdMap;
-	private CpsOccasionsDao cpsOccasionsDao;
-	
-	public EmailFeedbackParsingBolt(String env, String web, String browseKafkaTopic) {		
-		super(env);	
-		this.systemProperty = env;
-		this.browseKafkaTopic = browseKafkaTopic;
-		this.web = web;
+	public EmailFeedbackParsingBolt_Old(String env) {		
+		super(env);			
 	}	
 	
 	@Override
-	public void prepare(@SuppressWarnings("rawtypes") Map stormConf, TopologyContext context,OutputCollector collector) {
+	public void prepare(Map stormConf, TopologyContext context,OutputCollector collector) {
 		super.prepare(stormConf, context, collector);		
 		this.outputCollector = collector;	
+		//emailBuSubBuBlackoutVariablesDao = new EmailBuSubBuBlackoutVariablesDao();
 		topologyName = (String) stormConf.get("metrics_topology");
-		browseUtils = new BrowseUtils(systemProperty, browseKafkaTopic);
+		
 		emailBuVariablesDao = new EmailBuVariablesDao();
+		emailBUVariablesMap = emailBuVariablesDao.getEmailBUVariables();
 		modelPercentileDao = new ModelPercentileDao();
-		tagVariableDao = new TagVariableDao();
-		tagModelIdMap = tagVariableDao.getTagFromModelId();
-		boostBrowseBuSubBuDao = new BoostBrowseBuSubBuDao();
-		boostBrowseBuSubBuMap = boostBrowseBuSubBuDao.getBoostBuSubBuFromModelCode();
-		cpsOccasionsDao = new CpsOccasionsDao();
-		occasionIdMap = cpsOccasionsDao.getcpsOccasionId();
 	}
 	
 	@Override
 	public void execute(Tuple input) {
 		redisCountIncr("incoming_tuples");
-		
-	try{
 		JsonParser parser = new JsonParser();
 		JsonElement emailFeedbackObject = parser.parse(input.getValueByField("str").toString());
 		String lyl_id_no = emailFeedbackObject.getAsJsonObject().get("lyl_id_no").getAsString();
 		String bu = emailFeedbackObject.getAsJsonObject().get("BU").getAsString();//HA, AA
 		String format = emailFeedbackObject.getAsJsonObject().get("format").getAsString();//S/K
 		String emailFeedback = emailFeedbackObject.getAsJsonObject().get("emailFeedbackResponse").getAsString();//YES/NO	
-		String key = bu+"~"+format;
+		
 		LOGGER.info("Incoming Message to EmailFeedbackParsingBolt: " + input.toString());
 			
 		if (lyl_id_no == null) {
@@ -101,13 +73,16 @@ public class EmailFeedbackParsingBolt extends EnvironmentBolt {
 			String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no);
 			
 			Map<String, String> variableValueMap = new HashMap<String, String>();
-			Map<String, List<VariableModel>> emailBUVariablesMap = emailBuVariablesDao.getEmailBUVariables();
-			
-			//buSubBuList to be sent to kafka for BrowseTag creation
-			Set<String> buSubBuListtoKafka = new HashSet<String>();
 			
 			if(emailFeedback.equals("NO")){//blackout 
-			
+				/*emailBlackoutVariablesMap = emailBuSubBuBlackoutVariablesDao.getEmailBlackoutVariables(bu,format);
+				if(emailBlackoutVariablesMap.containsKey(bu)){
+					for (String b : emailBlackoutVariablesMap.get(bu)) {					
+							variableValueMap.put(b, "1");	//any value could have been suffice as Blackout strategy will reset the core to 0 anyway			
+					}	
+				}*/
+				
+				String key = bu+"~"+format;
 				if(emailBUVariablesMap.get(key)!=null && emailBUVariablesMap.get(key).size()>0){
 					System.out.println("NO - Email list for " + key + " is "+emailBUVariablesMap.get(key));
 					for (VariableModel var : emailBUVariablesMap.get(key)) {
@@ -120,6 +95,7 @@ public class EmailFeedbackParsingBolt extends EnvironmentBolt {
 			}
 			else if(emailFeedback.equals("YES")){//boost
 				//Sree. get email boost variables
+				String key = bu+"~"+format;
 				if(emailBUVariablesMap.get(key)!=null && emailBUVariablesMap.get(key).size()>0){
 					System.out.println("YES - Email list for " + key + " is "+emailBUVariablesMap.get(key));
 					for (VariableModel var : emailBUVariablesMap.get(key)) {									
@@ -128,34 +104,6 @@ public class EmailFeedbackParsingBolt extends EnvironmentBolt {
 					}
 				}
 				redisCountIncr("email_feedback_yes_count");
-			}
-		
-			else if(emailFeedback.equals("EXPLICIT")){
-				if(emailBUVariablesMap.get(key)!=null && emailBUVariablesMap.get(key).size()>0){
-					for (VariableModel var : emailBUVariablesMap.get(key)) {
-						LOGGER.info("EXPLICIT - Email list for " + key +"is " + emailBUVariablesMap.get(key) + " lid " + l_id);
-						/*int modelId = var.getModelId();
-						String tag  = tagModelIdMap.get(modelId);
-						String boostBrowseVar = boostBrowseBuSubBuMap.get(tag).getBoost();*/
-						
-						
-						/*
-						 * modelId is checked whether it is tagVar collection to get the tag from it
-						 * the retrieved tag is checked for its existence in boostBrowseBuSubBu collection to get the BOOST_BROWSE variable
-						 * for scoring and to get subBus for browse tag creation
-						 */
-						if(tagModelIdMap.containsKey(var.getModelId()) && boostBrowseBuSubBuMap.containsKey(tagModelIdMap.get(var.getModelId()))){
-							//For scoring
-							variableValueMap.put(boostBrowseBuSubBuMap.get(tagModelIdMap.get(var.getModelId())).getBoost(), BOOST_VALUE);
-						
-							//For BrowseTag creation
-							if(boostBrowseBuSubBuMap.get(tagModelIdMap.get(var.getModelId())).getBuSubBu() != null)
-								buSubBuListtoKafka.add(boostBrowseBuSubBuMap.get(tagModelIdMap.get(var.getModelId())).getBuSubBu()+occasionIdMap.get(web));
-							
-						}
-					}
-				}
-					redisCountIncr("email_feedback_explicit_count");
 			}
 			
 			if (variableValueMap != null && !variableValueMap.isEmpty()) {
@@ -177,21 +125,9 @@ public class EmailFeedbackParsingBolt extends EnvironmentBolt {
 			} else {
 				redisCountIncr("empty_var_map");
 			}
-			
-			//publishing to kafka for browseTag creation
-			if(buSubBuListtoKafka != null && !buSubBuListtoKafka.isEmpty()){
-				browseUtils.publishToKafka(buSubBuListtoKafka, lyl_id_no, l_id, topologyName, browseKafkaTopic);
-				redisCountIncr("explicit_to_kafka");
-			}
-			else{
-				redisCountIncr("explicit_not_to_kafka");
-			}
+			this.outputCollector.ack(input);
+
 		}
-	}
-	catch(Exception e){
-		LOGGER.error("Exception in EmailFeedbackParsng bolt "  + e);
-	}
-		this.outputCollector.ack(input);
 	}
 	
 	private String getVariableValue(int modelId){

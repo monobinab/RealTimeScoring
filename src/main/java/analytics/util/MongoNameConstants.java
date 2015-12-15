@@ -197,6 +197,10 @@ public class MongoNameConstants {
      
    //traitLnBuSubBu collection
      public static final String TRAIT_ID = "t";
+     
+   //boostBrowseBuSubBu collection
+     public static final String BOOST = "boost";
+     public static final String MODEL_CODE = "modelCode";
  
      
 }

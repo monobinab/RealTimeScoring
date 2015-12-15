@@ -34,9 +34,10 @@ public class MemberScoreDao extends AbstractDao {
 		BasicDBObject query = new BasicDBObject();
 		query.put(MongoNameConstants.L_ID, l_id);
 		DBObject dbObj = memberScoreCollection.findOne(query);
-
+		
 		if (dbObj != null && dbObj.keySet() != null) {
 			for (String key : dbObj.keySet()) {
+				try{
 				// skip expired changes
 				if (MongoNameConstants.L_ID.equals(key) || MongoNameConstants.ID.equals(key) || MongoNameConstants.TIMESTAMP.equals(key)) {
 					continue;
@@ -45,7 +46,16 @@ public class MemberScoreDao extends AbstractDao {
 					memberScores.put(key, dbObj.get(key).toString());
 				}
 			}
+				catch(Exception e){
+					LOGGER.error("Exception in memberScoreDao for " + l_id);
+				//	memberScores.put(key, "0");
+					
+				}
+			}
+			
 		}
+		
+		
 		return memberScores;
 				
 	}
