@@ -57,7 +57,7 @@ public class Change {
 		return this.expirationDate;
 	}
 	
-	/*public String getExpirationDateAsString() {
+	public String getExpirationDateAsString() {
 		return dtFormat.format(this.expirationDate);
 	}
 
@@ -66,25 +66,8 @@ public class Change {
 			return dtFormat.format(this.effectivDate);
 		}
 		else return dtFormat.format(new Date());
-	}*/
-	
-	public String getExpirationDateAsString() {
-        String result = "";
-        synchronized(dtFormat){
-                 result = dtFormat.format(this.expirationDate);
-        }
-        	return result;
 	}
-
-	public Object getEffectiveDateAsString() {
-        String result = "";
-        synchronized(dtFormat){
-                 if(this.effectivDate != null) {
-                         result = dtFormat.format(this.effectivDate);
-                 }
-                 else result = dtFormat.format(new Date());
-        }
-        return result;
-}
+	
+	
 
 }
