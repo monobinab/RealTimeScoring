@@ -21,7 +21,6 @@ import com.mongodb.DB;
 import analytics.exception.RealTimeScoringException;
 import analytics.util.dao.ChangedMemberScoresDao;
 import analytics.util.dao.ChangedMemberVariablesDao;
-import analytics.util.dao.MemberBrowseDao;
 import analytics.util.dao.MemberInfoDao;
 import analytics.util.dao.MemberVariablesDao;
 import analytics.util.dao.MemberBoostsDao;
@@ -59,8 +58,6 @@ public class ScoringSingleton {
 	ModelSywBoostDao modelSywBoostDao;
 	MemberBoostsDao memberBoostsDao;
 	
-	private MemberBrowseDao memberBrowseDao;
-
 	private boolean isExecuted = Boolean.FALSE;
 	
 	public static ScoringSingleton getInstance() {
@@ -100,34 +97,6 @@ public class ScoringSingleton {
 			memberBoostsDao = new MemberBoostsDao();
 			regionalFactorDao = new RegionalFactorDao();
 			memberInfoDao = new MemberInfoDao();
-			//code for checking MemberBrowse collection
-			/*memberBrowseDao = new MemberBrowseDao();
-			MemberBrowse memberBrowse = memberBrowseDao.getMemberBrowse("9a5rMKMCyTjL1KHHxF5c0v7SREI=");
-			System.out.println(memberBrowse.getlId());
-			Map<String, List<BrowseTag>> dateSpeTags = memberBrowse.getBrowseTags();
-			for(String key : dateSpeTags.keySet()){
-				System.out.println("date: " + key);
-				List<BrowseTag> brwTags = dateSpeTags.get(key);
-				for(int i=0; i<brwTags.size(); i++){
-					BrowseTag tag = brwTags.get(i);
-					Map<String, Object> count = tag.getFeedCounts();
-					System.out.println(tag.getBrowseTag() + ": ");
-					for(String key2 : count.keySet()){
-						System.out.println("feed: " + key2 +", " + count.get(key2));
-					}
-				}
-			}*/
-			/*memberBrowseDao = new MemberBrowseDao();
-			MemberBrowse memberBrowse = memberBrowseDao.getMemberBrowse("9a5rMKMCyTjL1KHHxF5c0v7SREI=");
-			System.out.println(memberBrowse.getlId());
-			Map<String, List<BrowseTag>> dateSpeTags = memberBrowse.getBrowseTags();
-			for (Map.Entry<String, List<BrowseTag>> entry : dateSpeTags.entrySet()) {
-				if(entry.getKey().equals(getDateFormat(new Date()))){
-					List<BrowseTag> browseTags = dateSpeTags.get(entry.getKey());
-					
-				}
-			}
-			*/
 		}
 	}
 
@@ -323,8 +292,12 @@ public class ScoringSingleton {
 			if (models == null)
 				continue;
 			for (Integer modelId : models) {
-				if (getMonth(modelId, modelsMap) != -1) 
+				if (!changedVariable.startsWith(MongoNameConstants.BLACKOUT_VAR_PREFIX) && getMonth(modelId, modelsMap) != -1) {
 					modelIdList.add(modelId);
+				}
+				else{
+					modelIdList.add(modelId);
+				}
 			}
 		}
 		return modelIdList;
@@ -427,7 +400,7 @@ public class ScoringSingleton {
 	
 	public boolean isBlackOutModel(Map<String, Change> allChanges,	Integer modelId, Map<Integer, Map<Integer, Model>> modelsMap) {
 		int blackFlag = 0;
-		Map<String, Variable> variableMap = getModelVariables(modelId, modelsMap);
+		Map<String, Variable> variableMap = getBlackoutModelVariables(modelId, modelsMap);
 		if(variableMap != null ){
 			for (Map.Entry<String, Change> entry : allChanges.entrySet()) {
 				String ch = entry.getKey();
@@ -690,6 +663,17 @@ public class ScoringSingleton {
 			variables = modelsMap.get(modelId).get(month).getVariables();
 		}
      		return variables;
+	}
+	
+	public Map<String, Variable> getBlackoutModelVariables(Integer modelId, Map<Integer, Map<Integer, Model>> modelsMap){
+		Map<String, Variable> variables = null;
+		Map<Integer, Model> monthModel = modelsMap.get(modelId);
+		for (Map.Entry<Integer, Model> entry : monthModel.entrySet()) {
+			if(monthModel.get(entry.getKey()) != null && monthModel.get(entry.getKey()).getVariables() != null){
+				variables = monthModel.get(entry.getKey()).getVariables();
+			}
+		}
+	   		return variables;
 	}
 	
 	public String getDateFormat(Date date){
