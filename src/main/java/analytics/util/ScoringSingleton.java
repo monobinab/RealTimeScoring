@@ -292,10 +292,10 @@ public class ScoringSingleton {
 			if (models == null)
 				continue;
 			for (Integer modelId : models) {
-				if (!changedVariable.startsWith(MongoNameConstants.BLACKOUT_VAR_PREFIX) && getMonth(modelId, modelsMap) != -1) {
+				if (changedVariable.startsWith(MongoNameConstants.BLACKOUT_VAR_PREFIX) ) {
 					modelIdList.add(modelId);
 				}
-				else{
+				else if(getMonth(modelId, modelsMap) != -1){
 					modelIdList.add(modelId);
 				}
 			}
