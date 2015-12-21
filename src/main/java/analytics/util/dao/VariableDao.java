@@ -79,4 +79,15 @@ public class VariableDao extends AbstractDao{
 		}
 		return strategyList;
 	}
+	
+	public List<String> getBoostBrowseVariables() {
+		List<String> variables = getVariableNames();
+		List<String> boostVariables = new ArrayList<String>();
+		for(String varName : variables){
+			if(varName.contains(MongoNameConstants.BROWSE_BOOST_PREFIX)){
+				boostVariables.add(varName);
+			}
+		}
+			return boostVariables;
+	}
 }

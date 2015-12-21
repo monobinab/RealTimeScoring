@@ -34,6 +34,7 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 	private MemberBoostsDao memberBoostsDao;
 	private DivLnBuSubBuDao divLnBuSubBuDao;
 	private DivLnBoostDao divLnBoostDao;
+	private VariableDao variableDao;
 	private PidMatchUtils pidMatchUtil;
 	private List<String> boostList;
 
@@ -57,6 +58,7 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 		divLnBoostDao = new DivLnBoostDao();
 		boostList = new ArrayList<String>();
 		divLnBuSubBuDao = new DivLnBuSubBuDao();
+		variableDao = new VariableDao();
 	}
 
 	@Override
@@ -65,6 +67,7 @@ public class ParsingBoltAAM_Browse extends ParseAAMFeeds {
 		Map<String, List<String>> boostValuesMap = new HashMap<String, List<String>>();
 		Map<String, String> divLnBuSubBuMap = divLnBuSubBuDao.getDvLnBuSubBu();
 		HashMap<String, List<String>> divLnBoostVariblesMap = divLnBoostDao.getDivLnBoost();
+		boostList = variableDao.getBoostBrowseVariables();
 		Collection<String> pidsCollection = l_idToValueCollectionMap
 				.get(current_l_id);
 
