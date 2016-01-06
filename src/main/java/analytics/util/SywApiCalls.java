@@ -127,7 +127,10 @@ public class SywApiCalls {
 	    //concat your URL - starting with your platform URL, and afterwards The request pattern for getting an offline token.
 	    String requestURL = String.format(BASEURI_HTTPS + TOKEN_REQUEST_PATTERN,USERID,APPID,signature,dateString);
 	    //Use your function of getting data from API's using URL.
-	    String responseBody = HttpRequest.get(requestURL).body();
+	    HttpRequest request = HttpRequest.get(requestURL);
+	    request.trustAllCerts();
+	    request.trustAllHosts();
+	    String responseBody = request.body();
 	    Gson gson = new Gson();
 	    return gson.fromJson(responseBody, String.class);
 	}

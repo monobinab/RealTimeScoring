@@ -203,7 +203,7 @@ public class ScoringSingletonTest {
 		Map<String, Variable> variablesMap = new HashMap<String, Variable>();
 		variablesMap.put("S_DSL_APP_INT_ACC_FTWR_TRS", new Variable("S_DSL_APP_INT_ACC_FTWR_TRS",0.002));
 		Map<Integer, Model> monthModelMap2 = new HashMap<Integer, Model>();
-		monthModelMap2.put(Calendar.getInstance().get(Calendar.MONTH), new Model(48, "Model_Name2", Calendar.getInstance().get(Calendar.MONTH), 7, variablesMap));
+		monthModelMap2.put(12-(Calendar.getInstance().get(Calendar.MONTH)), new Model(48, "Model_Name2", 12-(Calendar.getInstance().get(Calendar.MONTH)), 7, variablesMap));
 		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContent.put(48, monthModelMap2);
@@ -342,7 +342,7 @@ public class ScoringSingletonTest {
 		Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
 		monthModelMap.put(0, new Model(35, "Model_Name", 0, 5, variablesMap));
 		Map<Integer, Model> monthModelMap2 = new HashMap<Integer, Model>();
-		monthModelMap2.put(Calendar.getInstance().get(Calendar.MONTH), new Model(48, "Model_Name2", Calendar.getInstance().get(Calendar.MONTH), 7, variablesMap2));
+		monthModelMap2.put(12-(Calendar.getInstance().get(Calendar.MONTH)), new Model(48, "Model_Name2", 12-(Calendar.getInstance().get(Calendar.MONTH)), 7, variablesMap2));
 		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContent.put(35, monthModelMap);
@@ -729,7 +729,7 @@ public class ScoringSingletonTest {
 			Map<String, Variable> variablesMap = new HashMap<String, Variable>();
 			variablesMap.put("BOOST_S_DSL_APP_INT_ACC", new Boost("BOOST_S_DSL_APP_INT_ACC", 0.002, 0.1));
 			Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
-			monthModelMap.put(Calendar.getInstance().get(Calendar.MONTH) , new Model(27, "Model_Name2", Calendar.getInstance().get(Calendar.MONTH) , 5, variablesMap));
+			monthModelMap.put(12-(Calendar.getInstance().get(Calendar.MONTH)) , new Model(27, "Model_Name2", 12-(Calendar.getInstance().get(Calendar.MONTH)) , 5, variablesMap));
 			Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
 			modelsMapContent.put(27, monthModelMap);
 			double boost = scoringSingletonObj.getBoostScore(allChanges, 27, modelsMapContent);
@@ -1186,7 +1186,7 @@ public class ScoringSingletonTest {
 		variablesMap.put("S_DSL_APP_INT_ACC2", new Variable(
 				"S_DSL_APP_INT_ACC2", 0.0915));
 		Map<Integer, Model> monthModelMap = new HashMap<Integer, Model>();
-		monthModelMap.put(Calendar.getInstance().get(Calendar.MONTH) , new Model(35, "Model_Name", Calendar.getInstance().get(Calendar.MONTH) , 3, variablesMap));
+		monthModelMap.put(12-(Calendar.getInstance().get(Calendar.MONTH)) , new Model(35, "Model_Name", 12-(Calendar.getInstance().get(Calendar.MONTH)) , 3, variablesMap));
 		Map<Integer, Map<Integer, Model>> modelsMapContent = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContent.put(35, monthModelMap);
 
