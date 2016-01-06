@@ -1,9 +1,14 @@
 package analytics.util.objects;
 
+import java.io.Serializable;
 import java.util.Map;
 
-public class MemberBrowse {
+public class MemberBrowse implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String l_id;
 	Map<String, Map<String,Map<String,Integer>>> dateSpecificBuSubBu;
 	public String getL_id() {
