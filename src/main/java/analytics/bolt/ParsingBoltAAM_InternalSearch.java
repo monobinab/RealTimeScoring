@@ -33,18 +33,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
-	
 	private static final long serialVersionUID = 1L;
+
 	private DivLnVariableDao divLnVariableDao;
 	private PidDivLnDao pidDivLnDao;
 	private DivLnBuSubBuDao divLnBuSubBuDao;
-	
-    /*
-         * (non-Javadoc)
-         *
-         * @see backtype.storm.task.IBolt#prepare(java.util.Map,
-         * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
-         */
+
 	public ParsingBoltAAM_InternalSearch (String systemProperty, String topic) {
 		super(systemProperty, topic);
 	
@@ -55,7 +49,7 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
 		super.prepare(stormConf, context, collector);
 		divLnVariableDao = new DivLnVariableDao();
 		pidDivLnDao = new PidDivLnDao();
-		sourceTopic = "InternalSearch";
+	//	sourceTopic = "InternalSearch";
         divLnBuSubBuDao = new DivLnBuSubBuDao();
     }
 
@@ -110,11 +104,13 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
      */
 
 	@Override
-	protected Map<String, String> processList(String current_l_id, Hashtable<String, Integer> buSubBuMap) {
-	    	
+	protected Map<String, String> processList(String current_l_id,
+			 Map<String, Collection<String>> l_idToCurrentPidCollectionMap) {
+		
+		Map<String, String> incomingModelCodeMap = new HashMap<String, String>();
     	String queryResultsDoc = new String();
     	Set<String> pidSet = new HashSet<String>();
-    	Collection<String> searchStringsCollection = l_idToValueCollectionMap.get(current_l_id);
+    	Collection<String> searchStringsCollection = l_idToCurrentPidCollectionMap.get(current_l_id);
     	Map<String, List<String>> divLnVariablesMap = divLnVariableDao.getDivLnVariable();
     	if(searchStringsCollection==null || searchStringsCollection.isEmpty()|| (searchStringsCollection.toArray())[0].toString().trim().equalsIgnoreCase(""))
     		return null;
@@ -205,61 +201,19 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
     	if(pidSet.isEmpty()) {
     		return new HashMap<String,String>();
     	}
-    	
-    	Map<String,String> variableValueMap = new HashMap<String,String>();
-    	Map<String, String> divLnBuSubBuMap = divLnBuSubBuDao.getDvLnBuSubBu();
-    	
+    	    	
     	for(String pid: pidSet) {
     		DivLn divLnObj = pidDivLnDao.getDivLnFromPid(pid);
     		if(divLnObj != null) {
 	    		String div = divLnObj.getDiv();
 	    		String divLn = divLnObj.getDivLn();
-	    		
-	    		// populate buSubBuMap for BrowseTags
-	    		if (divLn != null) {
-					String buSubBu = divLnBuSubBuMap.get(divLn);
-					if(buSubBu != null){
-						if (!buSubBuMap.containsKey(buSubBu))
-							buSubBuMap.put(buSubBu, 1);
-						else {
-							int count = (buSubBuMap.get(buSubBu)) + 1;
-							buSubBuMap.put(buSubBu,
-									count);
-						}
-					}
-				}
-	    		
-	    		Collection<String> var = new ArrayList<String>();
-	    		if(divLnVariablesMap.containsKey(div)) {
-	    			var = divLnVariablesMap.get(div);
-	    			for(String v:var) {
-		    			if(variableValueMap.containsKey(var)) {
-		    				int value = 1 + Integer.valueOf(variableValueMap.get(v));
-		    				variableValueMap.remove(v);
-		    				variableValueMap.put(v, String.valueOf(value));
-		    			}
-		    			else {
-		    				variableValueMap.put(v, "1");
-		    			}
-	    			}
-	    		}
-	    		if(divLnVariablesMap.containsKey(divLn)) {
-	    			var = divLnVariablesMap.get(divLn);
-	    			for(String v:var) {
-		    			if(variableValueMap.containsKey(var)) {
-		    				int value = 1 + Integer.valueOf(variableValueMap.get(v));
-		    				variableValueMap.remove(v);
-		    				variableValueMap.put(v, String.valueOf(value));
-		    			}
-		    			else {
-		    				variableValueMap.put(v, "1");
-		    			}
-	    			}
-	    		}
+	    	    getIncomingModelCodeMap(div, incomingModelCodeMap);
+	    		getIncomingModelCodeMap(divLn, incomingModelCodeMap);
     		}
+    		   
     	}
-    	
-    	return variableValueMap;
+	    	
+    	return incomingModelCodeMap;
     }
 /*	@Override
 	protected String[] splitRec(String webRec) {

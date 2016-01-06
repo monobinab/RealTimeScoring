@@ -18,16 +18,22 @@ import com.google.gson.Gson;
 import analytics.util.dao.MemberBrowseDao;
 import analytics.util.objects.MemberBrowse;
 
-public class BrowseUtils {
+public class BrowseUtils{
 	private static final Logger LOGGER = LoggerFactory.getLogger(BrowseUtils.class);
 	
-	SimpleDateFormat dateFormat;
-	MemberBrowseDao memberBrowseDao;
-	String systemProperty;
+	private SimpleDateFormat dateFormat = null;
+	private MemberBrowseDao memberBrowseDao;
+	private String systemProperty;
 	private KafkaUtil kafkaUtil;
 	private String browseKafkaTopic;
 	
+	public BrowseUtils(){
+		dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		memberBrowseDao = new MemberBrowseDao();
+	}
+	
 	public BrowseUtils(String systemProperty, String browseKafkaTopic){
+		this();
 		this.systemProperty = systemProperty;
 		this.browseKafkaTopic = browseKafkaTopic;
 		kafkaUtil= new KafkaUtil(systemProperty);

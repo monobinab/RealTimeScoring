@@ -6,8 +6,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import junit.framework.Assert;
 
@@ -22,6 +24,8 @@ import analytics.MockTopologyContext;
 import analytics.bolt.BrowseCountPersistBolt;
 import analytics.util.FakeMongoStaticCollection;
 import analytics.util.SystemPropertyUtility;
+import analytics.util.dao.MemberBrowseDao;
+import analytics.util.objects.MemberBrowse;
 import backtype.storm.task.TopologyContext;
 
 import com.mongodb.BasicDBObject;
@@ -36,6 +40,7 @@ public class BrowseCountPersistboltTest {
 	private static DB db;
 	LocalDate date = new LocalDate(new Date());
 	SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
+	MemberBrowseDao memberBrowseDao = new MemberBrowseDao();
 	BrowseCountPersistBolt browseCountPersistBolt = new BrowseCountPersistBolt("test", "testSB", "testingWeb", "testingKafka");
 	@BeforeClass
 	public static void initializeFakeMongo() throws InstantiationException,
@@ -45,7 +50,6 @@ public class BrowseCountPersistboltTest {
 		SystemPropertyUtility.setSystemProperty();
 		fakeMongoStaticCollection = new FakeMongoStaticCollection();
 		db = SystemPropertyUtility.getDb();
-
 	}
 	
 	/*
@@ -62,17 +66,19 @@ public class BrowseCountPersistboltTest {
 		browseCountPersistBolt.prepare(SystemPropertyUtility.getStormConf(), context, outputCollector);
 		
 		//prepared incomingBuSubBuMap
-		Map<String, Integer> incomingBuSubBuMap = new HashMap<String, Integer>();
-		incomingBuSubBuMap.put("ABCDE", 1);
-		incomingBuSubBuMap.put("EFGHI", 2);
+		Map<String, String> incomingBuSubBuMap = new HashMap<String, String>();
+		incomingBuSubBuMap.put("ABCDE", "1");
+		incomingBuSubBuMap.put("EFGHI", "2");
 		
 		//fake memberBrowse collection
 		DBCollection memberBrowseColl = db.getCollection("memberBrowse");
+		
+		MemberBrowse memberBrowse = null;
 			
 		DBObject testing = memberBrowseColl.findOne(new BasicDBObject("l_id", l_id));
 		System.out.println("checking the memberBrowse before the method call: " + testing);
 		
-		List<String> buSubBuList = browseCountPersistBolt.updateMemberBrowseAndKafkaList(loyaltyId, l_id, incomingBuSubBuMap);
+		Set<String> buSubBuList = browseCountPersistBolt.updateMemberBrowseAndKafkaList(loyaltyId, l_id, incomingBuSubBuMap, memberBrowse);
 		
 		DBObject mbrBrowseDbObj = memberBrowseColl.findOne(new BasicDBObject("l_id", l_id));
 
@@ -96,7 +102,7 @@ public class BrowseCountPersistboltTest {
 		expectedBuSubBuMap.put("EFGHI", expectedFeedCountsMap2);
 		
 		//Assertion
-		Assert.assertEquals("list to be emitted to kafka empty as there is NO PC and IC does not = or > TH", new ArrayList<String>(), buSubBuList);
+		Assert.assertEquals("list to be emitted to kafka empty as there is NO PC and IC does not = or > TH", new HashSet<String>(), buSubBuList);
 		Assert.assertEquals(expectedBuSubBuMap.keySet(), actualBuSubBuMap.keySet());
 		
 		//Iterating through the expectedBuSubBuMap and checking with actualBuSubBuMap
@@ -123,17 +129,19 @@ public class BrowseCountPersistboltTest {
 		browseCountPersistBolt.prepare(SystemPropertyUtility.getStormConf(), context, outputCollector);
 		
 		//prepared incomingBuSubBuMap
-		Map<String, Integer> incomingBuSubBuMap = new HashMap<String, Integer>();
-		incomingBuSubBuMap.put("ABCDE", 1);
-		incomingBuSubBuMap.put("EFGHI", 4);
+		Map<String, String> incomingBuSubBuMap = new HashMap<String, String>();
+		incomingBuSubBuMap.put("ABCDE", "1");
+		incomingBuSubBuMap.put("EFGHI", "4");
 		
 		//fake memberBrowse collection
 		DBCollection memberBrowseColl = db.getCollection("memberBrowse");
-			
+		
 		DBObject testing = memberBrowseColl.findOne(new BasicDBObject("l_id", l_id));
 		System.out.println("checking the memberBrowse before the method call: " + testing);
-		
-		List<String> buSubBuList = browseCountPersistBolt.updateMemberBrowseAndKafkaList(loyaltyId, l_id, incomingBuSubBuMap);
+	
+		MemberBrowse memberBrowse = memberBrowseDao.getMemberBrowse7dayHistory(l_id);//getMemberBrowse7dayHistory
+			
+		Set<String> buSubBuList = browseCountPersistBolt.updateMemberBrowseAndKafkaList(loyaltyId, l_id, incomingBuSubBuMap, memberBrowse);
 		
 		DBObject mbrBrowseDbObj = memberBrowseColl.findOne(new BasicDBObject("l_id", l_id));
 
@@ -157,7 +165,7 @@ public class BrowseCountPersistboltTest {
 		expectedBuSubBuMap.put("EFGHI", expectedFeedCountsMap2);
 		
 		//Assertion
-		Assert.assertEquals("EFGHI7", buSubBuList.get(0));
+		Assert.assertTrue( buSubBuList.contains("EFGHI7"));
 		Assert.assertEquals(expectedBuSubBuMap.keySet(), actualBuSubBuMap.keySet());
 		
 		//Iterating through the expectedBuSubBuMap and checking with actualBuSubBuMap
@@ -184,9 +192,9 @@ public class BrowseCountPersistboltTest {
 		browseCountPersistBolt.prepare(SystemPropertyUtility.getStormConf(), context, outputCollector);
 		
 		//prepared incomingBuSubBuMap
-		Map<String, Integer> incomingBuSubBuMap = new HashMap<String, Integer>();
-		incomingBuSubBuMap.put("ABCDE", 1);
-		incomingBuSubBuMap.put("EFGHI", 2);
+		Map<String, String> incomingBuSubBuMap = new HashMap<String, String>();
+		incomingBuSubBuMap.put("ABCDE", "1");
+		incomingBuSubBuMap.put("EFGHI", "2");
 		
 		//fake memberBrowse collection
 		DBCollection memberBrowseColl = db.getCollection("memberBrowse");
@@ -208,7 +216,19 @@ public class BrowseCountPersistboltTest {
 		DBObject testing = memberBrowseColl.findOne(new BasicDBObject("l_id", l_id));
 		System.out.println(testing);
 		
-		List<String> buSubBuList = browseCountPersistBolt.updateMemberBrowseAndKafkaList(loyaltyId, l_id, incomingBuSubBuMap);
+		MemberBrowse memberBrowse = memberBrowseDao.getMemberBrowse7dayHistory(l_id);
+		
+		/*Map<String, Integer> feedCountMap = new HashMap<String, Integer>();
+		feedCountMap.put("testSG", 1);
+		Map<String, Map<String, Integer>> buSpeMap = new HashMap<String, Map<String,Integer>>();
+		buSpeMap.put("XYZW1", feedCountMap);
+		buSpeMap.put("12345", feedCountMap);
+		Map<String, Map<String, Map<String, Integer>>> dateSpecificBuSubBu = new HashMap<String, Map<String,Map<String,Integer>>>();
+		dateSpecificBuSubBu.put(dateString, buSpeMap);
+		memberBrowse.setDateSpecificBuSubBu(dateSpecificBuSubBu);
+		memberBrowse.setL_id(l_id);*/
+		
+		Set<String> buSubBuList = browseCountPersistBolt.updateMemberBrowseAndKafkaList(loyaltyId, l_id, incomingBuSubBuMap, memberBrowse);
 		
 		DBObject mbrBrowseDbObj = memberBrowseColl.findOne(new BasicDBObject("l_id", l_id));
 
@@ -232,7 +252,7 @@ public class BrowseCountPersistboltTest {
 		expectedBuSubBuMap.put("EFGHI", expectedFeedCountsMap2);
 		
 		//Assertion
-		Assert.assertEquals("list to be emitted to kafka empty as there is NO PC and IC does not = or > TH", new ArrayList<String>(), buSubBuList);
+		Assert.assertEquals("list to be emitted to kafka empty as there is NO PC and IC does not = or > TH", new HashSet<String>(), buSubBuList);
 		Assert.assertEquals(expectedBuSubBuMap.keySet(), actualBuSubBuMap.keySet());
 		
 		//Iterating through the expectedBuSubBuMap and checking with actualBuSubBuMap
@@ -259,9 +279,9 @@ public class BrowseCountPersistboltTest {
 		browseCountPersistBolt.prepare(SystemPropertyUtility.getStormConf(), context, outputCollector);
 		
 		//prepared incomingBuSubBuMap
-		Map<String, Integer> incomingBuSubBuMap = new HashMap<String, Integer>();
-		incomingBuSubBuMap.put("ABCDE", 1);
-		incomingBuSubBuMap.put("EFGHI", 2);
+		Map<String, String> incomingBuSubBuMap = new HashMap<String, String>();
+		incomingBuSubBuMap.put("ABCDE", "1");
+		incomingBuSubBuMap.put("EFGHI", "2");
 		
 		//fake memberBrowse collection
 		DBCollection memberBrowseColl = db.getCollection("memberBrowse");
@@ -282,7 +302,20 @@ public class BrowseCountPersistboltTest {
 		DBObject testing = memberBrowseColl.findOne(new BasicDBObject("l_id", l_id));
 		System.out.println(testing);
 		
-		List<String> buSubBuList = browseCountPersistBolt.updateMemberBrowseAndKafkaList(loyaltyId, l_id, incomingBuSubBuMap);
+		/*MemberBrowse memberBrowse = new MemberBrowse();
+		Map<String, Integer> feedCountMap = new HashMap<String, Integer>();
+		feedCountMap.put("testSG", 1);
+		Map<String, Map<String, Integer>> buSpeMap = new HashMap<String, Map<String,Integer>>();
+		buSpeMap.put("XYZW1", feedCountMap);
+		buSpeMap.put("12345", feedCountMap);
+		Map<String, Map<String, Map<String, Integer>>> dateSpecificBuSubBu = new HashMap<String, Map<String,Map<String,Integer>>>();
+		dateSpecificBuSubBu.put(dateString, buSpeMap);
+		memberBrowse.setDateSpecificBuSubBu(dateSpecificBuSubBu);
+		memberBrowse.setL_id(l_id);*/
+		
+		MemberBrowse memberBrowse = memberBrowseDao.getMemberBrowse7dayHistory(l_id);
+		
+		Set<String> buSubBuList = browseCountPersistBolt.updateMemberBrowseAndKafkaList(loyaltyId, l_id, incomingBuSubBuMap, memberBrowse);
 		
 		DBObject mbrBrowseDbObj = memberBrowseColl.findOne(new BasicDBObject("l_id", l_id));
 
@@ -312,7 +345,7 @@ public class BrowseCountPersistboltTest {
 		expectedBuSubBuMap.put("12345", expectedFeedCountsMap4);
 		
 		//Assertion
-		Assert.assertEquals("list to be emitted to kafka empty as PC+IC is not = nor > TH", new ArrayList<String>(), buSubBuList);
+		Assert.assertEquals("list to be emitted to kafka empty as PC+IC is not = nor > TH", new HashSet<String>(), buSubBuList);
 		Assert.assertEquals(expectedBuSubBuMap.keySet(), actualBuSubBuMap.keySet());
 		
 		//Iterating through the expectedBuSubBuMap and checking with actualBuSubBuMap
@@ -341,9 +374,9 @@ public class BrowseCountPersistboltTest {
 		browseCountPersistBolt.prepare(SystemPropertyUtility.getStormConf(), context, outputCollector);
 		
 		//prepared incomingBuSubBuMap
-		Map<String, Integer> incomingBuSubBuMap = new HashMap<String, Integer>();
-		incomingBuSubBuMap.put("ABCDE", 1);
-		incomingBuSubBuMap.put("EFGHI", 2);
+		Map<String, String> incomingBuSubBuMap = new HashMap<String, String>();
+		incomingBuSubBuMap.put("ABCDE", "1");
+		incomingBuSubBuMap.put("EFGHI", "2");
 		
 		//fake memberBrowse collection
 		DBCollection memberBrowseColl = db.getCollection("memberBrowse");
@@ -364,7 +397,20 @@ public class BrowseCountPersistboltTest {
 		DBObject testing = memberBrowseColl.findOne(new BasicDBObject("l_id", l_id));
 		System.out.println(testing);
 		
-		List<String> buSubBuList = browseCountPersistBolt.updateMemberBrowseAndKafkaList(loyaltyId, l_id, incomingBuSubBuMap);
+		/*MemberBrowse memberBrowse = new MemberBrowse();
+		Map<String, Integer> feedCountMap = new HashMap<String, Integer>();
+		feedCountMap.put("testSG", 4);
+		Map<String, Map<String, Integer>> buSpeMap = new HashMap<String, Map<String,Integer>>();
+		buSpeMap.put("XYZW1", feedCountMap);
+		buSpeMap.put("12345", feedCountMap);
+		Map<String, Map<String, Map<String, Integer>>> dateSpecificBuSubBu = new HashMap<String, Map<String,Map<String,Integer>>>();
+		dateSpecificBuSubBu.put(dateString, buSpeMap);
+		memberBrowse.setDateSpecificBuSubBu(dateSpecificBuSubBu);
+		memberBrowse.setL_id(l_id);*/
+		
+		MemberBrowse memberBrowse = memberBrowseDao.getMemberBrowse7dayHistory(l_id);
+		
+		Set<String> buSubBuList = browseCountPersistBolt.updateMemberBrowseAndKafkaList(loyaltyId, l_id, incomingBuSubBuMap, memberBrowse);
 		
 		DBObject mbrBrowseDbObj = memberBrowseColl.findOne(new BasicDBObject("l_id", l_id));
 
@@ -394,7 +440,7 @@ public class BrowseCountPersistboltTest {
 		expectedBuSubBuMap.put("12345", expectedFeedCountsMap4);
 		
 		//Assertion
-		Assert.assertEquals("list to be emitted to kafka empty as PC=TH", new ArrayList<String>(), buSubBuList);
+		Assert.assertEquals("list to be emitted to kafka empty as PC=TH", new HashSet<String>(), buSubBuList);
 		Assert.assertEquals(expectedBuSubBuMap.keySet(), actualBuSubBuMap.keySet());
 		
 		//Iterating through the expectedBuSubBuMap and checking with actualBuSubBuMap
@@ -423,9 +469,9 @@ public class BrowseCountPersistboltTest {
 		browseCountPersistBolt.prepare(SystemPropertyUtility.getStormConf(), context, outputCollector);
 		
 		//prepared incomingBuSubBuMap
-		Map<String, Integer> incomingBuSubBuMap = new HashMap<String, Integer>();
-		incomingBuSubBuMap.put("ABCDE", 5);
-		incomingBuSubBuMap.put("EFGHI", 2);
+		Map<String, String> incomingBuSubBuMap = new HashMap<String, String>();
+		incomingBuSubBuMap.put("ABCDE", "5");
+		incomingBuSubBuMap.put("EFGHI", "2");
 		
 		//fake memberBrowse collection
 		DBCollection memberBrowseColl = db.getCollection("memberBrowse");
@@ -446,7 +492,20 @@ public class BrowseCountPersistboltTest {
 		DBObject testing = memberBrowseColl.findOne(new BasicDBObject("l_id", l_id));
 		System.out.println(testing);
 		
-		List<String> buSubBuList = browseCountPersistBolt.updateMemberBrowseAndKafkaList(loyaltyId, l_id, incomingBuSubBuMap);
+		/*MemberBrowse memberBrowse = new MemberBrowse();
+		Map<String, Integer> feedCountMap = new HashMap<String, Integer>();
+		feedCountMap.put("testSG", 4);
+		Map<String, Map<String, Integer>> buSpeMap = new HashMap<String, Map<String,Integer>>();
+		buSpeMap.put("XYZW1", feedCountMap);
+		buSpeMap.put("12345", feedCountMap);
+		Map<String, Map<String, Map<String, Integer>>> dateSpecificBuSubBu = new HashMap<String, Map<String,Map<String,Integer>>>();
+		dateSpecificBuSubBu.put(dateString, buSpeMap);
+		memberBrowse.setDateSpecificBuSubBu(dateSpecificBuSubBu);
+		memberBrowse.setL_id(l_id);*/
+		
+		MemberBrowse memberBrowse = memberBrowseDao.getMemberBrowse7dayHistory(l_id);
+		
+		Set<String> buSubBuList = browseCountPersistBolt.updateMemberBrowseAndKafkaList(loyaltyId, l_id, incomingBuSubBuMap, memberBrowse);
 		
 		DBObject mbrBrowseDbObj = memberBrowseColl.findOne(new BasicDBObject("l_id", l_id));
 
@@ -476,7 +535,8 @@ public class BrowseCountPersistboltTest {
 		expectedBuSubBuMap.put("12345", expectedFeedCountsMap4);
 		
 		//Assertion
-		Assert.assertEquals( "ABCDE7", buSubBuList.get(0));
+	//	Assert.assertEquals( "ABCDE7", buSubBuList.get(0));
+		Assert.assertTrue(buSubBuList.contains("ABCDE7"));
 		Assert.assertEquals(expectedBuSubBuMap.keySet(), actualBuSubBuMap.keySet());
 		
 		//Iterating through the expectedBuSubBuMap and checking with actualBuSubBuMap
@@ -504,9 +564,9 @@ public class BrowseCountPersistboltTest {
 		browseCountPersistBolt.prepare(SystemPropertyUtility.getStormConf(), context, outputCollector);
 		
 		//prepared incomingBuSubBuMap
-		Map<String, Integer> incomingBuSubBuMap = new HashMap<String, Integer>();
-		incomingBuSubBuMap.put("XYZW1", 1);
-		incomingBuSubBuMap.put("12345", 2);
+		Map<String, String> incomingBuSubBuMap = new HashMap<String, String>();
+		incomingBuSubBuMap.put("XYZW1", "1");
+		incomingBuSubBuMap.put("12345", "2");
 		
 		//fake memberBrowse collection
 		DBCollection memberBrowseColl = db.getCollection("memberBrowse");
@@ -527,7 +587,19 @@ public class BrowseCountPersistboltTest {
 		DBObject testing = memberBrowseColl.findOne(new BasicDBObject("l_id", l_id));
 		System.out.println(testing);
 		
-		browseCountPersistBolt.updateMemberBrowseAndKafkaList(loyaltyId, l_id, incomingBuSubBuMap);
+		/*MemberBrowse memberBrowse = new MemberBrowse();
+		Map<String, Integer> feedCountMap = new HashMap<String, Integer>();
+		feedCountMap.put("testSG", 1);
+		Map<String, Map<String, Integer>> buSpeMap = new HashMap<String, Map<String,Integer>>();
+		buSpeMap.put("XYZW1", feedCountMap);
+		buSpeMap.put("12345", feedCountMap);
+		Map<String, Map<String, Map<String, Integer>>> dateSpecificBuSubBu = new HashMap<String, Map<String,Map<String,Integer>>>();
+		dateSpecificBuSubBu.put(dateString, buSpeMap);
+		memberBrowse.setDateSpecificBuSubBu(dateSpecificBuSubBu);
+		memberBrowse.setL_id(l_id);*/
+		
+		MemberBrowse memberBrowse = memberBrowseDao.getMemberBrowse7dayHistory(l_id);
+		browseCountPersistBolt.updateMemberBrowseAndKafkaList(loyaltyId, l_id, incomingBuSubBuMap, memberBrowse);
 		
 		DBObject mbrBrowseDbObj = memberBrowseColl.findOne(new BasicDBObject("l_id", l_id));
 
@@ -578,9 +650,9 @@ public class BrowseCountPersistboltTest {
 		browseCountPersistBolt.prepare(SystemPropertyUtility.getStormConf(), context, outputCollector);
 		
 		//prepared incomingBuSubBuMap
-		Map<String, Integer> incomingBuSubBuMap = new HashMap<String, Integer>();
-		incomingBuSubBuMap.put("XYZW1", 1);
-		incomingBuSubBuMap.put("12345", 3);
+		Map<String, String> incomingBuSubBuMap = new HashMap<String, String>();
+		incomingBuSubBuMap.put("XYZW1", "1");
+		incomingBuSubBuMap.put("12345", "3");
 		
 		//fake memberBrowse collection
 		DBCollection memberBrowseColl = db.getCollection("memberBrowse");
@@ -601,7 +673,20 @@ public class BrowseCountPersistboltTest {
 		DBObject testing = memberBrowseColl.findOne(new BasicDBObject("l_id", l_id));
 		System.out.println(testing);
 		
-		List<String> buSubBuList = browseCountPersistBolt.updateMemberBrowseAndKafkaList(loyaltyId, l_id, incomingBuSubBuMap);
+		/*MemberBrowse memberBrowse = new MemberBrowse();
+		Map<String, Integer> feedCountMap = new HashMap<String, Integer>();
+		feedCountMap.put("testSG", 1);
+		Map<String, Map<String, Integer>> buSpeMap = new HashMap<String, Map<String,Integer>>();
+		buSpeMap.put("XYZW1", feedCountMap);
+		buSpeMap.put("12345", feedCountMap);
+		Map<String, Map<String, Map<String, Integer>>> dateSpecificBuSubBu = new HashMap<String, Map<String,Map<String,Integer>>>();
+		dateSpecificBuSubBu.put(dateString, buSpeMap);
+		memberBrowse.setDateSpecificBuSubBu(dateSpecificBuSubBu);
+		memberBrowse.setL_id(l_id);*/
+		
+		MemberBrowse memberBrowse = memberBrowseDao.getMemberBrowse7dayHistory(l_id);
+			
+		Set<String> buSubBuList = browseCountPersistBolt.updateMemberBrowseAndKafkaList(loyaltyId, l_id, incomingBuSubBuMap, memberBrowse);
 		
 		DBObject mbrBrowseDbObj = memberBrowseColl.findOne(new BasicDBObject("l_id", l_id));
 
@@ -625,7 +710,8 @@ public class BrowseCountPersistboltTest {
 		expectedBuSubBuMap.put("12345", expectedFeedCountsMap2);
 		
 		//Assertion
-		Assert.assertEquals( "123457", buSubBuList.get(0));
+		//Assert.assertEquals( "123457", buSubBuList.get(0));
+		Assert.assertTrue(buSubBuList.contains("123457"));
 		Assert.assertEquals(expectedBuSubBuMap.keySet(), actualBuSubBuMap.keySet());
 		
 		//Iterating through the expectedBuSubBuMap and checking with actualBuSubBuMap
@@ -651,9 +737,9 @@ public class BrowseCountPersistboltTest {
 		browseCountPersistBolt.prepare(SystemPropertyUtility.getStormConf(), context, outputCollector);
 		
 		//prepared incomingBuSubBuMap
-		Map<String, Integer> incomingBuSubBuMap = new HashMap<String, Integer>();
-		incomingBuSubBuMap.put("XYZW1", 1);
-		incomingBuSubBuMap.put("12345", 2);
+		Map<String, String> incomingBuSubBuMap = new HashMap<String, String>();
+		incomingBuSubBuMap.put("XYZW1", "1");
+		incomingBuSubBuMap.put("12345", "2");
 		
 		//fake memberBrowse collection
 		DBCollection memberBrowseColl = db.getCollection("memberBrowse");
@@ -674,7 +760,23 @@ public class BrowseCountPersistboltTest {
 		DBObject testing = memberBrowseColl.findOne(new BasicDBObject("l_id", l_id));
 		System.out.println(testing);
 		
-		browseCountPersistBolt.updateMemberBrowseAndKafkaList(loyaltyId, l_id, incomingBuSubBuMap);
+		
+	/*	MemberBrowse memberBrowse = new MemberBrowse();
+		Map<String, Integer> feedCountMap = new HashMap<String, Integer>();
+		feedCountMap.put("testPR", 1);
+		Map<String, Integer> feedCountMap2 = new HashMap<String, Integer>();
+		feedCountMap2.put("testPR", 1);
+		Map<String, Map<String, Integer>> buSpeMap = new HashMap<String, Map<String,Integer>>();
+		buSpeMap.put("XYZW1", feedCountMap);
+		buSpeMap.put("12345", feedCountMap2);
+		Map<String, Map<String, Map<String, Integer>>> dateSpecificBuSubBu = new HashMap<String, Map<String,Map<String,Integer>>>();
+		dateSpecificBuSubBu.put(dateString, buSpeMap);
+		memberBrowse.setDateSpecificBuSubBu(dateSpecificBuSubBu);
+		memberBrowse.setL_id(l_id);*/
+		
+		MemberBrowse memberBrowse = memberBrowseDao.getMemberBrowse7dayHistory(l_id);
+		
+		browseCountPersistBolt.updateMemberBrowseAndKafkaList(loyaltyId, l_id, incomingBuSubBuMap, memberBrowse);
 		
 		DBObject mbrBrowseDbObj = memberBrowseColl.findOne(new BasicDBObject("l_id", l_id));
 
@@ -727,9 +829,9 @@ public class BrowseCountPersistboltTest {
 		browseCountPersistBolt.prepare(SystemPropertyUtility.getStormConf(), context, outputCollector);
 		
 		//prepared incomingBuSubBuMap
-		Map<String, Integer> incomingBuSubBuMap = new HashMap<String, Integer>();
-		incomingBuSubBuMap.put("XYZW1", 1);
-		incomingBuSubBuMap.put("12345", 2);
+		Map<String, String> incomingBuSubBuMap = new HashMap<String, String>();
+		incomingBuSubBuMap.put("XYZW1", "1");
+		incomingBuSubBuMap.put("12345", "2");
 		
 		//fake memberBrowse collection
 		DBCollection memberBrowseColl = db.getCollection("memberBrowse");
@@ -752,7 +854,22 @@ public class BrowseCountPersistboltTest {
 		DBObject testing = memberBrowseColl.findOne(new BasicDBObject("l_id", l_id));
 		System.out.println(testing);
 		
-		List<String> buSubBuList = browseCountPersistBolt.updateMemberBrowseAndKafkaList(loyaltyId, l_id, incomingBuSubBuMap);
+	/*	MemberBrowse memberBrowse = new MemberBrowse();
+		Map<String, Integer> feedCountMap = new HashMap<String, Integer>();
+		feedCountMap.put("testPR", 3);
+		Map<String, Integer> feedCountMap2 = new HashMap<String, Integer>();
+		feedCountMap2.put("testIS", 4);
+		Map<String, Map<String, Integer>> buSpeMap = new HashMap<String, Map<String,Integer>>();
+		buSpeMap.put("XYZW1", feedCountMap2);
+		buSpeMap.put("12345", feedCountMap);
+		Map<String, Map<String, Map<String, Integer>>> dateSpecificBuSubBu = new HashMap<String, Map<String,Map<String,Integer>>>();
+		dateSpecificBuSubBu.put(dateString, buSpeMap);
+		memberBrowse.setDateSpecificBuSubBu(dateSpecificBuSubBu);
+		memberBrowse.setL_id(l_id);*/
+		
+		MemberBrowse memberBrowse = memberBrowseDao.getMemberBrowse7dayHistory(l_id);
+		
+		Set<String> buSubBuList = browseCountPersistBolt.updateMemberBrowseAndKafkaList(loyaltyId, l_id, incomingBuSubBuMap, memberBrowse);
 		
 		DBObject mbrBrowseDbObj = memberBrowseColl.findOne(new BasicDBObject("l_id", l_id));
 
@@ -778,7 +895,8 @@ public class BrowseCountPersistboltTest {
 		expectedBuSubBuMap.put("12345", expectedFeedCountsMap2);
 		
 		//Assertion
-		Assert.assertEquals("123457", buSubBuList.get(0));
+		//Assert.assertEquals("123457", buSubBuList.get(0));
+		Assert.assertTrue(buSubBuList.contains("123457"));
 		Assert.assertEquals(expectedBuSubBuMap.keySet(), actualBuSubBuMap.keySet());
 		
 		//Iterating through the expectedBuSubBuMap and checking with actualBuSubBuMap
@@ -805,9 +923,9 @@ public class BrowseCountPersistboltTest {
 		browseCountPersistBolt.prepare(SystemPropertyUtility.getStormConf(), context, outputCollector);
 		
 		//prepared incomingBuSubBuMap
-		Map<String, Integer> incomingBuSubBuMap = new HashMap<String, Integer>();
-		incomingBuSubBuMap.put("XYZW1", 1);
-		incomingBuSubBuMap.put("12345", 2);
+		Map<String, String> incomingBuSubBuMap = new HashMap<String, String>();
+		incomingBuSubBuMap.put("XYZW1", "1");
+		incomingBuSubBuMap.put("12345", "2");
 		
 		//fake memberBrowse collection
 		DBCollection memberBrowseColl = db.getCollection("memberBrowse");
@@ -830,7 +948,22 @@ public class BrowseCountPersistboltTest {
 		DBObject testing = memberBrowseColl.findOne(new BasicDBObject("l_id", l_id));
 		System.out.println(testing);
 		
-		List<String> buSubBuList = browseCountPersistBolt.updateMemberBrowseAndKafkaList(loyaltyId, l_id, incomingBuSubBuMap);
+		/*MemberBrowse memberBrowse = new MemberBrowse();
+		Map<String, Integer> feedCountMap = new HashMap<String, Integer>();
+		feedCountMap.put("testPR", 3);
+		Map<String, Integer> feedCountMap2 = new HashMap<String, Integer>();
+		feedCountMap2.put("testIS", 3);
+		Map<String, Map<String, Integer>> buSpeMap = new HashMap<String, Map<String,Integer>>();
+		buSpeMap.put("XYZW1", feedCountMap2);
+		buSpeMap.put("12345", feedCountMap);
+		Map<String, Map<String, Map<String, Integer>>> dateSpecificBuSubBu = new HashMap<String, Map<String,Map<String,Integer>>>();
+		dateSpecificBuSubBu.put(dateString, buSpeMap);
+		memberBrowse.setDateSpecificBuSubBu(dateSpecificBuSubBu);
+		memberBrowse.setL_id(l_id);*/
+		
+		MemberBrowse memberBrowse = memberBrowseDao.getMemberBrowse7dayHistory(l_id);
+		
+		Set<String> buSubBuList = browseCountPersistBolt.updateMemberBrowseAndKafkaList(loyaltyId, l_id, incomingBuSubBuMap, memberBrowse);
 		
 		DBObject mbrBrowseDbObj = memberBrowseColl.findOne(new BasicDBObject("l_id", l_id));
 
@@ -883,9 +1016,9 @@ public class BrowseCountPersistboltTest {
 		browseCountPersistBolt.prepare(SystemPropertyUtility.getStormConf(), context, outputCollector);
 		
 		//prepared incomingBuSubBuMap
-		Map<String, Integer> incomingBuSubBuMap = new HashMap<String, Integer>();
-		incomingBuSubBuMap.put("ABCDE", 1);
-		incomingBuSubBuMap.put("EFGHI", 2);
+		Map<String, String> incomingBuSubBuMap = new HashMap<String, String>();
+		incomingBuSubBuMap.put("ABCDE", "1");
+		incomingBuSubBuMap.put("EFGHI", "2");
 		
 		//fake memberBrowse collection
 		DBCollection memberBrowseColl = db.getCollection("memberBrowse");
@@ -908,7 +1041,22 @@ public class BrowseCountPersistboltTest {
 		DBObject testing = memberBrowseColl.findOne(new BasicDBObject("l_id", l_id));
 		System.out.println(testing);
 		
-		browseCountPersistBolt.updateMemberBrowseAndKafkaList(loyaltyId, l_id, incomingBuSubBuMap);
+		/*MemberBrowse memberBrowse = new MemberBrowse();
+		Map<String, Integer> feedCountMap = new HashMap<String, Integer>();
+		feedCountMap.put("testPR", 1);
+		Map<String, Integer> feedCountMap2 = new HashMap<String, Integer>();
+		feedCountMap2.put("testIS", 1);
+		Map<String, Map<String, Integer>> buSpeMap = new HashMap<String, Map<String,Integer>>();
+		buSpeMap.put("XYZW1", feedCountMap);
+		buSpeMap.put("12345", feedCountMap2);
+		Map<String, Map<String, Map<String, Integer>>> dateSpecificBuSubBu = new HashMap<String, Map<String,Map<String,Integer>>>();
+		dateSpecificBuSubBu.put(dateString, buSpeMap);
+		memberBrowse.setDateSpecificBuSubBu(dateSpecificBuSubBu);
+		memberBrowse.setL_id(l_id);*/
+		
+		MemberBrowse memberBrowse = memberBrowseDao.getMemberBrowse7dayHistory(l_id);
+		
+		browseCountPersistBolt.updateMemberBrowseAndKafkaList(loyaltyId, l_id, incomingBuSubBuMap, memberBrowse);
 		
 		DBObject mbrBrowseDbObj = memberBrowseColl.findOne(new BasicDBObject("l_id", l_id));
 
@@ -965,9 +1113,9 @@ public class BrowseCountPersistboltTest {
 		browseCountPersistBolt.prepare(SystemPropertyUtility.getStormConf(), context, outputCollector);
 		
 		//prepared incomingBuSubBuMap
-		Map<String, Integer> incomingBuSubBuMap = new HashMap<String, Integer>();
-		incomingBuSubBuMap.put("ABCDE", 1);
-		incomingBuSubBuMap.put("EFGHI", 4);
+		Map<String, String> incomingBuSubBuMap = new HashMap<String, String>();
+		incomingBuSubBuMap.put("ABCDE", "1");
+		incomingBuSubBuMap.put("EFGHI", "4");
 		
 		//fake memberBrowse collection
 		DBCollection memberBrowseColl = db.getCollection("memberBrowse");
@@ -990,7 +1138,22 @@ public class BrowseCountPersistboltTest {
 		DBObject testing = memberBrowseColl.findOne(new BasicDBObject("l_id", l_id));
 		System.out.println(testing);
 		
-		browseCountPersistBolt.updateMemberBrowseAndKafkaList(loyaltyId, l_id, incomingBuSubBuMap);
+	/*	MemberBrowse memberBrowse = new MemberBrowse();
+		Map<String, Integer> feedCountMap = new HashMap<String, Integer>();
+		feedCountMap.put("testPR", 1);
+		Map<String, Integer> feedCountMap2 = new HashMap<String, Integer>();
+		feedCountMap2.put("testIS", 1);
+		Map<String, Map<String, Integer>> buSpeMap = new HashMap<String, Map<String,Integer>>();
+		buSpeMap.put("XYZW1", feedCountMap);
+		buSpeMap.put("12345", feedCountMap2);
+		Map<String, Map<String, Map<String, Integer>>> dateSpecificBuSubBu = new HashMap<String, Map<String,Map<String,Integer>>>();
+		dateSpecificBuSubBu.put(dateString, buSpeMap);
+		memberBrowse.setDateSpecificBuSubBu(dateSpecificBuSubBu);
+		memberBrowse.setL_id(l_id);*/
+		
+		MemberBrowse memberBrowse = memberBrowseDao.getMemberBrowse7dayHistory(l_id);
+		
+		browseCountPersistBolt.updateMemberBrowseAndKafkaList(loyaltyId, l_id, incomingBuSubBuMap, memberBrowse);
 		
 		DBObject mbrBrowseDbObj = memberBrowseColl.findOne(new BasicDBObject("l_id", l_id));
 

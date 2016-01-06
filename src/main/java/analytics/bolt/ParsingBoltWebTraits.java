@@ -23,16 +23,16 @@ import backtype.storm.task.TopologyContext;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 
-
 public class ParsingBoltWebTraits extends ParseAAMFeeds {
 
 	private static final long serialVersionUID = 1L;
+
 	private Map<String,List<String>> traitVariablesMap;
     private Map<String,List<String>> variableTraitsMap;
     private MemberTraitsDao memberTraitsDao;
     private TraitVariablesDao traitVariablesDao;
     private TraitBuSubBuDao traitBuSubBuDao;
-    private Map<String, String> traitBuSubBuMap;
+ //   private Map<String, String> traitBuSubBuMap;
     private ModelVariablesDao modelVariablesDao;
     
     public ParsingBoltWebTraits(){
@@ -46,7 +46,7 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
 	@Override
 	public void prepare(@SuppressWarnings("rawtypes") Map stormConf, TopologyContext context, OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
-		sourceTopic="WebTraits";
+	//	sourceTopic="WebTraits";
 
 		traitVariablesDao = new TraitVariablesDao();
 		memberTraitsDao = new MemberTraitsDao();
@@ -60,15 +60,16 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
         
         //POPULATE THE TRAITBUSUBBUMAP
         traitBuSubBuDao = new TraitBuSubBuDao();
-        traitBuSubBuMap = traitBuSubBuDao.getTraitBuSubBuMap();
+    //    traitBuSubBuMap = traitBuSubBuDao.getTraitBuSubBuMap();
     }
 
     
 
 	//Generalize with parsing bolt aam atc - processPidList
 	//[2014-29-08]:{Trait1,Trait2}, [2014-28-08]:{Trait3,Trait2}
-    protected Map<String,String> processList(String current_l_id, Hashtable<String, Integer> buSubBuMap) {
-    	LOGGER.debug("Processing list of traits");
+	protected Map<String, String> processList(String current_l_id,
+			 Map<String, Collection<String>> l_idToCurrentPidCollectionMap) {
+	   	LOGGER.debug("Processing list of traits");
     	Map<String, List<String>> dateTraitsMap = null; // MAP BETWEEN DATES AND SET OF TRAITS - HISTORICAL AND CURRENT TRAITS
 		List<String> variableList = new ArrayList<String>();
 		List<String> modelVariablesList = modelVariablesDao.getVariableList();
@@ -78,7 +79,7 @@ public class ParsingBoltWebTraits extends ParseAAMFeeds {
     	
     	//FOR EACH TRAIT FOUND FROM AAM DATA FIND THE VARIABLES THAT ARE IMPACTED
     	LOGGER.debug("Finding list of variables for each trait");
-    	for(String trait: l_idToValueCollectionMap.get(current_l_id)) {
+    	for(String trait: l_idToCurrentPidCollectionMap.get(current_l_id)) {
     		
     		// populate buSubBuMap for BrowseTags
     	/*	if (trait != null) {

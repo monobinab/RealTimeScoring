@@ -67,8 +67,8 @@ public class JsonUtils {
 	}
 
 	
-	public static Map<String, Integer> restoreTagsListFromJson(String json) {
-		Type varListType = new TypeToken<Map<String, Integer>>() {
+	public static Map<String, String> restoreTagsListFromJson(String json) {
+		Type varListType = new TypeToken<Map<String, String>>() {
 			private static final long serialVersionUID = 1L;
 		}.getType();
 

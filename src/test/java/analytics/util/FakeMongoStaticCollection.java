@@ -13,7 +13,14 @@ public class FakeMongoStaticCollection {
 	static DBCollection sourceFeedColl;
 	static DBCollection cpsOccasionsColl;
 	static DBCollection regionalAdjFactorsColl;
+	static DBCollection boostBrowseBuSubBuColl;
 	
+	public static DBCollection getBoostBrowseBuSubBuColl() {
+		return boostBrowseBuSubBuColl;
+	}
+	public static void setBoostBrowseBuSubBuColl(DBCollection boostBrowseBuSubBuColl) {
+		FakeMongoStaticCollection.boostBrowseBuSubBuColl = boostBrowseBuSubBuColl;
+	}
 	public static DBCollection getRegionalAdjFactorsColl() {
 		return regionalAdjFactorsColl;
 	}
@@ -123,12 +130,19 @@ public class FakeMongoStaticCollection {
 		cpsOccasionsColl = db.getCollection("cpsOccasions");
 		cpsOccasionsColl.insert(new BasicDBObject("occasionId", "7").append("occasion", "testingWeb").append("priority", 6).append("duration", 8).append("daysInHistory", "30").append("tagExpiresIn", "30"));
 		
+		//fake boostBrowseBuSubBu collection
+		boostBrowseBuSubBuColl = db.getCollection("boostBrowseBuSubBu");
+		boostBrowseBuSubBuColl.insert(new BasicDBObject("modelCode", "XYZW1").append("boost", "boost_XYZW1").append("bsb", "XYZW1"));
+		boostBrowseBuSubBuColl.insert(new BasicDBObject("modelCode", "12345").append("boost", "boost_12345").append("bsb", "12345"));
+		boostBrowseBuSubBuColl.insert(new BasicDBObject("modelCode", "ABCDE").append("boost", "boost_ABCDE").append("bsb", "ABCDE"));
+		boostBrowseBuSubBuColl.insert(new BasicDBObject("modelCode", "EFGHI").append("boost", "boost_EFGHI").append("bsb", "EFGHI"));
+		
 		setVarColl(varColl);
 		setModeVarColl(modeVarColl);
 		setRegionalAdjFactorsColl(regionalAdjFactorsColl);
 		setSourceFeedColl(sourceFeedColl);
 		setCpsOccasionsColl(cpsOccasionsColl);
-		
+		setBoostBrowseBuSubBuColl(boostBrowseBuSubBuColl);
 		/*setMemberVarsColl(memVarColl);
 		setChangedMemberVarsColl(changedMemberVar);
 		*/
