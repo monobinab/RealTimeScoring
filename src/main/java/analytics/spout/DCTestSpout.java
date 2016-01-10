@@ -14,6 +14,7 @@ import backtype.storm.tuple.Fields;
 public class DCTestSpout extends BaseRichSpout {
 	private SpoutOutputCollector collector;
 	String str = null;
+	boolean flag = false;
 
 	@Override
 	public void open(Map conf, TopologyContext context,
@@ -169,9 +170,12 @@ public class DCTestSpout extends BaseRichSpout {
 
 	@Override
 	public void nextTuple() {
+		if(flag == false){
 		 ArrayList<Object> listToEmit = new ArrayList<Object>();
 	        listToEmit.add(str);
 		this.collector.emit(listToEmit);
+		flag = true;
+		}
 	}
 
 	@Override

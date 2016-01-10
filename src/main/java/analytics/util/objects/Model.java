@@ -27,6 +27,12 @@ public class Model {
 		this.variables = vars;
 	}
 
+	public Model(int modId, String modelName,  Map<String, Variable> vars) {
+		this.modelName = modelName;
+		this.modelId = modId;
+		this.variables = vars;
+	}
+	
 	public int getModelId() {
 		return this.modelId;
 	}

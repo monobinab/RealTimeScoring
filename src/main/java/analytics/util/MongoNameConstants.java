@@ -201,6 +201,13 @@ public class MongoNameConstants {
    //boostBrowseBuSubBu collection
      public static final String BOOST = "boost";
      public static final String MODEL_CODE = "modelCode";
+     
+   //Boosts collection
+     public static final String BOOSTS_COLLECTION = "Boosts";
+     public static final String BOOST_NAME = "name";
+     public static final String BOOST_VID = "VID";
+     public static final String BOOST_STRATEGY = "strategy";
+ 
  
      
 }

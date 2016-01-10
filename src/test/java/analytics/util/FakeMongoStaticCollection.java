@@ -14,7 +14,21 @@ public class FakeMongoStaticCollection {
 	static DBCollection cpsOccasionsColl;
 	static DBCollection regionalAdjFactorsColl;
 	static DBCollection boostBrowseBuSubBuColl;
+	static DBCollection modelBoostsColl;
+	static DBCollection boostsColl;
 	
+	public static DBCollection getModelBoostsColl() {
+		return modelBoostsColl;
+	}
+	public static void setModelBoostsColl(DBCollection modelBoostsColl) {
+		FakeMongoStaticCollection.modelBoostsColl = modelBoostsColl;
+	}
+	public static DBCollection getBoostsColl() {
+		return boostsColl;
+	}
+	public static void setBoostsColl(DBCollection boostsColl) {
+		FakeMongoStaticCollection.boostsColl = boostsColl;
+	}
 	public static DBCollection getBoostBrowseBuSubBuColl() {
 		return boostBrowseBuSubBuColl;
 	}
@@ -68,11 +82,11 @@ public class FakeMongoStaticCollection {
 		varColl.insert(new BasicDBObject("name", "variable5").append("VID", 5).append("strategy","StrategyTurnOnFlag"));
 		varColl.insert(new BasicDBObject("name", "variable6").append("VID", 6).append("strategy","StrategyTurnOffFlag"));
 		varColl.insert(new BasicDBObject("name", "variable7").append("VID", 7).append("strategy","StrategyBoostProductTotalCount"));
-		varColl.insert(new BasicDBObject("name", "Boost_Syw_variable7").append("VID", 71).append("strategy","StrategySywTotalCounts"));
+		//varColl.insert(new BasicDBObject("name", "Boost_Syw_variable7").append("VID", 71).append("strategy","StrategySywTotalCounts"));
 		varColl.insert(new BasicDBObject("name", "variable8").append("VID", 8).append("strategy","StrategyDCFlag"));
 		varColl.insert(new BasicDBObject("name", "variable9").append("VID", 9).append("strategy","StrategyPurchaseOccasions"));
 		varColl.insert(new BasicDBObject("name", "variable10").append("VID", 10).append("strategy","StrategySumSales"));
-		varColl.insert(new BasicDBObject("name", "Blackout_variable").append("VID", 11).append("strategy","StrategyBlackout"));
+		//varColl.insert(new BasicDBObject("name", "Blackout_variable").append("VID", 11).append("strategy","StrategyBlackout"));
 		varColl.insert(new BasicDBObject("name", "variable12").append("VID", 12).append("strategy","NONE"));
 		varColl.insert(new BasicDBObject("name", "variable40").append("VID", 40).append("strategy","NONE"));
 		varColl.insert(new BasicDBObject("name", "variable13").append("VID", 13).append("strategy","StrategyCountTraitDates"));
@@ -80,14 +94,14 @@ public class FakeMongoStaticCollection {
 			
 		varColl.insert(new BasicDBObject("name", "S_SRS_VAR").append("VID", 16).append("strategy","StrategyCountTransactions"));
 		varColl.insert(new BasicDBObject("name", "S_SRS_VAR2").append("VID", 17).append("strategy","StrategyCountTransactions"));
-		varColl.insert(new BasicDBObject("name", "Blackout_variable2").append("VID", 18).append("strategy","StrategyBlackout"));
+		//varColl.insert(new BasicDBObject("name", "Blackout_variable2").append("VID", 18).append("strategy","StrategyBlackout"));
 	
 		//fake modelVariables collection
 		modeVarColl = db.getCollection("modelVariables");
 		BasicDBList dbList = new BasicDBList();
 		dbList.add(new BasicDBObject("name", "variable4").append("coefficient", 0.015));
 		dbList.add(new BasicDBObject("name", "variable10").append("coefficient", 0.05));
-		dbList.add(new BasicDBObject("name", "Boost_Syw_variable7").append("coefficient", 0.1).append("intercept", 0.0));
+		//dbList.add(new BasicDBObject("name", "Boost_Syw_variable7").append("coefficient", 0.1).append("intercept", 0.0));
 		modeVarColl.insert(new BasicDBObject("modelId", 35).append("modelName", "Model_Name").append("modelDescription", "Apparel").append("constant", 5).append("month", 0).append("variable", dbList));
 		BasicDBList dbList2 = new BasicDBList();
 		dbList2.add(new BasicDBObject("name", "Blackout_variable").append("coefficient", 0.015));
@@ -117,7 +131,7 @@ public class FakeMongoStaticCollection {
 			
 		BasicDBList dbList8 = new BasicDBList();
 		dbList8.add(new BasicDBObject("name", "S_SRS_VAR2").append("coefficient", 0.015));
-		dbList8.add(new BasicDBObject("name", "Blackout_variable2").append("coefficient", 0.015));
+		//dbList8.add(new BasicDBObject("name", "Blackout_variable2").append("coefficient", 0.015));
 		modeVarColl.insert(new BasicDBObject("modelId", 75).append("modelName", "Model_Name8").append("modelDescription", "Home Appliances2").append("constant", 5).append("month", 0).append("variable", dbList8));
 		
 		//fake regionalFactors collection
@@ -137,12 +151,34 @@ public class FakeMongoStaticCollection {
 		boostBrowseBuSubBuColl.insert(new BasicDBObject("modelCode", "ABCDE").append("boost", "boost_ABCDE").append("bsb", "ABCDE"));
 		boostBrowseBuSubBuColl.insert(new BasicDBObject("modelCode", "EFGHI").append("boost", "boost_EFGHI").append("bsb", "EFGHI"));
 		
+		//fake Boosts collection
+		DBCollection boostsColl = db.getCollection("Boosts");
+		boostsColl.insert(new BasicDBObject("name", "Boost_Syw_variable7").append("VID", 71).append("rts_flg", 0).append("strategy","StrategySywTotalCounts"));
+		boostsColl.insert(new BasicDBObject("name", "Blackout_variable").append("VID", 11).append("rts_flg", 0).append("strategy","StrategyBlackout"));
+		boostsColl.insert(new BasicDBObject("name", "Blackout_variable2").append("VID", 18).append("strategy","StrategyBlackout"));
+		
+		//fake modelBoosts collection
+		DBCollection modelBoostsColl = db.getCollection("modelBoost");
+		BasicDBList dbList9 = new BasicDBList();
+		dbList9.add(new BasicDBObject("name", "Boost_Syw_variable7").append("coefficient", 0.1).append("intercept", 0.0));
+		modelBoostsColl.insert(new BasicDBObject("modelId", 35).append("modelName", "Model_Name").append("modelDescription", "Apparel").append("constant", 5).append("month", 0).append("variable", dbList9));
+		
+		BasicDBList dbList93 = new BasicDBList();
+		dbList93.add(new BasicDBObject("name", "Blackout_variable").append("coefficient", 0.015).append("intercept", 0.0));
+		modelBoostsColl.insert(new BasicDBObject("modelId", 46).append("modelName", "Model_Name2").append("modelDescription", "Tools").append("constant", 5).append("month", 0).append("variable", dbList93));
+		
+		BasicDBList dbList92 = new BasicDBList();
+		dbList92.add(new BasicDBObject("name", "Blackout_variable2").append("coefficient", 0.015).append("intercept", 0.0));
+		modelBoostsColl.insert(new BasicDBObject("modelId", 75).append("modelName", "Model_Name8").append("modelDescription", "Home Appliances2").append("constant", 5).append("month", 0).append("variable", dbList92));
+		
 		setVarColl(varColl);
 		setModeVarColl(modeVarColl);
 		setRegionalAdjFactorsColl(regionalAdjFactorsColl);
 		setSourceFeedColl(sourceFeedColl);
 		setCpsOccasionsColl(cpsOccasionsColl);
 		setBoostBrowseBuSubBuColl(boostBrowseBuSubBuColl);
+		setBoostsColl(boostsColl);
+		setModelBoostsColl(modelBoostsColl);
 		/*setMemberVarsColl(memVarColl);
 		setChangedMemberVarsColl(changedMemberVar);
 		*/

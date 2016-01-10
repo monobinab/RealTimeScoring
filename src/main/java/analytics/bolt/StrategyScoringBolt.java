@@ -164,11 +164,11 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		
 			//Write changedMemberVariableswith expiry
 			if(memberRTSChanges.getAllChangesMap() != null && !memberRTSChanges.getAllChangesMap().isEmpty() )
-				scoringSingleton.updateChangedMemberVariables(lId, memberRTSChanges.getAllChangesMap());
+	//			scoringSingleton.updateChangedMemberVariables(lId, memberRTSChanges.getAllChangesMap());
 	    
 	    	//Write changedMemberScores with min max expiry
 			if(changedMemberScoresList != null && !changedMemberScoresList.isEmpty())
-				scoringSingleton.updateChangedMemberScore(lId, changedMemberScoresList, source);
+	//			scoringSingleton.updateChangedMemberScore(lId, changedMemberScoresList, source);
 	      	
 	      	//emitting to logging bolt
 			

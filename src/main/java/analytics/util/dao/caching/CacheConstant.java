@@ -23,7 +23,13 @@ public class CacheConstant {
 	public static final String RTS_CACHE_OCCASIONS_INFO_CACHE = "OCCASIONSINFOCACHE";
 	public static final String RTS_CACHE_BOOST_BROWSE_BUSUBBU_CACHE = "BOOSTBROWSEBUSUBBUCACHE";
 	public static final String RTS_CACHE_DIVlN_MODELCODE_CACHE = "DIVLNMODELCODECACHE";
+	public static final String RTS_CACHE_MODEL_BOOST_VARIABLES_CACHE = "MODELBOOSTVARIABLECACHE";
+	public static final String RTS_CACHE_BOOST_CACHE = "BOOSTSCACHE";
 	
+	//Second Level Cache
+	public static final String RTS_CACHE_ALL_MODEL_VARIABLES_CACHE = "ALLMODELVARIABLECACHE";
+	public static final String RTS_CACHE_ALL_VARIABLE_MODELS_CACHE = "ALLVARIABLEMODELSCACHE";
+	public static final String RTS_CACHE_ALL_VARIABLE_CACHE = "ALLVARIABLESCACHE";
 	
 	//Model Percentiles Cache Key
 	public static final String RTS_MODEL_PERCENTILES_CACHE_KEY = "fdc69723-214d-4bb7-8a8a-caaa4b07ab6f";
@@ -87,5 +93,17 @@ public class CacheConstant {
 	//DivLn ModelCode Cache Key
 	public static final String RTS_DIVLN_MODELCODE_CACHE_KEY = "0aa0ffc7-0bad-469f-bafe-69e1ed6a398c";
 		
+	//ModelBoosts Cache Key
+	public static final String RTS_MODEL_BOOSTS_CACHE_KEY = "8445f852-4aae-4830-96f6-34a2656e95cb";
 	
+	 //SECOND LEVEL CACHE
+	
+	 //All Model Variables Cache Key
+	 public static final String RTS_ALL_MODEL_VARIABLE_CACHE_KEY = "ec408594-e4c1-4bf5-a67a-805d99a14eb1";
+	 
+	 //All Variable Models Cache Key
+	 public static final String RTS_ALL_VARIABLE_MODEL_CACHE_KEY = "5d5cb6a1-7918-414f-b100-09633dc83c08";
+	 
+	//All Variable Cache Key
+	 public static final String RTS_ALL_VARIABLE_CACHE_KEY = "444e5984-4811-49c1-a236-c655dc082277";
 }
