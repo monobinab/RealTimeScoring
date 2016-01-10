@@ -2,9 +2,8 @@ package analytics.util.objects;
 
 import java.io.Serializable;
 
-import org.bson.types.ObjectId;
-
-public class Boost extends Variable{
+public class Boost extends Variable implements Serializable{
+	
 	private static final long serialVersionUID = 1L;
 	private double intercept;
 	 

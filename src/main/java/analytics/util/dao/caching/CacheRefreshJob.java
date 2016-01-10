@@ -18,8 +18,12 @@ public class CacheRefreshJob implements Job{
 	
 	@Override
 	public void execute(JobExecutionContext arg0) throws JobExecutionException {
-		List<Cache> caches = this.getDailyActiveCaches();
-        if(caches != null && caches.size() > 0){
+		this.clearCaches(this.getDailyActiveCaches());
+		this.clearCaches(this.getDailyActiveSubCaches());
+	}
+	
+	private void clearCaches(List<Cache> caches){
+		if(caches != null && caches.size() > 0){
         	for(Cache cache : caches){
         		CacheStatistics.getInstance().showCacheStatistics(cache);
     			cache.removeAll();
@@ -44,6 +48,32 @@ public class CacheRefreshJob implements Job{
 				caches.add(cache);
 			}
 			cache = CacheManager.getInstance().getCache(CacheConstant.RTS_CACHE_REGIONALFACTORCACHE);
+			if(cache != null){
+				caches.add(cache);
+			}
+			cache = CacheManager.getInstance().getCache(CacheConstant.RTS_CACHE_MODEL_BOOST_VARIABLES_CACHE);
+			if(cache != null){
+				caches.add(cache);
+			}
+			cache = CacheManager.getInstance().getCache(CacheConstant.RTS_CACHE_BOOST_CACHE);
+			if(cache != null){
+				caches.add(cache);
+			}
+			return caches;
+	 }
+	 
+	 private List<Cache> getDailyActiveSubCaches(){
+	    	Cache cache = null;
+			List<Cache> caches = new ArrayList<Cache>();
+			cache = CacheManager.getInstance().getCache(CacheConstant.RTS_CACHE_ALL_MODEL_VARIABLES_CACHE);
+			if(cache != null){
+				caches.add(cache);
+			}
+			cache = CacheManager.getInstance().getCache(CacheConstant.RTS_CACHE_ALL_VARIABLE_MODELS_CACHE);
+			if(cache != null){
+				caches.add(cache);
+			}
+			cache = CacheManager.getInstance().getCache(CacheConstant.RTS_CACHE_ALL_VARIABLE_CACHE);
 			if(cache != null){
 				caches.add(cache);
 			}

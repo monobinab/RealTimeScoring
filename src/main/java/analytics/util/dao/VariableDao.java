@@ -23,14 +23,22 @@ public class VariableDao extends AbstractDao{
 	
     private DBCollection variablesCollection;
     private Cache cache = null;
+    private Cache allVariableCache = null;
+    private BoostsDao boostsDao;
     
     public VariableDao(){
     	super();
-		variablesCollection = db.getCollection("Variables");
+    	boostsDao = new BoostsDao();
+		variablesCollection = db.getCollection("Variables_sep");
 		cache = CacheManager.getInstance().getCache(CacheConstant.RTS_CACHE_VARIABLESCACHE);
     	if(null == cache){
 			cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_VARIABLESCACHE);
 	    	CacheBuilder.getInstance().setCaches(cache);
+    	}
+    	allVariableCache = CacheManager.getInstance().getCache(CacheConstant.RTS_CACHE_ALL_VARIABLE_CACHE);
+    	if(null == allVariableCache){
+    		allVariableCache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_ALL_VARIABLE_CACHE);
+	    	CacheBuilder.getInstance().setCaches(allVariableCache);
     	}
     }
 	
@@ -55,6 +63,27 @@ public class VariableDao extends AbstractDao{
 			return variables;
 		}
 	}
+    
+    @SuppressWarnings("unchecked")
+	public List<Variable> getAllVariables(){
+    	String cacheKey = CacheConstant.RTS_ALL_VARIABLE_CACHE_KEY;
+		Element element = CacheWrapper.getInstance().isCacheKeyExist(allVariableCache, cacheKey);
+		if(element != null && element.getObjectKey().equals(cacheKey)){
+			return (List<Variable>) element.getObjectValue();
+		}else{
+			List<Variable> variablesList = this.getVariables();
+			List<Variable> boostsList = boostsDao.getBoosts();
+			//Combining boosts with variables
+			variablesList.addAll(boostsList);
+			if(variablesList.size() != 0){
+				allVariableCache.put(new Element(cacheKey, variablesList));
+			}
+			return variablesList;
+		}
+	  }
+    
+    
+    
 	
 	public List<String> getVariableNames() {
 		List<String> variables = new ArrayList<String>();
@@ -69,7 +98,7 @@ public class VariableDao extends AbstractDao{
 	
 	public Set<String> getStrategyList() {
 		Set<String> strategyList = new HashSet<String>();
-		List<Variable> variables = this.getVariables();
+		List<Variable> variables = this.getAllVariables();
 		if(variables != null && variables.size() > 0){
 			for(Variable variable : variables){
 				if(!"NONE".equals(variable.getStrategy())) {
