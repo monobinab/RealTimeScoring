@@ -74,7 +74,7 @@ public class FakeMongoStaticCollection {
 	//	if(!flag == true){
 		SystemPropertyUtility.setSystemProperty();
 		db = SystemPropertyUtility.getDb();
-		varColl = db.getCollection("Variables");
+		varColl = db.getCollection("Variables_sep");
 		varColl.insert(new BasicDBObject("name", "variable1").append("VID", 1).append("strategy","StrategyCountTransactions"));
 		varColl.insert(new BasicDBObject("name", "variable2").append("VID", 2).append("strategy","StrategyCountTraitDates"));
 		varColl.insert(new BasicDBObject("name", "variable3").append("VID", 3).append("strategy","StrategyCountTraits"));
@@ -97,7 +97,7 @@ public class FakeMongoStaticCollection {
 		//varColl.insert(new BasicDBObject("name", "Blackout_variable2").append("VID", 18).append("strategy","StrategyBlackout"));
 	
 		//fake modelVariables collection
-		modeVarColl = db.getCollection("modelVariables");
+		modeVarColl = db.getCollection("modelVariables_sep");
 		BasicDBList dbList = new BasicDBList();
 		dbList.add(new BasicDBObject("name", "variable4").append("coefficient", 0.015));
 		dbList.add(new BasicDBObject("name", "variable10").append("coefficient", 0.05));
@@ -152,13 +152,13 @@ public class FakeMongoStaticCollection {
 		boostBrowseBuSubBuColl.insert(new BasicDBObject("modelCode", "EFGHI").append("boost", "boost_EFGHI").append("bsb", "EFGHI"));
 		
 		//fake Boosts collection
-		DBCollection boostsColl = db.getCollection("Boosts");
+		DBCollection boostsColl = db.getCollection("Boosts_sep");
 		boostsColl.insert(new BasicDBObject("name", "Boost_Syw_variable7").append("VID", 71).append("rts_flg", 0).append("strategy","StrategySywTotalCounts"));
 		boostsColl.insert(new BasicDBObject("name", "Blackout_variable").append("VID", 11).append("rts_flg", 0).append("strategy","StrategyBlackout"));
 		boostsColl.insert(new BasicDBObject("name", "Blackout_variable2").append("VID", 18).append("strategy","StrategyBlackout"));
 		
 		//fake modelBoosts collection
-		DBCollection modelBoostsColl = db.getCollection("modelBoost");
+		DBCollection modelBoostsColl = db.getCollection("modelBoost_sep");
 		BasicDBList dbList9 = new BasicDBList();
 		dbList9.add(new BasicDBObject("name", "Boost_Syw_variable7").append("coefficient", 0.1).append("intercept", 0.0));
 		modelBoostsColl.insert(new BasicDBObject("modelId", 35).append("modelName", "Model_Name").append("modelDescription", "Apparel").append("constant", 5).append("month", 0).append("variable", dbList9));
