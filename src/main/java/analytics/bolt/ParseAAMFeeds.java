@@ -118,7 +118,7 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
             	boostValueJSON = JsonUtils.createJsonFromStringStringMap(getBoostFromModelCode(totalModelCodeMap));
     		}
     		else{
-    			 boostValueJSON = JsonUtils.createJsonFromStringStringMap(getBoostFromModelCode(incomingValueMap));
+    			 boostValueJSON = JsonUtils.createJsonFromStringStringMap(incomingValueMap);
     		}
        		
         	List<Object> listToEmit = new ArrayList<Object>();
