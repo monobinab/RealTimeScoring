@@ -22,6 +22,26 @@
  <cache name="REGIONALFACTORCACHE" maxElementsInMemory="50" eternal="false"
  	overflowToDisk="false" timeToLiveSeconds="0" memoryStoreEvictionPolicy="LFU">
  </cache>
+ 
+ <cache name="MODELBOOSTVARIABLECACHE" maxElementsInMemory="50" eternal="false"
+ 	overflowToDisk="false" timeToLiveSeconds="0" memoryStoreEvictionPolicy="LFU">
+ </cache>
+ 
+ <cache name="BOOSTSCACHE" maxElementsInMemory="50" eternal="false"
+ 	overflowToDisk="false" timeToLiveSeconds="0" memoryStoreEvictionPolicy="LFU">
+ </cache>
+ 
+ <cache name="ALLMODELVARIABLECACHE" maxElementsInMemory="50" eternal="false"
+ 	overflowToDisk="false" timeToLiveSeconds="0" memoryStoreEvictionPolicy="LFU">
+ </cache>
+ 
+ <cache name="ALLVARIABLEMODELSCACHE" maxElementsInMemory="50" eternal="false"
+ 	overflowToDisk="false" timeToLiveSeconds="0" memoryStoreEvictionPolicy="LFU">
+ </cache>
+ 
+ <cache name="ALLVARIABLESCACHE" maxElementsInMemory="50" eternal="false"
+ 	overflowToDisk="false" timeToLiveSeconds="0" memoryStoreEvictionPolicy="LFU">
+ </cache>
  <!-- Daily Refresh Caches -->
   
  
