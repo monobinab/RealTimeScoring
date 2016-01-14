@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import com.mongodb.DB;
 
 import analytics.exception.RealTimeScoringException;
-import analytics.util.dao.BoostsDao;
 import analytics.util.dao.ChangedMemberScoresDao;
 import analytics.util.dao.ChangedMemberVariablesDao;
 import analytics.util.dao.MemberInfoDao;
@@ -56,7 +55,6 @@ public class ScoringSingleton {
 	
 	//boost separation
 	ModelBoostsDao modelBoostsDao;
-	BoostsDao boostDao;
 
 	private boolean isExecuted = Boolean.FALSE;
 	
