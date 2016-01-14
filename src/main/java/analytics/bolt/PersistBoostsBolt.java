@@ -44,7 +44,7 @@ public class PersistBoostsBolt extends EnvironmentBolt {
         Map<String, Map<String, List<String>>> memberBoostValuesMap = new HashMap<String, Map<String, List<String>>>();
         Map<String, String> variablesStrategyMap = new HashMap<String, String>();
         //populate variablesStrategyMap
-  		for(Variable v: variableDao.getVariables()) {
+  		for(Variable v: variableDao.getAllVariables()) {
   			if(v.getName().substring(0, 5).equals(MongoNameConstants.BOOST_VAR_PREFIX)) {
   				variablesStrategyMap.put(v.getName(), v.getStrategy());
   			}

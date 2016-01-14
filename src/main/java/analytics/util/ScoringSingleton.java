@@ -112,7 +112,7 @@ public class ScoringSingleton {
 			if(memberRTSChanges != null){
 				List<ChangedMemberScore> changedMemberScoresList = memberRTSChanges.getChangedMemberScoreList();
 				//changedMemberScoresList null check is not needed, as calcRTSChanges method will NOT return null map
-				if(!changedMemberScoresList.isEmpty()){
+				if(changedMemberScoresList != null && changedMemberScoresList.size() > 0){
 					updateChangedMemberScore(l_id, changedMemberScoresList, source);
 					for(ChangedMemberScore changedMemScore : changedMemberScoresList){
 						modelIdStringScoreMap.put(changedMemScore.getModelId(), changedMemScore.getScore());
@@ -120,6 +120,7 @@ public class ScoringSingleton {
 				}
 			}
 		}
+		
 		catch(Exception e){
 			//e.printStackTrace();
 			LOGGER.error("Exception occured in rescoring " + l_id + " ", e.getMessage());
