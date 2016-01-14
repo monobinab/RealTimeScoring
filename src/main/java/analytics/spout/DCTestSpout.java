@@ -3,8 +3,6 @@ package analytics.spout;
 import java.util.ArrayList;
 import java.util.Map;
 
-import org.codehaus.jettison.json.JSONObject;
-
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;

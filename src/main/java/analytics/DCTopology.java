@@ -9,6 +9,7 @@ import analytics.bolt.ParsingBoltDC;
 import analytics.bolt.PurchaseScoreKafkaBolt;
 import analytics.bolt.RTSKafkaBolt;
 import analytics.bolt.StrategyScoringBolt;
+import analytics.spout.DCTestSpout;
 import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
 import analytics.util.SystemUtility;

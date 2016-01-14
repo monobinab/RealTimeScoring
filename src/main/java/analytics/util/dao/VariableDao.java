@@ -29,7 +29,7 @@ public class VariableDao extends AbstractDao{
     public VariableDao(){
     	super();
     	boostsDao = new BoostsDao();
-		variablesCollection = db.getCollection("Variables_sep");
+		variablesCollection = db.getCollection("Variables");
 		cache = CacheManager.getInstance().getCache(CacheConstant.RTS_CACHE_VARIABLESCACHE);
     	if(null == cache){
 			cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_VARIABLESCACHE);
@@ -52,14 +52,16 @@ public class VariableDao extends AbstractDao{
 			List<Variable> variables = new ArrayList<Variable>();
 			DBCursor vCursor = variablesCollection.find();
 			for (DBObject variable : vCursor) {
+				int defaultValue = (variable.containsField("default")) ? Integer.parseInt(((DBObject) variable).get("default").toString()):0;
 				variables.add(new Variable(
 						((DBObject) variable).get(MongoNameConstants.V_NAME).toString().toUpperCase(),
 						((DBObject) variable).get(MongoNameConstants.V_ID).toString(),
-						((DBObject) variable).get(MongoNameConstants.V_STRATEGY).toString()));
+						((DBObject) variable).get(MongoNameConstants.V_STRATEGY).toString(), defaultValue));
 			}
 			if(variables != null && variables.size() > 0){
 				cache.put(new Element(cacheKey, (List<Variable>) variables));
 			}
+			LOGGER.info("variablesMap is populated from variables collection");
 			return variables;
 		}
 	}
@@ -82,7 +84,16 @@ public class VariableDao extends AbstractDao{
 		}
 	  }
     
-    
+    public int getDefaultValue(String varName){
+    	int defaultValue = 0;
+    	List<Variable> variablesList = this.getVariables();
+    	for(Variable variable : variablesList){
+    		if(variable.getName().equalsIgnoreCase(varName)){
+    			defaultValue = variable.getDefaultValue();
+    		}
+    	}
+		return defaultValue;
+    }
     
 	
 	public List<String> getVariableNames() {

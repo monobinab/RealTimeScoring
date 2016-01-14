@@ -100,12 +100,12 @@ public class RealTimeScoringTellurideTopology {
 				.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST),new Integer (AuthPropertiesReader
 					.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 12).shuffleGrouping("parsingBolt");
        
-       /*topologyBuilder.setBolt("purchaseScoreKafka_bolt", new PurchaseScoreKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD), purchase_Topic), 2)
-		.shuffleGrouping("strategyScoringBolt","cp_purchase_scores_stream");*/
-		/*topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System.getProperty(MongoNameConstants.IS_PROD), "10.2.8.175", 11211,
+       topologyBuilder.setBolt("purchaseScoreKafka_bolt", new PurchaseScoreKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD), purchase_Topic), 2)
+		.shuffleGrouping("strategyScoringBolt","cp_purchase_scores_stream");
+       /*topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System.getProperty(MongoNameConstants.IS_PROD), "10.2.8.175", 11211,
 				"10.2.8.149", 11211), 12).shuffleGrouping("parsingBolt");*/
        
-      // topologyBuilder.setBolt("kafka_bolt", new RTSKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD),kafkatopic), 2).shuffleGrouping("strategyScoringBolt","kafka_stream");
+       topologyBuilder.setBolt("kafka_bolt", new RTSKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD),kafkatopic), 2).shuffleGrouping("strategyScoringBolt","kafka_stream");
 	
        if(System.getProperty(MongoNameConstants.IS_PROD).equalsIgnoreCase("PROD")){
         	topologyBuilder.setBolt("loggingBolt", new LoggingBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");

@@ -13,7 +13,6 @@ import analytics.util.dao.caching.CacheConstant;
 import analytics.util.dao.caching.CacheWrapper;
 import analytics.util.objects.Boost;
 import analytics.util.objects.Model;
-import analytics.util.objects.ModelBoosts;
 import analytics.util.objects.ModelVariable;
 import analytics.util.objects.Variable;
 import net.sf.ehcache.Cache;
@@ -34,11 +33,13 @@ public class ModelVariablesDao extends AbstractDao{
 	private Cache allModelVariablesCache= null;
 	private Cache allVariableModelsCache = null;
 	private ModelBoostsDao modelBoostsDao;
+	private VariableDao variableDao;
     
     public ModelVariablesDao(){
     	super();
-		modelVariablesCollection = db.getCollection("modelVariables_sep");
+		modelVariablesCollection = db.getCollection("modelVariables");
 		modelBoostsDao = new ModelBoostsDao();
+		variableDao = new VariableDao();
 		cache = CacheManager.getInstance().getCache(CacheConstant.RTS_CACHE_MODELVARIABLESCACHE);
     	if(null == cache){
     		cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_MODELVARIABLESCACHE);
@@ -103,6 +104,10 @@ public class ModelVariablesDao extends AbstractDao{
 											variable.setIntercept((Double)dbo.get("intercept"));
 										}
 									}
+									int defaultValue = variableDao.getDefaultValue((String)dbo.get("name"));
+									if(defaultValue != 0){
+										variable.setDefaultValue(defaultValue);
+									}
 								}
 								dbVariables.add(variable);
 							}
@@ -115,8 +120,7 @@ public class ModelVariablesDao extends AbstractDao{
 		if(modelVariables != null && modelVariables.size() > 0){
 			cache.put(new Element(cacheKey, (List<ModelVariable>) modelVariables));
 		}
-		System.out.println(cache.get(cacheKey));
-		return modelVariables;
+			return modelVariables;
 		}
 	}
 	
@@ -135,7 +139,7 @@ public class ModelVariablesDao extends AbstractDao{
 				for (Variable variable : variables) {
 					String variableName = variable.getName().toUpperCase();
 						Double coefficient = variable.getCoefficient();
-						variablesMap.put(variableName, new Variable(variableName,coefficient));
+						variablesMap.put(variableName, new Variable(variableName,coefficient, variable.getDefaultValue()));
 					}
 				
 				if (!modelsMap.containsKey(modelId)) {
@@ -147,6 +151,7 @@ public class ModelVariablesDao extends AbstractDao{
 				}
     		}
     	}
+    	LOGGER.info("modelsMap is populated from modelVariables collection");
 		return modelsMap;
 	}
 	
@@ -286,7 +291,7 @@ public class ModelVariablesDao extends AbstractDao{
 				variablesMap.put(variableName, new Boost(variableName, coefficient, intercept));
 			} else {
 				Double coefficient = variable.getCoefficient();
-				variablesMap.put(variableName, new Variable(variableName,coefficient));
+				variablesMap.put(variableName, new Variable(variableName,coefficient, variable.getDefaultValue() ));
 			}
 			if (!variableModelsMap.containsKey(variableName)) {
 				List<Integer> modelIds = new ArrayList<Integer>();

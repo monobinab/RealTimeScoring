@@ -19,7 +19,6 @@ import analytics.util.dao.caching.CacheWrapper;
 import analytics.util.objects.Boost;
 import analytics.util.objects.Model;
 import analytics.util.objects.ModelBoosts;
-import analytics.util.objects.ModelVariable;
 import analytics.util.objects.Variable;
 
 import com.mongodb.BasicDBList;
@@ -34,7 +33,7 @@ public class ModelBoostsDao extends AbstractDao {
     private Cache cache = null;
     public ModelBoostsDao(){
     	super();
-    	modelBoostsCollection = db.getCollection("modelBoost_sep");
+    	modelBoostsCollection = db.getCollection("modelBoost");
     	cache = CacheManager.getInstance().getCache(CacheConstant.RTS_CACHE_MODEL_BOOST_VARIABLES_CACHE);
     	if(null == cache){
     		cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_MODEL_BOOST_VARIABLES_CACHE);
@@ -96,6 +95,8 @@ public class ModelBoostsDao extends AbstractDao {
 			 }
 			 modelBoostsMap.put(modelBoost.getModelId(), new Model(modelBoost.getModelId(), modelBoost.getModelName(), boostsMap));
 		 }
+		 
+		 LOGGER.info("modelBoostsMap is populated from modelBoosts collection");
 		return modelBoostsMap;
 	 }
  

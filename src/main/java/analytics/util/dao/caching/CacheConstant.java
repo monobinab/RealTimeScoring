@@ -96,6 +96,9 @@ public class CacheConstant {
 	//ModelBoosts Cache Key
 	public static final String RTS_MODEL_BOOSTS_CACHE_KEY = "8445f852-4aae-4830-96f6-34a2656e95cb";
 	
+	//Boosts Cache Key
+	public static final String RTS_BOOSTS_CACHE_KEY = "686bc257-cc3d-4a8d-8734-9124a1d04a79";
+	
 	 //SECOND LEVEL CACHE
 	
 	 //All Model Variables Cache Key

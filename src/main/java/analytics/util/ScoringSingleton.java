@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -30,7 +30,6 @@ import analytics.util.dao.ModelVariablesDao;
 import analytics.util.dao.MongoDBConnectionWrapper;
 import analytics.util.dao.RegionalFactorDao;
 import analytics.util.dao.VariableDao;
-//import analytics.util.dao.caching.CacheStatistics;
 import analytics.util.objects.Boost;
 import analytics.util.objects.Change;
 import analytics.util.objects.ChangedMemberScore;
@@ -58,11 +57,6 @@ public class ScoringSingleton {
 	//boost separation
 	ModelBoostsDao modelBoostsDao;
 	BoostsDao boostDao;
-	private Map<String, String> boostVidToNameMap;
-	private Map<String, String> boostNameToVidMap;
-	private Map<String, String> boostNameToStrategyMap;
-	private Map<String, List<Integer>> boostModelsMap;
-	private Map<Integer, Model> modelBoostsMap;
 
 	private boolean isExecuted = Boolean.FALSE;
 	
@@ -139,8 +133,7 @@ public class ScoringSingleton {
 		Map<String, String> variableNameToStrategyMap = new HashMap<String, String>();
 		Map<String, String> variableNameToVidMap = new HashMap<String, String>();
 		Map<String, String> variableVidToNameMap = new HashMap<String, String>();
-		/*List<Variable> boosts = boostDao.getBoosts();
-		variables.addAll(boosts);*/
+		
 		List<Variable> variables = variableDao.getAllVariables();
 		for (Variable variable : variables) {
 			if (variable.getName() != null && variable.getVid() != null) {
@@ -151,62 +144,8 @@ public class ScoringSingleton {
 		}
 		Map<String, Double> regionalFactorsMap = regionalFactorDao.populateRegionalFactors();
 		
-		
-		
-		/*modelVariablesDao.populateModelVariables(modelsMap, variableModelsMap);
-		//code for boost separation
-		modelBoostsDao = new ModelBoostsDao();
-		modelBoostsMap = new HashMap<Integer, Model>();
-		boostModelsMap = new HashMap<String, List<Integer>>();
-		modelBoostsDao.populateModelBoostMap(modelBoostsMap, boostModelsMap);
-		
-		//combining the modelsMap and modelBoostsMap
-		for (Entry<Integer, Map<Integer, Model>> modelVarsMap : modelsMap.entrySet())
-		{
-			Map<Integer, Model> monthModelMap = modelVarsMap.getValue();
-			for (Entry<Integer, Model> modelMap : monthModelMap.entrySet())
-			{
-				Model model = modelMap.getValue();
-				int modelId = model.getModelId();
-				String modelName = model.getModelName();
-				double constant = model.getConstant();
-				int month = model.getMonth();
-				Map<String, Variable> vars = model.getVariables();
-				Model boostsModel = modelBoostsMap.get(modelId);
-				if(boostsModel != null){
-					Map<String, Variable> boost = boostsModel.getVariables();
-					vars.putAll(boost);
-					modelsMap.get(modelId).put(month, new Model(modelId, modelName, month, constant, vars ));
-				}
-			}
-		}*/
-		
-		/*	//combining the variableModelsMap and boostModelsMap
-		variableModelsMap.putAll(boostModelsMap);*/
-		
 		Map<Integer, Map<Integer, Model>> modelsMap = modelVariablesDao.getAllModelVariables();
 		Map<String, List<Integer>> variableModelsMap = modelVariablesDao.getAllVariableModelsMap();
-		
-		
-		
-		/**
-		 * 
-		 * Testing by sysouts
-		 * 
-		 */
-		for(Integer key : modelsMap.keySet()){
-			Map<Integer, Model> monthModel = modelsMap.get(key);
-			for(Integer month : monthModel.keySet()){
-				Model model = monthModel.get(month);
-				Map<String, Variable> var = model.getVariables();
-				System.out.println(model.getModelId() + ":");
-				for(String vars : var.keySet()){
-					Variable variable = var.get(vars);
-					System.out.println(vars);
-				}
-			}
-		}
-		
 	
 		try{		
 			//Find all models affected by the new incoming changes if newChangesVarValueMap is null
@@ -574,7 +513,14 @@ public class ScoringSingleton {
 				variableValue = allChanges.get(variable.getName().toUpperCase()).getValue();
 			} else if (mbrVarMap.containsKey(vid)) {
 				variableValue = mbrVarMap.get(vid);
-			} else {
+			} /*else if(defaultValue != null){
+				variableValue = defaultValue;
+				defaultValue = null;
+			}*/
+			else if(variable.getDefaultValue() != 0){
+				variableValue = variable.getDefaultValue();
+			}
+			else {
 				continue;
 			}
 			
@@ -589,6 +535,19 @@ public class ScoringSingleton {
 			}
 		}
 		return val;
+	}
+	
+	public Object getDefaultValue(String varName, List<Variable> variablesList){
+		Object defaultValue = null;
+		if(variablesList != null && !variablesList.isEmpty()){
+			for(Variable var : variablesList){
+				if(var.getName().equalsIgnoreCase(varName) && var.getDefaultValue() != 0.0){
+					defaultValue = var.getDefaultValue();
+					break;
+				}
+			}
+		}
+		return defaultValue;
 	}
 	
 	public double calcRegionalFactor(Integer modelId, String state, Map<String, Double> regionalFactorsMap){

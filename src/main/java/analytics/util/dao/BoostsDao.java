@@ -25,7 +25,7 @@ public class BoostsDao extends AbstractDao {
 
     public BoostsDao(){
         super();
-        boostsCollection = db.getCollection("Boosts_sep");
+        boostsCollection = db.getCollection("Boosts");
         cache = CacheManager.getInstance().getCache(CacheConstant.RTS_CACHE_BOOST_CACHE);
     	if(null == cache){
 			cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_BOOST_CACHE);
@@ -36,7 +36,7 @@ public class BoostsDao extends AbstractDao {
     @SuppressWarnings("unchecked")
 	public List<Variable> getBoosts() {
 		
-		String cacheKey = CacheConstant.RTS_CACHE_BOOST_CACHE;
+		String cacheKey = CacheConstant.RTS_BOOSTS_CACHE_KEY;
 		Element element = CacheWrapper.getInstance().isCacheKeyExist(cache, cacheKey);
 		if(element != null && element.getObjectKey().equals(cacheKey)){
 			return (List<Variable>) element.getObjectValue();
@@ -49,6 +49,7 @@ public class BoostsDao extends AbstractDao {
 					((DBObject) variable).get(MongoNameConstants.V_ID).toString(),
 					((DBObject) variable).get(MongoNameConstants.V_STRATEGY).toString()));
 		}
+			LOGGER.info("boostsMap is populated from boosts collection");
 			return boosts;
 		}
 	}
