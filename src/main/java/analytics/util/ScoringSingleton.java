@@ -88,7 +88,6 @@ public class ScoringSingleton {
 					mongoDBConnectionWrapper.populateDBConnection(db1, db2);
 				}
 			}
-			boostDao = new BoostsDao();
 			variableDao = new VariableDao();
 			modelVariablesDao = new ModelVariablesDao();
 			changedVariablesDao = new ChangedMemberVariablesDao();
@@ -120,7 +119,6 @@ public class ScoringSingleton {
 				}
 			}
 		}
-		
 		catch(Exception e){
 			//e.printStackTrace();
 			LOGGER.error("Exception occured in rescoring " + l_id + " ", e.getMessage());
