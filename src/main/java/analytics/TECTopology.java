@@ -44,6 +44,7 @@ public class TECTopology {
 		}
 		String kafkaTopic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;
 		String zkroot="tecTopic";
+		String group_id = "tec_groupid";
 		String env = System.getProperty(MongoNameConstants.IS_PROD);
 		TopologyBuilder builder = new TopologyBuilder();		
 				
@@ -53,7 +54,8 @@ public class TECTopology {
 			builder.setSpout(
 					"RTSKafkaSpout",
 					new RTSKafkaSpout(new KafkaUtil(System.getProperty(MongoNameConstants.IS_PROD)).getSpoutConfig(
-							kafkaTopic,zkroot)), 1);
+							kafkaTopic,zkroot,group_id)), 1);
+			
 		} catch (ConfigurationException e1) {
 			LOGGER.error(e1.getClass() + ": " + e1.getMessage(), e1);
 			LOGGER.error("Kafka Not Initialised ");
