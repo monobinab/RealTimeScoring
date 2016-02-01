@@ -3,13 +3,15 @@ package analytics.util.objects;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import analytics.util.CalendarUtil;
+
 public class Change {
 	private String vid;
 	private Object value;
 	private Date expirationDate;
 	private Date effectivDate;
 	
-	private static SimpleDateFormat dtFormat = new SimpleDateFormat("yyyy-MM-dd");
+	private SimpleDateFormat dtFormat = CalendarUtil.getDateFormat();
 	
 	public Change(){
 		
