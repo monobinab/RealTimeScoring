@@ -43,4 +43,12 @@ public class CalendarUtil {
 		return  null;
 		
 	}
+	/**
+	 * SimpleDateFormat is not designed to be used by multiple threads at the same time
+	 * Thus a new instance is needed to be created every time upon used. Better than synchronizing the object for now.
+	 * @return
+	 */
+	public static SimpleDateFormat getDateFormat(){
+		return new SimpleDateFormat("yyyy-MM-dd");
+	}
 }
