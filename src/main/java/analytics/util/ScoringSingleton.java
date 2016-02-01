@@ -166,7 +166,7 @@ public class ScoringSingleton {
 				Map<String, Object> memberVariablesMap = this.createMemberVariableValueMap(lId, modelIdsList, variableNameToVidMap, modelsMap);
 			
 				//checking only for null map as, with empty memberVaraiblesMap also, scoring should happen with new changes for that member
-				if(memberVariablesMap != null){
+				//if(memberVariablesMap != null){
 					
 					//create a map of non-expired variables and value fetched from changedMembervariables collection
 					Map<String, Change> changedMemberVariables = this.createChangedMemberVariablesMap(lId, variableVidToNameMap);
@@ -238,12 +238,12 @@ public class ScoringSingleton {
 							 memberRTSChanges.setlId(lId);
 							 memberRTSChanges.setChangedMemberScoreList(changedMemberScoreList);
 							 memberRTSChanges.setAllChangesMap(allChanges);
-				 	}
+			/*	 	}
 				else{
 					memberRTSChanges = new MemberRTSChanges();
 					LOGGER.info("PERSIST: no member variabls for " + lId);
 					memberRTSChanges.setMetricsString("no_member_variables");
-				}
+				}*/
 			 	}	
 			else{
 				memberRTSChanges = new MemberRTSChanges();
@@ -376,14 +376,14 @@ public class ScoringSingleton {
 					 * If this member had a changed variable
 					   allChanges at this point only contain changedMemberVariables
 					   changedMemberVariables can never be null, so no need for null check 
-					   ChangedMemberVarDao will return empty map NOT null map
+					   ChangedMemberVarDao will return empty map NOT null 
 					 */
 					if (!allChanges.isEmpty() && allChanges.containsKey(variableName)) {
 						context.setPreviousValue(allChanges.get(variableName).getValue());
 					}
 					// else get it from memberVariablesMap
 					else {
-						if (memberVariablesMap.get(variableNameToVidMap.get(variableName)) != null) {
+						if (memberVariablesMap != null && memberVariablesMap.get(variableNameToVidMap.get(variableName)) != null) {
 							context.setPreviousValue(memberVariablesMap.get(variableNameToVidMap.get(variableName)));
 						}
 					}
@@ -508,12 +508,9 @@ public class ScoringSingleton {
 			// otherwise skip it
 			if (allChanges.containsKey(variable.getName())) {
 				variableValue = allChanges.get(variable.getName().toUpperCase()).getValue();
-			} else if (mbrVarMap.containsKey(vid)) {
+			} else if (mbrVarMap != null && mbrVarMap.containsKey(vid)) {
 				variableValue = mbrVarMap.get(vid);
-			} /*else if(defaultValue != null){
-				variableValue = defaultValue;
-				defaultValue = null;
-			}*/
+			} 
 			else if(variable.getDefaultValue() != 0){
 				variableValue = variable.getDefaultValue();
 			}
