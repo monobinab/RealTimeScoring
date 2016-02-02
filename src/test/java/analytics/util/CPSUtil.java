@@ -156,7 +156,7 @@ public class CPSUtil {
 							if(modelId !=null){
 								Map<Integer, ChangedMemberScore>  changedScores = changedMemberScoresDao.getChangedMemberScores(l_id,modelId);
 								if(changedScores!=null && changedScores.size()>0){
-									ChangedMemberScore changedMemberScoreObject = changedScores.get(Integer.toString(modelId));
+									ChangedMemberScore changedMemberScoreObject = changedScores.get(modelId);
 									if(changedMemberScoreObject==null){
 										changedMemberScoreObject = new ChangedMemberScore();
 									}
@@ -205,7 +205,7 @@ public class CPSUtil {
 									//if so update it
 									Map<Integer, ChangedMemberScore>  changedScores = changedMemberScoresDao.getChangedMemberScores(l_id,modelId);
 									if(changedScores!=null && changedScores.size()>0){
-										ChangedMemberScore changedMemberScoreObject = changedScores.get(Integer.toString(modelId));
+										ChangedMemberScore changedMemberScoreObject = changedScores.get(modelId);
 										if(changedMemberScoreObject==null){
 											changedMemberScoreObject = new ChangedMemberScore();
 										}

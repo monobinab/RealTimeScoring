@@ -35,11 +35,11 @@ public class SecurityUtils {
 
 	public static String hashLoyaltyId(String l_id) {
 		String hashed = new String();
-		synchronized (mac) {
-			if (mac != null) {
+		if (mac != null) {
+			synchronized (mac) {
 				byte[] rawHmac = mac.doFinal(l_id.getBytes());
 				hashed = new String(Base64.encodeBase64(rawHmac));
-			}
+			}	
 		}
 		return hashed;
 	}

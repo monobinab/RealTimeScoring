@@ -14,9 +14,9 @@ public class MongoConnectionHelperProd2 {
     public static synchronized MongoClient getMongoClient(List<ServerAddress> replicaSetServers, MongoClientOptions options) throws UnknownHostException {
         if (mongoSingleton == null) {
             synchronized (MongoConnectionHelperProd2.class) {
-                if (mongoSingleton == null) {
+             //   if (mongoSingleton == null) {
                     mongoSingleton = new MongoClient(replicaSetServers, options);
-                }
+             //   }
             }
         }
         return mongoSingleton;

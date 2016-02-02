@@ -89,20 +89,18 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 			// Get list of tags from incoming json			
 			List<String> tagsList = getTagsFromJsonString(tagsString);	
 			//LOGGER.info("PERSIST: Input Tags for Lid " + lyl_id_no + " : "+ tagsList.toString());
-			
-			if(tagsList != null && tagsList.size()>0){
-				//Persist MdTags into memberMdTagsWithDates collection
-			    if(tagsList != null && tagsList.size()>0){
-			    	if(jsonElement.getAsJsonObject().has("tagIdentifier") && 
-			    		 jsonElement.getAsJsonObject().get("tagIdentifier").toString().contains("RTS")){
-			    		LOGGER.info("PERSIST: Input RTS Tags for Lid " + lyl_id_no + " : "+ tagsList.toString());
-			    		memberMDTags2Dao.addRtsMemberTags(l_id, tagsList,cpsOccasion.getcpsOccasionDurations(),cpsOccasion.getcpsOccasionPriority());			    		
-			    	}else {
-			    		LOGGER.info("PERSIST: Input mdTags for Lid " + lyl_id_no + " : "+ tagsList.toString());
-			    		memberMDTags2Dao.addMemberMDTags(l_id, tagsList,cpsOccasion.getcpsOccasionDurations(),cpsOccasion.getcpsOccasionPriority());
-			    	}
-			    }			
-			}
+		
+			//Persist MdTags into memberMdTagsWithDates collection
+		    if(tagsList != null && tagsList.size()>0){
+		    	if(jsonElement.getAsJsonObject().has("tagIdentifier") && 
+		    		 jsonElement.getAsJsonObject().get("tagIdentifier").toString().contains("RTS")){
+		    		LOGGER.info("PERSIST: Input RTS Tags for Lid " + lyl_id_no + " : "+ tagsList.toString());
+		    		memberMDTags2Dao.addRtsMemberTags(l_id, tagsList,cpsOccasion.getcpsOccasionDurations(),cpsOccasion.getcpsOccasionPriority());			    		
+		    	}else {
+		    		LOGGER.info("PERSIST: Input mdTags for Lid " + lyl_id_no + " : "+ tagsList.toString());
+		    		memberMDTags2Dao.addMemberMDTags(l_id, tagsList,cpsOccasion.getcpsOccasionDurations(),cpsOccasion.getcpsOccasionPriority());
+		    	}
+			}			
 			if(tagsList != null && tagsList.size()==0){
 				memberMDTags2Dao.deleteMemberMDTags(l_id);
 				LOGGER.info("PERSIST: OCCASION DELETE: " + l_id);

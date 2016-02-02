@@ -17,10 +17,10 @@ public class MongoConnectionHelper {
     public static synchronized MongoClient getMongoClientProd1(List<ServerAddress> replicaSetServers) throws UnknownHostException {
         if (mongoSingletonProd1 == null) {
             synchronized (MongoConnectionHelper.class) {
-                if (mongoSingletonProd1 == null) {
+              //  if (mongoSingletonProd1 == null) {
                 	//System.out.println("mongoSingletonProd1");
                 	mongoSingletonProd1 = new MongoClient(replicaSetServers);
-                }
+              //  }
             }
         }
         return mongoSingletonProd1;
@@ -29,10 +29,10 @@ public class MongoConnectionHelper {
     public static synchronized MongoClient getMongoClientProd2(List<ServerAddress> replicaSetServers) throws UnknownHostException {
         if (mongoSingletonProd2 == null) {
             synchronized (MongoConnectionHelper.class) {
-                if (mongoSingletonProd2 == null) {
+              //  if (mongoSingletonProd2 == null) {
                 	//System.out.println("mongoSingletonProd2");
                 	mongoSingletonProd2 = new MongoClient(replicaSetServers);
-                }
+              //  }
             }
         }
         return mongoSingletonProd2;
@@ -40,10 +40,10 @@ public class MongoConnectionHelper {
     public static synchronized MongoClient getMongoClientProd2_2(List<ServerAddress> replicaSetServers) throws UnknownHostException {
         if (mongoSingletonProd2_2 == null) {
             synchronized (MongoConnectionHelper.class) {
-                if (mongoSingletonProd2_2 == null) {
+              //  if (mongoSingletonProd2_2 == null) {
                 	System.out.println("mongoSingletonProd2_2");
                 	mongoSingletonProd2_2 = new MongoClient(replicaSetServers);
-                }
+              //  }
             }
         }
         return mongoSingletonProd2_2;

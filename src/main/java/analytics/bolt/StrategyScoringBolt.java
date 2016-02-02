@@ -44,9 +44,6 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	MemberVariablesDao memDao;
 	DB db;
 	DBCollection coll;
-	
-	private String respHost;
-	private int respPort;
 	JedisFactory jedisInterface;
 	
 	public JedisFactory getJedisInterface() {
@@ -57,12 +54,10 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		this.jedisInterface = jedisInterface;
 	}
 
-	public StrategyScoringBolt(String systemProperty, String host, int port, String respHost, int respPort) {
+	public StrategyScoringBolt(String systemProperty, String host, int port) {
 		super(systemProperty);
 		this.host = host;
 		this.port = port;
-		this.respHost = respHost;
-		this.respPort = respPort;
 	}
 	
 	 public StrategyScoringBolt(String systemProperty){
@@ -131,16 +126,20 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			}
 	
 			MemberRTSChanges memberRTSChanges = scoringSingleton.calcRTSChanges(lId, newChangesVarValueMap, null, source);
-
-			if(memberRTSChanges == null  || memberRTSChanges.getChangedMemberScoreList() == null || memberRTSChanges.getChangedMemberScoreList().isEmpty()){
+			if(memberRTSChanges == null){
+				outputCollector.ack(input);
+				return;
+			}
+			
+			List<ChangedMemberScore> changedMemberScoresList = memberRTSChanges.getChangedMemberScoreList();
+			if(memberRTSChanges == null  || changedMemberScoresList == null || changedMemberScoresList.isEmpty()){
 				redisCountIncr(memberRTSChanges.getMetricsString());
 				outputCollector.ack(input);
 				return;
 			}
 			
 			Map<String, String> modelIdScoreStringMap = new HashMap<String, String>();
-			List<ChangedMemberScore> changedMemberScoresList = memberRTSChanges.getChangedMemberScoreList();
-			
+				
 			//for TI_POS, score-value map set in redis for the specific member
 			for(ChangedMemberScore changedMemberScore : changedMemberScoresList){
 				modelIdScoreStringMap.put(""+changedMemberScore.getModelId(), ""+BigDecimal.valueOf(changedMemberScore.getScore()).toPlainString());
@@ -153,10 +152,6 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 				jedis = getJedisInterface().createJedis(host, port);
 				jedis.connect();
 				jedis.hmset("RTS:Telluride:"+lId, modelIdScoreStringMap);
-				/*if(testMode){
-					setFakeRedis(jedis);
-				}*/
-				
 				jedis.expire("RTS:Telluride:"+lId, 600);
 				jedis.disconnect();
 			}
@@ -183,15 +178,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	      	List<Object> listToEmitMemberScoreList = new ArrayList<Object>();
 	      	listToEmitMemberScoreList.add(changedMemberScoresList);
 	      	this.outputCollector.emit("score_stream", listToEmitMemberScoreList);
-	      	
-			//persisting the loyalty id to redis for UnknownOccasionsTopology to pick up the loyalty id
-		/*	if(respHost != null){
-					jedis = getJedisInterface().createJedis(respHost, respPort);
-					jedis.connect();
-					jedis.set("Unknown:"+lyl_id_no,"");
-					jedis.disconnect();
-			}*/
-			
+	
 			//Adding logic to set up a Stream that the KafkaBolt can listen to...
 			List<Object> listToEmit = new ArrayList<Object>();
 			listToEmit.add(lyl_id_no+"~"+topologyName);

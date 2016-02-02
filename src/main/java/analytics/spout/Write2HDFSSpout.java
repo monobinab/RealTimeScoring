@@ -76,27 +76,20 @@ public class Write2HDFSSpout extends BaseRichSpout{
 		TreeSet<Long> sortedSet = new TreeSet<Long>();
 		TreeSet<Long> sortedSubSet = new TreeSet<Long>();
 		try{
-			
-			
 			Jedis jedis = jedisPool.getResource();
 			latestPrefix =  Long.parseLong( jedis.get(topologyIdentifier))  ;
 			jedisPool.returnResource(jedis);
-			
 			String hdfsUrl = LISTSTATUS_WEBHDFS_URL.replace("<HDFS_LOCATION>", hdfsPath);
-			
 			JSONArray arr = (HttpClientUtils.httpGetCall(hdfsUrl)
 					.getJSONObject("FileStatuses").getJSONArray("FileStatus"));
-			
 			for (int i=0; i< arr.length(); i++){
 				sortedSet.add( arr.getJSONObject(i).getLong("pathSuffix"));
 			}
-			
 			if(sortedSet.contains(latestPrefix)){
 				//System.out.println(sortedSet.tailSet(latestPrefix, false));
 				//Get the remaining TO BE PROCESSED prefixes
 				sortedSubSet = (TreeSet<Long>) sortedSet.tailSet(latestPrefix, false);
 			}
-			
 			Iterator iter = sortedSubSet.iterator();
 			//Process Individual files from the timestamped(prefixed) directory.
 			while(iter.hasNext()){
@@ -105,18 +98,16 @@ public class Write2HDFSSpout extends BaseRichSpout{
 				String currentURL = Constants.LIST_STATUS_WEBHDFS_URL.replace("<HDFS_LOCATION>", hdfsPath+"/"+path);
 				JSONArray filesArray = (HttpClientUtils.httpGetCall(currentURL)
 						.getJSONObject("FileStatuses").getJSONArray("FileStatus"));
-				
 				//Only for simplicity the iteration has been performed and stored in a string array.
 				//This could also have been done in single iteration 
 				ArrayList<String> files = new ArrayList<String>();
 				for (int i=0; i< filesArray.length(); i++){
 					files.add(filesArray.getJSONObject(i).getString("pathSuffix"));
 				}
-				System.out.println("# of File to process = "+files.size());
-				
+				LOGGER.info("# of File to process = "+files.size());
 				for(int i=0;i<files.size();i++){
 					currentURL = Constants.FILE_READ_WEBHDFS_URL.replace("<PATH>", files.get(i)).replace("<HDFS_LOCATION>", hdfsPath+"/"+path);
-					System.out.println("File being Processed = " + currentURL);
+					LOGGER.info("File being Processed = " + currentURL);
 					readURLAndWriteToHDFS(currentURL);
 				}
 				

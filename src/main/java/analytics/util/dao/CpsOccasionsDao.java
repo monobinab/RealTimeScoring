@@ -81,7 +81,6 @@ public class CpsOccasionsDao extends AbstractDao {
 		}else{
     	List<OccasionInfo> occasionInfos = new ArrayList<OccasionInfo>();
     	DBCursor cpsOccasionsCursor = cpsOccasionsCollection.find();
-    	System.out.println(cpsOccasionsCursor.count());
     	if(cpsOccasionsCursor != null && cpsOccasionsCursor.count() > 0){
 	    	while(cpsOccasionsCursor.hasNext()) {
 	    		DBObject dbObj = cpsOccasionsCursor.next();

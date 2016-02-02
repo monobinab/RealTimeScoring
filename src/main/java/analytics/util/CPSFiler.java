@@ -4,7 +4,6 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -19,9 +18,7 @@ import analytics.exception.RealTimeScoringException;
 import analytics.util.CalendarUtil;
 import analytics.util.dao.MemberInfoDao;
 import analytics.util.dao.OccasionDao;
-import analytics.util.dao.OccationCustomeEventDao;
 import analytics.util.dao.OutboxDao;
-import analytics.util.dao.TagMetadataDao;
 import analytics.util.dao.TagResponsysActiveDao;
 import analytics.util.objects.APIResponseMapper;
 import analytics.util.objects.EmailPackage;
@@ -38,13 +35,11 @@ public class CPSFiler {
 	private OccasionDao occasionDao;
 	private MemberInfoDao memberInfoDao;
 	private TagResponsysActiveDao tagResponsysActiveDao;
-	private TagMetadataDao tagsMetaDataDao;
 	private List<String> activeTags;
 
 	public void initDAO() throws RealTimeScoringException{
 		outboxDao = new OutboxDao();
 		memberInfoDao = new MemberInfoDao();
-		tagsMetaDataDao = new TagMetadataDao();
 		occasionDao = new OccasionDao();
 		tagResponsysActiveDao = new TagResponsysActiveDao();
 		activeTags= tagResponsysActiveDao.getActiveResponsysTagsList();
@@ -335,32 +330,34 @@ public class CPSFiler {
 			SingletonJsonParser singletonJsonParser = SingletonJsonParser.getInstance();
 			if(singletonJsonParser != null){
 				APIResponseMapper apiResponseMapper = singletonJsonParser.getGsonInstance().fromJson(rtsAPIResponse, APIResponseMapper.class);  //Parsing response
-				List<ScoresInfo> scoresInfos = apiResponseMapper.getScoresInfo();
-				if(apiResponseMapper != null && scoresInfos != null && scoresInfos.size() > 0){
-					for(ScoresInfo scoresInfo : scoresInfos){
-						if(scoresInfo != null){
-							//Check if the occasion has an mdtag
-							String mdtag = scoresInfo.getMdTag();
-							if(StringUtils.isNotBlank(mdtag)){
-								if(this.isOccasionTop5Percent(mdtag) && !isOccasionResponsysReady(mdtag)){
-									logger.info("PERSIST: MemberId : "+ apiResponseMapper.getMemberId() + " | TAG : "+ mdtag +" | CPS STATUS : NOT QUEUED | REASON : Responsys not ready tag.");
-									continue;								
-								}	
-								TagMetadata tagMetaData = new TagMetadata();
-								tagMetaData.setPurchaseOccassion(scoresInfo.getOccassion());
-								tagMetaData.setBusinessUnit(scoresInfo.getBusinessUnit());
-								tagMetaData.setSubBusinessUnit(scoresInfo.getSubBusinessUnit());
-								tagMetaData.setMdTag(scoresInfo.getMdTag());							
-								mdTagsList.add(tagMetaData);								
-							}								
+				if(null != apiResponseMapper)	{
+					List<ScoresInfo> scoresInfos = apiResponseMapper.getScoresInfo();
+						if(scoresInfos != null && scoresInfos.size() > 0){
+							for(ScoresInfo scoresInfo : scoresInfos){
+								if(scoresInfo != null){
+									//Check if the occasion has an mdtag
+									String mdtag = scoresInfo.getMdTag();
+									if(StringUtils.isNotBlank(mdtag)){
+										if(this.isOccasionTop5Percent(mdtag) && !isOccasionResponsysReady(mdtag)){
+											logger.info("PERSIST: MemberId : "+ apiResponseMapper.getMemberId() + " | TAG : "+ mdtag +" | CPS STATUS : NOT QUEUED | REASON : Responsys not ready tag.");
+											continue;								
+										}	
+										TagMetadata tagMetaData = new TagMetadata();
+										tagMetaData.setPurchaseOccassion(scoresInfo.getOccassion());
+										tagMetaData.setBusinessUnit(scoresInfo.getBusinessUnit());
+										tagMetaData.setSubBusinessUnit(scoresInfo.getSubBusinessUnit());
+										tagMetaData.setMdTag(scoresInfo.getMdTag());							
+										mdTagsList.add(tagMetaData);								
+									}								
+								}
+							}
 						}
 					}
 				}
 			}
-		}
 		
-		return mdTagsList;	
-	}
+			return mdTagsList;	
+		}
 	
 	protected boolean isOccasionTop5Percent(String mdtag) {
 		

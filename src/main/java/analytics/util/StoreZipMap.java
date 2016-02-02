@@ -33,9 +33,12 @@ public class StoreZipMap {
     {
         if (instance == null)
         {
-            instance = new StoreZipMap();
-            instance.map = new HashMap<Integer, Integer>(3000);
-
+            /*instance = new StoreZipMap();
+            instance.map = new HashMap<Integer, Integer>(3000);*/
+        	
+        	StoreZipMap storeZipMap  = new StoreZipMap();
+        	storeZipMap.map = new HashMap<Integer, Integer>(3000);
+            
             try {
             	InputStreamReader isr = new InputStreamReader(StoreZipMap
                         .class.getClassLoader()
@@ -44,9 +47,10 @@ public class StoreZipMap {
                 String record = br.readLine();
                 while (record != null) {
                     String[] storeZip = record.split(",");
-                    instance.map.put(Integer.valueOf(storeZip[0]), Integer.valueOf(storeZip[1]));
+                    storeZipMap.map.put(Integer.valueOf(storeZip[0]), Integer.valueOf(storeZip[1]));
                     record = br.readLine();
                 }
+                instance = storeZipMap;
                 isr.close();
                 br.close();
             } catch (IOException e) {

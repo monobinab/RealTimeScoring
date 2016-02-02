@@ -22,7 +22,6 @@ import com.google.gson.Gson;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
 public class MemberMDTags2Dao extends AbstractDao {
@@ -367,7 +366,6 @@ public class MemberMDTags2Dao extends AbstractDao {
 		DBObject doc = memberMDTagsCollection.findOne(new BasicDBObject(
 				MongoNameConstants.L_ID, l_id));
 		BasicDBList rtsTagsList = null;
-		BasicDBList newRtsTagsList = new BasicDBList();
 		BasicDBList mdTagsList = new BasicDBList();
 		BasicDBObject newObj = null;
 		// If there is a document already in the Collection for that Lid

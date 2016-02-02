@@ -43,18 +43,20 @@ public class OccasionDao extends AbstractDao{
 		occasionInfoCollection = db.getCollection("cpsOccasions");
 		if(occasionInfoCollection != null){
 			DBCursor cursor = occasionInfoCollection.find();
-			cursor.sort(new BasicDBObject("priority", 1));
-			if (cursor != null && cursor.size() > 0) {
-				while (cursor.hasNext()) {
-					DBObject obj = cursor.next();
-					if(obj != null){
-						OccasionInfo occasionInfo = new OccasionInfo();
-						occasionInfo.setOccasion((String)obj.get("occasion"));
-						occasionInfo.setPriority((String)obj.get("priority"));
-						occasionInfo.setDuration((String)obj.get("duration"));
-						occasionInfo.setDaysToCheckInHistory((String)obj.get("daysInHistory"));
-						occasionInfo.setIntCustEvent("");
-						occasionInfos.add(occasionInfo);
+			if(null != cursor){
+				cursor.sort(new BasicDBObject("priority", 1));
+				if (cursor.size() > 0) {
+					while (cursor.hasNext()) {
+						DBObject obj = cursor.next();
+						if(obj != null){
+							OccasionInfo occasionInfo = new OccasionInfo();
+							occasionInfo.setOccasion((String)obj.get("occasion"));
+							occasionInfo.setPriority((String)obj.get("priority"));
+							occasionInfo.setDuration((String)obj.get("duration"));
+							occasionInfo.setDaysToCheckInHistory((String)obj.get("daysInHistory"));
+							occasionInfo.setIntCustEvent("");
+							occasionInfos.add(occasionInfo);
+						}
 					}
 				}
 			}
