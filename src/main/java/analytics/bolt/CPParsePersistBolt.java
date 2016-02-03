@@ -92,8 +92,7 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 		
 			//Persist MdTags into memberMdTagsWithDates collection
 		    if(tagsList != null && tagsList.size()>0){
-		    	if(jsonElement.getAsJsonObject().has("tagIdentifier") && 
-		    		 jsonElement.getAsJsonObject().get("tagIdentifier").toString().contains("RTS")){
+		    	if(jsonElement.getAsJsonObject().has("tagIdentifier") && jsonElement.getAsJsonObject().get("tagIdentifier").toString().contains("RTS")){
 		    		LOGGER.info("PERSIST: Input RTS Tags for Lid " + lyl_id_no + " : "+ tagsList.toString());
 		    		memberMDTags2Dao.addRtsMemberTags(l_id, tagsList,cpsOccasion.getcpsOccasionDurations(),cpsOccasion.getcpsOccasionPriority());			    		
 		    	}else {
@@ -112,14 +111,11 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 			this.outputCollector.emit(listToEmit);			
 			
 			redisCountIncr("output_count");	
-				
-				
 		} catch (Exception e) {			
 			LOGGER.error("PERSIST: CPParsePersistBolt: exception in parsing for memberId :: "+ input.getString(0) + " : " + ExceptionUtils.getMessage(e) + "Rootcause-"+ ExceptionUtils.getRootCauseMessage(e) +"  STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 			redisCountIncr("exception_count");				
-		
 		} 
-		outputCollector.ack(input);
+		 	outputCollector.ack(input);
 	}
 
 	public JsonElement getParsedJson(Tuple input, JsonParser parser)
