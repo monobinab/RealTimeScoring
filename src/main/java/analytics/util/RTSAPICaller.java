@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 public class RTSAPICaller {
 	
 	private static RTSAPICaller instance = null;
-	//public static final String RTS_API_PRE = "http://realtimescoring.intra.searshc.com/rtsapi/v1/top/categories/";
 	private static final Logger LOGGER = LoggerFactory.getLogger(RTSAPICaller.class);
 	private static String RTS_API_PRE;
 	public static RTSAPICaller getInstance() throws ConfigurationException {
@@ -30,15 +29,11 @@ public class RTSAPICaller {
 		return instance;
 	}
 
-	
-	
 	private RTSAPICaller() throws ConfigurationException {
 		PropertiesConfiguration properties = null;
 		String isProd = System.getProperty(MongoNameConstants.IS_PROD);
 		if(isProd!=null && "PROD".equals(isProd)){
-				
-				properties=  new PropertiesConfiguration("resources/connection_config_prod.properties");
-			
+			properties=  new PropertiesConfiguration("resources/connection_config_prod.properties");
 			LOGGER.info("~~~~~~~Using production properties in DBConnection~~~~~~~~~");
 		}
 		
@@ -51,18 +46,12 @@ public class RTSAPICaller {
 			properties=  new PropertiesConfiguration("resources/connection_config_local.properties");
 			LOGGER.info("Using test properties");	
 		}
-		RTS_API_PRE = properties.getString("rts_api_pre_url");
-			
-		
-		
-		
+		if(null != properties && null != properties.getString("rts_api_pre_url") )
+			RTS_API_PRE = properties.getString("rts_api_pre_url");
 	}
 	
-	
 	public String getRTSAPIResponse(String lyl_l_id,String level, String key, String format, boolean isTags, String tags ) {
-		
 		String baseURL = RTS_API_PRE+lyl_l_id+"/"+level+"?key="+key+"&format="+format;
-		
 		if(isTags)
 			baseURL= baseURL.concat("&tags=").concat(tags);
 		String jsonRespString = null;
@@ -107,6 +96,5 @@ public class RTSAPICaller {
 		in.close();
 		return sb.toString();
 	}
-	
 
 }

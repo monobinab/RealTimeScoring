@@ -17,15 +17,12 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Tuple;
 
 public class ResponseBolt extends EnvironmentBolt{
-	/**
-	 * 
-	 */
+	
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = LoggerFactory.getLogger(ResponseBolt.class);
 	private OutputCollector outputCollector;
 	private String host;
 	private int port;
-	//private JedisPool jedisPool;
 	private ResponsysUtil responsysUtil;
 	private EventsVibesActiveDao eventsVibesActiveDao;
 	private String topologyName;
@@ -44,11 +41,7 @@ public class ResponseBolt extends EnvironmentBolt{
 		this.outputCollector = collector;
 		eventsVibesActiveDao = new EventsVibesActiveDao();
 		topologyName = (String) stormConf.get("metrics_topology");
-		
-		//JedisPoolConfig poolConfig = new JedisPoolConfig();
-        //poolConfig.setMaxActive(100);
-        //jedisPool = new JedisPool(poolConfig,host, port, 100);
-	}
+  }
 
 	@Override
 	public void execute(Tuple input) {
@@ -60,56 +53,29 @@ public class ResponseBolt extends EnvironmentBolt{
 		try {
 			
 			String messageID = "";
-			if (input.contains("messageID")) {
-				messageID = input.getStringByField("messageID");
-			}
 			LOGGER.debug("TIME:" + messageID + "-Entering Response bolt-" + System.currentTimeMillis());
 			
 			if(input != null && input.contains("lyl_id_no")){
 				lyl_id_no = input.getString(0);
 				String scoreInfoJsonString = responsysUtil.callRtsAPI(lyl_id_no, topologyName);
 				String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no);
-				
+				messageID = input.getStringByField("messageID");
 				LOGGER.debug("TIME:" + messageID + "-Calling API complete-" + System.currentTimeMillis());
 				
 				//4-2-2015.Recent update to send responses only for 1 tag irrespective of 
 				//how many tags we receive in the difference. This occasion tag 
 				//for which the response has to be sent is taken from the 1st ranks occasion tags from the API call
-				
-				//Get the Difference Tags from Redis for an lid
-				/*jedis = new Jedis(host, port, 1800);
-				jedis.connect();
-				String diffTags = null;
-				if(jedis.exists("Responses:"+l_id)){
-					diffTags = jedis.get("Responses:"+l_id).toString() ;
-					jedis.del("Responses:"+l_id);
-				}
-				else{
-					LOGGER.info("PERSIST: No Tags found for lyl_id_no " + lyl_id_no);
-				}*/
 				String diffTags = input.getStringByField("tags");
 				LOGGER.info("PERSIST: Input Tags for lyl_id_no " + lyl_id_no+ " : "+diffTags);
-				
-				//jedis.disconnect();
-
 				if(diffTags!=null && !"".equals(diffTags)){
 					countMetric.scope("making_responsys_call").incr();
 					//Get the metadata info for all the tags
-					//ArrayList<TagMetadata> list = responsysUtil.getTagMetaDataList(diffTags);
-					
 					LOGGER.debug("TIME:" + messageID + "-Making responsys call-" + System.currentTimeMillis());
-					//if( readyToProcessTags.size()>0){
-					
-						
 						TagMetadata tagMetadata = responsysUtil.getResponseServiceResult(scoreInfoJsonString,lyl_id_no,l_id, messageID, countMetric);
-
 						LOGGER.info(" Time Taken for ResponsysCall & Processing = " + (System.currentTimeMillis() - startTime));
-						
 						LOGGER.debug("TIME:" + messageID + "-Completed responsys call-" + System.currentTimeMillis());
 						StringBuilder custVibesEvent = new StringBuilder();
-
 						if(tagMetadata!=null && tagMetadata.getPurchaseOccasion()!=null && 
-								//tagMetadata.getEmailOptIn()!=null && tagMetadata.getEmailOptIn().equals("N") && 
 								tagMetadata.getTextOptIn()!=null && tagMetadata.getTextOptIn().equals("Y") && 
 								isVibesActiveWithEvent(tagMetadata.getPurchaseOccasion(),tagMetadata.getFirst5CharMdTag(),custVibesEvent)){
 							Long time = System.currentTimeMillis();
@@ -117,7 +83,6 @@ public class ResponseBolt extends EnvironmentBolt{
 							jedis.connect();
 							jedis.set("Vibes:"+lyl_id_no, custVibesEvent.toString());
 							jedis.disconnect();
-							//jedisPool.returnResource(jedis);
 							countMetric.scope("adding_to_vibes_call").incr();
 							custVibesEvent = null;
 							LOGGER.info("Time taken to process Vibes : " + (System.currentTimeMillis()- time));

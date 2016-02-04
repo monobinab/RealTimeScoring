@@ -36,10 +36,12 @@ public class MySQLDataSource {
 			properties=  new PropertiesConfiguration("resources/mysql_connection_local.properties");
 			LOGGER.info("Using DEV properties in MySQLDataSource");	
 		}
-		ds.setDriverClassName(properties.getString("driverClass")); 
-		ds.setUrl(properties.getString("jdbcUrl"));
-		ds.setUsername(properties.getString("username"));
-		ds.setPassword(properties.getString("password"));
+		if(null != properties){
+			ds.setDriverClassName(properties.getString("driverClass")); 
+			ds.setUrl(properties.getString("jdbcUrl"));
+			ds.setUsername(properties.getString("username"));
+			ds.setPassword(properties.getString("password"));
+		}
 	}
 
     public static MySQLDataSource getInstance() throws IOException, SQLException, PropertyVetoException, ConfigurationException {

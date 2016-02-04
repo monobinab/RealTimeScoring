@@ -287,18 +287,72 @@ public class ScoringSingletonIntegrationTest {
 	
 	/*
 	 *  if a member does not have record in memberVariables collection i.e. memberVariablesMap is null,
-	 *  then the member should not be scored
+	 *  then the member will be scored from incoming changes
 	 */
 	@Test
-	public void calcRTSChangesTestNullMemVar() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
+	public void calcRTSChangesTestNullMemVarIncChangesScoring() throws SecurityException, NoSuchFieldException, ParseException, IllegalArgumentException, IllegalAccessException{
 		String l_id = "SearsIntegrationTesting5";
-	
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		getMemberInfoColl(l_id);
 		Map<String, String> newChangesVarValueMap = newChangesVarValueMap();
 				
 		MemberRTSChanges memberRTSChanges = scoringSingletonObj.calcRTSChanges(l_id, newChangesVarValueMap, null, "TEST");
-			
-		Assert.assertEquals("Expecting memberRTSChanges with metricsString 'no_member_variables'", "no_member_variables", memberRTSChanges.getMetricsString());
+		Date date = new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate();
+		List<ChangedMemberScore> changedMemberScoresList = memberRTSChanges.getChangedMemberScoreList();
+		ChangedMemberScore actualChangedMemberScore = changedMemberScoresList.get(0);
+		Map<String, Change> actualAllChanges =  memberRTSChanges.getAllChangesMap();
+		Object actualVar4Value = actualAllChanges.get("VARIABLE4").getValue();
+		Object actualVar10Value = actualAllChanges.get("VARIABLE10").getValue();
+		Date actualVar4Date = actualAllChanges.get("VARIABLE4").getExpirationDate();
+		Date actualVar10Date = actualAllChanges.get("VARIABLE10").getExpirationDate();
+	
+		int compareVal = new Integer((Integer) actualVar4Value).compareTo(new Integer((Integer) 1));
+		int compareVal2 = new Double((Double) actualVar10Value).compareTo(new Double((Double) 0.1));
+		int compareVal3 = new Double(0.09934388068659838).compareTo(new Double(actualChangedMemberScore.getScore()));
+		Assert.assertEquals(compareVal, 0);
+		Assert.assertEquals(compareVal2, 0);
+		Assert.assertEquals(date, actualVar4Date);
+		Assert.assertEquals(date, actualVar10Date);
+		Assert.assertEquals(0, compareVal3);
+		Assert.assertEquals(simpleDateFormat.format(date), actualChangedMemberScore.getMinDate());
+		Assert.assertEquals(simpleDateFormat.format(date), actualChangedMemberScore.getMaxDate());
+	}
+	
+	/*
+	 * If the member does not have record in memberVariables collection, and one of the variables associated with the model to be scored has defaultValue
+	 * scoring will be based on incoming changes and defaultValue
+	 */
+	@Test  
+	public void calcRTSChangesTestNullMemVarIncDefaultValueAndIncChangesScoring() throws ParseException{
+		String l_id = "SearsIntegrationTesting16";
+		DBCollection changedMemberVar = db.getCollection("changedMemberVariables");
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Change expected = new Change("4", 12,
+				simpleDateFormat.parse("2999-08-23"),
+				simpleDateFormat.parse("2015-08-01"));
+		
+		changedMemberVar.insert(new BasicDBObject("l_id", l_id).append(
+				"4",
+				new BasicDBObject("v", expected.getValue()).append("e",
+						expected.getExpirationDateAsString()).append("f",
+						expected.getEffectiveDateAsString())));
+		
+		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
+		newChangesVarValueMap.put("VARIABLE42", "71");
+		Date date = new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate();
+		MemberRTSChanges memberRTSChanges = scoringSingletonObj.calcRTSChanges(l_id, newChangesVarValueMap, null, "TEST");
+		Map<String, Change> actualAllChanges =  memberRTSChanges.getAllChangesMap();
+		Object actualVar42Value = actualAllChanges.get("VARIABLE42").getValue();
+		Date actualVar42Date = actualAllChanges.get("VARIABLE42").getExpirationDate();
+		List<ChangedMemberScore> changedMemberScoreList = memberRTSChanges.getChangedMemberScoreList();
+		ChangedMemberScore actualChangedMemberScore = changedMemberScoreList.get(0);
+		int compareVal = new Double((Double)actualVar42Value).compareTo(new Double((Double)71.0));
+		int compareVal3 = new Double(0.9999999598241609).compareTo(new Double(actualChangedMemberScore.getScore()));
+		Assert.assertEquals(compareVal, 0);
+		Assert.assertEquals(date, actualVar42Date);
+		Assert.assertEquals(compareVal3, 0);
+		Assert.assertEquals(simpleDateFormat.format(date), actualChangedMemberScore.getMinDate());
+		Assert.assertEquals(simpleDateFormat.format(date), actualChangedMemberScore.getMaxDate());
 	}
 	
 	/*to test a black out model

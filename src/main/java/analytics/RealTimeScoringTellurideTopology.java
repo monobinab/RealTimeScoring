@@ -9,7 +9,6 @@ import analytics.bolt.PurchaseScoreKafkaBolt;
 import analytics.bolt.RTSKafkaBolt;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.bolt.TellurideParsingBoltPOS;
-import analytics.jmx.JMXConnectionManager;
 import analytics.spout.WebsphereMQSpout;
 import analytics.util.AuthPropertiesReader;
 import analytics.util.Constants;
@@ -19,8 +18,6 @@ import analytics.util.MongoNameConstants;
 import analytics.util.SystemUtility;
 import analytics.util.TopicConstants;
 import analytics.util.WebsphereMQCredential;
-import analytics.util.dao.caching.CacheRefreshScheduler;
-//import analytics.util.dao.caching.CacheRefreshScheduler;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
@@ -76,7 +73,9 @@ public class RealTimeScoringTellurideTopology {
 										.getQueueChannel(), mqCredential
 										.getQueueName()), 3);
 		
-		
+		/*
+		 * The following block of commented code is needs to be here, in case if we want data from kafka itself rather than MQ
+		 */
 		//BrokerHosts hosts = new ZkHosts("trprtelpacmapp1.vm.itg.corp.us.shldcorp.com:2181");
 		// use topology Id as part of the consumer ID to make it unique
 		/*SpoutConfig kafkaConfig = new SpoutConfig(hosts, "telprod_reqresp_log_output", "", "RTSConsumer_Telluride"+topologyId);
@@ -95,16 +94,11 @@ public class RealTimeScoringTellurideTopology {
 
        topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System.getProperty(MongoNameConstants.IS_PROD), AuthPropertiesReader
 				.getProperty(Constants.TELLURIDE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
-				.getProperty(Constants.TELLURIDE_REDIS_SERVER_PORT)),
-				AuthPropertiesReader
-				.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST),new Integer (AuthPropertiesReader
-					.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 12).shuffleGrouping("parsingBolt");
+				.getProperty(Constants.TELLURIDE_REDIS_SERVER_PORT))), 12).shuffleGrouping("parsingBolt");
        
        topologyBuilder.setBolt("purchaseScoreKafka_bolt", new PurchaseScoreKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD), purchase_Topic), 2)
 		.shuffleGrouping("strategyScoringBolt","cp_purchase_scores_stream");
-       /*topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System.getProperty(MongoNameConstants.IS_PROD), "10.2.8.175", 11211,
-				"10.2.8.149", 11211), 12).shuffleGrouping("parsingBolt");*/
-       
+              
        topologyBuilder.setBolt("kafka_bolt", new RTSKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD),kafkatopic), 2).shuffleGrouping("strategyScoringBolt","kafka_stream");
 	
        if(System.getProperty(MongoNameConstants.IS_PROD).equalsIgnoreCase("PROD")){

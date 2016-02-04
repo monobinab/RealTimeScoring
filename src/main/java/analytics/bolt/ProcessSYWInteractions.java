@@ -102,22 +102,24 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 		 */
 
 		// Find type of catalog to process, and hence the boost variable
-		for (SYWEntity currentEntity : obj.getEntities()) {
-			if (currentEntity != null) {
-				//TODO: confirm with devika, catalog only has likes, product has all of them
-				if ("Catalog".equals(currentEntity.getType())) {
-					//interactionType
-					String catalogType = sywApiCalls.getCatalogType(currentEntity.getId());
-					LOGGER.debug(catalogType);
-					if (catalogType != null) {
-						if (catalogType.equals("Own")){
-							feedType = "SYW_OWN";
-						}
-						else if (catalogType.equals("Like")){
-							feedType = "SYW_LIKE";
-						}
-						else if (catalogType.equals("Want")){
-							feedType = "SYW_WANT";
+		if(null != obj){
+			for (SYWEntity currentEntity : obj.getEntities()) {
+				if (currentEntity != null) {
+					//TODO: confirm with devika, catalog only has likes, product has all of them
+					if ("Catalog".equals(currentEntity.getType())) {
+						//interactionType
+						String catalogType = sywApiCalls.getCatalogType(currentEntity.getId());
+						LOGGER.debug(catalogType);
+						if (catalogType != null) {
+							if (catalogType.equals("Own")){
+								feedType = "SYW_OWN";
+							}
+							else if (catalogType.equals("Like")){
+								feedType = "SYW_LIKE";
+							}
+							else if (catalogType.equals("Want")){
+								feedType = "SYW_WANT";
+							}
 						}
 					}
 				}

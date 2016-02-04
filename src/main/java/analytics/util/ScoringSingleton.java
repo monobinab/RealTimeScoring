@@ -165,9 +165,6 @@ public class ScoringSingleton {
 				//Create a map of variable values for member, fetched from memberVariables collection
 				Map<String, Object> memberVariablesMap = this.createMemberVariableValueMap(lId, modelIdsList, variableNameToVidMap, modelsMap);
 			
-				//checking only for null map as, with empty memberVaraiblesMap also, scoring should happen with new changes for that member
-				if(memberVariablesMap != null){
-					
 					//create a map of non-expired variables and value fetched from changedMembervariables collection
 					Map<String, Change> changedMemberVariables = this.createChangedMemberVariablesMap(lId, variableVidToNameMap);
 				
@@ -238,12 +235,6 @@ public class ScoringSingleton {
 							 memberRTSChanges.setlId(lId);
 							 memberRTSChanges.setChangedMemberScoreList(changedMemberScoreList);
 							 memberRTSChanges.setAllChangesMap(allChanges);
-				 	}
-				else{
-					memberRTSChanges = new MemberRTSChanges();
-					LOGGER.info("PERSIST: no member variabls for " + lId);
-					memberRTSChanges.setMetricsString("no_member_variables");
-				}
 			 	}	
 			else{
 				memberRTSChanges = new MemberRTSChanges();
@@ -306,7 +297,6 @@ public class ScoringSingleton {
 
 		// Create a map from VName->Change
 		Map<String, Change> changedMemberVariablesMap = new HashMap<String, Change>();
-	//	if (changedMbrVariables != null && changedMbrVariables.keySet() != null) {
 		if (changedMbrVariables != null ) {
 			for (Map.Entry<String, Change> entry : changedMbrVariables.entrySet()) {
 				String key = entry.getKey();
@@ -376,14 +366,14 @@ public class ScoringSingleton {
 					 * If this member had a changed variable
 					   allChanges at this point only contain changedMemberVariables
 					   changedMemberVariables can never be null, so no need for null check 
-					   ChangedMemberVarDao will return empty map NOT null map
+					   ChangedMemberVarDao will return empty map NOT null 
 					 */
 					if (!allChanges.isEmpty() && allChanges.containsKey(variableName)) {
 						context.setPreviousValue(allChanges.get(variableName).getValue());
 					}
 					// else get it from memberVariablesMap
 					else {
-						if (memberVariablesMap.get(variableNameToVidMap.get(variableName)) != null) {
+						if (memberVariablesMap != null && memberVariablesMap.get(variableNameToVidMap.get(variableName)) != null) {
 							context.setPreviousValue(memberVariablesMap.get(variableNameToVidMap.get(variableName)));
 						}
 					}
@@ -419,7 +409,6 @@ public class ScoringSingleton {
 	public double getBoostScore(Map<String, Change> allChanges, Integer modelId, Map<Integer, Map<Integer, Model>> modelsMap) {
 		double boosts = 0.0;
 	
-		//if(modelId == null || !modelExists(modelId)){
 		if(!modelExists(modelId, modelsMap)){
 			LOGGER.warn("getBoostScore() modelId is null");
 			return 0;
@@ -508,12 +497,9 @@ public class ScoringSingleton {
 			// otherwise skip it
 			if (allChanges.containsKey(variable.getName())) {
 				variableValue = allChanges.get(variable.getName().toUpperCase()).getValue();
-			} else if (mbrVarMap.containsKey(vid)) {
+			} else if (mbrVarMap != null && mbrVarMap.containsKey(vid)) {
 				variableValue = mbrVarMap.get(vid);
-			} /*else if(defaultValue != null){
-				variableValue = defaultValue;
-				defaultValue = null;
-			}*/
+			} 
 			else if(variable.getDefaultValue() != 0){
 				variableValue = variable.getDefaultValue();
 			}
@@ -574,8 +560,6 @@ public class ScoringSingleton {
 		}
 		
 		vars.append(key +" |");
-		// variable models map
-		//if (variableModelsMap.containsKey(key) && variableModelsMap.get(key).contains(modelId)) {
 		if (variableModelsMap.get(key).contains(modelId)) {
 		
 			Date exprDate = value.getExpirationDate();

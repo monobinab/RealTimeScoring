@@ -1,14 +1,11 @@
 package analytics.bolt;
 
-
-/*import java.math.BigInteger;*/
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,51 +74,25 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 			
 		if(input != null)
 		{
-			
-			
 			try{
 				JsonElement jsonElement = TupleParser.getParsedJson(input);
 				LOGGER.info("Input to TagCreatorBolt :" + jsonElement.toString());
 				JsonElement lyl_id_no = jsonElement.getAsJsonObject().get("memberId");
-				
-				
-				/*
-				 * topologyName is not needed as of now, but is there in the json emitted and can be used whenever needed
-				 */
-		        //	String topology = jsonElement.getAsJsonObject().get("topology").getAsString();
-				
-	    		/*	BigInteger loyaltyID =  new BigInteger(lyl_id_no.getAsString());
-				//if (! (loyaltyID.compareTo(startLoyalty) != -1  && loyaltyID.compareTo(lastLoyalty) != 1) ){
-				
-				if (loyaltyID.compareTo(startLoyalty) == -1  || loyaltyID.compareTo(lastLoyalty) == 1) {
-					LOGGER.info("Not creating Tag as lid is out of the percentile range alloted");
-					redisCountIncr("OutOf_PO_CPS_PercSplit");	
-					outputCollector.ack(input);
-					return;
-				}*/
-				
-				String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no.getAsString());
-				
-				if(lyl_id_no!=null){
+				if(lyl_id_no != null){
 					
 					TypeToken<List<ModelScore>> token = new TypeToken<List<ModelScore>>(){};
 					List<ModelScore> modelScoreList = new Gson().fromJson(jsonElement.getAsJsonObject().get("scoresInfo"), token.getType());
-					
-					//List<ModelScore> modelScoreList = (List<ModelScore>) jsonElement.getAsJsonObject().get("scoresInfo");
+					String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no.getAsString());
 					process(lyl_id_no, l_id, modelScoreList);
 				}
 			} catch (Exception e){
 				LOGGER.error("PERSIST:Exception Occured in TagCreatorBolt :: " +  e.getMessage()+ "  STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 				redisCountIncr("exception_count");
-				//outputCollector.fail(input);	
 			}
-				
 		} else {
 			redisCountIncr("null_lid");			
-			//outputCollector.fail(input);				
 		}
 		outputCollector.ack(input);
-		
 	}
 
 	private void process(JsonElement lyl_id_no, String l_id,
@@ -129,7 +100,6 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 		if(modelScoreList != null && !modelScoreList.isEmpty()){
 			List<Object> rtsTagsListToEmit = new ArrayList<Object>();
 			List<String> rtsTags = new ArrayList<String>();
-			JSONArray jsonArray = new JSONArray();
 			JSONObject mainJsonObj = new JSONObject();
 			boolean blackListed = false;
 			for(ModelScore modelScore :  modelScoreList){	

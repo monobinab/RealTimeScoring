@@ -313,10 +313,11 @@ public class SywScoringBolt extends BaseRichBolt {
 
 	public void updateChangedMemberScore(String lId, Map<Integer, String> modelIdToScore, String source) {
 		Map<Integer, ChangedMemberScore> updatedScores = new HashMap<Integer, ChangedMemberScore>();
+		
 		for (Integer modelId : modelIdToScore.keySet()) {
 			// FIND THE MIN AND MAX EXPIRATION DATE OF ALL VARIABLE CHANGES FOR
 			// CHANGED MODEL SCORE TO WRITE TO SCORE CHANGES COLLECTION
-			if (modelIdToScore == null || modelIdToScore.get(modelId) == null) {
+			if ( modelIdToScore.get(modelId) == null) {
 				// Getting next model since current one does not have score
 				continue;
 			}

@@ -3,7 +3,6 @@ package analytics.util;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,19 +22,15 @@ public class BrowseUtils{
 	
 	private SimpleDateFormat dateFormat = null;
 	private MemberBrowseDao memberBrowseDao;
-	private String systemProperty;
 	private KafkaUtil kafkaUtil;
-	private String browseKafkaTopic;
 	
 	public BrowseUtils(){
-		dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		dateFormat = CalendarUtil.getDateFormat();
 		memberBrowseDao = new MemberBrowseDao();
 	}
 	
 	public BrowseUtils(String systemProperty, String browseKafkaTopic){
 		this();
-		this.systemProperty = systemProperty;
-		this.browseKafkaTopic = browseKafkaTopic;
 		kafkaUtil= new KafkaUtil(systemProperty);
 	}
 	
@@ -105,7 +100,6 @@ public class BrowseUtils{
 			String jsonToBeSend = new Gson().toJson(mapToBeSend );
 			try {
 				kafkaUtil.sendKafkaMSGs(jsonToBeSend.toString(), browseKafkaTopic);
-			//	System.out.println("to kafka " + buSubBuListToKafka + ", " + source);
 				LOGGER.info( "PERSIST " + l_id + " --" + loyalty_id + " published to kafka from " + source + ": " + buSubBuListToKafka);
 			} catch (ConfigurationException e) {
 				LOGGER.error("Exception in kakfa " + ExceptionUtils.getFullStackTrace(e));

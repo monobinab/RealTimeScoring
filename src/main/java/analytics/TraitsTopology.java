@@ -23,7 +23,7 @@ public class TraitsTopology{
 		LOGGER.info("starting Traits topology");
 		
 		System.clearProperty(MongoNameConstants.IS_PROD);
-		if (args.length > 0) {
+		if (null != args && args.length > 0) {
 			System.setProperty(MongoNameConstants.IS_PROD, "true");
 		}
 		
