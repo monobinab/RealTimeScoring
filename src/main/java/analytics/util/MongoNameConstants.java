@@ -3,6 +3,7 @@ package analytics.util;
 public class MongoNameConstants {
 	
 	public static final String IS_PROD = "rtseprod";
+	public static final String ENV = "env";
 	public static final String REQ_SOURCE = "reqSource";
 	
 	public static final String ID="_id";

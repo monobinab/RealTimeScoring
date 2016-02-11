@@ -19,5 +19,7 @@ public interface TopicConstants {
 	public static final String BROWSE_KAFKA_TOPIC = "rts_browse";
 	//public static final String RESCORED_MEMBERIDS_KAFKA_TOPIC = "test2";
 	public static final String EMAIL_FEEDBACK_RESPONSES_KAFKA_TOPIC = "rts_emailFeedback_responses";
+	
+	public static final String PURCHASE_KAFKA_TOPIC = "rts_cp_purchase_scores";
 }
 
