@@ -223,7 +223,7 @@ public class OutboxDao extends AbstractMySQLDao{
 		PreparedStatement statement = null;
 		try{
 			StringBuilder query = new StringBuilder();
-			query.append("SELECT sent_datetime ")
+			query.append("SELECT max(sent_datetime) as sent_datetime ")
 				.append("FROM rts_member.cp_outbox ")
 				.append("WHERE loy_id=? AND status=1 AND occasion_name = ? AND bu = ? AND sub_bu = ?;");
 	    	statement = connection.prepareStatement(query.toString());
