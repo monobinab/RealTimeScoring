@@ -3,26 +3,22 @@ package analytics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import storm.kafka.*;
 import analytics.bolt.LoggingBolt;
 import analytics.bolt.ParsingBoltDC;
 import analytics.bolt.PurchaseScoreKafkaBolt;
 import analytics.bolt.RTSKafkaBolt;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.bolt.TopologyConfig;
-import analytics.spout.DCTestSpout;
-import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
-import analytics.util.SystemUtility;
 import analytics.util.TopicConstants;
-import analytics.util.dao.caching.CacheRefreshScheduler;
-import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.Config;
-import backtype.storm.LocalCluster;
-import backtype.storm.StormSubmitter;
-import backtype.storm.generated.AlreadyAliveException;
-import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.spout.SchemeAsMultiScheme;
+import backtype.storm.topology.TopologyBuilder;
+import storm.kafka.BrokerHosts;
+import storm.kafka.KafkaSpout;
+import storm.kafka.SpoutConfig;
+import storm.kafka.StringScheme;
+import storm.kafka.ZkHosts;
 
 public class DCTopology {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ParsingBoltDC.class);
@@ -54,19 +50,19 @@ public class DCTopology {
 		.getProperty(MongoNameConstants.IS_PROD)), 2).localOrShuffleGrouping("testSpout");*/
 		
 		builder.setBolt("dcParsingBolt", new ParsingBoltDC(System
-				.getProperty(MongoNameConstants.ENV)), 2).localOrShuffleGrouping("kafkaSpout");
+				.getProperty(MongoNameConstants.IS_PROD)), 2).localOrShuffleGrouping("kafkaSpout");
 		
 	    builder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System
-				.getProperty(MongoNameConstants.ENV)),1).localOrShuffleGrouping("dcParsingBolt");
+				.getProperty(MongoNameConstants.IS_PROD)),1).localOrShuffleGrouping("dcParsingBolt");
 	    
-	    builder.setBolt("RTSKafkaBolt", new RTSKafkaBolt(System.getProperty(MongoNameConstants.ENV),kafkatopic), 1)
+	    builder.setBolt("RTSKafkaBolt", new RTSKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD),kafkatopic), 1)
 	    		.shuffleGrouping("strategyScoringBolt","kafka_stream");
 	    
-	    builder.setBolt("purchaseScoreKafka_bolt", new PurchaseScoreKafkaBolt(System.getProperty(MongoNameConstants.ENV), purchase_Topic), 2)
+	    builder.setBolt("purchaseScoreKafka_bolt", new PurchaseScoreKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD), purchase_Topic), 2)
 				.shuffleGrouping("strategyScoringBolt","cp_purchase_scores_stream");
 		
-	    if(System.getProperty(MongoNameConstants.ENV).equals("PROD")){
-			builder.setBolt("loggingBolt", new LoggingBolt(System.getProperty(MongoNameConstants.ENV)), 1)
+	    if(System.getProperty(MongoNameConstants.IS_PROD).equals("PROD")){
+			builder.setBolt("loggingBolt", new LoggingBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1)
 					.shuffleGrouping("strategyScoringBolt", "score_stream");
 		}	
 		

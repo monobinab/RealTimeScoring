@@ -9,20 +9,15 @@ import analytics.bolt.PurchaseScoreKafkaBolt;
 import analytics.bolt.RTSKafkaBolt;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.bolt.TellurideParsingBoltPOS;
+import analytics.bolt.TopologyConfig;
 import analytics.spout.WebsphereMQSpout;
 import analytics.util.AuthPropertiesReader;
 import analytics.util.Constants;
 import analytics.util.MQConnectionConfig;
-import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
-import analytics.util.SystemUtility;
 import analytics.util.TopicConstants;
 import analytics.util.WebsphereMQCredential;
 import backtype.storm.Config;
-import backtype.storm.LocalCluster;
-import backtype.storm.StormSubmitter;
-import backtype.storm.generated.AlreadyAliveException;
-import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.topology.TopologyBuilder;
 
 
@@ -39,7 +34,7 @@ public class RealTimeScoringTellurideTopology {
 	public static void main(String[] args) throws ConfigurationException {
 		LOGGER.info("Starting telluride real time scoring topology");
 		// Configure logger
-		if (!SystemUtility.setEnvironment(args)) {
+		if (!TopologyConfig.setEnvironment(args)) {
 			System.out
 					.println("Please pass the environment variable argument- 'PROD' or 'QA' or 'LOCAL'");
 			System.exit(0);
@@ -105,7 +100,11 @@ public class RealTimeScoringTellurideTopology {
         	topologyBuilder.setBolt("loggingBolt", new LoggingBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
        }
        
- 		Config conf = new Config();
+       Config conf = TopologyConfig.prepareStormConf("Telluride");
+       conf.setNumWorkers(48);
+       TopologyConfig.submitStorm(conf, topologyBuilder, args[0]);
+       
+       /*Config conf = new Config();
 		conf.put("metrics_topology", "Telluride");
 		conf.registerMetricsConsumer(MetricsListener.class, System.getProperty(MongoNameConstants.IS_PROD), 3);
 		conf.setDebug(false);
@@ -138,7 +137,7 @@ public class RealTimeScoringTellurideTopology {
 				LOGGER.error(e.getClass() + ": " +  e.getMessage(), e);
 			}
 			cluster.shutdown();
-		}
+		}*/
 	}
 }
 

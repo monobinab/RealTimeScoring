@@ -9,17 +9,13 @@ import analytics.bolt.ParsingBoltAAM_Browse;
 import analytics.bolt.ParsingSignalBrowseBolt;
 import analytics.bolt.RTSKafkaBolt;
 import analytics.bolt.StrategyScoringBolt;
+import analytics.bolt.TopologyConfig;
 import analytics.spout.SignalBrowseSpout;
 import analytics.util.AuthPropertiesReader;
 import analytics.util.Constants;
-import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
-import analytics.util.SystemUtility;
 import analytics.util.TopicConstants;
-import analytics.util.dao.caching.CacheRefreshScheduler;
 import backtype.storm.Config;
-import backtype.storm.LocalCluster;
-import backtype.storm.StormSubmitter;
 import backtype.storm.topology.TopologyBuilder;
 
 public class SignalBrowseTopology{
@@ -28,7 +24,7 @@ public class SignalBrowseTopology{
 	
 	public static void main(String[] args)  throws Exception{
 		LOGGER.info("starting Signal Browse topology ");
-		if (!SystemUtility.setEnvironment(args)) {
+		if (!TopologyConfig.setEnvironment(args)) {
 			System.out
 					.println("Please pass the environment variable argument- 'PROD' or 'QA' or 'LOCAL'");
 			System.exit(0);
@@ -57,7 +53,11 @@ public class SignalBrowseTopology{
 		builder.setBolt("RTSKafkaBolt", new RTSKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD), kafkatopic), 1)
 		.shuffleGrouping("strategyScoringBolt","kafka_stream");
 
-		Config conf = new Config();
+		Config conf = TopologyConfig.prepareStormConf("SignalBrowse");
+		
+		TopologyConfig.submitStorm(conf, builder, args[0]);
+		
+		/*Config conf = new Config();
 			conf.put("metrics_topology", "SignalBrowse");
 			//stormconf is set with system's property as MetricsListener needs it
 			conf.registerMetricsConsumer(MetricsListener.class,System.getProperty(MongoNameConstants.IS_PROD), 3);
@@ -76,7 +76,7 @@ public class SignalBrowseTopology{
 						builder.createTopology());
 				Thread.sleep(10000000);
 				cluster.shutdown();
-			}
+			}*/
 		}
 	}
 }

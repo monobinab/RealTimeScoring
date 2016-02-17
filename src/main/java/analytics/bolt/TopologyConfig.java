@@ -61,14 +61,14 @@ public abstract class TopologyConfig {
 			for (String argument : args) {
 
 				if (argument.equalsIgnoreCase("PROD")) {
-					System.setProperty(MongoNameConstants.ENV, "PROD");
+					System.setProperty(MongoNameConstants.IS_PROD, "PROD");
 				} else if (argument.equalsIgnoreCase("QA")) {
-					System.setProperty(MongoNameConstants.ENV, "QA");
+					System.setProperty(MongoNameConstants.IS_PROD, "QA");
 				} else if (argument.equalsIgnoreCase("LOCAL")) {
-					System.setProperty(MongoNameConstants.ENV, "LOCAL");
+					System.setProperty(MongoNameConstants.IS_PROD, "LOCAL");
 				}
 			}
-			env = System.getProperty(MongoNameConstants.ENV);
+			env = System.getProperty(MongoNameConstants.IS_PROD);
 			return true;
 		} else {
 			return false;
@@ -91,7 +91,7 @@ public abstract class TopologyConfig {
 			}
 		} else {
 			LocalCluster cluster = new LocalCluster();
-			cluster.submitTopology("DCTopology", conf, builder.createTopology());
+			cluster.submitTopology(topologyAliasName, conf, builder.createTopology());
 			try {
 				Thread.sleep(10000000);
 			} catch (InterruptedException e) {

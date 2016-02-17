@@ -4,17 +4,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.bolt.POSPurchaseBolt;
+import analytics.bolt.TopologyConfig;
 import analytics.spout.ResponsysSpout;
 import analytics.util.AuthPropertiesReader;
 import analytics.util.Constants;
-import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
-import analytics.util.SystemUtility;
 import backtype.storm.Config;
-import backtype.storm.LocalCluster;
-import backtype.storm.StormSubmitter;
-import backtype.storm.generated.AlreadyAliveException;
-import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.topology.TopologyBuilder;
 
 public class POSPurchaseTopology {
@@ -23,7 +18,7 @@ public class POSPurchaseTopology {
 
 	public static void main(String[] args) throws Exception {
 		LOGGER.info("starting  POS Purchase topology");
-		if (!SystemUtility.setEnvironment(args)) {
+		if (!TopologyConfig.setEnvironment(args)) {
 			System.out
 					.println("Please pass the environment variable argument- 'PROD' or 'QA' or 'LOCAL'");
 			System.exit(0);
@@ -36,7 +31,12 @@ public class POSPurchaseTopology {
 
 		topologyBuilder.setBolt("responsysBolt", new POSPurchaseBolt(System.getProperty(MongoNameConstants.IS_PROD)), 12).shuffleGrouping("posPurchaseSpout");
 
-			Config conf = new Config();
+			
+		Config conf = TopologyConfig.prepareStormConf("posPurchase");
+		
+		TopologyConfig.submitStorm(conf, topologyBuilder, args[0]);
+		
+		/*Config conf = new Config();
 			conf.put("metrics_topology", "posPurchase");
 			conf.registerMetricsConsumer(MetricsListener.class, System.getProperty(MongoNameConstants.IS_PROD), 3);
 			conf.setDebug(false);
@@ -66,6 +66,6 @@ public class POSPurchaseTopology {
 					LOGGER.error(e.getClass() + ": " +  e.getMessage(), e);
 				}
 				cluster.shutdown();
-			}
+			}*/
 	}
 }
