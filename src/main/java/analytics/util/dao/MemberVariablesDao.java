@@ -23,7 +23,7 @@ public class MemberVariablesDao extends AbstractDao {
     DBCollection memberVariablesCollection;
     public MemberVariablesDao(){
     	//Connect to static collections replicaset
-    	super("static");
+    	super("mongo2");
 		memberVariablesCollection = db.getCollection("memberVariables");
     }
    
@@ -35,10 +35,11 @@ public class MemberVariablesDao extends AbstractDao {
     	
     	DBObject mbrVariables = memberVariablesCollection.findOne(
 				new BasicDBObject("l_id", l_id), variableFilterDBO);
-    	DBObject dbObj = memberVariablesCollection.findOne(new BasicDBObject("l_id", l_id));
+    //	DBObject dbObj = memberVariablesCollection.findOne(new BasicDBObject("l_id", l_id));
     //	System.out.println(dbObj);
-
-		if (mbrVariables == null) {
+    	
+    	LOGGER.info("memberVariables connected from " +  db.getMongo().getAllAddress() + " mongo " + db.getName() + "db");
+    	if (mbrVariables == null) {
 			return null;
 		}
 

@@ -19,12 +19,12 @@ public class DBConnection {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DBConnection.class);
 
-	private static int sPort = 0;
+	/*private static int sPort = 0;
 	private static int writeconcern = 0;
 	private static String sDatabaseName = "";
 	private static String sUserName = "";
 	private static String sPassword = "";
-	private static String serversStr = "";
+	private static String serversStr = "";*/
 
 	
 	
@@ -33,6 +33,13 @@ public class DBConnection {
 	}
 
 	public static DB getDBConnection(String server) throws ConfigurationException {
+		
+		int sPort = 0;
+		int writeconcern = 0;
+		String sDatabaseName = "";
+		String sUserName = "";
+		String sPassword = "";
+		String serversStr = "";
 		LOGGER.info("~~~~~~~~~~~~~~~DBCONNECTION CLASS~~~~~~~: " + System.getProperty(MongoNameConstants.IS_PROD));
 		DB conn = null;
 		PropertiesConfiguration properties = null;

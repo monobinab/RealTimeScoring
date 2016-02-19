@@ -8,7 +8,7 @@ public class MongoDBConnectionWrapper {
 	
 	public DB db1 = null;
 	public DB db2 = null;
-	
+	public DB db3 = null;
 	private MongoDBConnectionWrapper(){
 		
 	}
