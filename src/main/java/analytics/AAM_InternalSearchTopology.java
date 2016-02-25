@@ -8,19 +8,13 @@ import analytics.bolt.LoggingBolt;
 import analytics.bolt.ParsingBoltAAM_InternalSearch;
 import analytics.bolt.RTSKafkaBolt;
 import analytics.bolt.StrategyScoringBolt;
+import analytics.bolt.TopologyConfig;
 import analytics.spout.WebHDFSSpout;
 import analytics.util.Constants;
-import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
 import analytics.util.RedisConnection;
-import analytics.util.SystemUtility;
 import analytics.util.TopicConstants;
-import analytics.util.dao.caching.CacheRefreshScheduler;
 import backtype.storm.Config;
-import backtype.storm.LocalCluster;
-import backtype.storm.StormSubmitter;
-import backtype.storm.generated.AlreadyAliveException;
-import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.topology.TopologyBuilder;
 
 public class AAM_InternalSearchTopology {
@@ -30,7 +24,7 @@ public class AAM_InternalSearchTopology {
 
 public static void main(String[] args) {
 		
-		if (!SystemUtility.setEnvironment(args)) {
+	if (!TopologyConfig.setEnvironment(args)) {
 			System.out
 					.println("Please pass the environment variable argument- 'PROD' or 'QA' or 'LOCAL'");
 			System.exit(0);
@@ -57,7 +51,11 @@ public static void main(String[] args) {
 		}
 		
 		
-		Config conf = new Config();
+		Config conf = TopologyConfig.prepareStormConf("InternalSearch");
+		conf.setMaxSpoutPending(30);
+		TopologyConfig.submitStorm(conf, topologyBuilder, args[0]);
+		
+		/*Config conf = new Config();
 		conf.put("metrics_topology", "InternalSearch");
 		conf.setDebug(true);
 		
@@ -88,7 +86,7 @@ public static void main(String[] args) {
 			}
 			cluster.shutdown();
 
-			}
+			}*/
 		}
 	}
 

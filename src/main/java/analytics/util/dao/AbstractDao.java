@@ -51,7 +51,10 @@ public abstract class AbstractDao {
 						db = DBConnection.getDBConnection(server);
 					}
 				}if(StringUtils.isNotEmpty(server) && server.equalsIgnoreCase("mongo2")){
+					db = mongoDBConnectionWrapper.db3;
+					if(null == db){
 						db = DBConnection.getDBConnection(server);
+					}
 				}
 			}
 		} catch (Exception e) {

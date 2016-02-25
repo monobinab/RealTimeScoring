@@ -8,17 +8,11 @@ import analytics.bolt.EmailFeedbackParsingBolt;
 import analytics.bolt.LoggingBolt;
 import analytics.bolt.PurchaseScoreKafkaBolt;
 import analytics.bolt.StrategyScoringBolt;
+import analytics.bolt.TopologyConfig;
 import analytics.spout.RTSKafkaSpout;
 import analytics.util.KafkaUtil;
-import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
-import analytics.util.SystemUtility;
-import analytics.util.dao.caching.CacheRefreshScheduler;
 import backtype.storm.Config;
-import backtype.storm.LocalCluster;
-import backtype.storm.StormSubmitter;
-import backtype.storm.generated.AlreadyAliveException;
-import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.topology.TopologyBuilder;
 
 public class EmailFeedbackTopology {
@@ -29,7 +23,7 @@ public class EmailFeedbackTopology {
 	public static void main(String[] args) {
 		
 		String purchase_Topic="rts_cp_purchase_scores";
-		if (!SystemUtility.setEnvironment(args)) {
+		if (!TopologyConfig.setEnvironment(args)) {
 			System.out
 					.println("Please pass the environment variable argument- 'PROD' or 'QA' or 'LOCAL'");
 			System.exit(0);
@@ -69,7 +63,13 @@ public class EmailFeedbackTopology {
 		if(env.equals("PROD")){
 			builder.setBolt("loggingBolt", new LoggingBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
 		}
-		Config conf = new Config();
+		
+		
+		Config conf = TopologyConfig.prepareStormConf("EF");
+		conf.setMessageTimeoutSecs(7200);
+		TopologyConfig.submitStorm(conf, builder, args[0]);
+		
+		/*Config conf = new Config();
 		conf.put("metrics_topology", "EF");
 		conf.setMessageTimeoutSecs(7200);	
 		conf.registerMetricsConsumer(MetricsListener.class, System.getProperty(MongoNameConstants.IS_PROD), partition_num);
@@ -94,6 +94,6 @@ public class EmailFeedbackTopology {
 				LOGGER.debug("Unable to wait for topology", e);
 			}
 			cluster.shutdown();
-		}		
+		}*/		
 	}
 }

@@ -308,18 +308,16 @@ public class CPSFiler {
 	}
 
 	protected boolean arePackagesSame(List<EmailPackage> emailPackagesToBeSent,List<EmailPackage> currentPackages) {	
-		if(emailPackagesToBeSent.size() != currentPackages.size())
-			return false;
-		
-		for(int i = 0; i<emailPackagesToBeSent.size();i++){
+			if(emailPackagesToBeSent.size() != currentPackages.size())
+				return false;
 			
-			if(!(emailPackagesToBeSent.get(i).getMdTagMetaData().getMdTag().substring(0, 6)).equals(currentPackages.get(i).getMdTagMetaData().getMdTag().substring(0, 6)))
-				return false;	
+			for(int i = 0; i<emailPackagesToBeSent.size();i++){
+				if(!emailPackagesToBeSent.get(i).getMdTagMetaData().getMdTag().equals(currentPackages.get(i).getMdTagMetaData().getMdTag()))
+					return false;
+			}		
 			
-		}		
-		
-		return true;			
-}
+			return true;			
+	}
 
 	protected EmailPackage getInProgressOccasion(String lyl_id_no) throws SQLException, Exception {
 		List<OccasionInfo> occasionsInfo = occasionDao.getOccasionsInfo();

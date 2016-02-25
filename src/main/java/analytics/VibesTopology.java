@@ -3,18 +3,13 @@ package analytics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import analytics.bolt.TopologyConfig;
 import analytics.bolt.VibesBolt;
 import analytics.spout.VibesSpout;
 import analytics.util.AuthPropertiesReader;
 import analytics.util.Constants;
-import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
-import analytics.util.RedisConnection;
-import analytics.util.SystemUtility;
-import analytics.util.dao.caching.CacheRefreshScheduler;
 import backtype.storm.Config;
-import backtype.storm.LocalCluster;
-import backtype.storm.StormSubmitter;
 import backtype.storm.topology.TopologyBuilder;
 
 public class VibesTopology{
@@ -23,7 +18,7 @@ public class VibesTopology{
 	
 	public static void main(String[] args)  throws Exception{
 		LOGGER.info("starting Vibes topology");
-		if (!SystemUtility.setEnvironment(args)) {
+		if (!TopologyConfig.setEnvironment(args)) {
 			System.out
 					.println("Please pass the environment variable argument- 'PROD' or 'QA' or 'LOCAL'");
 			System.exit(0);
@@ -40,7 +35,11 @@ public class VibesTopology{
 		builder.setBolt("vibesBolt",new VibesBolt(System.getProperty(MongoNameConstants.IS_PROD)), 3)
 				.shuffleGrouping("vibesSpout");
 
-		Config conf = new Config();
+		Config conf = TopologyConfig.prepareStormConf("VibesMetrics");
+		
+		TopologyConfig.submitStorm(conf, builder, args[0]);
+		
+		/*Config conf = new Config();
 			conf.put("metrics_topology", "VibesMetrics");
 			//stormconf is set with system's property as MetricsListener needs it
 			conf.registerMetricsConsumer(MetricsListener.class,System.getProperty(MongoNameConstants.IS_PROD), 3);
@@ -59,7 +58,7 @@ public class VibesTopology{
 						builder.createTopology());
 				Thread.sleep(10000000);
 				cluster.shutdown();
-			}
+			}*/
 		}
 	}
 }

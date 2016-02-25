@@ -8,19 +8,13 @@ import analytics.bolt.LoggingBolt;
 import analytics.bolt.ParsingBoltAAM_Browse;
 import analytics.bolt.RTSKafkaBolt;
 import analytics.bolt.StrategyScoringBolt;
+import analytics.bolt.TopologyConfig;
 import analytics.spout.WebHDFSSpout;
 import analytics.util.Constants;
-import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
 import analytics.util.RedisConnection;
-import analytics.util.SystemUtility;
 import analytics.util.TopicConstants;
-import analytics.util.dao.caching.CacheRefreshScheduler;
 import backtype.storm.Config;
-import backtype.storm.LocalCluster;
-import backtype.storm.StormSubmitter;
-import backtype.storm.generated.AlreadyAliveException;
-import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.topology.TopologyBuilder;
 
 public class AAM_BrowseTopology {
@@ -29,11 +23,11 @@ public class AAM_BrowseTopology {
 
 	public static void main(String[] args) throws Exception {
 		LOGGER.info("Starting web feed topology from browse source");
-		if (!SystemUtility.setEnvironment(args)) {
-			System.out
-					.println("Please pass the environment variable argument- 'PROD' or 'QA' or 'LOCAL'");
+		
+		if (!TopologyConfig.setEnvironment(args)) {
+			System.out.println("Please pass the environment variable argument- 'PROD' or 'QA' or 'LOCAL'");
 			System.exit(0);
-		} 
+		}
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 		String topic = TopicConstants.AAM_BROWSE_PRODUCTS;
 		String kafkatopic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;
@@ -62,7 +56,11 @@ public class AAM_BrowseTopology {
 //		 topologyBuilder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 3).localOrShuffleGrouping("strategyScoringBolt", "score_stream");
 	//        topologyBuilder.setBolt("memberPublishBolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 3).localOrShuffleGrouping("strategyScoringBolt", "member_stream");
 
-		Config conf = new Config();
+		Config conf = TopologyConfig.prepareStormConf("Product_Browse");
+		conf.setMaxSpoutPending(30);
+		TopologyConfig.submitStorm(conf, topologyBuilder, args[0]);
+		
+		/*Config conf = new Config();
 		conf.put("metrics_topology", "Product_Browse");
 		conf.registerMetricsConsumer(MetricsListener.class, System.getProperty(MongoNameConstants.IS_PROD), 3);
 		conf.setMaxSpoutPending(30);
@@ -91,6 +89,6 @@ public class AAM_BrowseTopology {
 				LOGGER.error(e.getClass() + ": " + e.getMessage(), e);
 			}
 			cluster.shutdown();
-		}
+		}*/
 	}
 }

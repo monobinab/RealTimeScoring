@@ -5,21 +5,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.bolt.CPProcessingBolt;
-import analytics.bolt.RTSKafkaBolt;
-import analytics.bolt.TECProcessingBolt;
 import analytics.bolt.TagProcessingBolt;
+import analytics.bolt.TopologyConfig;
 import analytics.spout.RTSKafkaSpout;
 import analytics.util.KafkaUtil;
-//import analytics.spout.RTSKafkaSpout;
-import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
-import analytics.util.SystemUtility;
 import analytics.util.TopicConstants;
 import backtype.storm.Config;
-import backtype.storm.LocalCluster;
-import backtype.storm.StormSubmitter;
-import backtype.storm.generated.AlreadyAliveException;
-import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.topology.TopologyBuilder;
 
 public class TagBuilderTopology {
@@ -31,7 +23,7 @@ public class TagBuilderTopology {
 		
 	
 		String topologyId = "";
-		if (!SystemUtility.setEnvironment(args)) {
+		if (!TopologyConfig.setEnvironment(args)) {
 			System.out
 					.println("Please pass the environment variable argument- 'PROD' or 'QA' or 'LOCAL'");
 			System.exit(0);
@@ -58,7 +50,11 @@ public class TagBuilderTopology {
 		builder.setBolt("CPProcessingBolt", new CPProcessingBolt(env),10).shuffleGrouping("tagProcessingBolt");
 
 		
-		Config conf = new Config();
+		Config conf = TopologyConfig.prepareStormConf("TB");
+		conf.setMessageTimeoutSecs(7200);
+		TopologyConfig.submitStorm(conf, builder, args[0]);
+		
+		/*Config conf = new Config();
 		conf.put("metrics_topology", "TB");
 		conf.setMessageTimeoutSecs(7200);	
 		conf.registerMetricsConsumer(MetricsListener.class, env, partition_num);
@@ -83,6 +79,6 @@ public class TagBuilderTopology {
 				LOGGER.debug("Unable to wait for topology", e);
 			}
 			cluster.shutdown();
-		}
+		}*/
 	}
 }

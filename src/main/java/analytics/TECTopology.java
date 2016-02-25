@@ -1,31 +1,16 @@
 package analytics;
 
-import java.util.UUID;
-
 import org.apache.commons.configuration.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import storm.kafka.BrokerHosts;
-import storm.kafka.KafkaSpout;
-import storm.kafka.SpoutConfig;
-import storm.kafka.StringScheme;
-import storm.kafka.ZkHosts;
-import analytics.bolt.LoggingBolt;
 import analytics.bolt.TECProcessingBolt;
+import analytics.bolt.TopologyConfig;
 import analytics.spout.RTSKafkaSpout;
 import analytics.util.KafkaUtil;
-//import analytics.spout.RTSKafkaSpout;
-import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
-import analytics.util.SystemUtility;
 import analytics.util.TopicConstants;
 import backtype.storm.Config;
-import backtype.storm.LocalCluster;
-import backtype.storm.StormSubmitter;
-import backtype.storm.generated.AlreadyAliveException;
-import backtype.storm.generated.InvalidTopologyException;
-import backtype.storm.spout.SchemeAsMultiScheme;
 import backtype.storm.topology.TopologyBuilder;
 
 public class TECTopology {
@@ -37,7 +22,7 @@ public class TECTopology {
 		
 	
 		String topologyId = "";
-		if (!SystemUtility.setEnvironment(args)) {
+		if (!TopologyConfig.setEnvironment(args)) {
 			System.out
 					.println("Please pass the environment variable argument- 'PROD' or 'QA' or 'LOCAL'");
 			System.exit(0);
@@ -65,7 +50,11 @@ public class TECTopology {
 		
 		builder.setBolt("tecProcessingBolt", new TECProcessingBolt(env),2).localOrShuffleGrouping("RTSKafkaSpout");
 		
-		Config conf = new Config();
+		Config conf = TopologyConfig.prepareStormConf("TEC");
+		conf.setMessageTimeoutSecs(7200);
+		TopologyConfig.submitStorm(conf, builder, args[0]);
+		
+		/*Config conf = new Config();
 		conf.put("metrics_topology", "TEC");
 		conf.setMessageTimeoutSecs(7200);	
 		conf.registerMetricsConsumer(MetricsListener.class, env, partition_num);
@@ -90,6 +79,6 @@ public class TECTopology {
 				LOGGER.debug("Unable to wait for topology", e);
 			}
 			cluster.shutdown();
-		}
+		}*/
 	}
 }

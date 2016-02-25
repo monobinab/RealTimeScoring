@@ -9,15 +9,11 @@ import analytics.bolt.PersistBoostsBolt;
 import analytics.bolt.ProcessSYWInteractions;
 import analytics.bolt.RTSKafkaBolt;
 import analytics.bolt.StrategyScoringBolt;
+import analytics.bolt.TopologyConfig;
 import analytics.spout.SYWRedisSpout;
-import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
-import analytics.util.SystemUtility;
 import analytics.util.TopicConstants;
-import analytics.util.dao.caching.CacheRefreshScheduler;
 import backtype.storm.Config;
-import backtype.storm.LocalCluster;
-import backtype.storm.StormSubmitter;
 import backtype.storm.topology.TopologyBuilder;
 
   /*This topology demonstrates Storm's stream groupings and multilang
@@ -30,7 +26,7 @@ public class SYWEventsTopology {
 
 	public static void main(String[] args) throws Exception {
 		LOGGER.info("starting syw events topology");
-		if (!SystemUtility.setEnvironment(args)) {
+		if (!TopologyConfig.setEnvironment(args)) {
 			System.out
 					.println("Please pass the environment variable argument- 'PROD' or 'QA' or 'LOCAL'");
 			System.exit(0);
@@ -84,7 +80,12 @@ public class SYWEventsTopology {
 		}	
 		//topologyBuilder.setBolt("scorePublishBolt", new ScorePublishBolt(RedisConnection.getServers()[0], 6379,"score"), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
 		//topologyBuilder.setBolt("memberPublishBolt", new MemberPublishBolt(RedisConnection.getServers()[0], 6379,"member"), 2).shuffleGrouping("strategyScoringBolt", "member_stream");
-		Config conf = new Config();
+		
+		Config conf = TopologyConfig.prepareStormConf("Syw");
+		
+		TopologyConfig.submitStorm(conf, topologyBuilder, args[0]);
+		
+		/*Config conf = new Config();
 		conf.put("metrics_topology", "Syw");
 	    conf.registerMetricsConsumer(MetricsListener.class, System.getProperty(MongoNameConstants.IS_PROD), 3);
 	
@@ -103,6 +104,6 @@ public class SYWEventsTopology {
 					topologyBuilder.createTopology());
 			Thread.sleep(10000000);
 			cluster.shutdown();
-		}
+		}*/
 	}
 }
