@@ -163,13 +163,13 @@ public class ScoringSingleton {
 			if(modelIdsList != null && !modelIdsList.isEmpty()){ 
 				
 				long time = System.currentTimeMillis();
-			
+
 				//Create a map of variable values for member, fetched from memberVariables collection
 				Map<String, Object> memberVariablesMap = this.createMemberVariableValueMap(lId, modelIdsList, variableNameToVidMap, modelsMap);
-			
-				LOGGER.info("MemberVariables response time for member " + lId +": " + (time-System.currentTimeMillis()));
-				
-				//create a map of non-expired variables and value fetched from changedMembervariables collection
+
+				LOGGER.info("MemberVariables response time for member " + lId+": " + (System.currentTimeMillis() - time));
+					//create a map of non-expired variables and value fetched from changedMembervariables collection
+
 					Map<String, Change> changedMemberVariables = this.createChangedMemberVariablesMap(lId, variableVidToNameMap);
 				
 					//For each variable in new changes, execute strategy and store in allChanges
