@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -29,6 +28,7 @@ import analytics.util.dao.ModelVariablesDao;
 import analytics.util.dao.MongoDBConnectionWrapper;
 import analytics.util.dao.RegionalFactorDao;
 import analytics.util.dao.VariableDao;
+import analytics.util.objects.Blackout;
 import analytics.util.objects.Boost;
 import analytics.util.objects.Change;
 import analytics.util.objects.ChangedMemberScore;
@@ -195,8 +195,8 @@ public class ScoringSingleton {
 							double rtsScore = 0.0;
 							double regionalFactor = 1.0;
 							try {
-								if(!isBlackOutModel(allChanges, modelId, modelsMap)){
-								
+								Blackout blackout = isBlackOutModel(allChanges, modelId, modelsMap);
+								if(!blackout.isBlackoutFlag()){
 									//recalculate score for each model
 									rtsScore = this.calcScore(memberVariablesMap, allChanges, modelId, variableNameToVidMap, modelsMap);
 									
@@ -214,17 +214,21 @@ public class ScoringSingleton {
 									
 									if(rtsScore < 0.0)
 										rtsScore = 0.0;
+									Map<String, Date> minMaxMap = this.getMinMaxExpiry(modelId, allChanges, variableModelsMap, modelsMap);
+									getPopulatedChangedMemberScore(source, changedMemberScoreList, modelId, rtsScore, minMaxMap);
 								}
-									 Map<String, Date> minMaxMap = this.getMinMaxExpiry(modelId, allChanges, variableModelsMap, modelsMap);
-									 ChangedMemberScore changedMemberScore = new ChangedMemberScore();
-									 changedMemberScore.setModelId(modelId.toString());
-									 changedMemberScore.setMinDate(getDateFormat(minMaxMap.get("minExpiry")));
-									 changedMemberScore.setMaxDate(getDateFormat(minMaxMap.get("maxExpiry")));
-									 changedMemberScore.setEffDate(getDateFormat(new Date()));
-									 changedMemberScore.setScore(rtsScore);
-									 changedMemberScore.setSource(source);
-									 changedMemberScoreList.add(changedMemberScore);
-						 }
+								else {
+									String blackoutVar = blackout.getBlackoutVariables();
+									if(changedMemberVariables.keySet().contains(blackoutVar) ){
+										allChanges.remove(blackoutVar);
+										continue;
+									}
+									else{
+										Map<String, Date> minMaxMap = this.getBlackoutMinMaxExpiry(blackout, allChanges);
+										getPopulatedChangedMemberScore(source, changedMemberScoreList, modelId, rtsScore, minMaxMap);
+									}
+								}
+							}
 						   catch(RealTimeScoringException e2){
 							   LOGGER.error("Exception scoring modelId " + modelId +" for lId " + lId + " " + e2.getErrorMessage());
 							   memberRTSChanges.setMetricsString("exception_per_model");
@@ -239,11 +243,11 @@ public class ScoringSingleton {
 							 memberRTSChanges.setlId(lId);
 							 memberRTSChanges.setChangedMemberScoreList(changedMemberScoreList);
 							 memberRTSChanges.setAllChangesMap(allChanges);
-			 	}	
-			else{
-				memberRTSChanges = new MemberRTSChanges();
-				memberRTSChanges.setMetricsString("no_vars_ofinterest");
-			}
+				 		}	
+				else{
+					memberRTSChanges = new MemberRTSChanges();
+					memberRTSChanges.setMetricsString("no_vars_ofinterest");
+				}
 			}
 		catch(Exception e){
 			e.printStackTrace();
@@ -253,6 +257,19 @@ public class ScoringSingleton {
 			memberRTSChanges.setMetricsString("exception_per_member");
 		}
 			return memberRTSChanges;
+	}
+
+	private void getPopulatedChangedMemberScore(String source,
+			List<ChangedMemberScore> changedMemberScoreList, Integer modelId,
+			double rtsScore, Map<String, Date> minMaxMap) {
+		ChangedMemberScore changedMemberScore = new ChangedMemberScore();
+		 changedMemberScore.setModelId(modelId.toString());
+		 changedMemberScore.setMinDate(getDateFormat(minMaxMap.get("minExpiry")));
+		 changedMemberScore.setMaxDate(getDateFormat(minMaxMap.get("maxExpiry")));
+		 changedMemberScore.setEffDate(getDateFormat(new Date()));
+		 changedMemberScore.setScore(rtsScore);
+		 changedMemberScore.setSource(source);
+		 changedMemberScoreList.add(changedMemberScore);
 	}
 
 	public Map<String, Object> createMemberVariableValueMap(String loyaltyId, Set<Integer> modelIdList, Map<String, String> variableNameToVidMap, Map<Integer, Map<Integer, Model>> modelsMap)  {
@@ -336,13 +353,15 @@ public class ScoringSingleton {
 	 *            L_id -> Variables
 	 * @return
 	 */
-	public Map<String, Change> executeStrategy(Map<String, Change> allChanges, 
+	public Map<String, Change> executeStrategy(Map<String, Change> changedMemberVariables, 
 			Map<String, String> newChangesVarValueMap, 
 			Map<String, Object> memberVariablesMap, 
 			Map<String, String> variableNameToStrategyMap, 
 			Map<String, String> variableNameToVidMap,
 			Map<String, List<Integer>> variableModelsMap,
 			Map<Integer, Map<Integer, Model>> modelsMap) {
+			Map<String, Change> allChanges = new HashMap<String, Change>();
+			allChanges.putAll(changedMemberVariables);
 			for (String variableName : newChangesVarValueMap.keySet()) {
 				variableName = variableName.toUpperCase();
 				if (variableModelsMap.containsKey(variableName)) {
@@ -389,7 +408,7 @@ public class ScoringSingleton {
 					return allChanges;
 	}
 	
-	public boolean isBlackOutModel(Map<String, Change> allChanges,	Integer modelId, Map<Integer, Map<Integer, Model>> modelsMap) {
+	public boolean isBlackOutModel2(Map<String, Change> allChanges,	Integer modelId, Map<Integer, Map<Integer, Model>> modelsMap) {
 		int blackFlag = 0;
 		Map<String, Variable> variableMap = getBlackoutModelVariables(modelId, modelsMap);
 		if(variableMap != null ){
@@ -408,6 +427,32 @@ public class ScoringSingleton {
 			}
 		}
 	  	return false;
+	}
+	
+	
+	public Blackout isBlackOutModel(Map<String, Change> allChanges,	Integer modelId, Map<Integer, Map<Integer, Model>> modelsMap) {
+		Blackout blackout = new Blackout();
+		blackout.setBlackoutFlag(false);
+		int blackFlag = 0;
+		Map<String, Variable> variableMap = getBlackoutModelVariables(modelId, modelsMap);
+		if(variableMap != null ){
+			for (Map.Entry<String, Change> entry : allChanges.entrySet()) {
+				String ch = entry.getKey();
+				Change value = entry.getValue();
+				if(ch == null){
+					LOGGER.error("variable in allChanges is null for " + ch + "modelId " + modelId);
+				}
+			if ( ch != null && ch.startsWith(MongoNameConstants.BLACKOUT_VAR_PREFIX) && variableMap.containsKey(ch)) 
+				blackFlag = Integer.valueOf(value.getValue().toString());
+				if(blackFlag==1)
+				{
+					blackout.setBlackoutFlag(true);
+					blackout.setBlackoutVariables(ch);
+					return blackout;
+				}
+			}
+		}
+	  	return blackout;
 	}
 
 	public double getBoostScore(Map<String, Change> allChanges, Integer modelId, Map<Integer, Map<Integer, Model>> modelsMap) {
@@ -599,6 +644,14 @@ public class ScoringSingleton {
 			minMaxMap.put("minExpiry", minDate);
 			minMaxMap.put("maxExpiry", maxDate);
 		
+		return minMaxMap;
+	}
+	
+	
+	public Map<String, Date> getBlackoutMinMaxExpiry(Blackout blackout, Map<String, Change> allChanges) {
+		Map<String, Date> minMaxMap = new HashMap<String, Date>();
+		minMaxMap.put("minExpiry", allChanges.get(blackout.getBlackoutVariables()).getExpirationDate());
+		minMaxMap.put("maxExpiry", allChanges.get(blackout.getBlackoutVariables()).getExpirationDate());
 		return minMaxMap;
 	}
 

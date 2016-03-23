@@ -823,7 +823,7 @@ public class ScoringSingletonTest {
 		monthModelMap.put(0, new Model(35, "Model_Name", 0, 5,variablesMap));
 		Map<Integer, Map<Integer, Model>> modelsMapContentBlackout = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContentBlackout.put(35, monthModelMap);
-		Boolean value = scoringSingletonObj.isBlackOutModel(allChanges, 35, modelsMapContentBlackout);
+		Boolean value = scoringSingletonObj.isBlackOutModel(allChanges, 35, modelsMapContentBlackout).isBlackoutFlag();
 		Assert.assertEquals(Boolean.TRUE, value);
 	}
 
@@ -848,7 +848,7 @@ public class ScoringSingletonTest {
 		monthModelMap.put(0, new Model(35, "Model_Name", 0, 5, variablesMap));
 		Map<Integer, Map<Integer, Model>> modelsMapContentBoost = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContentBoost.put(35, monthModelMap);
-		Boolean value = scoringSingletonObj.isBlackOutModel(allChanges, 35, modelsMapContentBoost);
+		Boolean value = scoringSingletonObj.isBlackOutModel(allChanges, 35, modelsMapContentBoost).isBlackoutFlag();
 		Assert.assertEquals(Boolean.FALSE, value);
 	}
 
@@ -873,7 +873,7 @@ public class ScoringSingletonTest {
 		monthModelMap.put(0, new Model(35, "Model_Name", 0, 5,variablesMap));
 		Map<Integer, Map<Integer, Model>> modelsMapContentBoost = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContentBoost.put(35, monthModelMap);
-		Boolean value = scoringSingletonObj.isBlackOutModel(allChanges, 35, modelsMapContentBoost);
+		Boolean value = scoringSingletonObj.isBlackOutModel(allChanges, 35, modelsMapContentBoost).isBlackoutFlag();
 		Assert.assertEquals(Boolean.FALSE, value);
 	}
 	
@@ -903,7 +903,7 @@ public class ScoringSingletonTest {
 		monthModelMap.put(0, new Model(35, "Model_Name", 0, 5,variablesMap));
 		Map<Integer, Map<Integer, Model>> modelsMapContentBoost = new HashMap<Integer, Map<Integer, Model>>();
 		modelsMapContentBoost.put(35, monthModelMap);
-		Boolean value = scoringSingletonObj.isBlackOutModel(allChanges, 35, modelsMapContentBoost);
+		Boolean value = scoringSingletonObj.isBlackOutModel(allChanges, 35, modelsMapContentBoost).isBlackoutFlag();
 		Assert.assertEquals(Boolean.FALSE, value);
 	}
 	//calc rtsScore positive case test
