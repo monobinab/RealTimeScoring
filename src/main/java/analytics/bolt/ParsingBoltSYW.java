@@ -55,7 +55,9 @@ public class ParsingBoltSYW extends EnvironmentBolt {
 		
 		redisCountIncr("incoming_tuples");
 		JsonParser parser = new JsonParser();
-		JsonArray interactionArray = parser.parse(input.getStringByField("message")).getAsJsonArray();
+		JsonElement jsonElement = parser.parse(input.getString(0));
+		JsonArray interactionArray = jsonElement.getAsJsonArray();
+	//	JsonArray interactionArray = parser.parse(input.getStringByField("message")).getAsJsonArray();
 
 		// Each record can have multiple elements in it, though it is generally only one
 		for (JsonElement interaction : interactionArray) {
