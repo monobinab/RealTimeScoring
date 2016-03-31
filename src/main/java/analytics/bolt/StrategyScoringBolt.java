@@ -186,6 +186,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			objectToCps.add(topologyName);
 			objectToCps.add(changedMemberScoresList);
 			this.outputCollector.emit("cp_purchase_scores_stream", objectToCps);
+			LOGGER.info("PERSIST: " + lyl_id_no + " emitted to cp_purchase_scores_stream from " + topologyName );
 	
 			redisCountIncr("member_scored_successfully");
 			this.outputCollector.ack(input);

@@ -97,13 +97,15 @@ public class PurchaseScoreKafkaBolt extends EnvironmentBolt {
 
 							kafkaUtil.sendKafkaMSGs(mainJsonObj.toJSONString(),
 									currentTopic);
-
+							redisCountIncr("tag_to_kafka");
+							LOGGER.info("PERSIST: " +  loyId + " published to kafka from " + topology);
 						}
 
 						// KafkaUtil.sendKafkaMSGs(mainJsonObj.toJSONString(),
 						// currentTopic);
 					} catch (ConfigurationException e) {
 						LOGGER.error(e.getMessage(), e);
+						redisCountIncr("tag_not_to_kafka");
 						outputCollector.ack(input);
 					}
 				} else {
