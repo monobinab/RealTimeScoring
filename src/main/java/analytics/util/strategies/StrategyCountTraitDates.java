@@ -55,5 +55,12 @@ public class StrategyCountTraitDates implements Strategy {
 		return new LocalDate(new Date()).plusDays(this.daysToExpiration).toDateMidnight().toDate();
 	}
 
+	@Override
+	public Change executeBlackout(RealTimeScoringContext context,
+			Date transactionDate) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 }

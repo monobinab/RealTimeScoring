@@ -16,6 +16,11 @@ public class Change {
 	public Change(){
 		
 	}
+	public Change( Object val, Date expDate, Date effDate) {
+		this.value = val;
+		this.expirationDate = expDate;
+		this.effectivDate = effDate;
+	}
 	public Change(String vid, Object val, Date expDate, Date effDate) {
 		this.vid = vid;
 		this.value = val;

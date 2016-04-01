@@ -1,5 +1,7 @@
 package analytics.util.strategies;
 
+import java.util.Date;
+
 import analytics.util.objects.Change;
 import analytics.util.objects.RealTimeScoringContext;
 
@@ -8,4 +10,6 @@ import analytics.util.objects.RealTimeScoringContext;
  */
 public interface Strategy {
     Change execute(RealTimeScoringContext context);
+
+	Change executeBlackout(RealTimeScoringContext context, Date transactionDate);
 }

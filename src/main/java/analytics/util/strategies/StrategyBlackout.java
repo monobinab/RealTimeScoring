@@ -11,12 +11,18 @@ public class StrategyBlackout implements Strategy {
 
 	private int daysToExpiration = 730;
 	private Object value = 1;
-
+	@Override
+	public Change executeBlackout(RealTimeScoringContext context, Date transactionDate) {
+		return new Change(this.value, calculateBlackoutExpirationDate(transactionDate), transactionDate);
+	}
     @Override
 	public Change execute(RealTimeScoringContext context) {
 		return new Change(this.value, calculateExpirationDate());
 	}
 	private Date calculateExpirationDate() {
 		return new LocalDate(new Date()).plusDays(this.daysToExpiration).toDateMidnight().toDate();
+	}
+	private Date calculateBlackoutExpirationDate(Date transactionDate) {
+		return new LocalDate(transactionDate).plusDays(this.daysToExpiration).toDateMidnight().toDate();
 	}
 }

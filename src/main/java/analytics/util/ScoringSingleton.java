@@ -258,6 +258,136 @@ public class ScoringSingleton {
 		}
 			return memberRTSChanges;
 	}
+	
+	public MemberRTSChanges calcRTSChangesBlackout(String lId, Map<String, String> newChangesVarValueMap, Set<Integer> modelIdsList, String source, Date transactionDate){
+		MemberRTSChanges memberRTSChanges = null;
+		Map<String, String> variableNameToStrategyMap = new HashMap<String, String>();
+		Map<String, String> variableNameToVidMap = new HashMap<String, String>();
+		Map<String, String> variableVidToNameMap = new HashMap<String, String>();
+		
+		List<Variable> variables = variableDao.getAllVariables();
+		for (Variable variable : variables) {
+			if (variable.getName() != null && variable.getVid() != null) {
+				variableNameToVidMap.put(variable.getName(), variable.getVid());
+				variableNameToStrategyMap.put(variable.getName(), variable.getStrategy());
+				variableVidToNameMap.put(variable.getVid(), variable.getName());
+			}
+		}
+		Map<String, Double> regionalFactorsMap = regionalFactorDao.populateRegionalFactors();
+		
+		Map<Integer, Map<Integer, Model>> modelsMap = modelVariablesDao.getAllModelVariables();
+		Map<String, List<Integer>> variableModelsMap = modelVariablesDao.getAllVariableModelsMap();
+		try{		
+			//Find all models affected by the new incoming changes if newChangesVarValueMap is null
+			if(newChangesVarValueMap !=  null && !newChangesVarValueMap.isEmpty()){
+				Iterator<String> itr = newChangesVarValueMap.keySet().iterator();
+				while(itr.hasNext()){
+					String var = itr.next();
+					if(!variableNameToStrategyMap.containsKey(var)){
+						LOGGER.info("var NOT in variables collection " + var);
+					}
+					if(variableNameToStrategyMap.containsKey(var) && variableNameToStrategyMap.get(var).equalsIgnoreCase("NONE")){
+						itr.remove();
+					}
+				}
+				 modelIdsList = this.getModelIdList(newChangesVarValueMap, variableModelsMap, modelsMap);
+			}
+		
+			if(modelIdsList != null && !modelIdsList.isEmpty()){ 
+			
+				//Create a map of variable values for member, fetched from memberVariables collection
+				Map<String, Object> memberVariablesMap = this.createMemberVariableValueMap(lId, modelIdsList, variableNameToVidMap, modelsMap);
+			
+					//create a map of non-expired variables and value fetched from changedMembervariables collection
+					Map<String, Change> changedMemberVariables = this.createChangedMemberVariablesMap(lId, variableVidToNameMap);
+				
+					//For each variable in new changes, execute strategy and store in allChanges
+					//empty check for newChangesVarValueMap is NOT NEEDED here as empty map will come only from topology
+					//and if it is empty, modelList will be empty and the control won't be here
+					Map<String, Change> allChanges = null;
+					if( newChangesVarValueMap !=  null ){
+						allChanges = this.executeStrategyBlackout(changedMemberVariables, newChangesVarValueMap, memberVariablesMap, variableNameToStrategyMap, variableNameToVidMap, variableModelsMap, modelsMap, transactionDate);
+					}//if this method is called from outside of the topology, newChangesVarValueMap will be null and 
+					  //thereby allChanges should be set with changedMemberVariables for scoring
+					else{
+						allChanges = changedMemberVariables;
+					}
+				
+					//get the state for the memberId to get the regionalFactor for scoring
+					String state = this.getState(lId);
+					
+					memberRTSChanges = new MemberRTSChanges();
+					List<ChangedMemberScore> changedMemberScoreList = new ArrayList<ChangedMemberScore>();
+					
+					for (Integer modelId : modelIdsList) {
+					
+							double rtsScore = 0.0;
+							double regionalFactor = 1.0;
+							try {
+								Blackout blackout = isBlackOutModel(allChanges, modelId, modelsMap);
+								if(!blackout.isBlackoutFlag()){
+									//recalculate score for each model
+									rtsScore = this.calcScore(memberVariablesMap, allChanges, modelId, variableNameToVidMap, modelsMap);
+									
+									LOGGER.debug("new score before boost var: " + rtsScore);
+									
+									rtsScore = rtsScore + this.getBoostScore(allChanges, modelId, modelsMap);
+									
+									//get the score weighed with regionalFactor 
+									if(StringUtils.isNotEmpty(state)){
+										regionalFactor = this.calcRegionalFactor(modelId, state, regionalFactorsMap);
+									}
+									rtsScore = rtsScore * regionalFactor;
+									if(rtsScore > 1.0)
+										rtsScore = 1.0;
+									
+									if(rtsScore < 0.0){
+										rtsScore = 0.0;
+									}
+									Map<String, Date> minMaxMap = this.getMinMaxExpiry(modelId, allChanges, variableModelsMap, modelsMap);
+									getPopulatedChangedMemberScore(source, changedMemberScoreList, modelId, rtsScore, minMaxMap);
+								}
+								else {
+									String blackoutVar = blackout.getBlackoutVariables();
+									if(changedMemberVariables.keySet().contains(blackoutVar) ){
+										allChanges.remove(blackoutVar);
+										continue;
+									}
+									else{
+										Map<String, Date> minMaxMap = this.getBlackoutMinMaxExpiry(blackout, allChanges);
+										getPopulatedChangedMemberScore(source, changedMemberScoreList, modelId, rtsScore, minMaxMap);
+									}
+								}
+						 }
+						   catch(RealTimeScoringException e2){
+							   LOGGER.error("Exception scoring modelId " + modelId +" for lId " + lId + " " + e2.getErrorMessage());
+							   memberRTSChanges.setMetricsString("exception_per_model");
+						   }
+						   catch(Exception e){
+							   e.printStackTrace();
+							   LOGGER.error("Exception scoring modelId " + modelId +" for lId " + lId );
+							   memberRTSChanges.setMetricsString("exception_per_model");
+
+						   }
+						}
+							 memberRTSChanges.setlId(lId);
+							 memberRTSChanges.setChangedMemberScoreList(changedMemberScoreList);
+							 memberRTSChanges.setAllChangesMap(allChanges);
+				}	
+			else{
+				memberRTSChanges = new MemberRTSChanges();
+				memberRTSChanges.setMetricsString("no_vars_ofinterest");
+			}
+			}
+		catch(Exception e){
+			e.printStackTrace();
+			LOGGER.error("Exception scoring lId " + e.getMessage() + "cause: " + e.getCause());
+			LOGGER.error(ExceptionUtils.getMessage(e) + "root cause-"+ ExceptionUtils.getRootCauseMessage(e) + ExceptionUtils.getStackTrace(e));
+			memberRTSChanges = new MemberRTSChanges();
+			memberRTSChanges.setMetricsString("exception_per_member");
+		}
+			return memberRTSChanges;
+	}
 
 	private void getPopulatedChangedMemberScore(String source,
 			List<ChangedMemberScore> changedMemberScoreList, Integer modelId,
@@ -402,6 +532,62 @@ public class ScoringSingleton {
 					}
 					LOGGER.debug(" ~~~ STRATEGY BOLT CHANGES - context: " + context);
 					Change executedValue = strategy.execute(context);
+					allChanges.put(variableName, executedValue);
+				}
+			}
+					return allChanges;
+	}
+	
+	public Map<String, Change> executeStrategyBlackout(Map<String, Change> changedMemberVariables, 
+			Map<String, String> newChangesVarValueMap, 
+			Map<String, Object> memberVariablesMap, 
+			Map<String, String> variableNameToStrategyMap, 
+			Map<String, String> variableNameToVidMap,
+			Map<String, List<Integer>> variableModelsMap,
+			Map<Integer, Map<Integer, Model>> modelsMap, Date transactionDate) {
+		Map<String, Change> allChanges = new HashMap<String, Change>();
+		allChanges.putAll(changedMemberVariables);
+			for (String variableName : newChangesVarValueMap.keySet()) {
+				variableName = variableName.toUpperCase();
+				if (variableModelsMap.containsKey(variableName)) {
+					if (variableNameToStrategyMap.get(variableName) == null) {
+						LOGGER.info(" ~~~ DID NOT FIND VARIABLE IN VARIABLES COLLECTION: " + variableName);
+						continue;
+					}
+	
+					RealTimeScoringContext context = new RealTimeScoringContext();
+					context.setValue(newChangesVarValueMap.get(variableName));
+					// set default previous value to 0 in case the variable does not exist in memberVariables or changedMemberVariables
+					// memberVariables with 0 are removed by batch job
+					context.setPreviousValue(0);
+	
+					if ("NONE".equals(variableNameToStrategyMap.get(variableName))) {
+						continue;
+					}
+	
+					Strategy strategy = StrategyMapper.getInstance().getStrategy(variableNameToStrategyMap.get(variableName));
+					if (strategy == null) {
+						LOGGER.error("Unable to obtain strategy for " + variableName);
+						continue;
+					}
+					/*
+					 * If this member had a changed variable
+					   allChanges at this point only contain changedMemberVariables
+					   changedMemberVariables can never be null, so no need for null check 
+					   ChangedMemberVarDao will return empty map NOT null map
+					 */
+					if (!allChanges.isEmpty() && allChanges.containsKey(variableName)) {
+						context.setPreviousValue(allChanges.get(variableName).getValue());
+					}
+					// else get it from memberVariablesMap
+					else {
+						if (memberVariablesMap != null && memberVariablesMap.get(variableNameToVidMap.get(variableName)) != null) {
+							context.setPreviousValue(memberVariablesMap.get(variableNameToVidMap.get(variableName)));
+						}
+					}
+					LOGGER.debug(" ~~~ STRATEGY BOLT CHANGES - context: " + context);
+					//Change executedValue = strategy.execute(context);
+					Change executedValue = strategy.executeBlackout(context, transactionDate);
 					allChanges.put(variableName, executedValue);
 				}
 			}

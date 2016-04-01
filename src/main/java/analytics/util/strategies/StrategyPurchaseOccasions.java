@@ -29,4 +29,11 @@ public class StrategyPurchaseOccasions implements Strategy {
 		return new LocalDate(new Date()).plusDays(this.expiredDate).toDateMidnight().toDate();
 	}
 
+	@Override
+	public Change executeBlackout(RealTimeScoringContext context,
+			Date transactionDate) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
