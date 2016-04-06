@@ -89,11 +89,12 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
     @Override
     public void execute(Tuple input) {
 
+    	long time = System.currentTimeMillis();
           if (LOGGER.isDebugEnabled()){
             LOGGER.debug("The time it enters inside Telluride parsing bolt execute method" + System.currentTimeMillis() + " and the message ID is ..." + input.getMessageId());
           }
         LOGGER.info("PERSIST: incoming tuples in parsingbolt TELLURIDE");
-        System.out.println(System.getProperty("TEST_PROPERTY"));
+    //    System.out.println(System.getProperty("TEST_PROPERTY"));
         redisCountIncr("incoming_tuples");
         /**
         if(appMetricsBean != null && atomicInteger != null){
@@ -140,7 +141,7 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
 	            // 7)FIND DIVISION #, ITEM #, AMOUNT AND
 	            // FIND LINE FROM DIVISION # + ITEM #
 	            // AND PUT INTO LINE ITEM CLASS CONTAINER WITH HASHED LOYALTY ID + ALL TRANSACTION LEVEL DATA
-	            listLineItemsAndEmit(input, lyl_id_no, processTransaction, messageID, l_id);
+	            listLineItemsAndEmit(input, lyl_id_no, processTransaction, messageID, l_id, time);
 	
 	        } else {
 	            redisCountIncr("empty_xml");
@@ -186,7 +187,7 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
 		LOGGER.info("PERSIST: " + memberNumber +", " + pickUpStoreNumber + ", " + tenderStoreNumber +", " + orderStoreNumber + ", " + registerNumber +", " + transactionNumber +", " + requestorId +", " + transactionTime + ", " +", " + division + ", " + itemNumber + ", " + value + ", " + earnFlag +", "+ queueType );
 	}
 
-    private void listLineItemsAndEmit(Tuple input, String lyl_id_no, ProcessTransaction processTransaction, String messageID, String l_id) {
+    private void listLineItemsAndEmit(Tuple input, String lyl_id_no, ProcessTransaction processTransaction, String messageID, String l_id, long time) {
         Collection<TransactionLineItem> lineItemList = new ArrayList<TransactionLineItem>();
         Map<String, List<String>> divCatVariablesMap = divCatVariableDao.getDivCatVariable();
         List<LineItem> lineItems = processTransaction.getLineItemList();
@@ -377,6 +378,7 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
                 this.outputCollector.emit(listToEmit);
                 LOGGER.info("TIME:" + messageID + "-Emiting from parsing bolt-" + System.currentTimeMillis());
             }
+            LOGGER.info("Time taken for Telluride Parsing Bolt: " + (System.currentTimeMillis() - time));
         } else {
             redisCountIncr("empty_line_item");
             outputCollector.ack(input);

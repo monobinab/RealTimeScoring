@@ -129,7 +129,9 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		
 			List<ChangedMemberScore> changedMemberScoresList = memberRTSChanges.getChangedMemberScoreList();
 			if(memberRTSChanges == null  || changedMemberScoresList == null || changedMemberScoresList.isEmpty()){
-				redisCountIncr(memberRTSChanges.getMetricsString());
+				if(memberRTSChanges.getMetricsString() != null){
+					redisCountIncr(memberRTSChanges.getMetricsString());
+				}
 				outputCollector.ack(input);
 				return;
 			}

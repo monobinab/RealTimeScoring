@@ -26,7 +26,6 @@ import analytics.util.dao.MemberVariablesDao;
 import analytics.util.dao.ModelBoostsDao;
 import analytics.util.dao.ModelVariablesDao;
 import analytics.util.dao.MongoDBConnectionWrapper;
-import analytics.util.dao.RegionalFactorDao;
 import analytics.util.dao.VariableDao;
 import analytics.util.objects.Blackout;
 import analytics.util.objects.Boost;
@@ -47,7 +46,6 @@ public class ScoringSingleton {
 	private ChangedMemberVariablesDao changedVariablesDao;
 	private VariableDao variableDao;
 	private ModelVariablesDao modelVariablesDao;
-	private RegionalFactorDao regionalFactorDao;
 	private MemberInfoDao memberInfoDao;
 	
 	private static ScoringSingleton instance = null;
@@ -91,7 +89,6 @@ public class ScoringSingleton {
 			changedVariablesDao = new ChangedMemberVariablesDao();
 			memberVariablesDao = new MemberVariablesDao();
 			changedMemberScoresDao = new ChangedMemberScoresDao();
-			regionalFactorDao = new RegionalFactorDao();
 			memberInfoDao = new MemberInfoDao();
 		}
 	}
@@ -139,7 +136,6 @@ public class ScoringSingleton {
 				variableVidToNameMap.put(variable.getVid(), variable.getName());
 			}
 		}
-		Map<String, Double> regionalFactorsMap = regionalFactorDao.populateRegionalFactors();
 		
 		Map<Integer, Map<Integer, Model>> modelsMap = modelVariablesDao.getAllModelVariables();
 		Map<String, List<Integer>> variableModelsMap = modelVariablesDao.getAllVariableModelsMap();
@@ -184,16 +180,12 @@ public class ScoringSingleton {
 						allChanges = changedMemberVariables;
 					}
 				
-					//get the state for the memberId to get the regionalFactor for scoring
-					String state = this.getState(lId);
-					
 					memberRTSChanges = new MemberRTSChanges();
 					List<ChangedMemberScore> changedMemberScoreList = new ArrayList<ChangedMemberScore>();
 					
 					for (Integer modelId : modelIdsList) {
 					
 							double rtsScore = 0.0;
-							double regionalFactor = 1.0;
 							try {
 								Blackout blackout = isBlackOutModel(allChanges, modelId, modelsMap);
 								if(!blackout.isBlackoutFlag()){
@@ -204,11 +196,6 @@ public class ScoringSingleton {
 									
 									rtsScore = rtsScore + this.getBoostScore(allChanges, modelId, modelsMap);
 									
-									//get the score weighed with regionalFactor 
-									if(StringUtils.isNotEmpty(state)){
-										regionalFactor = this.calcRegionalFactor(modelId, state, regionalFactorsMap);
-									}
-									rtsScore = rtsScore * regionalFactor;
 									if(rtsScore > 1.0)
 										rtsScore = 1.0;
 									
@@ -220,12 +207,20 @@ public class ScoringSingleton {
 								else {
 									String blackoutVar = blackout.getBlackoutVariables();
 									if(changedMemberVariables.keySet().contains(blackoutVar) ){
-										allChanges.remove(blackoutVar);
-										continue;
+										if(newChangesVarValueMap != null && (newChangesVarValueMap.containsKey(blackoutVar))){
+											Map<String, Date> minMaxMap = this.getBlackoutMinMaxExpiry(blackout, allChanges);
+											getPopulatedChangedMemberScore(source, changedMemberScoreList, modelId, rtsScore, minMaxMap);
+											LOGGER.info("PERSIST: member " + lId +" blacked out " + "for model " + modelId +" on " + new Date());
+										}
+										else{
+											allChanges.remove(blackoutVar);
+											continue;
+										}
 									}
 									else{
 										Map<String, Date> minMaxMap = this.getBlackoutMinMaxExpiry(blackout, allChanges);
 										getPopulatedChangedMemberScore(source, changedMemberScoreList, modelId, rtsScore, minMaxMap);
+										LOGGER.info("PERSIST: member " + lId +" blacked out " + "for model " + modelId +" on " + new Date());
 									}
 								}
 							}
@@ -273,7 +268,6 @@ public class ScoringSingleton {
 				variableVidToNameMap.put(variable.getVid(), variable.getName());
 			}
 		}
-		Map<String, Double> regionalFactorsMap = regionalFactorDao.populateRegionalFactors();
 		
 		Map<Integer, Map<Integer, Model>> modelsMap = modelVariablesDao.getAllModelVariables();
 		Map<String, List<Integer>> variableModelsMap = modelVariablesDao.getAllVariableModelsMap();
@@ -312,17 +306,12 @@ public class ScoringSingleton {
 					else{
 						allChanges = changedMemberVariables;
 					}
-				
-					//get the state for the memberId to get the regionalFactor for scoring
-					String state = this.getState(lId);
-					
 					memberRTSChanges = new MemberRTSChanges();
 					List<ChangedMemberScore> changedMemberScoreList = new ArrayList<ChangedMemberScore>();
 					
 					for (Integer modelId : modelIdsList) {
 					
 							double rtsScore = 0.0;
-							double regionalFactor = 1.0;
 							try {
 								Blackout blackout = isBlackOutModel(allChanges, modelId, modelsMap);
 								if(!blackout.isBlackoutFlag()){
@@ -332,12 +321,7 @@ public class ScoringSingleton {
 									LOGGER.debug("new score before boost var: " + rtsScore);
 									
 									rtsScore = rtsScore + this.getBoostScore(allChanges, modelId, modelsMap);
-									
-									//get the score weighed with regionalFactor 
-									if(StringUtils.isNotEmpty(state)){
-										regionalFactor = this.calcRegionalFactor(modelId, state, regionalFactorsMap);
-									}
-									rtsScore = rtsScore * regionalFactor;
+						
 									if(rtsScore > 1.0)
 										rtsScore = 1.0;
 									
@@ -345,20 +329,28 @@ public class ScoringSingleton {
 										rtsScore = 0.0;
 									}
 									Map<String, Date> minMaxMap = this.getMinMaxExpiry(modelId, allChanges, variableModelsMap, modelsMap);
-									getPopulatedChangedMemberScore(source, changedMemberScoreList, modelId, rtsScore, minMaxMap);
+									getPopulatedChangedMemberScoreBlackout(source, changedMemberScoreList, modelId, rtsScore, minMaxMap, transactionDate);
 								}
 								else {
 									String blackoutVar = blackout.getBlackoutVariables();
 									if(changedMemberVariables.keySet().contains(blackoutVar) ){
-										allChanges.remove(blackoutVar);
-										continue;
+										if(newChangesVarValueMap != null && (newChangesVarValueMap.containsKey(blackoutVar))){
+											Map<String, Date> minMaxMap = this.getBlackoutMinMaxExpiry(blackout, allChanges);
+											getPopulatedChangedMemberScoreBlackout(source, changedMemberScoreList, modelId, rtsScore, minMaxMap, transactionDate);
+											LOGGER.info("PERSIST: member " + lId +" blacked out " + "for model " + modelId +" on " + new Date());
+										}
+										else{
+											allChanges.remove(blackoutVar);
+											continue;
+										}
 									}
 									else{
 										Map<String, Date> minMaxMap = this.getBlackoutMinMaxExpiry(blackout, allChanges);
-										getPopulatedChangedMemberScore(source, changedMemberScoreList, modelId, rtsScore, minMaxMap);
+										getPopulatedChangedMemberScoreBlackout(source, changedMemberScoreList, modelId, rtsScore, minMaxMap, transactionDate);
+										LOGGER.info("PERSIST: member " + lId +" blacked out " + "for model " + modelId +" on " + new Date());
 									}
 								}
-						 }
+							}
 						   catch(RealTimeScoringException e2){
 							   LOGGER.error("Exception scoring modelId " + modelId +" for lId " + lId + " " + e2.getErrorMessage());
 							   memberRTSChanges.setMetricsString("exception_per_model");
@@ -397,6 +389,19 @@ public class ScoringSingleton {
 		 changedMemberScore.setMinDate(getDateFormat(minMaxMap.get("minExpiry")));
 		 changedMemberScore.setMaxDate(getDateFormat(minMaxMap.get("maxExpiry")));
 		 changedMemberScore.setEffDate(getDateFormat(new Date()));
+		 changedMemberScore.setScore(rtsScore);
+		 changedMemberScore.setSource(source);
+		 changedMemberScoreList.add(changedMemberScore);
+	}
+	
+	private void getPopulatedChangedMemberScoreBlackout(String source,
+			List<ChangedMemberScore> changedMemberScoreList, Integer modelId,
+			double rtsScore, Map<String, Date> minMaxMap, Date transactionDate) {
+		ChangedMemberScore changedMemberScore = new ChangedMemberScore();
+		 changedMemberScore.setModelId(modelId.toString());
+		 changedMemberScore.setMinDate(getDateFormat(minMaxMap.get("minExpiry")));
+		 changedMemberScore.setMaxDate(getDateFormat(minMaxMap.get("maxExpiry")));
+		 changedMemberScore.setEffDate(getDateFormat(transactionDate));
 		 changedMemberScore.setScore(rtsScore);
 		 changedMemberScore.setSource(source);
 		 changedMemberScoreList.add(changedMemberScore);
