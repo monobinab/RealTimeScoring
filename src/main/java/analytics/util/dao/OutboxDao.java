@@ -217,6 +217,50 @@ public class OutboxDao extends AbstractMySQLDao{
 		return sentDate;		
 	}
 
+	// New method to get all email packages. Add a date cutoff to get only the recent ones.
+	
+	public List<EmailPackage> getSentEmailPackages(String lyl_id_no) throws  SQLException {
+		// This method returns all pending emails from the outbox
+		List<EmailPackage>emlPackageList = new ArrayList<EmailPackage>();
+		PreparedStatement statement = null;
+		try{
+			StringBuilder query = new StringBuilder();
+			query.append("SELECT * ")
+				.append("FROM cp_outbox ")
+				.append("WHERE loy_id= ? AND status=1 order by bu,sub_bu,occasion_name ASC;");
+ 		
+			statement = connection.prepareStatement(query.toString());
+			statement.setString(1, lyl_id_no);
+			
+			LOGGER.info("Query being executed for getting sent email packages sent in history: " + statement);
+			ResultSet rs = statement.executeQuery();
+	        
+	        while (rs.next()) {
+	             TagMetadata tagMetadata = new TagMetadata(rs.getString("md_tag"),rs.getString("bu"),rs.getString("sub_bu"),rs.getString("occasion_name"));
+
+	    	             emlPackageList.add(new EmailPackage(rs.getString("loy_id")
+	    		             		, tagMetadata
+	    		             		, rs.getTimestamp("added_datetime") /*addedDateTime*/
+	    		             		, rs.getDate("send_date") /*sendDate*/	
+	    		             		, rs.getDate("sent_datetime")
+	    		             		, rs.getInt("status")));	             
+	            
+	             	             
+	        }
+	        statement.close();
+		}catch(Exception e){
+			LOGGER.error("Exception Occured in getQueuedEmailPackages " + e.getMessage());
+		}finally{
+			if(statement!=null)
+				statement.close();
+		}
+		return emlPackageList;
+	}
+	
+	
+	
+	
+	
 	public Date getSentDate(EmailPackage emailPackage) throws SQLException {
 		Date sentDate = null;
 		
