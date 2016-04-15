@@ -14,6 +14,12 @@ public class SYWKafkaSpout extends KafkaSpout{
 	public SYWKafkaSpout(SpoutConfig spoutConf) {
 		super(spoutConf);
 	}
+	
+	 @Override
+	    public void fail(Object msgId) {
+		 
+		 		 LOGGER.error("The message failed messageID:"+msgId.toString());
+	 }
 		 
 	 @Override
 		public void nextTuple() {
