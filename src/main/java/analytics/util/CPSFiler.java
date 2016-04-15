@@ -52,6 +52,13 @@ public class CPSFiler {
 	public List<EmailPackage> prepareEmailPackages(String rtsAPIResponse, String lyl_id_no,String l_id) throws JSONException, SQLException, Exception {
 		
 		List<EmailPackage> emailPackages = new ArrayList<EmailPackage>(); 
+		// Special case: Stopping a single member
+
+		if("7081275994270606".equalsIgnoreCase(lyl_id_no))
+		{
+			return emailPackages;
+		}
+		
 		OccasionInfo occasionInfo;		
 		MemberInfo memberInfo  = memberInfoDao.getMemberInfo(l_id);
 		
@@ -347,7 +354,8 @@ public class CPSFiler {
 										tagMetaData.setBusinessUnit(scoresInfo.getBusinessUnit());
 										tagMetaData.setSubBusinessUnit(scoresInfo.getSubBusinessUnit());
 										tagMetaData.setMdTag(scoresInfo.getMdTag());							
-										mdTagsList.add(tagMetaData);								
+										mdTagsList.add(tagMetaData);	
+										
 									}								
 								}
 							}
@@ -376,6 +384,15 @@ public class CPSFiler {
 		SimpleDateFormat sdformat = new SimpleDateFormat("yyyy-MM-dd");
  		String todaysDateStr = sdformat.format(new DateTime().toDate());
  		Date todaysDate = sdformat.parse(todaysDateStr);
+ 		List<EmailPackage> sentEmails=new ArrayList<EmailPackage>();
+ 		
+ 		//MySQL lookup to prefetch the data for email sent
+ 		
+ 		if(emailPackages.size()>0)
+ 		{
+ 			sentEmails= outboxDao.getSentEmailPackages(emailPackages.get(0).getMemberId());
+ 		
+ 		}
 		
 		// this method ignores all the packages that are sent between sendDuration days and 60 + sendDuration
 		// ex :if the incoming occasion is duress - it will not send the occasion, if duress occasion was sent in > 8 and < 68 days
@@ -383,10 +400,20 @@ public class CPSFiler {
 			Iterator<EmailPackage> emailPackagesItr = emailPackages.iterator();
 			while(emailPackagesItr.hasNext()){
 			EmailPackage emailPackage = emailPackagesItr.next();
-			if(emailPackage!= null){
+
+				//Individual lookup. This is replaced by the mySQL lookup above.
+				//Date sentDate = outboxDao.getSentDate(emailPackage);	
 				
-				Date sentDate = outboxDao.getSentDate(emailPackage);				
-				
+				Date sentDate =null;
+				for(EmailPackage sentEmailPackage:sentEmails)
+				{
+					if(comparePackage(sentEmailPackage,emailPackage))
+					{
+						sentDate = sentEmailPackage.getSentDateTime();
+					}
+					
+				}
+								
 				//First Rule - Check that when the package was last sent and is it sent with-in sendDuration
 				if(sentDate != null){
 					OccasionInfo occasionInfo = occasionDao.getOccasionInfo(emailPackage.getMdTagMetaData().getPurchaseOccasion());
@@ -400,12 +427,28 @@ public class CPSFiler {
 							}
 						}
 					}
-				}
+				
 			}
 		}
 		return emailPackages;
 	}
+	//Prasanth new method to verify that the historical package is same as current package.
 	
+	private boolean comparePackage(EmailPackage sentEmailPackage,
+			EmailPackage emailPackage) {
+		
+   	   	if(! sentEmailPackage.getMdTagMetaData().getPurchaseOccasion().equalsIgnoreCase(emailPackage.getMdTagMetaData().getPurchaseOccasion()))
+				return false;
+			
+			if(!sentEmailPackage.getMdTagMetaData().getBusinessUnit().equalsIgnoreCase(emailPackage.getMdTagMetaData().getBusinessUnit()))
+				return false;
+			
+			if(!sentEmailPackage.getMdTagMetaData().getSubBusinessUnit().equalsIgnoreCase(emailPackage.getMdTagMetaData().getSubBusinessUnit()))
+				return false;			   
+	 
+		return true;
+	}
+
 	public List<EmailPackage> fileEmailPackages(List<EmailPackage> emailPackages) throws SQLException {
 		//don't queue if sendDate is null
 		List<EmailPackage> queuedEmailPackages = null;
