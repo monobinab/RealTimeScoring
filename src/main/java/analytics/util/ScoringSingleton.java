@@ -105,7 +105,6 @@ public class ScoringSingleton {
 			MemberRTSChanges memberRTSChanges = calcRTSChanges(l_id, null, modelIdList, source );
 			if(memberRTSChanges != null){
 				List<ChangedMemberScore> changedMemberScoresList = memberRTSChanges.getChangedMemberScoreList();
-				//changedMemberScoresList null check is not needed, as calcRTSChanges method will NOT return null map
 				if(changedMemberScoresList != null && changedMemberScoresList.size() > 0){
 					updateChangedMemberScore(l_id, changedMemberScoresList, source);
 					for(ChangedMemberScore changedMemScore : changedMemberScoresList){
@@ -115,7 +114,6 @@ public class ScoringSingleton {
 			}
 		}
 		catch(Exception e){
-			//e.printStackTrace();
 			LOGGER.error("Exception occured in rescoring " + l_id + " ", e.getMessage());
 		}
 			return modelIdStringScoreMap;
@@ -526,12 +524,12 @@ public class ScoringSingleton {
 					   changedMemberVariables can never be null, so no need for null check 
 					   ChangedMemberVarDao will return empty map NOT null 
 					 */
-					if (!allChanges.isEmpty() && allChanges.containsKey(variableName)) {
+					if (allChanges != null && !allChanges.isEmpty() && allChanges.containsKey(variableName)) {
 						context.setPreviousValue(allChanges.get(variableName).getValue());
 					}
 					// else get it from memberVariablesMap
 					else {
-						if (memberVariablesMap != null && memberVariablesMap.get(variableNameToVidMap.get(variableName)) != null) {
+						if (memberVariablesMap != null && !memberVariablesMap.isEmpty() && memberVariablesMap.get(variableNameToVidMap.get(variableName)) != null) {
 							context.setPreviousValue(memberVariablesMap.get(variableNameToVidMap.get(variableName)));
 						}
 					}
@@ -550,8 +548,10 @@ public class ScoringSingleton {
 			Map<String, String> variableNameToVidMap,
 			Map<String, List<Integer>> variableModelsMap,
 			Map<Integer, Map<Integer, Model>> modelsMap, Date transactionDate) {
-		Map<String, Change> allChanges = new HashMap<String, Change>();
-		allChanges.putAll(changedMemberVariables);
+			Map<String, Change> allChanges = new HashMap<String, Change>();
+			if(changedMemberVariables != null && !changedMemberVariables.isEmpty()){
+				allChanges.putAll(changedMemberVariables);
+			}
 			for (String variableName : newChangesVarValueMap.keySet()) {
 				variableName = variableName.toUpperCase();
 				if (variableModelsMap.containsKey(variableName)) {
@@ -581,7 +581,7 @@ public class ScoringSingleton {
 					   changedMemberVariables can never be null, so no need for null check 
 					   ChangedMemberVarDao will return empty map NOT null map
 					 */
-					if (!allChanges.isEmpty() && allChanges.containsKey(variableName)) {
+					if (allChanges != null && !allChanges.isEmpty() && allChanges.containsKey(variableName)) {
 						context.setPreviousValue(allChanges.get(variableName).getValue());
 					}
 					// else get it from memberVariablesMap

@@ -573,6 +573,7 @@ public class CPSFilerTest {
 	
 	//Test - Incoming list has HADH duress & SPFT browse;  HADH duress was already sent in last 30 days
 	//Expected Result -  HADH duress should not be sent again; SPFT is queued to send Today
+	@Ignore
 	@Test
 	public void testIgnorePackagesSentInHistoryWhenOccasionIsSentInLast30Days() throws SQLException, ParseException{
 				
