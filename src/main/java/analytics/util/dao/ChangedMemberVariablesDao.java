@@ -9,6 +9,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import analytics.util.CalendarUtil;
 import analytics.util.MongoNameConstants;
 import analytics.util.objects.Change;
 
@@ -23,7 +24,9 @@ public class ChangedMemberVariablesDao extends AbstractDao{
     DBCollection changedMemberVariablesCollection;
     public ChangedMemberVariablesDao(){
     	super();
-		changedMemberVariablesCollection = db.getCollection("changedMemberVariables");
+    	if(db != null){
+    		changedMemberVariablesCollection = db.getCollection("changedMemberVariables");
+    	}
     }
 	public void upsertUpdateChangedVariables(String lId, Map<String, Change> allChanges, Map<String, String> variableNameToVidMap) {
 		BasicDBObject newDocument = new BasicDBObject();
@@ -41,42 +44,42 @@ public class ChangedMemberVariablesDao extends AbstractDao{
 				lId);
 		changedMemberVariablesCollection.update(searchQuery,
 				new BasicDBObject("$set", newDocument), true, false);
-		
+
 	}
     public Map<String,Change> getChangedMemberVariables(String l_id){
-    	SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    	DBObject changedMbrVariables = changedMemberVariablesCollection.findOne(
-				new BasicDBObject("l_id", l_id));
-
-		if (changedMbrVariables == null) {
-			return null;
-		}
-		// CREATE MAP FROM VARIABLES TO VALUE (OBJECT)
-		Map<String, Change> memberVariablesMap = new HashMap<String, Change>();
-		Iterator<String> mbrVariablesIter = changedMbrVariables.keySet().iterator();
-		while (mbrVariablesIter.hasNext()) {
-			String key = mbrVariablesIter.next();
-			if (!key.equals(MongoNameConstants.L_ID) && !key.equals(MongoNameConstants.ID)) {
-				DBObject changedMbrVar = (DBObject) changedMbrVariables.get(key);
-				if(changedMbrVar!=null && changedMbrVar.get(MongoNameConstants.MV_EFFECTIVE_DATE)!=null &&
-						changedMbrVar.get(MongoNameConstants.MV_EXPIRY_DATE)!=null){
-				Change cVar;
-				try {
-					cVar = new Change(
-							key,
-							changedMbrVar.get(MongoNameConstants.MV_VID),
-							simpleDateFormat.parse(changedMbrVar.get(MongoNameConstants.MV_EXPIRY_DATE).toString()),
-							simpleDateFormat.parse(changedMbrVar.get(MongoNameConstants.MV_EFFECTIVE_DATE).toString())
-							);
-				} catch (ParseException e) {
-					LOGGER.error("Unable to parse date. Stopping further parse ",e);
-					return memberVariablesMap;
+    	
+    	Map<String, Change> memberVariablesMap = null;
+    		DBObject changedMbrVariables = changedMemberVariablesCollection.findOne(
+					new BasicDBObject("l_id", l_id));
+    		
+    		SimpleDateFormat simpleDateFormat = CalendarUtil.getDateFormat();
+    		if(changedMbrVariables != null){
+    			memberVariablesMap = new HashMap<String, Change>();
+		    	// CREATE MAP FROM VARIABLES TO VALUE (OBJECT)
+		    	Iterator<String> mbrVariablesIter = changedMbrVariables.keySet().iterator();
+				while (mbrVariablesIter.hasNext()) {
+					String key = mbrVariablesIter.next();
+					if (!key.equals(MongoNameConstants.L_ID) && !key.equals(MongoNameConstants.ID)) {
+						DBObject changedMbrVar = (DBObject) changedMbrVariables.get(key);
+						if(changedMbrVar!=null && changedMbrVar.get(MongoNameConstants.MV_EFFECTIVE_DATE)!=null &&
+								changedMbrVar.get(MongoNameConstants.MV_EXPIRY_DATE)!=null){
+						Change cVar;
+						try {
+							cVar = new Change(
+									key,
+									changedMbrVar.get(MongoNameConstants.MV_VID),
+									simpleDateFormat.parse(changedMbrVar.get(MongoNameConstants.MV_EXPIRY_DATE).toString()),
+									simpleDateFormat.parse(changedMbrVar.get(MongoNameConstants.MV_EFFECTIVE_DATE).toString())
+									);
+						} catch (ParseException e) {
+							LOGGER.error("Unable to parse date. Stopping further parse ",e);
+							return memberVariablesMap;
+						}
+						memberVariablesMap.put(key, cVar);
+						}
+					}
 				}
-				memberVariablesMap.put(key, cVar);
-				}
-			}
-		}
-		return memberVariablesMap;
-				
+	    	}
+    		return memberVariablesMap;
+    	}
 	}
-}

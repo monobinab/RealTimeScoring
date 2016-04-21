@@ -24,36 +24,33 @@ public class MemberVariablesDao extends AbstractDao {
     public MemberVariablesDao(){
     	//Connect to static collections replicaset
     	super("mongo2");
-		memberVariablesCollection = db.getCollection("memberVariables");
+    	if(db != null){
+    		memberVariablesCollection = db.getCollection("memberVariables");
+    	}
     }
    
     public Map<String,Object> getMemberVariablesFiltered(String l_id, Set<String> variableFilter){
-    	BasicDBObject variableFilterDBO = new BasicDBObject(MongoNameConstants.ID, 0);
+ 	   	BasicDBObject variableFilterDBO = new BasicDBObject(MongoNameConstants.ID, 0);
     	for(String var:variableFilter){
     		variableFilterDBO.append(var, 1);
     	}
-    	
+    	Map<String, Object> memberVariablesMap = null;
     	DBObject mbrVariables = memberVariablesCollection.findOne(
 				new BasicDBObject("l_id", l_id), variableFilterDBO);
-    //	DBObject dbObj = memberVariablesCollection.findOne(new BasicDBObject("l_id", l_id));
-    //	System.out.println(dbObj);
-    	
+     	
     	LOGGER.info("memberVariables connected from " +  db.getMongo().getAllAddress() + " mongo " + db.getName() + "db");
-    	if (mbrVariables == null) {
-			return null;
-		}
-
-		// CREATE MAP FROM VARIABLES TO VALUE (OBJECT)
-		Map<String, Object> memberVariablesMap = new HashMap<String, Object>();
-		Iterator<String> mbrVariablesIter = mbrVariables.keySet().iterator();
-		while (mbrVariablesIter.hasNext()) {
-			String key = mbrVariablesIter.next();
-			if (!key.equals(MongoNameConstants.L_ID) && !key.equals(MongoNameConstants.ID)) {
-				memberVariablesMap.put(key, mbrVariables.get(key));
+    	if (mbrVariables != null) {
+    		memberVariablesMap = new HashMap<String, Object>();;
+    		// CREATE MAP FROM VARIABLES TO VALUE (OBJECT)
+			Iterator<String> mbrVariablesIter = mbrVariables.keySet().iterator();
+			while (mbrVariablesIter.hasNext()) {
+				String key = mbrVariablesIter.next();
+				if (!key.equals(MongoNameConstants.L_ID) && !key.equals(MongoNameConstants.ID)) {
+					memberVariablesMap.put(key, mbrVariables.get(key));
+				}
 			}
-		}
+    	}
 		return memberVariablesMap;
-				
 	}
     
     public DBObject getMemVars(String lid){
