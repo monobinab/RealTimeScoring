@@ -17,8 +17,7 @@ public class SYWKafkaSpout extends KafkaSpout{
 	
 	 @Override
 	    public void fail(Object msgId) {
-		 
-		 		 LOGGER.error("The message failed messageID:"+msgId.toString());
+	 		 LOGGER.error("The message failed messageID:"+msgId.toString());
 	 }
 		 
 	 @Override

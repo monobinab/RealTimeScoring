@@ -63,43 +63,46 @@ public class LoggingBolt extends EnvironmentBolt {
 	public void execute(Tuple input) {
 		
 		redisCountIncr("incoming_tuples");
-		List<ChangedMemberScore> changedMemberScores = (List<ChangedMemberScore>)input.getValueByField("changedMemberScoresList");
+		List<ChangedMemberScore> changedMemberScores = null;
+		if(input.contains("changedMemberScoresList")){
+			changedMemberScores = (List<ChangedMemberScore>)input.getValueByField("changedMemberScoresList");
+		}
+	
 		if(changedMemberScores != null && changedMemberScores.size() > 0){
 			Map<Integer,TreeMap<Integer,Double>> modelScorePercentileMap = modelPercentileDao.getModelScorePercentilesMap();
 			for(ChangedMemberScore changedMemberScore : changedMemberScores){
 				
 				if(changedMemberScore != null){
 					try{
-					String l_id = changedMemberScore.getlId();
-					String modelId = changedMemberScore.getModelId();
-					String oldScore = memberScoreDao.getMemberScores(l_id).get(modelId);
-					String source = changedMemberScore.getSource();
-					Double newScore = changedMemberScore.getScore();
-					String minExpiry = changedMemberScore.getMinDate();
-					String maxExpiry = changedMemberScore.getMaxDate();
-
-					Integer newPercentile = getPercentileForScore(modelScorePercentileMap, newScore,Integer.parseInt(modelId));
-					Integer oldPercentile = (oldScore == null ? null : getPercentileForScore(modelScorePercentileMap, new Double (oldScore),Integer.parseInt(modelId)));
-
-					String messageID = "";
-					if (input.contains("messageID")) {
-						messageID = input.getStringByField("messageID");
-					}
-					LOGGER.info("TIME:" + messageID + "-Entering logging bolt-" + System.currentTimeMillis());
-					LOGGER.info("PERSIST: " + new Date() + ": Topology: Changes Scores : lid: " + l_id + ", modelId: "+modelId + ", oldScore: "+oldScore +
-							", newScore: "+newScore+", minExpiry: "+minExpiry+", maxExpiry: "+maxExpiry+", source: " + source+", "
-									+ "oldPercentile: " + oldPercentile+", newPercentile: " + newPercentile);
-					redisCountIncr("score_logged");
-					outputCollector.ack(input);	
+						String l_id = changedMemberScore.getlId();
+						String modelId = changedMemberScore.getModelId();
+						String oldScore = memberScoreDao.getMemberScores(l_id).get(modelId);
+						String source = changedMemberScore.getSource();
+						Double newScore = changedMemberScore.getScore();
+						String minExpiry = changedMemberScore.getMinDate();
+						String maxExpiry = changedMemberScore.getMaxDate();
+	
+						Integer newPercentile = getPercentileForScore(modelScorePercentileMap, newScore,Integer.parseInt(modelId));
+						Integer oldPercentile = (oldScore == null ? null : getPercentileForScore(modelScorePercentileMap, new Double (oldScore),Integer.parseInt(modelId)));
+	
+						String messageID = "";
+						if (input.contains("messageID")) {
+							messageID = input.getStringByField("messageID");
+						}
+						LOGGER.info("TIME:" + messageID + "-Entering logging bolt-" + System.currentTimeMillis());
+						LOGGER.info("PERSIST: " + new Date() + ": Topology: Changes Scores : lid: " + l_id + ", modelId: "+modelId + ", oldScore: "+oldScore +
+								", newScore: "+newScore+", minExpiry: "+minExpiry+", maxExpiry: "+maxExpiry+", source: " + source+", "
+										+ "oldPercentile: " + oldPercentile+", newPercentile: " + newPercentile);
+						redisCountIncr("score_logged");
+						outputCollector.ack(input);	
 					}
 					catch(Exception e){
 						LOGGER.error("Exception in Logging bolt for " + changedMemberScore.getlId() + " model " + changedMemberScore.getModelId());
 					}
 				}
-				
-			
 			}
 		}
+		outputCollector.ack(input);
 	}
 
 	/**

@@ -1,12 +1,12 @@
 package analytics.bolt;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +37,6 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 	protected SourceFeedDao sourceFeedDao;
 	protected VariableDao variableDao;
 	protected BoostBrowseBuSubBuDao boostBrowseBuSubBuDao;
-//	SimpleDateFormat dateFormat;
 	protected BrowseUtils browseUtils;
 	private static final int NUMBER_OF_DAYS = 7;
 
@@ -60,7 +59,6 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
         super.prepare(stormConf, context, collector);
 	    modelVariablesDao =  new ModelVariablesDao(); 
         sourceFeedDao = new SourceFeedDao();
-   //     dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         browseUtils = new BrowseUtils();
         divLnModelCodeDao = new DivLnModelCodeDao();
         boostBrowseBuSubBuDao = new BoostBrowseBuSubBuDao();
@@ -68,85 +66,90 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 
 	@Override
 	public void execute(Tuple input) {
+		Map<String,String> incomingValueMap;
+		try{
+			String loyalty_id;
 		
-		String loyalty_id;
-	
-		redisCountIncr("incoming_tuples");
+			redisCountIncr("incoming_tuples");
+			
+	        String interactionRec = input.getString(0);
+	        String splitRecArray[] = splitRec(interactionRec);
+	        
+	        if(splitRecArray == null || splitRecArray.length==0) {
+	    		redisCountIncr("invalid_record");
+	    		outputCollector.ack(input);
+	        	return;
+	        }
+	      
+	        String l_id = null;
+	        
+	        loyalty_id = splitRecArray[0].trim();
+	        if(loyalty_id.length()!=16 || !loyalty_id.startsWith("7081")){
+	        	LOGGER.info("Could not find Lid: " + loyalty_id);
+	        	redisCountIncr("no_lids");
+	        	outputCollector.ack(input);
+	        	return;
+	        }
+		    l_id = SecurityUtils.hashLoyaltyId(loyalty_id);
+	        
+		    Map<String, Collection<String>> l_idToCurrentValueCollectionMap = new HashMap<String, Collection<String>>();
+		    l_idToCurrentValueCollectionMap.put(l_id, new ArrayList<String>());
+			for(int i=1;i<splitRecArray.length;i++){
+				l_idToCurrentValueCollectionMap.get(l_id).add(splitRecArray[i].trim());
+			}
+			
+			/*
+			 * Get the MemberBrowse object for the member for 7 days
+			 */
+			MemberBrowse memberBrowse = browseUtils.getEntireMemberBrowse7DaysInHistory(l_id)	;
 		
-        String interactionRec = input.getString(0);
-        String splitRecArray[] = splitRec(interactionRec);
-        
-        if(splitRecArray == null || splitRecArray.length==0) {
-    		redisCountIncr("invalid_record");
-    		outputCollector.ack(input);
-        	return;
-        }
-      
-        String l_id = null;
-        
-        loyalty_id = splitRecArray[0].trim();
-        if(loyalty_id.length()!=16 || !loyalty_id.startsWith("7081")){
-        	LOGGER.info("Could not find Lid: " + loyalty_id);
-        	redisCountIncr("no_lids");
-        	outputCollector.ack(input);
-        	return;
-        }
-	    l_id = SecurityUtils.hashLoyaltyId(loyalty_id);
-        
-	    Map<String, Collection<String>> l_idToCurrentValueCollectionMap = new HashMap<String, Collection<String>>();
-	    l_idToCurrentValueCollectionMap.put(l_id, new ArrayList<String>());
-		for(int i=1;i<splitRecArray.length;i++){
-			l_idToCurrentValueCollectionMap.get(l_id).add(splitRecArray[i].trim());
+	    	incomingValueMap = processList(l_id, l_idToCurrentValueCollectionMap); //LIST OF VARIABLES FOUND DURING TRAITS PROCESSING
+	    	
+	    	if(incomingValueMap !=null && !incomingValueMap.isEmpty()) {
+	    		Object boostValueJSON = null;
+	    		if(!source.equalsIgnoreCase("WebTraits")){
+	    			Map<String, Integer> previousModelCodeMap = browseUtils.getPreviousBoostCounts(l_id, loyalty_id, incomingValueMap, NUMBER_OF_DAYS, memberBrowse);
+	        	//	System.out.println("PC modelCode Map for scoring " + previousModelCodeMap);
+	        		LOGGER.info("PC modelCode or buSubBu Map for scoring " + l_id + ": " + previousModelCodeMap);
+	        		Map<String, String> totalModelCodeMap = getTotalModelCodeValueMap(previousModelCodeMap, incomingValueMap);
+	            //	System.out.println("total modelCode Map for scoring " + totalModelCodeMap);
+	            	LOGGER.info("PC AND incoming modelCode or buSubBu Map for scoring " + l_id + ": "+ totalModelCodeMap);
+	            	boostValueJSON = JsonUtils.createJsonFromStringStringMap(getBoostFromModelCode(totalModelCodeMap));
+	    		}
+	    		else{
+	    			 boostValueJSON = JsonUtils.createJsonFromStringStringMap(incomingValueMap);
+	    		}
+	       		
+	        	List<Object> listToEmit = new ArrayList<Object>();
+	        	listToEmit.add(l_id);
+	        	listToEmit.add(boostValueJSON);
+	        	listToEmit.add(source);
+	        	listToEmit.add(loyalty_id);
+	        	this.outputCollector.emit(listToEmit);
+	        	redisCountIncr("processed_lid");
+	        	LOGGER.debug(" *** PARSING BOLT EMITTING: " + listToEmit);
+	      	}
+	    	else {
+	    		LOGGER.debug(" *** NO VARIABLES FOUND - NOTHING TO EMIT");
+	    		redisCountIncr("no_variables_affected");
+	    	}
+	    	
+	    	//emitting to BrowseCountPersistBolt
+	    	if(incomingValueMap != null && !incomingValueMap.isEmpty()){
+	    		Object boostJSON = JsonUtils.createJsonFromStringStringMap(incomingValueMap);
+	    		List<Object> listToEmit = new ArrayList<Object>();
+	        	listToEmit.add(loyalty_id);
+	        	listToEmit.add(boostJSON);
+	        	listToEmit.add(memberBrowse);
+	        	listToEmit.add(source);
+	        	this.outputCollector.emit("browse_tag_stream", listToEmit);
+	        	redisCountIncr("emitted_browse_tag");
+	    	}
 		}
-		
-		/*
-		 * Get the MemberBrowse object for the member for 7 days
-		 */
-		MemberBrowse memberBrowse = browseUtils.getEntireMemberBrowse7DaysInHistory(l_id)	;
-	
-    	Map<String,String> incomingValueMap = processList(l_id, l_idToCurrentValueCollectionMap); //LIST OF VARIABLES FOUND DURING TRAITS PROCESSING
-    	
-    	if(incomingValueMap !=null && !incomingValueMap.isEmpty()) {
-    		Object boostValueJSON = null;
-    		if(!source.equalsIgnoreCase("WebTraits")){
-    			Map<String, Integer> previousModelCodeMap = browseUtils.getPreviousBoostCounts(l_id, loyalty_id, incomingValueMap, NUMBER_OF_DAYS, memberBrowse);
-        	//	System.out.println("PC modelCode Map for scoring " + previousModelCodeMap);
-        		LOGGER.info("PC modelCode or buSubBu Map for scoring " + l_id + ": " + previousModelCodeMap);
-        		Map<String, String> totalModelCodeMap = getTotalModelCodeValueMap(previousModelCodeMap, incomingValueMap);
-            //	System.out.println("total modelCode Map for scoring " + totalModelCodeMap);
-            	LOGGER.info("PC AND incoming modelCode or buSubBu Map for scoring " + l_id + ": "+ totalModelCodeMap);
-            	boostValueJSON = JsonUtils.createJsonFromStringStringMap(getBoostFromModelCode(totalModelCodeMap));
-    		}
-    		else{
-    			 boostValueJSON = JsonUtils.createJsonFromStringStringMap(incomingValueMap);
-    		}
-       		
-        	List<Object> listToEmit = new ArrayList<Object>();
-        	listToEmit.add(l_id);
-        	listToEmit.add(boostValueJSON);
-        	listToEmit.add(source);
-        	listToEmit.add(loyalty_id);
-        	this.outputCollector.emit(listToEmit);
-        	redisCountIncr("processed_lid");
-        	LOGGER.debug(" *** PARSING BOLT EMITTING: " + listToEmit);
-      	}
-    	else {
-    		LOGGER.debug(" *** NO VARIABLES FOUND - NOTHING TO EMIT");
-    		redisCountIncr("no_variables_affected");
-    	}
-    	
-    	//emitting to BrowseCountPersistBolt
-    	if(incomingValueMap != null && !incomingValueMap.isEmpty()){
-    		Object boostJSON = JsonUtils.createJsonFromStringStringMap(incomingValueMap);
-    		List<Object> listToEmit = new ArrayList<Object>();
-        	listToEmit.add(loyalty_id);
-        	listToEmit.add(boostJSON);
-        	listToEmit.add(memberBrowse);
-        	listToEmit.add(source);
-        	this.outputCollector.emit("browse_tag_stream", listToEmit);
-        	redisCountIncr("emitted_browse_tag");
-    	}
-    	
+		catch(Exception e){
+			LOGGER.error("Exception occured in PasingBoltAAMFeeds: " + ExceptionUtils.getFullStackTrace(e));
+			e.printStackTrace();
+		}
 	    	incomingValueMap = null;   	
 	    	redisCountIncr("total_processing");
 	    	outputCollector.ack(input);

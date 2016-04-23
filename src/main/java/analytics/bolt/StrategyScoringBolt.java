@@ -25,12 +25,6 @@ import redis.clients.jedis.Jedis;
 import java.math.BigDecimal;
 import java.util.*;
 
-/**
- * 
- * @author dnairsy Bolt to find the models affected by a list of variables,
- *         apply strategy on each model and rescore each model
- *
- */
 public class StrategyScoringBolt extends EnvironmentBolt {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(StrategyScoringBolt.class);
@@ -81,7 +75,6 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	  	scoringSingleton = ScoringSingleton.getInstance();
 	  }
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	public void execute(Tuple input) {
 					
