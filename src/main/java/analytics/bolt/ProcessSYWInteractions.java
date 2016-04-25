@@ -23,7 +23,6 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,6 +81,7 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 
 	@Override
 	public void execute(Tuple input) {
+		try{
 		redisCountIncr("incoming_tuples");
 		String feedType = null;
 		
@@ -240,6 +240,11 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 
 		} else {
 			redisCountIncr("empty_var_map");
+		}
+		}
+		catch(Exception e){
+			LOGGER.error("Exception occured in ProcessSYWInteractions " + e.getMessage());
+			e.printStackTrace();
 		}
 		this.outputCollector.ack(input);
 	}

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package analytics.bolt;
 
 import analytics.util.dao.MemberScoreDao;
@@ -23,9 +20,7 @@ public class LoggingBolt extends EnvironmentBolt {
 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(LoggingBolt.class);
-	/**
-	 *
-	 */
+
 	private static final long serialVersionUID = 1L;
 	private OutputCollector outputCollector;
 	private MemberScoreDao memberScoreDao;
@@ -67,7 +62,10 @@ public class LoggingBolt extends EnvironmentBolt {
 		if(input.contains("changedMemberScoresList")){
 			changedMemberScores = (List<ChangedMemberScore>)input.getValueByField("changedMemberScoresList");
 		}
-	
+		String messageID = "";
+		if (input.contains("messageID")) {
+			messageID = input.getStringByField("messageID");
+		}
 		if(changedMemberScores != null && changedMemberScores.size() > 0){
 			Map<Integer,TreeMap<Integer,Double>> modelScorePercentileMap = modelPercentileDao.getModelScorePercentilesMap();
 			for(ChangedMemberScore changedMemberScore : changedMemberScores){
@@ -84,11 +82,6 @@ public class LoggingBolt extends EnvironmentBolt {
 	
 						Integer newPercentile = getPercentileForScore(modelScorePercentileMap, newScore,Integer.parseInt(modelId));
 						Integer oldPercentile = (oldScore == null ? null : getPercentileForScore(modelScorePercentileMap, new Double (oldScore),Integer.parseInt(modelId)));
-	
-						String messageID = "";
-						if (input.contains("messageID")) {
-							messageID = input.getStringByField("messageID");
-						}
 						LOGGER.info("TIME:" + messageID + "-Entering logging bolt-" + System.currentTimeMillis());
 						LOGGER.info("PERSIST: " + new Date() + ": Topology: Changes Scores : lid: " + l_id + ", modelId: "+modelId + ", oldScore: "+oldScore +
 								", newScore: "+newScore+", minExpiry: "+minExpiry+", maxExpiry: "+maxExpiry+", source: " + source+", "

@@ -48,32 +48,30 @@ public class ParsingSignalBrowseBolt extends EnvironmentBolt{
 		ArrayList<String> pidLst = null;
 
 		try {
-				lId = rtsCommonObj.getLyl_id_no();
-				pidLst = rtsCommonObj.getPidList();
-				LOGGER.info("PROCESSING L_Id: " + lId +" with PIDs " + pidLst);
-				String loyaltyId = memberLoyIdDao.getLoyaltyId(lId);
-						
-				if(lId != null && pidLst != null && pidLst.size()>0){
-					ArrayList<String> lst = new ArrayList<String>(pidLst.subList(1, pidLst.size()));
-					String pidLstStr = StringUtils.join(lst, ',');
-				//	String str = "[,"+loyaltyId+","+pidLstStr+",]";
-					String str = loyaltyId+","+pidLstStr;
-					outputCollector.emit(tuple(str));
-					str = null;
-					pidLstStr = null;
-					lst = null;
+			lId = rtsCommonObj.getLyl_id_no();
+			pidLst = rtsCommonObj.getPidList();
+			LOGGER.info("PROCESSING L_Id: " + lId +" with PIDs " + pidLst);
+			String loyaltyId = memberLoyIdDao.getLoyaltyId(lId);
 					
-				}else
-					LOGGER.info("Either L_Id is null or Pid List is null. No sending to Parsing Bolt .. Input Tuple : " +input);
+			if(lId != null && pidLst != null && pidLst.size()>0){
+				ArrayList<String> lst = new ArrayList<String>(pidLst.subList(1, pidLst.size()));
+				String pidLstStr = StringUtils.join(lst, ',');
+				String str = loyaltyId+","+pidLstStr;
+				outputCollector.emit(tuple(str));
+				str = null;
+				pidLstStr = null;
+				lst = null;
+				redisCountIncr("success_signal_browse");
+			}else{
+				LOGGER.info("Either L_Id is null or Pid List is null. No sending to Parsing Bolt .. Input Tuple : " +input);
+			}
 			
-			redisCountIncr("success_signal_browse");
-			outputCollector.ack(input);
 		} catch (Exception e) {
 			LOGGER.error("Exception Occured at SignalBrowseBolt for Lid" + lId );
 			e.printStackTrace();
-			
 			redisCountIncr("failure_signal_browse");
 		}
+		outputCollector.ack(input);
 	}
 
 	@Override

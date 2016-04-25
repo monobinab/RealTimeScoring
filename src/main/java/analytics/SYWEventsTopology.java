@@ -16,7 +16,7 @@ import analytics.bolt.PersistBoostsBolt;
 import analytics.bolt.ProcessSYWInteractions;
 import analytics.bolt.RTSKafkaBolt;
 import analytics.bolt.StrategyScoringBolt;
-import analytics.spout.SYWKafkaSpout;
+import analytics.spout.RTSKafkaSpout;
 import analytics.util.KafkaUtil;
 import analytics.util.MetricsListener;
 import analytics.util.MongoNameConstants;
@@ -42,7 +42,7 @@ public class SYWEventsTopology {
 		try {
 			SpoutConfig spoutConfig = null;
 			spoutConfig = new KafkaUtil(env).getSpoutConfig(sywKafkaTopic, zkroot_syw, group_id);
-			topologyBuilder.setSpout("sywKafkaSpout", new SYWKafkaSpout(spoutConfig), 1);
+			topologyBuilder.setSpout("sywKafkaSpout", new RTSKafkaSpout(spoutConfig), 1);
 		} catch (ConfigurationException e) {
 			LOGGER.error(e.getClass() + ": " + e.getMessage() +" STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 			System.exit(0);	

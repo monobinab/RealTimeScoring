@@ -32,7 +32,6 @@ public class AAM_BrowseTopology {
 		String topic = TopicConstants.AAM_BROWSE_PRODUCTS;
 		String kafkatopic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;
 		String browseKafkaTopic = TopicConstants.BROWSE_KAFKA_TOPIC;
-		//RedisConnection redisConnection = new RedisConnection();
 		String[] servers = RedisConnection.getServers(System.getProperty(MongoNameConstants.IS_PROD));
 		
 		//Sree. Spout that wakes up every 5 mins and process the Traits

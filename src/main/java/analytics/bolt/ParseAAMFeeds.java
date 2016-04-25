@@ -98,52 +98,46 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 				l_idToCurrentValueCollectionMap.get(l_id).add(splitRecArray[i].trim());
 			}
 			
+		   	incomingValueMap = processList(l_id, l_idToCurrentValueCollectionMap); //LIST OF VARIABLES FOUND DURING TRAITS PROCESSING
+		   	
 			/*
 			 * Get the MemberBrowse object for the member for 7 days
 			 */
 			MemberBrowse memberBrowse = browseUtils.getEntireMemberBrowse7DaysInHistory(l_id)	;
-		
-	    	incomingValueMap = processList(l_id, l_idToCurrentValueCollectionMap); //LIST OF VARIABLES FOUND DURING TRAITS PROCESSING
 	    	
 	    	if(incomingValueMap !=null && !incomingValueMap.isEmpty()) {
 	    		Object boostValueJSON = null;
 	    		if(!source.equalsIgnoreCase("WebTraits")){
-	    			Map<String, Integer> previousModelCodeMap = browseUtils.getPreviousBoostCounts(l_id, loyalty_id, incomingValueMap, NUMBER_OF_DAYS, memberBrowse);
-	        	//	System.out.println("PC modelCode Map for scoring " + previousModelCodeMap);
-	        		LOGGER.info("PC modelCode or buSubBu Map for scoring " + l_id + ": " + previousModelCodeMap);
-	        		Map<String, String> totalModelCodeMap = getTotalModelCodeValueMap(previousModelCodeMap, incomingValueMap);
-	            //	System.out.println("total modelCode Map for scoring " + totalModelCodeMap);
-	            	LOGGER.info("PC AND incoming modelCode or buSubBu Map for scoring " + l_id + ": "+ totalModelCodeMap);
-	            	boostValueJSON = JsonUtils.createJsonFromStringStringMap(getBoostFromModelCode(totalModelCodeMap));
+	    			if(memberBrowse != null){
+		    			Map<String, Integer> previousModelCodeMap = browseUtils.getPreviousBoostCounts(l_id, loyalty_id, incomingValueMap, NUMBER_OF_DAYS, memberBrowse);
+		           		LOGGER.info("PC modelCode or buSubBu Map for scoring " + l_id + ": " + previousModelCodeMap);
+		        		Map<String, String> totalModelCodeMap = getTotalModelCodeValueMap(previousModelCodeMap, incomingValueMap);
+		               	LOGGER.info("PC AND incoming modelCode or buSubBu Map for scoring " + l_id + ": "+ totalModelCodeMap);
+		            	boostValueJSON = JsonUtils.createJsonFromStringStringMap(getBoostFromModelCode(totalModelCodeMap));
+		            	emitToBrowseCountPersistBolt(incomingValueMap, loyalty_id, memberBrowse);
+	    			}
 	    		}
 	    		else{
 	    			 boostValueJSON = JsonUtils.createJsonFromStringStringMap(incomingValueMap);
 	    		}
-	       		
-	        	List<Object> listToEmit = new ArrayList<Object>();
-	        	listToEmit.add(l_id);
-	        	listToEmit.add(boostValueJSON);
-	        	listToEmit.add(source);
-	        	listToEmit.add(loyalty_id);
-	        	this.outputCollector.emit(listToEmit);
-	        	redisCountIncr("processed_lid");
-	        	LOGGER.debug(" *** PARSING BOLT EMITTING: " + listToEmit);
-	      	}
+	       		if(boostValueJSON != null ){
+		        	List<Object> listToEmit = new ArrayList<Object>();
+		        	listToEmit.add(l_id);
+		        	listToEmit.add(boostValueJSON);
+		        	listToEmit.add(source);
+		        	listToEmit.add(loyalty_id);
+		        	this.outputCollector.emit(listToEmit);
+		        	redisCountIncr("processed_lid");
+		        	LOGGER.debug(" *** PARSING BOLT EMITTING: " + listToEmit);
+	       		}
+	      	    	
+	    	//emitting to BrowseCountPersistBolt
+	       		emitToBrowseCountPersistBolt(incomingValueMap, loyalty_id,
+						memberBrowse);
+	       	}
 	    	else {
 	    		LOGGER.debug(" *** NO VARIABLES FOUND - NOTHING TO EMIT");
 	    		redisCountIncr("no_variables_affected");
-	    	}
-	    	
-	    	//emitting to BrowseCountPersistBolt
-	    	if(incomingValueMap != null && !incomingValueMap.isEmpty()){
-	    		Object boostJSON = JsonUtils.createJsonFromStringStringMap(incomingValueMap);
-	    		List<Object> listToEmit = new ArrayList<Object>();
-	        	listToEmit.add(loyalty_id);
-	        	listToEmit.add(boostJSON);
-	        	listToEmit.add(memberBrowse);
-	        	listToEmit.add(source);
-	        	this.outputCollector.emit("browse_tag_stream", listToEmit);
-	        	redisCountIncr("emitted_browse_tag");
 	    	}
 		}
 		catch(Exception e){
@@ -153,8 +147,21 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 	    	incomingValueMap = null;   	
 	    	redisCountIncr("total_processing");
 	    	outputCollector.ack(input);
-	    	return;
-        
+	  }
+
+	private void emitToBrowseCountPersistBolt(
+			Map<String, String> incomingValueMap, String loyalty_id,
+			MemberBrowse memberBrowse) {
+		if(memberBrowse != null){
+			Object boostJSON = JsonUtils.createJsonFromStringStringMap(incomingValueMap);
+			List<Object> listToEmit = new ArrayList<Object>();
+			listToEmit.add(loyalty_id);
+			listToEmit.add(boostJSON);
+			listToEmit.add(memberBrowse);
+			listToEmit.add(source);
+			this.outputCollector.emit("browse_tag_stream", listToEmit);
+			redisCountIncr("emitted_browse_tag");
+		}
 	}
 
 	@Override

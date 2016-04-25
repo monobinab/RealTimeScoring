@@ -54,69 +54,67 @@ public class PurchaseScoreKafkaBolt extends EnvironmentBolt {
 		kafkaUtil = new KafkaUtil(
 				System.getProperty(MongoNameConstants.IS_PROD));
 		// KafkaUtil.initiateKafkaProperties(System.getProperty(MongoNameConstants.IS_PROD));
-		LOGGER.info("RTSKafkaBolt Preparing to Launch");
+		LOGGER.info("PurchaseScoreKafkaBolt Preparing to Launch");
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public void execute(Tuple input) {
-		JSONObject mainJsonObj = new JSONObject();
-		if (input.contains("loyaltyId")
-				&& input.getValueByField("loyaltyId") != null) {
-			List<ChangedMemberScore> changedMemberScoreList = (List<ChangedMemberScore>) input
-					.getValueByField("cpsScoreMessage");
-			if (changedMemberScoreList != null
-					&& !changedMemberScoreList.isEmpty()) {
+		try{
+			JSONObject mainJsonObj = new JSONObject();
+			if (input.contains("loyaltyId")
+					&& input.getValueByField("loyaltyId") != null && input.contains("cpsScoreMessage")) {
+				List<ChangedMemberScore> changedMemberScoreList = (List<ChangedMemberScore>) input
+						.getValueByField("cpsScoreMessage");
 				String loyId = input.getStringByField("loyaltyId");
-				String topology = input.getStringByField("topology");
-				mainJsonObj.put("memberId", loyId);
-				mainJsonObj.put("topology", topology);
-				JSONArray jsonArray = new JSONArray();
 				if (changedMemberScoreList != null
 						&& !changedMemberScoreList.isEmpty()) {
-					try {
+					String topology = input.getStringByField("topology");
+					mainJsonObj.put("memberId", loyId);
+					mainJsonObj.put("topology", topology);
+					JSONArray jsonArray = new JSONArray();
 						for (ChangedMemberScore changedMemScore : changedMemberScoreList) {
-							if (models.contains(Integer
-									.parseInt(changedMemScore.getModelId()))) {
-								JSONObject jsonObj = new JSONObject();
-								jsonObj.put("modelId",
-										changedMemScore.getModelId());
-								jsonObj.put("score", changedMemScore.getScore());
-								jsonObj.put("percentile", scoringUtils
-										.getPercentileForScore(changedMemScore
-												.getScore(), Integer
-												.parseInt(changedMemScore
-														.getModelId())));
-								jsonArray.add(jsonObj);
+								if (models.contains(Integer
+										.parseInt(changedMemScore.getModelId()))) {
+									JSONObject jsonObj = new JSONObject();
+									jsonObj.put("modelId",
+											changedMemScore.getModelId());
+									jsonObj.put("score", changedMemScore.getScore());
+									jsonObj.put("percentile", scoringUtils
+											.getPercentileForScore(changedMemScore
+													.getScore(), Integer
+													.parseInt(changedMemScore
+															.getModelId())));
+									jsonArray.add(jsonObj);
+								}
+							}
+							mainJsonObj.put("scoresInfo", jsonArray);
+	
+							if (mainJsonObj != null
+									&& !"".equals(mainJsonObj.toJSONString())) {
+								try{
+									kafkaUtil.sendKafkaMSGs(mainJsonObj.toJSONString(),
+											currentTopic);
+									redisCountIncr("tag_to_kafka");
+									LOGGER.info("PERSIST: " +  loyId + " published to kafka from " + topology);
+								}
+								catch (ConfigurationException e) {
+									LOGGER.error(e.getMessage(), e);
+									outputCollector.fail(input);
+								}
 							}
 						}
-						mainJsonObj.put("scoresInfo", jsonArray);
-
-						if (mainJsonObj != null
-								&& !"".equals(mainJsonObj.toJSONString())) {
-
-							kafkaUtil.sendKafkaMSGs(mainJsonObj.toJSONString(),
-									currentTopic);
-							redisCountIncr("tag_to_kafka");
-							LOGGER.info("PERSIST: " +  loyId + " published to kafka from " + topology);
+						else {
+							LOGGER.error("No data to send to kafka for this member "
+									+ loyId);
 						}
-
-						// KafkaUtil.sendKafkaMSGs(mainJsonObj.toJSONString(),
-						// currentTopic);
-					} catch (ConfigurationException e) {
-						LOGGER.error(e.getMessage(), e);
-						redisCountIncr("tag_not_to_kafka");
-						outputCollector.ack(input);
 					}
-				} else {
-					LOGGER.error("No data to send to kafka for this member "
-							+ loyId);
-					outputCollector.ack(input);
 				}
+				catch(Exception e){
+					LOGGER.error("Exception in PurchaseScoreKafkaBolt " + e.getMessage());
+				}
+				outputCollector.ack(input);
 			}
-		}
-		outputCollector.ack(input);
-	}
 
 	
 
