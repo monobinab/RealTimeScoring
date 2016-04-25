@@ -10,6 +10,9 @@ import javax.jms.Session;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import analytics.util.XMLParser;
+import analytics.util.objects.ProcessTransaction;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -92,11 +95,15 @@ public class WebsphereMQSpout extends BaseRichSpout {
 		LOGGER.debug("Fetching a message from MQ");
 		try {
 			JMSMessage receivedMessage = (JMSMessage) receiver.receive();
+			
 			String messageID = receivedMessage.getJMSMessageID();
 			LOGGER.info("TIME:" + messageID + "-Entering spout-" + System.currentTimeMillis());
 			String transactionXmlString = getTransactionString(receivedMessage);
-			collector.emit(new Values(transactionXmlString), messageID);
+			collector.emit(new Values(transactionXmlString,messageID), transactionXmlString);
 			LOGGER.info("PERSIST: incoming tuples in spout from MQ TELLURIDE");
+		//	LOGGER.info("incoming xml in spout from MQ: " + transactionXmlString);
+
+		//	logAllTransaction(transactionXmlString);
 		} catch (JMSException e) {
 			LOGGER.error("Exception occurred while receiving message from queue ", e);
 		}
@@ -171,6 +178,15 @@ public class WebsphereMQSpout extends BaseRichSpout {
 	        return stringMessage;
 	    }
 	 
+	  /*private ProcessTransaction parseXMLAndExtractProcessTransaction(ProcessTransaction processTransaction, String transactionXmlAsString) {
+	        LOGGER.debug("Parsing MQ message XML");
+	        if ((transactionXmlAsString.contains("<ProcessTransaction") || transactionXmlAsString.contains(":ProcessTransaction")) && !transactionXmlAsString.contains("AnswerTxt")) {
+
+	            processTransaction = XMLParser
+	                    .parseXMLProcessTransaction(transactionXmlAsString);
+	        }
+	        return processTransaction;
+	  }*/
 	/**
 	 * Close connections
 	 * 

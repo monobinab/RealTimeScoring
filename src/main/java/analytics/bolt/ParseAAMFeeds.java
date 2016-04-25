@@ -130,10 +130,6 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 		        	redisCountIncr("processed_lid");
 		        	LOGGER.debug(" *** PARSING BOLT EMITTING: " + listToEmit);
 	       		}
-	      	    	
-	    	//emitting to BrowseCountPersistBolt
-	       		emitToBrowseCountPersistBolt(incomingValueMap, loyalty_id,
-						memberBrowse);
 	       	}
 	    	else {
 	    		LOGGER.debug(" *** NO VARIABLES FOUND - NOTHING TO EMIT");
@@ -146,7 +142,7 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 		}
 	    	incomingValueMap = null;   	
 	    	redisCountIncr("total_processing");
-	    	outputCollector.ack(input);
+	    	this.outputCollector.ack(input);
 	  }
 
 	private void emitToBrowseCountPersistBolt(
