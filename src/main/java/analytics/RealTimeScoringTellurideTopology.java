@@ -40,7 +40,6 @@ public class RealTimeScoringTellurideTopology {
 			System.exit(0);
 		}
 
-		//String topologyId = "";
 		String purchase_Topic="rts_cp_purchase_scores";
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 		String kafkatopic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;

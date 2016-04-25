@@ -36,6 +36,7 @@ public class KafkaUtil {
 	private static final String REQUIRED_ACKS = "request.required.acks";
 
 	public PropertiesConfiguration kafkaProperties = null;
+	public PropertiesConfiguration dcKafkaProperties = null;
 	public String environment = null;
 
 	public KafkaUtil(String environment) {
@@ -45,6 +46,12 @@ public class KafkaUtil {
 
 	}
 
+	public KafkaUtil(String environment, String dc) {
+		super();
+		this.environment = environment;
+		loadDCKafkaProperties(environment);
+
+	}
 	public SpoutConfig getSpoutConfig(String topic, String zkroot,String groupId)
 			throws ConfigurationException {
 		SpoutConfig spoutConfig = null;
@@ -153,5 +160,37 @@ public class KafkaUtil {
 		return kafkaProperties;
 
 	}
+
+	public SpoutConfig getDCSpoutConfig(String topic, String zkroot,String groupId)
+			throws ConfigurationException {
+		SpoutConfig spoutConfig = null;
+		BrokerHosts hosts = new ZkHosts(dcKafkaProperties.getString(ZOOKEEPER));
+		spoutConfig = new SpoutConfig(hosts, topic, "/" + zkroot, groupId);
+		spoutConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
+		spoutConfig.startOffsetTime = kafka.api.OffsetRequest.LatestTime();
+		return spoutConfig;
+	}
+
+	
+	public PropertiesConfiguration loadDCKafkaProperties(String environment) {
+
+		try {
+			if (environment != null) {
+				String propertyurl = null;
+				propertyurl = RESOURCE + "/kafka_dc.properties";
+				if (propertyurl != null) {
+					dcKafkaProperties = new PropertiesConfiguration(propertyurl);
+					LOGGER.info("~~~~~~~Using " + environment
+							+ " properties in KafkaUtil~~~~~~~~~");
+				}
+			}
+		} catch (ConfigurationException e) {
+			LOGGER.error("Error Loading Kafka properties from env : "
+					+ environment + " " + e.getMessage());
+			e.printStackTrace();
+		}
+		return dcKafkaProperties;
+	}
+	
 
 }

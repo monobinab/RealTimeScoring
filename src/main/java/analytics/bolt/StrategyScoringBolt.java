@@ -25,12 +25,6 @@ import redis.clients.jedis.Jedis;
 import java.math.BigDecimal;
 import java.util.*;
 
-/**
- * 
- * @author dnairsy Bolt to find the models affected by a list of variables,
- *         apply strategy on each model and rescore each model
- *
- */
 public class StrategyScoringBolt extends EnvironmentBolt {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(StrategyScoringBolt.class);
@@ -81,7 +75,6 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	  	scoringSingleton = ScoringSingleton.getInstance();
 	  }
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	public void execute(Tuple input) {
 					
@@ -171,10 +164,10 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	      			changedMemberScore.setSource(source);
 	      		}
 	      		changedMemberScore.setlId(lId);
-	      		changedMemberScore.setMessageID(messageID);
-			}
+	      	}
 	      	List<Object> listToEmitMemberScoreList = new ArrayList<Object>();
 	      	listToEmitMemberScoreList.add(changedMemberScoresList);
+	      	listToEmitMemberScoreList.add(messageID);
 	      	this.outputCollector.emit("score_stream", listToEmitMemberScoreList);
 	
 			//Adding logic to set up a Stream that the KafkaBolt can listen to...
@@ -204,7 +197,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declareStream("score_stream",new Fields("changedMemberScoresList"));
+		declarer.declareStream("score_stream",new Fields("changedMemberScoresList", "messageID"));
 		declarer.declareStream("kafka_stream", new Fields("message"));
 		declarer.declareStream("cp_purchase_scores_stream", new Fields("loyaltyId", "topology", "cpsScoreMessage"));
 	}

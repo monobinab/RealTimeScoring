@@ -1,10 +1,10 @@
 package analytics.util.dao;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import analytics.util.CalendarUtil;
 import analytics.util.MongoNameConstants;
 import analytics.util.objects.MemberBrowse;
 
@@ -15,11 +15,12 @@ import com.mongodb.DBObject;
 public class MemberBrowseDao extends AbstractDao{
 
     DBCollection memberBrowseCollection;
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    
+ 
     public MemberBrowseDao(){
     	super();
-    	memberBrowseCollection = db.getCollection("memberBrowse");
+    	if(db != null) {
+    		memberBrowseCollection = db.getCollection("memberBrowse");
+    	}
     }
     @SuppressWarnings("unchecked")
   	public MemberBrowse getEntireMemberBrowse(String lId){
@@ -50,7 +51,7 @@ public class MemberBrowseDao extends AbstractDao{
   	public MemberBrowse getMemberBrowse7dayHistory(String lId){
       	BasicDBObject filter7daysDBO = new BasicDBObject("l_id",1).append("_id", 0);
     	for(int i=0;i<7;i++) {
-    		filter7daysDBO.append(dateFormat.format(new Date().getTime() + (-i * 24 * 60 * 60 * 1000l)),1);
+    		filter7daysDBO.append(CalendarUtil.getDateFormat().format(new Date().getTime() + (-i * 24 * 60 * 60 * 1000l)),1);
     	}
     	
       	MemberBrowse memberBrowse7day = null;

@@ -13,6 +13,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +53,7 @@ public class ParsingBoltSYW extends EnvironmentBolt {
 
 	@Override
 	public void execute(Tuple input) {
-		
+		try{
 		redisCountIncr("incoming_tuples");
 		JsonParser parser = new JsonParser();
 		JsonElement jsonElement = parser.parse(input.getString(0));
@@ -91,6 +92,11 @@ public class ParsingBoltSYW extends EnvironmentBolt {
 				LOGGER.info("Ignore interaction type" + interactionType.getAsString());
 				redisCountIncr("unwanted_interaction_type");
 			}
+		}
+		}
+		catch(Exception e){
+			LOGGER.error("Exception in ParsingBoltSYW: " + ExceptionUtils.getMessage(e));
+			e.printStackTrace();
 		}
 		outputCollector.ack(input);
 	}

@@ -62,37 +62,40 @@ public class ParsingBoltDC extends EnvironmentBolt {
 		if(appMetricsBean != null && atomicInteger != null){
         	appMetricsBean.setDcTupCount(atomicInteger.incrementAndGet());
         }
-		String message = (String) input.getValueByField("str");
-		
-		//check the incoming string for <UpdateMemberPrompts or :UpdateMemberPrompts as it contains the member's response data
-		if (message.contains("<UpdateMemberPrompts") || message.contains(":UpdateMemberPrompts")) {
-			redisCountIncr("prompts_reply");
-			try {
-				JSONObject obj = new JSONObject(message);
+		try {
+			if(input.contains("str")){
+				String message = (String) input.getValueByField("str");
 				
-				//xmlReqData contains the answerChoiceIds which is needed
-				message = (String) obj.get("xmlReqData");
-				
-				LOGGER.info("xmlReqData: " + message);
-				//System.out.println("xmlreqData: " + message);
-							
-				//ParsedDC parses the xml and return the list of answerIds along with memberNumber
-				ParsedDC parsedDC = DCParsingHandler.getAnswerJson(message);
-				if(parsedDC != null){
-					processAidsList(parsedDC);
+				//check the incoming string for <UpdateMemberPrompts or :UpdateMemberPrompts as it contains the member's response data
+				if (message.contains("<UpdateMemberPrompts") || message.contains(":UpdateMemberPrompts")) {
+					redisCountIncr("prompts_reply");
+					
+						JSONObject obj = new JSONObject(message);
+						
+						//xmlReqData contains the answerChoiceIds which is needed
+						message = (String) obj.get("xmlReqData");
+						
+						LOGGER.info("xmlReqData: " + message);
+						//System.out.println("xmlreqData: " + message);
+									
+						//ParsedDC parses the xml and return the list of answerIds along with memberNumber
+						ParsedDC parsedDC = DCParsingHandler.getAnswerJson(message);
+						if(parsedDC != null){
+							processAidsList(parsedDC);
+						}
+						else{
+							outputCollector.ack(input);
+							return;
+						}
 				}
 				else{
 					outputCollector.ack(input);
 					return;
 				}
-			} catch (Exception e) {
-				e.printStackTrace();
-				LOGGER.error("exception in parsingBoltDC ", e);
 			}
-		}
-		else{
-			outputCollector.ack(input);
-			return;
+		} catch (Exception e) {
+			e.printStackTrace();
+			LOGGER.error("exception in parsingBoltDC ", e);
 		}
 		outputCollector.ack(input);
 	}

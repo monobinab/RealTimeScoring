@@ -1,7 +1,6 @@
 package analytics.bolt;
 
 import analytics.util.JsonUtils;
-import analytics.util.MongoNameConstants;
 import analytics.util.SecurityUtils;
 import analytics.util.XMLParser;
 import analytics.util.dao.DivCatKsnDao;
@@ -32,9 +31,7 @@ import java.util.*;
 public class TellurideParsingBoltPOS extends EnvironmentBolt {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TellurideParsingBoltPOS.class);
-    /**
-     * Created by Devarshi Das 8/27/2014
-     */
+ 
     private static final long serialVersionUID = 1L;
     private OutputCollector outputCollector;
     private DivLnVariableDao divLnVariableDao;
@@ -94,12 +91,7 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
             LOGGER.debug("The time it enters inside Telluride parsing bolt execute method" + System.currentTimeMillis() + " and the message ID is ..." + input.getMessageId());
           }
         LOGGER.info("PERSIST: incoming tuples in parsingbolt TELLURIDE");
-    //    System.out.println(System.getProperty("TEST_PROPERTY"));
         redisCountIncr("incoming_tuples");
-        /**
-        if(appMetricsBean != null && atomicInteger != null){
-        	appMetricsBean.setTellurideTupCount(atomicInteger.incrementAndGet());
-        }*/
         String lyl_id_no = "";
         ProcessTransaction processTransaction = null;
         String messageID = "";

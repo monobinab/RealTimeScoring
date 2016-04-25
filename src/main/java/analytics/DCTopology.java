@@ -1,7 +1,6 @@
 package analytics;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.configuration.ConfigurationException;
 
 import analytics.bolt.LoggingBolt;
 import analytics.bolt.ParsingBoltDC;
@@ -9,48 +8,45 @@ import analytics.bolt.PurchaseScoreKafkaBolt;
 import analytics.bolt.RTSKafkaBolt;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.bolt.TopologyConfig;
+import analytics.spout.RTSKafkaSpout;
+import analytics.util.KafkaUtil;
 import analytics.util.MongoNameConstants;
 import analytics.util.TopicConstants;
 import backtype.storm.Config;
-import backtype.storm.spout.SchemeAsMultiScheme;
 import backtype.storm.topology.TopologyBuilder;
-import storm.kafka.BrokerHosts;
-import storm.kafka.KafkaSpout;
 import storm.kafka.SpoutConfig;
-import storm.kafka.StringScheme;
-import storm.kafka.ZkHosts;
 
 public class DCTopology {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ParsingBoltDC.class);
-	private static final int partition_num = 3;
-	
-	
+
 	public static void main(String[] args) {
 		
 		String kafkatopic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;
-		String topologyId = "";
 		String purchase_Topic= TopicConstants.PURCHASE_KAFKA_TOPIC;
 		
 		if (!TopologyConfig.setEnvironment(args)) {
 			System.out.println("Please pass the environment variable argument- 'PROD' or 'QA' or 'LOCAL'");
 			System.exit(0);
 		}
-		
+		String env = System.getProperty(MongoNameConstants.IS_PROD);
+		String dcKafkaTopic="telprod_reqresp_log_output";
+		String zkroot_dc="dc_zkroot";
+		String group_id = "RTSConsumer";
+		SpoutConfig spoutConfig = null;
 		TopologyBuilder builder = new TopologyBuilder();
-		BrokerHosts hosts = new ZkHosts("trprtelpacmapp1.vm.itg.corp.us.shldcorp.com:2181");
-		
-		// use topology Id as part of the consumer ID to make it unique
-		SpoutConfig kafkaConfig = new SpoutConfig(hosts, "telprod_reqresp_log_output", "", "RTSConsumer"+topologyId);
-		kafkaConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
-		builder.setSpout("kafkaSpout", new KafkaSpout(kafkaConfig), 2);
-		
+		try {
+			spoutConfig = new KafkaUtil(env, "dc").getDCSpoutConfig(dcKafkaTopic, zkroot_dc, group_id);
+			builder.setSpout("dcKafkaSpout", new RTSKafkaSpout(spoutConfig), 1);
+		} catch (ConfigurationException e) {
+			e.printStackTrace();
+		}
+			
 		/*DCTestSpout testSpout = new DCTestSpout();
 		builder.setSpout("testSpout", testSpout, 2);*/
 		/*builder.setBolt("dcParsingBolt", new ParsingBoltDC(System
 		.getProperty(MongoNameConstants.IS_PROD)), 2).localOrShuffleGrouping("testSpout");*/
 		
 		builder.setBolt("dcParsingBolt", new ParsingBoltDC(System
-				.getProperty(MongoNameConstants.IS_PROD)), 2).localOrShuffleGrouping("kafkaSpout");
+				.getProperty(MongoNameConstants.IS_PROD)), 2).localOrShuffleGrouping("dcKafkaSpout");
 		
 	    builder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System
 				.getProperty(MongoNameConstants.IS_PROD)),1).localOrShuffleGrouping("dcParsingBolt");
