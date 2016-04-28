@@ -85,7 +85,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 
 		//PULL OUT HASHED LOYALTY ID FROM THE FIRST RECORD IN lineItemList
 		redisCountIncr("incoming_tuples");
-		String lId = input.getStringByField("l_id");
+		String lId = "";
 
 		String source = "";
 		String lyl_id_no = "";
@@ -93,6 +93,9 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 		LOGGER.info("Incoming Message to StrategyScoringBolt " + input.toString());
 		
 		try{
+			if(input.contains("l_id")){
+				lId = input.getStringByField("l_id");
+			}
 			if (input.contains("lyl_id_no")) {
 				lyl_id_no = input.getStringByField("lyl_id_no");
 			}
@@ -113,22 +116,29 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			//Create map of new changes from the input
 			Map<String, String> newChangesVarValueMap = JsonUtils.restoreVariableListFromJson(input.getString(1));
 			
-			if(newChangesVarValueMap == null || newChangesVarValueMap.isEmpty()){
-				outputCollector.ack(input);
-				return;
-			}
-	
-			MemberRTSChanges memberRTSChanges = scoringSingleton.calcRTSChanges(lId, newChangesVarValueMap, null, source);
-		
-			List<ChangedMemberScore> changedMemberScoresList = memberRTSChanges.getChangedMemberScoreList();
-			if(memberRTSChanges == null  || changedMemberScoresList == null || changedMemberScoresList.isEmpty()){
-				if(memberRTSChanges.getMetricsString() != null){
-					redisCountIncr(memberRTSChanges.getMetricsString());
-				}
+			if(lId.isEmpty() || lyl_id_no.isEmpty() || newChangesVarValueMap == null || newChangesVarValueMap.isEmpty()){
+				LOGGER.info(lId + " is getting acked in StrategyScoring bolt before SS");
 				outputCollector.ack(input);
 				return;
 			}
 			
+			LOGGER.info("PERSIST: " + lyl_id_no + " enters into strategyScoringBolt " + lId + " from " + source +" " + newChangesVarValueMap);
+	
+			MemberRTSChanges memberRTSChanges = scoringSingleton.calcRTSChanges(lId, newChangesVarValueMap, null, source);
+		
+			List<ChangedMemberScore> changedMemberScoresList = null;
+			if(memberRTSChanges != null){
+				changedMemberScoresList = memberRTSChanges.getChangedMemberScoreList();
+			}
+			if(changedMemberScoresList == null || changedMemberScoresList.isEmpty()){
+				if(memberRTSChanges != null && memberRTSChanges.getMetricsString() != null){
+					redisCountIncr(memberRTSChanges.getMetricsString());
+				}
+				LOGGER.info(lId + " is getting acked in StrategyScoring bolt after SS");
+				outputCollector.ack(input);
+				return;
+			}
+				
 			Map<String, String> modelIdScoreStringMap = new HashMap<String, String>();
 				
 			//for TI_POS, score-value map set in redis for the specific member
@@ -184,15 +194,15 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			LOGGER.info("PERSIST: " + lyl_id_no + " emitted to cp_purchase_scores_stream from " + topologyName );
 	
 			redisCountIncr("member_scored_successfully");
-			this.outputCollector.ack(input);
+		
 		}catch(Exception e){
 			e.printStackTrace();
 			LOGGER.info("Exception scoring lId " +lId +" "+ e.getCause());
-
 		}finally{
 			if(jedis!=null)
 				jedis.disconnect();
 		}
+		this.outputCollector.ack(input);
 	}
 	
 	@Override
