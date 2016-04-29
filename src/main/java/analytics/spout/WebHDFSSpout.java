@@ -13,7 +13,9 @@ import java.util.TreeSet;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.RemoteIterator;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,16 +109,24 @@ public class WebHDFSSpout extends BaseRichSpout {
 
 			URI uri = URI.create(Constants.WEBHDFS_URL);
 			FileSystem fs = FileSystem.get(uri, conf);
-
+			//New debug logs 
+				
+            LOGGER.info("The path to be checked is "+hdfsPath );;
 			FileStatus fstat[] = fs.listStatus(new Path(hdfsPath));
+			if(fstat.length==0)
+			{
+				LOGGER.info("There are no files in the directory");
+			}
 
 			for (FileStatus fst : fstat) {
+				LOGGER.info("File name from File status "+fst.getPath().getName());
 				sortedSet.add(new Long(fst.getPath().getName()));
 			}
 
 			if (sortedSet.contains(latestPrefix)) {
 				// System.out.println(sortedSet.tailSet(latestPrefix, false));
 				// Get the remaining TO BE PROCESSED prefixes
+				LOGGER.info("Adding the remaining TO BE PROCESSED to sortedset");
 				sortedSubSet = (TreeSet<Long>) sortedSet.tailSet(latestPrefix,
 						false);
 			}
@@ -157,11 +167,15 @@ public class WebHDFSSpout extends BaseRichSpout {
 	 */
 	private void processRecords(FileSystem fs, FileStatus[] fstat2)
 			throws IOException, InterruptedException {
+		
+		
+		
 		for (int i = 0; i < fstat2.length; i++) {
 			// ignoring files like _SUCCESS
 			if (fstat2[i].getPath().getName().startsWith("_")) {
 				continue;
 			}
+			LOGGER.info("In processRecords : about to Process File "+fstat2[i].getPath().getName());
 			BufferedReader br = new BufferedReader(
 					new InputStreamReader(fs.open(fstat2[i].getPath())));
 			String line;
