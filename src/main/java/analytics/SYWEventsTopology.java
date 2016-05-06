@@ -49,18 +49,19 @@ public class SYWEventsTopology {
 		}
 		
 		topologyBuilder.setBolt("parseEventsBolt", new ParsingBoltSYW(System
-				.getProperty(MongoNameConstants.IS_PROD)), 1)
+				.getProperty(MongoNameConstants.IS_PROD)), 2)
 				.shuffleGrouping("sywKafkaSpout");
 		topologyBuilder.setBolt("processSYWEvents",
-				new ProcessSYWInteractions(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping(
+				new ProcessSYWInteractions(System.getProperty(MongoNameConstants.IS_PROD)), 2).shuffleGrouping(
 				"parseEventsBolt");
-		topologyBuilder.setBolt("RTSKafkaBolt", new RTSKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD),kafkatopic), 1)
-		.shuffleGrouping("strategyScoringBolt","kafka_stream");
+		
 		topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System
-				.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("processSYWEvents", "score_stream");
+				.getProperty(MongoNameConstants.IS_PROD)), 2).shuffleGrouping("processSYWEvents", "score_stream");
 				
-		topologyBuilder.setBolt("persistBolt", new PersistBoostsBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("processSYWEvents", "persist_stream");
-				
+		topologyBuilder.setBolt("persistBolt", new PersistBoostsBolt(System.getProperty(MongoNameConstants.IS_PROD)), 2).shuffleGrouping("processSYWEvents", "persist_stream");
+			
+		topologyBuilder.setBolt("RTSKafkaBolt", new RTSKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD),kafkatopic), 2)
+		.shuffleGrouping("strategyScoringBolt","kafka_stream");
 		if(System.getProperty(MongoNameConstants.IS_PROD).equals("PROD")){
 			topologyBuilder.setBolt("loggingBolt", new LoggingBolt(System.getProperty(MongoNameConstants.IS_PROD)), 1).shuffleGrouping("strategyScoringBolt", "score_stream");
 		}	
@@ -74,6 +75,7 @@ public class SYWEventsTopology {
 				|| System.getProperty(MongoNameConstants.IS_PROD)
 						.equalsIgnoreCase("QA")) {
 			conf.setNumWorkers(6);
+			conf.setMessageTimeoutSecs(7200);
 			StormSubmitter.submitTopology(args[0], conf,
 					topologyBuilder.createTopology());
 		} else {

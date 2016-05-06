@@ -77,10 +77,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	
 	@Override
 	public void execute(Tuple input) {
-					
-		if(LOGGER.isDebugEnabled()){
-			LOGGER.debug("The time it enters inside Strategy Bolt execute method "	+ System.currentTimeMillis());
-		}
+		
 		Jedis jedis = null;
 
 		//PULL OUT HASHED LOYALTY ID FROM THE FIRST RECORD IN lineItemList
@@ -117,7 +114,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			Map<String, String> newChangesVarValueMap = JsonUtils.restoreVariableListFromJson(input.getString(1));
 			
 			if(lId.isEmpty() || lyl_id_no.isEmpty() || newChangesVarValueMap == null || newChangesVarValueMap.isEmpty()){
-				LOGGER.info(lId + " is getting acked in StrategyScoring bolt before SS");
+				LOGGER.info("PERSIST: " + lyl_id_no + " is getting acked in StrategyScoring bolt before SS");
 				outputCollector.ack(input);
 				return;
 			}
@@ -134,7 +131,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 				if(memberRTSChanges != null && memberRTSChanges.getMetricsString() != null){
 					redisCountIncr(memberRTSChanges.getMetricsString());
 				}
-				LOGGER.info(lId + " is getting acked in StrategyScoring bolt after SS");
+				LOGGER.info("PERSIST: " + lyl_id_no  + " is getting acked in StrategyScoring bolt after SS");
 				outputCollector.ack(input);
 				return;
 			}
@@ -178,11 +175,14 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	      	List<Object> listToEmitMemberScoreList = new ArrayList<Object>();
 	      	listToEmitMemberScoreList.add(changedMemberScoresList);
 	      	listToEmitMemberScoreList.add(messageID);
+	      	listToEmitMemberScoreList.add(lyl_id_no);
 	      	this.outputCollector.emit("score_stream", listToEmitMemberScoreList);
+	      	LOGGER.info("PERSIST: " + lyl_id_no + " emitted to score stream from " + topologyName );
 	
 			//Adding logic to set up a Stream that the KafkaBolt can listen to...
 			List<Object> listToEmit = new ArrayList<Object>();
 			listToEmit.add(lyl_id_no+"~"+topologyName);
+			listToEmit.add(lyl_id_no);
 			this.outputCollector.emit("kafka_stream", listToEmit);
 			
 			//Emitting changedMemberScoreList to cp_purchase_scores_stream
@@ -203,12 +203,13 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 				jedis.disconnect();
 		}
 		this.outputCollector.ack(input);
+		LOGGER.info("PERSIST: " + lyl_id_no + " acked successfully in StrategyScoring bolt " + topologyName);
 	}
 	
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declareStream("score_stream",new Fields("changedMemberScoresList", "messageID"));
-		declarer.declareStream("kafka_stream", new Fields("message"));
+		declarer.declareStream("score_stream",new Fields("changedMemberScoresList", "messageID", "lyl_id_no"));
+		declarer.declareStream("kafka_stream", new Fields("message", "lyl_id_no"));
 		declarer.declareStream("cp_purchase_scores_stream", new Fields("loyaltyId", "topology", "cpsScoreMessage"));
 	}
 }

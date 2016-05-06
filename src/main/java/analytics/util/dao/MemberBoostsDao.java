@@ -27,8 +27,12 @@ public class MemberBoostsDao extends AbstractDao {
 
 	public MemberBoostsDao() {
 		super();
-		memberBoostsCollection = db
-				.getCollection(MongoNameConstants.MBR_BOOSTS_COLLECTION);
+		if(null != db){
+			memberBoostsCollection = db.getCollection(MongoNameConstants.MBR_BOOSTS_COLLECTION);
+		}
+		else{
+			LOGGER.error("db NULL in MemberBoostsDao");
+		}
 	}
 
 	public Map<String, Map<String, List<String>>> getMemberBoostsValues(String l_id, Set<String> boostSet) {
