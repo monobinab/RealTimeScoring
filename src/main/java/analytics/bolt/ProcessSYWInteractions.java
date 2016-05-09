@@ -128,7 +128,7 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 			
 			// Get the memberBoostVariables for current lid. Consolidate into a map
 			Map<String, Map<String, List<String>>> allBoostValuesMap = memberBoostsDao.getMemberBoostsValues(lId, boostValuesMap.keySet());
-			if (allBoostValuesMap == null) {
+			if (allBoostValuesMap == null || allBoostValuesMap.size() == 0) {
 				allBoostValuesMap = new HashMap<String, Map<String, List<String>>>();
 			}
 			
