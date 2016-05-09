@@ -28,13 +28,10 @@ public class RTSKafkaBolt extends EnvironmentBolt {
 	private OutputCollector outputCollector;
 	private String currentTopic;
 	private KafkaUtil kafkaUtil;
-	//private String env;
 
 	public RTSKafkaBolt(String environment, String topic){
 		super(environment);
 		this.currentTopic = topic;
-
-		//env = environment;		
 	}
 
 	/*
@@ -42,28 +39,27 @@ public class RTSKafkaBolt extends EnvironmentBolt {
 	 */
 	@Override
 	public void execute(Tuple input) {
+		String loyaltyId = null;
+		if(input.contains("lyl_id_no")){
+			loyaltyId = input.getStringByField("lyl_id_no");
+		}
 		if (input.contains(KAFKA_MSG)) {
 			String message = input.getStringByField(KAFKA_MSG);
+		
 			if (message != null && !"".equals(message)) {
 				try {
-					
 					kafkaUtil.sendKafkaMSGs(message, currentTopic);
-				//	System.out.println("MSG SENT");
 				} catch (ConfigurationException e) {
 					LOGGER.error(e.getMessage(), e);
-					outputCollector.fail(input);
 				}
-
 			}
 		}
 		else
 		{
 			LOGGER.error("Kafka message is missing in the input Tuple");
-			outputCollector.fail(input);
 		}
-
-
 		outputCollector.ack(input);
+		LOGGER.info("PERSIST: " + loyaltyId + " acked successfully in RTSKafka bolt");
 	}
 
 

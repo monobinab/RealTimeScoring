@@ -33,8 +33,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class ProcessSYWInteractions extends EnvironmentBolt {
-
+public class ProcessSYWInteractions_Old extends EnvironmentBolt {
+	/**
+	 * 
+	 */
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = LoggerFactory.getLogger(ProcessSYWInteractions.class);
 	private List<String> entityTypes;
@@ -50,7 +52,7 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 	private ModelSywBoostDao modelBoostDao;
 	private Map<String, List<String>> boostListMap;
 	
-	 public ProcessSYWInteractions(String systemProperty){
+	 public ProcessSYWInteractions_Old(String systemProperty){
 		 super(systemProperty);
 		 }
 
@@ -79,125 +81,93 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 
 	@Override
 	public void execute(Tuple input) {
-		String lyl_id_no = null;
 		try{
-			redisCountIncr("incoming_tuples");
-			String feedType = null;
-	
-			String lId = input.getStringByField("l_id");
-			JsonParser parser = new JsonParser();
-			JsonObject interactionObject = parser.parse(input.getStringByField("message")).getAsJsonObject();
-			lyl_id_no = input.getStringByField("lyl_id_no");
-			Gson gson = new Gson();
-			SYWInteraction obj = gson.fromJson(interactionObject, SYWInteraction.class);
-			/* Ignore interactions that we dont want. 	
-			   We currently process Catalogs: Like, Want, Own Others: Like
-			 */
-			if(null != obj){
-				for (SYWEntity currentEntity : obj.getEntities()) {
-					if (currentEntity != null) {
-						if ("Catalog".equals(currentEntity.getType())) {
-							String catalogType = sywApiCalls.getCatalogType(currentEntity.getId());
-							LOGGER.debug(catalogType);
-							if (catalogType != null) {
-								if (catalogType.equals("Own")){
-									feedType = "SYW_OWN";
-								}
-								else if (catalogType.equals("Like")){
-									feedType = "SYW_LIKE";
-								}
-								else if (catalogType.equals("Want")){
-									feedType = "SYW_WANT";
-								}
+		redisCountIncr("incoming_tuples");
+		String feedType = null;
+		
+		// Get l_id", "message", "InteractionType" from parsing bolt
+		String lId = input.getStringByField("l_id");
+		JsonParser parser = new JsonParser();
+		JsonObject interactionObject = parser.parse(input.getStringByField("message")).getAsJsonObject();
+		
+		String lyl_id_no = input.getStringByField("lyl_id_no");
+		
+
+		Gson gson = new Gson();
+		SYWInteraction obj = gson.fromJson(interactionObject, SYWInteraction.class);
+
+
+		/* Ignore interactions that we dont want. 	
+		   We currently process Catalogs: Like, Want, Own Others: Like
+		 */
+
+		// Find type of catalog to process, and hence the boost variable
+		if(null != obj){
+			for (SYWEntity currentEntity : obj.getEntities()) {
+				if (currentEntity != null) {
+					//TODO: confirm with devika, catalog only has likes, product has all of them
+					if ("Catalog".equals(currentEntity.getType())) {
+						//interactionType
+						String catalogType = sywApiCalls.getCatalogType(currentEntity.getId());
+						LOGGER.debug(catalogType);
+						if (catalogType != null) {
+							if (catalogType.equals("Own")){
+								feedType = "SYW_OWN";
+							}
+							else if (catalogType.equals("Like")){
+								feedType = "SYW_LIKE";
+							}
+							else if (catalogType.equals("Want")){
+								feedType = "SYW_WANT";
 							}
 						}
 					}
 				}
 			}
-	
-			if (feedType == null) {
-				LOGGER.info("We process only own, like and want catalogs & SYW Likes");
-				redisCountIncr("customer_catalog");
-				outputCollector.ack(input);  
-				LOGGER.info("PERSIST: "+ lyl_id_no + " gets acked in ProcessSYWInteractions for unwanted feedType");
-				return;
-			}
-	
-			Map<String, String> variableValueMap = new HashMap<String, String>();
-			Map<String, List<String>> boostValuesMap = getBoostValueMap(feedType, obj);
-			
-			// Get the memberBoostVariables for current lid. Consolidate into a map
-			Map<String, Map<String, List<String>>> allBoostValuesMap = memberBoostsDao.getMemberBoostsValues(lId, boostValuesMap.keySet());
-			if (allBoostValuesMap == null || allBoostValuesMap.size() == 0) {
-				allBoostValuesMap = new HashMap<String, Map<String, List<String>>>();
-			}
-			
-			for (String b : boostValuesMap.keySet()) {
-				if (allBoostValuesMap.containsKey(b)) {
-					allBoostValuesMap.get(b).put("current", boostValuesMap.get(b));
-				} else {
-					allBoostValuesMap.put(b, new HashMap<String, List<String>>());
-					allBoostValuesMap.get(b).put("current", boostValuesMap.get(b));
-				}
-				variableValueMap.put(b, createJsonDoc(allBoostValuesMap.get(b)));
-			}
-			if (variableValueMap != null && !variableValueMap.isEmpty() && variableValueMap.size() > 0) {
-				Type varValueType = new TypeToken<Map<String, String>>() {
-					private static final long serialVersionUID = 1L;
-				}.getType();
-				String varValueString = gson.toJson(variableValueMap, varValueType);
-				List<Object> listToEmit1 = new ArrayList<Object>();
-				listToEmit1.add(input.getValueByField("l_id"));
-				listToEmit1.add(varValueString);
-				listToEmit1.add(feedType);
-				listToEmit1.add(lyl_id_no);
-				LOGGER.debug(" @@@ SYW PARSING BOLT EMITTING: " + listToEmit1 + " lid: " + lId);
-				this.outputCollector.emit("persist_stream", listToEmit1);
-				LOGGER.info("PERSIST: " +lyl_id_no + " getting emitted from ProcessSYWInteractions to PersistBoostsbolt");
-	
-				List<Object> listToEmit2 = new ArrayList<Object>();
-				Map<String, String> map = formMapForScoringBolt(feedType, lId, allBoostValuesMap, variableValueMap);
-				listToEmit2.add(lId);
-				listToEmit2.add(gson.toJson(map, varValueType));
-				listToEmit2.add(feedType);
-				listToEmit2.add(lyl_id_no);
-				this.outputCollector.emit("score_stream", listToEmit2);
-				LOGGER.info("PERSIST: " + lyl_id_no + " getting emitted from ProcessSYWInteractions to StrategyScoringBolt");
-				redisCountIncr("successful");
-	
-			} else {
-				redisCountIncr("empty_var_map");
-				LOGGER.info("PERSIST: " +lyl_id_no + " not getting emitted from ProcessSYWInteractions to PersistBoostsbolt");
-				LOGGER.info("PERSIST: " +lyl_id_no + " not getting emitted from ProcessSYWInteractions to StrategyScoringBolt");
-			}
 		}
-		catch(Exception e){
-			LOGGER.error("Exception occured in ProcessSYWInteractions " + e.getMessage());
-			e.printStackTrace();
-		}
-		this.outputCollector.ack(input);
-		LOGGER.info("PERSIST: " + lyl_id_no + " gets acked in ProcessSYWInteraction");
-	}
 
-	private Map<String, List<String>> getBoostValueMap(String feedType, SYWInteraction obj) {
-		Map<String, List<String>> divLnBoostVariblesMap = divLnBoostDao.getDivLnBoost();
+		if (feedType == null) {
+			LOGGER.info("We process only own, like and want catalogs & SYW Likes");
+			redisCountIncr("customer_catalog");
+			outputCollector.ack(input);  
+			return;
+		}
 		
+		Map<String, List<String>> divLnBoostVariblesMap = divLnBoostDao.getDivLnBoost();
+		// Variable map stores the vars to send to Strategy Bolt
+		Map<String, String> variableValueMap = new HashMap<String, String>();
 		Map<String, List<String>> boostValuesMap = new HashMap<String, List<String>>();
 		if (obj != null && obj.getEntities() != null) {
 
 			for (SYWEntity currentEntity : obj.getEntities()) {
+				if (currentEntity != null)
+					LOGGER.debug(currentEntity.getType());
+				// TODO: If more types handle in a more robust manner. If we
+				// expect only Products, this makes sense
 				if (currentEntity != null && "Product".equals(currentEntity.getType())) {
 					String productId = sywApiCalls.getCatalogId(currentEntity.getId());
+					/* Product does not exist? */
 					if (productId == null) {
+						LOGGER.info("Unable to get product id for " + currentEntity.getId());
+						// Get the next entity
 						continue;
 					} else {
+						// TODO: We should also handle Kmart items - in which
+						// case it would be divLnItm???
 						DivLn divLnObj = pidDivLnDao.getDivLnFromPid(productId);
+						LOGGER.trace(" div line for " + productId + " are " + divLnObj + " lid: " + lId);
 						if (divLnObj != null) {
 							String div = divLnObj.getDiv();
 							String divLn = divLnObj.getDivLn();
+							// Get the boost variable
 							if (divLnBoostVariblesMap.containsKey(div)) {
 								for (String b : divLnBoostVariblesMap.get(div)) {
-									if (boostListMap.get(feedType).contains(b)) {
+									if (boostListMap.get(feedType).contains(b)) {// If
+																					// it
+																					// belongs
+																					// to
+																					// current
+																					// feed
 										if (!boostValuesMap.containsKey(b)) {
 											boostValuesMap.put(b, new ArrayList<String>());
 										}
@@ -207,7 +177,12 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 							}
 							if (divLnBoostVariblesMap.containsKey(divLn)) {
 								for (String b : divLnBoostVariblesMap.get(divLn)) {
-									if (boostListMap.get(feedType).contains(b)) {
+									if (boostListMap.get(feedType).contains(b)) {// If
+																					// it
+																					// belongs
+																					// to
+																					// current
+																					// feed
 										if (!boostValuesMap.containsKey(b)) {
 											boostValuesMap.put(b, new ArrayList<String>());
 										}
@@ -216,13 +191,62 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 								}
 							}
 						}
+						// Eg - BOOST_SYW_APP_LIKETCOUNT
+						// divLnBoost -
+						// d:004 , b:BOOST_SYW_APP_LIKETCOUNT
+						// 004
+						LOGGER.trace(" boost value map :" + boostValuesMap + " lid: " + lId);
 					}
 
 				}
 
 			}
 		}
-		return boostValuesMap;
+		// Get the memberBoostVariables for current lid. Consolidate into a map
+		Map<String, Map<String, List<String>>> allBoostValuesMap = memberBoostsDao.getMemberBoostsValues(lId, boostValuesMap.keySet());
+		if (allBoostValuesMap == null) {
+			allBoostValuesMap = new HashMap<String, Map<String, List<String>>>();
+		}
+		
+		for (String b : boostValuesMap.keySet()) {
+			if (allBoostValuesMap.containsKey(b)) {
+				allBoostValuesMap.get(b).put("current", boostValuesMap.get(b));
+			} else {
+				allBoostValuesMap.put(b, new HashMap<String, List<String>>());
+				allBoostValuesMap.get(b).put("current", boostValuesMap.get(b));
+			}
+			variableValueMap.put(b, createJsonDoc(allBoostValuesMap.get(b)));
+		}
+		if (variableValueMap != null && !variableValueMap.isEmpty()) {
+			Type varValueType = new TypeToken<Map<String, String>>() {
+				private static final long serialVersionUID = 1L;
+			}.getType();
+			String varValueString = gson.toJson(variableValueMap, varValueType);
+			List<Object> listToEmit1 = new ArrayList<Object>();
+			listToEmit1.add(input.getValueByField("l_id"));
+			listToEmit1.add(varValueString);
+			listToEmit1.add(feedType);
+			LOGGER.debug(" @@@ SYW PARSING BOLT EMITTING: " + listToEmit1 + " lid: " + lId);
+			this.outputCollector.emit("persist_stream", listToEmit1);
+
+			List<Object> listToEmit2 = new ArrayList<Object>();
+			Map<String, String> map = formMapForScoringBolt(feedType, lId, allBoostValuesMap, variableValueMap);
+			listToEmit2.add(lId);
+			listToEmit2.add(gson.toJson(map, varValueType));
+			listToEmit2.add(feedType);
+			listToEmit2.add(lyl_id_no);
+			this.outputCollector.emit("score_stream", listToEmit2);
+			redisCountIncr("successful");
+
+		} else {
+			redisCountIncr("empty_var_map");
+		}
+		}
+		catch(Exception e){
+			LOGGER.error("Exception occured in ProcessSYWInteractions " + e.getMessage());
+			e.printStackTrace();
+		}
+		this.outputCollector.ack(input);
 	}
 
 	public Map<String, String> formMapForScoringBolt(String feedType, String lId, Map<String, Map<String, List<String>>> allBoostValuesMap, Map<String, String> variableValueMap) {
@@ -352,7 +376,7 @@ public class ProcessSYWInteractions extends EnvironmentBolt {
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		declarer.declareStream("score_stream", new Fields("l_id", "lineItemAsJsonString", "source","lyl_id_no"));;
-		declarer.declareStream("persist_stream", new Fields("l_id", "lineItemAsJsonString", "source", "lyl_id_no"));
+		declarer.declareStream("persist_stream", new Fields("l_id", "lineItemAsJsonString", "source"));
 	}
 
 	private String createJsonDoc(Map<String, List<String>> dateValuesMap) {
