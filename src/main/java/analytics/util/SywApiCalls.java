@@ -201,7 +201,7 @@ public class SywApiCalls {
 	 * @return
 	 */
 	public String getCatalogId(int sywId) {
-		String requestURL = BASEURI +
+		String requestURL = BASEURI_HTTPS +
 				"/products/get?ids="+sywId ;
 		//"&with categories-path" if we want to use it? It needs additional permissions
 		JsonElement element = makeGetRequestToSywAPI(requestURL);
@@ -224,7 +224,7 @@ public class SywApiCalls {
 	 * @return
 	 */
 	public String getCatalogType(int i){
-		String requestURL = BASEURI + "/catalogs/get?ids="+i;
+		String requestURL = BASEURI_HTTPS + "/catalogs/get?ids="+i;
 		JsonElement element = makeGetRequestToSywAPI(requestURL);
 		if(element==null)
 			return null;
@@ -247,7 +247,7 @@ public class SywApiCalls {
 	
 	//TODO: try catch block for this api call
 	public String getLoyaltyId(String userid) {
-		String requestURL = BASEURI +
+		String requestURL = BASEURI_HTTPS +
 	            "/users/get?ids=" + userid ;
 		JsonElement element = makeGetRequestToSywAPI(requestURL); 
 		if(element==null)
@@ -265,7 +265,7 @@ public class SywApiCalls {
 	 * This method does not work currently. follow up with SYW to see why
 	 */
 	public void getAuthState(){
-		String requestURL = String.format(BASEURI + "/auth/state" + "&token=" + token + "&hash=" + hash);
+		String requestURL = String.format(BASEURI_HTTPS + "/auth/state" + "&token=" + token + "&hash=" + hash);
 		Gson gson = new Gson();
 		JsonElement element = gson.fromJson (HttpRequest.get(requestURL).body(), JsonElement.class);
 	}
