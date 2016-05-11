@@ -104,8 +104,8 @@ public class ModelVariablesDao extends AbstractDao{
 											variable.setIntercept((Double)dbo.get("intercept"));
 										}
 									}
-									int defaultValue = variableDao.getDefaultValue((String)dbo.get("name"));
-									if(defaultValue != 0){
+									double defaultValue = variableDao.getDefaultValue((String)dbo.get("name"));
+									if(defaultValue != 0.0){
 										variable.setDefaultValue(defaultValue);
 									}
 								}

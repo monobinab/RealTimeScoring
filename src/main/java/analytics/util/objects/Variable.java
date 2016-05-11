@@ -13,7 +13,7 @@ public class Variable implements Serializable{
 	protected double coefficient;
 	protected String strategy;
 	protected double intercept;
-	protected int defaultValue;
+	protected double defaultValue;
 	
 	public Variable(){}
 	
@@ -22,7 +22,7 @@ public class Variable implements Serializable{
 		this.name   = nm;
 		this.coefficient = coefficnt;
 	}
-	public Variable( String nm, double coefficnt, int defaultValue)
+	public Variable( String nm, double coefficnt, double defaultValue)
 	{
 		this.name   = nm;
 		this.coefficient = coefficnt;
@@ -34,7 +34,7 @@ public class Variable implements Serializable{
 		this.vid   = id;
 		this.strategy = strategy;
 	}
-	public Variable( String nm, String id, String strategy, int defaultValue)
+	public Variable( String nm, String id, String strategy, double defaultValue)
 	{
 		this.name   = nm;
 		this.vid   = id;
@@ -42,11 +42,11 @@ public class Variable implements Serializable{
 		this.defaultValue = defaultValue;
 	}
 	 
-	public int getDefaultValue() {
+	public double getDefaultValue() {
 		return defaultValue;
 	}
 
-	public void setDefaultValue(int defaultValue) {
+	public void setDefaultValue(double defaultValue) {
 		this.defaultValue = defaultValue;
 	}
 

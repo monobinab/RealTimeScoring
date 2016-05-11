@@ -52,7 +52,19 @@ public class VariableDao extends AbstractDao{
 			List<Variable> variables = new ArrayList<Variable>();
 			DBCursor vCursor = variablesCollection.find();
 			for (DBObject variable : vCursor) {
-				int defaultValue = (variable.containsField("default")) ? Integer.parseInt(((DBObject) variable).get("default").toString()):0;
+				double defaultValue = 0.0;
+				Object defaultValueObj = null;
+				if(variable.containsField("default")){
+					defaultValueObj = ((DBObject) variable).get("default");
+				}
+				if(defaultValueObj != null){
+					if(defaultValueObj instanceof Double){
+						defaultValue = (Double) defaultValueObj;
+					}
+					else if(defaultValueObj instanceof Integer){
+						defaultValue = ((Integer) defaultValueObj).doubleValue();
+					}
+				}
 				variables.add(new Variable(
 						((DBObject) variable).get(MongoNameConstants.V_NAME).toString().toUpperCase(),
 						((DBObject) variable).get(MongoNameConstants.V_ID).toString(),
@@ -84,8 +96,8 @@ public class VariableDao extends AbstractDao{
 		}
 	  }
     
-    public int getDefaultValue(String varName){
-    	int defaultValue = 0;
+    public double getDefaultValue(String varName){
+    	double defaultValue = 0;
     	List<Variable> variablesList = this.getVariables();
     	for(Variable variable : variablesList){
     		if(variable.getName().equalsIgnoreCase(varName)){
