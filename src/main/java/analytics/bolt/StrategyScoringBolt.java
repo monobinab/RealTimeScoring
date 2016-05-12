@@ -114,7 +114,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 			Map<String, String> newChangesVarValueMap = JsonUtils.restoreVariableListFromJson(input.getString(1));
 			
 			if(lId.isEmpty() || lyl_id_no.isEmpty() || newChangesVarValueMap == null || newChangesVarValueMap.isEmpty()){
-				LOGGER.info("PERSIST: " + lyl_id_no + " is getting acked in StrategyScoring bolt before SS");
+				LOGGER.info("PERSIST: " + lyl_id_no + " is getting acked in StrategyScoring bolt before SS from " + source);
 				outputCollector.ack(input);
 				return;
 			}
@@ -131,7 +131,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 				if(memberRTSChanges != null && memberRTSChanges.getMetricsString() != null){
 					redisCountIncr(memberRTSChanges.getMetricsString());
 				}
-				LOGGER.info("PERSIST: " + lyl_id_no  + " is getting acked in StrategyScoring bolt after SS");
+				LOGGER.info("PERSIST: " + lyl_id_no  + " is getting acked in StrategyScoring bolt after SS from " + source);
 				outputCollector.ack(input);
 				return;
 			}
@@ -177,7 +177,7 @@ public class StrategyScoringBolt extends EnvironmentBolt {
 	      	listToEmitMemberScoreList.add(messageID);
 	      	listToEmitMemberScoreList.add(lyl_id_no);
 	      	this.outputCollector.emit("score_stream", listToEmitMemberScoreList);
-	      	LOGGER.info("PERSIST: " + lyl_id_no + " emitted to score stream from " + topologyName );
+	      	LOGGER.info("PERSIST: " + lyl_id_no + " emitted to score stream from " + source );
 	
 			//Adding logic to set up a Stream that the KafkaBolt can listen to...
 			List<Object> listToEmit = new ArrayList<Object>();

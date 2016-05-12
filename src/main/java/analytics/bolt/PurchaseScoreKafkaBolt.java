@@ -100,7 +100,6 @@ public class PurchaseScoreKafkaBolt extends EnvironmentBolt {
 								}
 								catch (ConfigurationException e) {
 									LOGGER.error(e.getMessage(), e);
-									outputCollector.fail(input);
 								}
 							}
 						}

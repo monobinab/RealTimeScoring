@@ -163,7 +163,8 @@ public class SywApiCalls {
 		Gson gson = new Gson();
 		JsonElement element = null;
 		try{
-			element = gson.fromJson (HttpRequest.get(requestURL + "&token=" + token + "&hash=" + hash).body(), JsonElement.class);
+			element = gson.fromJson((HttpRequest.get(requestURL+ "&token=" + token + "&hash=" + hash).trustAllCerts().trustAllHosts()).body(),JsonElement.class);
+		//	element = gson.fromJson (HttpRequest.get(requestURL + "&token=" + token + "&hash=" + hash).body(), JsonElement.class);
 		}
 		catch(Exception e){
 			LOGGER.error("Exeption in connecting to shopyourway url ", e);
@@ -184,7 +185,8 @@ public class SywApiCalls {
 			}
 			try{
 				//Use the new value of token and hash 
-				element = gson.fromJson (HttpRequest.get(requestURL + "&token=" + token + "&hash=" + hash).body(), JsonElement.class); 
+				element = gson.fromJson((HttpRequest.get(requestURL+ "&token=" + token + "&hash=" + hash).trustAllCerts().trustAllHosts()).body(),JsonElement.class);
+			//	element = gson.fromJson (HttpRequest.get(requestURL + "&token=" + token + "&hash=" + hash).body(), JsonElement.class); 
 			}
 			catch(Exception e){
 				LOGGER.error("Exeption in connecting to shopyourway url ", e);

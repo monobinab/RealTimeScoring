@@ -368,11 +368,13 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
             // 9) EMIT VARIABLES TO VALUES MAP IN JSON DOCUMENT
             if (listToEmit != null && !listToEmit.isEmpty()) {
                 this.outputCollector.emit(listToEmit);
+                LOGGER.info("PERSISI: " + lyl_id_no + " emitted to StrategyScoring bolt from TellurideParsing bolt " + processTransaction.getRequestorID());
                 LOGGER.info("TIME:" + messageID + "-Emiting from parsing bolt-" + System.currentTimeMillis());
             }
             LOGGER.info("Time taken for Telluride Parsing Bolt: " + (System.currentTimeMillis() - time));
         } else {
             redisCountIncr("empty_line_item");
+            LOGGER.info("PERSISI: " + lyl_id_no + " not emitted to StrategyScoring bolt from TellurideParsing bolt " + processTransaction.getRequestorID());
             outputCollector.ack(input);
             return;
         }
