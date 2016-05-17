@@ -64,7 +64,7 @@ public class DCTopology {
 		
 		
 		Config conf = TopologyConfig.prepareStormConf("DC");
-		
+		conf.setMessageTimeoutSecs(7200);
 		TopologyConfig.submitStorm(conf, builder, args[0]);
 	}
 }
