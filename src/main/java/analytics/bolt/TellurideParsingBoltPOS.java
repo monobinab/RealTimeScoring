@@ -7,15 +7,16 @@ import analytics.util.dao.DivCatKsnDao;
 import analytics.util.dao.DivCatVariableDao;
 import analytics.util.dao.DivLnItmDao;
 import analytics.util.dao.DivLnVariableDao;
+import analytics.util.objects.DivCatLineItem;
 import analytics.util.objects.LineItem;
 import analytics.util.objects.ProcessTransaction;
-import analytics.util.objects.TransactionLineItem;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +32,7 @@ import java.util.*;
 public class TellurideParsingBoltPOS extends EnvironmentBolt {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TellurideParsingBoltPOS.class);
- 
+
     private static final long serialVersionUID = 1L;
     private OutputCollector outputCollector;
     private DivLnVariableDao divLnVariableDao;
@@ -56,92 +57,150 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
         this.outputCollector = outputCollector;
     }
 
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see backtype.storm.task.IBolt#prepare(java.util.Map,
-     * backtype.storm.task.TopologyContext, backtype.storm.task.OutputCollector)
-     */
     @Override
     public void prepare(@SuppressWarnings("rawtypes") Map stormConf, TopologyContext context,
                         OutputCollector collector) {
         super.prepare(stormConf, context, collector);
         this.outputCollector = collector;
         LOGGER.info("Preparing telluride parsing bolt");
-
-        LOGGER.debug("Getting mongo collections");
-        LOGGER.trace("Populate div line variables map");
         divLnItmDao = new DivLnItmDao();
         divCatKsnDao = new DivCatKsnDao();
         divLnVariableDao = new DivLnVariableDao();
         divCatVariableDao = new DivCatVariableDao();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see backtype.storm.task.IBolt#execute(backtype.storm.tuple.Tuple)
-     */
     @Override
     public void execute(Tuple input) {
-
     	long time = System.currentTimeMillis();
-          if (LOGGER.isDebugEnabled()){
-            LOGGER.debug("The time it enters inside Telluride parsing bolt execute method" + System.currentTimeMillis() + " and the message ID is ..." + input.getMessageId());
-          }
-        LOGGER.info("PERSIST: incoming tuples in parsingbolt TELLURIDE");
-        redisCountIncr("incoming_tuples");
-        String lyl_id_no = "";
-        ProcessTransaction processTransaction = null;
-        String messageID = "";
-        if (input.contains("messageID")) {
-            messageID = input.getStringByField("messageID");
-        }
-        LOGGER.info("TIME:" + messageID + "-Entering parsing bolt-" + System.currentTimeMillis());
-        
-        String transactionXmlAsString = extractTransactionXml(input);
-    	
-        processTransaction = parseXMLAndExtractProcessTransaction(processTransaction, transactionXmlAsString);
-        
-        // 1) TEST IF TRANSACTION TYPE CODE IS = 1 (RETURN IF FALSE)
-        // 2) TEST IF TRANSACTION IS A MEMBER TRANSACTION (IF NOT RETURN)
-        // 3) HASH LOYALTY ID
-        // 4) FIND DIVISION #, ITEM #, AMOUNT AND
-        // FIND LINE FROM DIVISION # + ITEM #
-        // AND PUT INTO LINE ITEM CLASS CONTAINER WITH HASHED LOYALTY ID + ALL
-        // TRANSACTION LEVEL DATA
-        // 5) EMIT LINE ITEMS
-        if(processTransaction != null && processTransaction.getEarnFlag() != null ){
-       
-        	logTransaction(processTransaction);
-	        if ( processTransaction.getEarnFlag().equalsIgnoreCase("E")) {
-	        	
-	        	redisCountIncr("valid_transactions");
-	        	
-	        	lyl_id_no = processTransaction.getMemberNumber();
-	
-	            if (lyl_id_no == null || StringUtils.isEmpty(lyl_id_no)) {
-	                redisCountIncr("empty_lid");
-	                outputCollector.ack(input);
-	                return;
-	            }
-	           
-	            // 6) HASH LOYALTY ID
-	            String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no);
-	            
-	            // 7)FIND DIVISION #, ITEM #, AMOUNT AND
-	            // FIND LINE FROM DIVISION # + ITEM #
-	            // AND PUT INTO LINE ITEM CLASS CONTAINER WITH HASHED LOYALTY ID + ALL TRANSACTION LEVEL DATA
-	            listLineItemsAndEmit(input, lyl_id_no, processTransaction, messageID, l_id, time);
-	
-	        } else {
+    	String lyl_id_no = "";
+    	try{
+	    	redisCountIncr("incoming_tuples");
+     
+	        ProcessTransaction processTransaction = null;
+	        String messageID = "";
+	        
+	        if (input.contains("messageID")) {
+	            messageID = input.getStringByField("messageID");
+	        }
+	        
+	        //This stringBuilder is to populate div and lines and send purchase email to Responsys, and NOT involved in scoring
+	        StringBuilder divLineBuff = new StringBuilder();
+	        
+	        //STEP 1: extract the required xml
+	        String transactionXmlAsString = extractTransactionXml(input);
+	    	
+	        //STEP 2: Parse the xml and populate the ProcessTransaction DTO
+	        processTransaction = parseXMLAndExtractProcessTransaction(processTransaction, transactionXmlAsString);
+	     
+	        //STEP 3: If NOT an empty xml, get the lineITems with all fields populated for valid transactions
+	        if(processTransaction != null && processTransaction.getEarnFlag() != null ){
+	       
+	        	if ( processTransaction.getEarnFlag().equalsIgnoreCase("E")) {
+	        		//Log the valid transactions
+	        		logTransaction(processTransaction);
+		         	redisCountIncr("valid_transactions");
+		         	lyl_id_no = processTransaction.getMemberNumber();
+		
+		            if (lyl_id_no == null || StringUtils.isEmpty(lyl_id_no)) {
+		                redisCountIncr("empty_lid");
+		                outputCollector.ack(input);
+		                return;
+		            }
+		           
+		            String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no);
+		            
+		            List<LineItem> lineItemList = processTransaction.getLineItemList();
+		            
+		            if(lineItemList == null || lineItemList.size() == 0 || lineItemList.isEmpty()){
+		            	 redisCountIncr("empty_line_item");
+		            	 LOGGER.info("PERSIST: " + lyl_id_no + " not emitted to StrategyScoring bolt from TellurideParsing bolt and acked for empty lineItem " );
+			             outputCollector.ack(input);
+			             return;
+		            }
+		            //get list of lineItems with line/category and associated variables populated
+		            getPopulatedLineItemsList(lyl_id_no, lineItemList, processTransaction.getRequestorID(), messageID, l_id, divLineBuff);
+		            
+		            //set the value for each variable with amount and poulate the varAmount map
+		            Map<String, String> varValueMap = getVariablesValueMap(lineItemList);
+		            if(varValueMap != null && !varValueMap.isEmpty() && varValueMap.size() > 0){
+		            	emitToScoring(lyl_id_no, processTransaction.getRequestorID(), messageID, l_id, varValueMap );
+		            	outputCollector.ack(input); 
+		            }
+		         	LOGGER.info("Time taken for Telluride Parsing Bolt: " + (System.currentTimeMillis() - time));
+		        } 
+	        	else {
+		            redisCountIncr("invalid_transactions");
+		            LOGGER.info("PERSIST: " + lyl_id_no + " not emitted to StrategyScoring bolt from TellurideParsing bolt and acked for invalid transaction " );
+		            outputCollector.ack(input);
+		            return;
+		        }
+	        } 
+	        else {
 	            redisCountIncr("empty_xml");
+	            LOGGER.info("PERSIST: " + lyl_id_no + " not emitted to StrategyScoring bolt from TellurideParsing bolt and acked for empty xml " );
 	            outputCollector.ack(input);
 	            return;
 	        }
+	          
+	        //Adding the Div Line information to Redis to send RTS_purchase e-mail
+	        if (divLineBuff != null && divLineBuff.toString().length() > 0) {
+	            //persisting the loyalty id and div lines to redis for sending RTS_Purchase e-mails to customers
+	            try {
+	                writeToRedis(lyl_id_no, divLineBuff);
+	            } catch (Exception e) {
+	                LOGGER.error("Exception Occurred Writing to Redis for Lid " + lyl_id_no + " with divLines " + divLineBuff);
+	            }
+	        }
+    	}
+    	catch(Exception e){
+    		LOGGER.error("Exception in TellurideParsingbolt for loyalty id " + lyl_id_no + "exception: " + e.getStackTrace() + "cause: " + ExceptionUtils.getRootCauseMessage(e));
+    	}
+         outputCollector.ack(input);
+         LOGGER.info("PERSIST: " + lyl_id_no + " acked successfully in TellurideParsing bolt " );
+     }
+
+    
+	private void emitToScoring( String lyl_id_no, String requestorId, String messageID, String l_id, Map<String, String> varValueMap) {
+		List<Object> listToEmit = new ArrayList<Object>();
+	    listToEmit.add(l_id);
+	    listToEmit.add(JsonUtils.createJsonFromStringStringMap(varValueMap));
+	    listToEmit.add(requestorId);
+	    listToEmit.add(messageID);
+	    listToEmit.add(lyl_id_no);
+	    redisCountIncr("successful");
+	    if (listToEmit != null && !listToEmit.isEmpty()) {
+	        this.outputCollector.emit(listToEmit);
+	        LOGGER.info("PERSISI: " + lyl_id_no + " emitted to StrategyScoring bolt from TellurideParsing bolt " + requestorId);
         }
-    }
+	}
+    
+
+	private Map<String, String> getVariablesValueMap(List<LineItem> lineItemList) {
+		Map<String, String> varAmountMap = null;
+		if (lineItemList != null && !lineItemList.isEmpty()) {
+			varAmountMap = new HashMap<String, String>();
+		    for( LineItem lnItm : lineItemList) {
+		        List<String> varList = lnItm.getVariablesList();
+		        if (varList == null || varList.isEmpty()) {
+		        	LOGGER.info("PERSIST : varList is empty");
+		            continue;
+		        }
+		        for (String v : varList) {
+		            if (!varAmountMap.containsKey(v.toUpperCase())) {
+		                varAmountMap.put(v.toUpperCase(),
+		                        String.valueOf(lnItm.getDollarValuePostDisc()));
+		            } else {
+		                Double a1 = Double.valueOf(varAmountMap.get(v));
+		                a1 = a1 + Double.valueOf(lnItm.getDollarValuePostDisc());
+		                varAmountMap.remove(v.toUpperCase());
+		                varAmountMap.put(v.toUpperCase(),
+		                        String.valueOf(a1));
+		            }
+		        }
+		    }
+		}
+		return varAmountMap;
+	}
 
 	protected String extractTransactionXml(Tuple input) {
 		String transactionXmlAsString = (String) input.getValueByField("npos");
@@ -167,9 +226,6 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
 					orderStoreNumber, registerNumber, transactionNumber, requestorId,
 					transactionTime, division, itemNumber, value, earnFlag, "MQQueue");
 		}
-     	/*logPersist(memberNumber, pickUpStoreNumber, tenderStoreNumber,
-				orderStoreNumber, registerNumber, transactionNumber, requestorId,
-				transactionTime, earnFlag, "MQQueue");*/
 	}
 
 	public void logPersist(String memberNumber, String pickUpStoreNumber,
@@ -179,219 +235,155 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
 		LOGGER.info("PERSIST: " + memberNumber +", " + pickUpStoreNumber + ", " + tenderStoreNumber +", " + orderStoreNumber + ", " + registerNumber +", " + transactionNumber +", " + requestorId +", " + transactionTime + ", " +", " + division + ", " + itemNumber + ", " + value + ", " + earnFlag +", "+ queueType );
 	}
 
-    private void listLineItemsAndEmit(Tuple input, String lyl_id_no, ProcessTransaction processTransaction, String messageID, String l_id, long time) {
-        Collection<TransactionLineItem> lineItemList = new ArrayList<TransactionLineItem>();
+    private void getPopulatedLineItemsList(String lyl_id_no,  List<LineItem> lineItemsList, String requestorId, String messageID, String l_id, StringBuilder divLineBuff) {
         Map<String, List<String>> divCatVariablesMap = divCatVariableDao.getDivCatVariable();
-        List<LineItem> lineItems = processTransaction.getLineItemList();
         Map<String, List<String>> divLnVariablesMap = divLnVariableDao.getDivLnVariable();
-        if (LOGGER.isTraceEnabled()) {
-            String lineItems_toString = null;
-            if (lineItems != null)
-                lineItems_toString = lineItems.toString();
-            LOGGER.trace("Line Items are .." + lineItems_toString);
-        }
-        StringBuilder divLineBuff = new StringBuilder();
+     
+        if(divCatVariablesMap != null && divCatVariablesMap.size() > 0 && divLnVariablesMap != null && divLnVariablesMap.size() > 0){
+	        //HANDLING KMART TRANSACTIONS       
+	      	if ("KPOS".equalsIgnoreCase(requestorId)
+	                    || "KCOM".equalsIgnoreCase(requestorId)) {
+	      		
+	      		getLineItemsListKmart(divCatVariablesMap, lineItemsList);
+	        }
+	      	
+	      	//HANDLING SEARS TRANSACTIONS
+	      	else{
+	      		getLineItemsListSears(lineItemsList, divLnVariablesMap, divLineBuff);
+	      	}
+         }
+      }
 
-        if (lineItems != null && lineItems.size() != 0) {
-            for (LineItem lineItem : lineItems) {
+    
+    
+	private void getLineItemsListSears(List<LineItem> lineItemsList, Map<String, List<String>> divLnVariablesMap, StringBuilder divLineBuff) {
+		LOGGER.debug("Sears transaction processing");
+		/*
+		 * fetch the list of items and divisions from all the incoming lineItems
+		 */
+		List<String> divItemsList = new ArrayList<String>();
+		for(LineItem lineItem : lineItemsList){
+			String item = "";
+			if (lineItem.getItemNumber() != null ){
+				if (lineItem.getItemNumber().length() >= 6) {
+					item = lineItem.getItemNumber().substring(lineItem.getItemNumber().length() - 5);
+					lineItem.setItemNumber(item);
+				}
+				else{
+					item = lineItem.getItemNumber();
+				}
+				String div = lineItem.getDivision();
+				divItemsList.add(item + "," + div);
+			}
+		}
+		
+		/**
+		 * get the line for every lineItem by passing division and item to the corresponding mongo
+		 * and populate every lineItem with line
+		 */
+		List<DivCatLineItem> divLineItemsList = divLnItmDao.getDivCatLineFromDivItem(divItemsList);
+		if(divLineItemsList != null && !divLineItemsList.isEmpty() && divLineItemsList.size() > 0){
+			for(DivCatLineItem divLineCatItem : divLineItemsList){
+				for(LineItem lineItem : lineItemsList){
+					if(lineItem.getItemNumber().equalsIgnoreCase(divLineCatItem.getItem()) &&
+							lineItem.getDivision().equalsIgnoreCase(divLineCatItem.getDiv())){
+						lineItem.setLineNumber(divLineCatItem.getLine());
+						divLineBuff.append(divLineCatItem.getDiv() + divLineCatItem.getLine() + "~");
+						break;
+					}
+				}
+			}
+			
+		}
+		
+		/**
+		 * fetching the list of variables from div/div+line
+		 * and populate every lineItem 
+		 */
+		for(LineItem lineItem : lineItemsList){
+			List<String> variablesList = new ArrayList<String>();
+			if(divLnVariablesMap != null && divLnVariablesMap.size() > 0){
+				if((divLnVariablesMap.containsKey(lineItem.getDivision()))){
+					List<String> divVariableList = divLnVariablesMap.get(lineItem.getDivision());
+					if(divVariableList != null && !divVariableList.isEmpty()){
+						variablesList.addAll(divVariableList);
+					}
+				}
+				if(lineItem.getLineNumber() != null  &&
+						divLnVariablesMap.containsKey(lineItem.getDivision() + lineItem.getLineNumber()) ){
+					List<String> divLineVariableList = divLnVariablesMap.get(lineItem.getDivision()+ lineItem.getLineNumber());
+					if(divLineVariableList != null && !divLineVariableList.isEmpty()){
+						variablesList.addAll(divLineVariableList);
+					}
+				}
+				lineItem.setVariablesList(variablesList);
+			}
+		}
+	}
 
-                String item = "";
-                String amount = lineItem.getDollarValuePostDisc();
-                /*logger.info("Item is...." + item + "...Amount is...."
-                        + amount);*/
-                if (amount.contains("-")) {
-                    LOGGER.debug("amount_contains -");
-                    continue;
-                } else {
-                    // KPOS and KCOM
-                    LOGGER.debug("KPOS or KCOM transaction processing");
-                    if ("KPOS".equalsIgnoreCase(processTransaction.getRequestorID())
-                            || "KCOM".equalsIgnoreCase(processTransaction.getRequestorID())) {
-                        item = lineItem.getItemNumber();
-                        //logger.info("Item is..."+item);
-                        String divCategory = getDivCategoryFromCollection(item);
-                        if (divCategory == null || divCategory.length() == 0) {
-                            LOGGER.error("Unable to find div cat information for" + item);
-                            continue;
-                        }
-                        //logger.info("division and category are ...." + divCategory);
-                        String div = StringUtils.substring(divCategory, 0, 3);//Picks up start, end-1
-                        String cat = StringUtils.substring(divCategory, 3, 7);
-                        TransactionLineItem transactionLineItem = new TransactionLineItem(
-                                l_id, div, item, cat,
-                                Double.valueOf(amount));
-                        /*logger.info("Transaction Line Item is ..."
-                                + transactionLineItem);*/
+	
+	
+	private List<LineItem> getLineItemsListKmart(Map<String, List<String>> divCatVariablesMap, List<LineItem> lineItemsList) {
+		
+		//fetch the list of items from all the incoming lineItems
+		List<String> itemsList = new ArrayList<String>();
+		for (LineItem lineItem : lineItemsList) {
+		 	String amount = lineItem.getDollarValuePostDisc();
+		 	
+		 	/**
+		 	 * if "dollarValuePostDisc" in the incoming xml contains a "-", skip the lineitem
+		 	 */
+		 	if (amount.contains("-")) {
+		         LOGGER.debug("amount_contains -");
+		         continue;
+		     }
+		 	itemsList.add(lineItem.getItemNumber());
+		 }
+		
+		/**
+		 * get the category for every lineItem by passing list of items
+		 * and populate every lineItem with category
+		 */
+		List<DivCatLineItem> divCatItemsList = divCatKsnDao.getDivCatItemFromItems(itemsList);
+		if(divCatItemsList != null && divCatItemsList.size() > 0 && !divCatItemsList.isEmpty()){
+			for(DivCatLineItem divCatItem : divCatItemsList){
+				for(LineItem lineItem : lineItemsList){
+					if(lineItem.getDivision().equalsIgnoreCase(divCatItem.getDiv()) &&
+							lineItem.getItemNumber().equalsIgnoreCase(divCatItem.getItem())){
+						lineItem.setCategory(divCatItem.getCat());
+						break;
+					}
+				}
+			}
+		}
+		/**
+		 * fetching the list of variables from div/div+cat
+		 * and populate every lineItem 
+		 */
+		for(LineItem lineItem : lineItemsList){
+			List<String> variablesList = new ArrayList<String>();
+			List<String> divCatVariableList = null;
+			List<String> divVariableList = null;
+			if(divCatVariablesMap != null && divCatVariablesMap.size() > 0 ){
+				if(divCatVariablesMap.containsKey(lineItem.getDivision())){
+					divVariableList = divCatVariablesMap.get(lineItem.getDivision());
+				}
+					if(lineItem.getCategory() != null  && divCatVariablesMap.containsKey(lineItem.getDivision() + lineItem.getCategory())){
+						divCatVariableList = divCatVariablesMap.get(lineItem.getDivision()+ lineItem.getCategory());
+					}
+					if(divVariableList != null && !divVariableList.isEmpty()){
+						variablesList.addAll(divVariableList);
+					}
+					if(divCatVariableList != null && !divCatVariableList.isEmpty()){
+						variablesList.addAll(divCatVariableList);
+					}
+					lineItem.setVariablesList(variablesList);
+			}
+		}
+		return lineItemsList;
+	}
 
-                        // find all variables affected by div-line
-                        List<String> foundVariablesList = new ArrayList<String>();
-                        if (divCatVariablesMap
-                                .containsKey(transactionLineItem.getDiv()
-                                        + transactionLineItem.getLineOrCategory())
-                                || divCatVariablesMap
-                                .containsKey(transactionLineItem
-                                        .getDiv())) {
-
-                            Collection<String> divVariableCollection = divCatVariablesMap
-                                    .get(transactionLineItem.getDiv());
-                            Collection<String> divCatVariableCollection = divCatVariablesMap
-                                    .get(transactionLineItem.getDiv()
-                                            + transactionLineItem
-                                            .getLineOrCategory());
-                            if (divVariableCollection != null) {
-                                for (String var : divVariableCollection) {
-                                    /*logger.info("Div is added.....  in variable List"
-                                            + transactionLineItem.getDiv());*/
-                                    foundVariablesList.add(var);
-                                }
-                            }
-                            if (divCatVariableCollection != null) {
-                                for (String var : divCatVariableCollection) {
-                                    /*logger.info("Div is added..... in lnvariable List"
-                                            + transactionLineItem.getDiv());*/
-                                    foundVariablesList.add(var);
-                                }
-                            }
-                            transactionLineItem
-                                    .setVariableList(foundVariablesList);
-                            lineItemList.add(transactionLineItem);
-                            /*logger.info("Line Items are added inside lineItemList......"
-                                    + lineItemList.size());*/
-                        }
-                    } else {
-                        LOGGER.debug("Sears transaction processing");
-                        if (lineItem.getItemNumber() != null && lineItem.getItemNumber().length() >= 6) {
-
-                            item = lineItem.getItemNumber().substring(
-                                    lineItem.getItemNumber().length() - 5);
-
-                        } else {
-                            item = lineItem.getItemNumber();
-                        }
-                        String div = lineItem.getDivision();
-
-                        String line = divLnItmDao.getLnFromDivItem(div, item);
-                        if (line == null) {
-                            LOGGER.info("PERSIST: Line is null");
-                            continue;
-                        }
-                        //Adding the div line info to the buffer to be used by Responsys Bolts to
-                        //send an RTS_Purchase e-mail to the Customer
-
-                        divLineBuff.append(div + line + "~");
-
-                        //logger.info("Line is ...." + line);
-                        TransactionLineItem transactionLineItem = null;
-                        transactionLineItem = new TransactionLineItem(
-                                l_id, div, item, line,
-                                Double.valueOf(amount));
-                        /*logger.info("Transaction Line Item is ..."
-                                + transactionLineItem);*/
-                        // find all variables affected by div-line
-                        List<String> foundVariablesList = null;
-                        foundVariablesList = new ArrayList<String>();
-                        if (divLnVariablesMap
-                                .containsKey(transactionLineItem.getDiv()
-                                        + transactionLineItem.getLineOrCategory())
-                                || divLnVariablesMap
-                                .containsKey(transactionLineItem
-                                        .getDiv())) {
-
-
-                            Collection<String> divVariableCollection = divLnVariablesMap
-                                    .get(transactionLineItem.getDiv());
-                            Collection<String> divLnVariableCollection = divLnVariablesMap
-                                    .get(transactionLineItem.getDiv()
-                                            + transactionLineItem.getLineOrCategory());
-                            if (divVariableCollection != null) {
-                                for (String var : divVariableCollection) {
-                                    /*logger.info("Div is added.....  in variable List"
-                                            + transactionLineItem.getDiv());*/
-                                    foundVariablesList.add(var);
-                                }
-                            }
-                            if (divLnVariableCollection != null) {
-                                for (String var : divLnVariableCollection) {
-                                    /*logger.info("Div is added..... in lnvariable List"
-                                            + transactionLineItem.getDiv());*/
-                                    foundVariablesList.add(var);
-                                }
-                            }
-                            transactionLineItem
-                                    .setVariableList(foundVariablesList);
-                            lineItemList.add(transactionLineItem);
-                            /*logger.info("Line Items are added inside lineItemList......"
-                                    + lineItemList.size());*/
-                        }
-
-                    }
-                }
-            }
-        }
-
-        if (lineItemList != null && !lineItemList.isEmpty()) {
-
-            // 8) FOR EACH LINE ITEM FIND ASSOCIATED VARIABLES BY DIVISION
-            // AND LINE
-            Map<String, String> varAmountMap = null;
-            varAmountMap = new HashMap<String, String>();
-            List<Object> listToEmit = new ArrayList<Object>();
-            for (TransactionLineItem lnItm : lineItemList) {
-                List<String> varList = lnItm.getVariableList();
-                if (varList == null || varList.isEmpty()) {
-                	LOGGER.info("PERSIST : varList is empty");
-                    continue;
-                }
-                for (String v : varList) {
-                    if (!varAmountMap.containsKey(v.toUpperCase())) {
-                        varAmountMap.put(v.toUpperCase(),
-                                String.valueOf(lnItm.getAmount()));
-                    } else {
-                        Double a1 = Double.valueOf(varAmountMap.get(v));
-                        a1 = a1 + lnItm.getAmount();
-                        varAmountMap.remove(v.toUpperCase());
-                        varAmountMap.put(v.toUpperCase(),
-                                String.valueOf(a1));
-                    }
-                }
-            }
-
-            listToEmit.add(l_id);
-            listToEmit.add(JsonUtils.createJsonFromStringStringMap(varAmountMap));
-            listToEmit.add(processTransaction.getRequestorID());
-            listToEmit.add(messageID);
-            listToEmit.add(lyl_id_no);
-            LOGGER.debug(" *** telluride parsing bolt emitting: "
-                    + listToEmit.toString());
-            redisCountIncr("successful");
-            outputCollector.ack(input);
-            // 9) EMIT VARIABLES TO VALUES MAP IN JSON DOCUMENT
-            if (listToEmit != null && !listToEmit.isEmpty()) {
-                this.outputCollector.emit(listToEmit);
-                LOGGER.info("PERSISI: " + lyl_id_no + " emitted to StrategyScoring bolt from TellurideParsing bolt " + processTransaction.getRequestorID());
-                LOGGER.info("TIME:" + messageID + "-Emiting from parsing bolt-" + System.currentTimeMillis());
-            }
-            LOGGER.info("Time taken for Telluride Parsing Bolt: " + (System.currentTimeMillis() - time));
-        } else {
-            redisCountIncr("empty_line_item");
-            LOGGER.info("PERSISI: " + lyl_id_no + " not emitted to StrategyScoring bolt from TellurideParsing bolt " + processTransaction.getRequestorID());
-            outputCollector.ack(input);
-            return;
-        }
-
-        //Adding the Div Line information to Redis to send RTS_purchase e-mail
-        if (divLineBuff != null && divLineBuff.toString().length() > 0) {
-            //persisting the loyalty id and div lines to redis for sending RTS_Purchase e-mails to customers
-            try {
-
-                writeToRedis(lyl_id_no, divLineBuff);
-            } catch (Exception e) {
-                LOGGER.error("Exception Occurred Writing to Redis for Lid " + lyl_id_no + " with divLines " + divLineBuff);
-            }
-
-        }
-    }
-
+	
     private void writeToRedis(String lyl_id_no, StringBuilder divLineBuff) {
         Jedis jedis = new Jedis(host, port, 1800);
         jedis.connect();
@@ -399,6 +391,7 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
         jedis.disconnect();
     }
 
+    
     private ProcessTransaction parseXMLAndExtractProcessTransaction(ProcessTransaction processTransaction, String transactionXmlAsString) {
         LOGGER.debug("Parsing MQ message XML");
         if ((transactionXmlAsString.contains("<ProcessTransaction") || transactionXmlAsString.contains(":ProcessTransaction")) ) {
@@ -409,32 +402,12 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
         return processTransaction;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * backtype.storm.topology.IComponent#declareOutputFields(backtype.storm.
-     * topology.OutputFieldsDeclarer)
-     */
+    
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
         declarer.declare(new Fields("l_id", "lineItemAsJsonString", "source", "messageID", "lyl_id_no"));
     }
 
-    private final String getDivCategoryFromCollection(String item) {
-        LOGGER.debug("searching for category");
-        DivCatKsnDao.DivCat divCat = divCatKsnDao.getVariableFromTopic(item);
-
-        if (divCat == null)
-            return null;
-        String category = divCat.getCat();
-        String div = divCat.getDiv();
-
-        /*logger.info("  found category: " + category);
-        logger.info("  found division: " + div);*/
-
-        return div + category;
-    }
 
     @SuppressWarnings("unused")
 	private final static String convertStreamToString(final Message jmsMsg)throws Exception {
@@ -448,9 +421,7 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
         }
         bout.flush();
         stringMessage = new String(bout.toByteArray());
-
         bout.close();
-        //logger.info(stringMessage.toString());
         return stringMessage;
     }
 

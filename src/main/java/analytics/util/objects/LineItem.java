@@ -1,18 +1,15 @@
-/**
- * 
- */
+
 package analytics.util.objects;
 
-/**
- * @author ddas1
- *
- */
+import java.util.List;
+
 public class LineItem {
 	
 	private String lineNumber;
 	private String itemType;
 	private String division;
 	private String itemNumber;
+	private String category;
 	private String lineItemAmountTypeCode;
 	private String dollarValuePreDisc;
 	private String dollarValuePostDisc;
@@ -21,6 +18,20 @@ public class LineItem {
 	private String quantity;
 	private String taxAmount;
 	private String postSalesAdjustmentAmount;
+	private List<String> variablesList;
+	
+	public List<String> getVariablesList() {
+		return variablesList;
+	}
+	public void setVariablesList(List<String> variablesList) {
+		this.variablesList = variablesList;
+	}
+	public String getCategory() {
+		return category;
+	}
+	public void setCategory(String category) {
+		this.category = category;
+	}
 	public String getLineNumber() {
 		return lineNumber;
 	}

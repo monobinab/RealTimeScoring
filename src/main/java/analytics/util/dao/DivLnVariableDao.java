@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import analytics.util.MongoNameConstants;
 import analytics.util.dao.caching.CacheBuilder;
 import analytics.util.dao.caching.CacheConstant;
@@ -17,12 +20,19 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
 public class DivLnVariableDao extends AbstractDao{
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(DivLnVariableDao.class);
     private DBCollection divLnVariableCollection;
     private Cache cache = null;
     
     public DivLnVariableDao(){
     	super();
-		divLnVariableCollection = db.getCollection("divLnVariable");
+    	if(db != null){
+    		divLnVariableCollection = db.getCollection("divLnVariable");
+    	}
+    	else{
+    		LOGGER.error("db NULL in DivLnVariableDao");
+    	}
 		cache = CacheManager.getInstance().getCache(CacheConstant.RTS_CACHE_DIV_LN_VARIABLE_CACHE);
     	if(null == cache){
     		cache = CacheManager.newInstance().getCache(CacheConstant.RTS_CACHE_DIV_LN_VARIABLE_CACHE);
@@ -37,24 +47,31 @@ public class DivLnVariableDao extends AbstractDao{
 			return (HashMap<String, List<String>>) element.getObjectValue();
 		}else{
     	HashMap<String, List<String>> divLnVariablesMap = new HashMap<String, List<String>>();
-    	DBCursor divLnVarCursor = divLnVariableCollection.find();
-    	for(DBObject divLnDBObject: divLnVarCursor) {
-            if (divLnVariablesMap.get(divLnDBObject.get(MongoNameConstants.DLV_DIV)) == null)
-            {
-                List<String> varColl = new ArrayList<String>();
-                varColl.add(divLnDBObject.get(MongoNameConstants.DLV_VAR).toString());
-                divLnVariablesMap.put(divLnDBObject.get(MongoNameConstants.DLV_DIV).toString(), varColl);
-            }
-            else
-            {
-                List<String> varColl = divLnVariablesMap.get(divLnDBObject.get(MongoNameConstants.DLV_DIV).toString());
-                varColl.add(divLnDBObject.get(MongoNameConstants.DLV_VAR).toString().toUpperCase());
-                divLnVariablesMap.put(divLnDBObject.get(MongoNameConstants.DLV_DIV).toString(), varColl);
-            }
-        }
+    	if(divLnVariableCollection != null){
+	    	DBCursor divLnVarCursor = divLnVariableCollection.find();
+	    	if(divLnVarCursor != null){
+		    	for(DBObject divLnDBObject: divLnVarCursor) {
+		    		if(divLnDBObject!= null){
+			            if (divLnVariablesMap.get(divLnDBObject.get(MongoNameConstants.DLV_DIV)) == null)
+			            {
+			                List<String> varColl = new ArrayList<String>();
+			                varColl.add(divLnDBObject.get(MongoNameConstants.DLV_VAR).toString());
+			                divLnVariablesMap.put(divLnDBObject.get(MongoNameConstants.DLV_DIV).toString(), varColl);
+			            }
+			            else
+			            {
+			                List<String> varColl = divLnVariablesMap.get(divLnDBObject.get(MongoNameConstants.DLV_DIV).toString());
+			                varColl.add(divLnDBObject.get(MongoNameConstants.DLV_VAR).toString().toUpperCase());
+			                divLnVariablesMap.put(divLnDBObject.get(MongoNameConstants.DLV_DIV).toString(), varColl);
+			            }
+		    		}
+		        }
+	    	}
+    	}
     	if(divLnVariablesMap != null && divLnVariablesMap.size() > 0){
 			cache.put(new Element(cacheKey, (HashMap<String, List<String>>) divLnVariablesMap));
 		}
+    	
     	return divLnVariablesMap;
 		}
     }

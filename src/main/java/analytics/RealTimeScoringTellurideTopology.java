@@ -20,11 +20,6 @@ import analytics.util.WebsphereMQCredential;
 import backtype.storm.Config;
 import backtype.storm.topology.TopologyBuilder;
 
-
-/**
- * Created with IntelliJ IDEA. User: syermalk Date: 10/9/13 Time: 10:14 AM To
- * change this template use File | Settings | File Templates.
- */
 public class RealTimeScoringTellurideTopology {
 
 	private static final Logger LOGGER = LoggerFactory

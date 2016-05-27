@@ -60,13 +60,14 @@ public class PurchaseScoreKafkaBolt extends EnvironmentBolt {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void execute(Tuple input) {
+		String loyId = null;
 		try{
 			JSONObject mainJsonObj = new JSONObject();
 			if (input.contains("loyaltyId")
 					&& input.getValueByField("loyaltyId") != null && input.contains("cpsScoreMessage")) {
 				List<ChangedMemberScore> changedMemberScoreList = (List<ChangedMemberScore>) input
 						.getValueByField("cpsScoreMessage");
-				String loyId = input.getStringByField("loyaltyId");
+				loyId = input.getStringByField("loyaltyId");
 				if (changedMemberScoreList != null
 						&& !changedMemberScoreList.isEmpty()) {
 					String topology = input.getStringByField("topology");
@@ -113,6 +114,7 @@ public class PurchaseScoreKafkaBolt extends EnvironmentBolt {
 					LOGGER.error("Exception in PurchaseScoreKafkaBolt " + e.getMessage());
 				}
 				outputCollector.ack(input);
+				LOGGER.info("PERSIST: " +  loyId + " acked successfully in RTSKafka bolt");
 			}
 
 	
