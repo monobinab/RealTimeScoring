@@ -63,7 +63,7 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 			LOGGER.debug("TIME:" + messageID + "- Entering CPParsePersistBolt-"
 					+ System.currentTimeMillis());
 			
-			LOGGER.info("Message Being Received " +  lyl_id_no.getAsString());
+			LOGGER.info("Message Being Received " +  input.toString());
 			JsonParser parser = new JsonParser();
 			JsonElement jsonElement = null;
 			jsonElement = getParsedJson(input, parser);
