@@ -52,7 +52,7 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 	public void execute(Tuple input) {
 		
 		redisCountIncr("input_count");	
-		
+		JsonElement lyl_id_no=null;
 		try {
 			
 			String messageID = "";
@@ -112,7 +112,7 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 			
 			redisCountIncr("output_count");	
 		} catch (Exception e) {			
-			LOGGER.error("PERSIST: CPParsePersistBolt: exception in parsing for memberId :: "+ input.getLong(0) + " : " + ExceptionUtils.getMessage(e) + "Rootcause-"+ ExceptionUtils.getRootCauseMessage(e) +"  STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
+			LOGGER.error("PERSIST: CPParsePersistBolt: exception in parsing for memberId :: "+ lyl_id_no.getAsString() + " : " + ExceptionUtils.getMessage(e) + "Rootcause-"+ ExceptionUtils.getRootCauseMessage(e) +"  STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 			redisCountIncr("exception_count");				
 		} 
 		 	outputCollector.ack(input);
