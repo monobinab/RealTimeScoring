@@ -114,7 +114,7 @@ public class PurchaseScoreKafkaBolt extends EnvironmentBolt {
 					LOGGER.error("Exception in PurchaseScoreKafkaBolt " + e.getMessage());
 				}
 				outputCollector.ack(input);
-				LOGGER.info("PERSIST: " +  loyId + " acked successfully in RTSKafka bolt");
+				LOGGER.info("PERSIST: " +  loyId + " acked successfully in PurchaseScoreKafkaBolt ");
 			}
 
 	
