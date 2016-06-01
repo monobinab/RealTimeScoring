@@ -52,7 +52,7 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 	public void execute(Tuple input) {
 		
 		redisCountIncr("input_count");	
-		
+		JsonElement lyl_id_no=null;
 		try {
 			
 			String messageID = "";
@@ -63,14 +63,14 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 			LOGGER.debug("TIME:" + messageID + "- Entering CPParsePersistBolt-"
 					+ System.currentTimeMillis());
 			
-			LOGGER.info("Message Being Received " + input.getString(0));
+			LOGGER.info("Message Being Received " +  input.toString());
 			JsonParser parser = new JsonParser();
 			JsonElement jsonElement = null;
 			jsonElement = getParsedJson(input, parser);
 			String tagsString = convertTagsJsonToString(jsonElement);
 				
 			// Fetch l_id from json
-			JsonElement lyl_id_no = jsonElement.getAsJsonObject().get("lyl_id_no");
+			lyl_id_no = jsonElement.getAsJsonObject().get("lyl_id_no");
 			if (lyl_id_no == null) {
 				LOGGER.error("Invalid incoming json with empty loyalty id");
 				outputCollector.ack(input);
@@ -112,7 +112,7 @@ public class CPParsePersistBolt extends EnvironmentBolt{
 			
 			redisCountIncr("output_count");	
 		} catch (Exception e) {			
-			LOGGER.error("PERSIST: CPParsePersistBolt: exception in parsing for memberId :: "+ input.getString(0) + " : " + ExceptionUtils.getMessage(e) + "Rootcause-"+ ExceptionUtils.getRootCauseMessage(e) +"  STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
+			LOGGER.error("PERSIST: CPParsePersistBolt: exception in parsing for memberId :: "+ lyl_id_no.getAsString() + " : " + ExceptionUtils.getMessage(e) + "Rootcause-"+ ExceptionUtils.getRootCauseMessage(e) +"  STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 			redisCountIncr("exception_count");				
 		} 
 		 	outputCollector.ack(input);
