@@ -56,6 +56,8 @@ public class RTSAPICaller {
 			RTS_API_PRE = properties.getString("rts_api_pre_url");
 		
 		httpParams =  new BasicHttpParams();
+		HttpConnectionParams.setConnectionTimeout(httpParams, 500);
+	    HttpConnectionParams.setSoTimeout(httpParams, 500);
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -66,8 +68,7 @@ public class RTSAPICaller {
 		String jsonRespString = null;
 		HttpGet httpget = null;
 		try {
-			HttpConnectionParams.setConnectionTimeout(httpParams, 500);
-		    HttpConnectionParams.setSoTimeout(httpParams, 500);
+			
 		    HttpClient httpclient = new DefaultHttpClient(httpParams);
 		    LOGGER.info("RTS API request :" + baseURL );
 		    httpget = new HttpGet(baseURL);
