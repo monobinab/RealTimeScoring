@@ -108,15 +108,13 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 	    	if(incomingValueMap !=null && !incomingValueMap.isEmpty()) {
 	    		Object boostValueJSON = null;
 	    		if(!source.equalsIgnoreCase("WebTraits")){
-	    			if(memberBrowse != null){
-		    			Map<String, Integer> previousModelCodeMap = browseUtils.getPreviousBoostCounts(l_id, loyalty_id, incomingValueMap, NUMBER_OF_DAYS, memberBrowse);
+	    				Map<String, Integer> previousModelCodeMap = browseUtils.getPreviousBoostCounts(l_id, loyalty_id, incomingValueMap, NUMBER_OF_DAYS, memberBrowse);
 		           		LOGGER.info("PC modelCode or buSubBu Map for scoring " + l_id + ": " + previousModelCodeMap);
 		        		Map<String, String> totalModelCodeMap = getTotalModelCodeValueMap(previousModelCodeMap, incomingValueMap);
 		               	LOGGER.info("PC AND incoming modelCode or buSubBu Map for scoring " + l_id + ": "+ totalModelCodeMap);
 		            	boostValueJSON = JsonUtils.createJsonFromStringStringMap(getBoostFromModelCode(totalModelCodeMap));
 		            	emitToBrowseCountPersistBolt(incomingValueMap, loyalty_id, memberBrowse);
-	    			}
-	    		}
+	   	   		}
 	    		else{
 	    			 boostValueJSON = JsonUtils.createJsonFromStringStringMap(incomingValueMap);
 	    		}
@@ -130,6 +128,7 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 		        	redisCountIncr("processed_lid");
 		        	LOGGER.debug(" *** PARSING BOLT EMITTING: " + listToEmit);
 	       		}
+	       		
 	       	}
 	    	else {
 	    		LOGGER.debug(" *** NO VARIABLES FOUND - NOTHING TO EMIT");
@@ -148,7 +147,6 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 	private void emitToBrowseCountPersistBolt(
 			Map<String, String> incomingValueMap, String loyalty_id,
 			MemberBrowse memberBrowse) {
-		if(memberBrowse != null){
 			Object boostJSON = JsonUtils.createJsonFromStringStringMap(incomingValueMap);
 			List<Object> listToEmit = new ArrayList<Object>();
 			listToEmit.add(loyalty_id);
@@ -157,7 +155,6 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 			listToEmit.add(source);
 			this.outputCollector.emit("browse_tag_stream", listToEmit);
 			redisCountIncr("emitted_browse_tag");
-		}
 	}
 
 	@Override
@@ -174,7 +171,7 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 	protected Map<String, String> getTotalModelCodeValueMap(Map<String, Integer> previousModelCodeMap, Map<String, String> incomingModelCodesMap){
 		Map<String, String> totalModeCode= new HashMap<String, String>();
 		for(String modelCode: incomingModelCodesMap.keySet()){
-			if(previousModelCodeMap.containsKey(modelCode)){
+			if(previousModelCodeMap != null && previousModelCodeMap.size() > 0 &&  previousModelCodeMap.containsKey(modelCode)){
 				int count = previousModelCodeMap.get(modelCode) + Integer.valueOf(incomingModelCodesMap.get(modelCode));
 				totalModeCode.put(modelCode, String.valueOf(count));
 			}
