@@ -19,6 +19,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import scala.actors.threadpool.Arrays;
 import analytics.MockOutputCollector;
 import analytics.MockTopologyContext;
 import analytics.bolt.BrowseCountPersistBolt;
@@ -102,7 +103,7 @@ public class BrowseCountPersistboltTest {
 		expectedBuSubBuMap.put("EFGHI", expectedFeedCountsMap2);
 		
 		//Assertion
-		Assert.assertEquals("list to be emitted to kafka empty as there is NO PC and IC does not = or > TH", new HashSet<String>(), buSubBuList);
+		Assert.assertEquals( new HashSet<String>(){{add("EFGHI7");}}, buSubBuList);
 		Assert.assertEquals(expectedBuSubBuMap.keySet(), actualBuSubBuMap.keySet());
 		
 		//Iterating through the expectedBuSubBuMap and checking with actualBuSubBuMap
@@ -252,7 +253,7 @@ public class BrowseCountPersistboltTest {
 		expectedBuSubBuMap.put("EFGHI", expectedFeedCountsMap2);
 		
 		//Assertion
-		Assert.assertEquals("list to be emitted to kafka empty as there is NO PC and IC does not = or > TH", new HashSet<String>(), buSubBuList);
+		Assert.assertEquals(new HashSet<String>(){{add("EFGHI7");}}, buSubBuList);
 		Assert.assertEquals(expectedBuSubBuMap.keySet(), actualBuSubBuMap.keySet());
 		
 		//Iterating through the expectedBuSubBuMap and checking with actualBuSubBuMap
@@ -345,7 +346,7 @@ public class BrowseCountPersistboltTest {
 		expectedBuSubBuMap.put("12345", expectedFeedCountsMap4);
 		
 		//Assertion
-		Assert.assertEquals("list to be emitted to kafka empty as PC+IC is not = nor > TH", new HashSet<String>(), buSubBuList);
+		Assert.assertEquals( new HashSet<String>(){{add("EFGHI7");}}, buSubBuList);
 		Assert.assertEquals(expectedBuSubBuMap.keySet(), actualBuSubBuMap.keySet());
 		
 		//Iterating through the expectedBuSubBuMap and checking with actualBuSubBuMap
@@ -440,7 +441,7 @@ public class BrowseCountPersistboltTest {
 		expectedBuSubBuMap.put("12345", expectedFeedCountsMap4);
 		
 		//Assertion
-		Assert.assertEquals("list to be emitted to kafka empty as PC=TH", new HashSet<String>(), buSubBuList);
+		Assert.assertEquals("list to be emitted to kafka empty as PC=TH", new HashSet<String>(){{add("EFGHI7");}}, buSubBuList);
 		Assert.assertEquals(expectedBuSubBuMap.keySet(), actualBuSubBuMap.keySet());
 		
 		//Iterating through the expectedBuSubBuMap and checking with actualBuSubBuMap
@@ -896,7 +897,7 @@ public class BrowseCountPersistboltTest {
 		
 		//Assertion
 		//Assert.assertEquals("123457", buSubBuList.get(0));
-		Assert.assertTrue(buSubBuList.contains("123457"));
+		Assert.assertTrue(buSubBuList.isEmpty());
 		Assert.assertEquals(expectedBuSubBuMap.keySet(), actualBuSubBuMap.keySet());
 		
 		//Iterating through the expectedBuSubBuMap and checking with actualBuSubBuMap
@@ -989,8 +990,8 @@ public class BrowseCountPersistboltTest {
 		expectedBuSubBuMap.put("12345", expectedFeedCountsMap2);
 		
 		//Assertion
-		Assert.assertTrue("XYZW7 emitted to kafka", buSubBuList.contains("XYZW17"));
-		Assert.assertTrue("123457 emitted to kafka", buSubBuList.contains("123457"));
+		Assert.assertTrue(  buSubBuList.isEmpty());
+		Assert.assertTrue(buSubBuList.isEmpty());
 		Assert.assertEquals(expectedBuSubBuMap.keySet(), actualBuSubBuMap.keySet());
 		
 		//Iterating through the expectedBuSubBuMap and checking with actualBuSubBuMap

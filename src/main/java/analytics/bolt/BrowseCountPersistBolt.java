@@ -26,8 +26,8 @@ import backtype.storm.tuple.Tuple;
 
 public class BrowseCountPersistBolt extends EnvironmentBolt{
 	
-	private static final int THRESHOLD = 4;
-	private static final int NUMBER_OF_DAYS = 1;
+	private int browseTagThreshold;
+	private int numberOfDays;
 	static final Logger LOGGER = LoggerFactory.getLogger(BrowseCountPersistBolt.class);
 	private static final long serialVersionUID = 1L;
 	protected OutputCollector outputCollector;
@@ -60,6 +60,8 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
         this.outputCollector = collector;
         super.prepare(stormConf, context, collector);
         browseUtils = new BrowseUtils(System.getProperty(MongoNameConstants.IS_PROD), browseKafkaTopic);
+        browseTagThreshold =  browseUtils.threshhold;
+        numberOfDays = browseUtils.numberOfDays;
         memberBrowseDao = new MemberBrowseDao();
         dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         cpsOccasionsDao = new CpsOccasionsDao();
@@ -103,7 +105,7 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 		}
 		else{
 			Map<String, Map<String, Map<String, Integer>>> dateSpeBuSubBuMap = memberBrowse.getDateSpecificBuSubBu();
-			previousModelCodeMap = browseUtils.getPreviousBoostCounts(l_id, loyalty_id, incomingModelCodeMap, NUMBER_OF_DAYS, memberBrowse);
+			previousModelCodeMap = browseUtils.getPreviousBoostCounts(l_id, loyalty_id, incomingModelCodeMap, numberOfDays, memberBrowse);
 				for(String key : previousModelCodeMap.keySet()){
 					//System.out.println("PC " + key +": " + previousModelCodeMap.get(key));
 					LOGGER.info("PERSIST: PC modelCode or buSubBu for Browse tag " + l_id + "-- "+ key +": " + previousModelCodeMap.get(key));
@@ -189,12 +191,12 @@ public class BrowseCountPersistBolt extends EnvironmentBolt{
 			int IC = Integer.valueOf(incomingModelCodeMap.get(modelCode));
 			if(!existingModelCodeMap.isEmpty() && existingModelCodeMap.containsKey(modelCode)){
 				int PC = existingModelCodeMap.get(modelCode);
-				if(PC < THRESHOLD && (PC + IC) >= THRESHOLD && modelCodeToBoostBusSubBuMap.containsKey(modelCode) && modelCodeToBoostBusSubBuMap.get(modelCode).getBuSubBu() != null){
+				if(PC < browseTagThreshold && (PC + IC) >= browseTagThreshold && modelCodeToBoostBusSubBuMap.containsKey(modelCode) && modelCodeToBoostBusSubBuMap.get(modelCode).getBuSubBu() != null){
 					buSubBuList.add(modelCode+cpsOccasionsDao.getcpsOccasionId().get(web));
 				}
 			}
 			else{
-				if(IC >= THRESHOLD && modelCodeToBoostBusSubBuMap.containsKey(modelCode) && modelCodeToBoostBusSubBuMap.get(modelCode).getBuSubBu() != null){
+				if(IC >= browseTagThreshold && modelCodeToBoostBusSubBuMap.containsKey(modelCode) && modelCodeToBoostBusSubBuMap.get(modelCode).getBuSubBu() != null){
 					buSubBuList.add(modelCode+cpsOccasionsDao.getcpsOccasionId().get(web));
 				}
 			}

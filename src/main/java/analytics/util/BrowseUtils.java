@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
@@ -23,10 +24,20 @@ public class BrowseUtils{
 	private SimpleDateFormat dateFormat = null;
 	private MemberBrowseDao memberBrowseDao;
 	private KafkaUtil kafkaUtil;
+	PropertiesConfiguration properties = null;
+	public int threshhold;
+	public int numberOfDays;
 	
 	public BrowseUtils(){
+		try {
+			properties=  new PropertiesConfiguration("resources/browseutils.properties");
+		} catch (ConfigurationException e) {
+			LOGGER.error("Exception in BrowseUtils " + e);
+		}
 		dateFormat = CalendarUtil.getDateFormat();
 		memberBrowseDao = new MemberBrowseDao();
+		threshhold = Integer.parseInt(properties.getString("browse_threshold"));
+		numberOfDays = Integer.parseInt(properties.getString("browse_number_of_days"));
 	}
 	
 	public BrowseUtils(String systemProperty, String browseKafkaTopic){
