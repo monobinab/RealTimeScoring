@@ -1,18 +1,22 @@
 package analytics;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import storm.kafka.SpoutConfig;
 import analytics.bolt.LoggingBolt;
 import analytics.bolt.PurchaseScoreKafkaBolt;
 import analytics.bolt.RTSKafkaBolt;
 import analytics.bolt.StrategyScoringBolt;
 import analytics.bolt.TellurideParsingBoltPOS;
 import analytics.bolt.TopologyConfig;
+import analytics.spout.RTSKafkaSpout;
 import analytics.spout.WebsphereMQSpout;
 import analytics.util.AuthPropertiesReader;
 import analytics.util.Constants;
+import analytics.util.KafkaUtil;
 import analytics.util.MQConnectionConfig;
 import analytics.util.MongoNameConstants;
 import analytics.util.TopicConstants;
@@ -34,10 +38,22 @@ public class RealTimeScoringTellurideTopology {
 					.println("Please pass the environment variable argument- 'PROD' or 'QA' or 'LOCAL'");
 			System.exit(0);
 		}
-
+		String blackoutKafkaTopic="rts_telluride_batch_blackout";
+		String zkroot_telluride ="tell_zkroot";
+		String group_id = "telluride_groupid";
 		String purchase_Topic="rts_cp_purchase_scores";
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 		String kafkatopic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;
+		String env = System.getProperty(MongoNameConstants.IS_PROD);
+		try {
+			SpoutConfig spoutConfig = null;
+			spoutConfig = new KafkaUtil(env).getSpoutConfig(blackoutKafkaTopic, zkroot_telluride, group_id);
+			topologyBuilder.setSpout("tellurideKafkaSpout", new RTSKafkaSpout(spoutConfig), 1);
+		} catch (ConfigurationException e) {
+			LOGGER.error(e.getClass() + ": " + e.getMessage() +" STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
+			System.exit(0);	
+		}
+		
 		MQConnectionConfig mqConnection = new MQConnectionConfig();
 		WebsphereMQCredential mqCredential = mqConnection
 				.getWebsphereMQCredential(System.getProperty(MongoNameConstants.IS_PROD), "Telluride");
@@ -79,7 +95,9 @@ public class RealTimeScoringTellurideTopology {
 		// create definition of main spout for queue 1
 		topologyBuilder.setBolt("parsingBolt", new TellurideParsingBoltPOS(System.getProperty(MongoNameConstants.IS_PROD),AuthPropertiesReader
 				.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST),new Integer (AuthPropertiesReader
-						.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 12).shuffleGrouping("telluride1").shuffleGrouping("telluride2");
+						.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 12).shuffleGrouping("telluride1").shuffleGrouping("telluride2").shuffleGrouping("tellurideKafkaSpout");
+		
+		//.shuffleGrouping("telluride1").shuffleGrouping("telluride2")
 
        topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System.getProperty(MongoNameConstants.IS_PROD), AuthPropertiesReader
 				.getProperty(Constants.TELLURIDE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
@@ -96,6 +114,7 @@ public class RealTimeScoringTellurideTopology {
        
        Config conf = TopologyConfig.prepareStormConf("Telluride");
        conf.setNumWorkers(48);
+       conf.setMessageTimeoutSecs(7200);
        TopologyConfig.submitStorm(conf, topologyBuilder, args[0]);
        
        /*Config conf = new Config();

@@ -203,7 +203,14 @@ public class TellurideParsingBoltPOS extends EnvironmentBolt {
 	}
 
 	protected String extractTransactionXml(Tuple input) {
-		String transactionXmlAsString = (String) input.getValueByField("npos");
+		String transactionXmlAsString = null;
+		if(input.contains("npos")){
+			transactionXmlAsString = (String) input.getValueByField("npos");
+		}
+		else{
+			transactionXmlAsString = (String) input.getValue(0);
+			LOGGER.info("from kafka " + transactionXmlAsString );
+		}
 		return transactionXmlAsString;
 	}
 
