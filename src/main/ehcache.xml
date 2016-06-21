@@ -44,7 +44,7 @@
  </cache>
  <!-- Daily Refresh Sub-Caches -End -->
  <!-- Daily Refresh Caches -->
-  
+ 
  
  <!-- Weekly Refresh Caches -->
  <cache name="CPSOCCASIONSCACHE" maxElementsInMemory="50" eternal="false"
@@ -110,6 +110,21 @@
   <cache name="DIVLNMODELCODECACHE" maxElementsInMemory="50" eternal="false"
  	overflowToDisk="false" timeToLiveSeconds="604800" memoryStoreEvictionPolicy="LFU">
  </cache>
+ 
+  <cache name="MODELSEASONALZIPFACTORCACHE" maxElementsInMemory="50" eternal="false"
+ 	overflowToDisk="false" timeToLiveSeconds="604800" memoryStoreEvictionPolicy="LFU">
+ </cache>
+ 
+  <cache name="MODELNATIONALFACTORCACHE" maxElementsInMemory="50" eternal="false"
+ 	overflowToDisk="false" timeToLiveSeconds="604800" memoryStoreEvictionPolicy="LFU">
+ </cache>
  <!-- Weekly Refresh Caches -->
+ 
+ 
+  
+ <!-- CACHES NOT GETTING REFRESHED --> 
+ <cache name="MODELSEASONALCONSTANTCACHE" maxElementsInMemory="50" eternal="false"
+ 	overflowToDisk="false" timeToLiveSeconds="0" memoryStoreEvictionPolicy="LFU">
+ </cache>
  
 </ehcache>

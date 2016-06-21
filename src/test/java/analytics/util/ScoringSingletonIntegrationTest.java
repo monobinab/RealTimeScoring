@@ -890,6 +890,159 @@ public class ScoringSingletonIntegrationTest {
 		Assert.assertEquals(simpleDateFormat.format(date), actualChangedMemberScore.getMaxDate());
 	}
 	
+	/*
+	 * ModelId 100 is the one which has regionalFactors and Seasonal constant in the collection.
+	 * it should be weighed by zip/national factor and seasonal constant
+	 */
+	@Test
+	public void calcRTSChangesWithMemberSrsZipTest() throws ParseException{
+		String l_id = "SearsIntegrationTesting17";
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		
+		getMemberVarCollection(l_id);
+		getChangedMemberVarColl(l_id);
+		getMemberInfoColl(l_id);
+		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
+		newChangesVarValueMap.put("VARIABLE400", "0.01");
+	
+		MemberRTSChanges memberRTSChanges = scoringSingletonObj.calcRTSChanges(l_id, newChangesVarValueMap, null, "TEST");
+		Date date = new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate();
+		List<ChangedMemberScore> changedMemberScoresList = memberRTSChanges.getChangedMemberScoreList();
+		ChangedMemberScore actualChangedMemberScore = null;
+		for(int i=0; i<changedMemberScoresList.size(); i++){
+			if(changedMemberScoresList.get(i).getModelId().equals("100")){
+				actualChangedMemberScore = changedMemberScoresList.get(i);
+			}
+		}
+		
+		Map<String, Change> actualAllChanges =  memberRTSChanges.getAllChangesMap();
+		Object actualVar400Value = actualAllChanges.get("VARIABLE400").getValue();
+		Date actualVar400Date = actualAllChanges.get("VARIABLE400").getExpirationDate();
+			
+		int compareVal = new Integer((Integer) actualVar400Value).compareTo(new Integer(1));
+		int compareVal2 = new Double(0.4935038296049903).compareTo(new Double(actualChangedMemberScore.getScore()));
+		Assert.assertEquals(compareVal, 0);
+		Assert.assertEquals(date, actualVar400Date);
+		Assert.assertEquals(compareVal2, 0);
+		Assert.assertEquals(simpleDateFormat.format(date), actualChangedMemberScore.getMinDate());
+		Assert.assertEquals(simpleDateFormat.format(date), actualChangedMemberScore.getMaxDate());
+	}
+	
+	/*
+	 * modelId 35 is a model which is not influenced by regional factor and constant
+	 */
+	@Test
+	public void calcRTSChangesWithModelNotInfluencedByRegionTest() throws ParseException{
+		String l_id = "SearsIntegrationTesting18";
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		
+		getMemberVarCollection(l_id);
+		getChangedMemberVarColl(l_id);
+		getMemberInfoColl(l_id);
+		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
+		newChangesVarValueMap.put("VARIABLE4", "0.01");
+	
+		MemberRTSChanges memberRTSChanges = scoringSingletonObj.calcRTSChanges(l_id, newChangesVarValueMap, null, "TEST");
+		Date date = simpleDateFormat.parse("2999-09-23");
+		Date date2 = new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate();
+		List<ChangedMemberScore> changedMemberScoresList = memberRTSChanges.getChangedMemberScoreList();
+		ChangedMemberScore actualChangedMemberScore = null;
+		for(int i=0; i<changedMemberScoresList.size(); i++){
+			if(changedMemberScoresList.get(i).getModelId().equals("35")){
+				actualChangedMemberScore = changedMemberScoresList.get(i);
+			}
+		}
+		
+		Map<String, Change> actualAllChanges =  memberRTSChanges.getAllChangesMap();
+		Object actualVar400Value = actualAllChanges.get("VARIABLE4").getValue();
+		Date actualVar400Date = actualAllChanges.get("VARIABLE4").getExpirationDate();
+			
+		int compareVal = new Integer((Integer) actualVar400Value).compareTo(new Integer(1));
+		int compareVal2 = new Double(0.9937257044403371).compareTo(new Double(actualChangedMemberScore.getScore()));
+		Assert.assertEquals(compareVal, 0);
+		Assert.assertEquals(date2, actualVar400Date);
+		Assert.assertEquals(compareVal2, 0);
+		Assert.assertEquals(simpleDateFormat.format(date2), actualChangedMemberScore.getMinDate());
+		Assert.assertEquals(simpleDateFormat.format(date), actualChangedMemberScore.getMaxDate());//changedMemberVariable has variable 10 affecting modelId 35 with exp date of 2999-09-23
+	}
+	
+	/*
+	 * If the member doesn't have record in memberInfo collection, factor will be fetched from modelSeaonalNational collection
+	 */
+	@Test
+	public void calcRTSChangesWithNoMemberSrsZipTest() throws ParseException{
+		String l_id = "SearsIntegrationTesting19";
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		
+		getMemberVarCollection(l_id);
+		getChangedMemberVarColl(l_id);
+		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
+		newChangesVarValueMap.put("VARIABLE400", "0.01");
+	
+		MemberRTSChanges memberRTSChanges = scoringSingletonObj.calcRTSChanges(l_id, newChangesVarValueMap, null, "TEST");
+		Date date = new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate();
+		List<ChangedMemberScore> changedMemberScoresList = memberRTSChanges.getChangedMemberScoreList();
+		ChangedMemberScore actualChangedMemberScore = null;
+		for(int i=0; i<changedMemberScoresList.size(); i++){
+			if(changedMemberScoresList.get(i).getModelId().equals("100")){
+				actualChangedMemberScore = changedMemberScoresList.get(i);
+			}
+		}
+		
+		Map<String, Change> actualAllChanges =  memberRTSChanges.getAllChangesMap();
+		Object actualVar4Value = actualAllChanges.get("VARIABLE400").getValue();
+		Date actualVar400Date = actualAllChanges.get("VARIABLE400").getExpirationDate();
+			
+		int compareVal = new Integer((Integer) actualVar4Value).compareTo(new Integer(1));
+		int compareVal3 = new Double(0.9924215425629855).compareTo(new Double(actualChangedMemberScore.getScore()));
+		Assert.assertEquals(compareVal, 0);
+		Assert.assertEquals(date, actualVar400Date);
+		Assert.assertEquals(compareVal3, 0);
+		Assert.assertEquals(simpleDateFormat.format(date), actualChangedMemberScore.getMinDate());
+		Assert.assertEquals(simpleDateFormat.format(date), actualChangedMemberScore.getMaxDate());
+	}
+	
+	/*
+	 * If the member's zip code is not in ModelSeasonalZip collection, factor will be fetched from modelSeaonalNational collection
+	 */
+	@Test
+	public void calcRTSChangesWithMemberSrsZipNotInCollTest() throws ParseException{
+		String l_id = "SearsIntegrationTesting20";
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		
+		getMemberVarCollection(l_id);
+		getChangedMemberVarColl(l_id);
+		DBCollection memInfoColl = db.getCollection("memberInfo");
+		memInfoColl.insert(new BasicDBObject("l_id", l_id).append("srs", "0001470")
+				.append("srs_zip", "56142").append("kmt", "3251").append("kmt_zip", "46241")
+				.append( "eid", "258003809").append("eml_opt_in", "Y").append("st_cd", "TN"));
+		Map<String, String> newChangesVarValueMap = new HashMap<String, String>();
+		newChangesVarValueMap.put("VARIABLE400", "0.01");
+	
+		MemberRTSChanges memberRTSChanges = scoringSingletonObj.calcRTSChanges(l_id, newChangesVarValueMap, null, "TEST");
+		Date date = new LocalDate(new Date()).plusDays(2).toDateMidnight().toDate();
+		List<ChangedMemberScore> changedMemberScoresList = memberRTSChanges.getChangedMemberScoreList();
+		ChangedMemberScore actualChangedMemberScore = null;
+		for(int i=0; i<changedMemberScoresList.size(); i++){
+			if(changedMemberScoresList.get(i).getModelId().equals("100")){
+				actualChangedMemberScore = changedMemberScoresList.get(i);
+			}
+		}
+		
+		Map<String, Change> actualAllChanges =  memberRTSChanges.getAllChangesMap();
+		Object actualVar400Value = actualAllChanges.get("VARIABLE400").getValue();
+		Date actualVar400Date = actualAllChanges.get("VARIABLE400").getExpirationDate();
+			
+		int compareVal = new Integer((Integer) actualVar400Value).compareTo(new Integer(1));
+		int compareVal3 = new Double(0.9924215425629855).compareTo(new Double(actualChangedMemberScore.getScore()));
+		Assert.assertEquals(compareVal, 0);
+		Assert.assertEquals(date, actualVar400Date);
+		Assert.assertEquals(compareVal3, 0);
+		Assert.assertEquals(simpleDateFormat.format(date), actualChangedMemberScore.getMinDate());
+		Assert.assertEquals(simpleDateFormat.format(date), actualChangedMemberScore.getMaxDate());
+	}
+	
+	
 	@AfterClass
 	public static void cleanUp(){
 		SystemPropertyUtility.dropDatabase();

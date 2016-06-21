@@ -25,6 +25,9 @@ public class CacheConstant {
 	public static final String RTS_CACHE_DIVlN_MODELCODE_CACHE = "DIVLNMODELCODECACHE";
 	public static final String RTS_CACHE_MODEL_BOOST_VARIABLES_CACHE = "MODELBOOSTVARIABLECACHE";
 	public static final String RTS_CACHE_BOOST_CACHE = "BOOSTSCACHE";
+	public static final String RTS_CACHE_MODEL_SEASONAL_CONSTANT_CACHE = "MODELSEASONALCONSTANTCACHE";
+	public static final String RTS_CACHE_MODEL_SEASONAL_ZIP_FACTOR_CACHE = "MODELSEASONALZIPFACTORCACHE";
+	public static final String RTS_CACHE_MODEL_NATIONAL_FACTOR_CACHE = "MODELNATIONALFACTORCACHE";
 	
 	//Second Level Cache
 	public static final String RTS_CACHE_ALL_MODEL_VARIABLES_CACHE = "ALLMODELVARIABLECACHE";
@@ -98,6 +101,15 @@ public class CacheConstant {
 	
 	//Boosts Cache Key
 	public static final String RTS_BOOSTS_CACHE_KEY = "686bc257-cc3d-4a8d-8734-9124a1d04a79";
+	 
+	//ModelSeasonalConstant Cache Key
+	public static final String RTS_MODEL_SEASONAL_CONSTANT_CACHE_KEY = "90032e3f-9251-4e76-bd36-a550c3fa6d0e";
+	
+	//ModelSeasonalZipFactor Cache Key
+	public static final String RTS_MODEL_SEASONAL_ZIP_FACTOR_CACHE_KEY = "4329b2a4-53c5-4672-9c24-53315e03d55f";
+	
+	//ModelNationalFactor Cache Key
+	public static final String RTS_MODEL_NATIONAL_FACTOR_CACHE_KEY = "4fce7844-1478-4b4f-90ab-19f98fddb4e2";
 	
 	 //SECOND LEVEL CACHE
 	
@@ -109,4 +121,5 @@ public class CacheConstant {
 	 
 	//All Variable Cache Key
 	 public static final String RTS_ALL_VARIABLE_CACHE_KEY = "444e5984-4811-49c1-a236-c655dc082277";
+
 }

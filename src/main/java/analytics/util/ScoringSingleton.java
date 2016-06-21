@@ -24,6 +24,9 @@ import analytics.util.dao.ChangedMemberVariablesDao;
 import analytics.util.dao.MemberInfoDao;
 import analytics.util.dao.MemberVariablesDao;
 import analytics.util.dao.ModelBoostsDao;
+import analytics.util.dao.ModelSeasonalConstantDao;
+import analytics.util.dao.ModelSeasonalNationalDao;
+import analytics.util.dao.ModelSeasonalZipDao;
 import analytics.util.dao.ModelVariablesDao;
 import analytics.util.dao.MongoDBConnectionWrapper;
 import analytics.util.dao.VariableDao;
@@ -35,6 +38,7 @@ import analytics.util.objects.MemberInfo;
 import analytics.util.objects.MemberRTSChanges;
 import analytics.util.objects.Model;
 import analytics.util.objects.RealTimeScoringContext;
+import analytics.util.objects.RegionalFactor;
 import analytics.util.objects.StrategyMapper;
 import analytics.util.objects.Variable;
 import analytics.util.strategies.Strategy;
@@ -53,6 +57,11 @@ public class ScoringSingleton {
 	
 	//boost separation
 	ModelBoostsDao modelBoostsDao;
+	
+	//for RegionalFactor changes
+	private ModelSeasonalZipDao modelSeasonalZipDao;
+	private ModelSeasonalNationalDao modelSeasonalNationalDao;
+	private ModelSeasonalConstantDao modelSeasonalConstantDao;
 
 	private boolean isExecuted = Boolean.FALSE;
 	
@@ -90,6 +99,9 @@ public class ScoringSingleton {
 			memberVariablesDao = new MemberVariablesDao();
 			changedMemberScoresDao = new ChangedMemberScoresDao();
 			memberInfoDao = new MemberInfoDao();
+			modelSeasonalZipDao = new ModelSeasonalZipDao();
+			modelSeasonalNationalDao = new ModelSeasonalNationalDao();
+			modelSeasonalConstantDao = new ModelSeasonalConstantDao();
 		}
 	}
 
@@ -137,6 +149,12 @@ public class ScoringSingleton {
 		
 		Map<Integer, Map<Integer, Model>> modelsMap = modelVariablesDao.getAllModelVariables();
 		Map<String, List<Integer>> variableModelsMap = modelVariablesDao.getAllVariableModelsMap();
+		for(String key :  variableModelsMap.keySet()){
+//			System.out.println("variable " + key);
+		}
+		Map<String, RegionalFactor> modelSeasonalZipMap = modelSeasonalZipDao.getmodelSeasonalZipFactor();
+		Map<Integer, RegionalFactor> modelSeasonalNationalMap = modelSeasonalNationalDao.getmodelSeasonalNationalFactor();
+		Map<Integer, Model> modelSeasonalConstantMap = modelSeasonalConstantDao.getmodelSeasonalConstant();
 	
 		try{		
 			//Find all models affected by the new incoming changes if newChangesVarValueMap is null
@@ -178,17 +196,25 @@ public class ScoringSingleton {
 						allChanges = changedMemberVariables;
 					}
 				
+					for(String var : allChanges.keySet()){
+						System.out.println(var + ": " + allChanges.get(var).getValue());
+					}
 					memberRTSChanges = new MemberRTSChanges();
 					List<ChangedMemberScore> changedMemberScoreList = new ArrayList<ChangedMemberScore>();
-					
+									
 					for (Integer modelId : modelIdsList) {
-					
+						
 							double rtsScore = 0.0;
 							try {
 								Blackout blackout = isBlackOutModel(allChanges, modelId, modelsMap);
 								if(!blackout.isBlackoutFlag()){
 									//recalculate score for each model
 									rtsScore = this.calcScore(memberVariablesMap, allChanges, modelId, variableNameToVidMap, modelsMap);
+									
+									//, modelSeasonalZipMap, modelSeasonalNationalMap, modelSeasonalConstantMap
+									if(modelSeasonalConstantMap != null && modelSeasonalNationalMap != null && modelSeasonalConstantMap.containsKey(modelId)){
+										rtsScore = finalScore(rtsScore, lId, modelId, modelsMap, modelSeasonalZipMap, modelSeasonalNationalMap, modelSeasonalConstantMap );
+									}
 									
 									LOGGER.debug("new score before boost var: " + rtsScore);
 									
@@ -252,133 +278,15 @@ public class ScoringSingleton {
 			return memberRTSChanges;
 	}
 	
-	public MemberRTSChanges calcRTSChangesBlackout(String lId, Map<String, String> newChangesVarValueMap, Set<Integer> modelIdsList, String source, Date transactionDate){
-		MemberRTSChanges memberRTSChanges = null;
-		Map<String, String> variableNameToStrategyMap = new HashMap<String, String>();
-		Map<String, String> variableNameToVidMap = new HashMap<String, String>();
-		Map<String, String> variableVidToNameMap = new HashMap<String, String>();
-		
-		List<Variable> variables = variableDao.getAllVariables();
-		for (Variable variable : variables) {
-			if (variable.getName() != null && variable.getVid() != null) {
-				variableNameToVidMap.put(variable.getName(), variable.getVid());
-				variableNameToStrategyMap.put(variable.getName(), variable.getStrategy());
-				variableVidToNameMap.put(variable.getVid(), variable.getName());
-			}
+	@SuppressWarnings("unused")
+	private double regionalFactorScore(String lId, Integer modelId, Map<Integer, Model> modelsMap, Map<Model, RegionalFactor> modelSeasonalZipMap){
+		String modelName = modelsMap.get(modelId).getModelName();
+		String zip = getZip(lId, modelName);
+		if(zip != null){
 		}
-		
-		Map<Integer, Map<Integer, Model>> modelsMap = modelVariablesDao.getAllModelVariables();
-		Map<String, List<Integer>> variableModelsMap = modelVariablesDao.getAllVariableModelsMap();
-		try{		
-			//Find all models affected by the new incoming changes if newChangesVarValueMap is null
-			if(newChangesVarValueMap !=  null && !newChangesVarValueMap.isEmpty()){
-				Iterator<String> itr = newChangesVarValueMap.keySet().iterator();
-				while(itr.hasNext()){
-					String var = itr.next();
-					if(!variableNameToStrategyMap.containsKey(var)){
-						LOGGER.info("var NOT in variables collection " + var);
-					}
-					if(variableNameToStrategyMap.containsKey(var) && variableNameToStrategyMap.get(var).equalsIgnoreCase("NONE")){
-						itr.remove();
-					}
-				}
-				 modelIdsList = this.getModelIdList(newChangesVarValueMap, variableModelsMap, modelsMap);
-			}
-		
-			if(modelIdsList != null && !modelIdsList.isEmpty()){ 
-			
-				//Create a map of variable values for member, fetched from memberVariables collection
-				Map<String, Object> memberVariablesMap = this.createMemberVariableValueMap(lId, modelIdsList, variableNameToVidMap, modelsMap);
-			
-					//create a map of non-expired variables and value fetched from changedMembervariables collection
-					Map<String, Change> changedMemberVariables = this.createChangedMemberVariablesMap(lId, variableVidToNameMap);
-				
-					//For each variable in new changes, execute strategy and store in allChanges
-					//empty check for newChangesVarValueMap is NOT NEEDED here as empty map will come only from topology
-					//and if it is empty, modelList will be empty and the control won't be here
-					Map<String, Change> allChanges = null;
-					if( newChangesVarValueMap !=  null ){
-						allChanges = this.executeStrategyBlackout(changedMemberVariables, newChangesVarValueMap, memberVariablesMap, variableNameToStrategyMap, variableNameToVidMap, variableModelsMap, modelsMap, transactionDate);
-					}//if this method is called from outside of the topology, newChangesVarValueMap will be null and 
-					  //thereby allChanges should be set with changedMemberVariables for scoring
-					else{
-						allChanges = changedMemberVariables;
-					}
-					memberRTSChanges = new MemberRTSChanges();
-					List<ChangedMemberScore> changedMemberScoreList = new ArrayList<ChangedMemberScore>();
-					
-					for (Integer modelId : modelIdsList) {
-					
-							double rtsScore = 0.0;
-							try {
-								Blackout blackout = isBlackOutModel(allChanges, modelId, modelsMap);
-								if(!blackout.isBlackoutFlag()){
-									//recalculate score for each model
-									rtsScore = this.calcScore(memberVariablesMap, allChanges, modelId, variableNameToVidMap, modelsMap);
-									
-									LOGGER.debug("new score before boost var: " + rtsScore);
-									
-									rtsScore = rtsScore + this.getBoostScore(allChanges, modelId, modelsMap);
-						
-									if(rtsScore > 1.0)
-										rtsScore = 1.0;
-									
-									if(rtsScore < 0.0){
-										rtsScore = 0.0;
-									}
-									Map<String, Date> minMaxMap = this.getMinMaxExpiry(modelId, allChanges, variableModelsMap, modelsMap);
-									getPopulatedChangedMemberScoreBlackout(source, changedMemberScoreList, modelId, rtsScore, minMaxMap, transactionDate);
-								}
-								else {
-									String blackoutVar = blackout.getBlackoutVariables();
-									if(changedMemberVariables.keySet().contains(blackoutVar) ){
-										if(newChangesVarValueMap != null && (newChangesVarValueMap.containsKey(blackoutVar))){
-											Map<String, Date> minMaxMap = this.getBlackoutMinMaxExpiry(blackout, allChanges);
-											getPopulatedChangedMemberScoreBlackout(source, changedMemberScoreList, modelId, rtsScore, minMaxMap, transactionDate);
-											LOGGER.info("PERSIST: member " + lId +" blacked out " + "for model " + modelId +" on " + new Date());
-										}
-										else{
-											allChanges.remove(blackoutVar);
-											continue;
-										}
-									}
-									else{
-										Map<String, Date> minMaxMap = this.getBlackoutMinMaxExpiry(blackout, allChanges);
-										getPopulatedChangedMemberScoreBlackout(source, changedMemberScoreList, modelId, rtsScore, minMaxMap, transactionDate);
-										LOGGER.info("PERSIST: member " + lId +" blacked out " + "for model " + modelId +" on " + new Date());
-									}
-								}
-							}
-						   catch(RealTimeScoringException e2){
-							   LOGGER.error("Exception scoring modelId " + modelId +" for lId " + lId + " " + e2.getErrorMessage());
-							   memberRTSChanges.setMetricsString("exception_per_model");
-						   }
-						   catch(Exception e){
-							   e.printStackTrace();
-							   LOGGER.error("Exception scoring modelId " + modelId +" for lId " + lId );
-							   memberRTSChanges.setMetricsString("exception_per_model");
-
-						   }
-						}
-							 memberRTSChanges.setlId(lId);
-							 memberRTSChanges.setChangedMemberScoreList(changedMemberScoreList);
-							 memberRTSChanges.setAllChangesMap(allChanges);
-				}	
-			else{
-				memberRTSChanges = new MemberRTSChanges();
-				memberRTSChanges.setMetricsString("no_vars_ofinterest");
-			}
-			}
-		catch(Exception e){
-			e.printStackTrace();
-			LOGGER.error("Exception scoring lId " + e.getMessage() + "cause: " + e.getCause());
-			LOGGER.error(ExceptionUtils.getMessage(e) + "root cause-"+ ExceptionUtils.getRootCauseMessage(e) + ExceptionUtils.getStackTrace(e));
-			memberRTSChanges = new MemberRTSChanges();
-			memberRTSChanges.setMetricsString("exception_per_member");
-		}
-			return memberRTSChanges;
+		return 0;
 	}
-
+	
 	private void getPopulatedChangedMemberScore(String source,
 			List<ChangedMemberScore> changedMemberScoreList, Integer modelId,
 			double rtsScore, Map<String, Date> minMaxMap) {
@@ -392,19 +300,6 @@ public class ScoringSingleton {
 		 changedMemberScoreList.add(changedMemberScore);
 	}
 	
-	private void getPopulatedChangedMemberScoreBlackout(String source,
-			List<ChangedMemberScore> changedMemberScoreList, Integer modelId,
-			double rtsScore, Map<String, Date> minMaxMap, Date transactionDate) {
-		ChangedMemberScore changedMemberScore = new ChangedMemberScore();
-		 changedMemberScore.setModelId(modelId.toString());
-		 changedMemberScore.setMinDate(getDateFormat(minMaxMap.get("minExpiry")));
-		 changedMemberScore.setMaxDate(getDateFormat(minMaxMap.get("maxExpiry")));
-		 changedMemberScore.setEffDate(getDateFormat(transactionDate));
-		 changedMemberScore.setScore(rtsScore);
-		 changedMemberScore.setSource(source);
-		 changedMemberScoreList.add(changedMemberScore);
-	}
-
 	public Map<String, Object> createMemberVariableValueMap(String loyaltyId, Set<Integer> modelIdList, Map<String, String> variableNameToVidMap, Map<Integer, Map<Integer, Model>> modelsMap)  {
 		Set<String> filteredVariables = new HashSet<String>();
 		for (Integer modelId : modelIdList) {
@@ -468,12 +363,18 @@ public class ScoringSingleton {
 	}
 	
 	
-	public String getState(String lId){
-		MemberInfo memberIfo = memberInfoDao.getMemberInfo(lId);
-		String state = null;
-		if(memberIfo != null && memberIfo.getState() != null)
-			state = memberIfo.getState();
-		return state;
+	public String getZip(String lId, String modelName){
+		MemberInfo memberInfo = memberInfoDao.getMemberInfo(lId);
+		String zip = null;
+		if(memberInfo != null ){
+			if(modelName.contains("S_SCR") && memberInfo.getSrs_zip() != null){
+				zip = memberInfo.getSrs_zip();
+			}
+			else if(modelName.contains("K_SCR") && memberInfo.getKmt_zip() != null){
+				zip = memberInfo.getKmt_zip();
+			}
+		}
+		return zip;
 	}
 
 	/**
@@ -690,7 +591,7 @@ public class ScoringSingleton {
 		// recalculate score for model
 		double baseScore = calcBaseScore(mbrVarMap, allChanges, modelId, variableNameToVidMap, modelsMap);
 		double newScore;
-
+		double finalScore;
 		if (baseScore <= -100) {
 			newScore = 0;
 		} else if (baseScore >= 35) {
@@ -698,9 +599,42 @@ public class ScoringSingleton {
 		} else {
 			newScore = Math.exp(baseScore) / (1 + Math.exp(baseScore));
 		}
+	/*	finalScore = finalScore(newScore, lId, modelId, modelsMap, modelSeasonalZipMap, modelSeasonalNationalMap, modelSeasonalConstantMap );
+		if(finalScore != 0)
+			return finalScore;
+		else
+			return newScore;*/
 		return newScore;
 	}
 	
+	
+	protected double finalScore(double newScore, String lId, Integer modelId, Map<Integer, Map<Integer, Model>> modelsMap, Map<String, RegionalFactor> modelSeasonalZipMap, Map<Integer, RegionalFactor> modelSeasonalNationalMap, Map<Integer, Model> modelSeasonalConstantMap){
+		String modelName = modelsMap.get(modelId).get(0).getModelName();
+		String zip = getZip(lId, modelName);
+		double seasonalConstant = 0;
+		if(modelSeasonalConstantMap != null && modelSeasonalConstantMap.get(modelId) != null)
+			seasonalConstant = modelSeasonalConstantMap.get(modelId).getSeasonalConstant();
+		double regionalFactor = 0;
+		double regionalScore = 0;
+		String key = Integer.toString(modelId) + zip;
+		if(zip != null && modelSeasonalZipMap != null && modelSeasonalZipMap.containsKey(key) && modelSeasonalZipMap.get(key) != null ){
+				regionalFactor = modelSeasonalZipMap.get(key).getFactor();
+		}
+		else if(modelSeasonalNationalMap != null && modelSeasonalNationalMap.get(modelId) != null){
+			regionalFactor = modelSeasonalNationalMap.get(modelId).getFactor();
+		}
+		if(seasonalConstant != 0 && regionalFactor != 0)
+			regionalScore = regScore(newScore, regionalFactor, seasonalConstant);
+		return regionalScore;
+	}
+	
+	private double regScore(double newScore, double factor, double seasonalConstant){
+		double a = Math.exp(Math.log(newScore)+Math.log(1-seasonalConstant)+Math.log(factor));
+		double b = Math.exp(Math.log(1-newScore)+Math.log(seasonalConstant)+Math.log(1-factor));
+		double score = Math.exp(Math.log(a)-Math.log(a+b));
+		return score;
+	}
+
 	public double calcBaseScore(Map<String, Object> mbrVarMap, Map<String, Change> allChanges, Integer modelId, Map<String, String> variableNameToVidMap, Map<Integer, Map<Integer, Model>> modelsMap) throws RealTimeScoringException {
 
 		if (allChanges == null || allChanges.isEmpty()) {
