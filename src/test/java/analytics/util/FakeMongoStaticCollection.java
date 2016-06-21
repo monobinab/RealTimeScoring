@@ -16,7 +16,31 @@ public class FakeMongoStaticCollection {
 	static DBCollection boostBrowseBuSubBuColl;
 	static DBCollection modelBoostsColl;
 	static DBCollection boostsColl;
+	static DBCollection modelSeasonalConstantColl;
+	static DBCollection modelSeasonalZipColl;
+	static DBCollection modelSeasonalNationalColl;
 	
+	
+	public static DBCollection getModelSeasonalZipColl() {
+		return modelSeasonalZipColl;
+	}
+	public static void setModelSeasonalZipColl(DBCollection modelSeasonalZipColl) {
+		FakeMongoStaticCollection.modelSeasonalZipColl = modelSeasonalZipColl;
+	}
+	public static DBCollection getModelSeasonalNationalColl() {
+		return modelSeasonalNationalColl;
+	}
+	public static void setModelSeasonalNationalColl(
+			DBCollection modelSeasonalNationalColl) {
+		FakeMongoStaticCollection.modelSeasonalNationalColl = modelSeasonalNationalColl;
+	}
+	public static DBCollection getModelSeasonalConstantColl() {
+		return modelSeasonalConstantColl;
+	}
+	public static void setModelSeasonalConstantColl(
+			DBCollection modelSeasonalConstantColl) {
+		FakeMongoStaticCollection.modelSeasonalConstantColl = modelSeasonalConstantColl;
+	}
 	public static DBCollection getModelBoostsColl() {
 		return modelBoostsColl;
 	}
@@ -96,6 +120,7 @@ public class FakeMongoStaticCollection {
 		varColl.insert(new BasicDBObject("name", "S_SRS_VAR2").append("VID", 17).append("strategy","StrategyCountTransactions"));
 		varColl.insert(new BasicDBObject("name", "variable41").append("VID", 41).append("strategy","StrategySumSales").append("default", 731));
 		varColl.insert(new BasicDBObject("name", "variable42").append("VID", 42).append("strategy","StrategySumSales"));
+		varColl.insert(new BasicDBObject("name", "variable400").append("VID", 100).append("strategy","StrategyDaysSinceLast"));
 		//varColl.insert(new BasicDBObject("name", "Blackout_variable2").append("VID", 18).append("strategy","StrategyBlackout"));
 	
 		//fake modelVariables collection
@@ -141,6 +166,10 @@ public class FakeMongoStaticCollection {
 		dbList9.add(new BasicDBObject("name", "variable42").append("coefficient", 0.015));
 		modeVarColl.insert(new BasicDBObject("modelId", 73).append("modelName", "Model_Name73").append("modelDescription", "Home Appliances73").append("constant", 5).append("month", 0).append("variable", dbList9));
 		
+		BasicDBList dbList10 = new BasicDBList();
+		dbList10.add(new BasicDBObject("name", "variable400").append("coefficient", 0.1));
+		modeVarColl.insert(new BasicDBObject("modelId", 100).append("modelName", "S_SCR_TEST").append("modelDescription", "Home Appliances100").append("constant", 5).append("month", 0).append("variable", dbList10));
+		
 		/*BasicDBList dbList10 = new BasicDBList();
 		dbList10.add(new BasicDBObject("name", "variable42").append("coefficient", 0.015));
 		modeVarColl.insert(new BasicDBObject("modelId", 73).append("modelName", "Model_Name73").append("modelDescription", "Home Appliances73").append("constant", 5).append("month", 0).append("variable", dbList10));*/
@@ -182,6 +211,19 @@ public class FakeMongoStaticCollection {
 		dbList92.add(new BasicDBObject("name", "Blackout_variable2").append("coefficient", 0.015).append("intercept", 0.0));
 		modelBoostsColl.insert(new BasicDBObject("modelId", 75).append("modelName", "Model_Name8").append("modelDescription", "Home Appliances2").append("constant", 5).append("month", 0).append("variable", dbList92));
 		
+		//fake modelSeasonalConstant collection
+		modelSeasonalConstantColl = db.getCollection("modelSeasonalConstant");
+		modelSeasonalConstantColl.insert(new BasicDBObject("modelName", "S_SCR_TEST").append("modelId", 100).append("modelCode", "modelCode").append("constant", 0.01));
+	
+		//fake modelSeasonalZip collection
+		modelSeasonalZipColl = db.getCollection("modelSeasonalZip");
+		modelSeasonalZipColl.insert(new BasicDBObject("modelName", "S_SCR_TEST" ).append("modelId", 100).append("modelCode", "modelCode").append("zip", "99000").append("f_dt", "2016-06-10").append("factor", 0.007));
+		modelSeasonalZipColl.insert(new BasicDBObject("modelName", "S_SCR_TEST" ).append("modelId", 100).append("modelCode", "modelCode").append("zip", "46142").append("f_dt", "2016-06-10").append("factor", 0.00006));
+		
+		//fake modelSeasonalNational collection
+		modelSeasonalNationalColl = db.getCollection("modelSeasonalNational");
+		modelSeasonalNationalColl.insert(new BasicDBObject("modelName", "S_SCR_TEST" ).append("modelId", 100).append("modelCode", "modelCode").append("f_dt", "2016-06-10").append("factor", 0.008));
+		
 		setVarColl(varColl);
 		setModeVarColl(modeVarColl);
 		setRegionalAdjFactorsColl(regionalAdjFactorsColl);
@@ -190,6 +232,9 @@ public class FakeMongoStaticCollection {
 		setBoostBrowseBuSubBuColl(boostBrowseBuSubBuColl);
 		setBoostsColl(boostsColl);
 		setModelBoostsColl(modelBoostsColl);
+		setModelSeasonalZipColl(modelSeasonalZipColl);
+		setModelSeasonalNationalColl(modelSeasonalNationalColl);
+		setModelSeasonalConstantColl(modelSeasonalConstantColl);
 		/*setMemberVarsColl(memVarColl);
 		setChangedMemberVarsColl(changedMemberVar);
 		*/
