@@ -63,7 +63,7 @@ public class CPSFiler {
 		MemberInfo memberInfo  = memberInfoDao.getMemberInfo(l_id);
 		
 		if(memberInfo!=null){
-			if(StringUtils.isNotBlank(memberInfo.getEid())&& memberInfo.getEid()!="0"){
+			if(StringUtils.isNotBlank(memberInfo.getEid())&& Integer.parseInt(memberInfo.getEid())!=0){
 				List<TagMetadata> validOccasions = this.getValidOccasionsList(rtsAPIResponse);				
 				
 				if(validOccasions != null && validOccasions.size() > 0){
