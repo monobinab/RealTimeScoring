@@ -54,11 +54,7 @@ public class CPSFiler {
 		List<EmailPackage> emailPackages = new ArrayList<EmailPackage>(); 
 		// Special case: Stopping a single member
 
-		if("7081275994270606".equalsIgnoreCase(lyl_id_no))
-		{
-			return emailPackages;
-		}
-		
+	
 		OccasionInfo occasionInfo;		
 		MemberInfo memberInfo  = memberInfoDao.getMemberInfo(l_id);
 		
