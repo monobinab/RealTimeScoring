@@ -52,9 +52,7 @@ public class CPSFiler {
 	public List<EmailPackage> prepareEmailPackages(String rtsAPIResponse, String lyl_id_no,String l_id) throws JSONException, SQLException, Exception {
 		
 		List<EmailPackage> emailPackages = new ArrayList<EmailPackage>(); 
-		// Special case: Stopping a single member
 
-	
 		OccasionInfo occasionInfo;		
 		MemberInfo memberInfo  = memberInfoDao.getMemberInfo(l_id);
 		
