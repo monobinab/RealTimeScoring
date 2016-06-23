@@ -48,7 +48,7 @@ public class ModelSeasonalNationalDao extends AbstractDao{
 				modelCodeSeasonalNationalFactorMap.put(Integer.parseInt(dbObj.get(MongoNameConstants.MODEL_ID).toString()), regFactor);
 			}
 			if(modelCodeSeasonalNationalFactorMap != null && modelCodeSeasonalNationalFactorMap.size() > 0){
-				LOGGER.info("PERSIST: modelSeasonalZip collection gets refreshed on " + new Date());
+				LOGGER.info("PERSIST: modelSeasonalNational collection gets refreshed on " + new Date());
 				cache.put(new Element(cacheKey, (Map<Integer, RegionalFactor>) modelCodeSeasonalNationalFactorMap));
 			}
 			return modelCodeSeasonalNationalFactorMap;

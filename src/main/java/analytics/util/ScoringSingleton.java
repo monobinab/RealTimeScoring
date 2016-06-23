@@ -149,9 +149,7 @@ public class ScoringSingleton {
 		
 		Map<Integer, Map<Integer, Model>> modelsMap = modelVariablesDao.getAllModelVariables();
 		Map<String, List<Integer>> variableModelsMap = modelVariablesDao.getAllVariableModelsMap();
-		for(String key :  variableModelsMap.keySet()){
-//			System.out.println("variable " + key);
-		}
+
 		Map<String, RegionalFactor> modelSeasonalZipMap = modelSeasonalZipDao.getmodelSeasonalZipFactor();
 		Map<Integer, RegionalFactor> modelSeasonalNationalMap = modelSeasonalNationalDao.getmodelSeasonalNationalFactor();
 		Map<Integer, Model> modelSeasonalConstantMap = modelSeasonalConstantDao.getmodelSeasonalConstant();
@@ -195,10 +193,7 @@ public class ScoringSingleton {
 					else{
 						allChanges = changedMemberVariables;
 					}
-				
-					for(String var : allChanges.keySet()){
-						System.out.println(var + ": " + allChanges.get(var).getValue());
-					}
+		
 					memberRTSChanges = new MemberRTSChanges();
 					List<ChangedMemberScore> changedMemberScoreList = new ArrayList<ChangedMemberScore>();
 									
@@ -591,7 +586,6 @@ public class ScoringSingleton {
 		// recalculate score for model
 		double baseScore = calcBaseScore(mbrVarMap, allChanges, modelId, variableNameToVidMap, modelsMap);
 		double newScore;
-		double finalScore;
 		if (baseScore <= -100) {
 			newScore = 0;
 		} else if (baseScore >= 35) {
@@ -599,11 +593,6 @@ public class ScoringSingleton {
 		} else {
 			newScore = Math.exp(baseScore) / (1 + Math.exp(baseScore));
 		}
-	/*	finalScore = finalScore(newScore, lId, modelId, modelsMap, modelSeasonalZipMap, modelSeasonalNationalMap, modelSeasonalConstantMap );
-		if(finalScore != 0)
-			return finalScore;
-		else
-			return newScore;*/
 		return newScore;
 	}
 	

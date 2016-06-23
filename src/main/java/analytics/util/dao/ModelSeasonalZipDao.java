@@ -11,7 +11,6 @@ import analytics.util.MongoNameConstants;
 import analytics.util.dao.caching.CacheBuilder;
 import analytics.util.dao.caching.CacheConstant;
 import analytics.util.dao.caching.CacheWrapper;
-import analytics.util.objects.Model;
 import analytics.util.objects.RegionalFactor;
 
 import com.mongodb.DBCollection;
