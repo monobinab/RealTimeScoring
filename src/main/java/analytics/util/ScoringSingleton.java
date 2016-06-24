@@ -206,8 +206,8 @@ public class ScoringSingleton {
 									//recalculate score for each model
 									rtsScore = this.calcScore(memberVariablesMap, allChanges, modelId, variableNameToVidMap, modelsMap);
 									
-									//, modelSeasonalZipMap, modelSeasonalNationalMap, modelSeasonalConstantMap
-									if(modelSeasonalConstantMap != null && modelSeasonalNationalMap != null && modelSeasonalConstantMap.containsKey(modelId)){
+									
+									if(modelSeasonalConstantMap != null && modelSeasonalConstantMap.containsKey(modelId)){
 										rtsScore = finalScore(rtsScore, lId, modelId, modelsMap, modelSeasonalZipMap, modelSeasonalNationalMap, modelSeasonalConstantMap );
 									}
 									
@@ -614,7 +614,10 @@ public class ScoringSingleton {
 		}
 		if(seasonalConstant != 0 && regionalFactor != 0)
 			regionalScore = regScore(newScore, regionalFactor, seasonalConstant);
-		return regionalScore;
+		if(regionalScore != 0)
+			return regionalScore;
+		else
+			return newScore;
 	}
 	
 	private double regScore(double newScore, double factor, double seasonalConstant){
