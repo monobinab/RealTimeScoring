@@ -52,18 +52,12 @@ public class CPSFiler {
 	public List<EmailPackage> prepareEmailPackages(String rtsAPIResponse, String lyl_id_no,String l_id) throws JSONException, SQLException, Exception {
 		
 		List<EmailPackage> emailPackages = new ArrayList<EmailPackage>(); 
-		// Special case: Stopping a single member
 
-		if("7081275994270606".equalsIgnoreCase(lyl_id_no))
-		{
-			return emailPackages;
-		}
-		
 		OccasionInfo occasionInfo;		
 		MemberInfo memberInfo  = memberInfoDao.getMemberInfo(l_id);
 		
 		if(memberInfo!=null){
-			if(StringUtils.isNotBlank(memberInfo.getEid())&& memberInfo.getEid()!="0"){
+			if(StringUtils.isNotBlank(memberInfo.getEid())&& Integer.parseInt(memberInfo.getEid())!=0){
 				List<TagMetadata> validOccasions = this.getValidOccasionsList(rtsAPIResponse);				
 				
 				if(validOccasions != null && validOccasions.size() > 0){
@@ -475,6 +469,11 @@ public class CPSFiler {
 	
 	public boolean isOccasionResponsysReady(String mdtag) {
 		return activeTags.contains(mdtag.substring(0, 5));			
-	}	 
+	}
+	
+	public MemberInfo getMemberInfoObj(String l_id ){
+		return memberInfoDao.getMemberInfo(l_id);
+	}
+	
 	
 }
