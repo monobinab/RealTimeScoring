@@ -11,9 +11,10 @@ import analytics.bolt.TagCreatorBolt;
 import analytics.bolt.TagProcessingBolt;
 import analytics.bolt.TopologyConfig;
 import analytics.spout.RTSKafkaSpout;
+import analytics.util.AuthPropertiesReader;
+import analytics.util.Constants;
 import analytics.util.KafkaUtil;
 import analytics.util.MongoNameConstants;
-import analytics.util.TopicConstants;
 import backtype.storm.Config;
 import backtype.storm.topology.TopologyBuilder;
 import storm.kafka.SpoutConfig;
@@ -30,23 +31,23 @@ public class ConsideredPurchaseTopology {
 			System.exit(0);
 		}
 		
-		/* USE WHEN TESTING
+		// USE WHEN TESTING
 		String mdTagsKafkaTopic="rts_cp_membertags_qa";
 		String zkroot_mdtags="rts_cp_membertags_qa_zkroot";
 		String cpsPurchaseScoresTopic="rts_cp_purchase_scores_qa";
 		String zkroot_cp_purchase = "purchase_scores_qa_zkroot";
 		//Browse related changes...
 		String browseKafkaTopic = "rts_browse_qa";
-		String zkroot_browse="browseTopic_qa_zkroot"; */
+		String zkroot_browse="browseTopic_qa_zkroot"; 
 		
 		// USE FOR PRODUCTION
-		String mdTagsKafkaTopic="cps_rtstags_qa";
+		/*String mdTagsKafkaTopic="cps_rtstags_qa";
 		String zkroot_mdtags="cps_rtstags_qa_zkroot";
 		String cpsPurchaseScoresTopic="rts_cp_purchase_scores";
 		String zkroot_cp_purchase = "rts_cp_purchase_zkroot";		
 		//Browse related changes...
 		String browseKafkaTopic = TopicConstants.BROWSE_KAFKA_TOPIC;
-		String zkroot_browse="browseTopic";
+		String zkroot_browse="browseTopic";*/
 		
 		String group_id = "cps_groupid";
 		String env = System.getProperty(MongoNameConstants.IS_PROD);
@@ -78,8 +79,12 @@ public class ConsideredPurchaseTopology {
 					
 		//Browse Related Changes
 		topologyBuilder.setBolt("tagProcessingBolt", new TagProcessingBolt(env),5).localOrShuffleGrouping("BrowseKafkaSpout");
-		topologyBuilder.setBolt("CPProcessingBolt", new CPProcessingBolt(env),10).shuffleGrouping("CPParsePersistBolt").shuffleGrouping("tagProcessingBolt")
-		.shuffleGrouping("CPTagCreatorBolt", "blackedout_stream" );
+		
+		topologyBuilder.setBolt("CPProcessingBolt", new CPProcessingBolt(env, AuthPropertiesReader
+				.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
+				.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))),10)
+				.shuffleGrouping("CPParsePersistBolt").shuffleGrouping("tagProcessingBolt")
+				.shuffleGrouping("CPTagCreatorBolt", "blackedout_stream" );
 		
 		Config conf = TopologyConfig.prepareStormConf("CPS");
 		conf.setMessageTimeoutSecs(86400);	
