@@ -148,6 +148,8 @@ public class MongoNameConstants {
      public static final String KMART_OPT_IN = "kmte";
      public static final String SYW_OPT_IN = "sywe";
      public static final String TEXT_OPT_IN = "mblo";
+     public static final String SRS_ZIP = "srs_zip";
+     public static final String KMT_ZIP = "kmt_zip";
 
      //Occasion Custome Event Collection
      public static final String OCCASION = "occasion";
@@ -160,9 +162,7 @@ public class MongoNameConstants {
      public static final String CUST_VIBES_EVENT= "CUST_VIBES";
      
      //regionalFactors collection
-     public static final String MODELID = "modelId";
-     public static final String FACTOR = "factor";
-     public static final String REGIONAL_STATE = "state";
+      public static final String REGIONAL_STATE = "state";
      
      //Div Line Bu SubBu collection
      public static final String DLBS_DIV = "d";
@@ -208,8 +208,14 @@ public class MongoNameConstants {
      public static final String BOOST_NAME = "name";
      public static final String BOOST_VID = "VID";
      public static final String BOOST_STRATEGY = "strategy";
- 
- 
+     
+     //ModelSeasonalConstant collection
+     public static final String SEASONAL_CONSTANT = "constant";
+     
+     //ModelSeasonalZipFactor collection
+     public static final String EFF_DATE = "f_date";
+     public static final String FACTOR = "factor";
+   
      
 }
 

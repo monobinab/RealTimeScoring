@@ -9,6 +9,8 @@ public class MemberInfo {
 		private String kmt_opt_in;
 		private String syw_opt_in;
 		private String text_opt_in;
+		private String srs_zip;
+		private String kmt_zip;
 		
 		public MemberInfo(){
 			
@@ -32,6 +34,22 @@ public class MemberInfo {
 			this.syw_opt_in = syw_opt_in;
 		}
 		
+		public String getKmt_zip() {
+			return kmt_zip;
+		}
+
+		public void setKmt_zip(String kmt_zip) {
+			this.kmt_zip = kmt_zip;
+		}
+
+		public String getSrs_zip() {
+			return srs_zip;
+		}
+
+		public void setSrs_zip(String srs_zip) {
+			this.srs_zip = srs_zip;
+		}
+
 		/**
 		 * @return the text_opt_in
 		 */
