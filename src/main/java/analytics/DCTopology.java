@@ -34,7 +34,8 @@ public class DCTopology {
 		SpoutConfig spoutConfig = null;
 		TopologyBuilder builder = new TopologyBuilder();
 		try {
-			spoutConfig = new KafkaUtil(env, "dc").getDCSpoutConfig(dcKafkaTopic, zkroot_dc, group_id);
+			//spoutConfig = new KafkaUtil(env, "dc").getDCSpoutConfig(dcKafkaTopic, zkroot_dc, group_id);
+			spoutConfig = new KafkaUtil(env, "dc").getDCSpoutConfig(dcKafkaTopic, group_id);
 			builder.setSpout("dcKafkaSpout", new RTSKafkaSpout(spoutConfig), 1);
 		} catch (ConfigurationException e) {
 			e.printStackTrace();

@@ -170,6 +170,16 @@ public class KafkaUtil {
 		spoutConfig.startOffsetTime = kafka.api.OffsetRequest.LatestTime();
 		return spoutConfig;
 	}
+	
+	public SpoutConfig getDCSpoutConfig(String topic, String groupId)
+			throws ConfigurationException {
+		SpoutConfig spoutConfig = null;
+		BrokerHosts hosts = new ZkHosts(dcKafkaProperties.getString(ZOOKEEPER));
+		spoutConfig = new SpoutConfig(hosts, topic, "", groupId);
+		spoutConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
+		spoutConfig.startOffsetTime = kafka.api.OffsetRequest.LatestTime();
+		return spoutConfig;
+	}
 
 	
 	public PropertiesConfiguration loadDCKafkaProperties(String environment) {
