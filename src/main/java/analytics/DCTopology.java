@@ -29,13 +29,13 @@ public class DCTopology {
 		}
 		String env = System.getProperty(MongoNameConstants.IS_PROD);
 		String dcKafkaTopic="telprod_reqresp_log_output";
-		String zkroot_dc="dc_zkroot";
+		String zkroot_dc="dc_zkroot_new";
 		String group_id = "RTSConsumer";
 		SpoutConfig spoutConfig = null;
 		TopologyBuilder builder = new TopologyBuilder();
 		try {
-			//spoutConfig = new KafkaUtil(env, "dc").getDCSpoutConfig(dcKafkaTopic, zkroot_dc, group_id);
-			spoutConfig = new KafkaUtil(env, "dc").getDCSpoutConfig(dcKafkaTopic, group_id);
+			spoutConfig = new KafkaUtil(env, "dc").getDCSpoutConfig(dcKafkaTopic, zkroot_dc, group_id);
+			//spoutConfig = new KafkaUtil(env, "dc").getDCSpoutConfig(dcKafkaTopic, group_id);
 			builder.setSpout("dcKafkaSpout", new RTSKafkaSpout(spoutConfig), 1);
 		} catch (ConfigurationException e) {
 			e.printStackTrace();
