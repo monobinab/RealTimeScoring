@@ -32,9 +32,11 @@ public class Constants {
 	//public static final String AAM_BROWSER_PATH="/smith/adobe/rts/out/products";
 	public static final String AAM_INTERNAL_SEARCH_PATH="/warehouse/aam/prod/rts/out/is_grouped_search";
 	public static final String AAM_BROWSER_PATH = "/warehouse/aam/prod/rts/out/products_grouping";
+	//public static final String AAM_ATC_PATH = "/warehouse/aam/prod/rts/out/atc_grouping";
 	public static final String KERBEROSE_KEYTAB_PATH = "/appl/storm/keytabs/prod_aamadmin.keytab";
 	public static final String KERBEROSE_CONF_PATH = "/home/auto/spannal/krb5.conf";
 	//public static final String AAM_INTERNAL_SEARCH_PATH="/smith/adobe/rts/out/is";
+	//public static final String AAM_ATC_PATH = "/smith/adobe/rts/out/atc_grouping";
 	//public static final String AAM_INTERNAL_SEARCH_PATH="/user/kmuthuk/test";
 	//public static final String AAM_INTERNAL_SEARCH_PATH="/user/spannal/internalSearch/is";
 	//public static final String AAM_BROWSER_PATH="/user/kmuthuk/browse_grouped";
