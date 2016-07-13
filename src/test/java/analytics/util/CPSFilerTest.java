@@ -773,7 +773,8 @@ public class CPSFilerTest {
 				+ "\"percentile\":54, \"rank\":67},"
 				+ "{\"tag\":\"0177\", \"index\":0.5334645, \"rank\":68},"
 				+ "{\"tag\":\"0089\", \"index\":1.1149705, \"rank\":69}]}";		
-		memberInfo = new MemberInfo("Oj8kOFFTCkcrljYSO/srjUeGk3A=","N","AZ","N","N","N");
+		//memberInfo = new MemberInfo("Oj8kOFFTCkcrljYSO/srjUeGk3A=","N","AZ","N","N","N");
+		memberInfo = new MemberInfo("262363463","N","AZ","N","N","N");
 		when(memberInfoDao.getMemberInfo(anyString())).thenReturn(memberInfo);
 		when(occasionDao.getOccasionsInfo()).thenReturn(occasionInfos);
 		when(occasionDao.getOccasionInfo("Duress")).thenReturn(this.getOccasionInfo("Duress"));

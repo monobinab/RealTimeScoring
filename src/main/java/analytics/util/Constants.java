@@ -81,5 +81,6 @@ public class Constants {
 	
 	public static final Integer INTERRUPTED = 3;
 	public static final Integer SENT = 1;
-	public static final Integer TOP5PRIORITY = 8;
+	public static final String TOP5PRIORITY = "8";
+	public static final String SWEEPSPRIORITY = "Z";
 }
