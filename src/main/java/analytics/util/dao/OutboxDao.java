@@ -25,7 +25,7 @@ public class OutboxDao extends AbstractMySQLDao{
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(OutboxDao.class);
 	
-	public List<EmailPackage> getQueuedEmailPackages(String lyl_id_no, List<OccasionInfo> occasionsInfo, String format) throws RealTimeScoringException, SQLException {
+	public List<EmailPackage> getQueuedEmailPackages(String lyl_id_no, List<OccasionInfo> occasionsInfo) throws RealTimeScoringException, SQLException {
 		// This method returns all pending emails from the outbox
 		List<EmailPackage>emlPackageList = new ArrayList<EmailPackage>();
 		PreparedStatement statement = null;
@@ -33,12 +33,11 @@ public class OutboxDao extends AbstractMySQLDao{
 			StringBuilder query = new StringBuilder();
 			query.append("SELECT * ")
 				.append("FROM cp_outbox ")
-				.append("WHERE loy_id= ? AND status=0 AND format = ? ;");
+				.append("WHERE loy_id= ? AND status=0;");
     	
 		
 			statement = connection.prepareStatement(query.toString());
 			statement.setString(1, lyl_id_no);
-			statement.setString(2, format);
 			
 			LOGGER.info("query being executed for getting queued email packages: " + statement);
 			ResultSet rs = statement.executeQuery();
@@ -69,7 +68,7 @@ public class OutboxDao extends AbstractMySQLDao{
 		return emlPackageList;
 	}
 
-	public List<EmailPackage> queueEmailPackages(List<EmailPackage> emailPackages, String format) throws SQLException {
+	public List<EmailPackage> queueEmailPackages(List<EmailPackage> emailPackages) throws SQLException {
 		Integer queueLength =0;
 		List<EmailPackage> queuedEmailPackages=new ArrayList<EmailPackage>();
 		
@@ -79,9 +78,8 @@ public class OutboxDao extends AbstractMySQLDao{
 				if(queueLength < Constants.CPS_QUEUE_LENGTH){
 					StringBuilder query = new StringBuilder();
 					query.append("INSERT INTO rts_member.cp_outbox ")
-						.append("(loy_id, bu, sub_bu, md_tag, occasion_name, added_datetime, send_date, status, cust_event_name, customer_id, "
-								+ "sears_opt_in, kmart_opt_in, syw_opt_in, format) ")
-						.append("VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+						.append("(loy_id, bu, sub_bu, md_tag, occasion_name, added_datetime, send_date, status, cust_event_name, customer_id, sears_opt_in, kmart_opt_in, syw_opt_in) ")
+						.append("VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?);");
 			    	statement = connection.prepareStatement(query.toString());
 					statement.setString(1, emlPack.getMemberId());
 					statement.setString(2, emlPack.getMdTagMetaData().getBusinessUnit());
@@ -138,7 +136,6 @@ public class OutboxDao extends AbstractMySQLDao{
 						statement.setString(12, "");
 						statement.setString(13, "");
 					}
-					statement.setString(14, format);
 					LOGGER.info("query being executed for queing email package: " + statement);
 					
 					statement.executeUpdate();	
@@ -222,7 +219,7 @@ public class OutboxDao extends AbstractMySQLDao{
 
 	// New method to get all email packages. Add a date cutoff to get only the recent ones.
 	
-	public List<EmailPackage> getSentEmailPackages(String lyl_id_no, String format) throws  SQLException {
+	public List<EmailPackage> getSentEmailPackages(String lyl_id_no) throws  SQLException {
 		// This method returns all pending emails from the outbox
 		List<EmailPackage>emlPackageList = new ArrayList<EmailPackage>();
 		PreparedStatement statement = null;
@@ -230,11 +227,10 @@ public class OutboxDao extends AbstractMySQLDao{
 			StringBuilder query = new StringBuilder();
 			query.append("SELECT * ")
 				.append("FROM cp_outbox ")
-				.append("WHERE loy_id= ? AND status=1 AND format = ? order by bu,sub_bu,occasion_name ASC;");
+				.append("WHERE loy_id= ? AND status=1 order by bu,sub_bu,occasion_name ASC;");
  		
 			statement = connection.prepareStatement(query.toString());
 			statement.setString(1, lyl_id_no);
-			statement.setString(2, format);
 			
 			LOGGER.info("Query being executed for getting sent email packages sent in history: " + statement);
 			ResultSet rs = statement.executeQuery();
@@ -294,7 +290,7 @@ public class OutboxDao extends AbstractMySQLDao{
 		return sentDate;	
 	}
 
-	public EmailPackage getInProgressPackage(String lyl_id_no, List<OccasionInfo> occasionsInfo, String format) throws SQLException, ParseException {
+	public EmailPackage getInProgressPackage(String lyl_id_no, List<OccasionInfo> occasionsInfo) throws SQLException, ParseException {
 		SimpleDateFormat sdformat = new SimpleDateFormat("yyyy-MM-dd");
  		String todaysDateStr = sdformat.format(new DateTime().toDate());
  		Date todaysDate = sdformat.parse(todaysDateStr);
@@ -302,11 +298,9 @@ public class OutboxDao extends AbstractMySQLDao{
 		EmailPackage inProgressOccasion = null;
 		PreparedStatement statement = null;
 		try{
-			String query = "SELECT bu,sub_bu,md_tag,occasion_name, added_datetime, send_date,status, sent_datetime recentSentDate FROM rts_member.cp_outbox "
-					+ "WHERE loy_id=? AND status=1 AND format = ? order by sent_datetime desc limit 1;";
+			String query = "SELECT bu,sub_bu,md_tag,occasion_name, added_datetime, send_date,status, sent_datetime recentSentDate FROM rts_member.cp_outbox WHERE loy_id=? AND status=1 order by sent_datetime desc limit 1;";
 			statement = connection.prepareStatement(query);
 			statement.setString(1, lyl_id_no);
-			statement.setString(2, format);
 			LOGGER.info("query to get the latest emailPackage sent for this member : " + statement);
 			ResultSet rs1 = statement.executeQuery();
 			 
