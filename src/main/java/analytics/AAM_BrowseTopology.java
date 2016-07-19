@@ -30,19 +30,24 @@ public class AAM_BrowseTopology {
 		}
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
 		String topic = TopicConstants.AAM_BROWSE_PRODUCTS;
+		String atcTopic = TopicConstants.AAM_ATC_PRODUCTS;
 		String kafkatopic = TopicConstants.RESCORED_MEMBERIDS_KAFKA_TOPIC;
 		String browseKafkaTopic = TopicConstants.BROWSE_KAFKA_TOPIC;
 		String[] servers = RedisConnection.getServers(System.getProperty(MongoNameConstants.IS_PROD));
 		
 		//Sree. Spout that wakes up every 5 mins and process the Traits
 		topologyBuilder.setSpout("browseSpout", new WebHDFSSpout(servers[1], TopicConstants.PORT, Constants.AAM_BROWSER_PATH, "aamBrowser"), 1);
-		//topologyBuilder.setSpout("browseSpout", new WebHDFSSpout(servers[1], TopicConstants.PORT, Constants.AAM_ATC_PATH, "aamAtc"), 1);
 		topologyBuilder.setBolt("parsingBoltBrowse", new ParsingBoltAAM_Browse(System.getProperty(MongoNameConstants.IS_PROD), topic), 3).shuffleGrouping("browseSpout");
 		topologyBuilder.setBolt("browseCountPersist", new BrowseCountPersistBolt(System.getProperty(MongoNameConstants.IS_PROD), topic, "Browse", browseKafkaTopic), 3).shuffleGrouping("parsingBoltBrowse", "browse_tag_stream");
+		
+		topologyBuilder.setSpout("atcSpout", new WebHDFSSpout(servers[1], TopicConstants.PORT, Constants.AAM_ATC_PATH, "aamAtc"), 1);
+		topologyBuilder.setBolt("parsingBoltAtc", new ParsingBoltAAM_Browse(System.getProperty(MongoNameConstants.IS_PROD), atcTopic), 3).shuffleGrouping("atcSpout");
+		topologyBuilder.setBolt("atcCountPersist", new BrowseCountPersistBolt(System.getProperty(MongoNameConstants.IS_PROD), atcTopic, "Atc", browseKafkaTopic), 3).shuffleGrouping("parsingBoltAtc", "browse_tag_stream");
 
 		
 		topologyBuilder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System
 				.getProperty(MongoNameConstants.IS_PROD)), 3)
+				.localOrShuffleGrouping("parsingBoltAtc")
 				.localOrShuffleGrouping("parsingBoltBrowse");
 		
 		topologyBuilder.setBolt("RTSKafkaBolt", new RTSKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD),kafkatopic), 1)
