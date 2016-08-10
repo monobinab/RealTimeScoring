@@ -186,26 +186,39 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 	private Sweep getSweepsInfo(JsonElement jsonElement){
 		Sweep sweep = null;
 		JsonElement memIdElement = jsonElement.getAsJsonObject().get("memberId");
-		JsonElement prodIdElement = jsonElement.getAsJsonObject().get("productId");
-		if(prodIdElement != null && memIdElement != null && StringUtils.isNotEmpty(memIdElement.getAsString())){
-			JsonElement categoryElement = jsonElement.getAsJsonObject().get("category");
-			JsonElement subCategoryElement = jsonElement.getAsJsonObject().get("subCategory");
-			if(categoryElement != null && StringUtils.isNotEmpty(categoryElement.getAsString()) 
-					&& subCategoryElement != null && StringUtils.isNotEmpty(subCategoryElement.getAsString())){
+		JsonElement categoryElement = jsonElement.getAsJsonObject().get("Category");
+		if(memIdElement != null && categoryElement != null && StringUtils.isNotEmpty(memIdElement.getAsString())){
+			if(categoryElement != null && StringUtils.isNotEmpty(categoryElement.getAsString())){
+				JsonElement subCategoryElement = jsonElement.getAsJsonObject().get("SubCategory");
 				String memberId = memIdElement.getAsString();
 				String category = categoryElement.getAsString();
-				String subCategory = subCategoryElement.getAsString();
+				String subCategory = StringUtils.EMPTY;
+				if(subCategoryElement != null && StringUtils.isNotEmpty(subCategoryElement.getAsString())){
+					subCategory = subCategoryElement.getAsString();
+				}
 				if(catSubCatData != null && catSubCatData.size() > 0){
 					for(Sweep catSubCat : catSubCatData){
-						if(catSubCat.getCategory().equalsIgnoreCase(category) 
-								&& catSubCat.getSubCategory().equalsIgnoreCase(subCategory)){
-							sweep = new Sweep();
-							sweep.setMemberId(memberId);
-							sweep.setJsonMemberId(memIdElement);
-							sweep.setCategory(category);
-							sweep.setSubCategory(subCategory);
-							sweep.setModelId(catSubCat.getModelId());
-							sweep.setPriority(Constants.SWEEPSPRIORITY);
+						if(StringUtils.isNotEmpty(category)){
+							if(StringUtils.isNotEmpty(subCategory)){
+								if(catSubCat.getCategory().equalsIgnoreCase(category) 
+										&& catSubCat.getSubCategory().equalsIgnoreCase(subCategory)){
+									sweep = new Sweep();
+									sweep.setMemberId(memberId);
+									sweep.setJsonMemberId(memIdElement);
+									sweep.setCategory(category);
+									sweep.setSubCategory(subCategory);
+									sweep.setModelId(catSubCat.getModelId());
+									sweep.setPriority(Constants.SWEEPSPRIORITY);
+								}
+							}else if(catSubCat.getCategory().equalsIgnoreCase(category)){
+								sweep = new Sweep();
+								sweep.setMemberId(memberId);
+								sweep.setJsonMemberId(memIdElement);
+								sweep.setCategory(category);
+								sweep.setSubCategory(subCategory);
+								sweep.setModelId(catSubCat.getModelId());
+								sweep.setPriority(Constants.SWEEPSPRIORITY);
+							}
 						}
 					}
 				}
