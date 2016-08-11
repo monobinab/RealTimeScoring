@@ -2,12 +2,10 @@ package analytics.util.objects;
 
 import java.util.List;
 
-import com.google.gson.JsonElement;
-
 public class Sweep {
 
 	private String memberId;
-	private JsonElement jsonMemberId;
+	private String l_id;
 	private String category;
 	private String subCategory;
 	private List<String> modelId;
@@ -26,16 +24,16 @@ public class Sweep {
 		this.memberId = memberId;
 	}
 	/**
-	 * @return the jsonMemberId
+	 * @return the l_id
 	 */
-	public JsonElement getJsonMemberId() {
-		return jsonMemberId;
+	public String getL_id() {
+		return l_id;
 	}
 	/**
-	 * @param jsonMemberId the jsonMemberId to set
+	 * @param l_id the l_id to set
 	 */
-	public void setJsonMemberId(JsonElement jsonMemberId) {
-		this.jsonMemberId = jsonMemberId;
+	public void setL_id(String l_id) {
+		this.l_id = l_id;
 	}
 	/**
 	 * @return the category

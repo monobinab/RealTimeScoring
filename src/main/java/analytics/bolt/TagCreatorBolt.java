@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import analytics.util.Constants;
 import analytics.util.SecurityUtils;
+import analytics.util.SywApiCalls;
 import analytics.util.TupleParser;
 import analytics.util.dao.CatgSubcatgModelDAO;
 import analytics.util.dao.MemberMDTags2Dao;
@@ -43,6 +44,7 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 	Map<Integer, Model> modelsMap = new HashMap<Integer, Model>();
 	CatgSubcatgModelDAO catgSubcatgModelDAO;
 	List<Sweep> catSubCatData = new ArrayList<Sweep>();
+	SywApiCalls sywApiCalls;
 	/*private static BigInteger startLoyalty = new BigInteger("7081010000647509"); 
 	private static BigInteger lastLoyalty = new BigInteger("7081216198457607");*/
 
@@ -62,6 +64,7 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 		modelsMap = modelsDao.getModelNames();
 		catgSubcatgModelDAO = new CatgSubcatgModelDAO();
 		catSubCatData = catgSubcatgModelDAO.getCatSubCat();
+		sywApiCalls = new SywApiCalls(); //Used for sweeps
 	}
 
 	/**
@@ -90,14 +93,14 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 				if(jsonElement != null){
 					Sweep sweep = this.getSweepsInfo(jsonElement);
 					if(sweep != null && StringUtils.isNotEmpty(sweep.getMemberId())){
-						process(sweep.getJsonMemberId(), sweep.getMemberId(), null, sweep);
+						process(sweep.getMemberId(), sweep.getL_id(), null, sweep);
 					}else{
 						JsonElement lyl_id_no = jsonElement.getAsJsonObject().get("memberId");
 						if(lyl_id_no != null){
 							TypeToken<List<ModelScore>> token = new TypeToken<List<ModelScore>>(){};
 							List<ModelScore> modelScoreList = new Gson().fromJson(jsonElement.getAsJsonObject().get("scoresInfo"), token.getType());
 							String l_id = SecurityUtils.hashLoyaltyId(lyl_id_no.getAsString());
-							process(lyl_id_no, l_id, modelScoreList, null);
+							process(lyl_id_no.getAsString(), l_id, modelScoreList, null);
 						}
 					}
 				}
@@ -112,7 +115,7 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void process(JsonElement lyl_id_no, String l_id, List<ModelScore> modelScoreList, Sweep sweep) {
+	private void process(String lyl_id_no, String l_id, List<ModelScore> modelScoreList, Sweep sweep) {
 		List<Object> rtsTagsListToEmit = new ArrayList<Object>();
 		List<String> rtsTags = new ArrayList<String>();
 		JSONObject mainJsonObj = new JSONObject();
@@ -148,16 +151,16 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 			mainJsonObj.put("tags", rtsTags);
 			mainJsonObj.put("tagIdentifier", "RTS");
 			rtsTagsListToEmit.add(mainJsonObj.toString());
-			LOGGER.info("PERSIST:Tags being sent for loyalty Id : " +lyl_id_no.getAsString()+ " > 95% : " +rtsTags.toString());
+			LOGGER.info("PERSIST:Tags being sent for loyalty Id : " + lyl_id_no + " > 95% : " +rtsTags.toString());
 			if(blackListed){
-				LOGGER.info("PERSIST:Blackedout loyalty Id being sent to CP Processing : " +lyl_id_no.getAsString());
+				LOGGER.info("PERSIST:Blackedout loyalty Id being sent to CP Processing : " + lyl_id_no);
 			}
 			this.outputCollector.emit("rtsTags_stream",rtsTagsListToEmit);	
 		}
 		else if(rtsTags.size()==0 && blackListed){
 			List<Object> blackedoutListToEmit = new ArrayList<Object>();
-			blackedoutListToEmit.add(lyl_id_no.getAsString());
-			LOGGER.info("PERSIST:Blackedout loyalty Id being sent to CP Processing : " +lyl_id_no.getAsString());
+			blackedoutListToEmit.add(lyl_id_no);
+			LOGGER.info("PERSIST:Blackedout loyalty Id being sent to CP Processing : " + lyl_id_no);
 			this.outputCollector.emit("blackedout_stream",blackedoutListToEmit);
 		}
 	}
@@ -185,39 +188,42 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 
 	private Sweep getSweepsInfo(JsonElement jsonElement){
 		Sweep sweep = null;
-		JsonElement memIdElement = jsonElement.getAsJsonObject().get("memberId");
-		JsonElement categoryElement = jsonElement.getAsJsonObject().get("Category");
-		if(memIdElement != null && categoryElement != null && StringUtils.isNotEmpty(memIdElement.getAsString())){
-			if(categoryElement != null && StringUtils.isNotEmpty(categoryElement.getAsString())){
-				JsonElement subCategoryElement = jsonElement.getAsJsonObject().get("SubCategory");
-				String memberId = memIdElement.getAsString();
-				String category = categoryElement.getAsString();
-				String subCategory = StringUtils.EMPTY;
-				if(subCategoryElement != null && StringUtils.isNotEmpty(subCategoryElement.getAsString())){
-					subCategory = subCategoryElement.getAsString();
-				}
-				if(catSubCatData != null && catSubCatData.size() > 0){
-					for(Sweep catSubCat : catSubCatData){
-						if(StringUtils.isNotEmpty(category)){
-							if(StringUtils.isNotEmpty(subCategory)){
-								if(catSubCat.getCategory().equalsIgnoreCase(category) 
-										&& catSubCat.getSubCategory().equalsIgnoreCase(subCategory)){
+		if(jsonElement.getAsJsonObject().get("UserId") != null){
+			String userId = jsonElement.getAsJsonObject().get("UserId").getAsString();
+			String memberId = sywApiCalls.getLoyaltyId(userId);
+			JsonElement categoryElement = jsonElement.getAsJsonObject().get("Category");
+			if(StringUtils.isNotEmpty(memberId) && categoryElement != null){
+				String l_id = SecurityUtils.hashLoyaltyId(memberId);
+				if(categoryElement != null && StringUtils.isNotEmpty(categoryElement.getAsString())){
+					JsonElement subCategoryElement = jsonElement.getAsJsonObject().get("SubCategory");
+					String category = categoryElement.getAsString();
+					String subCategory = StringUtils.EMPTY;
+					if(subCategoryElement != null && StringUtils.isNotEmpty(subCategoryElement.getAsString())){
+						subCategory = subCategoryElement.getAsString();
+					}
+					if(catSubCatData != null && catSubCatData.size() > 0){
+						for(Sweep catSubCat : catSubCatData){
+							if(StringUtils.isNotEmpty(category)){
+								if(StringUtils.isNotEmpty(subCategory)){
+									if(catSubCat.getCategory().equalsIgnoreCase(category) 
+											&& catSubCat.getSubCategory().equalsIgnoreCase(subCategory)){
+										sweep = new Sweep();
+										sweep.setMemberId(memberId);
+										sweep.setL_id(l_id);
+										sweep.setCategory(category);
+										sweep.setSubCategory(subCategory);
+										sweep.setModelId(catSubCat.getModelId());
+										sweep.setPriority(Constants.SWEEPSPRIORITY);
+									}
+								}else if(catSubCat.getCategory().equalsIgnoreCase(category)){
 									sweep = new Sweep();
 									sweep.setMemberId(memberId);
-									sweep.setJsonMemberId(memIdElement);
+									sweep.setL_id(l_id);
 									sweep.setCategory(category);
 									sweep.setSubCategory(subCategory);
 									sweep.setModelId(catSubCat.getModelId());
 									sweep.setPriority(Constants.SWEEPSPRIORITY);
 								}
-							}else if(catSubCat.getCategory().equalsIgnoreCase(category)){
-								sweep = new Sweep();
-								sweep.setMemberId(memberId);
-								sweep.setJsonMemberId(memIdElement);
-								sweep.setCategory(category);
-								sweep.setSubCategory(subCategory);
-								sweep.setModelId(catSubCat.getModelId());
-								sweep.setPriority(Constants.SWEEPSPRIORITY);
 							}
 						}
 					}

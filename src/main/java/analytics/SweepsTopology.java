@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import analytics.bolt.SweepsProcessingBolt;
 import analytics.bolt.TagCreatorBolt;
+import analytics.bolt.TagProcessingBolt;
 import analytics.bolt.TopologyConfig;
 import analytics.spout.RTSKafkaSpout;
 import analytics.util.KafkaUtil;
