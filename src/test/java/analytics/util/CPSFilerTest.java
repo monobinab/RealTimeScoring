@@ -773,7 +773,9 @@ public class CPSFilerTest {
 				+ "\"percentile\":54, \"rank\":67},"
 				+ "{\"tag\":\"0177\", \"index\":0.5334645, \"rank\":68},"
 				+ "{\"tag\":\"0089\", \"index\":1.1149705, \"rank\":69}]}";		
-		memberInfo = new MemberInfo("Oj8kOFFTCkcrljYSO/srjUeGk3A=","N","AZ","N","N","N");
+		//memberInfo = new MemberInfo("Oj8kOFFTCkcrljYSO/srjUeGk3A=","N","AZ","N","N","N");
+		memberInfo = new MemberInfo("13551883","N","AZ","N","N","N");
+		//"13551883"
 		when(memberInfoDao.getMemberInfo(anyString())).thenReturn(memberInfo);
 		when(occasionDao.getOccasionsInfo()).thenReturn(occasionInfos);
 		when(occasionDao.getOccasionInfo("Duress")).thenReturn(this.getOccasionInfo("Duress"));
@@ -812,6 +814,7 @@ public class CPSFilerTest {
 		List<EmailPackage> queuedEmailPackages = new ArrayList<EmailPackage>();
 		when(outboxDao.getInProgressPackage("7081057547176153", occasionInfos)).thenReturn(inProgressEmailPackage);
 		when(outboxDao.getQueuedEmailPackages("7081057547176153", occasionInfos)).thenReturn(queuedEmailPackages);
+        //Prasanth Fix it
 		List<EmailPackage> retEmailPackages = cpsFiler.prepareEmailPackages(resp, "7081057547176153","Oj8kOFFTCkcrljYSO/srjUeGk3A=");
 		
 		Assert.assertNotNull(retEmailPackages);
