@@ -29,7 +29,7 @@ public class DCTopology {
 		}
 		String env = System.getProperty(MongoNameConstants.IS_PROD);
 		String dcKafkaTopic="telprod_reqresp_log_output";
-		String zkroot_dc="dc_zkroot_new";
+		String zkroot_dc="zkroot_dc";
 		String group_id = "RTSConsumer";
 		SpoutConfig spoutConfig = null;
 		String browseKafkaTopic = TopicConstants.BROWSE_KAFKA_TOPIC;
