@@ -43,12 +43,12 @@ public class ConsideredPurchaseTopology {
 		
 		// USE FOR PRODUCTION
 		String mdTagsKafkaTopic="cps_rtstags_qa";
-		String zkroot_mdtags="cps_rtstags_qa_zkroot";
+		String zkroot_mdtags="cps_rtstags_qa_zk";
 		String cpsPurchaseScoresTopic="rts_cp_purchase_scores";
-		String zkroot_cp_purchase = "rts_cp_purchase_zkroot";		
+		String zkroot_cp_purchase = "rts_cp_purchase_zk";		
 		//Browse related changes...
 		String browseKafkaTopic = TopicConstants.BROWSE_KAFKA_TOPIC;
-		String zkroot_browse="browseTopic";
+		String zkroot_browse="browse_zk";
 		
 		String group_id = "cps_groupid";
 		String env = System.getProperty(MongoNameConstants.IS_PROD);
