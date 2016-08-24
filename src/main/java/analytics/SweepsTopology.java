@@ -1,7 +1,6 @@
 package analytics;
 
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +26,6 @@ public class SweepsTopology {
 		}
 		String kafkaTopic = TopicConstants.SWEEPS_KAFKA_TOPIC;
 		String zkroot = "sweeps_zkroot";
-		//String zkroot = StringUtils.EMPTY;
 		String env = System.getProperty(MongoNameConstants.IS_PROD);
 		TopologyBuilder builder = new TopologyBuilder();		
 		
