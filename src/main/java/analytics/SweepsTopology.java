@@ -1,12 +1,12 @@
 package analytics;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import analytics.bolt.SweepsProcessingBolt;
 import analytics.bolt.TagCreatorBolt;
-import analytics.bolt.TagProcessingBolt;
 import analytics.bolt.TopologyConfig;
 import analytics.spout.RTSKafkaSpout;
 import analytics.util.KafkaUtil;
@@ -26,7 +26,8 @@ public class SweepsTopology {
 			System.exit(0);
 		}
 		String kafkaTopic = TopicConstants.SWEEPS_KAFKA_TOPIC;
-		String zkroot = "sweepTopic";
+		String zkroot = "sweeps_zkroot";
+		//String zkroot = StringUtils.EMPTY;
 		String env = System.getProperty(MongoNameConstants.IS_PROD);
 		TopologyBuilder builder = new TopologyBuilder();		
 		
