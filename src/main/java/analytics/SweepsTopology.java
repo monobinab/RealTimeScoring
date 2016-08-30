@@ -4,8 +4,8 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.bolt.SweepsProcessingBolt;
-import analytics.bolt.TagCreatorBolt;
+import analytics.bolt.RTSKafkaBolt;
+import analytics.bolt.SweepsTagCreatorBolt;
 import analytics.bolt.TopologyConfig;
 import analytics.spout.RTSKafkaSpout;
 import analytics.util.KafkaUtil;
@@ -36,9 +36,8 @@ public class SweepsTopology {
 			LOGGER.error("Kafka Not Initialised ");
 			   System.exit(0);
 		}	
-		builder.setBolt("sweepTagCreatorBolt", new TagCreatorBolt(env), 1).shuffleGrouping("RTSKafkaSpout");
-		builder.setBolt("sweepProcessingBolt", new SweepsProcessingBolt(env),1).shuffleGrouping("sweepTagCreatorBolt","rtsTags_stream");
-		
+		builder.setBolt("sweepTagCreatorBolt", new SweepsTagCreatorBolt(env), 1).shuffleGrouping("RTSKafkaSpout");
+		builder.setBolt("RTSKafkaBolt", new RTSKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD), "stormtopic"), 1).shuffleGrouping("sweepTagCreatorBolt","kafka_stream");	
 		Config conf = TopologyConfig.prepareStormConf("SWEEPS");
 		conf.setMessageTimeoutSecs(7200);
 		TopologyConfig.submitStorm(conf, builder, args[0]);

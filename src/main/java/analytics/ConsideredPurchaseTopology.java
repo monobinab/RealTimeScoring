@@ -32,23 +32,29 @@ public class ConsideredPurchaseTopology {
 			System.exit(0);
 		}
 		
+		/**
 		// USE WHEN TESTING
-		/*String mdTagsKafkaTopic="rts_cp_membertags_qa";
+		String mdTagsKafkaTopic="rts_cp_membertags_qa";
 		String zkroot_mdtags="rts_cp_membertags_qa_zkroot";
 		String cpsPurchaseScoresTopic="rts_cp_purchase_scores_qa";
 		String zkroot_cp_purchase = "purchase_scores_qa_zkroot";
 		//Browse related changes...
 		String browseKafkaTopic = "rts_browse_qa";
-		String zkroot_browse="browseTopic_qa_zkroot"; */
+		String zkroot_browse="browseTopic_qa_zkroot";
+		*/
 		
 		// USE FOR PRODUCTION
 		String mdTagsKafkaTopic="cps_rtstags_qa";
-		String zkroot_mdtags="cps_rtstags_qa_zkroot";
+		String zkroot_mdtags="cps_rtstags_qa_zk";
 		String cpsPurchaseScoresTopic="rts_cp_purchase_scores";
-		String zkroot_cp_purchase = "rts_cp_purchase_zkroot";		
+		String zkroot_cp_purchase = "rts_cp_purchase_zk";		
 		//Browse related changes...
 		String browseKafkaTopic = TopicConstants.BROWSE_KAFKA_TOPIC;
-		String zkroot_browse="browseTopic";
+		String zkroot_browse="browse_zk";
+		
+		//Sweeps
+		String sweepsKafkaTopic = TopicConstants.RTS_CPS_SWEEPS_KAFKA_TOPIC;
+		String zkroot_cps_sweeps = "zk_sweepsTopic";
 		
 		String group_id = "cps_groupid";
 		String env = System.getProperty(MongoNameConstants.IS_PROD);
@@ -67,7 +73,11 @@ public class ConsideredPurchaseTopology {
 			//Browse related changes
 			topologyBuilder.setSpout(
 					"BrowseKafkaSpout",
-					new RTSKafkaSpout(new KafkaUtil(env).getSpoutConfig(browseKafkaTopic,zkroot_browse,group_id)), 1);			
+					new RTSKafkaSpout(new KafkaUtil(env).getSpoutConfig(browseKafkaTopic,zkroot_browse,group_id)), 1);	
+			
+			topologyBuilder.setSpout(
+					"SweepsKafkaSpout",
+					new RTSKafkaSpout(new KafkaUtil(env).getSpoutConfig(sweepsKafkaTopic, zkroot_cps_sweeps, group_id)), 1);	
 			
 			LOGGER.info("CPS Topology listening to kafka topics : " + mdTagsKafkaTopic + ", "+ cpsPurchaseScoresTopic);
 			
@@ -81,10 +91,14 @@ public class ConsideredPurchaseTopology {
 		//Browse Related Changes
 		topologyBuilder.setBolt("tagProcessingBolt", new TagProcessingBolt(env),5).localOrShuffleGrouping("BrowseKafkaSpout");
 		
+		//Sweeps Related Changes
+		topologyBuilder.setBolt("sweepsTagProcessingBolt", new TagProcessingBolt(env),5).localOrShuffleGrouping("SweepsKafkaSpout");
+		
 		topologyBuilder.setBolt("CPProcessingBolt", new CPProcessingBolt(env, AuthPropertiesReader
 				.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
 				.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))),10)
 				.shuffleGrouping("CPParsePersistBolt").shuffleGrouping("tagProcessingBolt")
+				.shuffleGrouping("sweepsTagProcessingBolt")
 				.shuffleGrouping("CPTagCreatorBolt", "blackedout_stream" );
 		
 		Config conf = TopologyConfig.prepareStormConf("CPS");
