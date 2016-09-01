@@ -37,9 +37,15 @@ public class SignalSpout extends BaseRichSpout{
 				try{
 				List<Object> listToEmit = new ArrayList<Object>();
 				JSONObject jsonObj = (JSONObject) feedJsonArray.get(i);
-				LOGGER.info(jsonObj.toString());
+			//	LOGGER.info(jsonObj.toString());
 				String valueString = (String) jsonObj.get("value");
 				JSONObject valueJsonObj = new JSONObject(valueString);
+				/*
+				 * need to be removed, logging needed for testing
+				 */
+				if(valueJsonObj.get("type").toString().equalsIgnoreCase("BrowseProduct")){
+					LOGGER.info("PERSIST: ProductBrowse signal " + jsonObj.toString());
+				}
 				JSONObject userJsonObj = (JSONObject) valueJsonObj.get("user");
 				listToEmit.add(valueJsonObj.get("channel"));
 				if(valueJsonObj.has("products"))

@@ -1,26 +1,18 @@
 package analytics.bolt;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import analytics.util.SingletonJsonParser;
-import analytics.util.dao.DivLnBuSubBuDao;
-import analytics.util.dao.DivLnVariableDao;
 import analytics.util.dao.PidDivLnDao;
 import analytics.util.objects.DivLn;
 import backtype.storm.task.OutputCollector;
@@ -34,10 +26,7 @@ import com.google.gson.JsonParser;
 
 public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
 	private static final long serialVersionUID = 1L;
-
-	private DivLnVariableDao divLnVariableDao;
 	private PidDivLnDao pidDivLnDao;
-	private DivLnBuSubBuDao divLnBuSubBuDao;
 
 	public ParsingBoltAAM_InternalSearch (String systemProperty, String topic) {
 		super(systemProperty, topic);
@@ -47,10 +36,7 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
 	@Override
 	public void prepare(@SuppressWarnings("rawtypes") Map stormConf, TopologyContext context, OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
-		divLnVariableDao = new DivLnVariableDao();
 		pidDivLnDao = new PidDivLnDao();
-	//	sourceTopic = "InternalSearch";
-        divLnBuSubBuDao = new DivLnBuSubBuDao();
     }
 
 
@@ -111,7 +97,6 @@ public class ParsingBoltAAM_InternalSearch extends ParseAAMFeeds {
     	String queryResultsDoc = new String();
     	Set<String> pidSet = new HashSet<String>();
     	Collection<String> searchStringsCollection = l_idToCurrentPidCollectionMap.get(current_l_id);
-    	Map<String, List<String>> divLnVariablesMap = divLnVariableDao.getDivLnVariable();
     	if(searchStringsCollection==null || searchStringsCollection.isEmpty()|| (searchStringsCollection.toArray())[0].toString().trim().equalsIgnoreCase(""))
     		return null;
     	
