@@ -88,7 +88,7 @@ public class SweepsTagCreatorBolt extends EnvironmentBolt  {
 				if(jsonElement != null){
 					Sweep sweep = this.getSweepsInfo(jsonElement);
 					if(sweep != null && StringUtils.isNotEmpty(sweep.getMemberId())){
-						process(sweep.getMemberId(), sweep.getL_id(), null, sweep);
+						process(sweep.getMemberId(), sweep.getL_id(), sweep);
 					}
 				}
 			} catch (Exception e){
@@ -102,7 +102,7 @@ public class SweepsTagCreatorBolt extends EnvironmentBolt  {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void process(String lyl_id_no, String l_id, List<ModelScore> modelScoreList, Sweep sweep) {
+	private void process(String lyl_id_no, String l_id, Sweep sweep) {
 		List<Object> rtsTagsListToEmit = new ArrayList<Object>();
 		List<String> rtsTags = new ArrayList<String>();
 		JSONObject mainJsonObj = new JSONObject();

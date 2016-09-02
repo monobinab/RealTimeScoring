@@ -25,6 +25,7 @@ public class SweepsTopology {
 			System.exit(0);
 		}
 		String kafkaTopic = TopicConstants.SWEEPS_KAFKA_TOPIC;
+		String cps_sweeps_kafkaTopic = TopicConstants.RTS_CPS_SWEEPS_KAFKA_TOPIC;
 		String zkroot = "sweeps_zkroot";
 		String env = System.getProperty(MongoNameConstants.IS_PROD);
 		TopologyBuilder builder = new TopologyBuilder();		
@@ -37,7 +38,7 @@ public class SweepsTopology {
 			   System.exit(0);
 		}	
 		builder.setBolt("sweepTagCreatorBolt", new SweepsTagCreatorBolt(env), 1).shuffleGrouping("RTSKafkaSpout");
-		builder.setBolt("RTSKafkaBolt", new RTSKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD), "stormtopic"), 1).shuffleGrouping("sweepTagCreatorBolt","kafka_stream");	
+		builder.setBolt("RTSKafkaBolt", new RTSKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD), cps_sweeps_kafkaTopic), 1).shuffleGrouping("sweepTagCreatorBolt","kafka_stream");	
 		Config conf = TopologyConfig.prepareStormConf("SWEEPS");
 		conf.setMessageTimeoutSecs(7200);
 		TopologyConfig.submitStorm(conf, builder, args[0]);
