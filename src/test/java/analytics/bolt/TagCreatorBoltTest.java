@@ -58,7 +58,6 @@ public class TagCreatorBoltTest {
 	public void initialize() throws ConfigurationException {
 		
 		SystemPropertyUtility.setSystemProperty();
-		
 
 		// fake memberMDTags collection
 		memberMDTagsWithDatesColl = SystemPropertyUtility.getDb().getCollection("memberMdTagsWithDates");

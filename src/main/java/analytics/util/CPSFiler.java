@@ -52,6 +52,10 @@ public class CPSFiler {
 	public List<EmailPackage> prepareEmailPackages(String rtsAPIResponse, String lyl_id_no,String l_id) throws JSONException, SQLException, Exception {
 		
 		List<EmailPackage> emailPackages = new ArrayList<EmailPackage>(); 
+		if("7081126339746380".equalsIgnoreCase(lyl_id_no))
+		{
+			return emailPackages;
+		}
 
 		OccasionInfo occasionInfo;		
 		MemberInfo memberInfo  = memberInfoDao.getMemberInfo(l_id);

@@ -29,9 +29,10 @@ public class DCTopology {
 		}
 		String env = System.getProperty(MongoNameConstants.IS_PROD);
 		String dcKafkaTopic="telprod_reqresp_log_output";
-		String zkroot_dc="dc_zkroot_new";
+		String zkroot_dc="zkroot_dc";
 		String group_id = "RTSConsumer";
 		SpoutConfig spoutConfig = null;
+		String browseKafkaTopic = TopicConstants.BROWSE_KAFKA_TOPIC;
 		TopologyBuilder builder = new TopologyBuilder();
 		try {
 			spoutConfig = new KafkaUtil(env, "dc").getDCSpoutConfig(dcKafkaTopic, zkroot_dc, group_id);
@@ -47,12 +48,12 @@ public class DCTopology {
 		.getProperty(MongoNameConstants.IS_PROD)), 2).localOrShuffleGrouping("testSpout");*/
 		
 		builder.setBolt("dcParsingBolt", new ParsingBoltDC(System
-				.getProperty(MongoNameConstants.IS_PROD)), 2).localOrShuffleGrouping("dcKafkaSpout");
+				.getProperty(MongoNameConstants.IS_PROD), browseKafkaTopic, "DC"), 4).localOrShuffleGrouping("dcKafkaSpout");
 		
 	    builder.setBolt("strategyScoringBolt", new StrategyScoringBolt(System
-				.getProperty(MongoNameConstants.IS_PROD)),1).localOrShuffleGrouping("dcParsingBolt");
+				.getProperty(MongoNameConstants.IS_PROD)),2).localOrShuffleGrouping("dcParsingBolt");
 	    
-	    builder.setBolt("RTSKafkaBolt", new RTSKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD),kafkatopic), 1)
+	    builder.setBolt("RTSKafkaBolt", new RTSKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD),kafkatopic), 2)
 	    		.shuffleGrouping("strategyScoringBolt","kafka_stream");
 	    
 	    builder.setBolt("purchaseScoreKafka_bolt", new PurchaseScoreKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD), purchase_Topic), 2)

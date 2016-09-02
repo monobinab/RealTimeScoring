@@ -4,7 +4,7 @@ package analytics.util;
 
 public interface TopicConstants {
 
-	public static final String AAM_ATC_PRODUCTS = "AAM_CDF_ATCProducts" ;
+	public static final String AAM_ATC_PRODUCTS = "ATC" ;
 	public static final String AAM_BROWSE_PRODUCTS = "BROWSE" ;
 	public static final String SIGNAL_BROWSE_FEED = "SB" ;
 	public static final String AAM_CDF_INTERNALSEARCH = "InternalSearch" ;
