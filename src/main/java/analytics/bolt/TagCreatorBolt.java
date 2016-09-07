@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +15,9 @@ import analytics.util.Constants;
 import analytics.util.SecurityUtils;
 import analytics.util.TupleParser;
 import analytics.util.dao.MemberMDTags2Dao;
+import analytics.util.dao.ModelsDao;
 import analytics.util.dao.TagVariableDao;
+import analytics.util.objects.Model;
 import analytics.util.objects.ModelScore;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -34,13 +37,29 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 	TagVariableDao tagVariableDao;
 	MemberMDTags2Dao memberMDTags2Dao;
 	Map<Integer, String> modelTagsMap = new HashMap<Integer, String>();
-	/*private static BigInteger startLoyalty = new BigInteger("7081010000647509"); 
-	private static BigInteger lastLoyalty = new BigInteger("7081216198457607");*/
+	ModelsDao modelsDao;
+	Map<Integer, Model> modelsMap = new HashMap<Integer, Model>();
 
 	public TagCreatorBolt(String env) {
 		super(env);
 	}
 
+	/**
+	 * @return the modelsMap
+	 */
+	public Map<Integer, Model> getModelsMap() {
+		return modelsMap;
+	}
+
+	/**
+	 * @param modelsMap the modelsMap to set
+	 */
+	public void setModelsMap(Map<Integer, Model> modelsMap) {
+		this.modelsMap = modelsMap;
+	}
+
+
+	@SuppressWarnings("rawtypes")
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,	OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
@@ -49,6 +68,8 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 		tagVariableDao = new TagVariableDao();
 		modelTagsMap = tagVariableDao.getModelTags();
 		memberMDTags2Dao = new MemberMDTags2Dao();
+		modelsDao = new ModelsDao();
+		modelsMap = modelsDao.getModelNames();
 	}
 
 	/**
@@ -95,6 +116,7 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 		outputCollector.ack(input);
 	}
 
+	@SuppressWarnings("unchecked")
 	private void process(JsonElement lyl_id_no, String l_id,
 			List<ModelScore> modelScoreList) {
 		if(modelScoreList != null && !modelScoreList.isEmpty()){
@@ -108,7 +130,7 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 					blackListed = true;
 				
 				if(modelScore.getPercentile() > 95){
-					String rtsTag = createTag(modelScore,l_id,Constants.TOP5PRIORITY);
+					String rtsTag =this.createTag(modelScore,l_id,Constants.TOP5PRIORITY);
 					rtsTags.add(rtsTag);
 				}
 			}
@@ -132,6 +154,15 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 		}
 	}
 	
+	public String createTag(ModelScore modelScore, String l_id , String priority) {
+		Model model = modelsMap.get(Integer.parseInt(modelScore.getModelId()));
+		if(model != null && StringUtils.isNotBlank(model.getModelCode())){
+			return model.getModelCode() + priority;
+		}
+		return null;
+	}
+	
+	/**
 	public String createTag(ModelScore modelScore, String l_id , int priority) {
 		String tag = modelTagsMap.get(new Integer (modelScore.getModelId()));
 		
@@ -147,8 +178,8 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 		if(tag != null && mdTag == null)
 			mdTag = tag + priority;
 		
-		return mdTag;*/
-	}
+		return mdTag;
+	}*/
 	
 	private String getMdTagIfExists(String tag, String l_id){
 		

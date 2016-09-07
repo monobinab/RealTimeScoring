@@ -27,6 +27,7 @@ import analytics.util.SystemPropertyUtility;
 import analytics.util.dao.MemberMDTags2Dao;
 import analytics.util.dao.MemberMDTagsDao;
 import analytics.util.dao.TagVariableDao;
+import analytics.util.objects.Model;
 import analytics.util.objects.ModelScore;
 
 import com.github.fakemongo.Fongo;
@@ -44,6 +45,7 @@ public class TagCreatorBoltTest {
 	TagVariableDao tagVariableDao;
 	TagCreatorBolt tagCreatorBolt;
 	Map<Integer, String> modelTagsMap = new HashMap<Integer, String>();
+	Map<Integer, Model> modelsMap = new HashMap<Integer, Model>();
 	Date dNow = new Date( );
 	Date tomorrow = new Date(dNow.getTime() + (1000 * 60 * 60 * 24));
 	Date eighthDay = new Date(dNow.getTime() + (1000 * 60 * 60 * 24)*8);
@@ -56,7 +58,6 @@ public class TagCreatorBoltTest {
 	public void initialize() throws ConfigurationException {
 		
 		SystemPropertyUtility.setSystemProperty();
-		
 
 		// fake memberMDTags collection
 		memberMDTagsWithDatesColl = SystemPropertyUtility.getDb().getCollection("memberMdTagsWithDates");
@@ -121,6 +122,17 @@ public class TagCreatorBoltTest {
 		
 		modelTagsMap.put(28,"SPGMS");
 		modelTagsMap.put(29,"HAGAS");
+		
+		Model model = null;
+		model = new Model();
+		model.setModelId(28);
+		model.setModelCode("SPGMS");
+		modelsMap.put(28, model);
+		
+		model = new Model();
+		model.setModelId(29);
+		model.setModelCode("HAGAS");
+		modelsMap.put(29, model);
 		
 		occasionDurationMap.put("1", "8");
 		occasionDurationMap.put("2", "8");
@@ -534,10 +546,10 @@ public class TagCreatorBoltTest {
 	public void testCreateTagWithExistingMDTag() {
 		
 		ModelScore modelScore = new ModelScore();
-		modelScore.setModelId("28");;
-		tagCreatorBolt.setModelTagsMap(modelTagsMap);
+		modelScore.setModelId("28");
+		tagCreatorBolt.setModelsMap(modelsMap);
 		tagCreatorBolt.setMemberMDTags2Dao(memberMDTags2Dao);
-		String tag = tagCreatorBolt.createTag(modelScore, "OccassionTopologyTestingl_id", 8);
+		String tag = tagCreatorBolt.createTag(modelScore, "OccassionTopologyTestingl_id", "8");
 		Assert.assertEquals(tag, "SPGMS8");
 	}
 	
@@ -545,10 +557,10 @@ public class TagCreatorBoltTest {
 	public void testCreateTagWithNewRtsTag() {
 		
 		ModelScore modelScore = new ModelScore();
-		modelScore.setModelId("29");;
-		tagCreatorBolt.setModelTagsMap(modelTagsMap);
+		modelScore.setModelId("29");
+		tagCreatorBolt.setModelsMap(modelsMap);
 		tagCreatorBolt.setMemberMDTags2Dao(memberMDTags2Dao);
-		String tag = tagCreatorBolt.createTag(modelScore, "OccassionTopologyTestingl_id", 8);
+		String tag = tagCreatorBolt.createTag(modelScore, "OccassionTopologyTestingl_id", "8");
 		Assert.assertEquals(tag, "HAGAS8");
 	}
 	
