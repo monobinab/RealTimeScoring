@@ -18,7 +18,6 @@ import analytics.util.SystemPropertyUtility;
 import analytics.util.dao.MemberMDTagsDao;
 import analytics.util.dao.ModelPercentileDao;
 import analytics.util.dao.OccasionVariableDao;
-import analytics.util.dao.TagVariableDao;
 import analytics.util.objects.TagMetadata;
 import backtype.storm.tuple.Tuple;
 import static org.mockito.Mockito.mock;
@@ -42,7 +41,6 @@ static ParsingBoltOccassion parsingBoltOccassion;
 static String input;
 static Tuple tuple;
 static MemberMDTagsDao memberMDTagsDao;
-static TagVariableDao tagVariableDao;
 static OccasionVariableDao occasionVariableDao;
 static ModelPercentileDao modelPercDao;
 	
@@ -57,7 +55,6 @@ public static void intialize() throws Exception{
 		tagMetadataColl = ParsingBoltOccassionFakeMonogColl.getTagMetadataColl();
 		modelPercColl = ParsingBoltOccassionFakeMonogColl.getModelPercColl();
 		memberMDTagsDao = new MemberMDTagsDao();
-		tagVariableDao = new TagVariableDao();
 		modelPercDao = new ModelPercentileDao();
 			
 		parsingBoltOccassion = new ParsingBoltOccassion(System.getProperty("rtseprod"));
@@ -103,7 +100,7 @@ public void getMemberTagsTest(){
 }
 
 //test to check the variablesList for mdTagsList, every tag is associated with one variable, so number of tags = number of variables
-@Test
+/*@Test
 public void getTagVariablesListTest(){
 	List<String> tagsList = new ArrayList<String>();
 	tagsList.add("HACKS");
@@ -123,7 +120,7 @@ public void getTagVariablesListEmptyTest(){
 	tagsList.add("HAKKS2010");
 	List<String> tagsVarListActual = tagVariableDao.getTagVariablesList(tagsList);
 	Assert.assertEquals(0, tagsVarListActual.size());
-	}
+	}*/
 
 //test to check the StringBuilder which will be added to object, that is to be emitted to persistbolt
 @Test

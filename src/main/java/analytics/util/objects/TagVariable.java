@@ -7,14 +7,14 @@ public class TagVariable implements Serializable{
 	private static final long serialVersionUID = 1L;
 	private String tag;
 	private String modelId;
-	private String variable;
+	private String modelName;
 	
 	public TagVariable(){}
 
-	public TagVariable(String tag, String modelId, String variable) {
+	public TagVariable(String tag, String modelId, String modelName) {
 		this.tag = tag;
 		this.modelId = modelId;
-		this.variable = variable;
+		this.modelName = modelName;
 	}
 
 	public String getTag() {
@@ -33,12 +33,13 @@ public class TagVariable implements Serializable{
 		this.modelId = modelId;
 	}
 
-	public String getVariable() {
-		return variable;
+	public String getModelName() {
+		return modelName;
 	}
 
-	public void setVariable(String variable) {
-		this.variable = variable;
+	public void setModelName(String modelName) {
+		this.modelName = modelName;
 	}
+
 
 }

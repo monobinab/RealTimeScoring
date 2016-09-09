@@ -26,7 +26,7 @@ import analytics.util.MongoNameConstants;
 import analytics.util.SystemPropertyUtility;
 import analytics.util.dao.MemberMDTags2Dao;
 import analytics.util.dao.MemberMDTagsDao;
-import analytics.util.dao.TagVariableDao;
+import analytics.util.dao.ModelsDao;
 import analytics.util.objects.Model;
 import analytics.util.objects.ModelScore;
 
@@ -42,7 +42,7 @@ public class TagCreatorBoltTest {
 	//static DB db;
 	DBCollection memberMDTagsWithDatesColl;
 	MemberMDTags2Dao memberMDTags2Dao;
-	TagVariableDao tagVariableDao;
+	ModelsDao modelsDao;
 	TagCreatorBolt tagCreatorBolt;
 	Map<Integer, String> modelTagsMap = new HashMap<Integer, String>();
 	Map<Integer, Model> modelsMap = new HashMap<Integer, Model>();
@@ -116,7 +116,7 @@ public class TagCreatorBoltTest {
 			.append("rtsTags", rtsTagsList));
 
 		memberMDTags2Dao = new MemberMDTags2Dao();
-		tagVariableDao = new TagVariableDao();
+		modelsDao = new ModelsDao();
 		
 		tagCreatorBolt = new TagCreatorBolt(System.getProperty("rtseprod"));
 		
@@ -205,7 +205,7 @@ public class TagCreatorBoltTest {
 			);
 
 		memberMDTags2Dao = new MemberMDTags2Dao();
-		tagVariableDao = new TagVariableDao();
+		modelsDao = new ModelsDao();
 		
 		tagCreatorBolt = new TagCreatorBolt(System.getProperty("rtseprod"));
 		

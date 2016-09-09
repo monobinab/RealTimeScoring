@@ -17,7 +17,7 @@ import analytics.util.dao.BoostBrowseBuSubBuDao;
 import analytics.util.dao.CpsOccasionsDao;
 import analytics.util.dao.EmailBuVariablesDao;
 import analytics.util.dao.ModelPercentileDao;
-import analytics.util.dao.TagVariableDao;
+import analytics.util.dao.ModelsDao;
 import analytics.util.objects.BoostBrowseBuSubBu;
 import analytics.util.objects.VariableModel;
 import backtype.storm.task.OutputCollector;
@@ -44,7 +44,7 @@ public class EmailFeedbackParsingBolt extends EnvironmentBolt {
 	/*
 	 * for browse tag creation
 	*/
-	private TagVariableDao tagVariableDao;
+	private ModelsDao modelsDao;
 	private Map<Integer, String> tagModelIdMap;
 	private BoostBrowseBuSubBuDao boostBrowseBuSubBuDao;
 	private Map<String, BoostBrowseBuSubBu> boostBrowseBuSubBuMap;
@@ -70,8 +70,8 @@ public class EmailFeedbackParsingBolt extends EnvironmentBolt {
 		browseUtils = new BrowseUtils(systemProperty, browseKafkaTopic);
 		emailBuVariablesDao = new EmailBuVariablesDao();
 		modelPercentileDao = new ModelPercentileDao();
-		tagVariableDao = new TagVariableDao();
-		tagModelIdMap = tagVariableDao.getTagFromModelId();
+		modelsDao = new ModelsDao();
+		tagModelIdMap = modelsDao.getTagFromModelId();
 		boostBrowseBuSubBuDao = new BoostBrowseBuSubBuDao();
 		boostBrowseBuSubBuMap = boostBrowseBuSubBuDao.getBoostBuSubBuFromModelCode();
 		cpsOccasionsDao = new CpsOccasionsDao();

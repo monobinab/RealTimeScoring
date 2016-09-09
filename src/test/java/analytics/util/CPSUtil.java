@@ -30,8 +30,8 @@ import analytics.util.dao.MemberInfoDao;
 import analytics.util.dao.MemberMDTags2Dao;
 import analytics.util.dao.MemberScoreDao;
 import analytics.util.dao.ModelPercentileDao;
+import analytics.util.dao.ModelsDao;
 import analytics.util.dao.TagMetadataDao;
-import analytics.util.dao.TagVariableDao;
 import analytics.util.objects.ChangedMemberScore;
 import analytics.util.objects.ModelScore;
 import analytics.util.objects.TagMetadata;
@@ -53,7 +53,7 @@ public class CPSUtil {
 		HashMap<String, String> cpsOccasionDurationMap = cpsOccasion.getcpsOccasionDurations();
 		HashMap<String, String> cpsOccasionsByIdMap = cpsOccasion.getcpsOccasionsById();
 		ChangedMemberScoresDao changedMemberScoresDao = new ChangedMemberScoresDao();
-		TagVariableDao tagVariableDao = new TagVariableDao();
+		ModelsDao modelsDao = new ModelsDao();
 		MemberScoreDao memberScoreDao = new MemberScoreDao();
 		TagMetadataDao tagMetadataDao = new TagMetadataDao();
 		MemberInfoDao memberInfoDao = new MemberInfoDao();
@@ -151,7 +151,7 @@ public class CPSUtil {
 									
 							ModelScore modelScorePercentile1 = new ModelScore();
 							Double newScore = 0.0;
-							Integer modelId = tagVariableDao.getmodelIdFromTag(cptestItem.getMd_tag().substring(0,5));
+							Integer modelId = modelsDao.getmodelIdFromTag(cptestItem.getMd_tag().substring(0,5));
 							//Black out this model
 							if(modelId !=null){
 								Map<Integer, ChangedMemberScore>  changedScores = changedMemberScoresDao.getChangedMemberScores(l_id,modelId);
@@ -192,7 +192,7 @@ public class CPSUtil {
 						if(cptestItem.getMd_tag().contains("Top5")){
 							ModelScore modelScorePercentile2 = new ModelScore();
 							double newScore = 0.0;
-							Integer modelId = tagVariableDao.getmodelIdFromTag(cptestItem.getMd_tag().substring(0,5));
+							Integer modelId = modelsDao.getmodelIdFromTag(cptestItem.getMd_tag().substring(0,5));
 							//reset the score to be max(score) of 98th percentile for that model.
 							if(modelId !=null){
 								HashMap <String,String> modelPercentile = new HashMap<String, String>();
@@ -524,8 +524,8 @@ public class CPSUtil {
 	
 	@SuppressWarnings("unchecked")
 	private String createModelScorePercentileJson(String lyl_id_no, List<ModelScore> modelScorePercentiles) {
-		TagVariableDao tagVariableDao = new TagVariableDao();
-		Set<Integer>models = tagVariableDao.getModels();
+		ModelsDao modelsDao = new ModelsDao();
+		Set<Integer>models = modelsDao.getModels();
 		JSONObject mainJsonObj = new JSONObject();
 		mainJsonObj.put("memberId", lyl_id_no);
 		JSONArray jsonArray = new JSONArray();

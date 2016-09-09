@@ -16,7 +16,6 @@ import analytics.util.SecurityUtils;
 import analytics.util.TupleParser;
 import analytics.util.dao.MemberMDTags2Dao;
 import analytics.util.dao.ModelsDao;
-import analytics.util.dao.TagVariableDao;
 import analytics.util.objects.Model;
 import analytics.util.objects.ModelScore;
 import backtype.storm.task.OutputCollector;
@@ -34,7 +33,6 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(TagCreatorBolt.class);
 	private OutputCollector outputCollector;
-	TagVariableDao tagVariableDao;
 	MemberMDTags2Dao memberMDTags2Dao;
 	Map<Integer, String> modelTagsMap = new HashMap<Integer, String>();
 	ModelsDao modelsDao;
@@ -65,11 +63,10 @@ public class TagCreatorBolt extends EnvironmentBolt  {
 		super.prepare(stormConf, context, collector);
 		this.outputCollector = collector;		
 		
-		tagVariableDao = new TagVariableDao();
-		modelTagsMap = tagVariableDao.getModelTags();
 		memberMDTags2Dao = new MemberMDTags2Dao();
 		modelsDao = new ModelsDao();
 		modelsMap = modelsDao.getModelNames();
+		modelTagsMap = modelsDao.getModelTags();
 	}
 
 	/**

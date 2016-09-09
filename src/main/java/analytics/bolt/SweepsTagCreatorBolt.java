@@ -18,7 +18,6 @@ import analytics.util.TupleParser;
 import analytics.util.dao.CatgSubcatgModelDAO;
 import analytics.util.dao.MemberMDTags2Dao;
 import analytics.util.dao.ModelsDao;
-import analytics.util.dao.TagVariableDao;
 import analytics.util.objects.Model;
 import analytics.util.objects.ModelScore;
 import analytics.util.objects.Sweep;
@@ -35,7 +34,7 @@ public class SweepsTagCreatorBolt extends EnvironmentBolt  {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(TagCreatorBolt.class);
 	private OutputCollector outputCollector;
-	TagVariableDao tagVariableDao;
+	//TagVariableDao tagVariableDao;
 	MemberMDTags2Dao memberMDTags2Dao;
 	Map<Integer, String> modelTagsMap = new HashMap<Integer, String>();
 	ModelsDao modelsDao;
@@ -53,11 +52,12 @@ public class SweepsTagCreatorBolt extends EnvironmentBolt  {
 	public void prepare(Map stormConf, TopologyContext context,	OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
 		this.outputCollector = collector;		
-		tagVariableDao = new TagVariableDao();
-		modelTagsMap = tagVariableDao.getModelTags();
+		//tagVariableDao = new TagVariableDao();
+		
 		memberMDTags2Dao = new MemberMDTags2Dao();
 		modelsDao = new ModelsDao();
 		modelsMap = modelsDao.getModelNames();
+		modelTagsMap = modelsDao.getModelTags();
 		catgSubcatgModelDAO = new CatgSubcatgModelDAO();
 		catSubCatData = catgSubcatgModelDAO.getCatSubCat();
 		sywApiCalls = new SywApiCalls(); //Used for sweeps

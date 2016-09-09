@@ -50,11 +50,11 @@ import analytics.util.dao.HoldMembersDAO;
 import analytics.util.dao.MemberInfoDao;
 import analytics.util.dao.MemberMDTags2Dao;
 import analytics.util.dao.MemberMDTagsDao;
+import analytics.util.dao.ModelsDao;
 import analytics.util.dao.OccasionResponsesDao;
 import analytics.util.dao.OccationCustomeEventDao;
 import analytics.util.dao.TagMetadataDao;
 import analytics.util.dao.TagResponsysActiveDao;
-import analytics.util.dao.TagVariableDao;
 import analytics.util.dao.XMLResponsysDAO;
 import analytics.util.objects.MemberInfo;
 import analytics.util.objects.ResponsysPayload;
@@ -68,7 +68,7 @@ public class ResponsysUtil {
 	private OccationCustomeEventDao occationCustomeEventDao;
 	private OccasionResponsesDao occasionResponsesDao;
 	private MemberInfoDao memberInfoDao;
-	private TagVariableDao tagVariableDao;
+	private ModelsDao modelsDao;
 	private Map<Integer, String> tagModelsMap;
 	private HashSet<String> activeTags = new HashSet<String>();
 	private DivLineBuSubDao divLineBuSubDao;
@@ -88,12 +88,11 @@ public class ResponsysUtil {
 		occationCustomeEventDao = new OccationCustomeEventDao();
 		occasionResponsesDao = new OccasionResponsesDao();
 		tagResponsysActiveDao =  new TagResponsysActiveDao();
-		tagVariableDao = new TagVariableDao();
+		modelsDao = new ModelsDao();
 		eventsVibesActiveDao = new EventsVibesActiveDao();
 		memberInfoDao = new MemberInfoDao();
-		tagVariableDao = new TagVariableDao();
 		activeTags = getReadyToProcessTags();
-		tagModelsMap = tagVariableDao.getTagModelIds(activeTags);
+		tagModelsMap = modelsDao.getTagModelIds(activeTags);
 		divLineBuSubDao = new DivLineBuSubDao();
 		memberMDTagsDao = new MemberMDTagsDao();
 		memberMDTags2Dao = new MemberMDTags2Dao();
@@ -163,12 +162,7 @@ public class ResponsysUtil {
 	public void setMemberInfoDao(MemberInfoDao memberInfoDao) {
 		this.memberInfoDao = memberInfoDao;
 	}
-	public TagVariableDao getTagVariableDao() {
-		return tagVariableDao;
-	}
-	public void setTagVariableDao(TagVariableDao tagVariableDao) {
-		this.tagVariableDao = tagVariableDao;
-	}
+
 	public TagResponsysActiveDao getTagResponsysActiveDao() {
 		return tagResponsysActiveDao;
 	}

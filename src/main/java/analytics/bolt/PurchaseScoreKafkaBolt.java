@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import analytics.util.KafkaUtil;
 import analytics.util.MongoNameConstants;
 import analytics.util.ScoringUtils;
-import analytics.util.dao.TagVariableDao;
+import analytics.util.dao.ModelsDao;
 import analytics.util.objects.ChangedMemberScore;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -31,7 +31,7 @@ public class PurchaseScoreKafkaBolt extends EnvironmentBolt {
 	private OutputCollector outputCollector;
 	private String currentTopic;
 	private KafkaUtil kafkaUtil;
-	private TagVariableDao tagVariableDao;
+	private ModelsDao modelsDao;
 	private Set<Integer> models;
 	private ScoringUtils scoringUtils;
 
@@ -47,8 +47,8 @@ public class PurchaseScoreKafkaBolt extends EnvironmentBolt {
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
 		super.prepare(stormConf, context, collector);
-		tagVariableDao = new TagVariableDao();
-		models = tagVariableDao.getModels();
+		modelsDao = new ModelsDao();
+		models = modelsDao.getModels();
 		scoringUtils = new ScoringUtils();
 		this.outputCollector = collector;
 		kafkaUtil = new KafkaUtil(

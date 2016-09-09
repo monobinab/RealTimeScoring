@@ -131,8 +131,8 @@ public class MongoNameConstants {
      
      //tagVaraible collections
      public static final String TAG_VAR_VAR = "v";
-     public static final String TAG_VAR_MDTAG = "t";
-     public static final String TAG_VAR_MODEL = "m";
+     public static final String TAG_VAR_MDTAG = "modelCode";
+     public static final String TAG_VAR_MODEL = "modelId";
      
      //tagsMetadata collection
      public static final String PURCHASE_OCCASSION = "OCC";
@@ -144,7 +144,7 @@ public class MongoNameConstants {
      public static final String E_ID = "eid";
      public static final String EMAIL_OPT_IN = "eml_opt_in";
      public static final String STATE = "st_cd";
-     public static final String SEARS_OPT_IN = "srse";
+     public static final String SEARS_OPT_IN = "srs_opt_in";
      public static final String KMART_OPT_IN = "kmte";
      public static final String SYW_OPT_IN = "sywe";
      public static final String TEXT_OPT_IN = "mblo";
