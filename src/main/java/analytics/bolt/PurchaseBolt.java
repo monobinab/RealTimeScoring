@@ -2,31 +2,22 @@ package analytics.bolt;
 
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import analytics.util.Constants;
+import com.google.gson.JsonElement;
+
 import analytics.util.SecurityUtils;
 import analytics.util.TupleParser;
-import analytics.util.dao.MemberMDTags2Dao;
-import analytics.util.dao.TagVariableDao;
-import analytics.util.objects.ModelScore;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.reflect.TypeToken;
 
 public class PurchaseBolt extends EnvironmentBolt  {
 	private static final long serialVersionUID = 1L;
