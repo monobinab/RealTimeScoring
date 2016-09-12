@@ -54,14 +54,15 @@ public class OccasionDao extends AbstractDao{
 							occasionInfo.setPriority((String)obj.get("priority"));
 							occasionInfo.setDuration((String)obj.get("duration"));
 							occasionInfo.setDaysToCheckInHistory((String)obj.get("daysInHistory"));
-							occasionInfo.setIntCustEvent("");
+							occasionInfo.setIntCustEvent((String)obj.get("intCustEvent"));
+							occasionInfo.setCustEventId((Integer)obj.get("custEventId"));
 							occasionInfos.add(occasionInfo);
 						}
 					}
 				}
 			}
 		}
-		if(occasionInfos != null && occasionInfos.size() > 0){
+/*		if(occasionInfos != null && occasionInfos.size() > 0){
 			occasionInfoCollection = db.getCollection("occ_cust_event");
 			if(occasionInfoCollection != null){
 				
@@ -82,7 +83,7 @@ public class OccasionDao extends AbstractDao{
 					}
 				}
 			}
-		}
+		}*/
 		if(occasionInfos != null && occasionInfos.size() > 0){
 			cache.put(new Element(cacheKey, (List<OccasionInfo>) occasionInfos));
 		}
