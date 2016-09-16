@@ -51,4 +51,20 @@ public class CalendarUtil {
 	public static SimpleDateFormat getDateFormat(){
 		return new SimpleDateFormat("yyyy-MM-dd");
 	}
+	
+	public static Date getRequiredDate(String date, int month) throws ParseException{
+		Calendar cal = Calendar.getInstance(); 
+		cal.setTime(getDateFormat().parse(date));
+		cal.add(Calendar.MONTH, month);
+		Date reqDate = cal.getTime();
+		return reqDate;
+	}
+	
+	public static String getRequiredStringDate(Date date, int month) throws ParseException{
+		Calendar cal = Calendar.getInstance(); 
+		cal.setTime(date);
+		cal.add(Calendar.MONTH, month);
+		Date reqDate = cal.getTime();
+		return getDateFormat().format(reqDate);
+	}
 }

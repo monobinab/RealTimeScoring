@@ -186,14 +186,19 @@ public abstract class ParseAAMFeeds  extends EnvironmentBolt {
 		Map<String, List<String>> divLnModelCodeMap = divLnModelCodeDao.getDivLnModelCode();
 		if (divLnModelCodeMap.containsKey(div)) {
 			for (String modelCode : divLnModelCodeMap.get(div)) {
-				if(!incomingModelCodeMap.containsKey(modelCode)){
-					incomingModelCodeMap.put(modelCode, "1");
-				}
-				else{
-					int count = Integer.valueOf(incomingModelCodeMap.get(modelCode)) + 1;
-					incomingModelCodeMap.put(modelCode, String.valueOf(count));
-				}
+				populateIncomingModelCodeMap(incomingModelCodeMap, modelCode);
 			}
+		}
+	}
+
+	protected void populateIncomingModelCodeMap(
+			Map<String, String> incomingModelCodeMap, String modelCode) {
+		if(!incomingModelCodeMap.containsKey(modelCode)){
+			incomingModelCodeMap.put(modelCode, "1");
+		}
+		else{
+			int count = Integer.valueOf(incomingModelCodeMap.get(modelCode)) + 1;
+			incomingModelCodeMap.put(modelCode, String.valueOf(count));
 		}
 	}
 	
