@@ -26,7 +26,7 @@ public class SweepsTopology {
 		}
 		String kafkaTopic = TopicConstants.SWEEPS_KAFKA_TOPIC;
 		String cps_sweeps_kafkaTopic = TopicConstants.RTS_CPS_SWEEPS_KAFKA_TOPIC;
-		String zkroot = "sweeps_zkroot";
+		String zkroot = "sweeps_zkroot_new";
 		String env = System.getProperty(MongoNameConstants.IS_PROD);
 		TopologyBuilder builder = new TopologyBuilder();		
 		

@@ -39,7 +39,7 @@ public class RealTimeScoringTellurideTopology {
 			System.exit(0);
 		}
 		String blackoutKafkaTopic="rts_telluride_batch_blackout";
-		String zkroot_telluride ="tell_zkroot";
+		String zkroot_telluride ="telluride_zkroot";
 		String group_id = "telluride_groupid";
 		String purchase_Topic="rts_cp_purchase_scores";
 		TopologyBuilder topologyBuilder = new TopologyBuilder();
