@@ -174,7 +174,7 @@ public class ModelsDao extends AbstractDao {
 		DBCursor tagVariables = tagVariablesCollection.find();
 		while(tagVariables.hasNext()){
 			DBObject tagVariableObject = tagVariables.next();
-			if(tagVariableObject!=null)
+			if(tagVariableObject!=null && tagVariableObject.get(MongoNameConstants.TAG_VAR_MDTAG)!=null)
 			{
 				tagVariablesMap.put(Integer.valueOf(tagVariableObject.get(MongoNameConstants.TAG_VAR_MODEL).toString()), 
 						tagVariableObject.get(MongoNameConstants.TAG_VAR_MDTAG).toString());
