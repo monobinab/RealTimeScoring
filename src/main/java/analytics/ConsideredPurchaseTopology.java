@@ -98,9 +98,9 @@ public class ConsideredPurchaseTopology {
 				.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
 				.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))),10)
 				.shuffleGrouping("CPParsePersistBolt").shuffleGrouping("tagProcessingBolt")
-				.shuffleGrouping("sweepsTagProcessingBolt")
+				
 				.shuffleGrouping("CPTagCreatorBolt", "blackedout_stream" );
-		
+			//.shuffleGrouping("sweepsTagProcessingBolt")
 		Config conf = TopologyConfig.prepareStormConf("CPS");
 		conf.setMessageTimeoutSecs(86400);	
 		TopologyConfig.submitStorm(conf, topologyBuilder, args[0]);
