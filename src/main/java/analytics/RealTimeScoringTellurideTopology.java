@@ -48,7 +48,7 @@ public class RealTimeScoringTellurideTopology {
 		try {
 			SpoutConfig spoutConfig = null;
 			spoutConfig = new KafkaUtil(env).getSpoutConfig(blackoutKafkaTopic, zkroot_telluride, group_id);
-			topologyBuilder.setSpout("tellurideKafkaSpout", new RTSKafkaSpout(spoutConfig), 1);
+			//topologyBuilder.setSpout("tellurideKafkaSpout", new RTSKafkaSpout(spoutConfig), 1);
 		} catch (ConfigurationException e) {
 			LOGGER.error(e.getClass() + ": " + e.getMessage() +" STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 			System.exit(0);	
@@ -95,7 +95,7 @@ public class RealTimeScoringTellurideTopology {
 		// create definition of main spout for queue 1
 		topologyBuilder.setBolt("parsingBolt", new TellurideParsingBoltPOS(System.getProperty(MongoNameConstants.IS_PROD),AuthPropertiesReader
 				.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST),new Integer (AuthPropertiesReader
-						.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 12).shuffleGrouping("telluride1").shuffleGrouping("telluride2").shuffleGrouping("tellurideKafkaSpout");
+						.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))), 12).shuffleGrouping("telluride1").shuffleGrouping("telluride2");//.shuffleGrouping("tellurideKafkaSpout");
 		
 		//.shuffleGrouping("telluride1").shuffleGrouping("telluride2")
 
