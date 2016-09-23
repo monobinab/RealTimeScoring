@@ -75,9 +75,9 @@ public class ConsideredPurchaseTopology {
 					"BrowseKafkaSpout",
 					new RTSKafkaSpout(new KafkaUtil(env).getSpoutConfig(browseKafkaTopic,zkroot_browse,group_id)), 1);	
 			
-			/*topologyBuilder.setSpout(
+			topologyBuilder.setSpout(
 					"SweepsKafkaSpout",
-					new RTSKafkaSpout(new KafkaUtil(env).getSpoutConfig(sweepsKafkaTopic, zkroot_cps_sweeps, group_id)), 1);	*/
+					new RTSKafkaSpout(new KafkaUtil(env).getSpoutConfig(sweepsKafkaTopic, zkroot_cps_sweeps, group_id)), 1);	
 			
 			LOGGER.info("CPS Topology listening to kafka topics : " + mdTagsKafkaTopic + ", "+ cpsPurchaseScoresTopic);
 			
@@ -92,15 +92,15 @@ public class ConsideredPurchaseTopology {
 		topologyBuilder.setBolt("tagProcessingBolt", new TagProcessingBolt(env),5).localOrShuffleGrouping("BrowseKafkaSpout");
 		
 		//Sweeps Related Changes
-		//topologyBuilder.setBolt("sweepsTagProcessingBolt", new TagProcessingBolt(env),5).localOrShuffleGrouping("SweepsKafkaSpout");
+		topologyBuilder.setBolt("sweepsTagProcessingBolt", new TagProcessingBolt(env),5).localOrShuffleGrouping("SweepsKafkaSpout");
 		
 		topologyBuilder.setBolt("CPProcessingBolt", new CPProcessingBolt(env, AuthPropertiesReader
 				.getProperty(Constants.RESPONSE_REDIS_SERVER_HOST), new Integer (AuthPropertiesReader
 				.getProperty(Constants.RESPONSE_REDIS_SERVER_PORT))),10)
 				.shuffleGrouping("CPParsePersistBolt").shuffleGrouping("tagProcessingBolt")
-				
+				.shuffleGrouping("sweepsTagProcessingBolt")
 				.shuffleGrouping("CPTagCreatorBolt", "blackedout_stream" );
-			//.shuffleGrouping("sweepsTagProcessingBolt")
+
 		Config conf = TopologyConfig.prepareStormConf("CPS");
 		conf.setMessageTimeoutSecs(86400);	
 		TopologyConfig.submitStorm(conf, topologyBuilder, args[0]);
