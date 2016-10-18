@@ -145,6 +145,7 @@ public class MongoNameConstants {
      public static final String EMAIL_OPT_IN = "eml_opt_in";
      public static final String STATE = "st_cd";
      public static final String SEARS_OPT_IN = "srs_opt_in";
+     public static final String SRS_OPT_IN = "srse";
      public static final String KMART_OPT_IN = "kmte";
      public static final String SYW_OPT_IN = "sywe";
      public static final String TEXT_OPT_IN = "mblo";

@@ -1,4 +1,3 @@
-
 package analytics.util;
 
 
@@ -18,7 +17,7 @@ public interface TopicConstants {
 	public static final String RESCORED_MEMBERIDS_KAFKA_TOPIC = "rts_rescored_memberIds";
 	public static final String BROWSE_KAFKA_TOPIC = "rts_browse";
 	public static final String SWEEPS_KAFKA_TOPIC = "rts_sweeps";
-	public static final String RTS_CPS_SWEEPS_KAFKA_TOPIC = "rts_cps_sweeps";
+	public static final String RTS_CPS_SWEEPS_KAFKA_TOPIC = "rts_cps_sweeps_in";
 	//public static final String RESCORED_MEMBERIDS_KAFKA_TOPIC = "test2";
 	public static final String EMAIL_FEEDBACK_RESPONSES_KAFKA_TOPIC = "rts_emailFeedback_responses";
 	
