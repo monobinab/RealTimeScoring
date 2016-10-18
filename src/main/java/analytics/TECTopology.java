@@ -53,7 +53,7 @@ public class TECTopology {
 		Config conf = TopologyConfig.prepareStormConf("TEC");
 		conf.setMessageTimeoutSecs(7200);
 		TopologyConfig.submitStorm(conf, builder, args[0]);
-		
+		conf.setNumWorkers(3);
 		/*Config conf = new Config();
 		conf.put("metrics_topology", "TEC");
 		conf.setMessageTimeoutSecs(7200);	

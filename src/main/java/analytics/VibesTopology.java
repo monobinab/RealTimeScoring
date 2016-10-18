@@ -36,7 +36,7 @@ public class VibesTopology{
 				.shuffleGrouping("vibesSpout");
 
 		Config conf = TopologyConfig.prepareStormConf("VibesMetrics");
-		
+		conf.setNumWorkers(2);
 		TopologyConfig.submitStorm(conf, builder, args[0]);
 		
 		/*Config conf = new Config();

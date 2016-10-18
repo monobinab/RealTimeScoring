@@ -40,6 +40,7 @@ public class SweepsTopology {
 		builder.setBolt("sweepTagCreatorBolt", new SweepsTagCreatorBolt(env), 3).shuffleGrouping("RTSKafkaSpout");
 		builder.setBolt("RTSKafkaBolt", new RTSKafkaBolt(System.getProperty(MongoNameConstants.IS_PROD), cps_sweeps_kafkaTopic), 1).shuffleGrouping("sweepTagCreatorBolt","kafka_stream");	
 		Config conf = TopologyConfig.prepareStormConf("SWEEPS");
+		conf.setNumWorkers(2);
 		conf.setMessageTimeoutSecs(7200);
 		TopologyConfig.submitStorm(conf, builder, args[0]);
 	}

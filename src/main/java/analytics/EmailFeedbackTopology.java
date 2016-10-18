@@ -66,6 +66,7 @@ public class EmailFeedbackTopology {
 		
 		
 		Config conf = TopologyConfig.prepareStormConf("EF");
+		conf.setNumWorkers(2);
 		conf.setMessageTimeoutSecs(7200);
 		TopologyConfig.submitStorm(conf, builder, args[0]);
 		

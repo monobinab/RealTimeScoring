@@ -35,7 +35,7 @@ public class POSPurchaseTopology {
 		Config conf = TopologyConfig.prepareStormConf("posPurchase");
 		
 		TopologyConfig.submitStorm(conf, topologyBuilder, args[0]);
-		
+		conf.setNumWorkers(3);
 		/*Config conf = new Config();
 			conf.put("metrics_topology", "posPurchase");
 			conf.registerMetricsConsumer(MetricsListener.class, System.getProperty(MongoNameConstants.IS_PROD), 3);
