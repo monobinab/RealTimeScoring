@@ -30,6 +30,10 @@
  <cache name="BOOSTSCACHE" maxElementsInMemory="50" eternal="false"
  	overflowToDisk="false" timeToLiveSeconds="0" memoryStoreEvictionPolicy="LFU">
  </cache>
+ 
+ <cache name="PURCHASECACHE" maxElementsInMemory="50" eternal="false"
+ 	overflowToDisk="false" timeToLiveSeconds="0" memoryStoreEvictionPolicy="LFU">
+ </cache>
  <!-- Daily Refresh Sub-Caches -Start -->
  <cache name="ALLMODELVARIABLECACHE" maxElementsInMemory="50" eternal="false"
  	overflowToDisk="false" timeToLiveSeconds="0" memoryStoreEvictionPolicy="LFU">

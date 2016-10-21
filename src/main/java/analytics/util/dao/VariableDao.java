@@ -25,10 +25,11 @@ public class VariableDao extends AbstractDao{
     private Cache cache = null;
     private Cache allVariableCache = null;
     private BoostsDao boostsDao;
-    
+    private PurchaseDao purchaseDao;
     public VariableDao(){
     	super();
     	boostsDao = new BoostsDao();
+    	purchaseDao =  new PurchaseDao();
 		variablesCollection = db.getCollection("Variables");
 		cache = CacheManager.getInstance().getCache(CacheConstant.RTS_CACHE_VARIABLESCACHE);
     	if(null == cache){
@@ -87,8 +88,11 @@ public class VariableDao extends AbstractDao{
 		}else{
 			List<Variable> variablesList = this.getVariables();
 			List<Variable> boostsList = boostsDao.getBoosts();
+			List<Variable> purhcaseListList = purchaseDao.getPurchaseVariables();
 			//Combining boosts with variables
 			variablesList.addAll(boostsList);
+			//Combining purchases with Variables
+			variablesList.addAll(purhcaseListList);
 			if(variablesList.size() != 0){
 				allVariableCache.put(new Element(cacheKey, variablesList));
 			}

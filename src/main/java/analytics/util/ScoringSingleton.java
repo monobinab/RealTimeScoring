@@ -393,7 +393,7 @@ public class ScoringSingleton {
 			allChanges.putAll(changedMemberVariables);
 			for (String variableName : newChangesVarValueMap.keySet()) {
 				variableName = variableName.toUpperCase();
-				if (variableModelsMap.containsKey(variableName)) {
+				//if (variableModelsMap.containsKey(variableName) || variableName.equalsIgnoreCase("PURCHASE")) {
 					if (variableNameToStrategyMap.get(variableName) == null) {
 						LOGGER.info(" ~~~ DID NOT FIND VARIABLE IN VARIABLES COLLECTION: " + variableName);
 						continue;
@@ -432,7 +432,7 @@ public class ScoringSingleton {
 					LOGGER.debug(" ~~~ STRATEGY BOLT CHANGES - context: " + context);
 					Change executedValue = strategy.execute(context);
 					allChanges.put(variableName, executedValue);
-				}
+				//}
 			}
 					return allChanges;
 	}
@@ -790,6 +790,9 @@ public class ScoringSingleton {
 		List<Variable> variablesList = variableDao.getVariables();
 		for (Variable variable : variablesList) {
 			if (variable.getName() != null && variable.getVid() != null) {
+				if(variable.getName().contains("PURCHASE")){
+					LOGGER.info("PERSIST: " + variable.getName() + " gets updated for " + lId + "on " + new Date());
+				}
 				variableNameToVidMap.put(variable.getName(), variable.getVid());
 			}
 		}

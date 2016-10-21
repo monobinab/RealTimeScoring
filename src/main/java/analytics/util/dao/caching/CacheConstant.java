@@ -28,6 +28,7 @@ public class CacheConstant {
 	public static final String RTS_CACHE_MODEL_SEASONAL_CONSTANT_CACHE = "MODELSEASONALCONSTANTCACHE";
 	public static final String RTS_CACHE_MODEL_SEASONAL_ZIP_FACTOR_CACHE = "MODELSEASONALZIPFACTORCACHE";
 	public static final String RTS_CACHE_MODEL_NATIONAL_FACTOR_CACHE = "MODELNATIONALFACTORCACHE";
+	public static final String RTS_CACHE_PURCHASE_CACHE = "PURCHASECACHE";
 	
 	//Second Level Cache
 	public static final String RTS_CACHE_ALL_MODEL_VARIABLES_CACHE = "ALLMODELVARIABLECACHE";
@@ -121,5 +122,8 @@ public class CacheConstant {
 	 
 	//All Variable Cache Key
 	 public static final String RTS_ALL_VARIABLE_CACHE_KEY = "444e5984-4811-49c1-a236-c655dc082277";
+	 
+	 //Purchase Cache Key
+	 public static final String RTS_PURCHASE_CACHE_KEY = "4d4fc865-aeb5-4c5b-98d7-f0687e8f4d28"; 
 
 }
