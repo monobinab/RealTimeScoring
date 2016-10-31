@@ -61,7 +61,7 @@ public class CPProcessingBolt extends EnvironmentBolt  {
 			rtsApiCaller = RTSAPICaller.getInstance();			
 			cpsFiler = new CPSFiler();
 			cpsFiler.initDAO();	
-			cps_api_key = new ClientApiKeysDAO().findkey(cps_api_key_param);
+			cps_api_key = new ClientApiKeysDAO().getClientKey(cps_api_key_param);
 			
 			vibesUtil = VibesUtil.getInstance();
 		} catch (Exception e) {

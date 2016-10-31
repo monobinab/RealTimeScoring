@@ -47,7 +47,7 @@ public class TECProcessingBolt extends EnvironmentBolt {
 			LOGGER.error(e.getClass() + ": " + e.getMessage() +" STACKTRACE : "+ ExceptionUtils.getFullStackTrace(e));
 		}
 		//tecPostClient = TECPostClient.getInstance();
-		api_key=new ClientApiKeysDAO().findkey(api_Key_Param);
+		api_key=new ClientApiKeysDAO().getClientKey(api_Key_Param);
 		
 	}
 

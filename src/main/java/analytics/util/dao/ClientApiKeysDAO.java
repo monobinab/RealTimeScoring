@@ -4,8 +4,17 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 
+import analytics.util.objects.ClientAPIKey;
+
 public class ClientApiKeysDAO extends AbstractDao {
 	
+	  DBCollection clientApiKeysCollection;
+	    public ClientApiKeysDAO(){
+	    	super();
+	    	if(db != null){
+	    		clientApiKeysCollection = db.getCollection("clientApiKeys");
+	    	}
+	    }
 	
 	public String findkey(String param)
 	{
@@ -20,6 +29,12 @@ public class ClientApiKeysDAO extends AbstractDao {
 		LOGGER.info("Getting the client key as "+ key +" in ClientApiKeysDAO");
 		return key;
 		
+	}
+	
+	public String getClientKey(String param){
+		DBObject query = new BasicDBObject("clientName", param);
+		DBObject doc=clientApiKeysCollection.findOne(query);
+		return (String) doc.get("clientKey");
 	}
 	
 }
